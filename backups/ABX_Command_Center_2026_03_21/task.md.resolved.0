@@ -1,0 +1,10 @@
+# Task: Redesign Contacts and Departments Analysis Section
+
+- [x] Restore development server.
+- [/] Analyze `/tmp/canopi_excel/output.json` to map real metrics to the heatmaps.
+- [ ] Create [implementation_plan.md](file:///Users/user/.gemini/antigravity/brain/a9f481c0-d299-4327-9928-6b0ed404df3e/implementation_plan.md) for the redesign.
+- [ ] Implement the 5th missing heatmap: "Potencial Geral de Contato" (or verify if `pot` covers it).
+- [ ] Refine the 4 existing matrix heatmaps (Receptividade, Acessibilidade, Posicionamento, Oportunidade/Budget).
+- [ ] Create unique, data-rich `actionCards` for each of the 5 heatmaps in the Contacts section.
+- [ ] Remove legacy "Fit Firmográfico" and "Fit Tecnográfico" sections.
+- [ ] Verify layout and interactions in the browser.

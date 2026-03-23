@@ -1,0 +1,1126 @@
+"use client";
+
+import React, { useState, useMemo } from 'react';
+import { 
+  Target, 
+  Filter, 
+  Plus, 
+  ChevronRight, 
+  BarChart3, 
+  Database, 
+  Cpu, 
+  Search, 
+  CheckCircle2, 
+  Loader2, 
+  Sparkles,
+  Zap,
+  Layout,
+  Layers,
+  Activity,
+  Map,
+  ShieldCheck,
+  Globe,
+  PieChart,
+  ArrowRight,
+  TrendingUp,
+  Clock,
+  ExternalLink,
+  Bot,
+  BadgeCheck,
+  Users,
+  Box,
+  MessageSquare,
+  FileText,
+  Mail,
+  Calendar,
+  Eye,
+  ArrowUpRight,
+  MoreVertical,
+  Flag,
+  Maximize2,
+  TrendingDown,
+  BarChart,
+  Building2,
+  Cloud,
+  BrainCircuit,
+  Settings2,
+  History,
+  MousePointer2,
+  Smartphone,
+  Share2,
+  Bell,
+  CheckCircle,
+  AlertCircle,
+  FileSearch,
+  ZapOff,
+  Crosshair,
+  Send,
+  Mic,
+  Phone,
+  CheckSquare,
+  Coffee
+} from 'lucide-react';
+import { Card, Badge, Button, Modal } from '../components/ui';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// --- MOCK DATA ---
+
+const benchmarks = [
+  { id: 'reach', label: 'Target Account Reach', val: '72%', trend: '+15%', elite: 'Elite: 70%+', desc: 'Alcance total do comitê de compra' },
+  { id: 'winrate', label: 'ABM Win Rate', val: '48%', trend: '+12%', elite: 'Elite: 45%+', desc: 'Taxa de fechamento vs marketing trad.' },
+  { id: 'roi', label: 'Account-Based ROI', val: '432%', trend: '+5%', elite: 'Elite: 400%+', desc: 'Retorno financeiro por real investido' },
+  { id: 'prog', label: 'Progression Rate', val: '42%', trend: '+8%', elite: 'Elite: 40%+', desc: 'Contas que avançaram no funil' },
+];
+
+const abmAccounts = [
+  { id: '1',  initials: 'GB', name: 'Global Bank S.A.',   vertical: 'Financeiro',  fitScore: 9.8, status: 'HOT',       engagement: 92, mqa: true  },
+  { id: '2',  initials: 'MN', name: 'Manufatura Norte',   vertical: 'Manufactura', fitScore: 7.5, status: 'PLAYBOOK',  engagement: 45, mqa: false },
+  { id: '3',  initials: 'SB', name: 'ScalePay Brasil',    vertical: 'Financeiro',  fitScore: 9.2, status: 'MAPEANDO',  engagement: 88, mqa: true  },
+  { id: '4',  initials: 'IH', name: 'Innova Health',      vertical: 'Saúde',       fitScore: 8.9, status: 'HOT',       engagement: 74, mqa: true  },
+  { id: '5',  initials: 'AB', name: 'AlphaBank S.A.',     vertical: 'Financeiro',  fitScore: 9.0, status: 'HOT',       engagement: 85, mqa: true  },
+  { id: '6',  initials: 'FP', name: 'FinPay Brasil',      vertical: 'Fintech',     fitScore: 8.7, status: 'HOT',       engagement: 80, mqa: true  },
+  { id: '7',  initials: 'TM', name: 'TelecomMax',         vertical: 'Telecom',     fitScore: 8.4, status: 'MAPEANDO',  engagement: 72, mqa: true  },
+  { id: '8',  initials: 'AG', name: 'AgroCloud',          vertical: 'Agronegócio', fitScore: 7.8, status: 'PLAYBOOK',  engagement: 68, mqa: false },
+  { id: '9',  initials: 'IB', name: 'InfraBuild',         vertical: 'Construção',  fitScore: 7.2, status: 'MAPEANDO',  engagement: 60, mqa: false },
+  { id: '10', initials: 'EC', name: 'EnergyCore',         vertical: 'Energia',     fitScore: 6.8, status: 'WATCH',     engagement: 42, mqa: false },
+  { id: '11', initials: 'NS', name: 'NovaSaude',          vertical: 'Saúde',       fitScore: 7.0, status: 'MAPEANDO',  engagement: 55, mqa: false },
+  { id: '12', initials: 'PT', name: 'PaperTech Ind.',     vertical: 'Indústria',   fitScore: 6.5, status: 'WATCH',     engagement: 38, mqa: false },
+];
+
+// ABM Priority accounts - scatter data: x=Impacto, y=Probabilidade (% de 0-100)
+const scatterAccounts = [
+  { id: 1,  x: 78, y: 82, label: '10', account: 'Global Bank S.A.',   vertical: 'Financeiro',  tier: 'TIER 1', arr: 'R$ 450k', action: 'Ação 1', risk: 'critical',  actionDesc: 'Reunião executiva + Proposta personalizada Finanças 4.0' },
+  { id: 2,  x: 85, y: 88, label: '8',  account: 'ScalePay Brasil',    vertical: 'Financeiro',  tier: 'TIER 1', arr: 'R$ 280k', action: 'Ação 1', risk: 'critical',  actionDesc: 'Sequência de nurturing via LinkedIn + Social Ads 1:1' },
+  { id: 3,  x: 62, y: 75, label: '9',  account: 'Innova Health',      vertical: 'Saúde',       tier: 'TIER 1', arr: 'R$ 620k', action: 'Ação 3', risk: 'high',      actionDesc: 'Webinar exclusivo Compliance HealthTech + Follow-up SDR' },
+  { id: 4,  x: 90, y: 60, label: '12', account: 'TechInsure Co.',     vertical: 'Seguros',     tier: 'TIER 1', arr: 'R$ 390k', action: 'Ação 1', risk: 'high',      actionDesc: 'Conteúdo de prova social + Relatório ROI personalizado' },
+  { id: 5,  x: 50, y: 68, label: '9',  account: 'AgroCloud Latam',    vertical: 'Agronegócio', tier: 'MID',    arr: 'R$ 170k', action: 'Ação 3', risk: 'high',      actionDesc: 'Demo guiada do produto + Parceria de canal' },
+  { id: 6,  x: 38, y: 55, label: '10', account: 'Manufatura Norte',   vertical: 'Manufatura',  tier: 'MID',    arr: 'R$ 120k', action: 'Ação 4', risk: 'moderate', actionDesc: 'Relatório de eficiência operacional + Indicação interna' },
+  { id: 7,  x: 25, y: 78, label: '10', account: 'EduTech S.A.',       vertical: 'Educação',    tier: 'MID',    arr: 'R$ 95k',  action: 'Ação 4', risk: 'moderate', actionDesc: 'Programa de trial + Parceria acadêmica' },
+  { id: 8,  x: 70, y: 42, label: '4',  account: 'RetailMax Brasil',   vertical: 'Varejo',      tier: 'SMB',    arr: 'R$ 55k',  action: 'Ação 2', risk: 'moderate', actionDesc: 'Campanha de reengajamento por e-mail + Ads Remarketing' },
+  { id: 9,  x: 55, y: 38, label: '9',  account: 'LogParcel Group',    vertical: 'Logística',   tier: 'SMB',    arr: 'R$ 72k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Sequência de outbound fria com personalização por vertical' },
+  { id: 10, x: 18, y: 32, label: '10', account: 'StartupX',           vertical: 'SaaS',        tier: 'SMB',    arr: 'R$ 30k',  action: 'Ação 4', risk: 'low',      actionDesc: 'Inclusão em newsletter + Trial gratuito' },
+  { id: 11, x: 42, y: 22, label: '7',  account: 'GovTech MG',        vertical: 'Governo',     tier: 'SMB',    arr: 'R$ 48k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Webinar público + Levantamento de necessidades via BDR' },
+  { id: 12, x: 82, y: 28, label: '5',  account: 'MediaGroup Brasil', vertical: 'Mídia',       tier: 'SMB',    arr: 'R$ 42k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Estratégia de conteúdo co-criado + Campanha de influência' },
+];
+
+// Hexbin: organic multi-hotspot distribution
+const personas = ['CEO / Presidente', 'CFO / Dir. Finanças', 'CTO / Dir. TI', 'CMO / Dir. Mkt', 'COO / Dir. Ops', 'CISO / Seg. Info', 'VP Comercial', 'Head de Produto', 'Gerente de TI', 'Analista Sênior'];
+const hexVerticals = ['Financeiro', 'Saúde', 'Manufatura', 'SaaS', 'Logística', 'Varejo', 'Seguros', 'Educação', 'Energia', 'Agroneg.'];
+
+// Organic distribution: manually set hotspot intensities per (row=persona, col=vertical)
+// Values 0..1 → color scale
+const hexIntensityMap: Record<string, number> = {
+  '0,0':0.95, '0,1':0.45, '0,2':0.35, '0,3':0.60, '0,4':0.30, '0,5':0.25, '0,6':0.70, '0,7':0.20, '0,8':0.40, '0,9':0.50,
+  '1,0':0.85, '1,1':0.50, '1,2':0.30, '1,3':0.45, '1,4':0.20, '1,5':0.15, '1,6':0.65, '1,7':0.15, '1,8':0.35, '1,9':0.40,
+  '2,0':0.55, '2,1':0.75, '2,2':0.60, '2,3':0.90, '2,4':0.55, '2,5':0.80, '2,6':0.40, '2,7':0.50, '2,8':0.30, '2,9':0.35,
+  '3,0':0.40, '3,1':0.45, '3,2':0.35, '3,3':0.70, '3,4':0.30, '3,5':0.25, '3,6':0.35, '3,7':0.60, '3,8':0.25, '3,9':0.30,
+  '4,0':0.50, '4,1':0.40, '4,2':0.85, '4,3':0.50, '4,4':0.75, '4,5':0.30, '4,6':0.45, '4,7':0.35, '4,8':0.60, '4,9':0.70,
+  '5,0':0.60, '5,1':0.80, '5,2':0.45, '5,3':0.55, '5,4':0.35, '5,5':0.90, '5,6':0.55, '5,7':0.30, '5,8':0.25, '5,9':0.20,
+  '6,0':0.70, '6,1':0.50, '6,2':0.40, '6,3':0.55, '6,4':0.45, '6,5':0.35, '6,6':0.80, '6,7':0.40, '6,8':0.50, '6,9':0.60,
+  '7,0':0.45, '7,1':0.60, '7,2':0.70, '7,3':0.80, '7,4':0.50, '7,5':0.40, '7,6':0.35, '7,7':0.75, '7,8':0.30, '7,9':0.45,
+  '8,0':0.30, '8,1':0.35, '8,2':0.55, '8,3':0.45, '8,4':0.65, '8,5':0.30, '8,6':0.40, '8,7':0.50, '8,8':0.85, '8,9':0.55,
+  '9,0':0.20, '9,1':0.25, '9,2':0.40, '9,3':0.35, '9,4':0.50, '9,5':0.20, '9,6':0.30, '9,7':0.40, '9,8':0.60, '9,9':0.75,
+};
+const getHexCellColor = (intensity: number): string => {
+  if (intensity >= 0.90) return '#c0392b';
+  if (intensity >= 0.80) return '#e74c3c';
+  if (intensity >= 0.70) return '#e67e22';
+  if (intensity >= 0.60) return '#f39c12';
+  if (intensity >= 0.50) return '#f9ca24';
+  if (intensity >= 0.40) return '#a8e6cf';
+  if (intensity >= 0.30) return '#27ae60';
+  if (intensity >= 0.20) return '#2ecc71';
+  return '#1abc9c';
+};
+const channelByIntensity = (v: number) => {
+  if (v >= 0.80) return 'LinkedIn Ads 1:1 + Outreach Executive';
+  if (v >= 0.60) return 'Email Marketing + Webinar Exclusivo';
+  if (v >= 0.40) return 'Social Ads + Conteúdo Educacional';
+  return 'Newsletter + Trial Gratuito';
+};
+
+const entryPlays = [
+  { id: 'p1', title: 'Relatório Setorial Customizado', desc: 'Envio de PDF personalizado com comparativo de eficácia para C-Levels do setor Industrial.', efficacy: 88, icon: <FileText className="w-5 h-5" /> },
+  { id: 'p2', title: 'Webinar de Mesa Redonda', desc: 'Convite exclusivo para diretores financeiros de Fintechs Mid-market discutirem Open Banking.', efficacy: 72, icon: <Users className="w-5 h-5" /> },
+  { id: 'p3', title: 'Campanha Social Ads 1:1', desc: 'Ads altamente focados em dor específica de segurança de dados para o Tier 1 de HealthTech.', efficacy: 94, icon: <Layout className="w-5 h-5" /> },
+];
+
+const verticalClusters = [
+  { id: 'v1', name: 'Manufatura Enterprise', count: 32, playbook: 'Eficiência Operacional 4.0', val: 85, health: 'Estável' },
+  { id: 'v2', name: 'Fintech Mid-market', count: 48, playbook: 'Scaling High Velocity', val: 72, health: 'Em Queda' },
+  { id: 'v3', name: 'HealthTech Tier 1', count: 15, playbook: 'Compliance & Privacy First', val: 94, health: 'Crítico' },
+  { id: 'v4', name: 'AgroTech Expansion', count: 21, playbook: 'Penetração em Mercados de Alto Potencial', val: 67, health: 'Estável' },
+];
+
+const journeyTimeline = [
+  { stage: 'Awareness', count: 142, status: 'complete', color: 'bg-blue-400' },
+  { stage: 'Engagement', count: 85, status: 'active', color: 'bg-indigo-500' },
+  { stage: 'MQA', count: 24, status: 'pending', color: 'bg-emerald-500' },
+  { stage: 'Opportunity', count: 12, status: 'pending', color: 'bg-amber-500' },
+  { stage: 'Win', count: 5, status: 'pending', color: 'bg-emerald-600' },
+];
+
+
+
+// ---- 6 ABM HEATMAPS DATA ----
+
+const abmContacts = [
+  { id: 'c1', account: 'SMC Automação', name: 'Mauricio D. Alcantara', role: 'Head Supply Chain', dept: 'Supply Chain', level: 'Estratégico', pos: 'Decisor', email: 'malcantara@smcbr.com.br', rapport: 5, access: 1, potential: 0.64 },
+  { id: 'c2', account: 'Aramis', name: 'Maycol Brandão', role: 'Gerente TI', dept: 'TI', level: 'Alto Executivo', pos: 'Influenciador', email: 'maycol@aramis.com.br', rapport: 5, access: 1, potential: 0.44 },
+  { id: 'c3', account: 'Aramis', name: 'Marcos Borges', role: 'Especialista', dept: 'TI', level: 'Estratégico', pos: 'Influenciador', email: 'mborges@aramis.com.br', rapport: 5, access: 3, potential: 0.52 },
+  { id: 'c4', account: 'FinPay Brasil', name: 'Roberto S.', role: 'CFO', dept: 'Financeiro', level: 'Alto Executivo', pos: 'Decisor', email: 'rs@finpay.com.br', rapport: 3, access: 4, potential: 0.85 },
+  { id: 'c5', account: 'HealthTech 1', name: 'Carla Dias', role: 'CTO', dept: 'Tecnologia', level: 'Alto Executivo', pos: 'Bloqueador', email: 'cdias@health.com.br', rapport: 2, access: 5, potential: 0.30 },
+  { id: 'c6', account: 'TelecomMax', name: 'Ana Souza', role: 'Dir. Comercial', dept: 'Vendas', level: 'Estratégico', pos: 'Champion', email: 'ana@telecommax.com', rapport: 4, access: 2, potential: 0.78 },
+];
+
+const abmHeatmapAccounts = [
+  { id: 1,  name: 'FinPay Brasil',      vertical: 'Fintech',     imp: 88, icp: 85, crm: 80, vp: 78, ct: 60, ft: 88, budget: 380 },
+  { id: 2,  name: 'AlphaBank S.A.',    vertical: 'Financeiro',  imp: 82, icp: 87, crm: 75, vp: 82, ct: 78, ft: 84, budget: 420 },
+  { id: 3,  name: 'TelecomMax',        vertical: 'Telecom',     imp: 78, icp: 82, crm: 74, vp: 55, ct: 65, ft: 77, budget: 310 },
+  { id: 4,  name: 'NovaSaude',         vertical: 'Saúde',       imp: 74, icp: 72, crm: 69, vp: 68, ct: 55, ft: 70, budget: 185 },
+  { id: 5,  name: 'PaperTech Ind.',    vertical: 'Indústria',   imp: 68, icp: 58, crm: 68, vp: 75, ct: 90, ft: 55, budget: 90  },
+  { id: 6,  name: 'MobilityPro',       vertical: 'Mobilidade',  imp: 50, icp: 45, crm: 35, vp: 60, ct: 40, ft: 48, budget: 60  },
+  { id: 7,  name: 'AgroCloud',         vertical: 'Agronegócio', imp: 65, icp: 78, crm: 70, vp: 85, ct: 30, ft: 60, budget: 210 },
+  { id: 8,  name: 'SeguraVida',        vertical: 'Seguros',     imp: 55, icp: 55, crm: 48, vp: 52, ct: 72, ft: 50, budget: 130 },
+  { id: 9,  name: 'RetailTech',        vertical: 'Varejo',      imp: 42, icp: 38, crm: 55, vp: 40, ct: 35, ft: 38, budget: 45  },
+  { id: 10, name: 'EduVision',         vertical: 'Educação',    imp: 35, icp: 30, crm: 28, vp: 45, ct: 20, ft: 32, budget: 30  },
+];
+const abmHeatmapCriteria = [
+  {
+    id: 'avg',
+    title: 'Média Geral',
+    subtitle: 'Score consolidado dos 5 critérios — ranking ABM',
+    xLabel: 'SCORE CONSOLIDADO',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Score composto = média de ICP, Engajamento CRM, Potencial da Vertical, Contatos Mapeados e Fit Canopi. Contas acima de 72% são classificadas como TOP TIER e recebem SDR + AE dedicados.',
+    desc: (a: typeof abmHeatmapAccounts[0]) => {
+      const avg = Math.round((a.icp + a.crm + a.vp + a.ct + a.ft) / 5);
+      return `Média ${avg}% — ${avg >= 72 ? 'TOP TIER: Alocar SDR + AE dedicados. Iniciar play imediatamente.' : avg >= 55 ? 'MID TIER: Incluir em sequência nurturing avançada.' : 'LOW TIER: Manter em watch list e reavaliar em 90 dias.'}`;
+    },
+    scoreKey: 'avg' as const,
+  },
+  {
+    id: 'icp',
+    title: 'ICP Score',
+    subtitle: 'Aderência ao Perfil Ideal de Cliente',
+    xLabel: 'SCORE ICP',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Eixo X = aderência ao perfil ideal de cliente. Eixo Y = importância estratégica da conta. Contas no quadrante superior direito são prioridade máxima de abordagem.',
+    desc: (a: typeof abmHeatmapAccounts[0]) =>
+      `ICP ${a.icp}% — ${a.icp >= 75 ? 'Alta aderência ao perfil ideal. Prioridade máxima de abordagem.' : a.icp >= 50 ? 'Aderência moderada. Qualificar antes de avançar.' : 'Fora do perfil. Manter em nurturing passivo.'}`,
+    scoreKey: 'icp' as const,
+  },
+  {
+    id: 'ct',
+    title: 'Contatos Mapeados',
+    subtitle: 'Profundidade e qualidade dos relacionamentos na conta',
+    xLabel: 'COBERTURA DE CONTATOS',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Eixo X = cobertura do DMU (Decision Making Unit) — percentual de stakeholders mapeados na conta. Priorize contas estratégicas com baixa cobertura: maior gap, maior oportunidade de expansão.',
+    desc: (a: typeof abmHeatmapAccounts[0]) =>
+      `Contatos ${a.ct}% — ${a.ct >= 75 ? 'DMU bem mapeado. Champion e Decisor identificados.' : a.ct >= 45 ? 'Contatos parciais. Expandir rede via LinkedIn Sales Nav.' : 'Poucos contatos. Estratégia de entrada via eventos ou parceiros.'}`,
+    scoreKey: 'ct' as const,
+  },
+  {
+    id: 'ft',
+    title: 'Fit com a Canopi',
+    subtitle: 'Alinhamento tecnológico, cultural e de timing',
+    xLabel: 'FIT CANOPI',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Eixo X = alinhamento da conta com o stack tecnológico, maturidade analítica e timing comercial da Canopi. Contas com fit alto e importância alta são candidatas a fast-track no pipeline.',
+    desc: (a: typeof abmHeatmapAccounts[0]) =>
+      `Fit ${a.ft}% — ${a.ft >= 75 ? 'Fit excelente. Stack tecnológica e maturidade analítica alinhadas.' : a.ft >= 50 ? 'Fit parcial. Identificar gaps e propor roadmap gradual.' : 'Fit baixo. Considerar parceiros integradores antes de avançar.'}`,
+    scoreKey: 'ft' as const,
+  },
+  {
+    id: 'crm',
+    title: 'Engajamento no CRM',
+    subtitle: 'Histórico de interações e atividade registrada',
+    xLabel: 'NÍVEL DE ENGAJAMENTO',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Eixo X = volume de interações registradas no CRM (calls, e-mails, demos). Eixo Y = relevância da conta. Contas acima de 70% de engajamento devem ser ativadas via SDR imediatamente.',
+    desc: (a: typeof abmHeatmapAccounts[0]) =>
+      `Engajamento ${a.crm}% — ${a.crm >= 70 ? 'Conta ativa com múltiplas interações. Acionar SDR imediatamente.' : a.crm >= 45 ? 'Engajamento médio. Intensificar conteúdo 1:1.' : 'Conta fria. Iniciar reativação com campanha de reconhecimento.'}`,
+    scoreKey: 'crm' as const,
+  },
+  {
+    id: 'vp',
+    title: 'Potencial da Vertical',
+    subtitle: 'Mercado endereçável e sinergia com nosso portfólio',
+    xLabel: 'POTENCIAL DE MERCADO',
+    yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
+    note: 'Cada bolha representa uma vertical de mercado. Eixo X = potencial de expansão e TAM da vertical. Eixo Y = peso estratégico. Verticais no quadrante quente indicam onde concentrar budget de marketing.',
+    desc: (a: typeof abmHeatmapAccounts[0]) =>
+      `Vertical ${a.vp}% — ${a.vp >= 75 ? 'Vertical de alta tração. Há benchmarks e cases aplicáveis.' : a.vp >= 50 ? 'Potencial moderado. Desenvolver case específico.' : 'Vertical emergente. Avaliar ROI antes de investir.'}`,
+    scoreKey: 'vp' as const,
+  },
+];
+// Helper to get score for 'avg'
+const getHmScore = (acc: typeof abmHeatmapAccounts[0], key: string): number => {
+  if (key === 'avg') return Math.round((acc.icp + acc.crm + acc.vp + acc.ct + acc.ft) / 5);
+  return acc[key as keyof typeof acc] as number;
+};
+
+
+// --- HITMAPS (TREEMAPS) DATA & COMPONENTS ---
+import { 
+  Treemap, 
+  ResponsiveContainer, 
+  Tooltip, 
+  ScatterChart, 
+  Scatter, 
+  XAxis, 
+  YAxis, 
+  ZAxis, 
+  Cell, 
+  LabelList 
+} from 'recharts';
+
+// --- TREEMAP HELPERS (RESTAURADOS) ---
+const getTreemapColor = (val: number, reverse: boolean) => {
+  const normalized = reverse ? 6 - val : val;
+  if (normalized === 1) return '#10b981';
+  if (normalized === 2) return '#34d399';
+  if (normalized === 3) return '#fbbf24';
+  if (normalized === 4) return '#f97316';
+  return '#ef4444';
+};
+
+const CustomTreemapContent: React.FC<any> = (props) => {
+  const { x, y, width, height, name, depth, val, isReverse } = props;
+  if (depth === 1) {
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill="white" stroke="#e2e8f0" strokeWidth={2} />
+        {width > 60 && height > 20 && (
+          <text x={x + 10} y={y + 20} fill="#1e293b" fontSize={12} fontWeight="900" className="uppercase tracking-tighter" style={{ pointerEvents: 'none' }}>
+            {name}
+          </text>
+        )}
+      </g>
+    );
+  }
+  if (depth === 2) {
+    const color = getTreemapColor(val || 3, isReverse);
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill={color} stroke="#ffffff" strokeWidth={0.5} style={{ cursor: 'pointer' }} />
+        {width > 40 && height > 30 && (
+          <text x={x + 5} y={y + 15} fill="#ffffff" fontSize={10} fontWeight="800" style={{ pointerEvents: 'none' }}>{name}</text>
+        )}
+      </g>
+    );
+  }
+  return null;
+};
+
+const TreemapTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-slate-900 border border-slate-700 p-4 rounded-2xl shadow-2xl z-50">
+        <p className="text-white font-black text-xs uppercase mb-1 tracking-wider">{data.name}</p>
+        <p className="text-slate-400 text-[10px] font-bold">Vol: {data.size} | Score: {data.val}/5</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+
+const hitmapAcessibilidade = [
+  { 
+    name: 'Financeiro', 
+    children: [
+      { name: 'C-Level', size: 120, val: 5 }, 
+      { name: 'VP / Diretor', size: 200, val: 4 }, 
+      { name: 'Gerente', size: 300, val: 2 }, 
+      { name: 'Especialista', size: 400, val: 1 },
+      { name: 'Analista Sr', size: 150, val: 1 },
+      { name: 'Coordenador', size: 110, val: 2 }
+    ] 
+  },
+  { 
+    name: 'Tecnologia', 
+    children: [
+      { name: 'C-Level', size: 80, val: 4 }, 
+      { name: 'VP / Diretor', size: 150, val: 3 }, 
+      { name: 'Gerente', size: 250, val: 2 },
+      { name: 'Arquiteto', size: 120, val: 2 },
+      { name: 'Lead Dev', size: 180, val: 1 }
+    ] 
+  },
+  { 
+    name: 'Varejo', 
+    children: [
+      { name: 'C-Level', size: 100, val: 5 }, 
+      { name: 'Gerente Ops', size: 200, val: 3 }, 
+      { name: 'Analista', size: 500, val: 1 },
+      { name: 'Comprador', size: 220, val: 3 }
+    ] 
+  },
+  { 
+    name: 'Saúde', 
+    children: [
+      { name: 'C-Level', size: 50, val: 5 }, 
+      { name: 'Diretor Med.', size: 120, val: 4 }, 
+      { name: 'Gerente Adm.', size: 180, val: 4 },
+      { name: 'Compliance', size: 90, val: 4 }
+    ] 
+  }
+];
+
+const hitmapPosicionamento = [
+  { 
+    name: 'TI', 
+    children: [
+      { name: 'Decisor', size: 80, val: 5 }, 
+      { name: 'Influenciador', size: 300, val: 2 }, 
+      { name: 'Avaliador', size: 400, val: 3 }, 
+      { name: 'Bloqueador', size: 150, val: 5 }
+    ] 
+  },
+  { 
+    name: 'Supply Chain', 
+    children: [
+      { name: 'Decisor', size: 40, val: 4 }, 
+      { name: 'Influenciador', size: 200, val: 2 },
+      { name: 'Ambassador', size: 100, val: 1 }
+    ] 
+  },
+  { 
+    name: 'Vendas', 
+    children: [
+      { name: 'VP Sales', size: 120, val: 2 }, 
+      { name: 'Influenciador', size: 250, val: 1 }, 
+      { name: 'Champion', size: 60, val: 1 },
+      { name: 'Sales Ops', size: 180, val: 2 }
+    ] 
+  }
+];
+
+const hitmapSucesso = [
+  { 
+    name: 'SMC Automação', 
+    children: [
+      { name: 'Mauricio (Head)', size: 100, val: 1 }, 
+      { name: 'Adriano (Coord)', size: 80, val: 2 },
+      { name: 'Lucas (Espec)', size: 60, val: 1 }
+    ] 
+  },
+  { 
+    name: 'Aramis', 
+    children: [
+      { name: 'Maycol (Gerente)', size: 150, val: 2 }, 
+      { name: 'Marcos (Espec)', size: 90, val: 3 },
+      { name: 'Juliana (COO)', size: 110, val: 4 }
+    ] 
+  },
+  { 
+    name: 'FinPay Brasil', 
+    children: [
+      { name: 'Roberto (CFO)', size: 200, val: 4 },
+      { name: 'Daniela (Tax)', size: 130, val: 1 }
+    ] 
+  },
+  { 
+    name: 'TelecomMax', 
+    children: [
+      { name: 'Ana (Dir. Com)', size: 130, val: 1 },
+      { name: 'Paulo (C-Level)', size: 90, val: 5 }
+    ] 
+  }
+];
+
+// --- NEW SIDEBAR COMPONENTS FOR DASHBOARDS ---
+
+const RankingSection = () => {
+   const ranking = [
+      { id: 1, name: 'FinPay Brasil', score: 80, tier: 'TOP' },
+      { id: 2, name: 'AlphaBank S.A.', score: 75, tier: 'TOP' },
+      { id: 3, name: 'TelecomMax', score: 74, tier: 'TOP' },
+      { id: 4, name: 'NovaSaude', score: 69, tier: 'MID' },
+      { id: 5, name: 'PaperTech Ind.', score: 68, tier: 'MID' },
+   ];
+   return (
+      <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm">
+         <div className="flex justify-between items-center mb-6">
+            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+               <TrendingUp className="w-3 h-3 text-blue-600"/> Ranking ABM
+            </h5>
+            <span className="bg-indigo-50 text-indigo-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase">Ao Vivo</span>
+         </div>
+         <div className="space-y-4">
+            {ranking.map((item) => (
+               <div key={item.id} className="flex items-center justify-between group cursor-pointer hover:bg-slate-50 -mx-2 px-2 py-1.5 rounded-xl transition-all">
+                  <div className="flex items-center gap-4">
+                     <span className="text-slate-300 font-bold text-[10px] w-3">{item.id}</span>
+                     <p className="text-[11px] font-bold text-slate-900">{item.name}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                     <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md ${item.tier === 'TOP' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>{item.tier}</span>
+                     <span className="text-[11px] font-black text-slate-900">{item.score}%</span>
+                  </div>
+               </div>
+            ))}
+         </div>
+         <div className="grid grid-cols-3 gap-2 mt-8 pt-6 border-t border-slate-100">
+            <div className="py-2 flex flex-col items-center gap-1 hover:bg-slate-50 rounded-xl cursor-pointer">
+               <Share2 className="w-3 h-3 text-slate-400"/>
+               <span className="text-[8px] font-bold text-slate-500 uppercase">Exportar</span>
+            </div>
+            <div className="py-2 flex flex-col items-center gap-1 hover:bg-slate-50 rounded-xl cursor-pointer">
+               <Building2 className="w-3 h-3 text-slate-400"/>
+               <span className="text-[8px] font-bold text-slate-500 uppercase">Atribuir AE</span>
+            </div>
+            <div className="py-2 flex flex-col items-center gap-1 hover:bg-slate-50 rounded-xl cursor-pointer">
+               <Target className="w-3 h-3 text-slate-400"/>
+               <span className="text-[8px] font-bold text-slate-500 uppercase">Criar Meta</span>
+            </div>
+         </div>
+      </div>
+   );
+};
+
+const BatchActionSection = () => (
+   <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm space-y-3">
+      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+         <Zap className="w-3 h-3 text-amber-500"/> Orquestrar em Lote
+      </h5>
+      <button className="w-full bg-rose-600 hover:bg-rose-700 text-white rounded-2xl p-4 flex items-center gap-4 transition-all shadow-md active:scale-95 text-left group">
+         <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"><ChevronRight className="w-4 h-4"/></div>
+         <div>
+            <p className="text-[11px] font-black uppercase">Ativar TOP TIER</p>
+            <p className="text-[9px] font-medium opacity-80">5 contas prontas</p>
+         </div>
+      </button>
+      <button className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-2xl p-4 flex items-center gap-4 transition-all shadow-md active:scale-95 text-left group">
+         <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center"><Activity className="w-4 h-4"/></div>
+         <div>
+            <p className="text-[11px] font-black uppercase">Nurturing MID TIER</p>
+            <p className="text-[9px] font-medium opacity-80">4 contas em espera</p>
+         </div>
+      </button>
+      <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-2xl p-4 flex items-center gap-4 transition-all active:scale-95 text-left group">
+         <div className="w-8 h-8 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500"><Clock className="w-4 h-4"/></div>
+         <div>
+            <p className="text-[11px] font-black uppercase">Watch List LOW TIER</p>
+            <p className="text-[9px] font-medium text-slate-400 font-bold">3 contas</p>
+         </div>
+      </button>
+      <div className="grid grid-cols-3 gap-2 mt-4">
+         <div className="p-3 bg-slate-50 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-100 cursor-pointer transition-all border border-transparent hover:border-slate-200">
+            <Plus className="w-3 h-3 text-slate-400"/>
+            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter">Oport.</span>
+         </div>
+         <div className="p-3 bg-slate-50 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-100 cursor-pointer transition-all border border-transparent hover:border-slate-200">
+            <Calendar className="w-3 h-3 text-slate-400"/>
+            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter">Agendar</span>
+         </div>
+         <div className="p-3 bg-slate-50 rounded-2xl flex flex-col items-center gap-2 hover:bg-slate-100 cursor-pointer transition-all border border-transparent hover:border-slate-200">
+            <Cpu className="w-3 h-3 text-slate-400"/>
+            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-tighter">Sync CRM</span>
+         </div>
+      </div>
+   </div>
+);
+
+const ActivePlaybooksSection = () => (
+   <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm">
+      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-6">
+         <Layout className="w-3 h-3 text-indigo-600"/> Playbooks em Execução
+      </h5>
+      <div className="space-y-5">
+         {[
+            { name: 'Expansão Tier 1', status: 'ATIVO', efficiency: 94 },
+            { name: 'Reengajamento C-Level', status: 'ATIVO', efficiency: 72 },
+            { name: 'Nurturing Mid-Market', status: 'ATIVO', efficiency: 85 },
+         ].map((pb, idx) => (
+            <div key={idx} className="space-y-2 group cursor-pointer">
+               <div className="flex justify-between items-center">
+                  <p className="text-[10px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase">{pb.name}</p>
+                  <span className="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-widest">{pb.status}</span>
+               </div>
+               <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${pb.efficiency}%` }} className="h-full bg-blue-600 rounded-full" />
+               </div>
+            </div>
+         ))}
+      </div>
+      <button className="w-full bg-slate-900 text-white font-black text-[9px] uppercase tracking-widest py-3 rounded-xl mt-8 hover:bg-black transition-all shadow-lg active:scale-[0.98]">
+         Explorar Biblioteca de Plays
+      </button>
+      <div className="grid grid-cols-3 gap-2 mt-6">
+         <div className="flex flex-col items-center gap-1.5 hover:opacity-70 transition-opacity cursor-pointer">
+            <TrendingUp className="w-3 h-3 text-slate-300"/>
+            <span className="text-[8px] font-bold text-slate-400 uppercase">Performance</span>
+         </div>
+         <div className="flex flex-col items-center gap-1.5 hover:opacity-70 transition-opacity cursor-pointer">
+            <FileText className="w-3 h-3 text-slate-300"/>
+            <span className="text-[8px] font-bold text-slate-400 uppercase">Templates</span>
+         </div>
+         <div className="flex flex-col items-center gap-1.5 hover:opacity-70 transition-opacity cursor-pointer">
+            <Users className="w-3 h-3 text-slate-300"/>
+            <span className="text-[8px] font-bold text-slate-400 uppercase">Audiência</span>
+         </div>
+      </div>
+   </div>
+);
+
+// --- FIT SECTION AS SIDEBAR FOR ICP SCORE ---
+const FitSidebar = () => (
+   <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm space-y-8">
+      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+         <Globe className="w-3 h-3 text-emerald-600"/> Fit Firmográfico
+      </h5>
+      <div className="space-y-6">
+         {[
+            { label: 'Receita Anual (> R$ 500M)', val: 78, color: 'bg-emerald-500' },
+            { label: 'Sede (SP / REMOTO)', val: 92, color: 'bg-blue-600' },
+            { label: 'Tamanho Time Tech (> 50)', val: 45, color: 'bg-indigo-600' },
+         ].map((item, idx) => (
+            <div key={idx} className="space-y-2">
+               <div className="flex justify-between items-center text-[9px] font-black text-slate-500 uppercase tracking-tight">
+                  <span>{item.label}</span>
+                  <span className="text-slate-900">{item.val}%</span>
+               </div>
+               <div className="h-1.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
+                  <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.val}%` }} />
+               </div>
+            </div>
+         ))}
+      </div>
+      <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ideal Customer Profile</span>
+         <Badge className="bg-emerald-50 text-emerald-600 text-[8px] uppercase font-black px-3 py-1 rounded-full">94% Adherence</Badge>
+      </div>
+   </div>
+);
+
+// --- CONTACTS ACCOUNT SIDEBAR (RESTAURADO) ---
+const ContactsAccountSidebar = () => (
+   <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm space-y-6 shrink-0 h-full">
+      <div className="flex justify-between items-start">
+         <div>
+            <h5 className="text-[11px] font-black text-slate-900 uppercase">HealthTech Tier 1</h5>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">15 Contas Mapeadas</p>
+         </div>
+         <Badge className="bg-rose-50 text-rose-600 text-[8px] uppercase font-black px-2 py-0.5 rounded-md">Crítico</Badge>
+      </div>
+      <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
+         <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Efficiency: <span className="text-blue-600">94%</span></span>
+         <button className="text-[9px] font-black text-blue-600 uppercase hover:underline">Executar Playbook</button>
+      </div>
+      <div className="space-y-4 pt-2">
+         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <ShieldCheck className="w-3 h-3 text-emerald-500"/> Fit Tecnográfico
+         </p>
+         <div className="space-y-3">
+            {[
+               { icon: <Cloud className="w-3 h-3 text-blue-400"/>, label: 'Stack Cloud', val: 'AWS / Azure Dominante' },
+               { icon: <Database className="w-3 h-3 text-amber-400"/>, label: 'CRM Utilizado', val: 'Salesforce (85%)' },
+               { icon: <BrainCircuit className="w-3 h-3 text-indigo-400"/>, label: 'AI Readiness', val: 'Alta Maturidade' },
+            ].map((item, idx) => (
+               <div key={idx} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm">{item.icon}</div>
+                  <div>
+                     <p className="text-[8px] font-bold text-slate-400 uppercase leading-none mb-1">{item.label}</p>
+                     <p className="text-[10px] font-black text-slate-900 leading-none">{item.val}</p>
+                  </div>
+               </div>
+            ))}
+         </div>
+      </div>
+      <div className="pt-4 mt-auto">
+         <Button variant="outline" className="w-full text-slate-400 text-[9px] font-bold uppercase border-slate-100 hover:text-slate-900 hover:bg-slate-100">+ Ver Stakeholders</Button>
+      </div>
+   </div>
+);
+
+
+// --- CLUSTER SIDEBAR ---
+const ClusterSidebar = () => (
+   <div className="space-y-4">
+      <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-2">
+         <Cloud className="w-3 h-3 text-blue-600"/> Clusters Ativos
+      </h5>
+      {verticalClusters.map((vc) => (
+         <div key={vc.id} className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <div className="flex justify-between items-center mb-3">
+               <p className="text-[10px] font-black text-slate-900 uppercase">{vc.name}</p>
+               <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-md ${vc.health === 'Crítico' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>{vc.health}</span>
+            </div>
+            <p className="text-[9px] font-bold text-slate-400 mb-2 truncate">Playbook: {vc.playbook}</p>
+            <div className="flex items-center gap-3">
+               <div className="flex-1 h-0.5 bg-slate-50 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500" style={{ width: `${vc.val}%` }} />
+               </div>
+               <span className="text-[9px] font-black text-slate-900">{vc.count} contas</span>
+            </div>
+         </div>
+      ))}
+      <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-[9px] font-black text-slate-400 uppercase hover:text-slate-600 hover:border-slate-400 transition-all">
+         + Criar Novo Cluster
+      </button>
+   </div>
+);
+
+
+const HitmapSection = ({ title, subtitle, data, reverseColors, actionCards }: any) => (
+  <div className="space-y-6">
+    <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm overflow-hidden relative">
+      <div className="mb-10 flex justify-between items-end">
+         <div>
+            <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">{title}</h4>
+            <div className="flex items-center gap-4 mt-2">
+                <p className="text-sm text-slate-500 font-bold">{subtitle}</p>
+                <div className="flex gap-2 ml-4 border-l pl-4 border-slate-100">
+                    <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div><span className="text-[9px] font-black text-slate-400 uppercase">Baixo</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div><span className="text-[9px] font-black text-slate-400 uppercase">Médio</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-orange-500"></div><span className="text-[9px] font-black text-slate-400 uppercase">Alto</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div><span className="text-[9px] font-black text-slate-400 uppercase">Crítico</span></div>
+                </div>
+            </div>
+         </div>
+      </div>
+
+      <div className="flex flex-col xl:flex-row gap-10">
+        <div className="xl:w-[72%] h-[540px] rounded-3xl overflow-hidden bg-slate-50 border-2 border-slate-100 shadow-inner">
+            <ResponsiveContainer width="100%" height="100%">
+                <Treemap 
+                    data={data} 
+                    dataKey="size" 
+                    aspectRatio={16/9} 
+                    stroke="#fff" 
+                    content={(props: any) => <CustomTreemapContent {...props} isReverse={reverseColors} />}
+                >
+                    <Tooltip content={<TreemapTooltip />} />
+                </Treemap>
+            </ResponsiveContainer>
+        </div>
+        
+        <div className="xl:w-[28%] flex flex-col gap-4">
+            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Ações Sugeridas</h5>
+            {actionCards.map((card: any, idx: number) => (
+                <div key={idx} onClick={card.onClick} className={`p-5 rounded-[24px] border-2 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.02] hover:shadow-lg group ${card.bgClass} ${card.borderClass}`}>
+                    <div className={`w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center font-bold text-lg ${card.iconBg} ${card.iconColor}`}>{card.icon}</div>
+                    <div className="flex-1">
+                        <h6 className={`text-[11px] font-black uppercase tracking-tight leading-tight mb-1 ${card.titleColor}`}>{card.title}</h6>
+                        <p className={`text-[9px] font-bold leading-tight ${card.descColor}`}>{card.desc}</p>
+                    </div>
+                    <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1 ${card.iconColor}`} />
+                </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export const ABMStrategy = () => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalType, setModalType] = useState<any>(null);
+    const [modalData, setModalData] = useState<any>(null);
+
+    const openDetailedModal = (type: string, data: any) => {
+        setModalType(type);
+        setModalData(data);
+        setModalOpen(true);
+    };
+
+    return (
+        <div className="min-h-screen pb-24">
+            {/* 1. Header Hero Panel */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 mb-8 flex justify-between items-center shadow-sm">
+                <div className="flex gap-6 items-center">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-600 shadow-lg shadow-blue-500/30 flex items-center justify-center">
+                        <Target className="w-8 h-8 text-white"/>
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estratégia Comercial</span>
+                            <ChevronRight className="w-3 h-3 text-slate-300"/>
+                            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Growth Framework</span>
+                        </div>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Estratégia ABM</h2>
+                        <p className="text-sm font-medium text-slate-500 mt-1">Orquestração de contas-alvo baseada em fit firmográfico, tecnográfico e sinais de intenção em tempo real. Painel unificado de inteligência e plays táticos.</p>
+                    </div>
+                </div>
+                <div className="flex gap-8 items-center bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Accounts</p>
+                        <p className="text-3xl font-bold text-slate-800">142</p>
+                    </div>
+                    <div className="w-px h-12 bg-slate-200"></div>
+                    <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Health Score</p>
+                        <p className="text-3xl font-bold text-emerald-600">8.4/10</p>
+                    </div>
+                    <div className="ml-4">
+                        <Button className="bg-slate-900 text-white font-bold rounded-xl px-6 py-4 uppercase text-xs hover:bg-black shadow-lg">Refinar TAL</Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* 2. Benchmarks */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                {benchmarks.map((b: any) => (
+                    <div key={b.id} className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm relative group hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400"><Activity className="w-4 h-4"/></div>
+                            <span className="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase">{b.trend}</span>
+                        </div>
+                        <h4 className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">{b.label}</h4>
+                        <div className="text-4xl font-black text-slate-900 tracking-tight mb-3">{b.val}</div>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase">{b.elite}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* 3. Dashboards Superiores */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-10">
+                {/* Universo de Contas (TAL) */}
+                <div className="col-span-12 xl:col-span-8 bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm w-full">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-900 uppercase tracking-tight">Universo de Contas (TAL)</h3>
+                            <p className="text-xs text-slate-500 font-medium mt-1">Interações, Fit e Maturidade do Pipeline ABX</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase cursor-pointer hover:text-slate-600"><Filter className="w-4 h-4"/> Filtros</div>
+                            <Button className="bg-blue-600 text-white font-bold rounded-xl px-6 py-3 uppercase text-[10px] shadow-lg shadow-blue-500/30">Nova Conta</Button>
+                        </div>
+                    </div>
+                    <div className="w-full">
+                        <div className="grid grid-cols-12 text-[9px] font-bold text-slate-400 uppercase tracking-widest pb-4 border-b border-slate-100 mb-4">
+                            <div className="col-span-5">Account / Vertical</div>
+                            <div className="col-span-2 text-center">Score</div>
+                            <div className="col-span-1 text-center">MQA</div>
+                            <div className="col-span-2 text-left">Engagem.</div>
+                            <div className="col-span-2 text-right pr-2">Status</div>
+                        </div>
+                        <div className="space-y-4">
+                            {abmAccounts.map((acc: any) => (
+                                <div key={acc.id} className="grid grid-cols-12 items-center hover:bg-slate-50 p-2 -mx-2 rounded-xl transition-colors cursor-pointer" onClick={() => openDetailedModal('ACCOUNT', acc)}>
+                                    <div className="col-span-5 flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-500 text-xs">{acc.initials}</div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900">{acc.name}</p>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{acc.vertical}</p>
+                                        </div>
+                                    </div>
+                                    <div className="col-span-2 text-center font-bold text-slate-900">{acc.fitScore}</div>
+                                    <div className="col-span-1 text-center flex justify-center">
+                                        {acc.mqa ? <div className="w-4 h-4 rounded border-2 border-emerald-500 flex items-center justify-center"><CheckSquare className="w-3 h-3 text-emerald-500"/></div> : <div className="w-4 h-4 rounded border-2 border-slate-200"></div>}
+                                    </div>
+                                    <div className="col-span-2 flex items-center gap-3">
+                                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden relative">
+                                            <div className="absolute top-0 left-0 h-full rounded-full transition-all" style={{ width: `${acc.engagement}%`, backgroundColor: acc.engagement > 80 ? '#10b981' : '#3b82f6' }}></div>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-600">{acc.engagement}%</span>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                        <span className={`text-[9px] font-bold uppercase px-3 py-1.5 rounded-lg ${acc.status === 'HOT' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>{acc.status}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Jornada de Contas (Funil) */}
+                <div className="col-span-12 xl:col-span-4 bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm w-full flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-xl font-bold text-slate-900 uppercase tracking-tight">Jornada de Contas (Funil ABX)</h3>
+                            <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg uppercase">Progression</span>
+                        </div>
+                        <div className="space-y-6">
+                            {journeyTimeline.map((stage: any, i) => (
+                                <div key={i} className="flex justify-between items-center group cursor-pointer">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest w-24">{stage.stage}</p>
+                                    <div className="flex-1 h-3 bg-slate-50 mx-4 border border-slate-100 rounded-full overflow-hidden relative">
+                                        <motion.div initial={{ width: 0 }} animate={{ width: `${(stage.count / 142) * 100}%` }} className={`h-full ${stage.color} rounded-full`} />
+                                    </div>
+                                    <p className="text-sm font-bold text-slate-900 w-8 text-right">{stage.count}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Velocity Index</span>
+                        <span className="text-xs font-bold text-emerald-500 flex items-center gap-1"><TrendingUp className="w-3 h-3"/> 15% ACCEL.</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* 4. Clusterização */}
+            <div className="bg-white p-8 rounded-[32px] border border-slate-200 mb-10 shadow-sm flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <Cloud className="w-6 h-6 text-blue-600"/>
+                   <h3 className="text-xl font-bold text-slate-900 uppercase tracking-tight">Clusterização por Vertical</h3>
+                </div>
+                <Button className="text-slate-500 font-bold hover:text-slate-900 text-[10px] uppercase"> + Novo Cluster</Button>
+            </div>
+
+            {/* 5. 6 ABM Heatmaps (Gráficos Scatter com Barras Laterais) */}
+             <div className="space-y-16 mb-24 px-4">
+                {abmHeatmapCriteria.map((crit: any, idx: number) => (
+                   <div key={crit.id} className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                      {/* LADO ESQUERDO: O GRÁFICO */}
+                      <div className="xl:col-span-8 bg-white p-10 rounded-[40px] border border-slate-200 shadow-sm flex flex-col items-center">
+                         <div className="w-full mb-8">
+                             <div className="flex justify-between items-start">
+                                <div>
+                                   <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{crit.title}</h4>
+                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{crit.subtitle}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                   <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"></div><span className="text-[8px] font-bold text-slate-400 uppercase">Baixo</span></div>
+                                   <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400"></div><span className="text-[8px] font-bold text-slate-400 uppercase">Médio</span></div>
+                                   <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-500"></div><span className="text-[8px] font-bold text-slate-400 uppercase">Alto</span></div>
+                                   <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500"></div><span className="text-[8px] font-bold text-slate-400 uppercase">Crítico</span></div>
+                                </div>
+                             </div>
+                         </div>
+                         <div className="w-full aspect-[2/1] relative rounded-[32px] overflow-hidden shadow-inner border border-slate-200">
+                            {/* Heatmap Gradient Background */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 via-amber-400 to-rose-500 opacity-90"></div>
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] font-bold text-white/60 uppercase tracking-widest">{crit.xAxis}</div>
+                            <div className="absolute left-[-40px] top-1/2 -translate-y-1/2 -rotate-90 text-[9px] font-bold text-white/60 uppercase tracking-widest">{crit.yAxis}</div>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+                                   <XAxis type="number" dataKey="x" name={crit.xAxis} hide domain={[0,100]} />
+                                   <YAxis type="number" dataKey="y" name={crit.yAxis} hide domain={[0,100]} />
+                                   <ZAxis type="number" dataKey="id" range={[400, 1000]} />
+                                   <Tooltip content={({ active, payload }) => {
+                                      if (active && payload && payload.length) {
+                                         const point = payload[0].payload;
+                                         const critScore = point.y; 
+                                         return (
+                                            <div className="bg-slate-900 text-white p-4 rounded-xl shadow-xl border border-slate-700 w-64 z-50">
+                                                <div className="flex items-center gap-3 pb-3 border-b border-slate-700 mb-3 block">
+                                                   <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-[10px]">{point.label}</div>
+                                                   <div>
+                                                      <p className="font-bold text-xs uppercase leading-tight">{point.account}</p>
+                                                      <Badge className="bg-blue-900/40 text-blue-300 text-[8px] uppercase">{point.vertical}</Badge>
+                                                   </div>
+                                                </div>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">{crit.title} Score</p>
+                                                <div className="text-xl font-bold text-emerald-400 mb-4">{critScore} <span className="text-[10px] font-normal text-slate-500">/ 100</span></div>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">Ação Sugerida</p>
+                                                <p className="text-[10px] text-white font-medium bg-slate-800 p-2 rounded-lg">{point.actionDesc}</p>
+                                            </div>
+                                         );
+                                      }
+                                      return null;
+                                   }} cursor={{strokeDasharray: '3 3', stroke: 'rgba(255,255,255,0.2)'}} />
+                                   <Scatter name="Contas" data={abmHeatmapAccounts.map((ac, aidx) => ({ ...ac, x: (aidx * 8) + 12, y: getHmScore(ac, crit.scoreKey), label: ac.name.substring(0,2) }))} onClick={(e) => openDetailedModal('ACCOUNT_SCATTER', e)}>
+                                      {abmHeatmapAccounts.map((_, cidx) => (
+                                         <Cell key={`cell-${cidx}`} fill="#ffffff" stroke="rgba(0,0,0,0.1)" strokeWidth={2} className="cursor-pointer hover:stroke-white transition-all shadow-lg" />
+                                      ))}
+                                      <LabelList dataKey="label" fill="#1e293b" fontSize={9} fontWeight="900" />
+                                   </Scatter>
+                                </ScatterChart>
+                            </ResponsiveContainer>
+                         </div>
+                         <p className="mt-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center max-w-2xl leading-relaxed">
+                            Como ler: score composto = média de ICP, Engajamento CRM, Potencial da Vertical, Contatos Mapeados e Fit Canopi. Contas acima de 72% são classificadas como TOP TIER e recebem SDR + AE dedicados.
+                         </p>
+                      </div>
+
+                      {/* LADO DIREITO: COMPONENTES DINÂMICOS */}
+                      <div className="xl:col-span-4 space-y-6 self-stretch h-full">
+                         {idx === 0 && (
+                            <>
+                               <RankingSection />
+                               <BatchActionSection />
+                               <ActivePlaybooksSection />
+                            </>
+                         )}
+                         {idx === 1 && <FitSidebar />}
+                         {idx === 2 && <ContactsAccountSidebar />}
+                         {idx === 5 && <ClusterSidebar />}
+                         {idx !== 0 && idx !== 1 && idx !== 2 && idx !== 5 && (
+                            <div className="bg-slate-50 border border-slate-100 p-8 rounded-[40px] flex flex-col items-center justify-center text-center h-full min-h-[300px]">
+                               <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm mb-4"><Zap className="w-5 h-5 text-amber-400"/></div>
+                               <h5 className="text-[10px] font-black text-slate-900 uppercase mb-2">Insights do {crit.title}</h5>
+                               <p className="text-[9px] font-medium text-slate-500 max-w-[200px]">Dados granulares e ações específicas para este critério de priorização ABM.</p>
+                               <Button variant="outline" className="mt-6 text-[10px] font-bold uppercase rounded-xl border-slate-200">Ver Analítico</Button>
+                            </div>
+                         )}
+                      </div>
+                   </div>
+                ))}
+             </div>
+
+             {/* 6. Planos de Entrada Recomendados */}
+             <div className="mb-24 px-4">
+                <div className="flex justify-between items-center mb-10">
+                   <div>
+                      <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Planos de Entrada Recomendados</h3>
+                      <p className="text-sm text-slate-500 font-medium mt-1">Plays táticos validados para os clusters de maior aderência.</p>
+                   </div>
+                   <button className="text-blue-600 font-bold text-xs uppercase hover:underline">Ver Todos os Playbooks</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                   {[
+                      { title: 'Relatório Setorial Customizado', desc: 'Envio de PDF focado em benchmarks do setor do decisor via Direct Mail.', efficiency: 88, icon: <FileText className="w-5 h-5 text-blue-600"/> },
+                      { title: 'Mídia de Conversa Técnica', desc: 'Campanha de LinkedIn Ads focada em resolver dor de stack cloud AWS/Azure.', efficiency: 72, icon: <Layout className="w-5 h-5 text-indigo-600"/> },
+                      { title: 'Campanha de Engajamento 1:1', desc: 'Pitch de vendas focado em ROI para CFOs de empresas com budget > R$ 300k.', efficiency: 91, icon: <Zap className="w-5 h-5 text-amber-500"/> },
+                   ].map((play, idx) => (
+                      <div key={idx} className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm hover:shadow-xl transition-all cursor-pointer group">
+                         <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 group-hover:bg-blue-50 transition-colors">{play.icon}</div>
+                         <h4 className="text-lg font-black text-slate-900 uppercase mb-3 leading-tight">{play.title}</h4>
+                         <p className="text-[11px] font-medium text-slate-500 mb-8 leading-relaxed">{play.desc}</p>
+                         <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                            <span className="text-[10px] font-black text-slate-900">{play.efficiency}% <span className="text-slate-400 font-bold">Efficiency</span></span>
+                            <button className="bg-slate-900 text-white text-[9px] font-black uppercase px-6 py-3 rounded-xl hover:bg-blue-600 transition-colors">Ativar Play</button>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+            {/* 6. NOVA SEÇÃO INFERIOR: ORQUESTRAÇÃO DE STAKEHOLDERS (OS TREEMAPS E CARDS DO FINAL) */}
+            <div className="space-y-16 mt-16 pt-16 border-t-2 border-slate-200">
+               <div className="flex justify-between items-center px-4">
+                  <div>
+                     <h3 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Orquestração ABX: Stakeholders</h3>
+                     <p className="text-base text-slate-500 font-medium mt-1">Treemaps unificados por Setor e Cargo para direcionar campanhas Omnichannel.</p>
+                  </div>
+                  <Button className="bg-slate-900 text-white font-bold rounded-xl text-xs uppercase py-3 px-8 shadow-lg border-none hover:bg-black">Salesforce Sync</Button>
+               </div>
+
+               <HitmapSection 
+                  title="Acessibilidade: Setores vs Cargos"
+                  subtitle="Volume de Contatos (Tamanho) | Dificuldade de Acesso (Cor)"
+                  data={hitmapAcessibilidade}
+                  reverseColors={false}
+                  actionCards={[
+                     {
+                        title: 'InMail C-Level', desc: 'Acionamento Outbound Premium via Founder para quebrar objeção.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600',
+                        actionText: 'Ativar Outbound', icon: <Send className="w-4 h-4"/>, onClick: () => openDetailedModal('OUTBOUND', {label: 'InMail C-Level'})
+                     },
+                     {
+                        title: 'Eventos VIP', desc: 'Convite direto para Jantar Executivo 1:1 focando Finanças.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600',
+                        actionText: 'Enviar Convite', icon: <Calendar className="w-4 h-4"/>, onClick: () => openDetailedModal('EVENT', {label: 'Jantar Executivo'})
+                     },
+                     {
+                        title: 'Podcast Canopi', desc: 'Convidar Diretores de Varejo para entrevista em podcast.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-violet-50', iconColor: 'text-violet-600',
+                        actionText: 'Agendar', icon: <Mic className="w-4 h-4"/>, onClick: () => openDetailedModal('PODCAST', {label: 'Podcast Varejo'})
+                     },
+                     {
+                        title: 'Lusha Enrichment', desc: 'Mapear novos influenciadores no Agro para contornar a muralha.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
+                        actionText: 'Enriquecer', icon: <Search className="w-4 h-4"/>, onClick: () => openDetailedModal('ENRICH', {label: 'Enriquecimento Agro'})
+                     },
+                     {
+                        title: 'BDR Direct Dial', desc: 'Acionamento telefônico com cadência de 14 dias.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-rose-50', iconColor: 'text-rose-600',
+                        actionText: 'Ligar', icon: <Phone className="w-4 h-4"/>, onClick: () => openDetailedModal('CALL', {label: 'Cold Call Agro'})
+                     },
+                     {
+                        title: 'GAds Lookalike', desc: 'Sincronizar lista de "Portas Abertas" com Google Ads.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-amber-50', iconColor: 'text-amber-600',
+                        actionText: 'Sync Ads', icon: <Target className="w-4 h-4"/>, onClick: () => openDetailedModal('ADS', {label: 'Lookalike GAds'})
+                     }
+                  ]}
+               />
+               
+               <HitmapSection 
+                  title="Posicionamento vs Rapport"
+                  subtitle="Tamanho = Volume | Cor = Rapport Comercial (Verde = Defensor, Vermelho = Detrator)"
+                  data={hitmapPosicionamento}
+                  reverseColors={true}
+                  actionCards={[
+                     {
+                        title: 'Warm Intro', desc: 'Pedir introdução do Champion para outros decisores.',
+                        bgClass: 'bg-white', borderClass: 'border-emerald-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600',
+                        actionText: 'Engajar', icon: <Users className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Case de Sucesso', desc: 'Enviar Proof of Concept para influenciadores neutros.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
+                        actionText: 'Enviar', icon: <FileSearch className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Isolar Detratores', desc: 'Remover perfis com score crítico de campanhas diretas.',
+                        bgClass: 'bg-rose-50', borderClass: 'border-rose-100', titleColor: 'text-rose-900', descColor: 'text-rose-600', iconBg: 'bg-rose-100', iconColor: 'text-rose-700',
+                        actionText: 'Pausar', icon: <ZapOff className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Almoço Executivo', desc: 'Convidar influenciador quente para jantar relacional.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-amber-50', iconColor: 'text-amber-600',
+                        actionText: 'Reservar', icon: <Coffee className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Nutrição 1:1', desc: 'Artigos personalizados via e-mail para executivos.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-purple-50', iconColor: 'text-purple-600',
+                        actionText: 'Start', icon: <Mail className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'LinkedIn Ads', desc: 'Campanha focada em quebra de objeções para detratores.',
+                        bgClass: 'bg-slate-900', borderClass: 'border-slate-800', titleColor: 'text-white', descColor: 'text-slate-400', iconBg: 'bg-slate-800', iconColor: 'text-sky-400',
+                        actionText: 'Sincronizar', icon: <Crosshair className="w-4 h-4"/>, onClick: () => {}
+                     }
+                  ]}
+               />
+
+               <HitmapSection 
+                  title="Potencial de Sucesso de Contato"
+                  subtitle="Matriz Agregada (Histórico + Fit) | Cor = Score de Conversão"
+                  data={hitmapSucesso}
+                  reverseColors={false}
+                  actionCards={[
+                     {
+                        title: 'ABM Total Play', desc: 'Focar orçamento total no quadrante de sucesso imediato.',
+                        bgClass: 'bg-emerald-500', borderClass: 'border-emerald-600', titleColor: 'text-white', descColor: 'text-emerald-100', iconBg: 'bg-emerald-600', iconColor: 'text-white',
+                        actionText: 'Ativar Play', icon: <Activity className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'ABM Lite', desc: 'Campanhas One-to-Few para os cargos amarelos.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-blue-50', iconColor: 'text-blue-600',
+                        actionText: 'Start Lite', icon: <Layers className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Research Call', desc: 'SDR ligando apenas para pesquisa de mercado setorial.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-fuchsia-50', iconColor: 'text-fuchsia-600',
+                        actionText: 'Research', icon: <Phone className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Rich Content Ads', desc: 'Oferta de Whitepaper técnico sem barreira de lead.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600',
+                        actionText: 'Ads Inbound', icon: <FileText className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Webinar Massivo', desc: 'Nutrição de base fria (Laranja/Vermelha) para awareness.',
+                        bgClass: 'bg-white', borderClass: 'border-slate-100', titleColor: 'text-slate-900', descColor: 'text-slate-500', iconBg: 'bg-amber-50', iconColor: 'text-amber-600',
+                        actionText: 'Email Blast', icon: <Send className="w-4 h-4"/>, onClick: () => {}
+                     },
+                     {
+                        title: 'Descarte Tático', desc: 'Limpeza de base: remover perfis sem fit por 6 meses.',
+                        bgClass: 'bg-white', borderClass: 'border-rose-100', titleColor: 'text-rose-900', descColor: 'text-rose-500', iconBg: 'bg-rose-50', iconColor: 'text-rose-600',
+                        actionText: 'Congelar', icon: <ZapOff className="w-4 h-4"/>, onClick: () => {}
+                     }
+                  ]}
+               />
+            </div>
+
+            <AnimatePresence>
+               {modalOpen && (
+                  <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+                     <div className="p-10 text-center">
+                        <div className="mx-auto w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 drop-shadow-sm"><Activity className="w-8 h-8"/></div>
+                        <h3 className="text-2xl font-bold text-slate-900 uppercase">Ação Simulada</h3>
+                        <p className="text-sm font-medium text-slate-500 mt-2 mb-8">Play acionado para: <span className="text-slate-900 font-bold">{modalData?.label || modalData?.title || modalData?.name}</span></p>
+                        <Button className="bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase py-3 px-8 shadow-xl" onClick={() => setModalOpen(false)}>Fechar Simulação</Button>
+                     </div>
+                  </Modal>
+               )}
+            </AnimatePresence>
+        </div>
+    );
+};

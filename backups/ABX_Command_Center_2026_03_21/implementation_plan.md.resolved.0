@@ -1,0 +1,33 @@
+# Redesign of Contacts Analysis Section
+
+Redesign the "Contacts and Departments" section to be more functional, visually unique, and data-rich.
+
+## Proposed Changes
+
+### [AbmStrategy.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/pages/AbmStrategy.tsx)
+
+#### [MODIFY] [AbmStrategy.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/pages/AbmStrategy.tsx)
+- Add "Potencial Geral de Contato" (`pot_geral`) to `matrixViews`.
+- Implement specific [getMatrixScore](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/pages/AbmStrategy.tsx#2115-2150) logic for `pot_geral`.
+- Define unique, illustrated, and functional `actionCards` for:
+    - `recept` (Receptividade)
+    - `access` (Acessibilidade)
+    - `pos` (Posicionamento)
+    - `pot` (Oportunidade / Budget)
+    - `pot_geral` (Potencial Geral de Contato)
+- Ensure each heatmap has its own set of 3 cards (2 small + 1 large/wide).
+- Replace generic "Fit Firmográfico" and "Fit Tecnográfico" sections with the new heatmaps or just remove them as they are legacy.
+
+#### [DELETE] Legacy Sections
+- Remove the "Fit Firmográfico" and "Fit Tecnográfico" cards at the bottom of the page.
+
+## Verification Plan
+
+### Manual Verification
+1.  Open `http://localhost:3000` in the browser.
+2.  Navigate to the ABM Strategy page.
+3.  Scroll down to "Análise de Contatos e Departamentos".
+4.  Verify that there are 5 distinct heatmaps (Posicionamento, Potencial Vertical, Receptividade, Acessibilidade, Potencial Geral).
+5.  Check that each heatmap has unique action cards on the right.
+6.  Click on buttons in the action cards to verify they trigger the correct modals (or at least don't crash).
+7.  Verify that "Fit Firmográfico" and "Fit Tecnográfico" sections are gone.
