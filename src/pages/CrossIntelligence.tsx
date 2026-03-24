@@ -21,7 +21,10 @@ import {
   Ban,
   Megaphone,
   Sparkles,
-  Clock3
+  Clock3,
+  Workflow,
+  RefreshCcw,
+  Layers3
 } from 'lucide-react';
 import { Card, Badge } from '../components/ui';
 
@@ -33,7 +36,7 @@ export const CrossIntelligence: React.FC = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Inteligência Cruzada</h1>
           <p className="text-slate-500 font-medium">
-            Camada premium para reaproveitar aprendizados de ABM e ABX em toda a operação.
+            Execução orientada por padrões validados entre marketing, vendas e pós-venda.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -63,10 +66,10 @@ export const CrossIntelligence: React.FC = () => {
           <div className="lg:col-span-3 space-y-4">
             <Badge variant="blue" className="bg-white/10 text-white border-white/20">INTELIGÊNCIA OPERACIONAL ABM + ABX</Badge>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
-              Transforme padrões validados em próxima melhor ação para marketing, vendas e sucesso do cliente.
+              Decisão executiva com sinal confiável e recomendação acionável por módulo.
             </h2>
             <p className="text-white/75 text-sm md:text-base max-w-2xl">
-              A Inteligência Cruzada unifica sinal de intenção, comportamento e resposta comercial para acelerar decisões com contexto, confiança e aplicabilidade.
+              A página conecta sinal, padrão e impacto esperado para orientar prioridade com rastreabilidade operacional.
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
               <Badge variant="green">Dado factual: 1.284 interações analisadas</Badge>
@@ -143,6 +146,76 @@ export const CrossIntelligence: React.FC = () => {
         ))}
       </div>
 
+      {/* Ativação por módulo */}
+      <Card title="Ativação por Módulo" subtitle="O que entra em execução agora por área do sistema">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {[
+            { modulo: 'Marketing ABM', status: 'Ativo', variant: 'emerald', detalhe: '2 campanhas em ajuste de mensagem e público', proxima: 'Publicar variação com prova operacional até sexta.' },
+            { modulo: 'Vendas', status: 'Atenção', variant: 'amber', detalhe: 'Comitê incompleto em 5 contas enterprise', proxima: 'Abrir trilha com Compras e Jurídico no estágio inicial.' },
+            { modulo: 'Sucesso do Cliente', status: 'Ativo', variant: 'blue', detalhe: '3 contas prontas para expansão consultiva', proxima: 'Executar plano de expansão com sponsor interno.' },
+            { modulo: 'Operações de Receita', status: 'Monitorar', variant: 'slate', detalhe: '2 regras sem cobertura total de dados', proxima: 'Revisar origem e completar campos no CRM.' },
+          ].map((item, i) => (
+            <Card key={i} noPadding className="p-5 border border-slate-200 shadow-sm bg-white h-full">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Módulo</p>
+                  <p className="text-sm font-bold text-slate-900 mt-1">{item.modulo}</p>
+                </div>
+                <Badge variant={item.variant as any}>{item.status}</Badge>
+              </div>
+              <p className="text-xs text-slate-600 mt-3">{item.detalhe}</p>
+              <p className="text-[11px] text-slate-800 mt-3">
+                <strong>Próxima ação:</strong> {item.proxima}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </Card>
+
+      {/* Fila de recomendações acionáveis */}
+      <Card title="Fila de Recomendações Acionáveis" subtitle="Ordem sugerida por impacto esperado e nível de confiança">
+        <div className="space-y-3">
+          {[
+            { prioridade: '1', acao: 'Ativar trilha de comitê completo em CloudScale Inc.', impacto: 'Alto impacto em avanço de pipeline', modulo: 'Vendas', confianca: '92%' },
+            { prioridade: '2', acao: 'Replicar narrativa de eficiência em contas de Manufatura.', impacto: 'Ganho de velocidade em reuniões qualificadas', modulo: 'Marketing ABM', confianca: '88%' },
+            { prioridade: '3', acao: 'Executar plano de expansão em SecureBank com sponsor interno.', impacto: 'Expansão com menor risco de churn', modulo: 'Sucesso do Cliente', confianca: '90%' },
+          ].map((item, i) => (
+            <div key={i} className="border border-slate-200 rounded-xl p-4 bg-white flex flex-col md:flex-row md:items-center gap-3 md:gap-5">
+              <div className="w-8 h-8 rounded-lg bg-brand/10 text-brand font-bold text-sm flex items-center justify-center shrink-0">{item.prioridade}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">{item.acao}</p>
+                <p className="text-xs text-slate-600 mt-1">{item.impacto}</p>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <Badge variant="slate">{item.modulo}</Badge>
+                <Badge variant="emerald">{item.confianca} confiança</Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Fluxo cruzado */}
+      <Card title="Fluxo Cruzado de Decisão" subtitle="Sinal > padrão > recomendação > módulo > impacto">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-3">
+          {[
+            { etapa: 'Sinal', valor: 'Aumento de engajamento técnico em contas com legado', icon: Zap },
+            { etapa: 'Padrão', valor: 'Sequência técnica antes de Compras acelera consenso', icon: Workflow },
+            { etapa: 'Recomendação', valor: 'Abrir conversa com líder técnico no M1', icon: Target },
+            { etapa: 'Módulo', valor: 'Vendas + Operações de Receita', icon: Layers3 },
+            { etapa: 'Impacto', valor: 'Redução média de 15 dias no ciclo em contas similares', icon: Sparkles },
+          ].map((item, i) => (
+            <div key={i} className="border border-slate-200 rounded-xl p-4 bg-slate-50/60 h-full">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.etapa}</p>
+                <item.icon className="w-4 h-4 text-slate-500" />
+              </div>
+              <p className="text-xs text-slate-800 mt-3 leading-relaxed">{item.valor}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* The Loop Section */}
       <div className="border border-slate-200 rounded-2xl p-6 bg-white shadow-sm">
         <h2 className="text-lg font-bold text-slate-900 mb-6">O Loop de Inteligência</h2>
@@ -208,6 +281,68 @@ export const CrossIntelligence: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* Cobertura de buying group */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card noPadding className="p-5 border border-slate-200 bg-white shadow-sm lg:col-span-2">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Buying Group / Comitê</p>
+              <h3 className="text-base font-bold text-slate-900 mt-1">Cobertura de Comitê por Conta Prioritária</h3>
+            </div>
+            <Users className="w-5 h-5 text-slate-400" />
+          </div>
+          <div className="mt-4 space-y-3">
+            {[
+              { conta: 'CloudScale Inc.', cobertura: 83, lacuna: 'Jurídico ainda não ativado' },
+              { conta: 'Global Logistics', cobertura: 67, lacuna: 'Compras sem engajamento relevante' },
+              { conta: 'SecureBank', cobertura: 92, lacuna: 'Cobertura completa, manter cadência' },
+            ].map((item, i) => (
+              <div key={i} className="border border-slate-100 rounded-lg p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-900">{item.conta}</p>
+                  <span className="text-xs font-bold text-slate-700">{item.cobertura}% cobertura</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden mt-2">
+                  <div className="h-full bg-brand rounded-full" style={{ width: `${item.cobertura}%` }} />
+                </div>
+                <p className="text-xs text-slate-600 mt-2">{item.lacuna}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card noPadding className="p-5 border border-amber-200 bg-amber-50/50 shadow-sm">
+          <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">Lacunas de dados / limitações</p>
+          <ul className="mt-3 space-y-2 text-xs text-slate-700 list-disc pl-4">
+            <li>12% das contas sem atualização recente de cargo no CRM.</li>
+            <li>Interações offline sem padronização total de registro.</li>
+            <li>Cobertura parcial de eventos de pós-venda em 2 verticais.</li>
+          </ul>
+          <p className="text-xs text-slate-700 mt-4">
+            <strong>Risco operacional:</strong> reduzir generalizações até completar os campos críticos.
+          </p>
+        </Card>
+      </div>
+
+      {/* Feedback loop */}
+      <Card title="Feedback Loop de Execução" subtitle="Como a recomendação melhora a cada ciclo">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { titulo: 'Executar', texto: 'Times aplicam a próxima melhor ação por conta e módulo.', icon: ArrowRight },
+            { titulo: 'Medir', texto: 'Sistema captura resultado, tempo de ciclo e qualidade da resposta.', icon: BarChart3 },
+            { titulo: 'Recalibrar', texto: 'Padrões e confiança são atualizados para a próxima rodada.', icon: RefreshCcw },
+          ].map((item, i) => (
+            <div key={i} className="border border-slate-200 rounded-xl p-4 bg-white">
+              <div className="flex items-center gap-2">
+                <item.icon className="w-4 h-4 text-brand" />
+                <p className="text-sm font-bold text-slate-900">{item.titulo}</p>
+              </div>
+              <p className="text-xs text-slate-600 mt-2">{item.texto}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       {/* Aplicação por frente */}
       <div className="space-y-4">
