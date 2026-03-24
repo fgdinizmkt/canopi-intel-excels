@@ -3,38 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
-  Share2, 
-  TrendingUp, 
-  Users, 
+  Users,
   Zap, 
   Target, 
   ArrowRight, 
   Info, 
   ChevronDown, 
-  MoreHorizontal, 
-  CheckCircle2, 
+  CheckCircle2,
   AlertCircle,
   BarChart3,
-  Globe,
-  Mail,
-  MessageSquare,
   Building2,
-  Rocket,
-  RefreshCw,
-  Search,
-  Filter,
-  Download,
   Database,
   ShieldCheck,
   Star,
   Ban,
-  Plus,
-  Layers,
-  Megaphone
+  Megaphone,
+  Sparkles,
+  Clock3
 } from 'lucide-react';
-import { Card, Badge, Button } from '../components/ui';
+import { Card, Badge } from '../components/ui';
 
 export const CrossIntelligence: React.FC = () => {
   return (
@@ -44,7 +33,7 @@ export const CrossIntelligence: React.FC = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Inteligência Cruzada</h1>
           <p className="text-slate-500 font-medium">
-            Transformando aprendizados em recomendações escaláveis.
+            Camada premium para reaproveitar aprendizados de ABM e ABX em toda a operação.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -66,6 +55,47 @@ export const CrossIntelligence: React.FC = () => {
         </div>
       </div>
 
+      {/* Hero Premium */}
+      <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-7 md:p-9 text-white shadow-2xl shadow-slate-900/20">
+        <div className="absolute -top-16 -right-16 w-56 h-56 bg-brand/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-emerald-500/20 rounded-full blur-3xl" />
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 space-y-4">
+            <Badge variant="blue" className="bg-white/10 text-white border-white/20">INTELIGÊNCIA OPERACIONAL ABM + ABX</Badge>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
+              Transforme padrões validados em próxima melhor ação para marketing, vendas e sucesso do cliente.
+            </h2>
+            <p className="text-white/75 text-sm md:text-base max-w-2xl">
+              A Inteligência Cruzada unifica sinal de intenção, comportamento e resposta comercial para acelerar decisões com contexto, confiança e aplicabilidade.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Badge variant="green">Dado factual: 1.284 interações analisadas</Badge>
+              <Badge variant="indigo">Inferência: 42 padrões reutilizáveis ativos</Badge>
+              <Badge variant="amber">Recomendação: 13 ações prioritárias para esta semana</Badge>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 grid grid-cols-1 gap-3">
+            {[
+              { label: 'Confiança Média dos Padrões', value: '88%', detail: 'Com auditoria de origem por sinal', icon: ShieldCheck },
+              { label: 'Contas com Sinergia Alta', value: '19', detail: 'Sinergia acima de 85% neste ciclo', icon: Sparkles },
+              { label: 'Última atualização', value: '24 mar 2026 · 08:20 UTC', detail: 'Janela de dados: últimos 90 dias', icon: Clock3 },
+            ].map((item, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-white/60 font-bold">{item.label}</p>
+                    <p className="text-xl font-bold mt-1">{item.value}</p>
+                    <p className="text-xs text-white/70 mt-1">{item.detail}</p>
+                  </div>
+                  <item.icon className="w-4 h-4 text-white/80 shrink-0 mt-1" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Info Box */}
       <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex gap-4 items-start">
         <div className="p-2 bg-brand rounded-lg shrink-0">
@@ -74,6 +104,21 @@ export const CrossIntelligence: React.FC = () => {
         <p className="text-sm text-slate-700 leading-relaxed">
           <span className="font-bold text-slate-900">O que é:</span> Inteligência Cruzada é a camada que transforma aprendizados de campanhas, contas, comitês, relacionamento e performance em recomendações reaproveitáveis entre <span className="italic font-medium">ABM (Account-Based Marketing)</span> e <span className="italic font-medium">ABX (Account-Based Experience)</span>.
         </p>
+      </div>
+
+      {/* Prova e Transparência */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { title: 'Fontes do padrão', value: 'CRM, mídia, produto e reuniões', note: 'Cada padrão mostra origem e cobertura por canal.' },
+          { title: 'Critério de confiança', value: 'Volume + repetição + resultado', note: 'Modelo evita padrões com baixa amostragem.' },
+          { title: 'Risco de generalização', value: 'Controlado por vertical e porte', note: 'Sem extrapolação quando contexto diverge.' },
+        ].map((item, i) => (
+          <Card key={i} noPadding className="p-5 border border-slate-200 bg-white shadow-sm">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.title}</p>
+            <p className="text-sm font-bold text-slate-900 mt-2">{item.value}</p>
+            <p className="text-xs text-slate-500 mt-2">{item.note}</p>
+          </Card>
+        ))}
       </div>
 
       {/* KPI Row */}
@@ -101,7 +146,24 @@ export const CrossIntelligence: React.FC = () => {
       {/* The Loop Section */}
       <div className="border border-slate-200 rounded-2xl p-6 bg-white shadow-sm">
         <h2 className="text-lg font-bold text-slate-900 mb-6">O Loop de Inteligência</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <Card className="border border-slate-200 bg-slate-50/70 p-5">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Como o loop funciona</p>
+            <div className="space-y-3">
+              {[
+                'Captura de sinais de ABM e ABX por conta e classe de contato.',
+                'Normalização por vertical, porte e etapa de jornada.',
+                'Cálculo de padrão com score de confiança e risco.',
+                'Publicação da recomendação com próxima melhor ação.',
+              ].map((step, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                  <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                  <p>{step}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
           <Card className="border-l-4 border-l-brand bg-slate-50/50 p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-brand/10 rounded-lg">
@@ -115,11 +177,11 @@ export const CrossIntelligence: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-start gap-2 text-xs text-slate-700">
                 <Users className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                <p><strong>Stakeholders Aceleradores:</strong> CTOs em verticais SaaS tendem a reduzir em 15 dias o agendamento da primeira reunião quando tocados por LinkedIn Ads antes do outbound.</p>
+                <p><strong>Padrão validado:</strong> CTOs em SaaS reduzem em 15 dias o agendamento da primeira reunião quando tocados por anúncios de LinkedIn antes do outbound.</p>
               </div>
               <div className="flex items-start gap-2 text-xs text-slate-700">
                 <Target className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                <p><strong>Estruturas de Comitê:</strong> Empresas com {'>'}500 func. exigem aprovação de Procurement no estágio M3. Inicie o "warm-up" desse perfil agora.</p>
+                <p><strong>Próxima melhor ação:</strong> Empresas com {'>'}500 colaboradores exigem aprovação de Compras no estágio M3. Inicie o aquecimento desse perfil no M1.</p>
               </div>
             </div>
           </Card>
@@ -135,19 +197,41 @@ export const CrossIntelligence: React.FC = () => {
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-2 text-xs text-slate-700">
-                <Rocket className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <p><strong>Campanhas de Aquecimento:</strong> A campanha "Efficiency First" gerou 40% mais cliques em display para contas que receberam direct mail prévio no modelo 1:1.</p>
+                <Zap className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <p><strong>Padrão validado:</strong> A campanha "Efficiency First" gerou 40% mais cliques em display para contas que receberam mala direta prévia no modelo 1:1.</p>
               </div>
               <div className="flex items-start gap-2 text-xs text-slate-700">
-                <Search className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <p><strong>Canais de Melhor Abertura:</strong> C-levels do Setor Financeiro respondem 3x mais a convites para webinars exclusivos via WhatsApp do que por E-mail corporativo.</p>
+                <Target className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                <p><strong>Próxima melhor ação:</strong> Executivos C-level do setor financeiro respondem 3x mais a convites para webinars exclusivos via WhatsApp do que por e-mail corporativo.</p>
               </div>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Bottom Grid: Verticals & Contact Classes */}
+      {/* Aplicação por frente */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-lg font-bold text-slate-900">Aplicação por Frente</h2>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Uso recomendado por área</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {[
+            { frente: 'Marketing ABM', foco: 'Mensagens e canais por vertical', acao: 'Ajustar 3 campanhas prioritárias com base em padrões de resposta.' },
+            { frente: 'Vendas', foco: 'Ordem de contato do comitê', acao: 'Acionar perfil técnico antes de Compras em contas enterprise.' },
+            { frente: 'Sucesso do Cliente', foco: 'Risco e expansão por comportamento', acao: 'Executar plano de expansão em contas com uso crescente e alto fit.' },
+            { frente: 'Operações de Receita', foco: 'Padronização do playbook', acao: 'Publicar regras de priorização no rito semanal comercial.' },
+          ].map((item, i) => (
+            <Card key={i} noPadding className="p-5 border border-slate-200 shadow-sm bg-white h-full">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.frente}</p>
+              <p className="text-sm font-bold text-slate-900 mt-2">{item.foco}</p>
+              <p className="text-xs text-slate-600 mt-3 leading-relaxed">{item.acao}</p>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom Grid: Verticais & Classes de contato */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Patterns by Vertical */}
         <div className="lg:col-span-2 space-y-4">
@@ -196,6 +280,7 @@ export const CrossIntelligence: React.FC = () => {
                 <div className="flex-1">
                   <h4 className="text-sm font-bold text-slate-900">{v.name}</h4>
                   <p className="text-[10px] text-slate-500 leading-relaxed mt-1">{v.desc}</p>
+                  <p className="text-[10px] text-slate-700 mt-2"><strong>Quando funciona melhor:</strong> playbook com narrativa de eficiência + prova de impacto por etapa.</p>
                 </div>
                 <div className="space-y-4 pt-2">
                   <div className="space-y-1.5">
@@ -221,28 +306,29 @@ export const CrossIntelligence: React.FC = () => {
         <div className="space-y-4 flex flex-col">
           <h2 className="text-lg font-bold text-slate-900 px-2">Classes de Contato</h2>
           <Card noPadding className="p-6 border-none shadow-sm bg-white flex-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Perfis Comportamentais</p>
-            <div className="space-y-8">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Perfis Comportamentais + próxima melhor ação</p>
+            <div className="space-y-6">
               {[
-                { name: 'Decisores', desc: 'Buscam ROI e Segurança', relevance: 92, icon: BarChart3, color: 'blue' },
-                { name: 'Influencers', desc: 'Foco em Processo e UX', relevance: 85, icon: Megaphone, color: 'indigo' },
-                { name: 'Champions', desc: 'Aliados Internos de Valor', relevance: 98, icon: Star, color: 'emerald' },
-                { name: 'Bloqueadores', desc: 'Aversão à Mudança / Custo', relevance: null, icon: Ban, color: 'red' }
+                { name: 'Decisores', desc: 'Buscam ROI e Segurança', relevance: 92, icon: BarChart3, bgClass: 'bg-blue-50', hoverBgClass: 'group-hover:bg-blue-100', iconClass: 'text-blue-600', acao: 'Enviar caso de negócio com prazo de retorno em 90 dias.' },
+                { name: 'Influenciadores', desc: 'Foco em Processo e Experiência', relevance: 85, icon: Megaphone, bgClass: 'bg-indigo-50', hoverBgClass: 'group-hover:bg-indigo-100', iconClass: 'text-indigo-600', acao: 'Convidar para sessão técnica com prova operacional detalhada.' },
+                { name: 'Patrocinadores', desc: 'Aliados Internos de Valor', relevance: 98, icon: Star, bgClass: 'bg-emerald-50', hoverBgClass: 'group-hover:bg-emerald-100', iconClass: 'text-emerald-600', acao: 'Ativar indicação interna para acelerar consenso entre áreas.' },
+                { name: 'Bloqueadores', desc: 'Aversão à Mudança / Custo', relevance: null, icon: Ban, bgClass: 'bg-red-50', hoverBgClass: 'group-hover:bg-red-100', iconClass: 'text-red-600', acao: 'Antecipar objeções de risco e custo com plano de mitigação.' }
               ].map((p, i) => (
                 <div key={i} className="flex items-center gap-4 group cursor-default">
-                  <div className={`p-2.5 bg-${p.color}-50 rounded-xl transition-colors group-hover:bg-${p.color}-100`}>
-                    <p.icon className={`w-4 h-4 text-${p.color}-600`} />
+                  <div className={`p-2.5 rounded-xl transition-colors ${p.bgClass} ${p.hoverBgClass}`}>
+                    <p.icon className={`w-4 h-4 ${p.iconClass}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-0.5">
                       <h4 className="text-xs font-bold text-slate-900">{p.name}</h4>
                       {p.relevance ? (
-                        <span className="text-[9px] font-bold text-brand bg-brand/5 px-1.5 py-0.5 rounded-md">{p.relevance}% Relevance</span>
+                        <span className="text-[9px] font-bold text-brand bg-brand/5 px-1.5 py-0.5 rounded-md">{p.relevance}% aderência</span>
                       ) : (
                         <span className="text-[9px] font-bold text-red-500 uppercase bg-red-50 px-1.5 py-0.5 rounded-md">Monitorar</span>
                       )}
                     </div>
-                    <p className="text-[10px] text-slate-500 truncate font-medium">{p.desc}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">{p.desc}</p>
+                    <p className="text-[10px] text-slate-700 mt-1"><strong>Ação:</strong> {p.acao}</p>
                   </div>
                 </div>
               ))}
@@ -252,7 +338,7 @@ export const CrossIntelligence: React.FC = () => {
       </div>
 
       {/* Similar Accounts Table */}
-      <Card title="Contas com Sinergia Detectada" subtitle="Recomendações baseadas em padrões de sucesso de ABX">
+      <Card title="Contas com Sinergia Detectada" subtitle="Priorização com próxima melhor ação baseada em padrões de ABM + ABX">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -261,15 +347,16 @@ export const CrossIntelligence: React.FC = () => {
                 <th className="py-4 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vertical</th>
                 <th className="py-4 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sinergia</th>
                 <th className="py-4 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="py-4 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Próxima melhor ação</th>
                 <th className="py-4 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Ação</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { name: 'CloudScale Inc.', vertical: 'Fintech', synergy: 94, status: 'Pronto', color: 'emerald' },
-                { name: 'Global Logistics', vertical: 'Manufatura', synergy: 88, status: 'Aquecimento', color: 'blue' },
-                { name: 'RetailFlow', vertical: 'Varejo', synergy: 82, status: 'Análise', color: 'amber' },
-                { name: 'SecureBank', vertical: 'Fintech', synergy: 91, status: 'Pronto', color: 'emerald' },
+                { name: 'CloudScale Inc.', vertical: 'Fintech', synergy: 94, status: 'Pronto', color: 'emerald', action: 'Executar sequência 1:1 com C-level e Compras em 5 dias.' },
+                { name: 'Global Logistics', vertical: 'Manufatura', synergy: 88, status: 'Aquecimento', color: 'blue', action: 'Ativar conteúdo técnico + prova de integração com legado.' },
+                { name: 'RetailFlow', vertical: 'Varejo', synergy: 82, status: 'Análise', color: 'amber', action: 'Rodar diagnóstico de jornada antes da proposta comercial.' },
+                { name: 'SecureBank', vertical: 'Fintech', synergy: 91, status: 'Pronto', color: 'emerald', action: 'Priorizar webinar executivo via WhatsApp e follow-up consultivo.' },
               ].map((account, i) => (
                 <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
                   <td className="py-4 px-4">
@@ -294,6 +381,9 @@ export const CrossIntelligence: React.FC = () => {
                   <td className="py-4 px-4">
                     <Badge variant={account.color as any}>{account.status}</Badge>
                   </td>
+                  <td className="py-4 px-4">
+                    <p className="text-xs text-slate-700 max-w-xs">{account.action}</p>
+                  </td>
                   <td className="py-4 px-4 text-right">
                     <button className="p-2 text-slate-400 hover:text-brand hover:bg-brand/5 rounded-lg transition-all">
                       <ArrowRight className="w-4 h-4" />
@@ -306,25 +396,25 @@ export const CrossIntelligence: React.FC = () => {
         </div>
       </Card>
 
-      {/* Final CTA - Fixed Readability */}
+      {/* Final CTA */}
       <div className="bg-slate-900 p-10 rounded-[32px] text-white relative overflow-hidden shadow-2xl shadow-slate-900/20">
         {/* Dots Pattern */}
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-xl space-y-4">
-            <h2 className="text-3xl font-bold tracking-tight">Pronto para escalar?</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Pronto para ativar o plano de 7 dias?</h2>
             <p className="text-white/70 font-medium leading-relaxed">
-              Implemente estas recomendações de inteligência cruzada agora e aumente a velocidade do seu pipeline em até 25% através de automações de GTM baseadas em evidências.
+              Aplique o pacote priorizado desta semana com responsáveis, metas e rito de acompanhamento para converter inteligência em execução.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 shrink-0">
             <button className="bg-brand text-white hover:bg-brand/90 px-8 py-3.5 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-brand/20">
-              Aplicar Recomendações
+              Iniciar plano operacional
             </button>
             <button className="bg-transparent text-white border-2 border-white/20 hover:bg-white/10 px-8 py-3.5 font-bold rounded-2xl flex items-center justify-center gap-2 transition-all">
-              Exportar Playbooks
+              Exportar plano e responsáveis
             </button>
           </div>
         </div>
