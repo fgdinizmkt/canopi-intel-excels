@@ -6,6 +6,7 @@
 import React from 'react';
 import {
   Activity,
+  AlertTriangle,
   ArrowRight,
   CheckCircle2,
   Clock3,
@@ -20,10 +21,12 @@ import { Badge, Button, Card, Modal } from '../components/ui';
 type GrupoAcao = 'prontas' | 'validacao' | 'bloqueadas' | 'execucao';
 type FiltroPeriodo = 'dia' | 'semana' | 'mes';
 type PadraoInteracao = 'modal-curto' | 'gaveta' | 'painel-expandido';
+type ArquetipoAcao = 'handoff' | 'criacao-operacional' | 'sincronizacao' | 'validacao' | 'desbloqueio';
 
 type AcaoOperacional = {
   id: string;
   titulo: string;
+  arquetipo: ArquetipoAcao;
   situacao: string;
   recomendacao: string;
   grupo: GrupoAcao;
@@ -62,12 +65,14 @@ type AcaoOperacional = {
 
 type FluxoLoop = {
   id: string;
+  agrupamento: 'ABX orientando ABM' | 'ABM orientando ABX' | 'Aprendizados híbridos para outras frentes';
   origem: 'ABM' | 'ABX' | 'Híbrido';
   destino: 'ABM' | 'ABX' | 'Mídia Paga' | 'Conteúdo' | 'Receita';
   frenteImpactada: string;
   acaoGerada: string;
   status: 'Ativo' | 'Em validação' | 'Bloqueado';
   ferramenta: string;
+  impactoEsperado: string;
 };
 
 const filtroLabels: Record<FiltroPeriodo, string> = {
@@ -96,6 +101,14 @@ const padraoInteracaoLabel: Record<PadraoInteracao, string> = {
   'painel-expandido': 'Painel expandido',
 };
 
+const arquetipoMeta: Record<ArquetipoAcao, { label: string; badge: 'blue' | 'violet' | 'amber' | 'emerald' | 'red' }> = {
+  handoff: { label: 'Handoff', badge: 'blue' },
+  'criacao-operacional': { label: 'Criação operacional', badge: 'violet' },
+  sincronizacao: { label: 'Sincronização', badge: 'amber' },
+  validacao: { label: 'Validação', badge: 'emerald' },
+  desbloqueio: { label: 'Desbloqueio', badge: 'red' },
+};
+
 const moduloCor: Record<string, string> = {
   'Estratégia ABM': 'bg-brand',
   'Orquestração ABX': 'bg-indigo-500',
@@ -113,6 +126,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-1',
     titulo: 'Exportar audiência de expansão para Google Ads (Fintech Tier 1)',
+    arquetipo: 'criacao-operacional',
     situacao: 'Cluster Fintech com intenção alta e queda de alcance em remarketing.',
     recomendacao: 'Criar campanha de recuperação com segmentação por comitê técnico e econômico.',
     grupo: 'prontas',
@@ -146,6 +160,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-2',
     titulo: 'Criar cadência outbound para contas com bloqueio em Compras',
+    arquetipo: 'handoff',
     situacao: '17 contas com avanço técnico, mas sem abertura com área de Compras.',
     recomendacao: 'Abrir trilha de consenso com sequência de 5 toques em 10 dias.',
     grupo: 'prontas',
@@ -179,6 +194,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-3',
     titulo: 'Enviar briefing de narrativa para Conteúdo com base em perda por objeção',
+    arquetipo: 'validacao',
     situacao: 'Perda recorrente por objeção de integração em Manufatura.',
     recomendacao: 'Abrir pauta de conteúdo comparativo com prova de implantação real.',
     grupo: 'validacao',
@@ -216,6 +232,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-4',
     titulo: 'Sincronizar owner e play de expansão em contas da base ativa',
+    arquetipo: 'sincronizacao',
     situacao: 'Contas com sponsor interno sem play de expansão iniciado no ABX.',
     recomendacao: 'Iniciar play de expansão por conta com owner único e metas em 30 dias.',
     grupo: 'validacao',
@@ -253,6 +270,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-5',
     titulo: 'Atualizar cargos ausentes para liberar segmentação ABM',
+    arquetipo: 'desbloqueio',
     situacao: '12% das contas Tier 1 sem cargo de decisor econômico no CRM.',
     recomendacao: 'Completar campos obrigatórios e reprocessar segmentação de audiência.',
     grupo: 'bloqueadas',
@@ -287,6 +305,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-6',
     titulo: 'Sincronizar interações offline para reclassificar prontidão de contas',
+    arquetipo: 'sincronizacao',
     situacao: 'Eventos presenciais sem padrão de registro afetam score de prontidão.',
     recomendacao: 'Consolidar planilha de eventos e sincronizar no módulo Contas.',
     grupo: 'bloqueadas',
@@ -321,6 +340,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-7',
     titulo: 'Executar play ABX de recuperação de oportunidade parada',
+    arquetipo: 'handoff',
     situacao: '9 oportunidades paradas há mais de 21 dias após proposta enviada.',
     recomendacao: 'Iniciar play ABX com trilha de reengajamento por papel no comitê.',
     grupo: 'execucao',
@@ -354,6 +374,7 @@ const acoesOperacionais: AcaoOperacional[] = [
   {
     id: 'acao-8',
     titulo: 'Publicar campanha inbound para demanda de integração em legado',
+    arquetipo: 'criacao-operacional',
     situacao: 'Aumento de buscas por integração sem troca de stack em contas ICP.',
     recomendacao: 'Produzir conteúdo BOFU com CTA para diagnóstico técnico.',
     grupo: 'execucao',
@@ -389,39 +410,47 @@ const acoesOperacionais: AcaoOperacional[] = [
 const fluxosLoop: FluxoLoop[] = [
   {
     id: 'loop-1',
+    agrupamento: 'ABM orientando ABX',
     origem: 'ABM',
     destino: 'ABX',
     frenteImpactada: 'Reengajamento de oportunidades paradas',
     acaoGerada: 'Disparar play ABX com cadência por comitê e checkpoint no Slack',
     status: 'Ativo',
     ferramenta: 'HubSpot + Meetime + Slack',
+    impactoEsperado: 'Reativar pipeline de R$ 1,1 mi em 14 dias.',
   },
   {
     id: 'loop-2',
+    agrupamento: 'ABX orientando ABM',
     origem: 'ABX',
     destino: 'ABM',
     frenteImpactada: 'Refino de segmentação Tier 1',
     acaoGerada: 'Atualizar regra de priorização por sinais de resposta de Compras',
     status: 'Em validação',
     ferramenta: 'Businessmap + RevOps',
+    impactoEsperado: 'Elevar precisão de priorização ABM em 11%.',
   },
   {
     id: 'loop-3',
+    agrupamento: 'Aprendizados híbridos para outras frentes',
     origem: 'Híbrido',
     destino: 'Mídia Paga',
     frenteImpactada: 'Campanha de recuperação Fintech',
     acaoGerada: 'Exportar audiência combinando intenção ABX e score ABM',
     status: 'Ativo',
     ferramenta: 'Google Ads + Segmentação e Audiência',
+    impactoEsperado: 'Reduzir CAC do cluster Fintech em 9%.',
   },
   {
     id: 'loop-4',
+    agrupamento: 'Aprendizados híbridos para outras frentes',
     origem: 'Híbrido',
     destino: 'Conteúdo',
     frenteImpactada: 'Narrativa de integração sem troca de stack',
     acaoGerada: 'Abrir briefing no Slack e disparar campanha no RD Station',
     status: 'Bloqueado',
     ferramenta: 'Slack + RD Station',
+    impactoEsperado: 'Aumentar geração de MQL em 40 com narrativa técnica validada.',
   },
 ];
 
@@ -479,6 +508,27 @@ export const CrossIntelligence: React.FC = () => {
     status: item.status,
   }));
 
+  const matrizTransferencia = ['ABM', 'ABX', 'Híbrido'].map((origem) => ({
+    origem,
+    paraABM: fluxosLoop.filter((item) => item.origem === origem && item.destino === 'ABM').length,
+    paraABX: fluxosLoop.filter((item) => item.origem === origem && item.destino === 'ABX').length,
+    paraOutrasFrentes: fluxosLoop.filter((item) =>
+      item.origem === origem && ['Mídia Paga', 'Conteúdo', 'Receita'].includes(item.destino)
+    ).length,
+  }));
+
+  const leituraProntidaoImpactoBloqueio = acoesOperacionais
+    .map((item) => ({
+      id: item.id,
+      titulo: item.titulo,
+      prontidao: item.prontidao,
+      impacto: item.impacto,
+      bloqueio: Math.max(item.impacto - item.prontidao, 0),
+      ferramenta: item.ferramentaDestino.split('+')[0].trim(),
+      grupo: item.grupo,
+    }))
+    .sort((a, b) => b.bloqueio - a.bloqueio);
+
   const volumePeriodo = acoesOperacionais.reduce(
     (acc, item) => {
       acc.dia += item.periodo.dia;
@@ -493,6 +543,11 @@ export const CrossIntelligence: React.FC = () => {
   const maiorVolume = Math.max(volumePeriodo.dia, volumePeriodo.semana, volumePeriodo.mes);
 
   const gruposOrdenados: GrupoAcao[] = ['prontas', 'validacao', 'bloqueadas', 'execucao'];
+  const agrupamentosLoop: FluxoLoop['agrupamento'][] = [
+    'ABX orientando ABM',
+    'ABM orientando ABX',
+    'Aprendizados híbridos para outras frentes',
+  ];
 
   const abrirFluxoAcao = (item: AcaoOperacional) => {
     if (item.padraoInteracao === 'modal-curto') {
@@ -597,14 +652,51 @@ export const CrossIntelligence: React.FC = () => {
                       <p className="text-xs font-semibold text-slate-900 leading-snug">{item.titulo}</p>
                       <Badge variant={getBadgeByStatus(item.status)}>{item.status}</Badge>
                     </div>
-                    <p className="text-[11px] text-slate-700"><strong>Situação:</strong> {item.situacao}</p>
-                    <p className="text-[11px] text-slate-700"><strong>Destino real:</strong> {item.ferramentaDestino}</p>
-                    <p className="text-[11px] text-slate-700"><strong>Entrega:</strong> {item.tipoEntrega}</p>
-                    <p className="text-[11px] text-slate-700"><strong>Responsável:</strong> {item.responsavel}</p>
-                    <div className="flex items-center justify-between gap-2 text-[10px]">
-                      <span className="text-slate-500">Padrão de execução</span>
-                      <Badge variant="slate">{padraoInteracaoLabel[item.padraoInteracao]}</Badge>
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span className={`w-2 h-2 rounded-full ${moduloCor[item.moduloDestino] || 'bg-slate-400'}`} />
+                      <span className="text-slate-600 font-semibold">{item.moduloDestino}</span>
                     </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant={arquetipoMeta[item.arquetipo].badge}>{arquetipoMeta[item.arquetipo].label}</Badge>
+                      <span className="text-[10px] text-slate-500">Interação: {padraoInteracaoLabel[item.padraoInteracao]}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-700"><strong>Situação:</strong> {item.situacao}</p>
+                    {item.arquetipo === 'handoff' && (
+                      <div className="rounded-lg border border-blue-200 bg-blue-50 p-2 text-[11px] text-slate-700 space-y-1">
+                        <p><strong>Handoff:</strong> {item.ferramentaDestino} recebe {item.tipoEntrega}.</p>
+                        <p><strong>Campos enviados:</strong> {item.payloadPreview.join(' · ')}</p>
+                        <p><strong>Próxima etapa:</strong> {item.proximoEstado}</p>
+                      </div>
+                    )}
+                    {item.arquetipo === 'criacao-operacional' && (
+                      <div className="rounded-lg border border-violet-200 bg-violet-50 p-2 text-[11px] text-slate-700 space-y-1">
+                        <p><strong>Plataforma:</strong> {item.ferramentaDestino}</p>
+                        <p><strong>Objeto criado:</strong> {item.tipoEntrega}</p>
+                        <p><strong>Parâmetros:</strong> {item.configuracaoInicial.slice(0, 2).join(' · ')}</p>
+                      </div>
+                    )}
+                    {item.arquetipo === 'sincronizacao' && (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 text-[11px] text-slate-700 space-y-1">
+                        <p><strong>Origem:</strong> {item.origemDados}</p>
+                        <p><strong>Destino:</strong> {item.destinoDados}</p>
+                        <p><strong>Formato:</strong> {item.tipoEntrega}</p>
+                      </div>
+                    )}
+                    {item.arquetipo === 'validacao' && (
+                      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-[11px] text-slate-700 space-y-1">
+                        <p><strong>Validador:</strong> {item.validacaoPor} ({item.areaValidacao})</p>
+                        <p><strong>Motivo:</strong> {item.motivoValidacao}</p>
+                        <p><strong>Após validar:</strong> {item.acaoLiberadaAposValidacao}</p>
+                      </div>
+                    )}
+                    {item.arquetipo === 'desbloqueio' && (
+                      <div className="rounded-lg border border-red-200 bg-red-50 p-2 text-[11px] text-slate-700 space-y-1">
+                        <p><strong>Bloqueio:</strong> {item.bloqueio}</p>
+                        <p><strong>Pré-requisito crítico:</strong> {item.prerequisitos[0]}</p>
+                        <p><strong>Retorno após desbloquear:</strong> {item.retornoEsperado}</p>
+                      </div>
+                    )}
+                    <p className="text-[11px] text-slate-700"><strong>Responsável:</strong> {item.responsavel} · <strong>Janela:</strong> {item.janela}</p>
                     {item.validacaoPor && (
                       <p className="text-[11px] text-amber-700"><strong>Depende de:</strong> {item.validacaoPor} ({item.areaValidacao})</p>
                     )}
@@ -626,7 +718,7 @@ export const CrossIntelligence: React.FC = () => {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card noPadding className="p-5">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mapa de gargalos operacionais</p>
           <p className="text-xs text-slate-600 mt-1">Leitura imediata de travas que impedem execução com impacto.</p>
@@ -634,7 +726,7 @@ export const CrossIntelligence: React.FC = () => {
             {gargalos.map((item) => (
               <div key={item.id} className="rounded-xl border border-slate-200 p-3 bg-white">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-semibold text-slate-900">{item.titulo}</p>
+                  <p className="text-xs font-semibold text-slate-900 inline-flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5 text-red-500" />{item.titulo}</p>
                   <span className="text-[10px] font-bold text-red-700">Urgência {item.urgencia}%</span>
                 </div>
                 <p className="text-[11px] text-slate-600 mt-1"><strong>Causa:</strong> {item.causa}</p>
@@ -667,25 +759,49 @@ export const CrossIntelligence: React.FC = () => {
             })}
           </div>
         </Card>
+
+        <Card noPadding className="p-5">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Matriz de transferência cruzada</p>
+          <p className="text-xs text-slate-600 mt-1">Origem do aprendizado vs destino de aplicação no loop ABM ↔ ABX.</p>
+          <div className="mt-4 space-y-3">
+            {matrizTransferencia.map((linha) => (
+              <div key={linha.origem} className="rounded-xl border border-slate-200 p-3 bg-white">
+                <p className="text-xs font-semibold text-slate-900">{linha.origem}</p>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <p className="text-slate-500">Para ABM</p>
+                    <p className="text-base font-bold text-slate-900">{linha.paraABM}</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <p className="text-slate-500">Para ABX</p>
+                    <p className="text-base font-bold text-slate-900">{linha.paraABX}</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 border border-slate-200 p-2">
+                    <p className="text-slate-500">Outras frentes</p>
+                    <p className="text-base font-bold text-slate-900">{linha.paraOutrasFrentes}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card noPadding className="p-5 xl:col-span-2">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Confiança × prontidão × impacto</p>
-          <p className="text-xs text-slate-600 mt-1">Priorize ações de alto impacto com maior prontidão operacional.</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Prontidão × impacto × bloqueio</p>
+          <p className="text-xs text-slate-600 mt-1">Leitura para decidir: o que executar agora, o que destravar e o que escalar.</p>
           <div className="mt-4 space-y-3">
-            {acoesOperacionais.map((item) => (
+            {leituraProntidaoImpactoBloqueio.map((item) => (
               <div key={item.id} className="rounded-xl border border-slate-200 p-3 bg-white">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs font-semibold text-slate-900 truncate">{item.titulo}</p>
-                  <Badge variant={getBadgeByStatus(item.status)}>{item.status}</Badge>
+                  <Badge variant={item.bloqueio >= 25 ? 'red' : item.bloqueio >= 12 ? 'amber' : 'emerald'}>
+                    Bloqueio {item.bloqueio} pts
+                  </Badge>
                 </div>
+                <p className="text-[11px] text-slate-600 mt-1"><strong>Ferramenta foco:</strong> {item.ferramenta}</p>
                 <div className="grid grid-cols-3 gap-2 mt-3 text-[10px] text-slate-600">
-                  <div>
-                    <p className="font-bold mb-1">Confiança</p>
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500" style={{ width: `${item.confianca}%` }} /></div>
-                    <p className="mt-1">{item.confianca}%</p>
-                  </div>
                   <div>
                     <p className="font-bold mb-1">Prontidão</p>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-brand" style={{ width: `${item.prontidao}%` }} /></div>
@@ -695,6 +811,11 @@ export const CrossIntelligence: React.FC = () => {
                     <p className="font-bold mb-1">Impacto</p>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-violet-500" style={{ width: `${item.impacto}%` }} /></div>
                     <p className="mt-1">{item.impacto}%</p>
+                  </div>
+                  <div>
+                    <p className="font-bold mb-1">Tensão</p>
+                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-red-500" style={{ width: `${Math.min(item.bloqueio * 2, 100)}%` }} /></div>
+                    <p className="mt-1">{item.bloqueio} pts</p>
                   </div>
                 </div>
               </div>
@@ -727,22 +848,35 @@ export const CrossIntelligence: React.FC = () => {
         </Card>
       </div>
 
-      <Card title="Loop ABM ↔ ABX e aprendizados híbridos" subtitle="Origem, destino, frente impactada, ação gerada e status em execução">
-        <div className="space-y-3">
-          {fluxosLoop.map((loop) => (
-            <div key={loop.id} className="rounded-xl border border-slate-200 p-4 bg-white">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs">
-                  <Badge variant={loop.origem === 'ABM' ? 'blue' : loop.origem === 'ABX' ? 'amber' : 'emerald'}>{loop.origem}</Badge>
-                  <ArrowRight className="w-3 h-3 text-slate-400" />
-                  <Badge variant="slate">{loop.destino}</Badge>
-                </div>
-                <Badge variant={getBadgeByLoopStatus(loop.status)}>{loop.status}</Badge>
+      <Card title="Loop ABM ↔ ABX como backbone de orquestração" subtitle="ABX orientando ABM, ABM orientando ABX e aprendizados híbridos para outras frentes">
+        <div className="space-y-4">
+          {agrupamentosLoop.map((agrupamento) => (
+            <div key={agrupamento} className="rounded-2xl border border-slate-200 bg-slate-50/60 p-3 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-bold text-slate-900">{agrupamento}</p>
+                <Badge variant="slate">{fluxosLoop.filter((item) => item.agrupamento === agrupamento).length} fluxos</Badge>
               </div>
-              <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-700">
-                <p><strong>Frente impactada:</strong> {loop.frenteImpactada}</p>
-                <p><strong>Ação gerada:</strong> {loop.acaoGerada}</p>
-                <p><strong>Ferramenta de aplicação:</strong> {loop.ferramenta}</p>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                {fluxosLoop.filter((item) => item.agrupamento === agrupamento).map((loop) => (
+                  <div key={loop.id} className="rounded-xl border border-slate-200 p-4 bg-white">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Badge variant={loop.origem === 'ABM' ? 'blue' : loop.origem === 'ABX' ? 'amber' : 'emerald'}>{loop.origem}</Badge>
+                        <ArrowRight className="w-3 h-3 text-slate-400" />
+                        <Badge variant="slate">{loop.destino}</Badge>
+                      </div>
+                      <Badge variant={getBadgeByLoopStatus(loop.status)}>{loop.status}</Badge>
+                    </div>
+                    <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-slate-700">
+                      <p><strong>Origem do aprendizado:</strong> {loop.origem}</p>
+                      <p><strong>Destino da aplicação:</strong> {loop.destino}</p>
+                      <p><strong>Frente impactada:</strong> {loop.frenteImpactada}</p>
+                      <p><strong>Ação gerada:</strong> {loop.acaoGerada}</p>
+                      <p><strong>Ferramenta:</strong> {loop.ferramenta}</p>
+                      <p><strong>Impacto esperado:</strong> {loop.impactoEsperado}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -831,7 +965,7 @@ export const CrossIntelligence: React.FC = () => {
       <Modal
         isOpen={Boolean(acaoModalCurto)}
         onClose={() => setAcaoModalCurto(null)}
-        title={acaoModalCurto ? `Confirmação rápida · ${acaoModalCurto.ferramentaDestino}` : 'Confirmação rápida'}
+        title={acaoModalCurto ? `Confirmação rápida (${arquetipoMeta[acaoModalCurto.arquetipo].label}) · ${acaoModalCurto.ferramentaDestino}` : 'Confirmação rápida'}
         size="md"
       >
         {acaoModalCurto && (
@@ -841,6 +975,8 @@ export const CrossIntelligence: React.FC = () => {
               <p><strong>Ferramenta:</strong> {acaoModalCurto.ferramentaDestino}</p>
               <p><strong>Será enviado:</strong> {acaoModalCurto.tipoEntrega}</p>
               <p><strong>Responsável:</strong> {acaoModalCurto.responsavel}</p>
+              <p><strong>Campos preenchidos:</strong> {acaoModalCurto.payloadPreview.join(' · ')}</p>
+              <p><strong>Próximo dono:</strong> {acaoModalCurto.validacaoPor || acaoModalCurto.responsavel}</p>
               <p><strong>Próximo estado:</strong> {acaoModalCurto.proximoEstado}</p>
             </div>
             <div className="flex items-start gap-2 text-slate-700">
