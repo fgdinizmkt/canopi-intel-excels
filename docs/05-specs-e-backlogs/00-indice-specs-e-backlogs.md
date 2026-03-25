@@ -1,0 +1,17 @@
+# Canopi: pacote de specs e backlog por página
+
+- [01-acoes-spec-e-backlog.md](./01-acoes-spec-e-backlog.md)
+- [02-contas-spec-e-backlog.md](./02-contas-spec-e-backlog.md)
+- [03-contatos-spec-e-backlog.md](./03-contatos-spec-e-backlog.md)
+- [04-sinais-spec-e-backlog.md](./04-sinais-spec-e-backlog.md)
+- [05-visao-geral-spec-e-backlog.md](./05-visao-geral-spec-e-backlog.md)
+- [06-desempenho-spec-e-backlog.md](./06-desempenho-spec-e-backlog.md)
+- [07-estrategia-abm-spec-e-backlog.md](./07-estrategia-abm-spec-e-backlog.md)
+- [08-orquestracao-abx-spec-e-backlog.md](./08-orquestracao-abx-spec-e-backlog.md)
+- [09-inteligencia-cruzada-spec-e-backlog.md](./09-inteligencia-cruzada-spec-e-backlog.md)
+- [10-performance-organica-spec-e-backlog.md](./10-performance-organica-spec-e-backlog.md)
+- [11-midia-paga-spec-e-backlog.md](./11-midia-paga-spec-e-backlog.md)
+- [12-outbound-spec-e-backlog.md](./12-outbound-spec-e-backlog.md)
+- [13-assistente-spec-e-backlog.md](./13-assistente-spec-e-backlog.md)
+- [14-integracoes-spec-e-backlog.md](./14-integracoes-spec-e-backlog.md)
+- [15-configuracoes-spec-e-backlog.md](./15-configuracoes-spec-e-backlog.md)
