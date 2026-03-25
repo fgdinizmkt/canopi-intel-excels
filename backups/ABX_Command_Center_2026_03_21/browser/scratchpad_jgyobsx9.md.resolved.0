@@ -1,8 +1,0 @@
-# Plano de Tarefas - Orquestração ABX
-
-- [ ] Navegar para http://localhost:3001
-- [ ] Clicar em 'Orquestração ABX' na barra lateral
-- [ ] Explorar as camadas (Hero, Action Routes, Heatmaps, etc.)
-- [ ] Clicar na primeira linha da 'Fila de Comando ABX' para abrir o modal 'Visão 360°'
-- [ ] Capturar screenshots da seção Hero e do Modal
-- [ ] Resumir o estado visual (densidade do Hero, cores do Heatmap, conteúdo do Modal)
