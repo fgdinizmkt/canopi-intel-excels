@@ -40,6 +40,9 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "_historico",
+    "backups",
+    "src/pages/Performance-v3.tsx"
   ]
 }

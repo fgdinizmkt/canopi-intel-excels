@@ -512,7 +512,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
               <div className="absolute right-4 bottom-4 opacity-10"><FileText className="w-24 h-24"/></div>
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Exportar Lista ABM</p>
               <h4 className="text-xl font-bold">{data.label || 'Ranking ABM'}</h4>
-              <p className="text-[11px] opacity-70 mt-1">{ranked?.length || 142} registros prontos para exportação</p>
+              <p className="text-[11px] opacity-70 mt-1">{142} registros prontos para exportação</p>
             </div>
             <div className="space-y-2">
               <h5 className="text-[10px] font-bold text-slate-400 uppercase">Colunas a incluir</h5>
@@ -745,7 +745,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
             </div>
             <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
               <h5 className="text-[9px] font-bold text-slate-400 uppercase">Contas selecionadas para fast-track</h5>
-              {(abmHeatmapAccounts || []).filter((a:{ft:number})=>a.ft>=75).slice(0,4).map((acc:{id:string,name:string,ft:number,budget:number},i:number)=>(
+              {(abmHeatmapAccounts || []).filter((a:{ft:number})=>a.ft>=75).slice(0,4).map((acc:{id:number,name:string,ft:number,budget:number},i:number)=>(
                 <div key={i} className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                   <div>
                     <p className="text-[10px] font-bold text-slate-800">{acc.name}</p>

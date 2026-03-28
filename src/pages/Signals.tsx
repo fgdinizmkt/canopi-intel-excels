@@ -25,26 +25,26 @@ export const Signals: React.FC = () => {
     });
   }, [filterSeverity, filterType, filterCategory]);
 
-  const criticalCount = signals.filter(s => s.severity === "critico").length;
+  const criticalCount = signals.filter(s => s.severity === "crítico").length;
   const alertCount = signals.filter(s => s.severity === "alerta").length;
   const opportunityCount = signals.filter(s => s.severity === "oportunidade").length;
 
   const getSeverityColor = (severity: Severity) => {
     switch (severity) {
-      case "critico": return "red";
+      case "crítico": return "red";
       case "alerta": return "amber";
       case "oportunidade": return "blue";
-      case "estavel": return "emerald";
+      case "estável": return "emerald";
       default: return "slate";
     }
   };
 
   const getSeverityIcon = (severity: Severity) => {
     switch (severity) {
-      case "critico": return <AlertTriangle className="w-4 h-4 text-red-500" />;
+      case "crítico": return <AlertTriangle className="w-4 h-4 text-red-500" />;
       case "alerta": return <AlertTriangle className="w-4 h-4 text-amber-500" />;
       case "oportunidade": return <Zap className="w-4 h-4 text-brand" />;
-      case "estavel": return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+      case "estável": return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
       default: return <Info className="w-4 h-4 text-slate-500" />;
     }
   };
@@ -76,7 +76,7 @@ export const Signals: React.FC = () => {
           <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
           <div>
             <p className="text-2xl font-extrabold text-red-600">{criticalCount}</p>
-            <p className="text-xs font-semibold text-red-400 uppercase tracking-widest">Criticos</p>
+            <p className="text-xs font-semibold text-red-400 uppercase tracking-widest">Críticos</p>
           </div>
         </div>
         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-center gap-3">
@@ -101,10 +101,10 @@ export const Signals: React.FC = () => {
           <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)}
             className="text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 outline-none cursor-pointer">
             <option value="Todas">Todas</option>
-            <option value="critico">Critico</option>
+            <option value="crítico">Crítico</option>
             <option value="alerta">Alerta</option>
             <option value="oportunidade">Oportunidade</option>
-            <option value="estavel">Estavel</option>
+            <option value="estável">Estável</option>
           </select>
         </div>
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export const Signals: React.FC = () => {
         {filteredSignals.map((signal) => (
           <div key={signal.id} onClick={() => setSelectedSignal(signal)}
             className={"group bg-white hover:bg-slate-50/50 rounded-2xl p-6 transition-all border-l-4 shadow-sm hover:shadow-md cursor-pointer " +
-              (signal.severity === "critico" ? "border-l-red-500" :
+              (signal.severity === "crítico" ? "border-l-red-500" :
                signal.severity === "alerta" ? "border-l-amber-500" :
                signal.severity === "oportunidade" ? "border-l-brand" : "border-l-emerald-500")}>
             <div className="flex flex-col lg:flex-row gap-6">
@@ -185,7 +185,7 @@ export const Signals: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Impacto Estimado</p>
-                    <p className={"text-xs font-bold " + (signal.severity === "critico" ? "text-red-600" : signal.severity === "alerta" ? "text-amber-600" : "text-brand")}>
+                    <p className={"text-xs font-bold " + (signal.severity === "crítico" ? "text-red-600" : signal.severity === "alerta" ? "text-amber-600" : "text-brand")}>
                       {signal.impact}
                     </p>
                   </div>
@@ -258,7 +258,7 @@ export const Signals: React.FC = () => {
                   </div>
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Impacto</p>
-                    <p className={"text-sm font-bold " + (selectedSignal.severity === "critico" ? "text-red-600" : selectedSignal.severity === "alerta" ? "text-amber-600" : "text-brand")}>
+                    <p className={"text-sm font-bold " + (selectedSignal.severity === "crítico" ? "text-red-600" : selectedSignal.severity === "alerta" ? "text-amber-600" : "text-brand")}>
                       {selectedSignal.impact}
                     </p>
                   </div>

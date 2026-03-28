@@ -61,8 +61,7 @@ import {
   AlertCircle,
   TrendingDown,
   UserCheck,
-  HelpCircle,
-  Star
+  HelpCircle
 } from 'lucide-react';
 import { Card, Badge, Button, Modal } from '../components/ui';
 import { motion, AnimatePresence } from 'framer-motion';
