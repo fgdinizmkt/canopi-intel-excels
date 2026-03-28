@@ -1,571 +1,693 @@
-"use client";
+import { useMemo, useState } from 'react';
 
-import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Filter, 
-  Download, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  CheckCircle2,
-  AlertCircle,
-  Zap,
-  FileText,
-  MousePointer,
-  BarChart3,
-  ArrowRight
-} from 'lucide-react';
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  ReferenceDot
-} from 'recharts';
-import { Button, Modal } from '../components/ui';
+type FrontKey = 'abm' | 'abx' | 'seo' | 'inbound' | 'paid' | 'social' | 'events';
+type Confidence = 'Alta' | 'Média' | 'Baixa';
+type Status = 'saudável' | 'atenção' | 'crítico' | 'oportunidade';
 
-// Base Mock Data
-const basePerformanceData = [
-  { name: 'Semana 01', pipeline: 800000, investimento: 10000, pipelineAnterior: 720000, investimentoAnterior: 9500 },
-  { name: 'Semana 02', pipeline: 1200000, investimento: 12000, pipelineAnterior: 1050000, investimentoAnterior: 11000 },
-  { name: 'Semana 03', pipeline: 2450000, investimento: 14200, pipelineAnterior: 2100000, investimentoAnterior: 13500 },
-  { name: 'Semana 04', pipeline: 1800000, investimento: 13000, pipelineAnterior: 1950000, investimentoAnterior: 14200 },
-  { name: 'Semana 05', pipeline: 2900000, investimento: 15000, pipelineAnterior: 2400000, investimentoAnterior: 13800 },
+type Front = {
+  key: FrontKey;
+  label: string;
+  status: Status;
+  confidence: Confidence;
+  impact: string;
+  context: string;
+  integrations: string[];
+  metrics: { label: string; value: string; delta: string }[];
+  trend: number[];
+  mix: { label: string; value: number }[];
+  accounts: { name: string; owner: string; impact: string; note: string }[];
+  actions: { title: string; team: string; sla: string; expected: string }[];
+  nurture?: { flow: string; performance: string; emailModel: string }[];
+};
+
+type DetailState =
+  | { kind: 'front'; frontKey: FrontKey }
+  | { kind: 'account'; name: string; summary: string; owner: string }
+  | { kind: 'action'; title: string; team: string; expected: string }
+  | { kind: 'tool'; name: string; source: string; issue: string; impact: string }
+  | { kind: 'journey'; label: string }
+  | null;
+
+const heroMetrics = [
+  { label: 'Pipeline influenciado', value: 'R$ 5,4M', previous: 'R$ 4,8M', delta: '+12,5%' },
+  { label: 'Receita sob risco', value: 'R$ 1,3M', previous: 'R$ 1,5M', delta: '-13,3%' },
+  { label: 'SLA operacional', value: '79%', previous: '84%', delta: '-5 p.p.' },
+  { label: 'Execução efetiva', value: '41 / 56', previous: '37 / 51', delta: '+4 ações' },
 ];
 
-const baseChannelMetrics = [
-  { canal: 'SEO Orgânico', baseOportunidades: 142, basePipeline: 4.2, taxaBase: 22, cplBase: 12.00, color: '#3b82f6' },
-  { canal: 'Google Search (Paid)', baseOportunidades: 89, basePipeline: 2.8, taxaBase: 18, cplBase: 84.50, color: '#8b5cf6' },
-  { canal: 'Inbound Marketing', baseOportunidades: 204, basePipeline: 5.1, taxaBase: 28, cplBase: 45.20, color: '#10b981' },
-  { canal: 'LinkedIn Ads', baseOportunidades: 31, basePipeline: 1.1, taxaBase: 14, cplBase: 156.00, color: '#f59e0b' },
-  { canal: 'Eventos (Offline/Online)', baseOportunidades: 45, basePipeline: 3.5, taxaBase: 35, cplBase: 320.00, color: '#ec4899' },
-  { canal: 'Email Marketing', baseOportunidades: 211, basePipeline: 2.2, taxaBase: 12, cplBase: 8.50, color: '#06b6d4' },
-  { canal: 'Partners/Referral', baseOportunidades: 28, basePipeline: 6.4, taxaBase: 45, cplBase: 0.00, color: '#14b8a6' },
+const summaryCards = [
+  { label: 'Risco de churn / perda', value: 'R$ 620 mil', delta: '-8,1%', tone: 'warning' },
+  { label: 'Risco por não avanço', value: 'R$ 430 mil', delta: '-2,4%', tone: 'warning' },
+  { label: 'Risco por atraso operacional', value: 'R$ 250 mil', delta: '-1,8%', tone: 'warning' },
+  { label: 'Qualidade dos dados', value: '82%', delta: '+3 p.p.', tone: 'positive' },
+  { label: 'Qualidade das integrações', value: '68%', delta: '-4 p.p.', tone: 'warning' },
+  { label: 'Confiança da leitura', value: 'Média-alta', delta: 'Dados críticos ok', tone: 'neutral' },
+] as const;
+
+const macroSeries = [
+  { label: 'Pipeline influenciado', values: [32, 38, 46, 55, 68, 79], tone: '#10b981' },
+  { label: 'Risco de churn / perda', values: [64, 62, 60, 56, 51, 46], tone: '#f43f5e' },
+  { label: 'Risco por não avanço', values: [53, 55, 52, 47, 43, 39], tone: '#f59e0b' },
+  { label: 'Risco por atraso operacional', values: [48, 46, 45, 42, 39, 35], tone: '#0ea5e9' },
+] as const;
+
+const fronts: Front[] = [
+  {
+    key: 'abm',
+    label: 'ABM',
+    status: 'saudável',
+    confidence: 'Alta',
+    impact: '+R$ 690 mil',
+    context: 'ABM segue como frente mais consistente entre prioridade de conta, narrativa, sponsor e avanço comercial.',
+    integrations: ['CRM', 'HubSpot', 'Apollo'],
+    metrics: [
+      { label: 'Contas priorizadas', value: '34', delta: '+5' },
+      { label: 'Contas com avanço', value: '17', delta: '+4' },
+      { label: 'Pipeline influenciado', value: 'R$ 690 mil', delta: '+18%' },
+      { label: 'Executivos ativos', value: '26', delta: '+7' },
+    ],
+    trend: [39, 47, 54, 63, 72, 86],
+    mix: [
+      { label: 'Contas com sponsor', value: 74 },
+      { label: 'Narrativa aderente', value: 81 },
+      { label: 'Continuidade', value: 67 },
+      { label: 'Execução de owners', value: 72 },
+    ],
+    accounts: [
+      { name: 'MSD Saúde', owner: 'Pablo Diniz', impact: '+R$ 480 mil', note: 'Narrativa e continuidade puxaram avanço comercial.' },
+      { name: 'Minerva Foods', owner: 'Elber Costa', impact: '+R$ 210 mil', note: 'Conta avançou com sponsor e timing.' },
+    ],
+    actions: [
+      { title: 'Expandir padrão vencedor para contas lookalike', team: 'ABM + Conteúdo', sla: '48h', expected: 'Escalar avanço em contas com aderência semelhante.' },
+      { title: 'Redistribuir acompanhamento entre owners', team: 'Gestão Operacional', sla: '24h', expected: 'Reduzir dependência operacional concentrada.' },
+    ],
+    nurture: [
+      { flow: 'Nurture executivo', performance: 'Abertura 41%, clique 13%, avanço 4 contas', emailModel: 'Prova + narrativa setorial' },
+      { flow: 'Nurture de comitê', performance: 'Abertura 37%, clique 11%, 2 replies', emailModel: 'Dor operacional + caso semelhante' },
+    ],
+  },
+  {
+    key: 'abx',
+    label: 'ABX',
+    status: 'oportunidade',
+    confidence: 'Média',
+    impact: '+R$ 520 mil',
+    context: 'ABX ganha quando marketing, SDR e comercial atuam sobre as mesmas contas com contexto compartilhado.',
+    integrations: ['CRM', 'HubSpot', 'Salesforce'],
+    metrics: [
+      { label: 'Contas em orquestração', value: '21', delta: '+6' },
+      { label: 'Squads ativos', value: '5', delta: '+1' },
+      { label: 'Contas com toque multicanal', value: '14', delta: '+4' },
+      { label: 'Pipeline influenciado', value: 'R$ 520 mil', delta: '+16%' },
+    ],
+    trend: [28, 33, 39, 51, 63, 71],
+    mix: [
+      { label: 'Coordenação entre áreas', value: 69 },
+      { label: 'Multicanal por conta', value: 63 },
+      { label: 'Continuidade por jornada', value: 58 },
+      { label: 'Penetração em comitê', value: 54 },
+    ],
+    accounts: [
+      { name: 'Clever Devices', owner: 'Fábio Diniz', impact: '+R$ 170 mil', note: 'Conta respondeu melhor com coordenação entre marketing e SDR.' },
+      { name: 'FHLB', owner: 'Ligia Martins', impact: '+R$ 90 mil', note: 'Boa resposta a múltiplos toques.' },
+    ],
+    actions: [
+      { title: 'Abrir leitura de jornada por conta em orquestração', team: 'ABX + Ops', sla: '48h', expected: 'Dar visibilidade ao progresso por relacionamento.' },
+      { title: 'Priorizar contas com penetração parcial e intenção recente', team: 'ABX + SDR', sla: '24h', expected: 'Aumentar continuidade onde já existe tração.' },
+    ],
+    nurture: [
+      { flow: 'Nurture por jornada de conta', performance: 'Abertura 36%, clique 9%, 3 reuniões', emailModel: 'Dor + multitoque + prova' },
+      { flow: 'Nurture de expansão', performance: 'Abertura 33%, clique 10%, 1 reply executivo', emailModel: 'Caso + próximo passo operacional' },
+    ],
+  },
+  {
+    key: 'seo',
+    label: 'SEO',
+    status: 'oportunidade',
+    confidence: 'Média',
+    impact: '+R$ 420 mil',
+    context: 'SEO ganhou força em descoberta e intenção qualificada com GEO, AEO e AIO em temas comparativos e de eficiência.',
+    integrations: ['GA4', 'Search Console'],
+    metrics: [
+      { label: 'GEO', value: '61', delta: '+9' },
+      { label: 'AEO', value: '54', delta: '+7' },
+      { label: 'AIO', value: '43', delta: '+5' },
+      { label: 'Temas com tração', value: '18', delta: '+4' },
+    ],
+    trend: [28, 34, 39, 52, 61, 72],
+    mix: [
+      { label: 'Perguntas comparativas', value: 72 },
+      { label: 'Problemas e dores', value: 64 },
+      { label: 'Intenção comercial', value: 48 },
+      { label: 'Páginas estratégicas', value: 41 },
+    ],
+    accounts: [
+      { name: 'V.tal', owner: 'Camila Ribeiro', impact: '+R$ 190 mil', note: 'SEO sustentou descoberta e retomada.' },
+      { name: 'MSD Saúde', owner: 'Pablo Diniz', impact: '+R$ 110 mil', note: 'Temas específicos ajudaram na qualificação.' },
+    ],
+    actions: [
+      { title: 'Abrir páginas para termos com intenção alta', team: 'SEO + Conteúdo', sla: '48h', expected: 'Ganhar descoberta com melhor qualidade.' },
+      { title: 'Expandir cluster de integração e eficiência', team: 'Conteúdo', sla: '72h', expected: 'Aumentar aderência em buscas mais maduras.' },
+    ],
+  },
+  {
+    key: 'inbound',
+    label: 'Inbound',
+    status: 'atenção',
+    confidence: 'Alta',
+    impact: '+R$ 380 mil',
+    context: 'Inbound continua gerando demanda útil, mas perdeu velocidade entre descoberta, levantamento e resposta em contas enterprise.',
+    integrations: ['HubSpot', 'GA4'],
+    metrics: [
+      { label: 'Leads qualificados', value: '186', delta: '+11%' },
+      { label: 'Taxa de avanço', value: '24%', delta: '-3 p.p.' },
+      { label: 'Tempo até resposta', value: '2,8 dias', delta: '+0,6' },
+      { label: 'Ativos puxadores', value: '9', delta: '+2' },
+    ],
+    trend: [62, 60, 61, 57, 55, 51],
+    mix: [
+      { label: 'Descoberta', value: 78 },
+      { label: 'Levantamento', value: 55 },
+      { label: 'Resposta', value: 41 },
+      { label: 'Continuidade', value: 38 },
+    ],
+    accounts: [
+      { name: 'Carteiro Seguros Enterprise', owner: 'Ligia Martins', impact: 'Risco de R$ 220 mil', note: 'Perdeu timing entre interesse e recomendação.' },
+      { name: 'ArcelorMittal', owner: 'Célio Hira', impact: '+R$ 140 mil', note: 'Continuidade parcial após bom início.' },
+    ],
+    actions: [
+      { title: 'Revisar handoff entre inbound e vendas', team: 'RevOps', sla: '24h', expected: 'Recuperar velocidade em contas enterprise.' },
+      { title: 'Ajustar CTA dos ativos de maior valor', team: 'Conteúdo + Growth', sla: '72h', expected: 'Melhorar passagem para resposta.' },
+    ],
+    nurture: [
+      { flow: 'Nurture de consideração', performance: 'Abertura 39%, clique 12%, avanço 6 contas', emailModel: 'Problema + prova + CTA leve' },
+      { flow: 'Nurture de retomada', performance: 'Abertura 31%, clique 8%, 2 replies', emailModel: 'Recap + urgência operacional' },
+    ],
+  },
+  {
+    key: 'paid',
+    label: 'Mídia Paga',
+    status: 'crítico',
+    confidence: 'Alta',
+    impact: 'Risco de R$ 310 mil',
+    context: 'Mídia paga elevou custo em grupos amplos e não sustentou avanço proporcional em continuidade e pipeline.',
+    integrations: ['Google Ads', 'LinkedIn Ads', 'GA4'],
+    metrics: [
+      { label: 'Investimento', value: 'R$ 84 mil', delta: '+18%' },
+      { label: 'CPL', value: 'R$ 312', delta: '+22%' },
+      { label: 'Avanço útil', value: '11%', delta: '-4 p.p.' },
+      { label: 'Segmentos com desperdício', value: '7', delta: '+3' },
+    ],
+    trend: [78, 74, 71, 63, 58, 49],
+    mix: [
+      { label: 'Clique', value: 79 },
+      { label: 'Lead', value: 58 },
+      { label: 'Levantamento', value: 34 },
+      { label: 'Continuidade', value: 21 },
+    ],
+    accounts: [
+      { name: 'Minerva Foods', owner: 'Elber Costa', impact: '+R$ 130 mil', note: 'Melhor resposta em segmentação mais precisa.' },
+      { name: 'NowVertical BR', owner: 'Pablo Diniz', impact: 'Risco operacional', note: 'Clique alto sem avanço comercial compatível.' },
+    ],
+    actions: [
+      { title: 'Cortar grupos com clique sem continuidade', team: 'Mídia Paga', sla: 'Hoje', expected: 'Reduzir desperdício imediatamente.' },
+      { title: 'Redistribuir budget para ICP com melhor aderência', team: 'Performance', sla: '24h', expected: 'Melhorar avanço útil do investimento.' },
+    ],
+  },
+  {
+    key: 'social',
+    label: 'Mídia Social',
+    status: 'atenção',
+    confidence: 'Média',
+    impact: '+R$ 90 mil',
+    context: 'Social melhorou em prova, autoridade e apoio à jornada, mas ainda com atribuição parcial e pouco encadeamento direto.',
+    integrations: ['LinkedIn', 'Meta'],
+    metrics: [
+      { label: 'Engajamento útil', value: '7,2%', delta: '+1,4 p.p.' },
+      { label: 'Temas com resposta alta', value: '6', delta: '+2' },
+      { label: 'Contas tocadas', value: '14', delta: '+5' },
+      { label: 'Confiança da atribuição', value: '54%', delta: '+6 p.p.' },
+    ],
+    trend: [33, 38, 42, 47, 51, 57],
+    mix: [
+      { label: 'Prova e autoridade', value: 71 },
+      { label: 'Amplificação', value: 66 },
+      { label: 'Jornada de conta', value: 44 },
+      { label: 'Atribuição', value: 31 },
+    ],
+    accounts: [
+      { name: 'Clever Devices', owner: 'Fábio Diniz', impact: '+R$ 60 mil', note: 'Engajamento ajudou aquecimento.' },
+      { name: 'FHLB', owner: 'Ligia Martins', impact: 'Potencial de retomada', note: 'Influência visível, mas ainda sem fechamento claro.' },
+    ],
+    actions: [
+      { title: 'Conectar posts de prova a jornadas específicas', team: 'Social + Growth', sla: '72h', expected: 'Dar consequência para temas que já tracionam.' },
+      { title: 'Marcar contas impactadas por campanhas sociais', team: 'Ops', sla: '48h', expected: 'Melhorar a leitura da influência real.' },
+    ],
+  },
+  {
+    key: 'events',
+    label: 'Eventos',
+    status: 'oportunidade',
+    confidence: 'Média',
+    impact: '+R$ 260 mil',
+    context: 'Eventos trouxeram abertura de relacionamento e reuniões, mas a disciplina pós-evento ainda varia muito por owner.',
+    integrations: ['CRM', 'Planilhas'],
+    metrics: [
+      { label: 'Contas impactadas', value: '23', delta: '+8' },
+      { label: 'Follow-up em dia', value: '61%', delta: '+9 p.p.' },
+      { label: 'Reuniões geradas', value: '12', delta: '+4' },
+      { label: 'Oportunidades abertas', value: '4', delta: '+2' },
+    ],
+    trend: [21, 29, 36, 48, 59, 66],
+    mix: [
+      { label: 'Aquecimento', value: 73 },
+      { label: 'Follow-up', value: 61 },
+      { label: 'Reuniões', value: 52 },
+      { label: 'Oportunidade', value: 39 },
+    ],
+    accounts: [
+      { name: 'MSD Animal Health', owner: 'Camila Ribeiro', impact: '+R$ 140 mil', note: 'Bom follow-up e evolução.' },
+      { name: 'Grupo IN', owner: 'Fábio Diniz', impact: '+R$ 70 mil', note: 'Aquecimento consistente com continuidade parcial.' },
+    ],
+    actions: [
+      { title: 'Abrir régua pós-evento para contas quentes', team: 'CRM + SDR', sla: '24h', expected: 'Ganhar continuidade operacional.' },
+      { title: 'Priorizar reuniões com contas aquecidas', team: 'Comercial', sla: 'Hoje', expected: 'Converter calor em avanço real.' },
+    ],
+    nurture: [
+      { flow: 'Pós-evento quente', performance: 'Abertura 42%, clique 15%, 4 reuniões', emailModel: 'Recap + próximo passo + urgência' },
+      { flow: 'Pós-evento morno', performance: 'Abertura 29%, clique 7%, 1 reply', emailModel: 'Resumo + conteúdo de apoio' },
+    ],
+  },
 ];
 
-const baseHeatmapData = [
-  { time: '00-02H', channels: [1, 1, 2, 2, 1, 1] },
-  { time: '02-04H', channels: [1, 1, 1, 1, 1, 1] },
-  { time: '04-06H', channels: [2, 1, 1, 1, 1, 2] },
-  { time: '06-08H', channels: [3, 2, 2, 3, 2, 4] },
-  { time: '08-10H', channels: [4, 4, 3, 4, 3, 5] },
-  { time: '10-12H', channels: [5, 5, 4, 3, 4, 3] },
-  { time: '12-14H', channels: [4, 5, 5, 4, 3, 2] },
-  { time: '14-16H', channels: [4, 4, 5, 5, 4, 3] },
-  { time: '16-18H', channels: [5, 5, 4, 4, 5, 2] },
-  { time: '18-20H', channels: [3, 4, 3, 2, 2, 1] },
-  { time: '20-22H', channels: [2, 2, 2, 1, 1, 1] },
-  { time: '22-00H', channels: [1, 1, 1, 1, 1, 1] },
+const toolDiagnostics = [
+  { name: 'HubSpot', status: 'Conectado', source: 'Leads, fluxos, e-mails, lifecycle stage', issue: 'Alguns eventos de clique chegam com atraso em fluxos antigos.', impact: 'Pode subestimar performance de nutrição em algumas jornadas.' },
+  { name: 'Salesforce', status: 'Parcial', source: 'Oportunidades, estágio, owner, contas', issue: 'Campos de motivo de perda e próximos passos estão inconsistentes.', impact: 'A leitura de risco por não avanço fica menos precisa.' },
+  { name: 'GA4', status: 'Conectado', source: 'Sessões, conversão, páginas e eventos digitais', issue: 'Campanhas históricas têm UTMs incompletas.', impact: 'Atribuição digital fica parcial em alguns períodos.' },
+  { name: 'Search Console', status: 'Conectado', source: 'Queries, páginas, cliques, impressões', issue: 'Cobertura limitada para páginas novas de fundo comercial.', impact: 'SEO pode parecer menor do que realmente está contribuindo.' },
+  { name: 'LinkedIn Ads', status: 'Parcial', source: 'Campanhas, gasto, leads, segmentação', issue: 'Sincronização recente falhou em grupos específicos.', impact: 'Paid e influência social ficam subavaliados.' },
+  { name: 'CRM', status: 'Conectado', source: 'Contas, owners, ações, histórico operacional', issue: 'Contas sem owner e lacunas de senioridade persistem.', impact: 'Priorização e continuidade perdem qualidade.' },
 ];
 
-const channelNames = ['PAID SEARCH', 'SEO ORGÂNICO', 'SOCIAL ADS', 'OUTBOUND', 'REFERRAL', 'E-MAIL'];
+const journeySteps = [
+  { step: 'Origem do sinal', text: 'Paid perdeu continuidade, enquanto ABM, ABX e SEO sustentaram avanço qualificado.' },
+  { step: 'Onde apareceu primeiro', text: 'A quebra ficou visível em handoff, contas enterprise e jornadas com owner instável.' },
+  { step: 'Tipo de risco gerado', text: 'Parte do risco foi de churn/perda, parte de não avanço e parte de atraso operacional.' },
+  { step: 'Ação disparada', text: 'Cortar desperdício em paid, reforçar handoff, abrir clusters SEO e estabilizar owners nas contas críticas.' },
+  { step: 'Consequência esperada', text: 'Proteger receita, recuperar eficiência e tornar a próxima ação mais clara para cada frente.' },
+];
 
-type TimeFilter = '7d' | '30d' | '90d';
+const consequenceRows = [
+  { account: 'MSD Saúde', owner: 'Pablo Diniz', action: 'Ajustar narrativa executiva para comitê', status: 'Evoluiu', impact: '+R$ 480 mil influenciados' },
+  { account: 'V.tal', owner: 'Camila Ribeiro', action: 'Retomar resposta técnica e revisão', status: 'Risco por atraso', impact: '+14 dias no ciclo' },
+  { account: 'Carteiro Seguros Enterprise', owner: 'Ligia Martins', action: 'Corrigir roteamento de leads inbound', status: 'Risco por não avanço', impact: 'Risco de R$ 220 mil' },
+];
 
-const KPICard = ({ title, value, trend, isPositive }: { title: string, value: string, trend: string, isPositive: boolean }) => (
-  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300">
-    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{title}</p>
-    <div className="flex items-end justify-between">
-      <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
-      <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold ${
-        isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-      }`}>
-        {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-        {trend}
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(' ');
+}
+
+function toneClass(tone: string) {
+  switch (tone) {
+    case 'positive':
+    case 'saudável':
+      return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+    case 'warning':
+    case 'atenção':
+      return 'border-amber-200 bg-amber-50 text-amber-700';
+    case 'danger':
+    case 'crítico':
+      return 'border-rose-200 bg-rose-50 text-rose-700';
+    case 'oportunidade':
+      return 'border-sky-200 bg-sky-50 text-sky-700';
+    default:
+      return 'border-slate-200 bg-slate-50 text-slate-700';
+  }
+}
+
+function Sparkline({ values, color }: { values: number[]; color: string }) {
+  const w = 300;
+  const h = 120;
+  const pad = 10;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = Math.max(1, max - min);
+  const points = values
+    .map((v, i) => {
+      const x = pad + (i * (w - pad * 2)) / (values.length - 1);
+      const y = h - pad - ((v - min) / range) * (h - pad * 2);
+      return `${x},${y}`;
+    })
+    .join(' ');
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="h-32 w-full rounded-2xl border border-slate-200 bg-white">
+      <polyline points={points} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      {values.map((v, i) => {
+        const x = pad + (i * (w - pad * 2)) / (values.length - 1);
+        const y = h - pad - ((v - min) / range) * (h - pad * 2);
+        return <circle key={`${v}-${i}`} cx={x} cy={y} r="4" fill={color} />;
+      })}
+    </svg>
+  );
+}
+
+function Bars({ items, color }: { items: { label: string; value: number }[]; color: string }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="space-y-4">
+        {items.map((item) => (
+          <div key={item.label}>
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="text-slate-600">{item.label}</span>
+              <span className="font-semibold text-slate-900">{item.value}</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full" style={{ width: `${item.value}%`, background: color }} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
-  </div>
-);
+  );
+}
 
-export const Performance: React.FC = () => {
-  const [activeMetric, setActiveMetric] = useState('receita');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('30d');
-  
-  // Modal states for simulations
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<{ title: string; content: React.ReactNode } | null>(null);
+function SectionHeader({ title, description, right }: { title: string; description: string; right?: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h2>
+        <p className="mt-1 max-w-4xl text-sm text-slate-500">{description}</p>
+      </div>
+      {right}
+    </div>
+  );
+}
 
-  const filterMultipliers = {
-    '7d': { vol: 0.25, rateMod: -2.4, cplMod: +15, label: 'Últimos 7 dias' },
-    '30d': { vol: 1.0, rateMod: 0, cplMod: 0, label: 'Últimos 30 dias' },
-    '90d': { vol: 3.2, rateMod: +4.1, cplMod: -12, label: 'Últimos 90 dias' },
-  };
+export default function Performance() {
+  const [selectedFront, setSelectedFront] = useState<FrontKey>('abm');
+  const [search, setSearch] = useState('');
+  const [confidenceFilter, setConfidenceFilter] = useState<'todas' | Confidence>('todas');
+  const [detail, setDetail] = useState<DetailState>(null);
 
-  const currFilter = filterMultipliers[timeFilter];
+  const filteredFronts = useMemo(() => {
+    return fronts.filter((front) => {
+      const matchesSearch = [front.label, front.context, ...front.accounts.map((a) => a.name)].join(' ').toLowerCase().includes(search.toLowerCase());
+      const matchesConfidence = confidenceFilter === 'todas' || front.confidence === confidenceFilter;
+      return matchesSearch && matchesConfidence;
+    });
+  }, [search, confidenceFilter]);
 
-  // Derive dynamic heatmap data so colors change from Hot to Cold
-  const dynamicHeatmapData = baseHeatmapData.map((slot, i) => ({
-    time: slot.time,
-    channels: slot.channels.map((val, j) => {
-      // Simulate heat variation based on volume
-      let newVal = val * currFilter.vol;
+  const front = useMemo(() => filteredFronts.find((item) => item.key === selectedFront) ?? filteredFronts[0] ?? fronts[0], [filteredFronts, selectedFront]);
+  const toneColor = front.status === 'crítico' ? '#f43f5e' : front.status === 'atenção' ? '#f59e0b' : front.status === 'oportunidade' ? '#0ea5e9' : '#10b981';
 
-      // Add variety for other periods to illustrate big jumps
-      if (timeFilter !== '30d') {
-         // Create deterministic pseudo-random noise so it feels real
-         const noise = (Math.sin(i * 10 + j * 5) + Math.cos(val)) * (timeFilter === '90d' ? 2 : 1.5);
-         newVal += noise;
-      }
-      
-      if (activeMetric === 'volume') newVal *= 1.2;
-      if (activeMetric === 'investimento') newVal *= 0.8;
-      // Clamp between 1 (Colsest) to 5 (Hottest)
-      return Math.min(5, Math.max(1, Math.round(newVal)));
-    })
-  }));
-
-  const metrics = [
-    { id: 'receita', label: 'Receita' },
-    { id: 'volume', label: 'Volume' },
-    { id: 'oportunidades', label: 'Oportunidades' },
-    { id: 'investimento', label: 'Investimento' },
-    { id: 'trafego', label: 'Tráfego' },
-  ];
-
-  const getHeatmapValue = (intensity: number) => {
-    const base = intensity * 10;
-    switch (activeMetric) {
-      case 'receita': return `R$ ${(base * 12.5).toFixed(0)}k`;
-      case 'volume': return (base * 150).toFixed(0);
-      case 'oportunidades': return (base * 12).toFixed(0);
-      case 'investimento': return `R$ ${(base * 1.2).toFixed(1)}k`;
-      case 'trafego': return (base * 1200).toFixed(0);
-      default: return base;
-    }
-  };
-
-  // The requested Hot to Cold Color Scale (Frio -> Quente) with Pastel & Transparency
-  const hotColdScaleColors = [
-    'bg-[#bae6fd]/70 text-blue-900 border-[#7dd3fc]/50', // 1: Very Cold (Pastel Light Blue)
-    'bg-[#e0f2fe]/80 text-blue-900 border-[#bae6fd]/60', // 2: Cold (Lighter Blue/Cyan)
-    'bg-[#fef08a]/80 text-yellow-900 border-[#fde047]/60', // 3: Warm (Pastel Yellow)
-    'bg-[#fdba74]/80 text-orange-900 border-[#fb923c]/60', // 4: Hot (Pastel Orange)
-    'bg-[#fca5a5]/80 text-red-900 border-[#f87171]/60', // 5: Very Hot (Pastel Red)
-  ];
-
-  const getHeatmapColor = (intensity: number) => {
-    const index = Math.min(Math.max(Math.floor(intensity) - 1, 0), 4);
-    return hotColdScaleColors[index];
-  };
-
-  const cycleTimeFilter = () => {
-    if (timeFilter === '30d') setTimeFilter('90d');
-    else if (timeFilter === '90d') setTimeFilter('7d');
-    else setTimeFilter('30d');
-  };
-
-  const openSimModal = (title: string, type: string, extra?: any) => {
-    let content;
-    switch(type) {
-      case 'EXPORT':
-        content = (
-          <div className="space-y-6 flex flex-col items-center justify-center py-6 animate-in zoom-in-95">
-            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center animate-bounce">
-              <FileText className="w-8 h-8" />
-            </div>
-            <div className="text-center">
-              <h3 className="font-bold text-slate-900 text-lg">Gerando Relatório B2B...</h3>
-              <p className="text-sm text-slate-500 mt-2">Exportando KPIs detalhados da visualização de {currFilter.label}.</p>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-600 w-full animate-[progress_2s_ease-out]"></div>
-              <style>{`@keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }`}</style>
-            </div>
-            <p className="text-[10px] font-bold text-emerald-600 tracking-widest uppercase">Download Concluído</p>
-          </div>
-        );
-        break;
-      case 'HEATMAP_CELL':
-        content = (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
-              <div className={`w-8 h-8 rounded-lg ${getHeatmapColor(extra.intensity)}`}></div>
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase">{extra.channel} • {extra.time}</p>
-                <p className="font-bold text-slate-900 text-lg">{getHeatmapValue(extra.intensity)} gerados ({activeMetric})</p>
-              </div>
-            </div>
-            <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl relative overflow-hidden">
-              <Zap className="w-16 h-16 absolute -right-2 -bottom-2 text-amber-200/50" />
-              <p className="text-sm text-amber-900 relative z-10 font-medium">
-                <strong className="block mb-1 text-amber-700">Insight Sistêmico:</strong>
-                A conversão nesta faixa horária aumentou 45% nos {currFilter.label}. Recomendamos alocar SDRs dedicados para inbound reply neste momento específico.
-              </p>
-            </div>
-          </div>
-        );
-        break;
-      case 'FILTERS':
-        content = (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600">Simulação do painel lateral de Filtros Avançados.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 border border-slate-200 rounded-xl">
-                <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-2">SEGMENTO</p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" checked readOnly/> Enterprise</div>
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" readOnly/> Mid-Market</div>
-                </div>
-              </div>
-              <div className="p-4 border border-slate-200 rounded-xl">
-                <p className="text-[10px] font-bold tracking-widest text-slate-400 mb-2">TIER CONTA</p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" checked readOnly/> Tier 1</div>
-                  <div className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" readOnly/> Tier 2</div>
-                </div>
-              </div>
-            </div>
-            <Button className="w-full bg-blue-600" onClick={() => setModalOpen(false)}>Aplicar Filtros</Button>
-          </div>
-        );
-        break;
-      case 'REPORT':
-        content = (
-          <div className="text-center py-8 space-y-4">
-             <BarChart3 className="w-12 h-12 text-slate-300 mx-auto" />
-             <h3 className="font-bold text-lg">Abrindo Deep Dive...</h3>
-             <p className="text-sm text-slate-500">Isso abriria um drill-down detalhado das métricas do funil por canal.</p>
-          </div>
-        );
-        break;
-      default:
-        content = <div className="p-4">Simulação acionada.</div>;
-    }
-
-    setModalData({ title, content });
-    setModalOpen(true);
-  };
+  const openAccount = (account: Front['accounts'][number]) => setDetail({ kind: 'account', name: account.name, summary: account.note, owner: account.owner });
+  const openAction = (action: Front['actions'][number]) => setDetail({ kind: 'action', title: action.title, team: action.team, expected: action.expected });
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24 max-w-7xl mx-auto">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Análise de Desempenho</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">Monitoramento avançado de fluxo de receita e eficiência de funil.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Dynamic Filter simulation trigger */}
-          <button 
-            onClick={cycleTimeFilter}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm group relative"
-          >
-            <Calendar className="w-4 h-4 group-hover:scale-110 transition-transform" />
-            <span className="w-[110px] text-center">{currFilter.label}</span>
-            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
-          </button>
-          
-          <button onClick={() => openSimModal('Filtros Avançados', 'FILTERS')} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
-            <Filter className="w-4 h-4" />
-            Filtros
-          </button>
-          <button onClick={() => openSimModal('Exportação', 'EXPORT')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-lg text-xs font-bold text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20">
-            <Download className="w-4 h-4" />
-            Exportar
-          </button>
-        </div>
-      </div>
-
-      {/* KPI Grid (Dynamic) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard 
-          title="Investimento Total" 
-          value={`R$ ${(142.5 * currFilter.vol).toFixed(1)}k`} 
-          trend={currFilter.vol > 1 ? "+12%" : "-4%"} 
-          isPositive={currFilter.vol >= 1} 
-        />
-        <KPICard 
-          title="Custo por Lead (CPL)" 
-          value={`R$ ${(42.10 * (1 + (currFilter.cplMod/100))).toFixed(2)}`} 
-          trend={`${currFilter.cplMod > 0 ? '+' : ''}${currFilter.cplMod}%`} 
-          isPositive={currFilter.cplMod <= 0} 
-        />
-        <KPICard 
-          title="Taxa de Conversão" 
-          value={`${(18.4 + currFilter.rateMod).toFixed(1)}%`} 
-          trend={`${currFilter.rateMod > 0 ? '+' : ''}${(2.1 + currFilter.rateMod).toFixed(1)}%`} 
-          isPositive={currFilter.rateMod >= 0} 
-        />
-        <KPICard 
-          title="CAC Médio" 
-          value={`R$ ${(1250 * (1 + (currFilter.cplMod/100))).toFixed(0)}`} 
-          trend={`${currFilter.cplMod > 0 ? '+' : '-'}${(8 + Math.abs(currFilter.cplMod)).toFixed(1)}%`} 
-          isPositive={currFilter.cplMod <= 0} 
-        />
-      </div>
-
-      {/* Main Chart Section */}
-      <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Duna de Receita & Tendência de Investimento</h2>
-            <p className="text-slate-400 text-xs mt-1 font-medium">Análise temporal de pipeline influenciado vs capital alocado</p>
-          </div>
-          <div className="flex items-center gap-6 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500/20 border-2 border-blue-600"></div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pipeline</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-200"></div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Investimento</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="h-[350px] w-full relative">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={basePerformanceData.map(d => ({
-              ...d, 
-              pipeline: d.pipeline * currFilter.vol,
-              investimento: d.investimento * currFilter.vol,
-              pipelineAnterior: d.pipelineAnterior * currFilter.vol,
-            }))}>
-              <defs>
-                <linearGradient id="colorPipeline" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15}/>
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0.01}/>
-                </linearGradient>
-                <linearGradient id="colorPipelineAnterior" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.08}/>
-                  <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{fill: '#94a3b8', fontSize: 10, fontWeight: 700}}
-                dy={10}
-              />
-              <YAxis hide />
-              <Tooltip 
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="bg-slate-900 text-white p-4 rounded-xl shadow-2xl border border-slate-800">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Detalhamento Semanal</p>
-                        <div className="space-y-2">
-                          <div>
-                            <p className="text-[9px] font-bold text-blue-400 uppercase mb-1">Período Atual</p>
-                            <p className="text-xs font-medium flex justify-between gap-6">
-                              <span className="text-slate-400">Pipeline:</span>
-                              <span className="font-bold text-white">R$ {payload[0]?.value ? Number(payload[0].value).toLocaleString('pt-BR') : 0}</span>
-                            </p>
-                          </div>
-                          <div className="pt-2 border-t border-slate-800">
-                            <p className="text-[9px] font-bold text-slate-500 uppercase mb-1">Período Anterior</p>
-                            <p className="text-xs font-medium flex justify-between gap-6">
-                              <span className="text-slate-400">Pipeline:</span>
-                              <span className="font-bold text-slate-300">R$ {payload[1]?.value ? Number(payload[1].value).toLocaleString('pt-BR') : 0}</span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Area type="monotone" dataKey="pipelineAnterior" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 5" fill="url(#colorPipelineAnterior)" />
-              <Area type="monotone" dataKey="pipeline" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorPipeline)" />
-              <Area type="monotone" dataKey="investimento" stroke="#93c5fd" strokeWidth={2} strokeDasharray="3 3" fill="transparent" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Heatmap Section */}
-      <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm transition-all">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Matriz de Densidade de Conversão</h2>
-            <div className="flex items-center gap-4 mt-2">
-              <p className="text-slate-500 text-xs font-medium">Temperatura performática redimensionada por: <b>{currFilter.label}</b></p>
-              <div className="h-1 w-1 rounded-full bg-slate-300"></div>
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-                <span className="text-[8px] font-bold text-blue-700 uppercase tracking-widest">Frio</span>
-                <div className="flex gap-0.5">
-                  {hotColdScaleColors.map((color, i) => (
-                    <div key={i} className={`w-4 h-1.5 rounded-sm ${color}`}></div>
-                  ))}
-                </div>
-                <span className="text-[8px] font-bold text-red-600 uppercase tracking-widest">Quente</span>
+    <div className="min-h-screen bg-[#f6f8fc] text-slate-900">
+      <div className="mx-auto w-full max-w-[1480px] px-6 py-6 xl:px-8">
+        <section className="overflow-hidden rounded-[28px] bg-[#10358f] text-white shadow-[0_20px_60px_rgba(16,53,143,0.22)]">
+          <div className="px-6 py-6 md:px-8 md:py-7">
+            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/90">Desempenho</span>
+            <div className="mt-4 grid gap-6 xl:grid-cols-[1.15fr_1fr]">
+              <div>
+                <h1 className="max-w-3xl text-3xl font-semibold tracking-tight md:text-[34px]">Ler performance, entender causas e decidir onde agir.</h1>
+                <p className="mt-2 max-w-2xl text-sm text-white/75">Resultado da operação no período, com contexto para priorizar as próximas decisões sem perder consequência comercial.</p>
               </div>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center bg-slate-100/50 p-1 rounded-xl">
-            {metrics.map((metric) => (
-              <button
-                key={metric.id}
-                onClick={() => setActiveMetric(metric.id)}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                  activeMetric === metric.id
-                    ? 'bg-white text-blue-600 shadow-sm border border-slate-200'
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                {metric.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="overflow-x-auto pb-4">
-          <div className="min-w-[800px]">
-            <div className="grid grid-cols-[140px_1fr] gap-4">
-              <div className="space-y-3 pt-1">
-                {channelNames.map((channel, i) => (
-                  <div key={i} className="h-10 flex items-center justify-end pr-2 border-r border-slate-100">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{channel}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-12 gap-1.5">
-                {dynamicHeatmapData.map((timeSlot, colIndex) => (
-                  <div key={colIndex} className="space-y-3">
-                    {timeSlot.channels.map((intensity, rowIndex) => (
-                      <div 
-                        key={rowIndex} 
-                        onClick={() => openSimModal('Insight por Quadrante', 'HEATMAP_CELL', { intensity, channel: channelNames[rowIndex], time: timeSlot.time })}
-                        className={`h-10 rounded-lg transition-all duration-300 hover:scale-[1.15] cursor-pointer ${getHeatmapColor(intensity)} flex items-center justify-center group relative shadow-sm hover:z-10`}
-                      >
-                        <span className="text-[7px] font-bold opacity-80 group-hover:opacity-0 transition-opacity whitespace-nowrap px-1">
-                           {getHeatmapValue(intensity)}
-                        </span>
-                        <span className="text-[8px] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 absolute inset-0 justify-center">
-                           <MousePointer className="w-3 h-3"/>
-                        </span>
-                      </div>
-                    ))}
-                    <div className="pt-2 text-center border-t border-slate-50">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter whitespace-nowrap">
-                        {timeSlot.time}
-                      </span>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {heroMetrics.map((metric) => (
+                  <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/65">{metric.label}</div>
+                    <div className="mt-3 text-3xl font-semibold tracking-tight">{metric.value}</div>
+                    <div className="mt-2 flex items-center justify-between gap-3 text-xs text-white/72">
+                      <span>Anterior {metric.previous}</span>
+                      <span className="rounded-full bg-white/10 px-2 py-1 font-semibold text-white">{metric.delta}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Comparison Table and Insights */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-lg font-bold text-slate-900">Métricas Comparativas por Canal</h2>
-            <button onClick={() => openSimModal('Relatório Consolidado', 'REPORT')} className="text-blue-600 text-[11px] font-bold uppercase tracking-widest hover:underline flex items-center gap-1">Ver relatório <ArrowRight className="w-3 h-3" /></button>
+        <section className="mt-6 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="grid gap-3 xl:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))]">
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar conta, canal, campanha, owner ou situação" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none" />
+            <button className="rounded-2xl border border-slate-200 px-4 py-3 text-left text-sm text-slate-700">Período: últimos 30 dias</button>
+            <button className="rounded-2xl border border-slate-200 px-4 py-3 text-left text-sm text-slate-700">Dimensão principal: situacional</button>
+            <select value={confidenceFilter} onChange={(e) => setConfidenceFilter(e.target.value as any)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none">
+              <option value="todas">Confiança: todas</option>
+              <option value="Alta">Confiança: alta</option>
+              <option value="Média">Confiança: média</option>
+              <option value="Baixa">Confiança: baixa</option>
+            </select>
+            <button className="rounded-2xl border border-slate-200 px-4 py-3 text-left text-sm text-slate-700">Integrações: todas</button>
+            <button className="rounded-2xl border border-slate-200 px-4 py-3 text-left text-sm text-slate-700">Owners: todos</button>
           </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="text-left pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-4">Canal de Aquisição</th>
-                  <th className="text-right pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Oportunidades</th>
-                  <th className="text-right pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pipeline Gerado</th>
-                  <th className="text-right pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Taxa SQL/OP</th>
-                  <th className="text-right pb-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest pr-4">CPL</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {baseChannelMetrics.map((item, i) => (
-                  <tr key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => openSimModal(`Detalhes: ${item.canal}`, 'REPORT')}>
-                    <td className="py-4 pl-4 rounded-l-xl">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-sm font-bold text-slate-700">{item.canal}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-right text-sm font-medium text-slate-600">{(item.baseOportunidades * currFilter.vol).toFixed(0)}</td>
-                    <td className="py-4 text-right text-sm font-bold text-slate-900 border-l border-transparent group-hover:border-slate-100 px-4 bg-transparent group-hover:bg-slate-100/50 transition-colors">
-                      R$ {(item.basePipeline * currFilter.vol).toFixed(1)}M
-                    </td>
-                    <td className="py-4 text-right text-sm font-bold text-emerald-600">
-                      {Math.max(1, (item.taxaBase + currFilter.rateMod)).toFixed(1)}%
-                    </td>
-                    <td className="py-4 pr-4 rounded-r-xl text-right text-sm font-medium text-slate-600">
-                      R$ {(item.cplBase * (1 + (currFilter.cplMod/100))).toFixed(2)}
-                    </td>
-                  </tr>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Resumo executivo" description="Leitura consolidada do período com separação do risco de receita por perda, não avanço e atraso operacional." />
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {summaryCards.map((card) => (
+              <div key={card.label} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{card.label}</div>
+                  <span className={cn('rounded-full border px-2.5 py-1 text-[11px] font-semibold', toneClass(card.tone))}>{card.delta}</span>
+                </div>
+                <div className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{card.value}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Leitura macro do período" description="Visualização geral do avanço e dos tipos de risco que exigem leitura mais profunda nas frentes abaixo." />
+          <div className="mt-6 grid gap-5 xl:grid-cols-4">
+            {macroSeries.map((series) => (
+              <div key={series.label} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 text-sm font-semibold text-slate-900">{series.label}</div>
+                <Sparkline values={[...series.values]} color={series.tone} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Frentes que explicam o período" description="ABM e ABX aparecem junto das demais frentes para mostrar onde o diferencial do Canopi influencia avanço, risco e relacionamento." />
+          <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.5fr]">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+              {filteredFronts.map((item) => (
+                <button key={item.key} onClick={() => setSelectedFront(item.key)} className={cn('rounded-[24px] border p-4 text-left transition', selectedFront === item.key ? 'border-slate-900 bg-slate-900 text-white shadow-lg' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50')}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className={cn('text-base font-semibold', selectedFront === item.key ? 'text-white' : 'text-slate-900')}>{item.label}</div>
+                      <div className={cn('mt-1 text-xs', selectedFront === item.key ? 'text-white/70' : 'text-slate-500')}>{item.confidence} confiança</div>
+                    </div>
+                    <span className={cn('rounded-full border px-2 py-1 text-[11px] font-semibold', toneClass(item.status), selectedFront === item.key && 'border-white/15 bg-white/10 text-white')}>{item.status}</span>
+                  </div>
+                  <div className={cn('mt-3 text-sm leading-6', selectedFront === item.key ? 'text-white/82' : 'text-slate-600')}>{item.context}</div>
+                  <div className={cn('mt-4 text-lg font-semibold', selectedFront === item.key ? 'text-white' : 'text-slate-900')}>{item.impact}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+              <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 xl:flex-row xl:items-start xl:justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Frente selecionada</div>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{front.label}</h3>
+                  <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">{front.context}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {front.integrations.map((integration) => <span key={integration} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">{integration}</span>)}
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 lg:grid-cols-4">
+                {front.metrics.map((metric) => (
+                  <div key={metric.label} className="rounded-[20px] border border-slate-200 bg-white p-4">
+                    <div className="text-xs uppercase tracking-[0.18em] text-slate-400">{metric.label}</div>
+                    <div className="mt-2 text-2xl font-semibold text-slate-900">{metric.value}</div>
+                    <div className="mt-1 text-xs text-slate-500">{metric.delta}</div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {/* Insights Card */}
-          <div className="bg-gradient-to-br from-blue-700 to-indigo-900 p-8 rounded-3xl text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-pulse"></div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-6">
-                <Zap className="w-6 h-6 text-blue-300" />
-                <h2 className="text-lg font-bold">Insights Estratégicos</h2>
               </div>
-              
-              <div className="space-y-4">
-                <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/15 transition-colors cursor-pointer" onClick={() => openSimModal('Aprofundamento', 'REPORT')}>
-                  <p className="text-sm font-medium leading-relaxed text-blue-50">
-                    "O ROI de <strong className="text-white">Partners/Referral</strong> domina a geração de Pipeline eficiente (- CPL) nos {currFilter.label}."
-                  </p>
+
+              <div className="mt-5 grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+                <div className="space-y-5">
+                  <div>
+                    <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Tendência da frente</div>
+                    <Sparkline values={front.trend} color={toneColor} />
+                  </div>
+                  <div>
+                    <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Composição da leitura</div>
+                    <Bars items={front.mix} color={toneColor} />
+                  </div>
                 </div>
-                <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md border border-white/20 hover:bg-white/15 transition-colors cursor-pointer" onClick={() => openSimModal('Aprofundamento Heatmap', 'REPORT')}>
-                  <p className="text-sm font-medium leading-relaxed text-blue-50">
-                    "Picos (<strong className="text-red-300">Quente</strong>) no heatmap às 14h apontam que Eventos Online performam melhor à tarde."
-                  </p>
+
+                <div className="grid gap-4 content-start">
+                  <div className="rounded-[20px] border border-slate-200 bg-white p-4">
+                    <div className="text-sm font-semibold text-slate-900">Contas mais impactadas</div>
+                    <div className="mt-3 space-y-3">
+                      {front.accounts.map((account) => (
+                        <button key={account.name} onClick={() => openAccount(account)} className="block w-full rounded-2xl border border-slate-200 p-3 text-left hover:bg-slate-50">
+                          <div className="flex items-center justify-between gap-3"><span className="font-semibold text-slate-900">{account.name}</span><span className="text-sm text-slate-900">{account.impact}</span></div>
+                          <div className="mt-1 text-xs text-slate-500">Owner: {account.owner}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-[20px] border border-slate-200 bg-white p-4">
+                    <div className="text-sm font-semibold text-slate-900">Ações imediatas</div>
+                    <div className="mt-3 space-y-3">
+                      {front.actions.map((action) => (
+                        <button key={action.title} onClick={() => openAction(action)} className="block w-full rounded-2xl border border-slate-200 p-3 text-left hover:bg-slate-50">
+                          <div className="font-semibold text-slate-900">{action.title}</div>
+                          <div className="mt-1 text-xs text-slate-500">{action.team} • SLA {action.sla}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Data Integrity Card */}
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Integridade de Dados</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-50 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-700">Analytics API</span>
-                </div>
-                <span className="text-[9px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-full border border-emerald-100 uppercase tracking-widest">Sincronizado</span>
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Contas, ações e nutrições ligadas à frente" description="Onde essa leitura aparece na operação, quais ações nascem dela e quais fluxos de nutrição sustentam ou travam o avanço." />
+          <div className="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr_0.9fr]">
+            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Contas puxadas por {front.label}</div>
+              <div className="space-y-3">
+                {front.accounts.map((account) => (
+                  <button key={account.name} onClick={() => openAccount(account)} className="flex w-full items-start justify-between gap-4 rounded-[20px] border border-slate-200 bg-white p-4 text-left hover:bg-slate-50">
+                    <div>
+                      <div className="text-sm font-semibold text-slate-900">{account.name}</div>
+                      <div className="mt-1 text-xs text-slate-500">Owner: {account.owner}</div>
+                      <div className="mt-2 text-sm text-slate-600">{account.note}</div>
+                    </div>
+                    <div className="text-sm font-semibold text-slate-900">{account.impact}</div>
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
-                    <AlertCircle className="w-4 h-4" />
+            </div>
+            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Ações ligadas</div>
+              <div className="space-y-3">
+                {front.actions.map((action) => (
+                  <button key={action.title} onClick={() => openAction(action)} className="flex w-full items-start justify-between gap-4 rounded-[20px] border border-slate-200 bg-white p-4 text-left hover:bg-slate-50">
+                    <div>
+                      <div className="text-sm font-semibold text-slate-900">{action.title}</div>
+                      <div className="mt-1 text-xs text-slate-500">{action.team}</div>
+                      <div className="mt-2 text-sm text-slate-600">{action.expected}</div>
+                    </div>
+                    <div className="text-xs text-slate-500">SLA {action.sla}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5">
+              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Nutrições e modelos de e-mail</div>
+              <div className="space-y-3">
+                {(front.nurture ?? []).length === 0 ? <div className="rounded-[20px] border border-slate-200 bg-white p-4 text-sm text-slate-500">Sem fluxo de nutrição relevante nesta frente.</div> : front.nurture?.map((item) => (
+                  <div key={item.flow} className="rounded-[20px] border border-slate-200 bg-white p-4">
+                    <div className="text-sm font-semibold text-slate-900">{item.flow}</div>
+                    <div className="mt-2 text-sm text-slate-600">{item.performance}</div>
+                    <div className="mt-2 text-xs text-slate-500">Modelo: {item.emailModel}</div>
                   </div>
-                  <span className="text-xs font-bold text-slate-700">LinkedIn Ads</span>
-                </div>
-                <span className="text-[9px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded-full border border-rose-100 uppercase tracking-widest">Falha Token</span>
+                ))}
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Jornada da situação" description="Como o sinal apareceu, onde gerou consequência e que tipo de risco ou avanço foi produzido no período." right={<button onClick={() => setDetail({ kind: 'journey', label: 'Jornada da situação' })} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Abrir jornada</button>} />
+          <div className="mt-6 grid gap-4 xl:grid-cols-5">
+            {journeySteps.map((item, index) => (
+              <div key={item.step} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <div className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">{index + 1}</div>
+                <div className="text-sm font-semibold text-slate-900">{item.step}</div>
+                <div className="mt-2 text-sm leading-6 text-slate-600">{item.text}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Qualidade da leitura" description="Ferramentas conectadas, o que lemos de cada uma, problemas atuais e impacto direto na confiança da análise." />
+          <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            {toolDiagnostics.map((tool) => (
+              <button key={tool.name} onClick={() => setDetail({ kind: 'tool', name: tool.name, source: tool.source, issue: tool.issue, impact: tool.impact })} className="rounded-[24px] border border-slate-200 bg-slate-50 p-5 text-left hover:bg-white">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-lg font-semibold text-slate-900">{tool.name}</div>
+                  <span className={cn('rounded-full border px-2.5 py-1 text-[11px] font-semibold', tool.status === 'Conectado' ? toneClass('positive') : toneClass('warning'))}>{tool.status}</span>
+                </div>
+                <div className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-900">Leitura:</span> {tool.source}</div>
+                <div className="mt-2 text-sm text-slate-600"><span className="font-semibold text-slate-900">Problema:</span> {tool.issue}</div>
+                <div className="mt-2 text-sm text-slate-600"><span className="font-semibold text-slate-900">Impacto:</span> {tool.impact}</div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <SectionHeader title="Consequência" description="Contas, owners e ações como efeito da leitura anterior, conectadas à execução operacional e ao tipo de risco gerado." />
+          <div className="mt-6 overflow-hidden rounded-[24px] border border-slate-200">
+            <div className="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-4 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <div>Conta</div><div>Owner</div><div>Ação ligada</div><div>Status</div><div>Impacto</div>
+            </div>
+            {consequenceRows.map((row) => (
+              <div key={row.account} className="grid grid-cols-[1.4fr_1fr_1.4fr_1fr_1fr] gap-4 border-b border-slate-200 px-4 py-4 text-sm last:border-b-0">
+                <button onClick={() => setDetail({ kind: 'account', name: row.account, summary: row.status, owner: row.owner })} className="text-left font-semibold text-slate-900">{row.account}</button>
+                <div className="text-slate-600">{row.owner}</div>
+                <button onClick={() => setDetail({ kind: 'action', title: row.action, team: row.owner, expected: row.impact })} className="text-left text-slate-700">{row.action}</button>
+                <div className="text-slate-600">{row.status}</div>
+                <div className="font-semibold text-slate-900">{row.impact}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {detail && (
+          <section className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+            <SectionHeader title="Detalhe acionado" description="Aprofundamento contextual do item clicado, sem drawer genérico." right={<button onClick={() => setDetail(null)} className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">Fechar</button>} />
+            <div className="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 p-5">
+              {detail.kind === 'front' && <div className="text-sm text-slate-700">{detail.frontKey}</div>}
+              {detail.kind === 'account' && (
+                <div className="space-y-3">
+                  <div className="text-2xl font-semibold text-slate-900">{detail.name}</div>
+                  <div className="text-sm text-slate-600">Owner: {detail.owner}</div>
+                  <div className="text-sm leading-6 text-slate-600">{detail.summary}</div>
+                </div>
+              )}
+              {detail.kind === 'action' && (
+                <div className="space-y-3">
+                  <div className="text-2xl font-semibold text-slate-900">{detail.title}</div>
+                  <div className="text-sm text-slate-600">Equipe: {detail.team}</div>
+                  <div className="text-sm leading-6 text-slate-600">{detail.expected}</div>
+                </div>
+              )}
+              {detail.kind === 'tool' && (
+                <div className="space-y-3">
+                  <div className="text-2xl font-semibold text-slate-900">{detail.name}</div>
+                  <div className="text-sm leading-6 text-slate-600"><span className="font-semibold text-slate-900">O que lemos:</span> {detail.source}</div>
+                  <div className="text-sm leading-6 text-slate-600"><span className="font-semibold text-slate-900">Problema:</span> {detail.issue}</div>
+                  <div className="text-sm leading-6 text-slate-600"><span className="font-semibold text-slate-900">Impacto:</span> {detail.impact}</div>
+                </div>
+              )}
+              {detail.kind === 'journey' && (
+                <div className="space-y-3">
+                  <div className="text-2xl font-semibold text-slate-900">{detail.label}</div>
+                  <div className="text-sm leading-6 text-slate-600">A jornada detalha origem do sinal, frente afetada, tipo de risco, ação disparada e consequência esperada.</div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
-
-       {/* Simulation Modal */}
-       <Modal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        title={modalData?.title || 'Operação Canopi'}
-      >
-        <div className="pt-2 pb-4">
-          {modalData?.content}
-        </div>
-      </Modal>
-
     </div>
   );
-};
-
-
-export default Performance;
+}
