@@ -9,3 +9,22 @@ coverage/
 
 .next/
 tsconfig.tsbuildinfo
+
+# Arquivos históricos e versões paralelas na raiz
+Actions*.tsx
+Performance*.tsx
+AbmStrategy.tsx
+backups/
+canopi-contexto.txt
+claude-prompt-inicial.txt
+repo-map.txt
+*.py
+*.xlsx
+*.zip
+*.json
+compilado_clientes.json
+
+# Arquivos com extensão inválida dentro de src/
+src/pages/*.pre-*
+src/pages/*.before_*
+src/pages/Performance-v3.tsx
