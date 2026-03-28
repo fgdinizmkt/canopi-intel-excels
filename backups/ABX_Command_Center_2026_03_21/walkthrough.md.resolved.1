@@ -1,0 +1,61 @@
+# ABX Orchestration Optimization Walkthrough
+
+The ABX Orchestration page has been transformed from a static dashboard into a high-fidelity **Journey Coordination Command Center**.
+
+## Key Enhancements
+
+### 1. Functional Command Center Layout
+The page now follows a 7-layer architecture designed for operational coordination between Marketing, Sales, and RevOps.
+
+### 2. Operational Hero & Enriched KPIs
+- **Hero**: Now shows the predominant stage ("Engajamento") and the main bottleneck ("Sponsor Executivo").
+- **KPIs**: Enriched with temporal trends (+12%, stable, +8%) and drill-down metrics.
+
+### 3. Real-time Journey Progression
+# Walkthrough de Orquestração ABX - Centro de Comando Canopi
+
+A página de Orquestração ABX foi completamente redesenhada para funcionar como um **Centro de Comando Operacional**, integrando dados reais da planilha "ABM Data Mapping" e oferecendo uma visão clara de pipeline, expansão e riscos por conta.
+
+## Principais Camadas Implementadas (Design de 8 Camadas)
+
+### 1. Hero & Status de Comando
+- **Interface de Controle**: Resumo visual do status de coordenação, sincro CRM e ações rápidas.
+- **Métricas Chave**: Visualização imediata de gargalos operacionais e potenciais de receita.
+
+### 2. KPIs Comerciais 360°
+- **Indicadores Reais**: Upsell Potencial, Cross-sell Ativo, Risco Crítico de Churn e Projetos em Play (Iniciativas s/ CRM).
+- **Leitura Dinâmica**: Tendências e descrições contextuais para cada métrica.
+
+### 3. Pipeline 360° (Data Viz)
+- **Pipeline por Vertical**: Gráfico de barras empilhadas mostrando o volume segmentado por setor (Varejo, Saúde, Finanças, etc.).
+- **Impacto Cross-Channel**: Gráfico de pizza com atribuição de fontes (Apollo.io, CRM, Paid Media) na geração de pipeline.
+
+### 4. Rankings Estratégicos
+- **Foco no Dinheiro**: Rankings automatizados para "Top Upsell Potential", "Cross-sell Momentum" e "Critical Churn Risk".
+- **Account Intelligence**: Visualização do fit score e volume por conta.
+
+### 5. Memória Comercial
+- **Histórico Vivo**: Snapshot do histórico de vitórias (Wins), oportunidades abertas e perdas (Loss) das top contas, fornecendo contexto para vendas.
+
+### 6. Heatmaps de Orquestração
+- **Cobertura de Comitê**: Heatmap detalhado de stakeholders mapeados por conta prioritária.
+- **White-Space Operacional**: Identificação visual de onde as soluções Canopi NÃO estão atuando, facilitando plays de expansão.
+
+### 7. Fila de Comando Priorizada
+- **Ação Imediata**: Tabela operacional ordenada por prontidão e risco, com detalhamento de expansion gaps e pain points.
+- **Ação Directa**: Botão "Orquestrar" para cada conta prioritária.
+
+### 8. Rodapé de Origem de Dados
+- **Transparência**: Visibilidade das fontes sincronizadas (Apollo, CRM, Planilhas) e versão do sistema Canopi Intel Engine.
+
+## Validação e Dados
+
+- **Fonte de Dados**: Importação e processamento real do `ABM Data Mapping.xlsx` via [abxData.ts](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/data/abxData.ts).
+- **Lógica de Score**: Implementação de inferência de estágio (Descoberta, Engajamento, Expansão, Retenção) baseada no uso de serviços e licenças.
+- **Componentização**: Refatoração em sub-componentes modulares para performance e manutenção.
+
+![Página de Orquestração ABX](file:///Users/user/.gemini/antigravity/brain/0e6ee571-c628-4f06-af07-ffea1860beff/abx_orchestration_preview_1774134685575.webp)
+*Nota: A imagem reflete a estrutura visual consolidada do Centro de Comando.*
+dified**: [src/pages/ABXOrchestration.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/pages/ABXOrchestration.tsx), [src/components/ui/index.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/components/ui/index.tsx).
+- **New Components**: `MatrixHeatmap` (inlined), `VerticalTimeline` (inlined), `ExpansionGrid` (inlined).
+- **Enhanced Components**: [Modal](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/components/ui/index.tsx#103-134) now supports `size` prop ('sm', 'md', 'lg', 'xl').

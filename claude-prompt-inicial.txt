@@ -1,0 +1,27 @@
+Leia toda a base de conhecimento deste projeto antes de sugerir mudanças.
+
+Quero que você:
+1. mapeie a arquitetura completa do app
+2. identifique rotas, páginas, componentes, estados, dados mockados e integrações simuladas
+3. explique como a plataforma está organizada hoje
+4. aponte redundâncias, sobreposições, arquivos legados, versões paralelas e possíveis sobras
+5. destaque especialmente as páginas:
+   - Visão Geral
+   - Sinais
+   - Ações
+   - Desempenho
+   - Contas
+   - Estratégia ABM
+   - Orquestração ABX
+   - Inteligência Cruzada
+   - Assistente
+   - Integrações
+   - Configurações
+6. diferencie o que parece estado oficial do que parece histórico paralelo ou backup
+7. entregue primeiro só um diagnóstico estrutural, sem propor redesign imediato
+8. depois proponha uma ordem ideal de refatoração com menor risco
+9. preserve ao máximo a arquitetura existente antes de sugerir reconstruções
+10. considere que ABM e ABX são diferenciais centrais do produto e que qualidade de dados e integrações precisam aparecer como camadas estruturais da leitura
+
+Não comece implementando nada.
+Primeiro quero um diagnóstico profundo e frio da aplicação inteira.

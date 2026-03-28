@@ -1,0 +1,52 @@
+Canopi | intel excels
+
+Contexto do produto:
+Plataforma SaaS B2B de inteligência operacional, account intelligence, marketing e receita.
+
+Objetivo:
+Ajudar times a enxergar sinais, ações, desempenho, contas e jornadas com mais clareza operacional, sem parecer um CRM genérico, BI genérico ou dashboard cenográfico.
+
+Diretrizes do produto:
+- Priorizar clareza, aplicabilidade e produto real.
+- Diferenciar dado factual, hipótese, inferência e recomendação.
+- Evitar inflar funcionalidades irreais.
+- Preservar a arquitetura existente sempre que possível.
+- Não recriar a plataforma do zero.
+- Não romantizar ideias nem transformar tudo em conceito visual.
+- Pensar sempre em recursos limitados de um construtor solo.
+
+Estado atual relevante:
+- A página Ações foi tratada como uma referência mais madura de qualidade visual.
+- A página Desempenho passou por várias iterações e ainda precisa refinamento.
+- ABM e ABX são diferenciais centrais do produto e precisam aparecer claramente.
+- Qualidade de dados e integrações devem ser camadas estruturais da leitura.
+- A plataforma precisa mostrar consequência real, não apenas leitura analítica.
+
+Páginas principais:
+- Visão Geral
+- Sinais
+- Ações
+- Desempenho
+- Contas
+- Estratégia ABM
+- Orquestração ABX
+- Inteligência Cruzada
+- Assistente
+- Integrações
+- Configurações
+
+Problemas já percebidos:
+- excesso de blocos sem função real
+- algumas telas ainda parecem mais wireframe do que produto real
+- redundâncias entre seções
+- excesso de versões paralelas e arquivos históricos
+- parte das interações ainda é cenográfica
+- a página Desempenho ainda sofre com densidade, profundidade e funcionalidade insuficientes
+
+Solicitação inicial para análise:
+- Ler a aplicação inteira antes de sugerir mudanças
+- Mapear a arquitetura completa
+- Identificar rotas, páginas, componentes, estados, dados mockados e integrações simuladas
+- Destacar redundâncias, sobreposições, arquivos legados e sobras
+- Explicar o que é estado oficial e o que parece histórico paralelo
+- Propor uma ordem racional de refatoração sem quebrar a arquitetura atual

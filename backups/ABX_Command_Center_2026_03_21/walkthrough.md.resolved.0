@@ -1,0 +1,48 @@
+# ABX Orchestration Optimization Walkthrough
+
+The ABX Orchestration page has been transformed from a static dashboard into a high-fidelity **Journey Coordination Command Center**.
+
+## Key Enhancements
+
+### 1. Functional Command Center Layout
+The page now follows a 7-layer architecture designed for operational coordination between Marketing, Sales, and RevOps.
+
+### 2. Operational Hero & Enriched KPIs
+- **Hero**: Now shows the predominant stage ("Engajamento") and the main bottleneck ("Sponsor Executivo").
+- **KPIs**: Enriched with temporal trends (+12%, stable, +8%) and drill-down metrics.
+
+### 3. Real-time Journey Progression
+A dark-themed, high-contrast section showing:
+- **Movement Analytics**: Counts, deltas, and velocity (days per stage).
+- **Actionable AI**: Automated suggestions for each stage (e.g., "Ativar Champion Play").
+
+### 4. Specialized ABX Heatmaps
+- **Buying Committee Coverage**: Matrix of accounts vs 8 roles (Sponsor, Tech, Finance, etc.) with status indicators (Engaged, Champion, Risk).
+- **Orchestrated Pressure**: Intensity vs Efficacy across 10 channels (SDR, LinkedIn, Exec Sync, etc.).
+
+### 5. Operational Pulse
+- **Coordinated Timeline**: A live feed of events (Plays initiated, Intent signals, Meetings).
+- **Decisions & Blockers**: Dedicated area for critical blockers that need immediate resolution.
+
+### 6. Pipeline & Expansion Memory
+- **White-Space Map**: Visualizes coverage by department (Marketing, Tech, Finance, etc.) across the client base.
+- **AI Next Best Action**: Recommendations based on chair changes, whitespace, and churn risk.
+
+### 7. Prioritized Operational Queue
+A detailed table of all 142 active accounts, sortable by IA Score, Readiness, and Risk, with direct access to next steps.
+
+## Visual Proof
+
+![ABX Top Section](/Users/user/.gemini/antigravity/brain/0e6ee571-c628-4f06-af07-ffea1860beff/abx_orchestration_top_1774134770579.png)
+*Hero and KPI section with premium styling.*
+
+![ABX Heatmaps](/Users/user/.gemini/antigravity/brain/0e6ee571-c628-4f06-af07-ffea1860beff/abx_orchestration_header_metrics_1774134815046.png)
+*Journey Progression and Buying Committee Coverage Heatmap.*
+
+![ABX Timeline & Decisions](/Users/user/.gemini/antigravity/brain/0e6ee571-c628-4f06-af07-ffea1860beff/abx_orchestration_bottom_timeline_table_1774134893417.png)
+*Coordinated Timeline and Decision Center.*
+
+## Technical Details
+- **Files Modified**: [src/pages/ABXOrchestration.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/pages/ABXOrchestration.tsx), [src/components/ui/index.tsx](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/components/ui/index.tsx).
+- **New Components**: `MatrixHeatmap` (inlined), `VerticalTimeline` (inlined), `ExpansionGrid` (inlined).
+- **Enhanced Components**: [Modal](file:///Users/user/Documents/Command%20Center%20Cockpit/Canopi_Antigravity/canopi---intel-excels/src/components/ui/index.tsx#102-133) now supports `size` prop ('sm', 'md', 'lg', 'xl').
