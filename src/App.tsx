@@ -81,7 +81,7 @@ export default function App({ initialPage = 'visao-geral' }: { initialPage?: str
       case 'desempenho':
         return <Performance />;
       case 'contas':
-        return <Accounts setActivePage={setActivePage} />;
+        return <Accounts />;
       case 'seo-inbound':
         return <SeoInbound />;
       case 'outbound':
