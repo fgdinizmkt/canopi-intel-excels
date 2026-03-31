@@ -3,9 +3,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, { Suspense } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Search, Bell, Settings, Filter, ChevronRight } from 'lucide-react';
+
+const AbmTabs: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRelatorios = searchParams?.get('tab') === 'relatorios';
+  return (
+    <>
+      <button
+        onClick={() => router.push('/estrategia-abm?tab=principal')}
+        className={`text-sm font-bold transition-all ${!isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+      >
+        Estratégia ABM
+      </button>
+      <button
+        onClick={() => router.push('/estrategia-abm?tab=relatorios')}
+        className={`text-sm font-bold transition-all ${isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+      >
+        Relatórios
+      </button>
+    </>
+  );
+};
 
 interface TopbarProps {
   title?: string;
@@ -80,20 +102,9 @@ export const Topbar: React.FC<TopbarProps> = ({
         {showTabs && (
           <div className="flex items-center gap-6 ml-8">
             {pathname === '/estrategia-abm' ? (
-              <>
-                <button 
-                  onClick={() => setSubPage?.('principal')}
-                  className={`text-sm font-bold transition-all ${subPage === 'principal' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  Estratégia ABM
-                </button>
-                <button 
-                  onClick={() => setSubPage?.('relatorios')}
-                  className={`text-sm font-bold transition-all ${subPage === 'relatorios' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  Relatórios
-                </button>
-              </>
+              <Suspense fallback={null}>
+                <AbmTabs />
+              </Suspense>
             ) : (
               <>
                 <button
