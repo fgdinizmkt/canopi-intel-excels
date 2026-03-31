@@ -49,8 +49,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active, on
 );
 
 interface SidebarProps {
-  activePage: string;
-  setActivePage: (page: string) => void;
+  activePage?: string;
+  setActivePage?: (page: string) => void;
   onNewCampaign?: () => void;
 }
 
@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
+                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
+                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -146,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
+                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -176,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
                 label={item.label}
                 active={pathname === '/' + item.id}
                 onClick={() => {
-                  setActivePage(item.id);
+                  setActivePage?.(item.id);
                   router.push('/' + item.id);
                 }}
               />

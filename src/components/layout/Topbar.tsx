@@ -4,11 +4,11 @@
  */
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Search, Bell, Settings, Filter, ChevronRight } from 'lucide-react';
 
 interface TopbarProps {
-  title: string;
+  title?: string;
   breadcrumbs?: string[];
   activePage?: string;
   setActivePage?: (page: string) => void;
@@ -25,25 +25,61 @@ export const Topbar: React.FC<TopbarProps> = ({
   setSubPage
 }) => {
   const router = useRouter();
-  const showTabs = activePage === 'contas' || activePage === 'sinais' || activePage === 'estrategia-abm';
+  const pathname = usePathname();
+
+  const pageTitles: Record<string, string> = {
+    '/visao-geral': 'Visão Geral',
+    '/sinais': 'Sinais',
+    '/acoes': 'Fila de Ações',
+    '/desempenho': 'Análise de Desempenho',
+    '/contas': 'Contas',
+    '/seo-inbound': 'SEO & Inbound',
+    '/midia-paga': 'Mídia Paga',
+    '/outbound': 'Outbound',
+    '/estrategia-abm': 'Estratégia ABM',
+    '/orquestracao-abx': 'Orquestração ABX',
+    '/inteligencia-cruzada': 'Inteligência Cruzada',
+    '/assistente': 'Assistente',
+    '/integracoes': 'Integrações',
+    '/contatos': 'Contatos',
+    '/configuracoes': 'Configurações',
+  };
+
+  const pageBreadcrumbs: Record<string, string[]> = {
+    '/acoes': ['CANOPI', 'REVENUE OPS'],
+    '/contas': ['CANOPI', 'INTELIGÊNCIA'],
+    '/sinais': ['CANOPI', 'INTELIGÊNCIA'],
+    '/estrategia-abm': ['CANOPI', 'ESTRATÉGIA'],
+    '/orquestracao-abx': ['CANOPI', 'ESTRATÉGIA'],
+    '/inteligencia-cruzada': ['CANOPI', 'ESTRATÉGIA'],
+    '/outbound': ['CANOPI', 'OUTBOUND'],
+    '/integracoes': ['CANOPI', 'CONFIGURAÇÕES', 'INTEGRAÇÕES'],
+    '/assistente': ['CANOPI', 'ASSISTENTE'],
+    '/contatos': ['CANOPI', 'CONTATOS'],
+  };
+
+  const derivedTitle = (pathname ? pageTitles[pathname] : undefined) ?? title ?? 'Canopi Platform';
+  const derivedBreadcrumbs = (pathname ? pageBreadcrumbs[pathname] : undefined) ?? breadcrumbs ?? ['CANOPI'];
+
+  const showTabs = pathname === '/contas' || pathname === '/sinais' || pathname === '/estrategia-abm';
 
   return (
     <header className="h-16 bg-white border-b border-slate-100 sticky top-0 z-40 flex items-center justify-between px-8">
       <div className="flex items-center gap-6 flex-1">
         <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          {breadcrumbs.map((crumb, i) => (
+          {derivedBreadcrumbs.map((crumb, i) => (
             <React.Fragment key={i}>
               <span>{crumb}</span>
-              {i < breadcrumbs.length - 1 && <ChevronRight className="w-3 h-3" />}
+              {i < derivedBreadcrumbs.length - 1 && <ChevronRight className="w-3 h-3" />}
             </React.Fragment>
           ))}
-          {breadcrumbs.length > 0 && <ChevronRight className="w-3 h-3" />}
-          <span className="text-brand">{title}</span>
+          {derivedBreadcrumbs.length > 0 && <ChevronRight className="w-3 h-3" />}
+          <span className="text-brand">{derivedTitle}</span>
         </div>
         
         {showTabs && (
           <div className="flex items-center gap-6 ml-8">
-            {activePage === 'estrategia-abm' ? (
+            {pathname === '/estrategia-abm' ? (
               <>
                 <button 
                   onClick={() => setSubPage?.('principal')}
@@ -62,13 +98,13 @@ export const Topbar: React.FC<TopbarProps> = ({
               <>
                 <button
                   onClick={() => { setActivePage?.('contas'); router.push('/contas'); }}
-                  className={`text-sm font-bold transition-all ${activePage === 'contas' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`text-sm font-bold transition-all ${pathname === '/contas' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Contas
                 </button>
                 <button
                   onClick={() => { setActivePage?.('sinais'); router.push('/sinais'); }}
-                  className={`text-sm font-bold transition-all ${activePage === 'sinais' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`text-sm font-bold transition-all ${pathname === '/sinais' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Sinais
                 </button>
