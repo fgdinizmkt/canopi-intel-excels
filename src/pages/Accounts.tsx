@@ -1,459 +1,273 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Search, 
-  X, 
-  ExternalLink,
-  ChevronDown,
-  BarChart2,
-  Sparkles,
-  User
-} from 'lucide-react';
-import { Modal } from '../components/ui';
+import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
+import { contasMock, type Conta } from '../data/accountsData';
 
-interface MockAccount {
-  id: string;
-  name: string;
-  domain: string;
-  avatar: string;
-  avatarBg: string;
-  avatarText: string;
+type Visualizacao = 'lista' | 'grade' | 'board';
+type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc';
+
+type Filtros = {
+  busca: string;
   vertical: string;
-  segment: string;
-  stage: string;
-  stageBadgeBg: string;
-  stageBadgeText: string;
-  engagement: number;
-  engBarColor: string;
-  engTextColor: string;
-}
+  segmento: string;
+  owner: string;
+  etapa: string;
+  tipoConta: 'todas' | 'em_andamento' | 'abm' | 'abx' | 'hibridas';
+  potencial: string;
+  risco: string;
+  cobertura: string;
+  oportunidade: string;
+  atividade: string;
+  play: string;
+};
 
-const mockAccounts: MockAccount[] = [
-  {
-    id: '1',
-    name: 'CloudTech Solutions Inc.',
-    domain: 'cloudtech.com',
-    avatar: 'CT',
-    avatarBg: 'bg-blue-100',
-    avatarText: 'text-blue-600',
-    vertical: 'SaaS',
-    segment: 'Enterprise',
-    stage: 'CONSIDERAÇÃO',
-    stageBadgeBg: 'bg-amber-100/60',
-    stageBadgeText: 'text-amber-700',
-    engagement: 85,
-    engBarColor: 'bg-blue-600',
-    engTextColor: 'text-blue-600'
-  },
-  {
-    id: '2',
-    name: 'Global Logística S.A.',
-    domain: 'globallog.com.br',
-    avatar: 'GL',
-    avatarBg: 'bg-purple-100',
-    avatarText: 'text-purple-600',
-    vertical: 'Logística',
-    segment: 'Mid-Market',
-    stage: 'APRENDIZADO',
-    stageBadgeBg: 'bg-blue-100/60',
-    stageBadgeText: 'text-blue-600',
-    engagement: 42,
-    engBarColor: 'bg-blue-600',
-    engTextColor: 'text-blue-600'
-  },
-  {
-    id: '3',
-    name: 'Nexus Fintech',
-    domain: 'nexus.finance',
-    avatar: 'NX',
-    avatarBg: 'bg-orange-100',
-    avatarText: 'text-orange-600',
-    vertical: 'Finanças',
-    segment: 'Enterprise',
-    stage: 'DECISÃO',
-    stageBadgeBg: 'bg-rose-100/60',
-    stageBadgeText: 'text-rose-700',
-    engagement: 98,
-    engBarColor: 'bg-rose-600',
-    engTextColor: 'text-rose-600'
-  }
-];
+const filtrosIniciais: Filtros = {
+  busca: '', vertical: 'todos', segmento: 'todos', owner: 'todos', etapa: 'todas',
+  tipoConta: 'todas', potencial: 'todos', risco: 'todos', cobertura: 'todos', oportunidade: 'todas', atividade: 'todas', play: 'todos'
+};
 
-export const Accounts = ({ setActivePage }: { setActivePage?: (page: string) => void }) => {
-  const [selectedAccount, setSelectedAccount] = useState<MockAccount | null>(null);
-  
-  // Simulation Modal State
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<{ title: string; content: React.ReactNode } | null>(null);
+const toDate = (date: string) => new Date(date).getTime();
+const badgeClasse = (status: Conta['statusGeral']) => status === 'Crítico' ? 'bg-rose-100 text-rose-700' : status === 'Atenção' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700';
+const riscoClasse = (risco: number) => risco >= 70 ? 'text-rose-600' : risco >= 40 ? 'text-amber-600' : 'text-emerald-600';
 
-  const openSimModal = (title: string, msg: string) => {
-    setModalData({
-      title,
-      content: (
-        <div className="space-y-4 py-2">
-          <p className="text-sm font-medium text-slate-800 leading-relaxed">
-            {msg}
-          </p>
-          <div className="flex items-center gap-2 mt-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100/50">
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
-              Status da Operação
-            </span>
-            <span className="text-xs text-slate-500">
-              Mock ilustrativo acionado na plataforma Canopi.
-            </span>
-          </div>
-        </div>
-      )
+export const Accounts = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [loading, setLoading] = useState(true);
+  const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams.get('view') as Visualizacao) || 'lista');
+  const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams.get('sort') as Ordenacao) || 'potencial_desc');
+  const [filtros, setFiltros] = useState<Filtros>({
+    ...filtrosIniciais,
+    busca: searchParams.get('busca') || '',
+    vertical: searchParams.get('vertical') || 'todos',
+    segmento: searchParams.get('segmento') || 'todos',
+    owner: searchParams.get('owner') || 'todos',
+    etapa: searchParams.get('etapa') || 'todas',
+    tipoConta: (searchParams.get('tipo') as Filtros['tipoConta']) || 'todas',
+    potencial: searchParams.get('potencial') || 'todos',
+    risco: searchParams.get('risco') || 'todos',
+    cobertura: searchParams.get('cobertura') || 'todos',
+    oportunidade: searchParams.get('oportunidade') || 'todas',
+    atividade: searchParams.get('atividade') || 'todas',
+    play: searchParams.get('play') || 'todos'
+  });
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 550);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filtros.busca) params.set('busca', filtros.busca);
+    if (filtros.vertical !== 'todos') params.set('vertical', filtros.vertical);
+    if (filtros.segmento !== 'todos') params.set('segmento', filtros.segmento);
+    if (filtros.owner !== 'todos') params.set('owner', filtros.owner);
+    if (filtros.etapa !== 'todas') params.set('etapa', filtros.etapa);
+    if (filtros.tipoConta !== 'todas') params.set('tipo', filtros.tipoConta);
+    if (filtros.potencial !== 'todos') params.set('potencial', filtros.potencial);
+    if (filtros.risco !== 'todos') params.set('risco', filtros.risco);
+    if (filtros.cobertura !== 'todos') params.set('cobertura', filtros.cobertura);
+    if (filtros.oportunidade !== 'todas') params.set('oportunidade', filtros.oportunidade);
+    if (filtros.atividade !== 'todas') params.set('atividade', filtros.atividade);
+    if (filtros.play !== 'todos') params.set('play', filtros.play);
+    params.set('view', visualizacao);
+    params.set('sort', ordenacao);
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [filtros, visualizacao, ordenacao, pathname, router]);
+
+  const opcoes = useMemo(() => ({
+    verticais: Array.from(new Set(contasMock.map((c) => c.vertical))),
+    segmentos: Array.from(new Set(contasMock.map((c) => c.segmento))),
+    owners: Array.from(new Set(contasMock.map((c) => c.ownerPrincipal))),
+    etapas: Array.from(new Set(contasMock.map((c) => c.etapa)))
+  }), []);
+
+  const filtradas = useMemo(() => {
+    let data = contasMock.filter((c) => {
+      if (filtros.busca && !`${c.nome} ${c.dominio}`.toLowerCase().includes(filtros.busca.toLowerCase())) return false;
+      if (filtros.vertical !== 'todos' && c.vertical !== filtros.vertical) return false;
+      if (filtros.segmento !== 'todos' && c.segmento !== filtros.segmento) return false;
+      if (filtros.owner !== 'todos' && c.ownerPrincipal !== filtros.owner) return false;
+      if (filtros.etapa !== 'todas' && c.etapa !== filtros.etapa) return false;
+      if (filtros.tipoConta === 'abm' && c.tipoEstrategico !== 'ABM') return false;
+      if (filtros.tipoConta === 'abx' && c.tipoEstrategico !== 'ABX') return false;
+      if (filtros.tipoConta === 'hibridas' && c.tipoEstrategico !== 'Híbrida') return false;
+      if (filtros.tipoConta === 'em_andamento' && c.tipoEstrategico !== 'Em andamento') return false;
+      if (filtros.potencial === 'alto' && c.potencial < 80) return false;
+      if (filtros.potencial === 'medio' && (c.potencial < 50 || c.potencial >= 80)) return false;
+      if (filtros.risco === 'alto' && c.risco < 70) return false;
+      if (filtros.risco === 'medio' && (c.risco < 40 || c.risco >= 70)) return false;
+      if (filtros.cobertura === 'baixa' && c.coberturaRelacional >= 50) return false;
+      if (filtros.cobertura === 'alta' && c.coberturaRelacional < 70) return false;
+      if (filtros.oportunidade === 'com' && !c.possuiOportunidade) return false;
+      if (filtros.oportunidade === 'sem' && c.possuiOportunidade) return false;
+      if (filtros.atividade !== 'todas' && c.atividadeRecente.toLowerCase() !== filtros.atividade) return false;
+      if (filtros.play !== 'todos' && c.playAtivo.toLowerCase() !== filtros.play) return false;
+      return true;
     });
-    setModalOpen(true);
-  };
+
+    data = data.sort((a, b) => {
+      if (ordenacao === 'potencial_desc') return b.potencial - a.potencial;
+      if (ordenacao === 'risco_desc') return b.risco - a.risco;
+      return toDate(b.ultimaMovimentacao) - toDate(a.ultimaMovimentacao);
+    });
+
+    return data;
+  }, [filtros, ordenacao]);
+
+  const metricas = useMemo(() => ({
+    prioritarias: contasMock.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
+    risco: contasMock.filter((c) => c.risco >= 70).length,
+    andamento: contasMock.filter((c) => c.tipoEstrategico === 'Em andamento').length,
+    abm: contasMock.filter((c) => c.tipoEstrategico === 'ABM').length,
+    abx: contasMock.filter((c) => c.tipoEstrategico === 'ABX').length,
+    altoPotencial: contasMock.filter((c) => c.potencial >= 80).length,
+    baixaCobertura: contasMock.filter((c) => c.coberturaRelacional < 50).length,
+    oportunidades: contasMock.filter((c) => c.possuiOportunidade).length
+  }), []);
+
+  const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
+
+  const macroCards = [
+    { titulo: 'Contas prioritárias', valor: metricas.prioritarias, acao: () => setFiltros((f) => ({ ...f, potencial: 'alto' })) },
+    { titulo: 'Contas em risco', valor: metricas.risco, acao: () => setFiltros((f) => ({ ...f, risco: 'alto' })) },
+    { titulo: 'Contas em andamento', valor: metricas.andamento, acao: () => setFiltros((f) => ({ ...f, tipoConta: 'em_andamento' })) },
+    { titulo: 'Contas ABM', valor: metricas.abm, acao: () => setFiltros((f) => ({ ...f, tipoConta: 'abm' })) },
+    { titulo: 'Contas ABX', valor: metricas.abx, acao: () => setFiltros((f) => ({ ...f, tipoConta: 'abx' })) },
+    { titulo: 'Alto potencial', valor: metricas.altoPotencial, acao: () => setFiltros((f) => ({ ...f, potencial: 'alto' })) },
+    { titulo: 'Baixa cobertura relacional', valor: metricas.baixaCobertura, acao: () => setFiltros((f) => ({ ...f, cobertura: 'baixa' })) },
+    { titulo: 'Oportunidades ativas', valor: metricas.oportunidades, acao: () => setFiltros((f) => ({ ...f, oportunidade: 'com' })) }
+  ];
+
+  const coberturaBase = Math.round(contasMock.reduce((acc, c) => acc + c.coberturaRelacional, 0) / contasMock.length);
+
+  if (loading) {
+    return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-500">Carregando portfólio de contas...</div>;
+  }
+
+  if (contasMock.length === 0) {
+    return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-600">Nenhuma conta cadastrada no portfólio. Cadastre contas para iniciar a priorização operacional.</div>;
+  }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 min-h-screen">
-      
-      {/* Top Navigation Tabs & Search */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-0">
-        <div className="flex items-center gap-8 px-2">
-          <button className="text-blue-600 border-b-2 border-blue-600 pb-4 font-bold text-sm">Contas</button>
-          <button onClick={() => openSimModal('Aba: Sinais', 'Navegação para o feed contínuo de sinais detectados. Esta interface listará comportamentos agudos por conta e pessoa em tempo real.')} className="text-slate-500 hover:text-slate-800 pb-4 font-semibold text-sm transition-colors">Sinais</button>
-        </div>
-        <div className="relative mb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-          <input
-            readOnly
-            onClick={() => openSimModal('Pesquisa Global', 'Aqui abriria o painel de Omni-Busca da Canopi, capaz de encontrar Contas, Pessoas, Sinais e Oportunidades instantaneamente.')}
-            type="text"
-            placeholder="Buscar..."
-            className="w-48 md:w-64 pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none cursor-pointer hover:bg-slate-100 transition-colors"
-          />
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto pt-4 space-y-8">
-        {/* Header Section */}
+    <div className="space-y-6">
+      <header className="space-y-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Contas</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">Gestão centralizada de empresas e inteligência de receita.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900">Contas</h1>
+          <p className="text-sm text-slate-500 mt-1">Visão centralizada das empresas, com priorização, contexto estratégico e navegação para profundidade operacional.</p>
         </div>
-
-        {/* Dashboard Cards Container */}
-        <div className="flex gap-4">
-          {/* Card: Contas Prioritárias */}
-          <div 
-             onClick={() => openSimModal('Filtro Rapido', 'Isolando e recarregando tabela apenas com as 42 Contas Prioritárias atuais do funil.')}
-             className="flex-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-          >
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Contas Prioritárias</p>
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-extrabold text-slate-900">42</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">+12%</span>
-            </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="relative min-w-[280px] flex-1 max-w-lg">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input value={filtros.busca} onChange={(e) => atualizarFiltro('busca', e.target.value)} className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm" placeholder="Buscar conta, domínio ou contexto" />
           </div>
-
-          {/* Card: Contas em Risco */}
-          <div 
-            onClick={() => openSimModal('Filtro Rapido', 'Isolando e recarregando tabela apenas com as 08 Contas em Risco mapeadas.')}
-            className="flex-1 bg-white p-6 rounded-2xl border border-slate-200 border-l-[3px] border-l-rose-600 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-          >
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Contas Em Risco</p>
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-extrabold text-slate-900">08</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">+2</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="w-4 h-4 text-slate-400" />
+            <select value={ordenacao} onChange={(e) => setOrdenacao(e.target.value as Ordenacao)} className="px-3 py-2 rounded-xl border border-slate-200 text-sm">
+              <option value="potencial_desc">Ordenar: Potencial (maior)</option>
+              <option value="risco_desc">Ordenar: Risco (maior)</option>
+              <option value="movimentacao_desc">Ordenar: Última movimentação</option>
+            </select>
           </div>
-
-          {/* Card: Alto Potencial */}
-          <div 
-            onClick={() => openSimModal('Filtro Rapido', 'Isolando e recarregando tabela apenas com as 124 Contas de Alto Potencial mapeadas.')}
-            className="flex-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-          >
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Alto Potencial</p>
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-extrabold text-slate-900">124</span>
-              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">Ativas</span>
-            </div>
+          <div className="inline-flex bg-slate-100 rounded-xl p-1">
+            <button onClick={() => setVisualizacao('lista')} className={`px-3 py-1.5 text-xs rounded-lg font-semibold ${visualizacao === 'lista' ? 'bg-white shadow text-slate-900' : 'text-slate-500'}`}><List className="w-4 h-4 inline mr-1" />Lista</button>
+            <button onClick={() => setVisualizacao('grade')} className={`px-3 py-1.5 text-xs rounded-lg font-semibold ${visualizacao === 'grade' ? 'bg-white shadow text-slate-900' : 'text-slate-500'}`}><LayoutGrid className="w-4 h-4 inline mr-1" />Grade</button>
+            <button onClick={() => setVisualizacao('board')} className={`px-3 py-1.5 text-xs rounded-lg font-semibold ${visualizacao === 'board' ? 'bg-white shadow text-slate-900' : 'text-slate-500'}`}><KanbanSquare className="w-4 h-4 inline mr-1" />Board</button>
           </div>
         </div>
+      </header>
 
-        {/* Filters Bar */}
-        <div className="flex flex-wrap items-center gap-4 py-3 px-4 bg-slate-50/80 rounded-xl border border-slate-200">
-          <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest ml-1 hidden sm:inline-block">Filtros:</span>
-          
-          <select className="px-3 py-1.5 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-600 hover:border-slate-300 transition-colors shadow-sm outline-none cursor-pointer">
-            <option>Vertical: Todas</option>
-            <option>SaaS</option>
-            <option>Finanças</option>
-            <option>Logística</option>
-            <option>Saúde</option>
-          </select>
-          
-          <select className="px-3 py-1.5 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-600 hover:border-slate-300 transition-colors shadow-sm outline-none cursor-pointer">
-            <option>Segmento: Enterprise</option>
-            <option>Segmento: Mid-Market</option>
-            <option>Segmento: SMB</option>
-          </select>
-          
-          <select className="px-3 py-1.5 bg-white border border-slate-200 rounded-md text-xs font-semibold text-slate-600 hover:border-slate-300 transition-colors shadow-sm outline-none cursor-pointer">
-            <option>Funil: Todos</option>
-            <option>1. Conscientização</option>
-            <option>2. Aprendizado</option>
-            <option>3. Consideração</option>
-            <option>4. Decisão</option>
-            <option>5. Retenção</option>
-          </select>
+      {coberturaBase < 55 && (
+        <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          <AlertTriangle className="w-4 h-4" /> Aviso: cobertura média da base em {coberturaBase}%. Recomenda-se reforçar mapeamento relacional.
         </div>
+      )}
 
-        {/* Accounts Table Container */}
-        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="pl-6 pr-4 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Nome da Conta</th>
-                <th className="px-4 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Vertical / Segm.</th>
-                <th className="px-4 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Etapa Funil</th>
-                <th className="px-4 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Engajamento</th>
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {macroCards.map((card) => (
+          <button key={card.titulo} onClick={card.acao} className="bg-white border border-slate-200 rounded-xl p-4 text-left hover:border-brand/40 hover:shadow-sm transition-all">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500">{card.titulo}</p>
+            <p className="text-2xl font-extrabold text-slate-900 mt-2">{card.valor}</p>
+          </button>
+        ))}
+      </section>
+
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+        <select value={filtros.vertical} onChange={(e) => atualizarFiltro('vertical', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Vertical: todas</option>{opcoes.verticais.map((v) => <option key={v}>{v}</option>)}</select>
+        <select value={filtros.segmento} onChange={(e) => atualizarFiltro('segmento', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Segmento: todos</option>{opcoes.segmentos.map((v) => <option key={v}>{v}</option>)}</select>
+        <select value={filtros.owner} onChange={(e) => atualizarFiltro('owner', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Owner: todos</option>{opcoes.owners.map((v) => <option key={v}>{v}</option>)}</select>
+        <select value={filtros.etapa} onChange={(e) => atualizarFiltro('etapa', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todas">Etapa: todas</option>{opcoes.etapas.map((v) => <option key={v}>{v}</option>)}</select>
+        <select value={filtros.tipoConta} onChange={(e) => atualizarFiltro('tipoConta', e.target.value as Filtros['tipoConta'])} className="p-2 border rounded-lg text-sm"><option value="todas">Tipo: todas</option><option value="em_andamento">Em andamento</option><option value="abm">ABM</option><option value="abx">ABX</option><option value="hibridas">Híbridas</option></select>
+        <select value={filtros.potencial} onChange={(e) => atualizarFiltro('potencial', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Potencial: todos</option><option value="alto">Alto</option><option value="medio">Médio</option></select>
+        <select value={filtros.risco} onChange={(e) => atualizarFiltro('risco', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Risco: todos</option><option value="alto">Alto</option><option value="medio">Médio</option></select>
+        <select value={filtros.cobertura} onChange={(e) => atualizarFiltro('cobertura', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Cobertura: todas</option><option value="baixa">Baixa</option><option value="alta">Alta</option></select>
+        <select value={filtros.oportunidade} onChange={(e) => atualizarFiltro('oportunidade', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todas">Oportunidade: todas</option><option value="com">Com oportunidade</option><option value="sem">Sem oportunidade</option></select>
+        <select value={filtros.atividade} onChange={(e) => atualizarFiltro('atividade', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todas">Atividade recente</option><option value="alta">Alta</option><option value="média">Média</option><option value="baixa">Baixa</option></select>
+        <select value={filtros.play} onChange={(e) => atualizarFiltro('play', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Play ativo</option><option value="abm">ABM</option><option value="abx">ABX</option><option value="híbrido">Híbrido</option></select>
+        <button onClick={() => setFiltros(filtrosIniciais)} className="p-2 border rounded-lg text-sm font-semibold text-slate-600">Limpar filtros</button>
+      </section>
+
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <button onClick={() => atualizarFiltro('risco', 'alto')} className="bg-white border rounded-xl p-3 text-left"><p className="text-xs font-bold text-slate-500 uppercase">Contas que exigem atenção</p><p className="text-sm text-slate-700 mt-1">Risco alto e última movimentação recente.</p></button>
+        <button onClick={() => { atualizarFiltro('tipoConta', 'abm'); atualizarFiltro('cobertura', 'baixa'); }} className="bg-white border rounded-xl p-3 text-left"><p className="text-xs font-bold text-slate-500 uppercase">Contas prontas para ABM</p><p className="text-sm text-slate-700 mt-1">Fit alto com cobertura inicial a completar.</p></button>
+        <button onClick={() => { atualizarFiltro('tipoConta', 'abx'); atualizarFiltro('oportunidade', 'com'); }} className="bg-white border rounded-xl p-3 text-left"><p className="text-xs font-bold text-slate-500 uppercase">Contas prontas para ABX</p><p className="text-sm text-slate-700 mt-1">Base instalada com oportunidade ativa.</p></button>
+        <button onClick={() => atualizarFiltro('cobertura', 'baixa')} className="bg-white border rounded-xl p-3 text-left"><p className="text-xs font-bold text-slate-500 uppercase">Cobertura da base</p><p className="text-sm text-slate-700 mt-1">Média atual: {coberturaBase}%.</p></button>
+      </section>
+
+      {filtradas.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center">
+          <p className="text-lg font-semibold text-slate-800">Nenhum resultado encontrado</p>
+          <p className="text-sm text-slate-500 mt-1">Ajuste os filtros para visualizar contas compatíveis com sua consulta.</p>
+        </div>
+      ) : visualizacao !== 'lista' ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {filtradas.map((conta) => (
+            <Link key={conta.id} href={`/contas/${conta.slug}?sessao=resumo`} className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-sm">
+              <p className="font-bold text-slate-900">{conta.nome}</p>
+              <p className="text-xs text-slate-500 mt-1">{conta.vertical} · {conta.segmento}</p>
+              <p className="text-xs mt-3 text-slate-600">Próxima ação: {conta.proximaMelhorAcao}</p>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
+              <tr>
+                <th className="p-3 text-left">Conta</th><th className="p-3 text-left">Vertical / Segmento</th><th className="p-3 text-left">Owner</th><th className="p-3 text-left">Etapa</th><th className="p-3 text-left">Tipo estratégico</th><th className="p-3 text-left">Potencial</th><th className="p-3 text-left">Risco</th><th className="p-3 text-left">Cobertura relacional</th><th className="p-3 text-left">Última movimentação</th><th className="p-3 text-left">Oportunidade</th><th className="p-3 text-left">Próxima melhor ação</th><th className="p-3 text-left">Status geral</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
-              {mockAccounts.map((account) => (
-                <tr 
-                  key={account.id}
-                  onClick={() => setSelectedAccount(account)}
-                  className="group hover:bg-slate-50/50 cursor-pointer transition-colors"
-                >
-                  {/* Avatar and Name */}
-                  <td className="pl-6 pr-4 py-5">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${account.avatarBg} ${account.avatarText} shadow-sm group-hover:scale-105 transition-transform`}>
-                        {account.avatar}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-slate-900 group-hover:text-blue-700 transition-colors">{account.name}</h4>
-                        <p className="text-[11px] font-medium text-slate-400 mt-0.5">{account.domain}</p>
-                      </div>
-                    </div>
+            <tbody>
+              {filtradas.map((conta) => (
+                <tr key={conta.id} className="border-t border-slate-100 hover:bg-slate-50">
+                  <td className="p-3"><Link href={`/contas/${conta.slug}?sessao=resumo`} className="font-bold text-brand hover:underline">{conta.nome}</Link><p className="text-xs text-slate-500">{conta.dominio}</p></td>
+                  <td className="p-3">{conta.vertical} / {conta.segmento}</td>
+                  <td className="p-3"><button onClick={() => atualizarFiltro('owner', conta.ownerPrincipal)} className="underline decoration-dotted">{conta.ownerPrincipal}</button></td>
+                  <td className="p-3">{conta.etapa}</td>
+                  <td className="p-3">
+                    {conta.tipoEstrategico === 'ABM' ? <Link href={`/contas/${conta.slug}?sessao=abm`} className="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">ABM</Link> : conta.tipoEstrategico === 'ABX' ? <Link href={`/contas/${conta.slug}?sessao=abx`} className="px-2 py-1 rounded bg-purple-100 text-purple-700 font-semibold">ABX</Link> : <span className="px-2 py-1 rounded bg-slate-100 text-slate-700 font-semibold">{conta.tipoEstrategico}</span>}
                   </td>
-
-                  {/* Vertical / Segment */}
-                  <td className="px-4 py-5">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-semibold text-slate-700">{account.vertical}</p>
-                      <p className="text-[10px] font-medium text-slate-400">{account.segment}</p>
-                    </div>
-                  </td>
-
-                  {/* Etapa Funil */}
-                  <td className="px-4 py-5">
-                    <span className={`px-2.5 py-1 rounded-[4px] text-[9px] font-bold uppercase tracking-widest ${account.stageBadgeBg} ${account.stageBadgeText}`}>
-                      {account.stage}
-                    </span>
-                  </td>
-
-                  {/* Engajamento */}
-                  <td className="px-4 py-5 pr-8">
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden w-28">
-                        <div 
-                          className={`h-full ${account.engBarColor} rounded-full`}
-                          style={{ width: `${account.engagement}%` }}
-                        />
-                      </div>
-                      <span className={`text-xs font-bold ${account.engTextColor} min-w-[3ch]`}>
-                        {account.engagement}%
-                      </span>
-                    </div>
-                  </td>
+                  <td className="p-3">{conta.potencial}</td>
+                  <td className={`p-3 font-semibold ${riscoClasse(conta.risco)}`}>{conta.risco}</td>
+                  <td className="p-3">{conta.coberturaRelacional}%</td>
+                  <td className="p-3">{new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR')}</td>
+                  <td className="p-3">{conta.oportunidadePrincipal ? <Link href={`/contas/${conta.slug}?sessao=oportunidades`} className="underline">{conta.oportunidadePrincipal}</Link> : '-'}</td>
+                  <td className="p-3">{conta.proximaMelhorAcao}</td>
+                  <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span></td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="px-6 py-4 bg-slate-50/40 border-t border-slate-100">
-            <p className="text-[11px] font-semibold text-slate-500">Exibindo 10 de 542 contas</p>
-          </div>
         </div>
-
-      </div>
-
-      {/* Visão 360 - Side Drawer */}
-      <AnimatePresence>
-        {selectedAccount && (
-          <>
-            {/* Backdrop overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedAccount(null)}
-              className="fixed inset-0 bg-slate-900/10 backdrop-blur-[2px] z-40 transition-opacity"
-            />
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: '100%', boxShadow: '-10px 0 30px rgba(0,0,0,0)' }}
-              animate={{ x: 0, boxShadow: '-10px 0 40px rgba(0,0,0,0.08)' }}
-              exit={{ x: '100%', boxShadow: '-10px 0 30px rgba(0,0,0,0)' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-              className="fixed right-0 top-0 h-screen w-full md:w-[480px] bg-white z-50 overflow-y-auto border-l border-slate-200/50"
-            >
-              <div className="p-8 space-y-8">
-                
-                {/* Drawer Header */}
-                <div className="flex justify-between items-center pb-2">
-                  <div className="flex items-center gap-3">
-                    <BarChart2 className="w-5 h-5 text-blue-700" />
-                    <h2 className="font-bold text-slate-900 text-lg tracking-tight">Visão 360 da Conta</h2>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedAccount(null)}
-                    className="p-1 hover:bg-slate-100 rounded-md transition-colors"
-                  >
-                    <X className="w-5 h-5 text-slate-400" />
-                  </button>
-                </div>
-
-                {/* Identity Profile */}
-                <div className="flex flex-col items-center text-center space-y-4 pt-2">
-                  <div className="w-20 h-20 rounded-2xl bg-blue-100 text-blue-500 flex items-center justify-center font-bold text-2xl shadow-sm">
-                    {selectedAccount.avatar}
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight">{selectedAccount.name}</h3>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 text-[9px] font-bold rounded-full uppercase tracking-widest shadow-sm">
-                        ENTERPRISE
-                      </span>
-                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-bold rounded-full uppercase tracking-widest shadow-sm">
-                        ATIVA
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Micro KPIs (Saúde & Expansão) */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-[#f0fdf4] border border-[#dcfce7] shadow-sm">
-                    <p className="text-[9px] font-extrabold text-emerald-800/60 uppercase tracking-widest mb-1.5">Score Saúde</p>
-                    <div className="flex items-baseline gap-0.5">
-                      <span className="text-3xl font-bold text-emerald-600 tracking-tight">92</span>
-                      <span className="text-sm font-semibold text-emerald-600/50">/100</span>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-xl bg-[#fefce8] border border-[#fef08a] shadow-sm">
-                    <p className="text-[9px] font-extrabold text-amber-800/60 uppercase tracking-widest mb-1.5">Prob. Expansão</p>
-                    <div className="flex items-baseline gap-0.5">
-                      <span className="text-3xl font-bold text-amber-700 tracking-tight">74</span>
-                      <span className="text-sm font-semibold text-amber-700/60">%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Recommended Play Card */}
-                <div onClick={() => openSimModal('Executar Play Recomendado', 'Isto acionaria o módulo de Orquestração ABX para envolver o VP de Engenharia nessa sequência configurada de Email, Conexão no LinkedIn e Ads focados no material consumido.')} className="relative p-5 rounded-xl border border-blue-600 bg-white shadow-sm cursor-pointer hover:bg-blue-50/30 transition-colors">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-l-xl"></div>
-                  <div className="space-y-3 pl-3">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-blue-600" />
-                      <span className="text-[11px] font-bold text-blue-800 tracking-wide">Play Recomendado</span>
-                    </div>
-                    <p className="text-[13px] text-slate-700 leading-relaxed font-medium">
-                      Iniciar "Executive Outreach" com foco em eficiência operacional. O VP de Engenharia demonstrou alto engajamento em Whitepapers de ROI.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Sinais Recentes Timeline */}
-                <div className="space-y-5 pt-2">
-                  <h4 className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Sinais Recentes</h4>
-                  
-                  <div className="space-y-6">
-                    {/* Signal 1 */}
-                    <div className="flex gap-4">
-                      <div className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
-                      <div className="space-y-0.5 -mt-0.5 cursor-pointer" onClick={() => openSimModal('Detalhe do Sinal', 'Visualização do Job Title exato que buscou no LinkedIn, keywords atreladas a arquitetura e Cloud e quem da conta interagiu com o post.')}>
-                        <p className="text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 transition-colors">Nova Vaga: VP de Cloud Platform</p>
-                        <p className="text-[11px] italic text-slate-500">Há 2 horas • LinkedIn Intent</p>
-                      </div>
-                    </div>
-                    
-                    {/* Signal 2 */}
-                    <div className="flex gap-4">
-                      <div className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 shrink-0"></div>
-                      <div className="space-y-0.5 -mt-0.5 cursor-pointer" onClick={() => openSimModal('Páginas Visitadas', 'Abertura do percurso exato do Lead "VP Eng" no site, rastreando estadia média na página de Pricing por 4m12s.')}>
-                        <p className="text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 transition-colors">Acesso ao Deck de Preços (3x)</p>
-                        <p className="text-[11px] italic text-slate-500">Hoje às 10:42 • Direct Traffic</p>
-                      </div>
-                    </div>
-
-                    {/* Signal 3 */}
-                    <div className="flex gap-4">
-                      <div className="mt-1.5 w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
-                      <div className="space-y-0.5 -mt-0.5 cursor-pointer" onClick={() => openSimModal('Alerta de Adoção', 'Ruptura na tendência de requests no Endpoint X monitorado pelo Integrador Hubspot/Mixpanel. Alto indicativo de churn gap ou downsizing técnico.')}>
-                        <p className="text-[13px] font-bold text-slate-800 leading-snug hover:text-blue-600 transition-colors">Redução de Uso API - Endpoint X</p>
-                        <p className="text-[11px] italic text-slate-500">Ontem • Product Usage</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Timeline */}
-                <div className="space-y-5 pt-4">
-                  <h4 className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Linha do Tempo</h4>
-                  
-                  <div className="relative space-y-8 before:absolute before:left-[4px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200">
-                     {/* Item 1 */}
-                     <div className="relative pl-7 flex flex-col space-y-1">
-                        <div className="absolute left-[-2.5px] top-1.5 w-3.5 h-3.5 rounded-full border-[3px] border-blue-600 bg-white z-10" />
-                        <p className="text-[10px] font-semibold text-slate-500">12 Mai, 2024</p>
-                        <p className="text-[13px] font-bold text-slate-800 leading-tight">Mapeamento de Stakeholders concluído</p>
-                      </div>
-
-                      {/* Item 2 */}
-                      <div className="relative pl-7 flex flex-col space-y-1 opacity-60">
-                         <div className="absolute left-[-1.5px] top-1.5 w-3 h-3 rounded-full bg-slate-200 border-2 border-white z-10" />
-                         <p className="text-[10px] font-semibold text-slate-500">05 Mai, 2024</p>
-                         <p className="text-[13px] font-bold text-slate-800 leading-tight">Reunião de Alinhamento Técnico</p>
-                      </div>
-                  </div>
-                </div>
-
-                {/* Final Drawer Buttons */}
-                <div className="pt-4 pb-2 space-y-3">
-                  <button onClick={() => openSimModal('Redirecionamento', 'Navegação para a página isolada do CRM "CloudTech Solutions", trazendo aba de Pessoas, Oportunidades, Atividades e Logs do Agente Autônomo.')} className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-700 text-white font-bold text-sm rounded-lg hover:bg-blue-800 shadow-sm transition-colors cursor-pointer group">
-                    <ExternalLink className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    Abrir Perfil Completo
-                  </button>
-                  <button 
-                    onClick={() => {
-                       if (setActivePage) setActivePage('contatos');
-                       setSelectedAccount(null);
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-slate-50 border border-slate-200 text-slate-700 font-bold text-sm rounded-lg hover:bg-slate-100 hover:text-blue-700 shadow-sm transition-colors cursor-pointer group"
-                  >
-                    <User className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
-                    Ver as 12 Pessoas da Conta
-                  </button>
-                </div>
-
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      <Modal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        title={modalData?.title || 'Simulação Canopi'}
-      >
-        <div className="py-2">
-          {modalData?.content}
-        </div>
-      </Modal>
-
+      )}
     </div>
   );
 };
 
 export default Accounts;
-
