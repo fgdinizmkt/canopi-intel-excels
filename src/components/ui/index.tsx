@@ -72,7 +72,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'blue' | 'amber' | 'red' | 'emerald' | 'slate';
+  variant?: 'blue' | 'amber' | 'red' | 'emerald' | 'slate' | 'violet';
   className?: string;
 }
 
@@ -83,6 +83,7 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'slate', class
     red: 'bg-red-50 text-red-700 border-red-100',
     emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
     slate: 'bg-slate-50 text-slate-700 border-slate-100',
+    violet: 'bg-violet-50 text-violet-700 border-violet-100',
   };
 
   return (

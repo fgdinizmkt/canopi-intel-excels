@@ -23,8 +23,8 @@ export default function ContaDetalhePage() {
     else router.push('/login');
   }, [router]);
 
-  const conta = useMemo(() => contaPorSlug(params.slug), [params.slug]);
-  const sessao = (searchParams.get('sessao') as Sessao) || 'resumo';
+  const conta = useMemo(() => contaPorSlug(params?.slug ?? ''), [params?.slug]);
+  const sessao = (searchParams?.get('sessao') as Sessao) || 'resumo';
   const sessaoValida: Sessao = sessoes.includes(sessao) ? sessao : 'resumo';
 
   const goSessao = (s: Sessao) => {

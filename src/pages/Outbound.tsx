@@ -43,7 +43,7 @@ import {
   Area
 } from 'recharts';
 import { Modal } from '../components/ui';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 // --- MOCK DATA ---
 

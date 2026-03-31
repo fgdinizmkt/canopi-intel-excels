@@ -39,22 +39,22 @@ export const Accounts = () => {
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(true);
-  const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams.get('view') as Visualizacao) || 'lista');
-  const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams.get('sort') as Ordenacao) || 'potencial_desc');
+  const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
+  const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
   const [filtros, setFiltros] = useState<Filtros>({
     ...filtrosIniciais,
-    busca: searchParams.get('busca') || '',
-    vertical: searchParams.get('vertical') || 'todos',
-    segmento: searchParams.get('segmento') || 'todos',
-    owner: searchParams.get('owner') || 'todos',
-    etapa: searchParams.get('etapa') || 'todas',
-    tipoConta: (searchParams.get('tipo') as Filtros['tipoConta']) || 'todas',
-    potencial: searchParams.get('potencial') || 'todos',
-    risco: searchParams.get('risco') || 'todos',
-    cobertura: searchParams.get('cobertura') || 'todos',
-    oportunidade: searchParams.get('oportunidade') || 'todas',
-    atividade: searchParams.get('atividade') || 'todas',
-    play: searchParams.get('play') || 'todos'
+    busca: searchParams?.get('busca') || '',
+    vertical: searchParams?.get('vertical') || 'todos',
+    segmento: searchParams?.get('segmento') || 'todos',
+    owner: searchParams?.get('owner') || 'todos',
+    etapa: searchParams?.get('etapa') || 'todas',
+    tipoConta: (searchParams?.get('tipo') as Filtros['tipoConta']) || 'todas',
+    potencial: searchParams?.get('potencial') || 'todos',
+    risco: searchParams?.get('risco') || 'todos',
+    cobertura: searchParams?.get('cobertura') || 'todos',
+    oportunidade: searchParams?.get('oportunidade') || 'todas',
+    atividade: searchParams?.get('atividade') || 'todas',
+    play: searchParams?.get('play') || 'todos'
   });
 
   useEffect(() => {
