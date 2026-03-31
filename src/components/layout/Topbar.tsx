@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Bell, Settings, Filter, ChevronRight } from 'lucide-react';
 
 interface TopbarProps {
@@ -15,14 +16,15 @@ interface TopbarProps {
   setSubPage?: (subPage: string) => void;
 }
 
-export const Topbar: React.FC<TopbarProps> = ({ 
-  title, 
-  breadcrumbs = [], 
-  activePage, 
+export const Topbar: React.FC<TopbarProps> = ({
+  title,
+  breadcrumbs = [],
+  activePage,
   setActivePage,
   subPage,
   setSubPage
 }) => {
+  const router = useRouter();
   const showTabs = activePage === 'contas' || activePage === 'sinais' || activePage === 'estrategia-abm';
 
   return (
@@ -58,14 +60,14 @@ export const Topbar: React.FC<TopbarProps> = ({
               </>
             ) : (
               <>
-                <button 
-                  onClick={() => setActivePage?.('contas')}
+                <button
+                  onClick={() => { setActivePage?.('contas'); router.push('/contas'); }}
                   className={`text-sm font-bold transition-all ${activePage === 'contas' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Contas
                 </button>
-                <button 
-                  onClick={() => setActivePage?.('sinais')}
+                <button
+                  onClick={() => { setActivePage?.('sinais'); router.push('/sinais'); }}
                   className={`text-sm font-bold transition-all ${activePage === 'sinais' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   Sinais

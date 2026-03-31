@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
   Radio, 
@@ -56,6 +56,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onNewCampaign }) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     localStorage.removeItem('canopi_auth');
@@ -107,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
                 setActivePage(item.id);
                 router.push('/' + item.id);
@@ -125,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
                 setActivePage(item.id);
                 router.push('/' + item.id);
@@ -143,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
                 setActivePage(item.id);
                 router.push('/' + item.id);
@@ -173,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
                 key={item.id}
                 icon={item.icon}
                 label={item.label}
-                active={activePage === item.id}
+                active={pathname === '/' + item.id}
                 onClick={() => {
                   setActivePage(item.id);
                   router.push('/' + item.id);
