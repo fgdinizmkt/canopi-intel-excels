@@ -23,6 +23,7 @@ export interface Signal {
   recommendation: string;
   suggestedOwner: string;
   mainAction: string;
+  account?: string;
 }
 
 export interface TimelineEvent {

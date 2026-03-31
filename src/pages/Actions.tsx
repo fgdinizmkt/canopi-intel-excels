@@ -15,13 +15,14 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { Badge, Button, Card } from '../components/ui';
 
 type Priority = "Crítica" | "Alta" | "Média" | "Baixa";
 type ActionStatus = "Nova" | "Em andamento" | "Bloqueada" | "Aguardando aprovação" | "Concluída";
 type SlaStatus = "vencido" | "alerta" | "ok" | "sem_sla";
 type ViewMode = "Lista" | "Kanban";
 type ModalTab = "resumo" | "projeto" | "historico";
-type CardDensity = "compacta" | "media" | "expandida";
+type CardDensity = "super-compacta" | "compacta" | "media" | "expandida";
 
 type ProjectStep = {
   id: string;
@@ -70,19 +71,60 @@ type ActionItem = {
   buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
 };
 
+// ─── Style helpers (inline para garantir compilação no Tailwind v4) ─────────
+
+const priorityBadgeStyle: Record<Priority, React.CSSProperties> = {
+  Crítica: { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' },
+  Alta:    { background: '#eff2ff', color: '#2b44ff', border: '1px solid #c7d2fe' },
+  Média:   { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' },
+  Baixa:   { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' },
+};
+
+const statusBadgeStyle: Record<ActionStatus, React.CSSProperties> = {
+  Nova:                   { background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0' },
+  'Em andamento':         { background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' },
+  Bloqueada:              { background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' },
+  'Aguardando aprovação': { background: '#f5f3ff', color: '#6d28d9', border: '1px solid #ddd6fe' },
+  Concluída:              { background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' },
+};
+
+const slaColorStyle: Record<SlaStatus, React.CSSProperties> = {
+  vencido: { color: '#dc2626', fontWeight: 700 },
+  alerta:  { color: '#d97706', fontWeight: 700 },
+  ok:      { color: '#0f172a', fontWeight: 700 },
+  sem_sla: { color: '#94a3b8', fontWeight: 600 },
+};
+
+const cardBorderStyle: Record<Priority, React.CSSProperties> = {
+  Crítica: { borderLeft: '4px solid #ef4444' },
+  Alta:    { borderLeft: '4px solid #2b44ff' },
+  Média:   { borderLeft: '4px solid #f59e0b' },
+  Baixa:   { borderLeft: '4px solid #94a3b8' },
+};
+
+const cardBgStyle: Record<ActionStatus, React.CSSProperties> = {
+  Nova:                   { background: 'rgba(248,250,252,0.9)' },
+  'Em andamento':         { background: 'rgba(239,246,255,0.7)' },
+  Bloqueada:              { background: 'rgba(255,251,235,0.8)' },
+  'Aguardando aprovação': { background: 'rgba(245,243,255,0.8)' },
+  Concluída:              { background: 'rgba(240,253,244,0.8)' },
+};
+
+// ─── Classes legadas (usadas no Kanban e Overlay) ───────────────────────────
+
 const priorityClasses: Record<Priority, string> = {
   Crítica: "border border-red-200 bg-red-50 text-red-700",
-  Alta: "border border-blue-200 bg-blue-50 text-blue-700",
-  Média: "border border-orange-200 bg-orange-50 text-orange-700",
-  Baixa: "border border-slate-200 bg-slate-100 text-slate-600",
+  Alta:    "border border-blue-200 bg-blue-50 text-blue-700",
+  Média:   "border border-orange-200 bg-orange-50 text-orange-700",
+  Baixa:   "border border-slate-200 bg-slate-100 text-slate-600",
 };
 
 const statusClasses: Record<ActionStatus, string> = {
-  Nova: "border border-slate-200 bg-slate-100 text-slate-700",
-  "Em andamento": "border border-blue-200 bg-blue-50 text-blue-700",
-  Bloqueada: "border border-amber-200 bg-amber-50 text-amber-700",
-  "Aguardando aprovação": "border border-violet-200 bg-violet-50 text-violet-700",
-  Concluída: "border border-emerald-200 bg-emerald-50 text-emerald-700",
+  Nova:                   "bg-slate-100 text-slate-700",
+  'Em andamento':         "bg-blue-100 text-blue-700",
+  Bloqueada:              "bg-amber-100 text-amber-700",
+  'Aguardando aprovação': "bg-violet-100 text-violet-700",
+  Concluída:              "bg-emerald-100 text-emerald-700",
 };
 
 const slaClasses: Record<SlaStatus, string> = {
@@ -93,11 +135,18 @@ const slaClasses: Record<SlaStatus, string> = {
 };
 
 const cardSurfaceClasses: Record<ActionStatus, string> = {
-  Nova: "border-slate-200 bg-slate-50/80",
-  "Em andamento": "border-blue-100 bg-blue-50/55",
-  Bloqueada: "border-amber-100 bg-amber-50/65",
-  "Aguardando aprovação": "border-violet-100 bg-violet-50/65",
-  Concluída: "border-emerald-100 bg-emerald-50/65",
+  Nova: "bg-slate-50",
+  'Em andamento': "bg-blue-50",
+  Bloqueada: "bg-amber-50",
+  'Aguardando aprovação': "bg-violet-50",
+  Concluída: "bg-emerald-50",
+};
+
+const priorityBorderClasses: Record<Priority, string> = {
+  Crítica: "border-l-4 border-l-red-500",
+  Alta: "border-l-4 border-l-blue-600",
+  Média: "border-l-4 border-l-amber-500",
+  Baixa: "border-l-4 border-l-slate-400",
 };
 
 const ganttBarClasses: Record<ProjectStep["status"], string> = {
@@ -114,6 +163,16 @@ const historyDotClasses: Record<HistoryItem["type"], string> = {
   owner: "bg-violet-500",
   "follow-up": "bg-amber-500",
 };
+
+// Inline version for guaranteed rendering
+const historyDotColor: Record<HistoryItem["type"], string> = {
+  mudança: "#2563eb",
+  evidência: "#10b981",
+  risco: "#ef4444",
+  owner: "#7c3aed",
+  "follow-up": "#f59e0b",
+};
+
 
 const statusOptions: ActionStatus[] = ["Nova", "Em andamento", "Bloqueada", "Aguardando aprovação", "Concluída"];
 const weekLabels = ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"];
@@ -684,18 +743,12 @@ function sortByPriorityAndSla(items: ActionItem[]) {
   });
 }
 
-
-function MetricCard({ label, value, helper, icon }: { label: string; value: string | number; helper?: string; icon?: React.ReactNode }) {
+function MetricCard({ label, value, helper, icon }: { label: string; value: number; helper?: string; icon: React.ReactNode }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/5 px-5 py-5 text-white/95 backdrop-blur-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">{label}</p>
-          <p className="mt-3 text-4xl font-black tracking-tight">{value}</p>
-          {helper ? <p className="mt-2 text-sm text-white/60">{helper}</p> : null}
-        </div>
-        {icon ? <div className="text-white/35">{icon}</div> : null}
-      </div>
+    <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 18px', backdropFilter: 'blur(8px)' }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{value}</div>
+      {helper && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{helper}</div>}
     </div>
   );
 }
@@ -741,34 +794,29 @@ function QuickButton({
   onClick: () => void;
   small?: boolean;
 }) {
-  const toneClass =
-    tone === "primary"
-      ? "bg-[#2457f5] text-white hover:bg-[#1d49d0]"
-      : tone === "danger"
-        ? "border border-red-200 bg-white text-red-600 hover:bg-red-50"
-        : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cx(
-        "rounded-2xl font-semibold transition",
-        small ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm",
-        toneClass
-      )}
-    >
-      {label}
-    </button>
-  );
+  const s: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    padding: small ? '6px 12px' : '9px 18px',
+    fontSize: small ? 12 : 13,
+    background: tone === 'primary' ? '#2b44ff' : tone === 'danger' ? '#fef2f2' : 'white',
+    color: tone === 'primary' ? 'white' : tone === 'danger' ? '#dc2626' : '#334155',
+    border: tone === 'primary' ? 'none' : tone === 'danger' ? '1px solid #fecaca' : '1px solid #e2e8f0',
+  };
+  return <button type="button" onClick={onClick} style={s}>{label}</button>;
 }
 
 function InfoBlock({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div className="rounded-2xl bg-white/70 px-4 py-3.5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</p>
-      <p className="mt-1.5 text-sm font-bold leading-6 text-slate-900">{value}</p>
-      <p className="mt-1 text-xs leading-5 text-slate-500">{helper}</p>
+    <div style={{ borderRadius: 14, background: 'rgba(255,255,255,0.85)', padding: '12px 14px' }}>
+      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>{label}</p>
+      <p style={{ marginTop: 6, fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: '#0f172a' }}>{value}</p>
+      <p style={{ marginTop: 3, fontSize: 11, lineHeight: 1.5, color: '#64748b' }}>{helper}</p>
     </div>
   );
 }
@@ -853,48 +901,125 @@ function normalizeStep(step: ProjectStep, scale: ProjectScale) {
 
 function ActionListCard({
   item,
+  density = 'media',
   onTitleClick,
   onButtonAction,
 }: {
   item: ActionItem;
+  density?: CardDensity;
   onTitleClick: (item: ActionItem) => void;
   onButtonAction: (item: ActionItem, action: ActionItem["buttons"][number]["action"]) => void;
 }) {
+  const cardStyle: React.CSSProperties = {
+    borderRadius: density === 'super-compacta' ? 14 : 24,
+    border: '1px solid #e2e8f0',
+    borderLeft: cardBorderStyle[item.priority].borderLeft,
+    ...cardBgStyle[item.status],
+    padding: density === 'super-compacta' ? '10px 16px' : '20px 24px',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+  };
+
+  // ── Super compacta: só título, owner e tags ────────────────────────
+  if (density === 'super-compacta') {
+    return (
+      <div style={cardStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{item.priority}</span>
+          <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{item.status}</span>
+          <button
+            type="button"
+            onClick={() => onTitleClick(item)}
+            style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {item.accountName} <span style={{ fontWeight: 500, color: '#64748b' }}>— {item.title}</span>
+          </button>
+          <span style={{ fontSize: 12, color: '#64748b', flexShrink: 0 }}>{item.ownerName ?? 'N/A'}</span>
+          <span style={{ ...slaColorStyle[item.slaStatus], fontSize: 12, flexShrink: 0 }}>{item.slaText}</span>
+        </div>
+      </div>
+    );
+  }
+
+  const btnStyle = (tone: string): React.CSSProperties => ({
+    display: 'block',
+    width: '100%',
+    padding: '9px 16px',
+    borderRadius: 14,
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+    textAlign: 'center',
+    border: tone === 'primary' ? 'none' : '1px solid #e2e8f0',
+    background: tone === 'primary' ? '#2b44ff' : tone === 'danger' ? '#fef2f2' : 'white',
+    color: tone === 'primary' ? 'white' : tone === 'danger' ? '#dc2626' : '#334155',
+  });
+
   return (
-    <div className={cx("rounded-[28px] border p-5 shadow-sm transition hover:border-slate-300", cardSurfaceClasses[item.status])}>
-      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={cx("rounded-full px-3 py-1 text-[11px] font-bold", priorityClasses[item.priority])}>{item.priority}</span>
-            <span className={cx("rounded-full px-3 py-1 text-[11px] font-bold", statusClasses[item.status])}>{item.status}</span>
-            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-500">{item.channel}</span>
-            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">{item.category}</span>
+    <div style={cardStyle}>
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+        {/* Main content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Badges */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+            <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+              {item.priority}
+            </span>
+            <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+              {item.status}
+            </span>
+            <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>
+              {item.channel}
+            </span>
+            <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>
+              {item.category}
+            </span>
           </div>
 
-          <div className="mt-4">
-            <button type="button" onClick={() => onTitleClick(item)} className="text-left transition hover:opacity-85">
-              <p className="text-[24px] font-black leading-tight tracking-tight text-slate-950 lg:text-[26px]">{item.accountName}</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-600">{item.title}</p>
+          {/* Title & description */}
+          <div style={{ marginTop: 16 }}>
+            <button type="button" onClick={() => onTitleClick(item)} style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <p style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a' }}>{item.accountName}</p>
+              <p style={{ marginTop: 4, fontSize: 14, fontWeight: 600, color: '#475569' }}>{item.title}</p>
             </button>
-            <p className="mt-3 max-w-[920px] text-sm leading-6 text-slate-600">{item.description}</p>
+            {density !== 'compacta' && (
+              <p style={{ marginTop: 12, fontSize: 13, lineHeight: 1.7, color: '#64748b', maxWidth: 880 }}>{item.description}</p>
+            )}
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5 auto-rows-fr">
-            <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
-            <InfoBlock label="Owner" value={item.ownerName ?? "Não atribuído"} helper={item.ownerTeam} />
-            <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
-            <InfoBlock label="Impacto esperado" value={item.expectedImpact} helper="Consequência operacional esperada" />
-            <InfoBlock label="Próximo passo" value={item.nextStep} helper={item.slaText} />
-          </div>
+          {/* Info blocks — hide on compacta */}
+          {density === 'expandida' && (
+            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+              <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
+              <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={item.ownerTeam} />
+              <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
+              <InfoBlock label="Impacto" value={item.expectedImpact} helper="Consequência esperada" />
+              <InfoBlock label="Próximo passo" value={item.nextStep} helper={item.slaText} />
+            </div>
+          )}
+          {density === 'media' && (
+            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={item.ownerTeam} />
+              <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
+              <InfoBlock label="SLA" value={item.slaText} helper={item.status} />
+            </div>
+          )}
         </div>
 
-        <div className="flex w-full flex-col gap-3 xl:max-w-[220px]">
+        {/* Action sidebar */}
+        <div style={{ width: 180, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {item.buttons.map((button) => (
-            <QuickButton key={button.id} label={button.label} tone={button.tone} onClick={() => onButtonAction(item, button.action)} />
+            <button
+              key={button.id}
+              type="button"
+              style={btnStyle(button.tone)}
+              onClick={() => onButtonAction(item, button.action)}
+            >
+              {button.label}
+            </button>
           ))}
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs">
-            <p className="font-semibold uppercase tracking-[0.16em] text-slate-400">SLA</p>
-            <p className={cx("mt-2 text-sm font-bold", slaClasses[item.slaStatus])}>{item.slaText}</p>
+          <div style={{ borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '10px 12px' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>SLA</p>
+            <p style={{ marginTop: 5, fontSize: 13, ...slaColorStyle[item.slaStatus] }}>{item.slaText}</p>
           </div>
         </div>
       </div>
@@ -915,58 +1040,120 @@ function KanbanCard({
   onButtonAction: (item: ActionItem, action: ActionItem["buttons"][number]["action"]) => void;
   onDragStart: (id: string) => void;
 }) {
-  const compact = density === "compacta";
-  const medium = density === "media";
-  const summary = compact ? truncateText(item.description, 72) : medium ? truncateText(item.description, 110) : truncateText(item.description, 145);
+  const compact = density === 'compacta' || density === 'super-compacta';
+  const superCompact = density === 'super-compacta';
+  const medium = density === 'media';
+  const summary = compact
+    ? truncateText(item.description, 72)
+    : medium
+      ? truncateText(item.description, 110)
+      : truncateText(item.description, 145);
 
-  const densityFrame = compact ? "min-h-[248px]" : medium ? "min-h-[284px]" : "min-h-[318px]";
+  const minH = superCompact ? 120 : compact ? 200 : medium ? 248 : 290;
+
+  const cardStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    borderRadius: 20,
+    border: '1px solid #e2e8f0',
+    borderLeft: cardBorderStyle[item.priority].borderLeft,
+    ...cardBgStyle[item.status],
+    padding: 14,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+    minHeight: minH,
+    cursor: 'grab',
+  };
 
   return (
-    <div
-      draggable
-      onDragStart={() => onDragStart(item.id)}
-      className={cx("flex h-full flex-col rounded-[24px] border p-3.5 shadow-sm transition hover:border-slate-300", cardSurfaceClasses[item.status], densityFrame)}
-    >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2 text-slate-400">
-          <GripVertical className="h-4 w-4" />
-          <span className={cx("rounded-full px-2.5 py-1 text-[10px] font-bold", priorityClasses[item.priority])}>{item.priority}</span>
-          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">{item.category}</span>
+    <div draggable onDragStart={() => onDragStart(item.id)} style={cardStyle}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <GripVertical style={{ width: 14, height: 14, color: '#94a3b8', flexShrink: 0 }} />
+          <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700 }}>
+            {item.priority}
+          </span>
+          <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '2px 8px', fontSize: 10, fontWeight: 600, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {item.category}
+          </span>
         </div>
-        {!compact ? <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">{item.channel}</span> : null}
+        {!compact && (
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8', flexShrink: 0 }}>
+            {item.channel}
+          </span>
+        )}
       </div>
 
-      <div className="mt-3 min-w-0">
-        <button type="button" onClick={() => onTitleClick(item)} className="w-full text-left transition hover:opacity-85">
-          <p className={cx("truncate font-black tracking-tight text-slate-950", compact ? "text-[19px] leading-6" : "text-[20px] leading-6")}>{item.accountName}</p>
-          <p className="mt-1 truncate text-[12px] font-semibold text-slate-600">{item.title}</p>
+      {/* Title */}
+      {!superCompact && (
+        <div style={{ marginTop: 12, minWidth: 0 }}>
+          <button
+            type="button"
+            onClick={() => onTitleClick(item)}
+            style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <p style={{ fontSize: compact ? 17 : 18, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.25, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.accountName}
+            </p>
+            <p style={{ marginTop: 3, fontSize: 12, fontWeight: 600, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.title}
+            </p>
+          </button>
+          <p style={{ marginTop: 8, fontSize: compact ? 11 : 12, lineHeight: 1.5, color: '#64748b' }}>{summary}</p>
+        </div>
+      )}
+      {superCompact && (
+        <button
+          type="button"
+          onClick={() => onTitleClick(item)}
+          style={{ marginTop: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+        >
+          {item.accountName}
         </button>
-        <p className={cx("mt-2.5 text-slate-600", compact ? "text-[12px] leading-5" : "text-[13px] leading-5")}>{summary}</p>
-      </div>
+      )}
 
-      <div className={cx("mt-3 grid gap-2.5", compact ? "grid-cols-1" : "grid-cols-2")}>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Owner</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">{item.ownerName ?? "Não atribuído"}</p>
-          <p className="mt-1 text-xs text-slate-500">{item.ownerTeam}</p>
+      {/* Meta — hide on super-compacta */}
+      {!superCompact && (
+        <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: compact ? '1fr' : '1fr 1fr', gap: 8 }}>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>Owner</p>
+            <p style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{item.ownerName ?? 'Não atribuído'}</p>
+            <p style={{ marginTop: 2, fontSize: 11, color: '#64748b' }}>{item.ownerTeam}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>SLA</p>
+            <p style={{ marginTop: 4, fontSize: 12, ...slaColorStyle[item.slaStatus] }}>{item.slaText}</p>
+            <p style={{ marginTop: 2, fontSize: 11, color: '#64748b' }}>{item.status}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">SLA</p>
-          <p className={cx("mt-1 text-sm font-semibold", slaClasses[item.slaStatus])}>{item.slaText}</p>
-          <p className="mt-1 text-xs text-slate-500">{item.status}</p>
-        </div>
-      </div>
+      )}
 
-      {density !== "compacta" ? (
-        <div className="mt-3 rounded-2xl bg-white/75 px-3 py-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Próximo passo</p>
-          <p className="mt-2 text-sm leading-6 text-slate-700">{truncateText(item.nextStep, density === "media" ? 80 : 120)}</p>
+      {/* Next step */}
+      {density !== 'compacta' && (
+        <div style={{ marginTop: 10, borderRadius: 12, background: 'rgba(255,255,255,0.8)', padding: '10px 12px' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>Próximo passo</p>
+          <p style={{ marginTop: 6, fontSize: 12, lineHeight: 1.5, color: '#334155' }}>
+            {truncateText(item.nextStep, density === 'media' ? 80 : 120)}
+          </p>
         </div>
-      ) : null}
+      )}
 
-      <div className="mt-auto flex flex-wrap gap-2 pt-3">
-        <QuickButton label="Ver" tone="secondary" small onClick={() => onButtonAction(item, "open")} />
-        <QuickButton label={item.status === "Concluída" ? "Reabrir" : "Executar"} tone="primary" small onClick={() => onButtonAction(item, item.status === "Concluída" ? "open" : "start")} />
+      {/* Buttons */}
+      <div style={{ marginTop: 'auto', paddingTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => onButtonAction(item, 'open')}
+          style={{ borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}
+        >
+          Ver
+        </button>
+        <button
+          type="button"
+          onClick={() => onButtonAction(item, item.status === 'Concluída' ? 'open' : 'start')}
+          style={{ borderRadius: 12, border: 'none', background: '#2b44ff', padding: '6px 12px', fontSize: 12, fontWeight: 600, color: 'white', cursor: 'pointer' }}
+        >
+          {item.status === 'Concluída' ? 'Reabrir' : 'Executar'}
+        </button>
       </div>
     </div>
   );
@@ -1007,103 +1194,122 @@ function ActionOverlay({
   const config = scaleConfig(projectScale);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/45 p-5 backdrop-blur-[2px]">
-      <div className="mx-auto flex h-full max-w-[1380px] flex-col overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-2xl">
-        <div className="border-b border-slate-200 px-7 py-6 lg:px-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap gap-2">
-                <span className={cx("rounded-full px-3 py-1 text-[11px] font-bold", priorityClasses[item.priority])}>{item.priority}</span>
-                <span className={cx("rounded-full px-3 py-1 text-[11px] font-bold", statusClasses[item.status])}>{item.status}</span>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-semibold text-slate-600">{item.channel}</span>
-                <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold text-slate-500">{item.category}</span>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(15,23,42,0.5)', padding: 20, backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'stretch' }}>
+      <div style={{ margin: '0 auto', display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 1380, overflow: 'hidden', borderRadius: 34, border: '1px solid #e2e8f0', background: 'white', boxShadow: '0 32px 80px rgba(0,0,0,0.18)' }}>
+        {/* Header */}
+        <div style={{ borderBottom: '1px solid #e2e8f0', padding: '24px 32px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{item.priority}</span>
+                <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{item.status}</span>
+                <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#475569' }}>{item.channel}</span>
+                <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>{item.category}</span>
               </div>
-              <p className="mt-5 text-sm font-semibold uppercase tracking-[0.18em] text-[#2457f5]">{item.accountName}</p>
-              <h2 className="mt-2 max-w-5xl text-[52px] font-black leading-[1.02] tracking-tight text-slate-950">{item.title}</h2>
-              <p className="mt-4 max-w-5xl text-lg leading-8 text-slate-600">{item.description}</p>
+              <p style={{ marginTop: 16, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}>{item.accountName}</p>
+              <h2 style={{ marginTop: 8, fontSize: 40, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05, color: '#0f172a', maxWidth: 900 }}>{item.title}</h2>
+              <p style={{ marginTop: 12, fontSize: 16, lineHeight: 1.7, color: '#475569', maxWidth: 860 }}>{item.description}</p>
             </div>
-            <button type="button" onClick={onClose} className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50">
-              <X className="h-6 w-6" />
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ width: 48, height: 48, borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+            >
+              <X style={{ width: 20, height: 20 }} />
             </button>
           </div>
 
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <div className="flex overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1">
+          {/* Tabs + Actions */}
+          <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', borderRadius: 14, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 4, gap: 2 }}>
               {[
-                { id: "resumo", label: "Resumo" },
-                { id: "projeto", label: "Projeto" },
-                { id: "historico", label: "Histórico" },
+                { id: 'resumo', label: 'Resumo' },
+                { id: 'projeto', label: 'Projeto' },
+                { id: 'historico', label: 'Histórico' },
               ].map((entry) => (
                 <button
                   key={entry.id}
                   type="button"
                   onClick={() => setTab(entry.id as ModalTab)}
-                  className={cx(
-                    "rounded-xl px-5 py-3 text-base font-semibold transition",
-                    tab === entry.id ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                  )}
+                  style={{
+                    borderRadius: 10,
+                    padding: '8px 18px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: 'none',
+                    background: tab === entry.id ? 'white' : 'transparent',
+                    color: tab === entry.id ? '#0f172a' : '#64748b',
+                    boxShadow: tab === entry.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                  }}
                 >
                   {entry.label}
                 </button>
               ))}
             </div>
 
-            <div className="ml-auto flex flex-wrap gap-2">
-              <QuickButton label={item.ownerName ? "Reatribuir owner" : "Atribuir owner sugerido"} tone="secondary" onClick={() => onAssignOwner(item.id)} />
+            <div style={{ marginLeft: 'auto', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <QuickButton label={item.ownerName ? 'Reatribuir owner' : 'Atribuir owner sugerido'} tone="secondary" onClick={() => onAssignOwner(item.id)} />
               <QuickButton label="Escalar risco" tone="danger" onClick={() => onEscalate(item.id)} />
             </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-7 py-7 lg:px-8">
-          {tab === "resumo" ? (
-            <div className="grid gap-6 xl:grid-cols-[1.28fr_0.92fr]">
-              <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
+          {tab === 'resumo' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: 24 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* Info grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
                   <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
-                  <InfoBlock label="Owner" value={item.ownerName ?? "Não atribuído"} helper={`Time: ${item.ownerTeam}`} />
+                  <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={`Time: ${item.ownerTeam}`} />
                   <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
-                  <InfoBlock label="SLA" value={item.slaText} helper={`Status atual: ${item.status}`} />
+                  <InfoBlock label="SLA" value={item.slaText} helper={`Status: ${item.status}`} />
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Impacto esperado</p>
-                    <p className="mt-4 text-[22px] font-black leading-8 tracking-tight text-slate-950">{item.expectedImpact}</p>
+
+                {/* Impact + Next step */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Impacto esperado</p>
+                    <p style={{ marginTop: 12, fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.3, color: '#0f172a' }}>{item.expectedImpact}</p>
                   </div>
-                  <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Próximo passo</p>
-                    <p className="mt-4 text-lg font-semibold leading-8 text-slate-900">{item.nextStep}</p>
-                    <div className="mt-5 flex gap-2">
-                      <QuickButton label="Abrir projeto" tone="secondary" onClick={() => setTab("projeto")} />
-                      <QuickButton label="Marcar em andamento" tone="primary" onClick={() => onChangeStatus(item.id, "Em andamento")} />
+                  <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Próximo passo</p>
+                    <p style={{ marginTop: 12, fontSize: 15, fontWeight: 600, lineHeight: 1.6, color: '#0f172a' }}>{item.nextStep}</p>
+                    <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+                      <QuickButton label="Abrir projeto" tone="secondary" onClick={() => setTab('projeto')} />
+                      <QuickButton label="Marcar em andamento" tone="primary" onClick={() => onChangeStatus(item.id, 'Em andamento')} />
                     </div>
                   </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
+
+                {/* Evidence + Dependencies */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <DetailList title="Evidências" items={item.evidence} emptyLabel="Sem evidências registradas." />
                   <DetailList title="Dependências" items={item.dependencies} emptyLabel="Nenhuma dependência registrada." />
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Ações operacionais</p>
-                  <div className="mt-4 grid gap-3">
-                    <QuickButton label="Executar esta ação" tone="primary" onClick={() => onChangeStatus(item.id, "Em andamento")} />
-                    <QuickButton label="Mover para bloqueada" tone="secondary" onClick={() => onChangeStatus(item.id, "Bloqueada")} />
-                    <QuickButton label="Aguardando aprovação" tone="secondary" onClick={() => onChangeStatus(item.id, "Aguardando aprovação")} />
-                    <QuickButton label="Concluir ação" tone="secondary" onClick={() => onChangeStatus(item.id, "Concluída")} />
+              {/* Right sidebar */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Ações operacionais</p>
+                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <QuickButton label="Executar esta ação" tone="primary" onClick={() => onChangeStatus(item.id, 'Em andamento')} />
+                    <QuickButton label="Mover para bloqueada" tone="secondary" onClick={() => onChangeStatus(item.id, 'Bloqueada')} />
+                    <QuickButton label="Aguardando aprovação" tone="secondary" onClick={() => onChangeStatus(item.id, 'Aguardando aprovação')} />
+                    <QuickButton label="Concluir ação" tone="secondary" onClick={() => onChangeStatus(item.id, 'Concluída')} />
                   </div>
                 </div>
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Histórico recente</p>
-                  <div className="mt-4 space-y-3">
+                <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico recente</p>
+                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {item.history.slice(0, 4).map((entry) => (
-                      <div key={entry.id} className="flex gap-3">
-                        <span className={cx("mt-2 h-2.5 w-2.5 rounded-full", historyDotClasses[entry.type])} />
+                      <div key={entry.id} style={{ display: 'flex', gap: 12 }}>
+                        <span style={{ width: 10, height: 10, borderRadius: '50%', background: historyDotColor[entry.type], flexShrink: 0, marginTop: 4 }} />
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{entry.text}</p>
-                          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">{entry.actor} · {entry.when}</p>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
+                          <p style={{ marginTop: 3, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when}</p>
                         </div>
                       </div>
                     ))}
@@ -1111,117 +1317,88 @@ function ActionOverlay({
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
 
-          {tab === "projeto" ? (
-            <div className="space-y-6">
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6">
-                <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          {tab === 'projeto' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ borderRadius: 24, border: '1px solid #e2e8f0', background: 'white', padding: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
                   <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Projeto operacional da ação</p>
-                    <h3 className="mt-3 max-w-4xl text-[34px] font-black leading-tight tracking-tight text-slate-950">{item.projectObjective}</h3>
-                    <p className="mt-3 text-base leading-7 text-slate-600">Critério de sucesso: {item.projectSuccess}</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Projeto operacional da ação</p>
+                    <h3 style={{ marginTop: 10, fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a', maxWidth: 760 }}>{item.projectObjective}</h3>
+                    <p style={{ marginTop: 10, fontSize: 14, lineHeight: 1.7, color: '#64748b' }}>Critério de sucesso: {item.projectSuccess}</p>
                   </div>
-                  <div className="flex items-center gap-2 self-start rounded-2xl border border-slate-200 bg-slate-50 p-1">
-                    {[
-                      { id: "semana", label: "Semana" },
-                      { id: "mes", label: "Mês" },
-                      { id: "trimestre", label: "Trimestre" },
-                    ].map((option) => (
+                  <div style={{ display: 'flex', borderRadius: 12, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 4, gap: 4 }}>
+                    {[{ id: 'semana', label: 'Semana' }, { id: 'mes', label: 'Mês' }, { id: 'trimestre', label: 'Trimestre' }].map((o) => (
                       <button
-                        key={option.id}
+                        key={o.id}
                         type="button"
-                        onClick={() => setProjectScale(option.id as ProjectScale)}
-                        className={cx(
-                          "rounded-xl px-4 py-2 text-sm font-semibold transition",
-                          projectScale === option.id ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                        )}
-                      >
-                        {option.label}
-                      </button>
+                        onClick={() => setProjectScale(o.id as ProjectScale)}
+                        style={{ borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', background: projectScale === o.id ? 'white' : 'transparent', color: projectScale === o.id ? '#0f172a' : '#64748b', boxShadow: projectScale === o.id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                      >{o.label}</button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6">
-                <div className="overflow-auto">
-                  <div className="min-w-[1120px]">
-                    <div className="grid grid-cols-[180px_340px_160px_minmax(0,1fr)] gap-4 border-b border-slate-200 pb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                      <div>Fase</div>
-                      <div>Entregável</div>
-                      <div>Owner</div>
-                      <div>
-                        <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${config.units}, minmax(0, 1fr))` }}>
-                          {config.labels.map((label) => (
-                            <div key={label} className="text-center">{label}</div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="divide-y divide-slate-100">
-                      {item.projectSteps.map((step) => {
-                        const normalized = normalizeStep(step, projectScale);
-                        const left = ((normalized.start - 1) / config.units) * 100;
-                        const width = (normalized.duration / config.units) * 100;
-                        return (
-                          <div key={step.id} className="grid grid-cols-[180px_340px_160px_minmax(0,1fr)] gap-4 py-5">
-                            <div>
-                              <p className="text-base font-bold text-slate-900">{step.lane}</p>
-                            </div>
-                            <div>
-                              <p className="text-base font-semibold text-slate-900">{step.label}</p>
-                              <p className="mt-2 text-sm leading-6 text-slate-500">{step.detail}</p>
-                            </div>
-                            <div className="text-sm text-slate-600">{step.owner}</div>
-                            <div>
-                              <div className="relative h-14 rounded-2xl bg-slate-50">
-                                <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${config.units}, minmax(0, 1fr))` }}>
-                                  {config.labels.map((label) => (
-                                    <div key={`${step.id}-${label}`} className="border-l border-slate-200/80 first:border-l-0" />
-                                  ))}
-                                </div>
-                                <div
-                                  className={cx("absolute top-2 h-10 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-sm", ganttBarClasses[step.status])}
-                                  style={{ left: `${left}%`, width: `${Math.max(width, 8)}%` }}
-                                >
-                                  <span className="block truncate">{step.label}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+              <div style={{ borderRadius: 24, border: '1px solid #e2e8f0', background: 'white', padding: 24, overflowX: 'auto' }}>
+                <div style={{ minWidth: 1000 }}>
+                  {/* Gantt header */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '160px 300px 140px 1fr', gap: 16, paddingBottom: 14, borderBottom: '1px solid #e2e8f0', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#94a3b8' }}>
+                    <div>Fase</div><div>Entregável</div><div>Owner</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                      {config.labels.map((l) => <div key={l} style={{ textAlign: 'center' }}>{l}</div>)}
                     </div>
                   </div>
+                  {/* Gantt rows */}
+                  {item.projectSteps.map((step) => {
+                    const norm = normalizeStep(step, projectScale);
+                    const left = ((norm.start - 1) / config.units) * 100;
+                    const width = (norm.duration / config.units) * 100;
+                    const barBg = step.status === 'done' ? '#10b981' : step.status === 'active' ? '#2563eb' : step.status === 'risk' ? '#ef4444' : '#cbd5e1';
+                    return (
+                      <div key={step.id} style={{ display: 'grid', gridTemplateColumns: '160px 300px 140px 1fr', gap: 16, paddingTop: 18, paddingBottom: 18, borderBottom: '1px solid #f1f5f9' }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{step.lane}</p>
+                        <div><p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{step.label}</p><p style={{ marginTop: 6, fontSize: 12, lineHeight: 1.5, color: '#64748b' }}>{step.detail}</p></div>
+                        <p style={{ fontSize: 13, color: '#475569' }}>{step.owner}</p>
+                        <div style={{ position: 'relative', height: 48, borderRadius: 12, background: '#f8fafc' }}>
+                          <div style={{ position: 'absolute', inset: 0, display: 'grid', gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                            {config.labels.map((l) => <div key={l} style={{ borderLeft: '1px solid rgba(226,232,240,0.7)' }} />)}
+                          </div>
+                          <div style={{ position: 'absolute', top: 6, height: 36, borderRadius: 8, background: barBg, left: `${left}%`, width: `${Math.max(width, 8)}%`, padding: '6px 10px', fontSize: 12, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {step.label}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
 
-          {tab === "historico" ? (
-            <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-              <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Histórico da ação</p>
-                <div className="mt-5 space-y-5">
+          {tab === 'historico' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 24 }}>
+              <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico da ação</p>
+                <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {item.history.map((entry) => (
-                    <div key={entry.id} className="flex gap-4">
-                      <span className={cx("mt-2 h-3 w-3 rounded-full", historyDotClasses[entry.type])} />
+                    <div key={entry.id} style={{ display: 'flex', gap: 14 }}>
+                      <span style={{ width: 12, height: 12, borderRadius: '50%', background: historyDotColor[entry.type], flexShrink: 0, marginTop: 4 }} />
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{entry.text}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-400">{entry.actor} · {entry.when} · {entry.type}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
+                        <p style={{ marginTop: 4, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when} · {entry.type}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="space-y-6">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <DetailList title="Dependências em aberto" items={item.dependencies} emptyLabel="Nenhuma dependência em aberto." />
                 <DetailList title="Evidências-chave" items={item.evidence} emptyLabel="Sem evidências-chave." />
               </div>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>
@@ -1241,7 +1418,10 @@ export const Actions: React.FC = () => {
   const [projectScale, setProjectScale] = useState<ProjectScale>("semana");
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [showAllList, setShowAllList] = useState(false);
-  const [kanbanDensity, setKanbanDensity] = useState<CardDensity>("media");
+  const [kanbanDensity, setKanbanDensity] = useState<CardDensity>('media');
+  const [listDensity, setListDensity] = useState<CardDensity>('media');
+  const [showNewAction, setShowNewAction] = useState(false);
+  const [newActionForm, setNewActionForm] = useState({ account: '', title: '', owner: '', priority: 'Alta' as Priority });
 
   const ownerOptions = useMemo(() => {
     const uniqueOwners = Array.from(new Set(items.map((item) => item.ownerName ?? "Sem owner")));
@@ -1364,31 +1544,71 @@ export const Actions: React.FC = () => {
     setDraggedId(null);
   }
 
+  function handleExport() {
+    const cols = ['Conta', 'Título', 'Prioridade', 'Status', 'Canal', 'Owner', 'SLA', 'Origem'];
+    const rows = filteredItems.map((item) => [
+      item.accountName,
+      item.title,
+      item.priority,
+      item.status,
+      item.channel,
+      item.ownerName ?? 'Não atribuído',
+      item.slaText,
+      item.origin,
+    ]);
+    const csv = [cols, ...rows].map((r) => r.map((c) => `"${c}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `canopi-acoes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
-    <div className="min-h-screen bg-[#f6f8fc] px-5 py-8 lg:px-8 2xl:px-10">
+    <div className="min-h-screen px-5 py-8 lg:px-8 2xl:px-10" style={{ background: '#f6f8fc' }}>
       <div className="mx-auto max-w-[1520px]">
-        <section className="overflow-hidden rounded-[36px] border border-[#17348f] bg-[linear-gradient(135deg,#041135_0%,#11286e_52%,#1f3f9b_100%)] px-7 py-8 text-white shadow-[0_28px_80px_rgba(15,36,104,0.22)] lg:px-8 lg:py-9">
-          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
-            <div className="max-w-4xl">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/85">Revenue Ops</span>
-                <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-300">Sinais conectados</span>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Projeto por ação</span>
+        <section
+          style={{
+            background: 'linear-gradient(135deg, #041135 0%, #11286e 52%, #1f3f9b 100%)',
+            borderRadius: 36,
+            border: '1px solid #17348f',
+            padding: '32px 32px 36px',
+            color: 'white',
+            boxShadow: '0 28px 80px rgba(15,36,104,0.22)',
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          {/* Buttons — absolute top-right */}
+          <div style={{ position: 'absolute', top: 20, right: 24, display: 'flex', gap: 8, zIndex: 2 }}>
+            <button
+              onClick={handleExport}
+              title={`Exportar ${filteredItems.length} ações como CSV`}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 10, border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.08)', padding: '6px 13px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)', cursor: 'pointer', backdropFilter: 'blur(4px)' }}
+            >
+              <Download style={{ width: 13, height: 13 }} /> Exportar
+            </button>
+            <button
+              onClick={() => setShowNewAction(true)}
+              title="Criar nova ação na fila operacional"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 10, background: 'white', padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#17348f', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
+            >
+              <Plus style={{ width: 13, height: 13 }} /> Nova ação
+            </button>
+          </div>
+
+          <div style={{ maxWidth: 680 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                <span style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.85)' }}>Revenue Ops</span>
+                <span style={{ background: 'rgba(52,211,153,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#6ee7b7' }}>Sinais conectados</span>
+                <span style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.7)' }}>Projeto por ação</span>
               </div>
-              <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">Canopi · Revenue Ops · Fila de ações</p>
-              <h1 className="mt-4 max-w-4xl text-[48px] font-black leading-[1.02] tracking-tight lg:text-[60px]">Fila operacional de ações</h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-white/72">
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginTop: 20 }}>Canopi · Revenue Ops · Fila de ações</p>
+              <h1 style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.02, marginTop: 16 }}>Fila operacional de ações</h1>
+              <p style={{ marginTop: 16, fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.65)' }}>
                 Orquestração de ações com contexto de conta, sinal, owner, SLA, histórico e fluxo operacional por ação. A leitura geral fica leve, e o detalhe profundo abre em overlay central quando a equipe precisa decidir e agir.
               </p>
-            </div>
-            <div className="flex flex-wrap gap-3 xl:justify-end">
-              <button className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/15">
-                <Download className="h-4 w-4" /> Exportar
-              </button>
-              <button className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-[#17348f] transition hover:bg-slate-100">
-                <Plus className="h-4 w-4" /> Nova ação
-              </button>
-            </div>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -1401,51 +1621,83 @@ export const Actions: React.FC = () => {
         </section>
 
         <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div className="grid flex-1 gap-3 lg:grid-cols-[1.6fr_repeat(4,minmax(0,1fr))]">
-              <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-                <Search className="h-4 w-4 text-slate-400" />
-                <input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Buscar por conta, ação, owner, origem"
-                  className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
-                />
-              </label>
-              <SelectField label="Prioridade" value={priorityFilter} options={["Todas", "Crítica", "Alta", "Média", "Baixa"]} onChange={setPriorityFilter} />
-              <SelectField label="Canal" value={channelFilter} options={["Todos", ...Array.from(new Set(items.map((item) => item.channel)))]} onChange={setChannelFilter} />
-              <SelectField label="Status" value={statusFilter} options={["Todos", ...statusOptions]} onChange={setStatusFilter} />
-              <SelectField label="Owner" value={ownerFilter} options={ownerOptions} onChange={setOwnerFilter} />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {/* Search */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, flex: '1 1 220px', borderRadius: 14, border: '1px solid #e2e8f0', background: 'white', padding: '8px 14px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)', minWidth: 180 }}>
+              <Search style={{ width: 15, height: 15, color: '#94a3b8', flexShrink: 0 }} />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar conta, ação, owner..."
+                style={{ width: '100%', background: 'transparent', fontSize: 13, color: '#334155', outline: 'none', border: 'none' }}
+              />
+            </label>
 
-            <div className="flex overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1 shadow-sm">
+            {/* Filters row */}
+            {[
+              { label: 'Prioridade', value: priorityFilter, options: ['Todas', 'Crítica', 'Alta', 'Média', 'Baixa'], set: setPriorityFilter },
+              { label: 'Canal', value: channelFilter, options: ['Todos', ...Array.from(new Set(items.map((i) => i.channel)))], set: setChannelFilter },
+              { label: 'Status', value: statusFilter, options: ['Todos', ...statusOptions], set: setStatusFilter },
+              { label: 'Owner', value: ownerFilter, options: ownerOptions, set: setOwnerFilter },
+            ].map((f) => (
+              <div key={f.label} style={{ position: 'relative', flexShrink: 0 }}>
+                <select
+                  value={f.value}
+                  onChange={(e) => f.set(e.target.value)}
+                  style={{ appearance: 'none', WebkitAppearance: 'none', borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '7px 28px 7px 12px', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
+                >
+                  {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+                <ChevronDown style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 13, height: 13, color: '#94a3b8', pointerEvents: 'none' }} />
+              </div>
+            ))}
+
+            {/* Spacer */}
+            <div style={{ flex: 1 }} />
+
+            {/* Density (for list view, discrete) */}
+            {viewMode === 'Lista' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>Densidade</span>
+                <div style={{ display: 'flex', borderRadius: 10, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2 }}>
+                  {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setListDensity(d)}
+                      title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
+                      style={{ borderRadius: 7, padding: '4px 9px', fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none', background: listDensity === d ? 'white' : 'transparent', color: listDensity === d ? '#0f172a' : '#94a3b8', boxShadow: listDensity === d ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                    >
+                      {{ 'super-compacta': 'S', compacta: 'C', media: 'M', expandida: 'E' }[d]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* View toggle */}
+            <div style={{ display: 'flex', borderRadius: 12, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2, flexShrink: 0 }}>
               {[
-                { id: "Lista", label: "Lista", icon: LayoutList },
-                { id: "Kanban", label: "Kanban", icon: FolderKanban },
-              ].map((entry) => {
-                const Icon = entry.icon;
-                return (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    onClick={() => setViewMode(entry.id as ViewMode)}
-                    className={cx(
-                      "inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition",
-                      viewMode === entry.id ? "bg-white text-slate-950 shadow-sm" : "text-slate-500 hover:text-slate-700"
-                    )}
-                  >
-                    <Icon className="h-4 w-4" /> {entry.label}
-                  </button>
-                );
-              })}
+                { id: 'Lista', label: 'Lista', Icon: LayoutList },
+                { id: 'Kanban', label: 'Kanban', Icon: FolderKanban },
+              ].map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setViewMode(id as ViewMode)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 9, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: viewMode === id ? 'white' : 'transparent', color: viewMode === id ? '#0f172a' : '#64748b', boxShadow: viewMode === id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                >
+                  <Icon style={{ width: 14, height: 14 }} /> {label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {viewMode === "Lista" ? (
-          <div className="mt-6 space-y-5">
+        {viewMode === 'Lista' ? (
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: listDensity === 'super-compacta' ? 6 : 14 }}>
             {visibleListItems.map((item) => (
-              <ActionListCard key={item.id} item={item} onTitleClick={(selected) => openOverlay(selected, "resumo")} onButtonAction={handleButtonAction} />
+              <ActionListCard key={item.id} item={item} density={listDensity} onTitleClick={(selected) => openOverlay(selected, 'resumo')} onButtonAction={handleButtonAction} />
             ))}
             {filteredItems.length === 0 ? (
               <div className="rounded-[28px] border border-dashed border-slate-200 bg-white px-6 py-16 text-center text-slate-500 shadow-sm">
@@ -1461,9 +1713,23 @@ export const Actions: React.FC = () => {
             ) : null}
           </div>
         ) : (
-          <div className="mt-6 space-y-4">
-            <div className="flex justify-end pr-1">
-              <DensityToggle value={kanbanDensity} onChange={setKanbanDensity} />
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* Density toggle for Kanban — right aligned, compact */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>Densidade</span>
+              <div style={{ display: 'flex', borderRadius: 10, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2 }}>
+                {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setKanbanDensity(d)}
+                    title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
+                    style={{ borderRadius: 7, padding: '4px 9px', fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none', background: kanbanDensity === d ? 'white' : 'transparent', color: kanbanDensity === d ? '#0f172a' : '#94a3b8', boxShadow: kanbanDensity === d ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                  >
+                    {{ 'super-compacta': 'S', compacta: 'C', media: 'M', expandida: 'E' }[d]}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="rounded-[30px] border border-slate-200 bg-white px-4 py-4 shadow-sm lg:px-5">
@@ -1519,6 +1785,117 @@ export const Actions: React.FC = () => {
         onChangeStatus={handleChangeStatus}
         onEscalate={handleEscalate}
       />
+
+      {/* ─── Modal Nova Ação ─────────────────────────────────────────── */}
+      {showNewAction && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(15,23,42,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backdropFilter: 'blur(3px)' }}>
+          <div style={{ background: 'white', borderRadius: 28, padding: 32, width: '100%', maxWidth: 520, boxShadow: '0 32px 80px rgba(0,0,0,0.2)', position: 'relative' }}>
+            <button onClick={() => setShowNewAction(false)} style={{ position: 'absolute', top: 20, right: 20, width: 36, height: 36, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+              <X style={{ width: 16, height: 16 }} />
+            </button>
+
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}>Nova ação</p>
+            <h2 style={{ marginTop: 6, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Criar ação na fila</h2>
+            <p style={{ marginTop: 6, fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Preencha os campos abaixo para adicionar uma nova ação à fila operacional.</p>
+
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Conta *</label>
+                <input
+                  value={newActionForm.account}
+                  onChange={(e) => setNewActionForm((f) => ({ ...f, account: e.target.value }))}
+                  placeholder="Ex: Carteira Seguros Enterprise"
+                  style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Título da ação *</label>
+                <input
+                  value={newActionForm.title}
+                  onChange={(e) => setNewActionForm((f) => ({ ...f, title: e.target.value }))}
+                  placeholder="Ex: Reativar contato com decisor"
+                  style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Owner</label>
+                  <input
+                    value={newActionForm.owner}
+                    onChange={(e) => setNewActionForm((f) => ({ ...f, owner: e.target.value }))}
+                    placeholder="Nome do responsável"
+                    style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Prioridade</label>
+                  <select
+                    value={newActionForm.priority}
+                    onChange={(e) => setNewActionForm((f) => ({ ...f, priority: e.target.value as Priority }))}
+                    style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', background: 'white', appearance: 'none', boxSizing: 'border-box' }}
+                  >
+                    <option>Alta</option>
+                    <option>Crítica</option>
+                    <option>Média</option>
+                    <option>Baixa</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 28, display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setShowNewAction(false)}
+                style={{ flex: 1, borderRadius: 14, border: '1px solid #e2e8f0', background: 'white', padding: '11px 0', fontSize: 14, fontWeight: 600, color: '#334155', cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (!newActionForm.account.trim() || !newActionForm.title.trim()) return;
+                  const now = new Date();
+                  const newItem: ActionItem = {
+                    id: `new-${Date.now()}`,
+                    accountName: newActionForm.account,
+                    accountContext: 'Conta adicionada manualmente',
+                    title: newActionForm.title,
+                    description: 'Ação criada manualmente via fila operacional.',
+                    priority: newActionForm.priority as Priority,
+                    status: 'Nova',
+                    channel: 'Revenue Ops',
+                    category: 'Manual',
+                    ownerName: newActionForm.owner || null,
+                    suggestedOwner: '',
+                    ownerTeam: 'Revenue Ops',
+                    origin: 'Criação manual',
+                    relatedSignal: '—',
+                    slaText: 'vence em 5 dias',
+                    slaStatus: 'ok',
+                    expectedImpact: 'A definir',
+                    nextStep: 'Definir próximos passos',
+                    dependencies: [],
+                    evidence: [],
+                    history: [{ id: 'h1', when: now.toLocaleString('pt-BR'), actor: 'Você', type: 'mudança', text: 'Ação criada manualmente.' }],
+                    projectObjective: newActionForm.title,
+                    projectSuccess: 'A definir',
+                    projectSteps: [],
+                    buttons: [
+                      { id: 'b1', label: 'Ver detalhes', tone: 'secondary', action: 'open' },
+                      { id: 'b2', label: 'Executar', tone: 'primary', action: 'start' },
+                    ],
+                  };
+                  setItems((prev) => [newItem, ...prev]);
+                  setShowNewAction(false);
+                  setNewActionForm({ account: '', title: '', owner: '', priority: 'Alta' });
+                }}
+                style={{ flex: 2, borderRadius: 14, background: '#2b44ff', border: 'none', padding: '11px 0', fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer' }}
+              >
+                Criar ação
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

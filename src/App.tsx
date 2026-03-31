@@ -11,7 +11,7 @@ import { Topbar } from './components/layout/Topbar';
 import Overview from './pages/Overview';
 import Signals from './pages/Signals';
 import Actions from './pages/Actions';
-import Performance from './pages/Performance';
+import Performance from './pages/Performance-v8.1';
 import Accounts from './pages/Accounts';
 import Outbound from './pages/Outbound';
 import PaidMedia from './pages/PaidMedia';
@@ -140,7 +140,7 @@ export default function App({ initialPage = 'visao-geral' }: { initialPage?: str
           setSubPage={setSubPage}
         />
         
-        <main className="flex-1 p-8 max-w-[1600px] mx-auto w-full">
+        <main className={`flex-1 max-w-[1600px] mx-auto w-full ${['desempenho', 'acoes', 'sinais'].includes(activePage) ? '' : 'p-8'}`}>
           {renderPage()}
         </main>
 
