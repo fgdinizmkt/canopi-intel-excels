@@ -17,12 +17,6 @@ import {
   Bot, 
   Puzzle, 
   Settings,
-  ShieldCheck,
-  Menu,
-  X,
-  Globe,
-  Mail,
-  ExternalLink,
   Plus,
   LogOut
 } from 'lucide-react';
@@ -49,12 +43,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active, on
 );
 
 interface SidebarProps {
-  activePage?: string;
-  setActivePage?: (page: string) => void;
   onNewCampaign?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onNewCampaign }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -110,7 +102,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -128,7 +119,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -146,7 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               label={item.label}
               active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage?.(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -176,7 +165,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
                 label={item.label}
                 active={pathname === '/' + item.id}
                 onClick={() => {
-                  setActivePage?.(item.id);
                   router.push('/' + item.id);
                 }}
               />
