@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
   Radio, 
@@ -17,12 +17,6 @@ import {
   Bot, 
   Puzzle, 
   Settings,
-  ShieldCheck,
-  Menu,
-  X,
-  Globe,
-  Mail,
-  ExternalLink,
   Plus,
   LogOut
 } from 'lucide-react';
@@ -49,13 +43,12 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon: Icon, label, active, on
 );
 
 interface SidebarProps {
-  activePage: string;
-  setActivePage: (page: string) => void;
   onNewCampaign?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onNewCampaign }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     localStorage.removeItem('canopi_auth');
@@ -107,9 +100,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -125,9 +117,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -143,9 +134,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
               key={item.id}
               icon={item.icon}
               label={item.label}
-              active={activePage === item.id}
+              active={pathname === '/' + item.id}
               onClick={() => {
-                setActivePage(item.id);
                 router.push('/' + item.id);
               }}
             />
@@ -173,9 +163,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, onN
                 key={item.id}
                 icon={item.icon}
                 label={item.label}
-                active={activePage === item.id}
+                active={pathname === '/' + item.id}
                 onClick={() => {
-                  setActivePage(item.id);
                   router.push('/' + item.id);
                 }}
               />
