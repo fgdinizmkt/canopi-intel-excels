@@ -65,12 +65,12 @@ Critério de pronto: toda página tem papel, fronteira, inputs, outputs, KPIs e 
 | 7 | Estratégia ABM | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
 | 8 | Orquestração ABX | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
 | 9 | Inteligência Cruzada | ✅ Primeiro recorte de Fase 5 — commit `c1a4c95` |
-| 10 | Integrações | ⏳ Existe (`Integrations.tsx`) mas em estado inicial |
+| 10 | Integrações | ✅ Painel de Confiabilidade do Stack — commit `cdea929` |
 | 11 | Assistente | ⏳ Existe (`Assistant.tsx`) mas em estado inicial |
 | 12 | Configurações | ⏳ Existe (`Settings.tsx`) mas em estado inicial |
-| 13 | Performance Orgânica | ⏳ Existe (`SeoInbound.tsx`) mas em estado inicial |
-| 14 | Mídia Paga | ⏳ Existe (`PaidMedia.tsx`) mas em estado inicial |
-| 15 | Outbound | ⏳ Existe (`Outbound.tsx`) mas em estado inicial |
+| 13 | Performance Orgânica | ✅ Saneamento técnico inicial — commit `8135da4` |
+| 14 | Mídia Paga | ✅ Saneamento técnico inicial — commit `8135da4` |
+| 15 | Outbound | ✅ Cockpit tático orientado por sinais — commit `281613e` |
 
 ### Critério de pronto para Fase 4
 Baseado em `docs/05-specs-e-backlogs/06-desempenho-spec-e-backlog.md` (e equivalentes):
@@ -92,12 +92,15 @@ A Fase 4 foi encerrada no seu núcleo imediato (Visão Geral e Desempenho) em 20
 
 Recortes concluídos:
 - [x] **CrossIntelligence.tsx** — Injeção de sinais reais (Nexus/Minerva) e persistência em `canopi_actions` (commit `c1a4c95`).
+- [x] **Estabilização UI/Runtime** — Criação de `globals.css` e saneamento de cache do Next.js 15 (commit `0bd0822`).
+- [x] **Integrations.tsx** — Dashboard de confiabilidade e KPIs de saúde do stack (commit `cdea929`).
+- [x] **Outbound.tsx** — Cockpit tático com fila de intervenção e Contexto ICP (commit `281613e`).
+- [x] **Centro de Comando (Completo)** — Perfil da Conta, Organograma Visual e Perfil do Contato (commit `8135da4`).
 
 Itens em andamento/previstos:
-- Revisar qualidade das telas
-- Revisar coerência de navegação
-- Ajustar regras e priorização
-- Remover redundância e excesso de escopo
+- Revisar qualidade das telas remanescentes (Assistente, Configurações).
+- Consolidar orquestração cross-channel.
+- Manter o foco em refino de funcionalidade e preservação da estética premium (Regra 6).
 
-Próxima etapa: Definir o segundo recorte técnico da Fase 5 com base nas pendências de refino.
+Próxima etapa: Iniciar o 6º Recorte da Fase 5 (Evolução do Assistente de IA ou orquestração).
 

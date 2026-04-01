@@ -23,8 +23,6 @@
 - Manter foco em refino funcional e preservação da estética premium.
 
 ## Pendências / Backlog
-- **Organograma Visual:** Implementação técnica do grafo de Stakeholders (Fase 2).
-- **Perfil do Contato:** Detalhamento individual de Stakeholders (Fase 3).
 - **Consolidação Assistant:** Integrar o assistente de IA com o contexto da conta aberta.
 
 ## Arquivos que sempre precisam ser lidos
