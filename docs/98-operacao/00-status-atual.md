@@ -74,6 +74,15 @@
 - Metadados de impacto operacional por fonte de dados.
 - CTAs funcionais baseados no status do conector.
 
+### Fase 5 — Quarto recorte de Cockpit de Outbound (2026-04-01)
+
+**Outbound.tsx** — commit `281613e`
+- Cockpit tático orientado por sinais (Nexus/Minerva/Local).
+- Fila de intervenção com classificação ABM / ABX / Growth / Híbrido.
+- Drawer funcional de playbook com roteamento de alçada (SDR vs. Global Actions).
+- Aba Contexto ICP completa com Personas e Benchmarks.
+- Costura arquitetural e semântica de navegação finalizada.
+
 ### Limpeza de branches
 - `feat/evolucao-produto` deletada do remote em 2026-04-01
 - PR #11 fechada e merged (squash) em main
@@ -82,18 +91,19 @@
 
 ## O que está em andamento
 
-Definição do 4º recorte técnico da Fase 5 (Refino de Canais/Sustentação).
+Definição do 5º recorte técnico da Fase 5 (ex: Assistant.tsx ou Signals.tsx).
 
 ---
 
 ## Próximo passo aprovado
 
-- Definir o 4º recorte da Fase 5 conforme prioridades do roadmap (ex: Outbound ou Assistant).
-- Manter o foco em refino de funcionalidade e dados reais.
-- Continuar o monitoramento de integridade do App Router.
+- Definir o 5º recorte da Fase 5 conforme prioridades do roadmap.
+- Manter o foco em refino de funcionalidade e preservação da estética premium (Regra 6).
+- Implementar backlogs de Perfil da Empresa e do Contato conforme oportunidade.
 
 ---
 
 | Contatos | Pendência de produto | Página existe (`Contacts.tsx`) mas não foi fortalecida nesta rodada |
-| Canais + Sustentação | Pendência ampla | Outbound, SeoInbound, PaidMedia, Settings, Assistant — em estado inicial |
-| Roadmap | Documentação | Definir prioridade do 4º recorte da Fase 5 |
+| Canais + Sustentação | Pendência ampla | SeoInbound, PaidMedia, Settings, Assistant — em estado inicial |
+| Backlog Tático | Recorte 4 (Follow-up) | Perfil da Empresa e Perfil do Contato (Drawer de profundidade) |
+| Roadmap | Documentação | Definir prioridade do 5º recorte da Fase 5 |

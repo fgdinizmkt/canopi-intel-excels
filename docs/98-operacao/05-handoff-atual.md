@@ -18,12 +18,14 @@
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## Próximo passo correto
-- Definir e propor o 4º recorte técnico da Fase 5 (ex: Outbound ou Assistant).
-- Executar o recorte após aprovação explícita.
+- Definir e propor o 5º recorte técnico da Fase 5 (ex: Assistant.tsx ou Signals.tsx).
+- Executar o recorte após proposta e aprovação visual prévia (Regra 6).
 - Manter a integridade de runtime e UI durante as próximas evoluções.
 
-## Pendências
-- Escolha da próxima página/funcionalidade do roadmap para refino.
+## Pendências / Backlog
+- **Perfil da Empresa:** Aprofundamento da visão firmográfica e estratégica (Drawer/Deep View).
+- **Perfil do Contato:** Aprofundamento do contexto granular de Stakeholders (Drawer/Deep View).
+- Escolha da próxima página/funcionalidade do roadmap (ex: Assistant).
 
 ## Arquivos que sempre precisam ser lidos
 - AGENTS.md
