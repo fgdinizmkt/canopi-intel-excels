@@ -227,13 +227,32 @@ export const Accounts = () => {
         </div>
       ) : visualizacao !== 'lista' ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {filtradas.map((conta) => (
-            <Link key={conta.id} href={`/contas/${conta.slug}?sessao=resumo`} className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-sm">
-              <p className="font-bold text-slate-900">{conta.nome}</p>
-              <p className="text-xs text-slate-500 mt-1">{conta.vertical} · {conta.segmento}</p>
-              <p className="text-xs mt-3 text-slate-600">Próxima ação: {conta.proximaMelhorAcao}</p>
-            </Link>
-          ))}
+          {filtradas.map((conta) => {
+            const acoesAtrasadas = conta.acoes.filter(a => a.status === 'Atrasada').length;
+            return (
+              <Link key={conta.id} href={`/contas/${conta.slug}?sessao=resumo`} className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-sm block">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <p className="font-bold text-slate-900 leading-tight">{conta.nome}</p>
+                  <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-3">{conta.vertical} · {conta.segmento}</p>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">Pot. {conta.potencial}</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    conta.atividadeRecente === 'Alta' ? 'bg-emerald-100 text-emerald-700' :
+                    conta.atividadeRecente === 'Média' ? 'bg-amber-100 text-amber-700' :
+                    'bg-slate-100 text-slate-500'
+                  }`}>{conta.atividadeRecente}</span>
+                  {conta.sinais.length > 0 && (
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">{conta.sinais.length} sinal{conta.sinais.length !== 1 ? 'is' : ''}</span>
+                  )}
+                  {acoesAtrasadas > 0 && (
+                    <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">{acoesAtrasadas} atras.</span>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-auto">
@@ -246,7 +265,15 @@ export const Accounts = () => {
             <tbody>
               {filtradas.map((conta) => (
                 <tr key={conta.id} className="border-t border-slate-100 hover:bg-slate-50">
-                  <td className="p-3"><Link href={`/contas/${conta.slug}?sessao=resumo`} className="font-bold text-brand hover:underline">{conta.nome}</Link><p className="text-xs text-slate-500">{conta.dominio}</p></td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${conta.atividadeRecente === 'Alta' ? 'bg-emerald-500' : conta.atividadeRecente === 'Média' ? 'bg-amber-500' : 'bg-slate-400'}`} />
+                      <div>
+                        <Link href={`/contas/${conta.slug}?sessao=resumo`} className="font-bold text-brand hover:underline">{conta.nome}</Link>
+                        <p className="text-xs text-slate-500">{conta.dominio}</p>
+                      </div>
+                    </div>
+                  </td>
                   <td className="p-3">{conta.vertical} / {conta.segmento}</td>
                   <td className="p-3"><button onClick={() => atualizarFiltro('owner', conta.ownerPrincipal)} className="underline decoration-dotted">{conta.ownerPrincipal}</button></td>
                   <td className="p-3">{conta.etapa}</td>
@@ -258,7 +285,7 @@ export const Accounts = () => {
                   <td className="p-3">{conta.coberturaRelacional}%</td>
                   <td className="p-3">{new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR')}</td>
                   <td className="p-3">{conta.oportunidadePrincipal ? <Link href={`/contas/${conta.slug}?sessao=oportunidades`} className="underline">{conta.oportunidadePrincipal}</Link> : '-'}</td>
-                  <td className="p-3">{conta.proximaMelhorAcao}</td>
+                  <td className="p-3 max-w-[200px]"><span className="block truncate" title={conta.proximaMelhorAcao}>{conta.proximaMelhorAcao}</span></td>
                   <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span></td>
                 </tr>
               ))}

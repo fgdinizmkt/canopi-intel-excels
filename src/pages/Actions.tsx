@@ -936,6 +936,9 @@ function ActionListCard({
           <span style={{ fontSize: 12, color: '#64748b', flexShrink: 0 }}>{item.ownerName ?? 'N/A'}</span>
           <span style={{ ...slaColorStyle[item.slaStatus], fontSize: 12, flexShrink: 0 }}>{item.slaText}</span>
         </div>
+        {item.origin && (
+          <p style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500, marginTop: 3, paddingLeft: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.origin}</p>
+        )}
       </div>
     );
   }
@@ -983,6 +986,9 @@ function ActionListCard({
             </button>
             {density !== 'compacta' && (
               <p style={{ marginTop: 12, fontSize: 13, lineHeight: 1.7, color: '#64748b', maxWidth: 880 }}>{item.description}</p>
+            )}
+            {density === 'compacta' && item.origin && (
+              <p style={{ marginTop: 8, fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>{item.origin}</p>
             )}
           </div>
 
@@ -1405,6 +1411,41 @@ function ActionOverlay({
   );
 }
 
+// ─── Adapter: localStorage action (from Signals) → ActionItem ───────────────
+
+function adaptStoredAction(raw: Record<string, string>): ActionItem {
+  return {
+    id: raw.id,
+    priority: (['Crítica', 'Alta', 'Média', 'Baixa'].includes(raw.priority) ? raw.priority : 'Alta') as Priority,
+    category: raw.category || 'Operacional',
+    channel: raw.category || 'Operacional',
+    status: (['Nova', 'Em andamento', 'Bloqueada', 'Aguardando aprovação', 'Concluída'].includes(raw.status) ? raw.status : 'Nova') as ActionStatus,
+    title: raw.title || '',
+    description: raw.description || '',
+    accountName: raw.account || '',
+    accountContext: raw.origin || '',
+    origin: raw.origin || 'Gerado por Signals',
+    relatedSignal: raw.origin || '',
+    ownerName: raw.owner || null,
+    suggestedOwner: raw.owner || '',
+    ownerTeam: '',
+    slaText: raw.sla || '',
+    slaStatus: (['vencido', 'alerta', 'ok', 'sem_sla'].includes(raw.slaStatus) ? raw.slaStatus : 'ok') as SlaStatus,
+    expectedImpact: '',
+    nextStep: '',
+    dependencies: [],
+    evidence: [],
+    history: [{ id: raw.id + '-h0', when: raw.createdAt || 'Agora', actor: 'Signals', type: 'evidência' as const, text: raw.description || 'Ação criada automaticamente a partir de um sinal detectado.' }],
+    projectObjective: '',
+    projectSuccess: '',
+    projectSteps: [],
+    buttons: [
+      { id: 'view', label: 'Ver detalhes', tone: 'secondary' as const, action: 'open' as const },
+      { id: 'start', label: 'Executar', tone: 'primary' as const, action: 'start' as const },
+    ],
+  };
+}
+
 export const Actions: React.FC = () => {
   const [items, setItems] = useState<ActionItem[]>(initialActions);
   const [query, setQuery] = useState("");
@@ -1447,6 +1488,28 @@ export const Actions: React.FC = () => {
     );
   }, [items, query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
 
+  // ─── Merge com localStorage (ações criadas em Signals) ──────────────────────
+  useEffect(() => {
+    function mergeFromStorage() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('canopi_actions') || '[]');
+        if (!Array.isArray(stored) || stored.length === 0) return;
+        setItems((current) => {
+          const existingIds = new Set(current.map((i) => i.id));
+          const incoming = stored
+            .filter((raw: Record<string, string>) => raw?.id && !existingIds.has(raw.id))
+            .map(adaptStoredAction);
+          return incoming.length === 0 ? current : [...incoming, ...current];
+        });
+      } catch {
+        // ignora localStorage malformado
+      }
+    }
+    mergeFromStorage();
+    window.addEventListener('storage', mergeFromStorage);
+    return () => window.removeEventListener('storage', mergeFromStorage);
+  }, []);
+
   useEffect(() => {
     setShowAllList(false);
   }, [query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
@@ -1458,7 +1521,7 @@ export const Actions: React.FC = () => {
     const total = items.length;
     const critical = items.filter((item) => item.priority === "Crítica").length;
     const inProgress = items.filter((item) => item.status === "Em andamento").length;
-    const delayed = items.filter((item) => item.slaStatus === "vencido").length;
+    const delayed = items.filter((item) => item.slaStatus === "vencido" || item.slaStatus === "alerta").length;
     const noOwner = items.filter((item) => item.ownerName === null).length;
     return { total, critical, inProgress, delayed, noOwner };
   }, [items]);
@@ -1615,7 +1678,7 @@ export const Actions: React.FC = () => {
             <MetricCard label="Total de ações" value={metrics.total} helper="fila operacional conectada" icon={<LayoutList className="h-5 w-5" />} />
             <MetricCard label="Críticas" value={metrics.critical} helper="exigem atenção executiva" icon={<AlertTriangle className="h-5 w-5" />} />
             <MetricCard label="Em andamento" value={metrics.inProgress} helper="sendo executadas" icon={<Clock3 className="h-5 w-5" />} />
-            <MetricCard label="Atrasadas" value={metrics.delayed} helper="SLA vencido" icon={<History className="h-5 w-5" />} />
+            <MetricCard label="Em risco de SLA" value={metrics.delayed} helper="vencido ou em alerta" icon={<History className="h-5 w-5" />} />
             <MetricCard label="Sem owner" value={metrics.noOwner} helper="pedem atribuição" icon={<Users className="h-5 w-5" />} />
           </div>
         </section>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import '../pages/signals.css';
-import { advancedSignals, ownersList, stSuggestionsList, abmStepsList, abxChannelsList } from '../data/signalsV6';
+import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
 
 export const Signals: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -272,12 +272,23 @@ export const Signals: React.FC = () => {
           <div className="hero-metric"><div className="hero-metric-label">Alertas</div><div className="hero-metric-value">{counts.alerta}</div></div>
           <div className="hero-metric"><div className="hero-metric-label">Oportunidades</div><div className="hero-metric-value">{counts.oportunidade}</div></div>
           <div className="hero-metric"><div className="hero-metric-label">Total ativos</div><div className="hero-metric-value">{active.length}</div></div>
+          <div className="hero-metric"><div className="hero-metric-label">Arquivados</div><div className="hero-metric-value">{archived.length}</div></div>
         </div>
       </div>
 
       <div className="page-body">
         <div className="filter-bar">
           <div className="filter-search"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar conta, sinal, owner..." /></div>
+          <select className="filter-select" value={filterSev} onChange={e => setFilterSev(e.target.value)}>
+            <option value="">Severidade: todas</option>
+            <option value="crítico">Crítico</option>
+            <option value="alerta">Alerta</option>
+            <option value="oportunidade">Oportunidade</option>
+          </select>
+          <select className="filter-select" value={filterCat} onChange={e => setFilterCat(e.target.value)}>
+            <option value="">Categoria: todas</option>
+            {Array.from(new Set(active.map(s => s.category))).map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
           {(search || filterSev || filterType || filterCat) && <button className="filter-clear" onClick={() => { setSearch(''); setFilterSev(''); setFilterType(''); setFilterCat(''); }}>✕ Limpar</button>}
           <span className="filter-count">{filtered.length} de {active.length} sinais</span>
           <button className="filter-arc-btn" style={{ color: showArc ? 'var(--brand)' : 'var(--slate-400)', fontWeight: showArc ? 700 : 600 }} onClick={() => setShowArc(!showArc)}>
@@ -295,6 +306,9 @@ export const Signals: React.FC = () => {
                     <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--slate-400)' }}>{s.id} · {s.timestamp}</span>
                     <span className="badge badge-slate" style={{ marginLeft: 'auto' }}>{s.category}</span>
                     {s.resolved && <span className="badge badge-green">✓ Resolvido</span>}
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--slate-400)', fontWeight: 600, marginTop: '6px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <span>{s.channel}</span><span style={{ opacity: 0.35 }}>·</span><span>{s.source}</span>
                   </div>
                   <div className="sig-title">{s.title}</div>
                   <div className="sig-desc">{s.description}</div>
@@ -518,8 +532,8 @@ export const Signals: React.FC = () => {
             <div style={{ fontSize: '14px', fontWeight: 700, color: '#d97706' }}>Taxa: 3,2% · Benchmark: 8% · 34 contas · 12 dias</div>
           </div>
           <div style={{ background: 'var(--slate-50)', border: '1px solid var(--slate-200)', borderRadius: '16px', padding: '16px', marginBottom: '16px' }}>
-            <div className="section-label">Diagnóstico da IA</div>
-            {['Copy genérico sem personalização por subvertical', 'Assunto sem relevância setorial', 'Timing fora do pico (seg-qua 8-10h)', 'Ausência de cases de manufatura'].map(d => (
+            <div className="section-label">Diagnóstico</div>
+            {([midData?.probableCause, midData?.context] as string[]).filter(Boolean).map((d) => (
               <div key={d} style={{ display: 'flex', gap: '8px', padding: '6px 0', fontSize: '13px', color: '#374151', borderBottom: '1px solid var(--slate-100)' }}>
                 <span style={{ color: 'var(--amber)' }}>⚠</span><span>{d}</span>
               </div>
