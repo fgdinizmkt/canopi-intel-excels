@@ -4,7 +4,7 @@
 `main` — atualizada em 2026-04-01
 
 ## Fase atual do plano
-**Fase 4 — Construção da V1** (em andamento)
+**Fase 5 — Início da camada de inteligência cruzada** (em andamento)
 
 ---
 
@@ -39,7 +39,7 @@
 - Coluna "Próxima melhor ação": `truncate` com `title` para leitura completa no hover
 
 **Signals.tsx** — commit `ab2722b`
-- 5ª métrica hero: `archived.length` (preenche o grid `repeat(5,1fr)` que já existia)
+- 5ª métrica hero: `archived.length`
 - Filtros de severidade e categoria conectados ao estado existente
 - Linha de metadados `source + channel` no card da lista
 - Bullets de diagnóstico Outbound conectados ao `midData.probableCause` e `midData.context`
@@ -50,6 +50,15 @@
 - Campo `origin` visível nas densidades compacta e super-compacta
 - Métrica SLA renomeada para "Em risco de SLA" (vencido + alerta)
 
+### Fase 5 — Primeiro recorte de CrossIntelligence (2026-04-01)
+
+**CrossIntelligence.tsx** — commit `c1a4c95`
+- Injeção de sinais reais no fluxo operacional, incluindo Nexus e Minerva
+- Persistência em `localStorage('canopi_actions')`
+- Conexão dos CTAs finais para alimentar a fila global de ações
+- Recorte restrito ao arquivo `CrossIntelligence.tsx`
+- Build validado antes do commit
+
 ### Limpeza de branches
 - `feat/evolucao-produto` deletada do remote em 2026-04-01
 - PR #11 fechada e merged (squash) em main
@@ -58,13 +67,15 @@
 
 ## O que está em andamento
 
-Nenhum recorte ativo no momento. Fase 4 encerrada no núcleo mínimo.
+Fechamento documental do primeiro recorte da Fase 5.
 
 ---
 
 ## Próximo passo aprovado
 
-Não definido ainda. Aguardando decisão sobre início da Fase 5.
+- Atualizar a memória operacional para refletir o recorte de `CrossIntelligence.tsx`
+- Fazer push da `main` para `origin/main`
+- Só depois decidir o próximo recorte da Fase 5
 
 ---
 
@@ -72,8 +83,7 @@ Não definido ainda. Aguardando decisão sobre início da Fase 5.
 
 | Item | Tipo | Detalhe |
 |---|---|---|
-| `refactor/organizacao-inicial` ainda existe localmente | Branch local | Tem docs e versões mais evoluídas de alguns arquivos que não foram portados para main |
-| `docs/` não está em main | Pendência | A pasta de documentação do produto existe apenas em `refactor/organizacao-inicial` |
-| Desempenho sem dados reais | Pendência de produto | `Performance.tsx` usa mock hardcoded desconectado de `signalsV6.ts` / `accountsData.ts` |
-| Contatos | Pendência Fase 4 | Página existe (`Contacts.tsx`) mas não foi fortalecida nesta rodada |
-| Canais + Sustentação | Pendência Fase 4 ampla | Outbound, SeoInbound, PaidMedia, Integrations, Settings, Assistant — em estado inicial |
+| `main` local à frente de `origin/main` | Git | Há 1 commit local ainda não publicado |
+| `03-log-de-sessoes.md` ainda não registra o recorte de CrossIntelligence | Documentação | Precisa ser atualizado antes de fechar o processo |
+| Contatos | Pendência de produto | Página existe (`Contacts.tsx`) mas não foi fortalecida nesta rodada |
+| Canais + Sustentação | Pendência ampla | Outbound, SeoInbound, PaidMedia, Integrations, Settings, Assistant — em estado inicial |

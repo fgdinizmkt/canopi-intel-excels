@@ -158,3 +158,33 @@ AGENTS.md:
 - Desempenho agora conecta visualmente sinais e ações por conta — cumpre critério de "relação clara com entidades-base" da Fase 4
 - Memória operacional estabelecida como parte do processo padrão
 - Fase 4 pode ser considerada encerrada no núcleo mínimo (Visão Geral + Desempenho concluídos)
+
+---
+
+## 2026-04-01 — Início da Fase 5 com recorte de CrossIntelligence
+
+**Branch:** main  
+**Commit:** `c1a4c95`
+
+**Contexto:**
+- Após o fechamento da Fase 4 no núcleo mínimo, foi iniciado o primeiro recorte da Fase 5.
+- A página escolhida para abertura da fase foi `CrossIntelligence.tsx`.
+
+**Objetivo do recorte:**
+- Tirar CrossIntelligence de um estado mais estático e conectá-la ao núcleo operacional real da plataforma.
+
+**O que foi feito:**
+- Injeção de sinais reais no fluxo operacional da página
+- Uso explícito de sinais ligados a Nexus e Minerva como gatilhos do recorte
+- Implementação de persistência em `localStorage('canopi_actions')`
+- Conexão dos CTAs finais para alimentar a fila global de ações
+- Recorte mantido estritamente em `src/pages/CrossIntelligence.tsx`
+
+**Validação:**
+- Build validado antes do commit
+- Escopo confirmado como restrito a `CrossIntelligence.tsx`
+- Working tree limpa após commit
+
+**Resultado:**
+- CrossIntelligence passou a atuar como ponte operacional real entre sinais e fila global de ações
+- Fase 5 foi iniciada com foco em inteligência cruzada aplicada ao fluxo operacional
