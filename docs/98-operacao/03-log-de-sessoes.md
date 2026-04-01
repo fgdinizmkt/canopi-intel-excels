@@ -278,3 +278,35 @@ AGENTS.md:
 **Resultado:**
 - O Perfil da Conta agora atua como o ponto de convergência de toda a inteligência da plataforma.
 - Fase 1 concluída, preparando a base estrutural para o Organograma (Fase 2) e Perfil do Contato (Fase 3).
+
+---
+
+## 2026-04-01 — Consolidação Final do Centro de Comando (Fases 2 e 3)
+
+**Branch:** main  
+**Commit:** `8135da4`
+
+**Contexto:**
+- Continuidade do 5º Recorte da Fase 5 para entrega da profundidade de dados da Conta e do Contato.
+- Estabilização técnica do build Next.js 15 para eliminar resíduos de migração.
+
+**O que foi feito:**
+- **Fase 2 — Organograma Visual (Power Grid):**
+  - Implementação de motor de renderização recursiva em `AccountDetailView.tsx` baseado em `liderId`.
+  - Criação do componente `OrganogramNode.tsx` com visual de alta densidade e indicadores de influência/classificação.
+  - Toggle funcional entre vizualização em Árvore (Organograma) e Lista (Ranking).
+- **Fase 3 — Perfil Granular do Contato (Deep Dive):**
+  - Criação da camada `ContactDetailProfile.tsx` (Slide-Overlay interno).
+  - Implementação de inteligência Canopi AI para recomendações de abordagem tática.
+  - Sincronismo de Sinais e Ações associados ao contexto operacional do stakeholder.
+  - Efeito de Dimming e Backdrop Blur no modo Fullscreen para preservação de foco.
+- **Saneamento Técnico de Build:**
+  - Correção de erro `width(-1)` em ResponsiveContainers via wrapper `ClientOnly`.
+  - Estabilização do contexto global no Pages Router através do `src/pages/_app.tsx`.
+  - Limpeza de sintaxe e remoção de redundâncias no `AccountDetailView`.
+
+**Resultado:**
+- O Centro de Comando está funcional em sua totalidade (Conta, Comitê e Contato).
+- Navegação híbrida Drawer/Fullscreen preservada sem quebra de contexto.
+- Build 100% íntegro (`Exit code: 0`).
+- Próximo passo definido como nova frente estratégica fora da profundidade de conta.

@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- Último recorte concluído: Centro de Comando (Fase 1 — Perfil da Conta)
-- Último commit relevante: eb6e07a - feat: implementacao do Centro de Comando (Fase 1) e costura global em Accounts, Outbound, Actions e Signals
+- Último recorte concluído: Centro de Comando (Completo — Perfil, Organograma e Contato)
+- Último commit relevante: 8135da4 - feat: consolidação do centro de comando (fases 1-3) e saneamento técnico
 - Branch atual: main
 - Status do push: local em sincronia com origin/main 
 
@@ -18,9 +18,9 @@
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## Próximo passo correto
-- Executar a Fase 2 do Centro de Comando: Organograma Visual em `AccountDetailView.tsx`.
-- Executar a Fase 3 do Centro de Comando: Perfil Granular do Contato.
-- Manter a integridade da navegação híbrida (Drawer/Fullscreen) durante as expansões.
+- Iniciar o 6º Recorte da Fase 5 (Frente a definir pelo usuário).
+- Consolidar a visão de assistente contextual ou evolução de orquestração se houver demanda.
+- Manter foco em refino funcional e preservação da estética premium.
 
 ## Pendências / Backlog
 - **Organograma Visual:** Implementação técnica do grafo de Stakeholders (Fase 2).

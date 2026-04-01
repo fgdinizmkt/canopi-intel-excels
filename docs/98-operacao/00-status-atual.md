@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Pós-Recorte 5)
+`main` — atualizada em 2026-04-01 (Centro de Comando Completo)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -85,12 +85,12 @@
 
 ### Fase 5 — Quinto recorte de Centro de Comando (2026-04-01)
 
-**Centro de Comando (Fase 1 — Perfil da Conta)** — commit `eb6e07a`
-- Estabelecimento do `AccountDetailContext` para abertura global de contas.
-- Implementação do `AccountDetailManager` (Shell Híbrido: Drawer + Fullscreen).
-- Narrativa Operacional em `AccountDetailView.tsx`: Golden Record, Contexto ICP, Comitê e Playbook.
-- Costura Global ("Wiring"): injeção de disparos dinâmicos em **Accounts**, **Outbound**, **Actions** e **Signals**.
-- Saneamento técnico de resíduos e duplicatas em `Signals.tsx` e `Actions.tsx`.
+**Centro de Comando (Completo — Fases 1, 2 e 3)** — commit `8135da4`
+- Fase 1 (Perfil da Conta): `AccountDetailContext` + `AccountDetailManager` + `AccountDetailView` estrutural.
+- Fase 2 (Organograma Visual): Implementação de árvore recursiva (`liderId`) e componente `OrganogramNode` (Power Grid).
+- Fase 3 (Perfil do Contato): Camada de profundidade granular (`ContactDetailProfile`) com Manual Canopi AI, Matriz de Poder e Acesso, e Dimming Background.
+- Saneamento Técnico: Correção de warnings de `width(-1)` em gráficos via wrapper `ClientOnly`, estabilização do Pages Router via `_app.tsx` e ajuste de `@import` no CSS.
+- Costura Global Final: Injeção de pontos de contato em **Accounts**, **Outbound**, **Actions** e **Signals**.
 
 ### Limpeza de branches
 - `feat/evolucao-produto` deletada do remote em 2026-04-01
@@ -100,19 +100,20 @@
 
 ## O que está em andamento
 
-Execução da Fase 2 do Centro de Comando (Organograma Visual).
+Nenhuma implementação funcional em andamento. Fase de fechamento operacional concluída.
 
 ---
 
 ## Próximo passo aprovado
 
-- Executar a Fase 2 (Organograma) e Fase 3 (Perfil do Contato) do Centro de Comando.
+- Iniciar o 6º Recorte da Fase 5 (Frente a definir pelo usuário).
+- Consolidar a visão de assistente contextual se houver aprovação.
 - Manter o foco em refino de funcionalidade e preservação da estética premium (Regra 6).
-- Consolidar a visão de profundidade da conta como o hub central da plataforma.
 
 ---
 
 | Centro de Comando | Fase 1 Concluída | Perfil da Conta integrado e costurado globalmente |
-| Centro de Comando | Fase 2 Pendente | Implementação do Organograma Visual no Perfil da Conta |
-| Centro de Comando | Fase 3 Pendente | Implementação do Perfil Granular do Contato |
-| Roadmap | Documentação | Avançar para o 6º recorte após conclusão do Centro de Comando |
+| Centro de Comando | Fase 2 Concluída | Organograma Visual recursivo funcional |
+| Centro de Comando | Fase 3 Concluída | Perfil Granular do Contato com inteligência Canopi |
+| Roadmap | Sincronismo | Memória operacional e remoto atualizados |
+| Roadmap | Próximo Passo | Recorte 6 — Nova frente estratégica |
