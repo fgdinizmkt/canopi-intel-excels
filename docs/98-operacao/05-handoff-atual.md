@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- Último recorte concluído: Cockpit de Outbound (Outbound.tsx)
-- Último commit relevante: 9450dab - docs(operacao): registra conclusão do 4º recorte (Outbound) e atualiza backlogs
+- Último recorte concluído: Centro de Comando (Fase 1 — Perfil da Conta)
+- Último commit relevante: eb6e07a - feat: implementacao do Centro de Comando (Fase 1) e costura global em Accounts, Outbound, Actions e Signals
 - Branch atual: main
 - Status do push: local em sincronia com origin/main 
 
@@ -18,14 +18,14 @@
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## Próximo passo correto
-- Definir e propor o 5º recorte técnico da Fase 5 (ex: Assistant.tsx ou Signals.tsx).
-- Executar o recorte após proposta e aprovação visual prévia (Regra 6).
-- Manter a integridade de runtime e UI durante as próximas evoluções.
+- Executar a Fase 2 do Centro de Comando: Organograma Visual em `AccountDetailView.tsx`.
+- Executar a Fase 3 do Centro de Comando: Perfil Granular do Contato.
+- Manter a integridade da navegação híbrida (Drawer/Fullscreen) durante as expansões.
 
 ## Pendências / Backlog
-- **Perfil da Empresa:** Aprofundamento da visão firmográfica e estratégica (Drawer/Deep View).
-- **Perfil do Contato:** Aprofundamento do contexto granular de Stakeholders (Drawer/Deep View).
-- Escolha da próxima página/funcionalidade do roadmap (ex: Assistant).
+- **Organograma Visual:** Implementação técnica do grafo de Stakeholders (Fase 2).
+- **Perfil do Contato:** Detalhamento individual de Stakeholders (Fase 3).
+- **Consolidação Assistant:** Integrar o assistente de IA com o contexto da conta aberta.
 
 ## Arquivos que sempre precisam ser lidos
 - AGENTS.md

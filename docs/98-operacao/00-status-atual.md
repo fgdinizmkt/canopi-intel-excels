@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01
+`main` — atualizada em 2026-04-01 (Pós-Recorte 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -83,6 +83,15 @@
 - Aba Contexto ICP completa com Personas e Benchmarks.
 - Costura arquitetural e semântica de navegação finalizada.
 
+### Fase 5 — Quinto recorte de Centro de Comando (2026-04-01)
+
+**Centro de Comando (Fase 1 — Perfil da Conta)** — commit `eb6e07a`
+- Estabelecimento do `AccountDetailContext` para abertura global de contas.
+- Implementação do `AccountDetailManager` (Shell Híbrido: Drawer + Fullscreen).
+- Narrativa Operacional em `AccountDetailView.tsx`: Golden Record, Contexto ICP, Comitê e Playbook.
+- Costura Global ("Wiring"): injeção de disparos dinâmicos em **Accounts**, **Outbound**, **Actions** e **Signals**.
+- Saneamento técnico de resíduos e duplicatas em `Signals.tsx` e `Actions.tsx`.
+
 ### Limpeza de branches
 - `feat/evolucao-produto` deletada do remote em 2026-04-01
 - PR #11 fechada e merged (squash) em main
@@ -91,19 +100,19 @@
 
 ## O que está em andamento
 
-Definição do 5º recorte técnico da Fase 5 (ex: Assistant.tsx ou Signals.tsx).
+Execução da Fase 2 do Centro de Comando (Organograma Visual).
 
 ---
 
 ## Próximo passo aprovado
 
-- Definir o 5º recorte da Fase 5 conforme prioridades do roadmap.
+- Executar a Fase 2 (Organograma) e Fase 3 (Perfil do Contato) do Centro de Comando.
 - Manter o foco em refino de funcionalidade e preservação da estética premium (Regra 6).
-- Implementar backlogs de Perfil da Empresa e do Contato conforme oportunidade.
+- Consolidar a visão de profundidade da conta como o hub central da plataforma.
 
 ---
 
-| Contatos | Pendência de produto | Página existe (`Contacts.tsx`) mas não foi fortalecida nesta rodada |
-| Canais + Sustentação | Pendência ampla | SeoInbound, PaidMedia, Settings, Assistant — em estado inicial |
-| Backlog Tático | Recorte 4 (Follow-up) | Perfil da Empresa e Perfil do Contato (Drawer de profundidade) |
-| Roadmap | Documentação | Definir prioridade do 5º recorte da Fase 5 |
+| Centro de Comando | Fase 1 Concluída | Perfil da Conta integrado e costurado globalmente |
+| Centro de Comando | Fase 2 Pendente | Implementação do Organograma Visual no Perfil da Conta |
+| Centro de Comando | Fase 3 Pendente | Implementação do Perfil Granular do Contato |
+| Roadmap | Documentação | Avançar para o 6º recorte após conclusão do Centro de Comando |

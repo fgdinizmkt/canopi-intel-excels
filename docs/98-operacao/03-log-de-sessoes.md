@@ -252,3 +252,29 @@ AGENTS.md:
 **Impacto no projeto:**
 - Consolida a camada tática de prospecção, provendo um terminal de decisão de alta performance para o SDR baseado em inteligência real.
 - Estabiliza a relação entre o Outbound e os motores de inteligência centralizada (Nexus/Minerva).
+
+---
+
+## 2026-04-01 — 5º Recorte da Fase 5: Centro de Comando (Fase 1 — Perfil da Conta)
+
+**Branch:** main  
+**Commit:** `eb6e07a`
+
+**Contexto:**
+- Implementação da primeira fase do novo Centro de Comando, focada na entidade "Conta" (Empresa).
+- Transição da navegação baseada em modais estáticos para um sistema híbrido de profundidade contextual.
+
+**O que foi feito:**
+- **Infraestrutura Global:** Criação do `AccountDetailContext` e injeção do `AccountDetailManager` no layout principal.
+- **Shell Híbrido:** Implementação de um sistema que alterna entre *Deep Drawer* (tático) e *Fullscreen* (estratégico).
+- **Motor de Narrativa (View):** Criação de `AccountDetailView.tsx` com mapeamento fiel aos dados de `contasMock`, `signalsV6` e `canopi_actions`.
+- **Costura Global ("Wiring"):** 
+  - `Accounts.tsx`: Substituição de links por disparos dinâmicos.
+  - `Outbound.tsx`: Integração da fila de intervenção e botões de navegação lateral.
+  - `Actions.tsx`: Injeção de hooks em cards (Lista/Kanban) e Modal de Detalhes.
+  - `Signals.tsx`: Vinculação de nomes de conta na listagem e na visão detalhada.
+- **Saneamento Técnico:** Limpeza de duplicidade de imports e variáveis em `Signals.tsx` e `Actions.tsx` geradas durante o processo de injeção.
+
+**Resultado:**
+- O Perfil da Conta agora atua como o ponto de convergência de toda a inteligência da plataforma.
+- Fase 1 concluída, preparando a base estrutural para o Organograma (Fase 2) e Perfil do Contato (Fase 3).
