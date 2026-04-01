@@ -36,6 +36,21 @@ Ao final de cada tarefa:
 - validar build/lint se aplicável
 - apontar pendências ou limitações
 
+## Fluxo obrigatório antes de qualquer commit
+
+Toda implementação segue esta sequência, sem exceção:
+
+1. Executar o recorte autorizado
+2. Mostrar resultado do build
+3. Mostrar `git diff --stat`
+4. Mostrar diff real do arquivo alterado
+5. **Aguardar aprovação explícita do usuário**
+6. Só então commitar
+7. Só então atualizar a memória operacional
+8. Só então fazer commit da documentação, se necessário
+
+Commitar antes da aprovação explícita é uma violação de processo, mesmo que o build esteja limpo e o recorte esteja dentro do escopo autorizado.
+
 ## Memória operacional — regra obrigatória
 
 A pasta `docs/98-operacao/` é a memória viva do projeto. Toda sessão deve mantê-la atualizada.

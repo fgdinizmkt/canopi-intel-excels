@@ -5,6 +5,23 @@ Tornar explícito o que deve acontecer após cada evento do projeto. Nada aqui �
 
 ---
 
+## Regra 0 — Fluxo obrigatório antes de qualquer commit
+
+Toda implementação segue esta sequência, sem exceção:
+
+1. Executar o recorte autorizado
+2. Mostrar resultado do build (`✓ Compiled` ou erros)
+3. Mostrar `git diff --stat`
+4. Mostrar diff real do arquivo alterado
+5. **Aguardar aprovação explícita do usuário**
+6. Só então commitar
+7. Só então atualizar a memória operacional
+8. Só então fazer commit da documentação, se necessário
+
+Commitar antes da aprovação explícita é uma violação de processo, mesmo que o build esteja limpo e o recorte esteja dentro do escopo autorizado.
+
+---
+
 ## Regra 1 — Toda etapa concluída atualiza a memória operacional
 
 Quando um recorte for implementado, commitado e validado:
