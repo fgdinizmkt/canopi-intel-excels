@@ -5,18 +5,21 @@ import { Sidebar } from '../../components/layout/Sidebar';
 import { Topbar } from '../../components/layout/Topbar';
 import { Modal, Button } from '../../components/ui';
 import { Rocket, Target, Users, Zap } from 'lucide-react';
+import { AccountDetailProvider } from '../../context/AccountDetailContext';
+import { AccountDetailManager } from '../../components/account/AccountDetailManager';
 
 export default function ShellLayout({ children }: { children: React.ReactNode }) {
   const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Sidebar onNewCampaign={() => setIsCampaignModalOpen(true)} />
-      <div className="ml-60 flex flex-col min-h-screen flex-1">
-        <Topbar />
-        <main className="flex-1 p-8 max-w-[1600px] mx-auto w-full">
-          {children}
-        </main>
+    <AccountDetailProvider>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar onNewCampaign={() => setIsCampaignModalOpen(true)} />
+        <div className="ml-60 flex flex-col min-h-screen flex-1">
+          <Topbar />
+          <main className="flex-1 p-8 max-w-[1600px] mx-auto w-full">
+            {children}
+          </main>
 
         <footer className="p-8 border-t border-slate-100 flex flex-col items-center gap-2">
           <div className="flex items-center gap-3 opacity-40">
@@ -70,6 +73,8 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
       </Modal>
-    </div>
+      <AccountDetailManager />
+      </div>
+    </AccountDetailProvider>
   );
 }

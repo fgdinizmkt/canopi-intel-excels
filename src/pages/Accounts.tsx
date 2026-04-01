@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
 import { contasMock, type Conta } from '../data/accountsData';
+import { useAccountDetail } from '../context/AccountDetailContext';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
 type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc';
@@ -37,6 +38,7 @@ export const Accounts = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { openAccount } = useAccountDetail();
 
   const [loading, setLoading] = useState(true);
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
@@ -230,9 +232,13 @@ export const Accounts = () => {
           {filtradas.map((conta) => {
             const acoesAtrasadas = conta.acoes.filter(a => a.status === 'Atrasada').length;
             return (
-              <Link key={conta.id} href={`/contas/${conta.slug}?sessao=resumo`} className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-sm block">
+              <button 
+                key={conta.id} 
+                onClick={() => openAccount(conta.id)} 
+                className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand/50 hover:shadow-md transition-all text-left block w-full group"
+              >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="font-bold text-slate-900 leading-tight">{conta.nome}</p>
+                  <p className="font-bold text-slate-900 leading-tight group-hover:text-brand transition-colors">{conta.nome}</p>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span>
                 </div>
                 <p className="text-xs text-slate-500 mb-3">{conta.vertical} · {conta.segmento}</p>
@@ -250,7 +256,7 @@ export const Accounts = () => {
                     <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">{acoesAtrasadas} atras.</span>
                   )}
                 </div>
-              </Link>
+              </button>
             );
           })}
         </div>
@@ -269,7 +275,7 @@ export const Accounts = () => {
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${conta.atividadeRecente === 'Alta' ? 'bg-emerald-500' : conta.atividadeRecente === 'Média' ? 'bg-amber-500' : 'bg-slate-400'}`} />
                       <div>
-                        <Link href={`/contas/${conta.slug}?sessao=resumo`} className="font-bold text-brand hover:underline">{conta.nome}</Link>
+                        <button onClick={() => openAccount(conta.id)} className="font-bold text-brand hover:underline text-left">{conta.nome}</button>
                         <p className="text-xs text-slate-500">{conta.dominio}</p>
                       </div>
                     </div>
@@ -278,13 +284,13 @@ export const Accounts = () => {
                   <td className="p-3"><button onClick={() => atualizarFiltro('owner', conta.ownerPrincipal)} className="underline decoration-dotted">{conta.ownerPrincipal}</button></td>
                   <td className="p-3">{conta.etapa}</td>
                   <td className="p-3">
-                    {conta.tipoEstrategico === 'ABM' ? <Link href={`/contas/${conta.slug}?sessao=abm`} className="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">ABM</Link> : conta.tipoEstrategico === 'ABX' ? <Link href={`/contas/${conta.slug}?sessao=abx`} className="px-2 py-1 rounded bg-purple-100 text-purple-700 font-semibold">ABX</Link> : <span className="px-2 py-1 rounded bg-slate-100 text-slate-700 font-semibold">{conta.tipoEstrategico}</span>}
+                    {conta.tipoEstrategico === 'ABM' ? <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">ABM</button> : conta.tipoEstrategico === 'ABX' ? <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-purple-100 text-purple-700 font-semibold">ABX</button> : <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-slate-100 text-slate-700 font-semibold">{conta.tipoEstrategico}</button>}
                   </td>
                   <td className="p-3">{conta.potencial}</td>
                   <td className={`p-3 font-semibold ${riscoClasse(conta.risco)}`}>{conta.risco}</td>
                   <td className="p-3">{conta.coberturaRelacional}%</td>
                   <td className="p-3">{new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR')}</td>
-                  <td className="p-3">{conta.oportunidadePrincipal ? <Link href={`/contas/${conta.slug}?sessao=oportunidades`} className="underline">{conta.oportunidadePrincipal}</Link> : '-'}</td>
+                  <td className="p-3">{conta.oportunidadePrincipal ? <button onClick={() => openAccount(conta.id)} className="underline text-left">{conta.oportunidadePrincipal}</button> : '-'}</td>
                   <td className="p-3 max-w-[200px]"><span className="block truncate" title={conta.proximaMelhorAcao}>{conta.proximaMelhorAcao}</span></td>
                   <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span></td>
                 </tr>

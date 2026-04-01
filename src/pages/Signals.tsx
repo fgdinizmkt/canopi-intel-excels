@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import '../pages/signals.css';
 import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
+import { useAccountDetail } from '../context/AccountDetailContext';
+import { contasMock } from '../data/accountsData';
 
 export const Signals: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -12,6 +14,12 @@ export const Signals: React.FC = () => {
   
   const [midPanel, setMidPanel] = useState<string | null>(null);
   const [midData, setMidData] = useState<any>(null);
+  const { openAccount } = useAccountDetail();
+
+  const getAccountIdByName = (name: string) => {
+    const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
+    return account ? account.id : '1';
+  };
   const [subpage, setSubpage] = useState<string | null>(null);
   const [subpageData, setSubpageData] = useState<any>(null);
   
@@ -188,7 +196,7 @@ export const Signals: React.FC = () => {
           </div>
         </div>
         <div className="fp-body">
-           <div className="fp-title">{subpageData.account}</div>
+           <div className="fp-title cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openAccount(getAccountIdByName(subpageData.account))}>{subpageData.account}</div>
            <div className="fp-subtitle">{subpageData.accountContext || subpageData.description}</div>
            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginTop: '28px', marginBottom: '28px' }}>
              {(subpageData.accountDetails || []).map((d: any) => (
@@ -316,7 +324,7 @@ export const Signals: React.FC = () => {
                     <div><div className="sig-data-label">Causa</div><div className="sig-data-val">{s.probableCause}</div></div>
                     <div><div className="sig-data-label">Impacto</div><div className="sig-data-val" style={{ fontWeight: 700, color: ic(s.severity) }}>{s.impact}</div></div>
                     <div><div className="sig-data-label">Confiança</div><div className="conf-wrap"><div className="conf-bar"><div className="conf-fill" style={{ width: `${s.confidence}%`, background: cc(s.confidence) }}></div></div><span className="conf-val">{s.confidence}%</span></div></div>
-                    <div><div className="sig-data-label">Conta</div><div className="sig-data-val">{s.account}</div></div>
+                    <div><div className="sig-data-label">Conta</div><div className="sig-data-val cursor-pointer hover:text-blue-600 transition-colors" onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(s.account)); }}>{s.account}</div></div>
                   </div>
                 </div>
                 <div className="sig-side">

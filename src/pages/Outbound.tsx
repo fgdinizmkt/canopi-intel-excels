@@ -46,6 +46,8 @@ import {
 } from 'recharts';
 import { Modal, Badge } from '../components/ui';
 import { advancedSignals } from '../data/signalsV6';
+import { contasMock } from '../data/accountsData';
+import { useAccountDetail } from '../context/AccountDetailContext';
 
 // --- MOCK DATA PARA ICP / PERSONAS ---
 const personaData = [
@@ -96,6 +98,13 @@ export const Outbound: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{ title: string; content: React.ReactNode; size?: 'sm' | 'md' | 'lg' | 'xl' } | null>(null);
   const [activeTab, setActiveTab ] = useState<'queue' | 'personas'>('queue');
+  const { openAccount } = useAccountDetail();
+
+  // Helper para buscar ID da conta pelo nome (para costura com sinais)
+  const getAccountIdByName = (name: string) => {
+    const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
+    return account ? account.id : '1'; // Fallback para ID '1' se não encontrar
+  };
 
   // Mapeamento de Sinais para Metadados Táticos (FASE 2: Costura Arquitetural)
   const outboundSignals = useMemo(() => {
@@ -212,11 +221,11 @@ export const Outbound: React.FC = () => {
       content: (
          <div className="py-12 px-6 text-center space-y-6">
             <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-[24px] flex items-center justify-center mx-auto shadow-inner">
-               {type === 'account' ? <Globe className="w-10 h-10 text-slate-400" /> : <User className="w-10 h-10 text-slate-400" />}
+               <User className="w-10 h-10 text-slate-400" />
             </div>
             <div className="space-y-2">
                <h3 className="text-xl font-bold text-slate-900">{name}</h3>
-               <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed italic">Direcionando para o cockpit de {type === 'account' ? 'Contas ABM' : 'Stakeholders'}...</p>
+               <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed italic">Direcionando para o cockpit de Stakeholders...</p>
             </div>
             <div className="pt-4 flex gap-3">
                <button className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold shadow-lg shadow-slate-900/10">Ver no CRM</button>
@@ -322,7 +331,7 @@ export const Outbound: React.FC = () => {
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
-                     <div className="flex items-center gap-2 cursor-pointer group/item" onClick={() => openEntityModal('account', signal.account)}>
+                     <div className="flex items-center gap-2 cursor-pointer group/item" onClick={() => openAccount(getAccountIdByName(signal.account))}>
                         <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-black shadow-lg">
                            {signal.account.substring(0, 2).toUpperCase()}
                         </div>
@@ -366,11 +375,11 @@ export const Outbound: React.FC = () => {
                     
                     {/* Conta e Contato (Costura Arquitetural) */}
                     <div className="w-full lg:w-72 flex items-center gap-4">
-                       <div className="w-12 h-12 rounded-[18px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 flex items-center justify-center shadow-inner group-hover:bg-white group-hover:border-blue-200 group-hover:text-blue-600 transition-all cursor-pointer" onClick={() => openEntityModal('account', item.account)} title="Ver visão da empresa">
+                       <div className="w-12 h-12 rounded-[18px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 flex items-center justify-center shadow-inner group-hover:bg-white group-hover:border-blue-200 group-hover:text-blue-600 transition-all cursor-pointer" onClick={() => openAccount(getAccountIdByName(item.account))} title="Ver visão da empresa">
                           {item.id.split('-')[1]}
                        </div>
                        <div className="flex-1 min-w-0">
-                          <h4 className="text-[14px] font-black text-slate-900 truncate tracking-tight hover:text-blue-700 cursor-pointer transition-colors" onClick={() => openEntityModal('account', item.account)}>{item.account}</h4>
+                          <h4 className="text-[14px] font-black text-slate-900 truncate tracking-tight hover:text-blue-700 cursor-pointer transition-colors" onClick={() => openAccount(getAccountIdByName(item.account))}>{item.account}</h4>
                           <div className="flex items-center gap-2 mt-1">
                              <div className="flex items-center gap-1 cursor-pointer group/contact" onClick={() => openEntityModal('contact', item.owner)} title="Ver perfil do contato">
                                 <User className="w-3 h-3 text-slate-400 group-hover/contact:text-blue-500 transition-colors" />
@@ -415,7 +424,7 @@ export const Outbound: React.FC = () => {
                           <button className="w-11 h-11 bg-white border border-slate-200 rounded-[16px] flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm group/settings" title="Configurar Playbook (Configuração Técnica)">
                              <Settings className="w-4 h-4 text-slate-400 group-hover/settings:rotate-90 transition-all" />
                           </button>
-                          <button onClick={() => openEntityModal('account', item.account)} className="w-11 h-11 bg-white border border-slate-200 rounded-[16px] flex items-center justify-center hover:bg-blue-50 hover:border-blue-200 group/nav transition-all shadow-sm" title="Abrir Visão da Empresa">
+                          <button onClick={() => openAccount(getAccountIdByName(item.account))} className="w-11 h-11 bg-white border border-slate-200 rounded-[16px] flex items-center justify-center hover:bg-blue-50 hover:border-blue-200 group/nav transition-all shadow-sm" title="Abrir Visão da Empresa">
                              <ChevronRight className="w-4 h-4 text-slate-400 group-hover/nav:text-blue-500 group-hover/nav:translate-x-0.5 transition-all" />
                           </button>
                        </div>

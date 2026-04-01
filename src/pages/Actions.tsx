@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 import { Badge, Button, Card } from '../components/ui';
+import { useAccountDetail } from "../context/AccountDetailContext";
+import { contasMock } from "../data/accountsData";
 
 type Priority = "Crítica" | "Alta" | "Média" | "Baixa";
 type ActionStatus = "Nova" | "Em andamento" | "Bloqueada" | "Aguardando aprovação" | "Concluída";
@@ -910,6 +912,11 @@ function ActionListCard({
   onTitleClick: (item: ActionItem) => void;
   onButtonAction: (item: ActionItem, action: ActionItem["buttons"][number]["action"]) => void;
 }) {
+  const { openAccount } = useAccountDetail();
+  const getAccountIdByName = (name: string) => {
+    const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
+    return account ? account.id : '1';
+  };
   const cardStyle: React.CSSProperties = {
     borderRadius: density === 'super-compacta' ? 14 : 24,
     border: '1px solid #e2e8f0',
@@ -928,10 +935,10 @@ function ActionListCard({
           <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{item.status}</span>
           <button
             type="button"
-            onClick={() => onTitleClick(item)}
+            onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
             style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
           >
-            {item.accountName} <span style={{ fontWeight: 500, color: '#64748b' }}>— {item.title}</span>
+            <span className="hover:text-blue-600 transition-colors">{item.accountName}</span> <span style={{ fontWeight: 500, color: '#64748b' }}>— {item.title}</span>
           </button>
           <span style={{ fontSize: 12, color: '#64748b', flexShrink: 0 }}>{item.ownerName ?? 'N/A'}</span>
           <span style={{ ...slaColorStyle[item.slaStatus], fontSize: 12, flexShrink: 0 }}>{item.slaText}</span>
@@ -980,10 +987,18 @@ function ActionListCard({
 
           {/* Title & description */}
           <div style={{ marginTop: 16 }}>
-            <button type="button" onClick={() => onTitleClick(item)} style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <p style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a' }}>{item.accountName}</p>
-              <p style={{ marginTop: 4, fontSize: 14, fontWeight: 600, color: '#475569' }}>{item.title}</p>
-            </button>
+            <div style={{ textAlign: 'left', background: 'none', border: 'none', padding: 0 }}>
+              <p 
+                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+                className="hover:text-blue-600 transition-colors cursor-pointer"
+                style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a' }}
+              >
+                {item.accountName}
+              </p>
+              <button type="button" onClick={() => onTitleClick(item)} style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                <p style={{ marginTop: 4, fontSize: 14, fontWeight: 600, color: '#475569' }}>{item.title}</p>
+              </button>
+            </div>
             {density !== 'compacta' && (
               <p style={{ marginTop: 12, fontSize: 13, lineHeight: 1.7, color: '#64748b', maxWidth: 880 }}>{item.description}</p>
             )}
@@ -1186,6 +1201,11 @@ function ActionOverlay({
   onChangeStatus: (id: string, nextStatus: ActionStatus) => void;
   onEscalate: (id: string) => void;
 }) {
+  const { openAccount } = useAccountDetail();
+  const getAccountIdByName = (name: string) => {
+    const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
+    return account ? account.id : '1';
+  };
   useEffect(() => {
     if (!item) return;
     const previousOverflow = document.body.style.overflow;
@@ -1212,7 +1232,13 @@ function ActionOverlay({
                 <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#475569' }}>{item.channel}</span>
                 <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>{item.category}</span>
               </div>
-              <p style={{ marginTop: 16, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}>{item.accountName}</p>
+              <p 
+                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+                className="hover:text-blue-600 transition-colors cursor-pointer"
+                style={{ marginTop: 16, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}
+              >
+                {item.accountName}
+              </p>
               <h2 style={{ marginTop: 8, fontSize: 40, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05, color: '#0f172a', maxWidth: 900 }}>{item.title}</h2>
               <p style={{ marginTop: 12, fontSize: 16, lineHeight: 1.7, color: '#475569', maxWidth: 860 }}>{item.description}</p>
             </div>
@@ -1267,7 +1293,11 @@ function ActionOverlay({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Info grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                  <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
+                  <div onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }} className="cursor-pointer group">
+                    <div className="group-hover:border-blue-300 transition-colors">
+                      <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
+                    </div>
+                  </div>
                   <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={`Time: ${item.ownerTeam}`} />
                   <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
                   <InfoBlock label="SLA" value={item.slaText} helper={`Status: ${item.status}`} />

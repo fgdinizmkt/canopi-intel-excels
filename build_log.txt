@@ -1,0 +1,94 @@
+
+> canopi-intel-excels-app@1.0.0 build
+> next build
+
+   ▲ Next.js 15.5.14
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 6.4s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/36) ...
+   Generating static pages (9/36) 
+   Generating static pages (18/36) 
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+   Generating static pages (27/36) 
+ ✓ Generating static pages (36/36)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS
+┌ ○ /                                       131 B         102 kB
+├ ○ /_not-found                              1 kB         103 kB
+├ ○ /acoes                                20.3 kB         122 kB
+├ ƒ /api/chat                               131 B         102 kB
+├ ○ /assistente                           38.6 kB         140 kB
+├ ○ /configuracoes                        5.75 kB         108 kB
+├ ○ /contas                               5.49 kB         115 kB
+├ ƒ /contas/[slug]                        3.31 kB         113 kB
+├ ○ /contatos                             3.74 kB         106 kB
+├ ○ /desempenho                           15.2 kB         117 kB
+├ ○ /estrategia-abm                       38.2 kB         180 kB
+├ ○ /integracoes                          5.32 kB         107 kB
+├ ○ /inteligencia-cruzada                 14.5 kB         116 kB
+├ ○ /login                                5.06 kB         147 kB
+├ ○ /midia-paga                           11.2 kB         212 kB
+├ ○ /orquestracao-abx                     31.8 kB         253 kB
+├ ○ /outbound                             10.8 kB         238 kB
+├ ○ /seo-inbound                          12.2 kB         224 kB
+├ ○ /sinais                               8.52 kB         115 kB
+└ ○ /visao-geral                          5.91 kB         117 kB
++ First Load JS shared by all              102 kB
+  ├ chunks/1255-dfb5f8d642ae4426.js       45.7 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js   54.2 kB
+  └ other shared chunks (total)           1.95 kB
+
+Route (pages)                                Size  First Load JS
+┌ ○ /AbmStrategy (1192 ms)                78.3 kB         177 kB
+├ ○ /ABXOrchestration (1192 ms)           31.6 kB         249 kB
+├ ○ /Accounts (1192 ms)                    9.6 kB         113 kB
+├ ○ /Actions                              20.1 kB         119 kB
+├ ○ /Assistant (1192 ms)                  38.3 kB         137 kB
+├ ○ /Contacts                             3.58 kB         102 kB
+├ ○ /CrossIntelligence                    14.4 kB         113 kB
+├ ○ /Integrations                         5.14 kB         104 kB
+├ ○ /Outbound (1192 ms)                   10.7 kB         234 kB
+├ ○ /Overview                              5.8 kB         114 kB
+├ ○ /PaidMedia (1192 ms)                  11.1 kB         208 kB
+├ ○ /Performance                            15 kB         114 kB
+├ ○ /SeoInbound (1192 ms)                   12 kB         220 kB
+├ ○ /Settings                             5.57 kB         104 kB
+└ ○ /Signals                              8.41 kB         112 kB
+    └ css/d92eeb3f42e25bbd.css            3.36 kB
++ First Load JS shared by all             98.9 kB
+  ├ chunks/framework-a32a2a465584c0bc.js  59.8 kB
+  ├ chunks/main-c31d8922ca9766f7.js       37.2 kB
+  └ other shared chunks (total)           1.91 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
