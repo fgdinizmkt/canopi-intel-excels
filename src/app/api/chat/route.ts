@@ -245,10 +245,11 @@ Deve mostrar:
 - fontes conectadas
 - parciais
 - ausentes
-- impacto da ausência
-- saúde da integração
-- mapeamento de entidades
-- linhagem dos dados
+- erros críticos
+- sincronizações atrasadas
+- impacto na plataforma
+- entidades alimentadas
+- qualidade da cobertura
 
 14. Configurações
 É a camada de governança operacional.
@@ -689,34 +690,130 @@ Não trate todas as ideias como igualmente prontas.
 Não superestime a maturidade do produto.
 Seja honesto, crítico e construtivo.`;
 
+interface HistoryMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+interface OperationalContext {
+  contaAberta: {
+    nome: string;
+    vertical: string;
+    statusGeral: string;
+    resumoExecutivo: string;
+    prontidao: number;
+    potencial: number;
+    proximaMelhorAcao: string;
+  } | null;
+  sinaisCriticos: Array<{
+    title: string;
+    severity: string;
+    account: string;
+    recommendation: string;
+    confidence: number;
+  }>;
+  acoesFila: Array<{
+    title: string;
+    accountName: string;
+    status: string;
+  }>;
+}
+
+function buildContextualInstruction(context: OperationalContext): string {
+  const lines: string[] = [
+    '\n\n==================================================',
+    'CONTEXTO OPERACIONAL ATUAL (estado real da plataforma)',
+    '==================================================',
+  ];
+
+  if (context.contaAberta) {
+    const c = context.contaAberta;
+    lines.push(
+      '\nCONTA ABERTA NO PAINEL:',
+      `- Nome: ${c.nome}`,
+      `- Vertical: ${c.vertical}`,
+      `- Status: ${c.statusGeral}`,
+      `- Prontidão ABM/ABX: ${c.prontidao}%`,
+      `- Potencial: ${c.potencial}%`,
+      `- Resumo executivo: ${c.resumoExecutivo}`,
+      `- Próxima melhor ação: ${c.proximaMelhorAcao}`,
+    );
+  } else {
+    lines.push('\nNenhuma conta aberta no painel. Contexto global da operação.');
+  }
+
+  if (context.sinaisCriticos.length > 0) {
+    lines.push('\nSINAIS CRÍTICOS ATIVOS (top 3):');
+    context.sinaisCriticos.forEach((s, i) => {
+      lines.push(
+        `${i + 1}. [${s.severity.toUpperCase()}] ${s.title}` +
+        ` — Conta: ${s.account}` +
+        ` — Confiança: ${s.confidence}%` +
+        ` — Recomendação: ${s.recommendation}`,
+      );
+    });
+  }
+
+  if (context.acoesFila.length > 0) {
+    lines.push('\nACÕES NA FILA OPERACIONAL (top 3):');
+    context.acoesFila.forEach((a, i) => {
+      lines.push(`${i + 1}. ${a.title} — Conta: ${a.accountName} — Status: ${a.status}`);
+    });
+  }
+
+  lines.push(
+    '\nUse este contexto para personalizar suas respostas.',
+    'Quando o usuário perguntar sobre a conta aberta, sinais ou ações, use esses dados como base factual.',
+    'Diferencie sempre o que é dado real (acima) do que é inferência ou recomendação sua.',
+  );
+
+  return lines.join('\n');
+}
+
 export async function POST(req: Request) {
   try {
-    const { message, history } = await req.json();
+    const { message, history, context } = await req.json();
 
     if (!process.env.GEMINI_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "API Key não configurada. Defina GEMINI_API_KEY no arquivo .env.local" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({ error: 'API Key não configurada. Defina GEMINI_API_KEY no arquivo .env.local' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } },
       );
     }
 
+    // Build system instruction — static base + optional operational context
+    const systemInstruction = context
+      ? SYSTEM_INSTRUCTION + buildContextualInstruction(context as OperationalContext)
+      : SYSTEM_INSTRUCTION;
+
+    // Map conversation history to Gemini format
+    // Local: { role: 'user' | 'assistant', content: string }
+    // Gemini: { role: 'user' | 'model', parts: [{ text: string }] }
+    const historyContents = ((history as HistoryMessage[]) || []).map(msg => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }));
+
+    const contents = [
+      ...historyContents,
+      { role: 'user', parts: [{ text: message }] },
+    ];
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: message,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION
-      }
+      contents,
+      config: { systemInstruction },
     });
 
     return new Response(
       JSON.stringify({ text: response.text }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
     );
   } catch (error: any) {
-    console.error("Erro no /api/chat:", error);
+    console.error('Erro no /api/chat:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'Erro interno no assistente IA' }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
     );
   }
 }
