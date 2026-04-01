@@ -310,3 +310,53 @@ AGENTS.md:
 - Navegação híbrida Drawer/Fullscreen preservada sem quebra de contexto.
 - Build 100% íntegro (`Exit code: 0`).
 - Próximo passo definido como nova frente estratégica fora da profundidade de conta.
+
+---
+
+## 2026-04-01 — 6º Recorte da Fase 5: Assistant Contextual
+
+**Branch:** main
+**Commit de código:** `0dd95a0`
+
+**Contexto:**
+- Após varredura técnica completa do estado do projeto, o Assistant foi identificado como a frente com maior impacto relativo e menor risco de regressão para o 6º Recorte.
+- `Assistant.tsx` estava em estado de casca: KPIs hardcoded, fila hardcoded, chat genérico sem contexto do sistema real.
+- Todos os dados necessários já existiam — apenas não eram consumidos pelo Assistant.
+
+**Objetivo do recorte:**
+Transformar o Assistant de chat genérico em camada operacional conectada ao estado real da plataforma, sem alterar design, sem nova rota de API, sem tocar em outros módulos.
+
+**Arquivos alterados:**
+- `src/pages/Assistant.tsx`
+- `src/app/api/chat/route.ts`
+
+**O que foi feito:**
+
+`Assistant.tsx`:
+- Conectado a `useAccountDetail` — detecta conta aberta em tempo real via `selectedAccountId`
+- Importa `contasMock` e `advancedSignals` como fontes canônicas
+- `useEffect` defensivo lê `localStorage('canopi_actions')` com try/catch (sem risco de SSR)
+- 5 KPIs derivados de dados reais: ações na fila, sinais ativos, sinais críticos, contas prioritárias, confiança média
+- Fila operacional: ações reais do localStorage com fallback em sinais críticos quando fila vazia
+- Subtítulo do header exibe nome e vertical da conta aberta quando houver
+- Placeholder do input adapta ao contexto da conta aberta
+- `handleSend` monta `contextBlock` compacto (conta + top 3 sinais + top 3 ações) e envia `{ message, history, context }` para a API
+- Histórico construído excluindo a mensagem inicial hardcoded — garante que o primeiro turn do Gemini seja sempre `user`
+
+`route.ts`:
+- Recebe `{ message, history, context }` (antes só recebia `message`)
+- `buildContextualInstruction()`: serializa contexto operacional em bloco textual compacto anexado ao `SYSTEM_INSTRUCTION`
+- Histórico mapeado do formato local (`assistant`, `content`) para Gemini (`model`, `parts[{ text }]`)
+- `contents` passa de string simples para array multi-turno com histórico real
+- `context: null` → instrução base pura, sem bloco adicional
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings novos
+- Working tree limpa antes do commit
+- Recorte limitado a exatamente 2 arquivos
+
+**Resultado:**
+- O Assistant passa a conhecer a conta aberta no painel, os sinais críticos ativos e as ações em fila a cada mensagem enviada.
+- O histórico da conversa é transmitido corretamente para o Gemini — memória real de multi-turno.
+- KPIs e fila passam a refletir o estado real da operação, sem nenhum valor inventado.
+- Zero impacto em outros módulos.

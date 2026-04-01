@@ -98,17 +98,29 @@
 
 ---
 
+### Fase 5 — Sexto recorte: Assistant Contextual (2026-04-01)
+
+**Assistant.tsx** + **route.ts** — commit `0dd95a0`
+- `useAccountDetail` conectado: Assistant detecta conta aberta em tempo real
+- `localStorage('canopi_actions')` lido defensivamente em `useEffect`
+- 5 KPIs derivados de dados reais: ações na fila, sinais ativos, sinais críticos, contas prioritárias, confiança média
+- Fila operacional: ações reais com fallback em sinais críticos quando fila vazia
+- `handleSend` monta `contextBlock` compacto e envia `{ message, history, context }` à API
+- `route.ts`: histórico mapeado para formato Gemini (`model`/`parts`), contexto injetado no `systemInstruction`
+
+---
+
 ## O que está em andamento
 
-Nenhuma implementação funcional em andamento. Fase de fechamento operacional concluída.
+Nenhuma implementação funcional em andamento.
 
 ---
 
 ## Próximo passo aprovado
 
-- Iniciar o 6º Recorte da Fase 5 (Frente a definir pelo usuário).
-- Consolidar a visão de assistente contextual se houver aprovação.
-- Manter o foco em refino de funcionalidade e preservação da estética premium (Regra 6).
+- Iniciar o 7º Recorte da Fase 5 (frente a definir).
+- Candidatos naturais: `Contacts.tsx` (após decisão arquitetural sobre página independente vs extensão de Contas), `Performance.tsx` (conexão com dados reais e decisão CSS inline vs Tailwind), ou auditoria de `ABMStrategy.tsx`.
+- Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
 
