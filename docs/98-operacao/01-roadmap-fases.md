@@ -61,7 +61,7 @@ Critério de pronto: toda página tem papel, fronteira, inputs, outputs, KPIs e 
 | 3 | Contatos | ⏳ Existe mas não foi fortalecida nesta rodada |
 | 4 | Sinais | ✅ Fortalecida com dados reais — commit `ab2722b` |
 | 5 | Visão Geral | ✅ Fortalecida com dados reais — commit `b64d82e` |
-| 6 | Desempenho | 🔄 Em diagnóstico — execução pendente |
+| 6 | Desempenho | ✅ Recorte executado — contas inline com sinais e ações — commit `6395b58` |
 | 7 | Estratégia ABM | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
 | 8 | Orquestração ABX | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
 | 9 | Inteligência Cruzada | ⚠️ Existe, evoluída em PRs #1–#6, não auditada nesta rodada |

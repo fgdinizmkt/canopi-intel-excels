@@ -28,6 +28,11 @@
 - ABM Readiness: contas de `contasMock` com `prontidao > 70`
 - Channel Health: `getChannelStatus()` deriva pior severidade por categoria de sinal
 
+**Performance.tsx** — commit `6395b58`
+- Seção Contas: sinais ativos e ações em andamento expandidos inline por conta
+- Rodapé: 5 campos visíveis (canal, valor, owner, relacionamento, último contato)
+- Cumpre critério de Fase 4: relação clara com entidades-base (sinais + ações visíveis por conta)
+
 **Accounts.tsx** — commit `ab2722b`
 - Card Grade/Board: microbadges de status, potencial, atividade, sinais e atrasos
 - Lista: dot colorido por `atividadeRecente` da conta
@@ -53,22 +58,13 @@
 
 ## O que está em andamento
 
-### Desempenho (Performance.tsx) — pendente de execução
-- Diagnóstico comparativo já feito entre a versão `main` e a versão `refactor/organizacao-inicial`
-- Proposta de recorte seguro documentada em `docs/98-operacao/` (este repositório)
-- Aguardando aprovação para execução
+Nenhum recorte ativo no momento. Fase 4 encerrada no núcleo mínimo.
 
 ---
 
 ## Próximo passo aprovado
 
-Não iniciado ainda. Proposta em `docs/98-operacao/00-status-atual.md` (seção "Desempenho").
-
-Recorte proposto para Performance.tsx:
-1. Migrar seção Contas para layout inline (sinais + ações visíveis sem clique extra)
-2. Enriquecer Squads com dados `comp / active / time`
-
-Ver detalhes completos em `docs/98-operacao/` e na conversa de diagnóstico.
+Não definido ainda. Aguardando decisão sobre início da Fase 5.
 
 ---
 

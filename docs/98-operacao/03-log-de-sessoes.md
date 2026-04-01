@@ -123,4 +123,38 @@ b072ff2 Estado estável inicial da aplicação com ABM e ABX funcionando
 
 **Proposta de execução:** ver `docs/98-operacao/00-status-atual.md` e Bloco 2 da conversa desta sessão.
 
-**Status:** aguardando aprovação para execução.
+**Status:** aprovado e executado. Ver entrada abaixo.
+
+---
+
+## 2026-04-01 — Recorte de Desempenho executado + memória operacional criada
+
+**Fase:** Fase 4 — Construção da V1
+
+**O que foi feito:**
+
+Performance.tsx — seção Contas:
+- Substituído grid 2 colunas com cards clicáveis (abriam side panel) por lista vertical com cards inline
+- Sinais ativos agora exibem: dot colorido por severidade + ID + título completo + badge de severidade
+- Ações em andamento agora exibem: título + owner + badge de status
+- Rodapé expandido de 3 para 5 campos: Canal, Valor, Owner, Relacionamento, Último contato
+- Botão "Ver análise" removido (não havia destino útil sem painel); adicionados "Ver no Canopi" + contador de sinais/ações
+- `openAccPanel` preservada no componente (ainda usada pelas Frentes)
+- CSS `perf-*` preservado — nenhuma dependência nova introduzida
+
+docs/98-operacao/:
+- Criados 5 arquivos: 00-status-atual, 01-roadmap-fases, 02-decisoes-arquiteturais, 03-log-de-sessoes, 04-regras-do-processo
+- 04-regras-do-processo.md: regras operacionais explícitas com tabela de eventos → arquivos a atualizar
+
+AGENTS.md:
+- Seção "Memória operacional — regra obrigatória" adicionada com tabela e instruções
+
+**Commits:**
+- `6395b58` — feat: fortalece desempenho com contas inline e memória operacional
+
+**PRs:** nenhuma (commit direto em main)
+
+**Impacto no projeto:**
+- Desempenho agora conecta visualmente sinais e ações por conta — cumpre critério de "relação clara com entidades-base" da Fase 4
+- Memória operacional estabelecida como parte do processo padrão
+- Fase 4 pode ser considerada encerrada no núcleo mínimo (Visão Geral + Desempenho concluídos)
