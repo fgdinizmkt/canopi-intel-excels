@@ -2,10 +2,10 @@
 
 ## Estado atual
 - Fase: Fase 5
-- Último recorte concluído: CrossIntelligence.tsx com sinais reais e persistência em canopi_actions
-- Último commit relevante: c1a4c95 - feat: conecta cross intelligence a sinais reais e fila global de ações
+- Último recorte concluído: Restauração de UI e Runtime Global (Endurecimento de Base)
+- Último commit relevante: 0bd0822 - feat(ui): restaura camada visual e estabiliza runtime do app router (recorte 2 fase 5)
 - Branch atual: main
-- Status do push: local à frente de origin/main por 1 commit
+- Status do push: local à frente de origin/main por 2 commits (CrossIntelligence + UI/Runtime)
 
 ## Regras obrigatórias
 - Executar apenas o recorte autorizado

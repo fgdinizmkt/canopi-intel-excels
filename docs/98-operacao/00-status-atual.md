@@ -56,8 +56,14 @@
 - Injeção de sinais reais no fluxo operacional, incluindo Nexus e Minerva
 - Persistência em `localStorage('canopi_actions')`
 - Conexão dos CTAs finais para alimentar a fila global de ações
-- Recorte restrito ao arquivo `CrossIntelligence.tsx`
-- Build validado antes do commit
+
+### Fase 5 — Segundo recorte de Restauração UI/Runtime (2026-04-01)
+
+**Estabilização Global** — commit `0bd0822`
+- Correção de falha de injeção de CSS (Tailwind v4) no App Router.
+- Criação de `src/app/globals.css` com ordem correta de `@import`.
+- Atualização do Root Layout (`src/app/layout.tsx`).
+- Eliminação de erro de runtime (`_document.js`) via limpeza de cache (.next) e rebuild íntegro.
 
 ### Limpeza de branches
 - `feat/evolucao-produto` deletada do remote em 2026-04-01
@@ -73,9 +79,9 @@ Fechamento documental do primeiro recorte da Fase 5.
 
 ## Próximo passo aprovado
 
-- Atualizar a memória operacional para refletir o recorte de `CrossIntelligence.tsx`
-- Fazer push da `main` para `origin/main`
-- Só depois decidir o próximo recorte da Fase 5
+- Concluir o 3º recorte da Fase 5: Fortalecimento de `src/pages/Integrations.tsx`.
+- Validar integridade visual e funcional após o restart do ambiente.
+- Fazer push da `main` para `origin/main`.
 
 ---
 

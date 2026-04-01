@@ -188,3 +188,25 @@ AGENTS.md:
 **Resultado:**
 - CrossIntelligence passou a atuar como ponte operacional real entre sinais e fila global de ações
 - Fase 5 foi iniciada com foco em inteligência cruzada aplicada ao fluxo operacional
+
+---
+
+## 2026-04-01 — 2º Recorte da Fase 5: Restauração de UI e Runtime Global
+
+**Branch:** main  
+**Commit:** `0bd0822`
+
+**Contexto:**
+- Durante a implementação do 3º recorte (Integrations.tsx), foi detectado um incidente global de UI (raw HTML) e um erro de runtime do Next.js (`Cannot find module './5611.js'` em `_document.js`).
+- O incidente foi enquadrado como o 2º Recorte Técnico da Fase 5 para garantir a estabilidade da base do App Router antes de prosseguir com refinos de página.
+
+**O que foi feito:**
+- **Estabilização de Estilos:** Criação de `src/app/globals.css` com a ordem correta de `@import` (mandatório para Tailwind v4 no Next.js 15).
+- **Consolidação de Layout:** Atualização do Root Layout (`src/app/layout.tsx`) para o novo ponto de entrada de CSS, garantindo injeção global consistente.
+- **Saneamento de Runtime:** Limpeza profunda do cache do Next.js (`rm -rf .next`) para eliminar chunks inconsistentes gerados pela coexistência entre App Router e Pages Router.
+- **Build de Integridade:** Validação via `npm run build` confirmando a eliminação de erros e a geração correta de chunks de CSS para todas as rotas.
+
+**Resultado:**
+- Camada visual restaurada em toda a aplicação.
+- Runtime estabilizado e livre de erros de carregamento de módulo stale.
+- Base técnica do App Router endurecida para os próximos recortes da Fase 5.
