@@ -65,6 +65,27 @@ Quando qualquer pendência, risco ou bloqueio for identificado:
 
 ---
 
+## Regra 6 — Protocolo de Mudança Visual
+
+A estética premium é um pilar não-negociável do projeto. Nenhuma mudança operacional deve tornar a tela "fria", "árida" ou excessivamente densa.
+
+### Fluxo de Aprovação Visual Obrigatória
+
+Antes de qualquer mudança estrutural forte de UI (layout, hierarquia ou linguagem):
+
+1. **Propor Direção Visual:** O agente descreve como pretende organizar os elementos.
+2. **Explicar o Impacto:** O que ganha protagonismo e o que perde peso visual.
+3. **Obter Aprovação:** O usuário deve validar explicitamente a direção proposta.
+4. **Implementar:** Só após o "OK", o código é alterado.
+
+### Diretrizes de UI
+
+- Mudanças bruscas de layout ou densidade sem validação prévia são violação de processo.
+- Ajustes incrementais podem seguir o fluxo normal (Regra 0).
+- A clareza operativa deve caminhar junto com o design editorial/premium.
+
+---
+
 ## Regra 5 — O que não está documentado é pendência do processo
 
 Se uma etapa foi concluída e não está registrada em `03-log-de-sessoes.md`, isso é uma lacuna do processo — não da memória de chat.

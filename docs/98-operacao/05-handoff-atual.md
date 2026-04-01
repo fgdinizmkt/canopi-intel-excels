@@ -14,6 +14,8 @@
 - Atualizar a memória operacional ao fechar cada recorte
 - Não avançar para outra frente sem fechar corretamente a atual
 - Não inventar contexto, resultados ou análises
+- **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
+- **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## Próximo passo correto
 - Definir e propor o 4º recorte técnico da Fase 5 (ex: Outbound ou Assistant).

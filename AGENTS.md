@@ -17,7 +17,9 @@ Este projeto é a plataforma Canopi | intel excels.
 - Não confundir MVP com visão futura.
 
 ## Direção de UX/UI
-- Manter estética premium, limpa, enterprise e consistente com a plataforma.
+- **Estética Premium:** Manter experiência visual bonita, limpa e agradável para uso humano.
+- **Refinamento != Degradação:** Melhorias operacionais não podem degradar a qualidade estética.
+- **Consistência:** Preservar a linguagem visual enterprise em todas as páginas.
 - Cada página deve ter função clara no sistema.
 - Evitar blocos decorativos sem utilidade prática.
 - Reforçar contexto, confiança, explicabilidade e próxima melhor ação.
@@ -40,10 +42,11 @@ Ao final de cada tarefa:
 
 Toda implementação segue esta sequência, sem exceção:
 
-1. Executar o recorte autorizado
-2. Mostrar resultado do build
-3. Mostrar `git diff --stat`
-4. Mostrar diff real do arquivo alterado
+1. **Mudança Visual/Estrutural:** Se o recorte envolver alteração brusca de UI, deve-se propor a direção visual, explicar as mudanças e obter aprovação **antes** de codar.
+2. Executar o recorte autorizado
+3. Mostrar resultado do build
+4. Mostrar `git diff --stat`
+5. Mostrar diff real do arquivo alterado
 5. **Aguardar aprovação explícita do usuário**
 6. Só então commitar
 7. Só então atualizar a memória operacional
