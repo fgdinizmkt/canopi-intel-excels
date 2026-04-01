@@ -4,7 +4,7 @@
 `main` — atualizada em 2026-04-01
 
 ## Fase atual do plano
-**Fase 5 — Início da camada de inteligência cruzada** (em andamento)
+**Fase 5 — Refino e endurecimento** (em andamento)
 
 ---
 
