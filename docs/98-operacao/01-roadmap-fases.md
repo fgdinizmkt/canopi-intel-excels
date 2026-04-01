@@ -49,7 +49,7 @@ Critério de pronto: toda página tem papel, fronteira, inputs, outputs, KPIs e 
 ---
 
 ## Fase 4 — Construção da V1
-**Status: Em andamento**
+**Status: Concluída (Núcleo Mínimo)**
 
 ### Ordem de construção definida
 (baseada em `docs/02-estrutura-da-plataforma/02-ordem-de-construcao-das-paginas.md`)
@@ -64,7 +64,7 @@ Critério de pronto: toda página tem papel, fronteira, inputs, outputs, KPIs e 
 | 6 | Desempenho | ✅ Recorte executado — contas inline com sinais e ações — commit `6395b58` |
 | 7 | Estratégia ABM | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
 | 8 | Orquestração ABX | ⚠️ Existe, evoluída em commits anteriores, não auditada nesta rodada |
-| 9 | Inteligência Cruzada | ⚠️ Existe, evoluída em PRs #1–#6, não auditada nesta rodada |
+| 9 | Inteligência Cruzada | ✅ Primeiro recorte de Fase 5 — commit `c1a4c95` |
 | 10 | Integrações | ⏳ Existe (`Integrations.tsx`) mas em estado inicial |
 | 11 | Assistente | ⏳ Existe (`Assistant.tsx`) mas em estado inicial |
 | 12 | Configurações | ⏳ Existe (`Settings.tsx`) mas em estado inicial |
@@ -82,20 +82,22 @@ Baseado em `docs/05-specs-e-backlogs/06-desempenho-spec-e-backlog.md` (e equival
 - Fronteira clara com páginas vizinhas
 - Dados mock ou estrutura suficiente para navegação coerente
 
-### O que falta para encerrar Fase 4 (interpretação mínima)
-O roadmap lista "consolidar Visão Geral e Desempenho" como o grupo imediato após Ações, Contas e Sinais. Visão Geral está concluída. **Desempenho é o próximo passo obrigatório antes de avançar para Fase 5.**
-
-As demais páginas (Contatos, canais, sustentação) também fazem parte da Fase 4 no sentido amplo, mas podem ser abordadas em iterações subsequentes dentro da mesma fase, ou tratadas como primeiro escopo da Fase 5 dependendo da decisão do produto.
+### Conclusão da Fase 4
+A Fase 4 foi encerrada no seu núcleo imediato (Visão Geral e Desempenho) em 2026-04-01, permitindo a transição para a camada de inteligência e refino.
 
 ---
 
 ## Fase 5 — Refino e endurecimento
-**Status: Não iniciada**
+**Status: Em andamento**
 
-Itens previstos:
+Recortes concluídos:
+- [x] **CrossIntelligence.tsx** — Injeção de sinais reais (Nexus/Minerva) e persistência em `canopi_actions` (commit `c1a4c95`).
+
+Itens em andamento/previstos:
 - Revisar qualidade das telas
 - Revisar coerência de navegação
 - Ajustar regras e priorização
 - Remover redundância e excesso de escopo
 
-Pré-requisito: Fase 4 suficientemente concluída (pelo menos o núcleo operacional).
+Próxima etapa: Definir o segundo recorte técnico da Fase 5 com base nas pendências de refino.
+
