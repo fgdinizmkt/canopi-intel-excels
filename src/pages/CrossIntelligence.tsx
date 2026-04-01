@@ -17,6 +17,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Badge, Button, Card, Modal } from '../components/ui';
+import { advancedSignals } from '../data/signalsV6';
 
 type GrupoAcao = 'prontas' | 'validacao' | 'bloqueadas' | 'execucao';
 type FiltroPeriodo = 'dia' | 'semana' | 'mes';
@@ -124,38 +125,72 @@ const moduloCor: Record<string, string> = {
 
 const acoesOperacionais: AcaoOperacional[] = [
   {
-    id: 'acao-1',
-    titulo: 'Exportar audiência de expansão para Google Ads (Fintech Tier 1)',
-    arquetipo: 'criacao-operacional',
-    situacao: 'Cluster Fintech com intenção alta e queda de alcance em remarketing.',
-    recomendacao: 'Criar campanha de recuperação com segmentação por comitê técnico e econômico.',
+    id: 'SIG-4068-ACTION',
+    titulo: 'Mapear novo decisor e acionar CFO (Nexus Fintech)',
+    arquetipo: 'handoff',
+    situacao: 'Sponsor principal (VP Tecnologia) deixou a empresa. Proposta de R$ 280k em risco.',
+    recomendacao: 'Mapear substituto urgentemente e acionar CFO com narrativa executiva.',
+    grupo: 'prontas',
+    padraoInteracao: 'painel-expandido',
+    moduloDestino: 'Estratégia ABM',
+    ferramentaDestino: 'HubSpot + LinkedIn Sales Navigator',
+    tipoEntrega: 'Mapeamento de stakeholder e sequência de recuperação',
+    dadosUsados: ['Histórico Nexus Fintech', 'LinkedIn Intent Data', 'Comitê de Decisão CRM'],
+    origemDados: 'LinkedIn + Intent Data',
+    destinoDados: 'HubSpot (Conta Nexus) + Playbook ABM',
+    configuracaoInicial: ['Play: Recuperação de Sponsor', 'Urgência: Máxima', 'SLA: 24h'],
+    prerequisitos: ['Acesso ao Sales Navigator', 'Owner (Pablo Diniz) disponível', 'Aprovação de narrativa executiva'],
+    responsavel: 'Pablo Diniz',
+    janela: 'Hoje · até 17:00',
+    dependencia: 'Identificação de substituto ou CFO',
+    metricaPrincipal: 'Retenção de oportunidade (R$ 280k)',
+    retornoEsperado: 'Evitar atraso de 60 dias no ciclo de decisão.',
+    retornoOperacional: 'Novo sponsor mapeado e play de recuperação ativo no HubSpot.',
+    ctaPrimaria: 'Iniciar fluxo de recuperação',
+    ctaSecundaria: 'Ver sinal original',
+    status: 'Pronto',
+    proximoEstado: 'Novo sponsor em cadência',
+    conexaoStatus: 'Conectado',
+    payloadPreview: ['Nexus Fintech', 'R$ 280k em risco', 'Pablo Diniz as Owner'],
+    logSincronizacao: 'Sinal SIG-4068 detectado há 3h.',
+    confianca: 97,
+    prontidao: 85,
+    impacto: 95,
+    periodo: { dia: 1, semana: 1, mes: 1 },
+  },
+  {
+    id: 'SIG-4092-ACTION',
+    titulo: 'Auditoria técnica Google Ads e GTM (Minerva Foods)',
+    arquetipo: 'desbloqueio',
+    situacao: 'Queda de 45% no CTR e aumento de CPC no Google Ads.',
+    recomendacao: 'Revisar container GTM e pausar campanhas afetadas até correção.',
     grupo: 'prontas',
     padraoInteracao: 'gaveta',
     moduloDestino: 'Mídia Paga',
-    ferramentaDestino: 'Google Ads + módulo Segmentação e Audiência',
-    tipoEntrega: 'Exportação de audiência e estrutura inicial de campanha',
-    dadosUsados: ['Lista CRM Tier 1', 'Engajamento ABX 30 dias', 'Pontuação de propensão RevOps'],
-    origemDados: 'CRM + eventos ABX + scoring RevOps',
-    destinoDados: 'Google Ads (Customer Match) + módulo Mídia Paga',
-    configuracaoInicial: ['Orçamento inicial R$ 12.000', 'Tema: eficiência operacional + ROI em 90 dias', 'Exclusão de contas em negociação final'],
-    prerequisitos: ['Conector Google Ads ativo', 'Conta de anúncios vinculada ao CNPJ correto', 'Lista sem conflito de LGPD'],
-    responsavel: 'Marina (Mídia Paga)',
-    janela: 'Hoje · até 18:00',
-    dependencia: 'Conector Google Ads ativo',
-    metricaPrincipal: 'Custo por reunião qualificada',
-    retornoEsperado: 'Aumentar em 18% reuniões qualificadas do cluster em 7 dias.',
-    retornoOperacional: 'Campanha criada no Google Ads com 3 audiências e 7 temas de anúncio.',
-    ctaPrimaria: 'Exportar estrutura para Google Ads',
-    ctaSecundaria: 'Revisar payload',
+    ferramentaDestino: 'Google Ads + GTM + Performance Marketing',
+    tipoEntrega: 'Auditoria de tags e ajuste de orçamento emergencial',
+    dadosUsados: ['Logs GTM', 'Dashboards Google Ads', 'Alertas de Custo'],
+    origemDados: 'Google Ads + GTM',
+    destinoDados: 'Google Ads Manager + GTM Container',
+    configuracaoInicial: ['Pausar campanha "Expansão de Infraestrutura"', 'Modo: DEBUG GTM'],
+    prerequisitos: ['Acesso administrativo GTM', 'Status de campanhas ativas'],
+    responsavel: 'Equipe de Performance',
+    janela: 'Hoje · Imediato',
+    dependencia: 'Acesso ao GTM',
+    metricaPrincipal: 'Normalização do CTR',
+    retornoEsperado: 'Estancar perda estimada de R$ 1.2k/dia.',
+    retornoOperacional: 'Campanhas auditadas e erros de tags corrigidos.',
+    ctaPrimaria: 'Corrigir e auditar agora',
+    ctaSecundaria: 'Ver diagnóstico',
     status: 'Pronto',
-    proximoEstado: 'Em execução no Google Ads',
+    proximoEstado: 'Campanhas reativadas',
     conexaoStatus: 'Conectado',
-    payloadPreview: ['1.284 contatos', '3 audiências (Técnico, Econômico, Compras)', '7 temas de anúncio pré-configurados'],
-    logSincronizacao: 'Última sincronização: 24/03 às 08:12 · sem erros.',
-    confianca: 92,
-    prontidao: 95,
-    impacto: 90,
-    periodo: { dia: 3, semana: 8, mes: 21 },
+    payloadPreview: ['Minerva Foods', 'Google Ads', 'R$ 1.2k/dia em risco'],
+    logSincronizacao: 'Última leitura: há 12 min.',
+    confianca: 94,
+    prontidao: 90,
+    impacto: 92,
+    periodo: { dia: 1, semana: 4, mes: 12 },
   },
   {
     id: 'acao-2',
@@ -348,7 +383,7 @@ const acoesOperacionais: AcaoOperacional[] = [
     moduloDestino: 'Orquestração ABX',
     ferramentaDestino: 'HubSpot + Meetime + Slack + módulo ABX',
     tipoEntrega: 'Fluxo cross-módulo com checkpoints e alertas por função',
-    dadosUsados: ['Etapa da oportunidade', 'Última interação por papel', 'Objeção dominante'],
+    dadosUsados: ['Etapa do oportunidade', 'Última interação por papel', 'Objeção dominante'],
     origemDados: 'HubSpot + ABX',
     destinoDados: 'Workflow ABX + tarefas HubSpot + alerta Slack',
     configuracaoInicial: ['Play de 14 dias', 'Trilha técnico > econômico > compras', 'Regra de saída por resposta positiva'],
@@ -473,6 +508,45 @@ export const CrossIntelligence: React.FC = () => {
   const [acaoModalCurto, setAcaoModalCurto] = React.useState<AcaoOperacional | null>(null);
   const [acaoGaveta, setAcaoGaveta] = React.useState<AcaoOperacional | null>(null);
   const [acaoPainel, setAcaoPainel] = React.useState<AcaoOperacional | null>(null);
+
+  const persistActionToGlobalQueue = (item: AcaoOperacional) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('canopi_actions') || '[]');
+      
+      const newAction = {
+        id: `cross-${item.id}-${Date.now()}`,
+        priority: item.impacto > 90 ? "Crítica" : item.impacto > 80 ? "Alta" : "Média",
+        category: item.arquetipo === 'handoff' ? 'ABX' : item.moduloDestino,
+        channel: item.ferramentaDestino.split(' ')[0],
+        status: "Nova",
+        title: item.titulo,
+        description: item.situacao,
+        accountName: item.titulo.match(/\(([^)]+)\)/)?.[1] || "Nexus Fintech",
+        accountContext: item.situacao,
+        origin: "Inteligência Cruzada",
+        relatedSignal: item.logSincronizacao,
+        ownerName: item.responsavel,
+        suggestedOwner: item.responsavel,
+        ownerTeam: item.moduloDestino,
+        slaText: item.janela,
+        slaStatus: "ok",
+        expectedImpact: item.retornoEsperado,
+        nextStep: item.proximoEstado,
+        dependencies: item.prerequisitos,
+        evidence: [item.recomendacao, item.logSincronizacao],
+        history: [{ id: `h-${Date.now()}`, when: new Date().toLocaleString(), actor: "Canopi", type: "mudança", text: "Ação gerada via despacho de Inteligência Cruzada." }],
+        buttons: [
+          { id: "view", label: "Ver detalhes", tone: "secondary", action: "open" },
+          { id: "start", label: "Iniciar execução", tone: "primary", action: "start" }
+        ]
+      };
+
+      localStorage.setItem('canopi_actions', JSON.stringify([newAction, ...stored]));
+      console.log('Ação despachada com sucesso:', newAction);
+    } catch (e) {
+      console.error('Erro ao persistir ação:', e);
+    }
+  };
 
   const faixaConfianca = [
     { label: 'Confiança média', value: '88%' },
@@ -984,7 +1058,7 @@ export const CrossIntelligence: React.FC = () => {
               <p>Confirmação reversível: a plataforma apenas registra e encaminha a tarefa para o destino operacional selecionado.</p>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => setAcaoModalCurto(null)} icon={<ArrowRight className="w-4 h-4" />}>
+              <Button onClick={() => { persistActionToGlobalQueue(acaoModalCurto); setAcaoModalCurto(null); }} icon={<ArrowRight className="w-4 h-4" />}>
                 Confirmar e enviar
               </Button>
               <Button variant="outline" onClick={() => setAcaoModalCurto(null)}>Cancelar</Button>
@@ -1027,7 +1101,9 @@ export const CrossIntelligence: React.FC = () => {
                 <p className="text-slate-700 mt-1">{acaoGaveta.retornoOperacional}</p>
               </div>
               <div className="flex gap-2">
-                <Button onClick={() => setAcaoGaveta(null)} icon={<ArrowRight className="w-4 h-4" />}>Confirmar execução na ferramenta</Button>
+                <Button onClick={() => { persistActionToGlobalQueue(acaoGaveta); setAcaoGaveta(null); }} icon={<ArrowRight className="w-4 h-4" />}>
+                  Confirmar execução na ferramenta
+                </Button>
                 <Button variant="outline" onClick={() => setAcaoGaveta(null)}>Fechar</Button>
               </div>
             </div>
@@ -1078,7 +1154,9 @@ export const CrossIntelligence: React.FC = () => {
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              <Button onClick={() => setAcaoPainel(null)} icon={<Workflow className="w-4 h-4" />}>Executar fluxo cross-módulo</Button>
+              <Button onClick={() => { persistActionToGlobalQueue(acaoPainel); setAcaoPainel(null); }} icon={<Workflow className="w-4 h-4" />}>
+                Executar fluxo cross-módulo
+              </Button>
               <Button variant="outline" onClick={() => setAcaoPainel(null)}>Salvar como rascunho</Button>
               <Button variant="ghost" onClick={() => setAcaoPainel(null)}>Fechar painel</Button>
             </div>
