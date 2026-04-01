@@ -35,3 +35,35 @@ Ao final de cada tarefa:
 - listar arquivos alterados
 - validar build/lint se aplicável
 - apontar pendências ou limitações
+
+## Memória operacional — regra obrigatória
+
+A pasta `docs/98-operacao/` é a memória viva do projeto. Toda sessão deve mantê-la atualizada.
+
+### Quando atualizar
+
+| Evento | Arquivos a atualizar |
+|---|---|
+| Etapa concluída (recorte implementado e commitado) | `00-status-atual.md`, `03-log-de-sessoes.md` |
+| Fase muda de status | `00-status-atual.md`, `01-roadmap-fases.md`, `03-log-de-sessoes.md` |
+| Decisão arquitetural consolidada ou alterada | `02-decisoes-arquiteturais.md` |
+| Pendência identificada | `00-status-atual.md` (seção riscos e pendências) |
+
+### O que registrar
+
+Em `03-log-de-sessoes.md`:
+- o que foi feito (sem inventar — apenas fatos do repositório)
+- em qual fase se encaixa
+- commits relevantes (hash + mensagem)
+- PRs relevantes (número + título)
+- impacto no estado atual do projeto
+
+Em `00-status-atual.md`:
+- sempre refletir o estado mais recente
+- próximo passo aprovado deve ser atualizado após cada execução
+
+### Regras
+
+- a atualização documental é parte do processo, não tarefa opcional do fim
+- se algo foi finalizado e não está documentado, é pendência do processo
+- não depender de memória de chat — a documentação deve ser autossuficiente para retomar o projeto em outro chat

@@ -437,43 +437,64 @@ export default function Performance() {
  
         {/* ── CONTAS ── */}
         <div className="perf-card">
-          <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Contas · Atribuição e Resultado</div><div className="perf-sec-sub">Clique em qualquer conta para análise completa do relacionamento</div></div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+          <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Contas · Sinais, Ações e Atribuição</div><div className="perf-sec-sub">Sinais ativos e ações em andamento visíveis por conta</div></div>
+          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
             {ACCOUNTS.map(acc => (
-              <div key={acc.name} className="perf-acc-card" style={{borderLeftColor:acc.color}} onClick={()=>openAccPanel(acc)}>
-                <div style={{padding:'14px 16px 10px'}}>
-                  <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'8px'}}>
+              <div key={acc.name} style={{borderRadius:'18px',border:'1px solid #e2e8f0',borderLeft:`4px solid ${acc.color}`,background:'white',overflow:'hidden'}}>
+                {/* cabeçalho */}
+                <div style={{padding:'14px 18px 12px'}}>
+                  <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'10px'}}>
                     <div>
-                      <div style={{fontSize:'14px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em',marginBottom:'2px'}}>{acc.name}</div>
-                      <div style={{fontSize:'11px',color:'#94a3b8',lineHeight:1.4}}>{acc.meta}</div>
+                      <div style={{fontSize:'15px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em',marginBottom:'2px'}}>{acc.name}</div>
+                      <div style={{fontSize:'12px',color:'#64748b',lineHeight:1.5}}>{acc.meta}</div>
                     </div>
-                    <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'4px'}}>
+                    <div style={{display:'flex',gap:'6px',alignItems:'center',flexShrink:0}}>
                       <span className={bc(acc.statusClass)}>{acc.status}</span>
                       <span className="perf-badge perf-bsl" style={{fontSize:'9px'}}>{acc.canal}</span>
                     </div>
                   </div>
-                  <svg viewBox="0 0 200 24" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'24px',display:'block',marginBottom:'8px'}}>
-                    <defs><linearGradient id={`ag${acc.name.replace(/\s/g,'')}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={acc.color} stopOpacity="0.15"/><stop offset="100%" stopColor={acc.color} stopOpacity="0"/></linearGradient></defs>
-                    <polyline points={acc.sparkArea} fill={`url(#ag${acc.name.replace(/\s/g,'')})`} stroke="none"/>
-                    <polyline points={acc.spark} fill="none" stroke={acc.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  {/* sinais ativos */}
                   {acc.signals.length>0&&(
-                    <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
-                      {acc.signals.map(s=><span key={s.id} className={bc(s.sev==='crítico'?'br':s.sev==='alerta'?'bam':'bb')} style={{fontSize:'9px'}}>{s.id} · {s.sev}</span>)}
+                    <div style={{marginBottom:'10px'}}>
+                      <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Sinais ativos</div>
+                      {acc.signals.map((s,i)=>(
+                        <div key={s.id} style={{display:'flex',alignItems:'center',gap:'8px',padding:'6px 0',borderBottom:i<acc.signals.length-1?'1px solid #f1f5f9':'none'}}>
+                          <div style={{width:'8px',height:'8px',borderRadius:'50%',flexShrink:0,background:s.sev==='crítico'?'#ef4444':s.sev==='alerta'?'#f59e0b':'#2b44ff'}}/>
+                          <span style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',flexShrink:0}}>{s.id} ·</span>
+                          <span style={{fontSize:'12px',color:'#0f172a',flex:1}}>{s.title}</span>
+                          <span className={bc(s.sev==='crítico'?'br':s.sev==='alerta'?'bam':'bb')} style={{fontSize:'9px',flexShrink:0}}>{s.sev}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* ações em andamento */}
+                  {acc.actions.length>0&&(
+                    <div>
+                      <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Ações em andamento</div>
+                      {acc.actions.map((a,i)=>(
+                        <div key={a.title} style={{display:'flex',alignItems:'center',gap:'8px',padding:'5px 0',borderBottom:i<acc.actions.length-1?'1px solid #f1f5f9':'none'}}>
+                          <span style={{fontSize:'12px',color:'#0f172a',flex:1}}>{a.title}</span>
+                          <span style={{fontSize:'11px',color:'#64748b',flexShrink:0}}>{a.owner}</span>
+                          <span className={bc(a.status==='Em andamento'?'bb':'bsl')} style={{fontSize:'9px',flexShrink:0}}>{a.status}</span>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',borderTop:'1px solid #f1f5f9'}}>
-                  {[{k:'Valor',v:acc.valor,c:acc.color},{k:'Owner',v:acc.owner.split(' ')[0],c:'#0f172a'},{k:'Contato',v:acc.lastContact,c:'#0f172a'}].map((x,i)=>(
-                    <div key={x.k} style={{padding:'9px 12px',borderRight:i<2?'1px solid #f1f5f9':'none'}}>
+                {/* rodapé: métricas */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0',borderTop:'1px solid #f1f5f9',background:'#f8fafc',padding:'10px 18px'}}>
+                  {[{k:'Canal',v:acc.canal,c:'#0f172a'},{k:'Valor',v:acc.valor,c:acc.color},{k:'Owner',v:acc.owner.split(' ')[0],c:'#0f172a'},{k:'Relacionamento',v:acc.lifetime,c:'#0f172a'},{k:'Último contato',v:acc.lastContact,c:'#0f172a'}].map(x=>(
+                    <div key={x.k}>
                       <div className="perf-acc-k">{x.k}</div>
                       <div className="perf-acc-v" style={{color:x.c,fontSize:'12px'}}>{x.v}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{padding:'8px 12px',borderTop:'1px solid #f1f5f9',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <button className="perf-btn perf-btn-outline" style={{fontSize:'10px',padding:'4px 10px'}} onClick={e=>{e.stopPropagation();openAccPanel(acc);}}>Ver análise →</button>
-                  <button className="perf-btn perf-btn-hubspot" style={{fontSize:'10px',padding:'4px 10px'}} onClick={e=>{e.stopPropagation();showToast(`Abrindo ${acc.name} no HubSpot`);}}>🔗 HubSpot</button>
+                {/* rodapé: ações */}
+                <div style={{display:'flex',alignItems:'center',gap:'8px',borderTop:'1px solid #f1f5f9',padding:'8px 18px',flexWrap:'wrap'}}>
+                  <button className="perf-btn perf-btn-primary" style={{fontSize:'11px',padding:'5px 12px'}}>→ Ver no Canopi</button>
+                  <button className="perf-btn perf-btn-hubspot" style={{fontSize:'11px',padding:'5px 12px'}} onClick={()=>showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
+                  <span style={{marginLeft:'auto',fontSize:'11px',color:'#94a3b8'}}>{acc.signals.length} sinal(is) · {acc.actions.length} ação(ões)</span>
                 </div>
               </div>
             ))}
