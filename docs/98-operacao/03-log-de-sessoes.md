@@ -210,3 +210,24 @@ AGENTS.md:
 - Camada visual restaurada em toda a aplicação.
 - Runtime estabilizado e livre de erros de carregamento de módulo stale.
 - Base técnica do App Router endurecida para os próximos recortes da Fase 5.
+
+---
+
+## 2026-04-01 — 3º Recorte da Fase 5: Fortalecimento de Integrações
+
+**Branch:** main  
+**Commit:** `cdea929`
+
+**Contexto:**
+- Após a estabilização da base (Recorte 2), a página de Integrações foi retomada para fortalecer a comunicação de saúde do stack tecnológico.
+
+**O que foi feito em Integrations.tsx:**
+- **Dashboard de Confiabilidade:** Transformação da página estática em um painel funcional de KPIs.
+- **Métricas de Saúde:** Adição de "Confiança do Stack" e contagem de "Fontes Críticas Ativas".
+- **Categorização Funcional:** Agrupamento de conectores por CRM, Ads, Dados e Destinos.
+- **Relacionamento de Impacto:** Metadados no card de cada integração mostrando quais fluxos operacionais (ABM, Pipeline, Atribuição) dependem daquela fonte.
+- **Ações Contextuais:** Refino dos CTAs ("Corrigir Conector", "Revisar Mapeamento") baseados no status técnico da integração.
+
+**Resultado:**
+- Integrations.tsx agora atua como um "Painel de Controle de Saúde do Ecossistema", provendo visibilidade imediata de gaps e riscos operacionais.
+- Build validado com sucesso.
