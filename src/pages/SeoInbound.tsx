@@ -33,6 +33,7 @@ import {
   Tooltip
 } from 'recharts';
 import { Modal } from '../components/ui';
+import { ClientOnly } from '../components/ui/ClientOnly';
 
 // --- MOCK DATA ---
 
@@ -478,10 +479,11 @@ export const SeoInbound: React.FC = () => {
             </div>
           </div>
 
-          <div className="relative h-[280px] w-full rounded-xl overflow-hidden mb-8 mt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              {/* Stacked Area Chart to represent Search+AI mix */}
-              <AreaChart data={basePerformanceData.map((d, i) => ({
+          <div className="relative h-[280px] w-full rounded-xl overflow-hidden mb-8 mt-2 min-h-[280px]">
+            <ClientOnly fallback={<div className="h-full w-full bg-slate-50 animate-pulse rounded-3xl" />}>
+              <ResponsiveContainer width="100%" height="100%">
+                {/* Stacked Area Chart to represent Search+AI mix */}
+                <AreaChart data={basePerformanceData.map((d, i) => ({
                  name: d.name,
                  search: (d.search * currFilter.seoVol) + (Math.sin(i) * 1500 * (currFilter.seoVol > 1 ? 2 : 0.5)),
                  ai: (d.ai * currFilter.seoVol * 2.5) // Exaggerate AI growth visually
@@ -519,6 +521,7 @@ export const SeoInbound: React.FC = () => {
                 <Area type="monotone" dataKey="ai" stackId="1" stroke="#8b5cf6" strokeWidth={3} fill="url(#colorAi)" dot={{ r: 0 }} />
               </AreaChart>
             </ResponsiveContainer>
+          </ClientOnly>
           </div>
 
           {/* Expanded Bottom Section: Assets, Keywords & Performance Grid */}

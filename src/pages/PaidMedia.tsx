@@ -53,6 +53,7 @@ import {
   Area
 } from 'recharts';
 import { Modal } from '../components/ui';
+import { ClientOnly } from '../components/ui/ClientOnly';
 import { motion, AnimatePresence } from 'motion/react';
 
 // --- MOCK DATA ---
@@ -441,17 +442,19 @@ export const PaidMedia: React.FC = () => {
                  <div className="w-full md:w-80 space-y-6">
                     <div className="bg-white border-2 border-slate-100 p-6 rounded-3xl relative overflow-hidden">
                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Atribuição por Canal</p>
-                       <div className="h-40">
-                          <ResponsiveContainer width="100%" height="100%">
-                             <BarChart data={[{name: 'G', val: 40}, {name: 'L', val: 78}, {name: 'M', val: 12}, {name: 'B', val: 24}]}>
-                                <Bar dataKey="val" radius={[4, 4, 0, 0]}>
-                                   <Cell fill="#3b82f6" />
-                                   <Cell fill="#2563eb" />
-                                   <Cell fill="#8b5cf6" />
-                                   <Cell fill="#10b981" />
-                                </Bar>
-                             </BarChart>
-                          </ResponsiveContainer>
+                       <div className="h-40 min-h-[160px]">
+                          <ClientOnly fallback={<div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" />}>
+                             <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={[{name: 'G', val: 40}, {name: 'L', val: 78}, {name: 'M', val: 12}, {name: 'B', val: 24}]}>
+                                   <Bar dataKey="val" radius={[4, 4, 0, 0]}>
+                                      <Cell fill="#3b82f6" />
+                                      <Cell fill="#2563eb" />
+                                      <Cell fill="#8b5cf6" />
+                                      <Cell fill="#10b981" />
+                                   </Bar>
+                                </BarChart>
+                             </ResponsiveContainer>
+                          </ClientOnly>
                        </div>
                     </div>
                     <button className="w-full py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all" onClick={() => setModalOpen(false)}>Visualizar Analytics Completo</button>

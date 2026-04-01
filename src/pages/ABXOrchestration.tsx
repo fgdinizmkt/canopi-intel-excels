@@ -64,6 +64,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { Card, Badge, Button, Modal } from '../components/ui';
+import { ClientOnly } from '../components/ui/ClientOnly';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BarChart as ReBarChart, 
@@ -402,9 +403,10 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <Card className="lg:col-span-2 p-8 border-slate-200 shadow-sm rounded-[40px] bg-white overflow-hidden relative">
       <SectionHeader title="Pipeline por Vertical" subtitle="Volume de expansão e risco segmentado por setor" icon={<Building2 className="w-5 h-5" />} badge="Real-time" />
-      <div className="h-[300px] w-full mt-8">
-        <ResponsiveContainer width="100%" height="100%">
-          <ReBarChart data={pipelineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+      <div className="h-[300px] w-full mt-8 min-h-[300px]">
+        <ClientOnly fallback={<div className="h-full w-full bg-slate-50 animate-pulse rounded-2xl" />}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ReBarChart data={pipelineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
@@ -415,21 +417,24 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
             <Bar dataKey="risk" name="Risco" fill="#ef4444" radius={[8, 8, 8, 8]} barSize={10} />
           </ReBarChart>
         </ResponsiveContainer>
+      </ClientOnly>
       </div>
     </Card>
     <Card className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white">
       <SectionHeader title="Impacto Cross-Channel" subtitle="Atribuição de fontes na geração de pipeline" icon={<Network className="w-5 h-5" />} badgeColor="indigo" />
-      <div className="h-[250px] mt-4 flex items-center justify-center relative">
-         <ResponsiveContainer width="100%" height="100%">
-           <RePieChart>
+      <div className="h-[250px] mt-4 flex items-center justify-center relative min-h-[250px]">
+         <ClientOnly fallback={<div className="h-20 w-20 rounded-full border-4 border-slate-100 border-t-blue-500 animate-spin" />}>
+           <ResponsiveContainer width="100%" height="100%">
+             <RePieChart>
              <Pie data={channelData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={8} dataKey="value">
                {channelData.map((entry, index) => (
                  <Cell key={`cell-${index}`} fill={['#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#f43f5e', '#f59e0b'][index % 6]} stroke="none" />
                ))}
              </Pie>
              <ReTooltip />
-           </RePieChart>
-         </ResponsiveContainer>
+             </RePieChart>
+           </ResponsiveContainer>
+         </ClientOnly>
          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
             <span className="text-2xl font-black text-slate-900">+38%</span>
