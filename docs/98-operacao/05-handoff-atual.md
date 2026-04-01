@@ -16,15 +16,12 @@
 - Não inventar contexto, resultados ou análises
 
 ## Próximo passo correto
-- Confirmar se a memória operacional já registra corretamente o recorte de CrossIntelligence.tsx
-- Commitar o handoff atual
-- Fazer push para origin/main
-- Só depois seguir para o próximo recorte da Fase 5
+- Definir e propor o 4º recorte técnico da Fase 5 (ex: Outbound ou Assistant).
+- Executar o recorte após aprovação explícita.
+- Manter a integridade de runtime e UI durante as próximas evoluções.
 
 ## Pendências
-- Verificar se 00-status-atual.md e 03-log-de-sessoes.md refletem o recorte de CrossIntelligence.tsx
-- Commitar docs/98-operacao/05-handoff-atual.md
-- Publicar o commit em origin/main
+- Escolha da próxima página/funcionalidade do roadmap para refino.
 
 ## Arquivos que sempre precisam ser lidos
 - AGENTS.md

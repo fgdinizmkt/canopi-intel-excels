@@ -82,7 +82,7 @@
 
 ## O que está em andamento
 
-Fechamento documental do primeiro recorte da Fase 5.
+Definição do 4º recorte técnico da Fase 5 (Refino de Canais/Sustentação).
 
 ---
 
@@ -94,11 +94,6 @@ Fechamento documental do primeiro recorte da Fase 5.
 
 ---
 
-## Riscos e pendências
-
-| Item | Tipo | Detalhe |
-|---|---|---|
-| `main` local à frente de `origin/main` | Git | Há 1 commit local ainda não publicado |
-| `03-log-de-sessoes.md` ainda não registra o recorte de CrossIntelligence | Documentação | Precisa ser atualizado antes de fechar o processo |
 | Contatos | Pendência de produto | Página existe (`Contacts.tsx`) mas não foi fortalecida nesta rodada |
-| Canais + Sustentação | Pendência ampla | Outbound, SeoInbound, PaidMedia, Integrations, Settings, Assistant — em estado inicial |
+| Canais + Sustentação | Pendência ampla | Outbound, SeoInbound, PaidMedia, Settings, Assistant — em estado inicial |
+| Roadmap | Documentação | Definir prioridade do 4º recorte da Fase 5 |
