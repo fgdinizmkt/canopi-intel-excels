@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Fila de Fogo (Fire Queue) e Priorização Estratégica (Recorte 28 - Fase 7)
+
+**Objetivo:** Criar a seção "Fila de Fogo" para unificar sinais, radar relacional e memória histórica em recomendações acionáveis em lote.
+
+**Atividades:**
+- **Fire Queue:** Implementação do motor de recomendações "Next Best Play" com cruzamento de 3 vetores: Sinais Ativos, Radar Relacional e Inteligência Cumulativa.
+- **Categorização:** Mapeamento de Alertas Críticos, Gaps de Cobertura e Estratégias AI, cada um com lastro explícito em dados do `contasMock`.
+- **UX/UI:** Design orientado a urgência com paleta semântica (Red/Amber/Emerald) e micro-interações de ativação de play.
+- **Qualidade:** Validação de build limpo (Exit 0) com saneamento de entidades JSX.
+
+---
+
 ## [2026-04-02] — Inteligência Cumulativa e Insights Históricos (Recorte 27 - Fase 7)
 
 **Objetivo:** Adicionar seção de memória persistente da conta ao perfil, consumindo o campo `inteligencia{}`.
