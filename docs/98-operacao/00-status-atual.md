@@ -138,11 +138,11 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 8º Recorte da Fase 5 (frente a definir).
+- Iniciar o 9º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `Contacts.tsx` — requer decisão arquitetural prévia (página independente vs extensão de Contas)
-  2. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
-  3. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
+  1. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
+  2. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
+  3. Central de Playbooks — orquestração cross-channel corporativa
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---

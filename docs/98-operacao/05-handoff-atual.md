@@ -35,7 +35,6 @@
 
 ## Pendências / Backlog
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente — migração fora do escopo do 7º recorte.
-- **Contacts.tsx:** decisão arquitetural pendente (página independente vs extensão de Contas).
 - **ABMStrategy.tsx:** sem audit recente; maior arquivo do projeto; sem `AccountDetailContext`.
 - **ABXOrchestration.tsx:** sem `AccountDetailContext`; usa `abxData` próprio sem audit recente.
 
