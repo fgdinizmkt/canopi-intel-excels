@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último recorte concluído:** Saneamento de Dead Code (13º Recorte Fase 5)
-- **Último commit relevante:** `fef12eb` — refactor: remove dead code órfão de AbmStrategy após remoção do modal fictício (13º recorte)
+- **Último recorte concluído:** Saneamento de journeyTimeline (14º Recorte Fase 5)
+- **Último commit relevante:** `9af5011` — refactor: remove hardcoded journeyTimeline visualization from AbmStrategy (14º recorte)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -17,28 +17,23 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## O que foi entregue (13º Recorte — Saneamento de Dead Code)
-- 7 imports Lucide órfãos removidos: `Loader2`, `MoreVertical`, `Maximize2`, `TrendingDown`, `Building2`, `MousePointer2`, `Info`.
-- `AnimatePresence` removido de `motion/react` (usado apenas no modal excluído).
-- `scatterAccounts` removido (12 contas com scatter data x/y — exclusivo do modal).
-- `personas`, `hexVerticals` removidos (arrays do hexbin do modal).
-- `hexIntensityMap` removido (Record 10×10 de intensidades).
-- `getHexCellColor`, `channelByIntensity` removidos (helpers do hexbin).
-- `budgetAlloc`/`setBudgetAlloc`, `totalBudget` removidos (estado do modal de budget).
-- `Hexagon` removido (helper component SVG sem referência no JSX restante).
-- Total: `11 insertions(+), 74 deletions(-)` — zero impacto visual ou funcional.
+## O que foi entregue (14º Recorte — Saneamento de journeyTimeline)
+- `journeyTimeline` constant removido (7 linhas): hardcoded array com 5 estágios (Awareness, Engagement, MQA, Opportunity, Win) e contagens fictícias (142→85→24→12→5).
+- Visualização "Jornada de Contas (Funil ABM)" removida (23 linhas): card completo com progress bars animadas, badge "PROGRESSION" e footer "Velocity Index ABM (15% ACCEL.)".
+- Total: `0 insertions(+), 32 deletions(-)` — zero impacto visual ou funcional.
+- Justificativa: dados decorativos não derivados de fonte real; não alinhados com operacionalidade do cockpit.
 
 ---
 
 ## Próximos passos (Roadmap)
-1. Iniciar o **14º Recorte da Fase 5** (frente a definir).
+1. Iniciar o **15º Recorte da Fase 5** (frente a definir).
 2. Candidatos priorizados:
    - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs ainda intactos.
    - Central de Playbooks — orquestração cross-channel corporativa.
 3. ABX encerrado — sem dívidas imediatas.
 
 ## Pendências / Backlog
-- **AbmStrategy.tsx:** Saneamento de dead code concluído. IIFEs (~1000 linhas), `abmHeatmapAccounts`, `entryPlays`, `benchmarks`, `verticalClusters`, `journeyTimeline` — todos ainda ativos no render (fora do escopo do 13º recorte).
+- **AbmStrategy.tsx:** Saneamento de dead code e journeyTimeline concluído. IIFEs (~1000 linhas), `abmHeatmapAccounts`, `entryPlays`, `benchmarks`, `verticalClusters` — ainda ativos no render (escopo do 15º recorte e adiante).
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
 - **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução.
 - **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (aceito como estado definitivo).
