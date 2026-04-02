@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 14º Recorte: Saneamento de journeyTimeline em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Remoção de `journeyTimeline`: constant hardcoded com 5 estágios (Awareness, Engagement, MQA, Opportunity, Win) e contagens fictícias (142→85→24→12→5).
+- Remoção da visualização "Jornada de Contas (Funil ABM)": card completo com progress bars animadas, badge "PROGRESSION" e footer "Velocity Index ABM (15% ACCEL.)".
+- Justificativa: dados decorativos não derivados de fonte real (contasMock), sem função operacional no workflow ABM, baixo impacto (apenas 1 visualization block afetado).
+
+**Commits:**
+- `9af5011` — refactor: remove hardcoded journeyTimeline visualization from AbmStrategy (14º recorte)
+
+**PRs:** nenhum (commit direto em main)
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` passa de 1559 para 1527 linhas (32 linhas a menos).
+- Zero impacto visual ou funcional — componente continua operacional com todas as features principais intactas (heatmaps, tech-fit, TAL table, clusterização, organograma).
+- Continuação bem-sucida do saneamento de hardcodes não-operacionais.
+
+---
+
 ## 2026-04-02 — 13º Recorte: Saneamento de Dead Code em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

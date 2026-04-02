@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Saneamento de Dead Code — 13º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Saneamento de journeyTimeline — 14º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -175,6 +175,14 @@
 - `Hexagon` removido (helper component SVG sem referência no JSX)
 - Total: `11 insertions(+), 74 deletions(-)` — zero impacto visual ou funcional
 
+### Fase 5 — Décimo quarto recorte: Saneamento de journeyTimeline (2026-04-02)
+
+**AbmStrategy.tsx** — commit `9af5011`
+- Remoção de `journeyTimeline` constant (7 linhas): hardcoded array com 5 estágios (Awareness, Engagement, MQA, Opportunity, Win) e contagens fictícias.
+- Remoção da visualização "Jornada de Contas (Funil ABM)" (23 linhas): card com progress bars animadas, badge "PROGRESSION" e footer "Velocity Index ABM".
+- Total: `0 insertions(+), 32 deletions(-)` — zero impacto visual ou funcional.
+- Justificativa: dados decorativos não derivados de fonte real; não alinha com operacionalidade do cockpit.
+
 ---
 
 ## O que está em andamento
@@ -185,7 +193,7 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 14º Recorte da Fase 5 (frente a definir).
+- Iniciar o 15º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
   1. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
@@ -203,6 +211,7 @@ Nenhuma implementação funcional em andamento.
 | ABX Action Routes | 10º Recorte Concluído (fechado) | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
 | ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
 | Saneamento Dead Code | 13º Recorte Concluído | 8 imports órfãos, 5 constantes/helpers, 1 useState, 1 component — todos resíduos do modal removido |
+| Saneamento journeyTimeline | 14º Recorte Concluído | journeyTimeline constant + visualização "Jornada de Contas" removidas — dados decorativos não operacionais |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 14 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 15 — Frente a definir |
