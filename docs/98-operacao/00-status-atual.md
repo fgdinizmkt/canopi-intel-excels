@@ -191,4 +191,4 @@ Nenhuma implementação funcional em andamento.
 | ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 12 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 13 — Frente a definir |
