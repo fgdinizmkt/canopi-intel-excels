@@ -478,4 +478,75 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 **Resultado:**
 - A TAL Table de ABMStrategy agora exibe as contas reais do projeto ordenadas por `contasMock`
 - Clicar em qualquer conta na TAL abre o Centro de Comando com perfil completo — mesma UX das demais páginas da plataforma
+
+---
+
+## 2026-04-01 — 10º Recorte da Fase 5: ABX Action Routes + Dead Code
+
+**Commit de código:** `a52dd2e` — feat: ativa action routes e limpa dead code em abxorchestration
+**Arquivo:** `src/pages/ABXOrchestration.tsx`
+
+**Contexto:**
+- Arquivo de 1307 linhas com fonte de dados exclusiva: `compiladoClientesData` (abxData — Excel-derivado)
+- Sem `contasMock`, `advancedSignals` ou `AccountDetailContext`
+- Auditoria revelou: dead code de module scope (variáveis shadowed por versões locais do componente) e `ActionRoutesLayer` com `cursor-pointer` mas sem `onClick`
+- Incompatibilidade estrutural de IDs entre `processedAccounts` (abxData) e `contasMock` impede conexão ao `AccountDetailContext` sem mapeamento por nome — documentado no backlog
+
+**O que foi feito:**
+
+`ABXOrchestration.tsx`:
+- `ActionRoutesLayer` passou a receber prop `onSelect: (acc: any) => void`
+- Cards de conta internos ganharam `onClick={() => onSelect(acc)}` — agora funcionais
+- Na chamada do layer no componente principal: `onSelect={handleAccountSelect}` — reutiliza o modal 360° já existente
+- Dead code removido do module scope: `committeeRoles` (shadowed pelo local do componente), `pipelineByVertical` (idem), `channelInfluence` (idem), `funnelEvolution` (não referenciado em nenhum render)
+
+**Decisões:**
+- Não conectar ao `AccountDetailContext` — IDs de abxData são incompatíveis com `contasMock`; conexão por nome seria frágil e fora do escopo mínimo
+- `generatePeopleData`, `peopleData`, `Math.random()` mantidos — substituição requer fonte de dados de pessoas que não existe no projeto
+- `CommercialMemoryLayer`, `ContactActionsLayer`, `ContactOperationalFilaLayer` não tocados — botões sem handlers não eram o alvo do recorte
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings novos
+- `git diff --stat`: 1 arquivo, 3 insertions, 28 deletions
+- Working tree limpa antes do commit
+
+**Resultado:**
+- Cards de `ActionRoutesLayer` agora respondem ao clique e abrem o modal 360° com dados reais do abxData
+- Module scope do arquivo está mais limpo: 4 constantes dead code removidas sem impacto visual
 - Zero impacto em heatmaps, modais, scatter ou qualquer outra seção da página
+
+---
+
+## 2026-04-01 — 11º Recorte da Fase 5: Settings — Control Tower V1
+
+**Commit de código:** `75f3426` — feat: transforma settings em control tower v1
+**Arquivo:** `src/pages/Settings.tsx`
+
+**Contexto:**
+- O projeto possuía uma página de configurações genérica, dispersa entre regras de negócio desequilibradas (funil, roteamento) e falta de centro de governança.
+- A direção estratégica aprovada foi transformar a página no "Cockpit de Governança e Confiabilidade" do Canopi, servindo como monitor de saúde do workspace e da engine Nexus.
+
+**O que foi feito:**
+
+`src/pages/Settings.tsx`:
+- **Workspace Health (Hero)**: Implementação de um dashboard de status técnico no topo, com KPIs de integridade, latência do Nexus Core e status de sincrone (Healthy).
+- **Nexus Core Engine**: Bloco centralizado para orquestração da inteligência com ícone `BrainCircuit`. Inclui controle de agressividade preditiva e monitoramento da instância dedicada (Gemini 1.5 Pro).
+- **Data Governance**: Painel de integridade de fontes de dados (CRM, Apollo, Minerva, Ads) com indicadores visuais de confiabilidade por fluxo.
+- **Global Preferences**: Reestruturação enxuta para parâmetros corporativos (Moeda, Período Fiscal e Metas Globais do Workspace).
+- **Operational Guardrails**: Refino do bloco de notificações de criticidade, focado em alçadas de governança (P0, P1, P2) e roteamento de alertas operacionais.
+- **Limpeza de Escopo**: Remoção de blocos "Regras de Funil" e "Owner/Roteamento" do protagonismo do V1, priorizando a narrativa de Controle e Confiabilidade.
+
+**Decisões:**
+- Estética "Power Grid" mantida com alta densidade de informação e componentes premium.
+- Inclusão do contexto de auditoria/autorização administrativa no rodapé ("Fábio Diniz").
+- Preservação da funcionalidade dos inputs e switches existentes dentro da nova hierarquia.
+
+**Validação:**
+- Build `✓ Compiled successfully`.
+- First Load JS (Settings): 6.71 kB — eficiência preservada.
+- `git diff --stat`: 1 arquivo, 258 insertions, 136 deletions.
+
+**Resultado:**
+- O Canopi agora possui um terminal centralizado de Governança e Confiabilidade técnica.
+- A página de configurações transicionou de um formulário administrativo passivo para um cockpit operacional estratégico.
+- Próximo passo definido como 12º Recorte da Fase 5.

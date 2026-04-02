@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (ABM TAL Real Data — 9º Recorte Fase 5)
+`main` — atualizada em 2026-04-01 (Settings Control Tower V1 — 11º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -137,6 +137,15 @@
 - `useAccountDetail` e `contasMock` adicionados aos imports
 - IIFE, heatmaps, scatter, persona matrix, `openDetailedModal`, benchmarks, clusters, `journeyTimeline`, `entryPlays` mantidos intencionalmente fora do escopo
 
+### Fase 5 — Décimo recorte: ABX Action Routes + Dead Code (2026-04-01)
+
+**ABXOrchestration.tsx** — commit `a52dd2e`
+- Auditoria técnica completa: 1307 linhas, fonte exclusiva `compiladoClientesData` (abxData), sem `AccountDetailContext`
+- `ActionRoutesLayer` agora recebe prop `onSelect: (acc: any) => void`; cards de conta têm `onClick={() => onSelect(acc)}` → abre modal 360° interno (`handleAccountSelect`) ao clicar
+- Dead code removido do module scope: `pipelineByVertical`, `channelInfluence`, `committeeRoles` e `funnelEvolution` — todos confirmados como shadowed por versões locais do componente
+- `AccountDetailContext`, `generatePeopleData`, `peopleData`, `Math.random()`, heatmaps e bloco de pessoas mantidos intencionalmente fora do escopo
+- Incompatibilidade de IDs (abxData vs contasMock) documentada no backlog
+
 ---
 
 ## O que está em andamento
@@ -147,11 +156,11 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 10º Recorte da Fase 5 (frente a definir).
+- Iniciar o 12º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
-  2. Continuação do saneamento de `AbmStrategy.tsx` — IIFE, modais e benchmarks ainda hardcoded
-  3. Central de Playbooks — orquestração cross-channel corporativa
+  1. Continuação do saneamento de `AbmStrategy.tsx` — IIFE, modais e benchmarks ainda hardcoded
+  2. Central de Playbooks — orquestração cross-channel corporativa
+  3. `ABXOrchestration.tsx` — conexão final de pessoas (People Layer) com dados reais
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -163,5 +172,7 @@ Nenhuma implementação funcional em andamento.
 | Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
 | Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
 | ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
+| ABX Action Routes | 10º Recorte Concluído | ActionRoutesLayer conectado ao handleAccountSelect; dead code removido |
+| Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 10 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 12 — Frente a definir |
