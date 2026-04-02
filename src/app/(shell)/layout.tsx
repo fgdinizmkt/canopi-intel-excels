@@ -57,7 +57,7 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
                 className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all text-left group"
               >
                 <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-110 transition-transform">
-                  <type.icon className={`w-5 h-5 text-${type.color === 'brand' ? 'brand' : type.color + '-600'}`} />
+                   <type.icon key={i} className={`w-5 h-5 text-${type.color === 'brand' ? 'brand' : type.color + '-600'}`} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">{type.title}</h4>
@@ -73,7 +73,6 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
       </Modal>
-      <AccountDetailManager />
       </div>
     </AccountDetailProvider>
   );

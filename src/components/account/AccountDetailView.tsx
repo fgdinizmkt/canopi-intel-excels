@@ -138,11 +138,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={onToggleViewMode} className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400" title={isFullscreen ? 'Reduzir' : 'Expandir'}>
-              {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-            </button>
-            <button onClick={onClose} className="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors text-slate-400" title="Fechar">
-              <X className="w-5 h-5" />
+            <button 
+              onClick={onClose} 
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm group"
+              title="Voltar"
+            >
+              <X className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
+              Sair do Perfil
             </button>
           </div>
         </div>
