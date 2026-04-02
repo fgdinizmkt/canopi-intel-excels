@@ -2,11 +2,9 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- Último recorte concluído: 7º Recorte — Performance com dados reais
-- Último commit relevante: `165dc40` — feat: conecta performance a contas e sinais reais
-- **Data:** 2026-04-01
 - **Último recorte concluído:** Stakeholder Intelligence (Recorte 8)
-- **Último commit relevante:** `d8a184b`
+- **Último commit relevante:** `d8a184b` — feat: transforma contacts em radar transversal de stakeholders
+- **Data:** 2026-04-01
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
 ## Regras obrigatórias
