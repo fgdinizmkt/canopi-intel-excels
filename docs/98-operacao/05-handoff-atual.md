@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último recorte concluído:** Auditoria técnica de abmHeatmapAccounts (18º Recorte Fase 5)
-- **Último commit relevante:** `137fd17` — docs: registra conclusao do 18º recorte (auditoria tecnica de abmHeatmapAccounts)
+- **Último recorte concluído:** Auditoria técnica das IIFEs (19º Recorte Fase 5)
+- **Último commit relevante:** Documentação do 19º recorte (auditoria técnica das IIFEs, sem código)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -17,28 +17,36 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## O que foi entregue (18º Recorte — Auditoria Técnica de abmHeatmapAccounts)
+## O que foi entregue (19º Recorte — Auditoria Técnica das IIFEs)
 - **Tipo:** Auditoria técnica (research/validation, sem código alterado).
-- **Achado:** `abmHeatmapAccounts` não pode ser saneado com `contasMock` no estado atual.
-- **Motivo:** Ausência de campos numéricos exigidos (icp, crm, vp, ft, budget) em `contasMock`; volume insuficiente (3 contas vs. 12); dependência estrutural em 6+ pontos do código.
-- **Decisão:** `abmHeatmapAccounts` formalmente **BLOQUEADO** até que `contasMock` evolua.
+- **Achado:** As 2 IIFEs (linhas 288–850 e 859–1313, ~1016 linhas totais) estão estruturalmente consolidadas e não possuem slice pequeno/seguro para extração.
+- **Motivo:**
+  - Acoplamento de dados: `abmHeatmapAccounts` alimenta 10 visualizações (6 heatmaps + 4 matrix views)
+  - Acoplamento de estado: `hmTooltip`/`setHmTooltip` compartilhados entre IIFE 1 e IIFE 2
+  - Acoplamento de renderização: SVG heatmap + SVG matrix + 30+ action cards são interdependentes
+  - Tentativa de split resultaria em 8–10 props novos, 2 componentes intermediários, zero ganho de legibilidade
+- **Decisão:** IIFEs formalmente **FORA DO ESCOPO** de saneamento incremental da Fase 5. Refactor eventual só em Fase 6+ com separação de camadas.
 - **Total:** `0 insertions(+), 0 deletions(-)` — zero impacto no código; apenas documentação estratégica.
-- **Justificativa:** Evitar trabalho especulativo; documentar pré-requisitos mínimos para saneamento futuro.
+- **Justificativa:** Evitar refactor especulativo que deterioraria código sem ganho funcional ou de manutenção.
 
 ---
 
 ## Próximos passos (Roadmap)
-1. Iniciar o **19º Recorte da Fase 5** (frente a definir).
+1. Iniciar o **20º Recorte da Fase 5** (frente a definir).
 2. Candidatos priorizados:
-   - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs (~1000 linhas) ainda ativos.
-   - Central de Playbooks — orquestração cross-channel corporativa.
-3. **Bloqueio formal:** `abmHeatmapAccounts` saneável apenas após evolução de `contasMock` (pré-requisitos registrados).
+   - Central de Playbooks — orquestração cross-channel corporativa (PRIORIZADO).
+   - Refactor defensivo de helpers scoring (`getHmScore`, `getWeightedIcp`) — Fase 6+, não agora.
+3. **Bloqueios formais registrados:**
+   - `abmHeatmapAccounts` saneável apenas após evolução de `contasMock` (18º recorte).
+   - IIFEs de `AbmStrategy.tsx` fora do escopo incremental (19º recorte).
 4. ABX encerrado — sem dívidas imediatas.
 
 ## Pendências / Backlog
-- **AbmStrategy.tsx:** Saneamento de dead code, journeyTimeline, benchmarks, verticalClusters e entryPlays concluído. IIFEs (~1000 linhas) — ainda ativos no render (escopo do 19º recorte e adiante). **`abmHeatmapAccounts` — BLOQUEADO** (auditoria 18º recorte concluída: pré-requisitos = adicionar icp, crm, vp, ft, budget numéricos a contasMock + garantir 6-12 contas).
+- **AbmStrategy.tsx:** Saneamento de dead code, journeyTimeline, benchmarks, verticalClusters e entryPlays concluído.
+  - **`abmHeatmapAccounts` — BLOQUEADO (18º recorte):** Pré-requisitos = adicionar icp, crm, vp, ft, budget numéricos a contasMock + garantir 6-12 contas.
+  - **IIFEs (~1016 linhas) — BLOQUEADO (19º recorte):** Acoplamento estrutural em dados, estado e SVG; refactor eventual em Fase 6+.
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
-- **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução.
+- **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução. **CANDIDATO PRIORITÁRIO para 20º Recorte.**
 - **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (aceito como estado definitivo).
 
 ## Arquivos que sempre precisam ser lidos

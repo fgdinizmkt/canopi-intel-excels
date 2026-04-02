@@ -5,6 +5,42 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 19º Recorte: Auditoria Técnica das IIFEs em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Auditoria técnica completa das 2 IIFEs principais em `AbmStrategy.tsx` (linhas 288–850 e 859–1313).
+- **IIFE 1 (linhas 288–850, ~562 linhas):** Renderiza 6 heatmaps ABM (avg, icp, crm, vp, ct, ft) + 18 action cards + tooltip interativo.
+  - Dependências internas: `MiniActions` component, `actionCards` map, SVG rendering, state `hmTooltip`/`setHmTooltip`, helpers `getHmScore`, `getWeightedIcp`.
+  - Constantes: `abmHeatmapAccounts`, `abmHeatmapCriteria`.
+  - Refs a `abmHeatmapAccounts`: 5 pontos (linhas 293, 299–301, 459, 523, 766).
+- **IIFE 2 (linhas 859–1313, ~454 linhas):** Renderiza 4 matrix views (pos, pot, recept, access) + 12 action cards + scatter plot.
+  - Dependências internas: `matrixCardsMap` map, `getPositioningCharacteristic`, `getMatrixScore`, SVG scatter, state `hmTooltip`/`setHmTooltip`.
+  - Constantes: `abmHeatmapAccounts`.
+  - Refs a `abmHeatmapAccounts`: 1 ponto (linha 817).
+- **Acoplamento identificado:**
+  - Dados: `abmHeatmapAccounts` (12 contas fictícias) é fonte única para 10 visualizações diferentes
+  - Estado: `hmTooltip`/`setHmTooltip` compartilhados entre IIFE 1 (tooltip heatmap) e IIFE 2 (tooltip scatter)
+  - Helpers: `getHmScore`, `getWeightedIcp` isolados em IIFE 1 mas sem impacto cruzado
+  - Renderização: SVG heatmap + SVG matrix + action cards — nenhum slice pequeno é semanticamente independente
+- **Tentativa de extração avaliada:** Separar IIFE 1 ou IIFE 2 resultaria em mínimo 8–10 novos props, 4–6 helpers refatorados, 2 componentes intermediários, zero redução de linhas, piora de legibilidade.
+- **Decisão formal:** IIFEs são bloco estrutural consolidado — fora do escopo de saneamento incremental da Fase 5.
+- **Pré-requisito futuro:** Eventual refactor (Fase 6+) requereria separação de camadas: dados → cálculo → renderização. Não viável agora.
+
+**Commits:**
+- Nenhum commit de código — apenas documentação.
+
+**PRs:** nenhum
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` mantém integridade completa — nenhuma alteração visual ou funcional.
+- Bloqueio registrado formalmente previne trabalho especulativo no saneamento de IIFEs.
+- Escopo de Fase 5 reorientado: foco em Central de Playbooks ou novos recortes (20º em diante).
+- Caminho futuro documentado: IIFEs são candidatas a refactor apenas após consolidação de Fase 5.
+
+---
+
 ## 2026-04-02 — 18º Recorte: Auditoria Técnica de abmHeatmapAccounts em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

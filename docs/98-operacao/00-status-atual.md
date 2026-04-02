@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Auditoria técnica de abmHeatmapAccounts — 18º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Auditoria técnica das IIFEs de AbmStrategy — 19º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -218,10 +218,11 @@ Nenhuma implementação funcional em andamento.
 ## Próximo passo aprovado
 
 - **18º Recorte Concluído (Auditoria):** `abmHeatmapAccounts` auditado e formalmente BLOQUEADO.
-- Iniciar o 19º Recorte da Fase 5 (frente a definir).
+- **19º Recorte Concluído (Auditoria):** IIFEs de AbmStrategy auditadas e formalmente fora do escopo de saneamento incremental.
+- Iniciar o 20º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `AbmStrategy.tsx` — IIFEs (~1000 linhas) ainda ativos (saneamento continuado)
-  2. Central de Playbooks — orquestração cross-channel corporativa
+  1. Central de Playbooks — orquestração cross-channel corporativa
+  2. Refactor defensivo de helpers globais (`getHmScore`, `getWeightedIcp`, scoring) — Fase 6+
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -241,6 +242,7 @@ Nenhuma implementação funcional em andamento.
 | Saneamento verticalClusters | 16º Recorte Concluído | verticalClusters constant + "Clusterização ABM" removidas — dados fictícios, botões não funcionais |
 | Saneamento entryPlays | 17º Recorte Concluído | entryPlays constant + "Plays de Entrada Recomendados" removidas — dados fictícios, botões sem ação |
 | Auditoria abmHeatmapAccounts | 18º Recorte Concluído (Auditoria) | Bloqueado: ausência de campos numéricos em contasMock; dependência estrutural de 6 heatmaps identificada |
+| Auditoria IIFEs AbmStrategy | 19º Recorte Concluído (Auditoria) | Bloqueado: 2 IIFEs (~1000 linhas) acopladas em dados, estado e SVG rendering; fora do escopo de refactor incremental |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 19 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 20 — Frente a definir |
