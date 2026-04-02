@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (ABM Modal Fictício Removido — 12º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Saneamento de Dead Code — 13º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -162,6 +162,19 @@
 - `openAccount(acc.id)` na TAL Table preservado — único ponto de interação real
 - Toda estrutura visual, IIFEs, datasets, sliders e visualizações preservados intactos
 
+### Fase 5 — Décimo terceiro recorte: Saneamento de Dead Code (2026-04-02)
+
+**AbmStrategy.tsx** — commit `fef12eb`
+- 7 imports Lucide órfãos removidos: `Loader2`, `MoreVertical`, `Maximize2`, `TrendingDown`, `Building2`, `MousePointer2`, `Info`
+- `AnimatePresence` removido de `motion/react` (não referenciado após exclusão do modal)
+- `scatterAccounts` removido (scatter data exclusivo do modal — 12 contas fictícias)
+- `personas`, `hexVerticals` removidos (arrays do hexbin do modal)
+- `hexIntensityMap` removido (Record 10×10 de intensidades do hexbin)
+- `getHexCellColor`, `channelByIntensity` removidos (helpers do hexbin)
+- `budgetAlloc`/`setBudgetAlloc`, `totalBudget` removidos (estado do modal de budget)
+- `Hexagon` removido (helper component SVG sem referência no JSX)
+- Total: `11 insertions(+), 74 deletions(-)` — zero impacto visual ou funcional
+
 ---
 
 ## O que está em andamento
@@ -172,10 +185,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 13º Recorte da Fase 5 (frente a definir).
+- Iniciar o 14º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `AbmStrategy.tsx` — IIFEs, datasets hardcoded e benchmarks ainda intactos (saneamento continuado)
-  2. Central de Playbooks — orquestração cross-channel corporativa
+  1. Central de Playbooks — orquestração cross-channel corporativa
+  2. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -189,6 +202,7 @@ Nenhuma implementação funcional em andamento.
 | ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
 | ABX Action Routes | 10º Recorte Concluído (fechado) | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
 | ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
+| Saneamento Dead Code | 13º Recorte Concluído | 8 imports órfãos, 5 constantes/helpers, 1 useState, 1 component — todos resíduos do modal removido |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 13 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 14 — Frente a definir |

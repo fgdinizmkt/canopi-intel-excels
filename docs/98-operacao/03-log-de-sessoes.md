@@ -5,6 +5,32 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 13º Recorte: Saneamento de Dead Code em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Auditoria completa de `AbmStrategy.tsx` para identificar todos os resíduos órfãos deixados pela remoção do `openDetailedModal` no 12º recorte.
+- Remoção de 7 imports Lucide que só existiam no JSX do modal: `Loader2`, `MoreVertical`, `Maximize2`, `TrendingDown`, `Building2`, `MousePointer2`, `Info`.
+- Remoção de `AnimatePresence` de `motion/react` (usado apenas para animar o modal).
+- Remoção de `scatterAccounts` (array de 12 contas com coordenadas x/y para scatter plot do modal).
+- Remoção de `personas` e `hexVerticals` (arrays do hexbin interativo do modal).
+- Remoção de `hexIntensityMap` (Record 10×10 de intensidades do hexbin), `getHexCellColor` e `channelByIntensity` (helpers associados).
+- Remoção de `budgetAlloc`/`setBudgetAlloc` e `totalBudget` (estado do painel de budget allocation do modal).
+- Remoção do helper component `Hexagon` (SVG sem nenhuma referência no JSX restante).
+
+**Commits:**
+- `fef12eb` — refactor: remove dead code órfão de AbmStrategy após remoção do modal fictício (13º recorte)
+
+**PRs:** nenhum (commit direto em main)
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` passa de 1559 para 1486 linhas (73 linhas a menos).
+- Zero impacto visual ou funcional — todos os itens removidos eram código morto puro.
+- Arquivo mais limpo, menor bundle, sem estado fantasma em memória.
+
+---
+
 ## 2026-03-23 — Estado inicial
 
 **Commit base:** `b072ff2` — "Estado estável inicial da aplicação com ABM e ABX funcionando"
