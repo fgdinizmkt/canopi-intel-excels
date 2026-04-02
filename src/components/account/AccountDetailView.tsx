@@ -298,6 +298,87 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
           </div>
 
+          {/* ────── INSIGHTS HISTÓRICOS & LIÇÕES APRENDIDAS (RECORTE 27) ────── */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-amber-500" />
+              <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Inteligência Cumulativa e Memória Operacional</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Sucessos e Insucessos: O Fato Histórico */}
+              <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50 flex flex-col gap-4">
+                <div>
+                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Memória de Prospecção</span>
+                   <div className="space-y-3">
+                     {account.inteligencia.sucessos.map((s, i) => (
+                       <div key={i} className="flex gap-2 text-xs">
+                         <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                         <p className="text-slate-300 leading-relaxed">{s}</p>
+                       </div>
+                     ))}
+                     {account.inteligencia.insucessos.map((s, i) => (
+                       <div key={i} className="flex gap-2 text-xs opacity-60">
+                         <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-red-400" />
+                         <p className="text-slate-400 leading-relaxed line-through decoration-red-900/50 italic">{s}</p>
+                       </div>
+                     ))}
+                   </div>
+                </div>
+              </div>
+
+              {/* Padrões e Learnings: O Conhecimento Extraído */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 border border-blue-500/10 flex flex-col gap-4">
+                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-1">Padrões & Learnings</span>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Padrões Observados</p>
+                    <div className="space-y-2 text-xs text-slate-200 font-medium">
+                      {account.inteligencia.padroes.map((p, i) => (
+                        <div key={i} className="bg-blue-500/5 p-2 rounded-lg border border-blue-500/10 italic">
+                          &quot;{p}&quot;
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Lição Principal</p>
+                    <div className="flex items-center gap-3 bg-amber-500/5 p-2.5 rounded-xl border border-amber-500/10">
+                      <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <p className="text-xs text-amber-200/80 font-bold leading-tight">{account.inteligencia.learnings[0] || 'Sem learnings registrados.'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hipóteses e Recomendações: A Implicação operacional */}
+              <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50 flex flex-col gap-4">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Hipóteses de Destrave</span>
+                <div className="space-y-3">
+                  {account.inteligencia.hipoteses.map((h, i) => (
+                    <div key={i} className="p-3 rounded-xl bg-slate-900/30 border border-slate-800 flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <SparkleIcon className="w-3 h-3 text-blue-400" />
+                        <p className="text-xs font-bold text-slate-200">Hipótese #{i+1}</p>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-normal">{h}</p>
+                    </div>
+                  ))}
+                  {account.inteligencia.fatoresRecomendacao.length > 0 && (
+                     <div className="mt-2 pt-3 border-t border-slate-700/50">
+                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5">Fatores AI</p>
+                        <div className="flex flex-wrap gap-1.5">
+                           {account.inteligencia.fatoresRecomendacao.map((f, i) => (
+                             <span key={i} className="text-[8px] px-1.5 py-0.5 bg-slate-800 text-slate-500 rounded border border-slate-700">{f}</span>
+                           ))}
+                        </div>
+                     </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* ────── RADAR RELACIONAL (RECORTE 26) ────── */}
           <div className="p-6 bg-blue-500/5 rounded-[28px] border border-blue-500/10 shadow-lg">
             <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-5 flex items-center gap-3">
