@@ -65,6 +65,13 @@ export interface Conta {
   risco: number;
   prontidao: number;
   coberturaRelacional: number;
+  icp: number;
+  crm: number;
+  vp: number;
+  ct: number;
+  ft: number;
+  /** Valor absoluto em BRL (Reais) */
+  budgetBrl: number;
   ultimaMovimentacao: string;
   atividadeRecente: 'Alta' | 'Média' | 'Baixa';
   playAtivo: 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
@@ -139,6 +146,12 @@ export const contasMock: Conta[] = [
     atividadeRecente: 'Alta',
     playAtivo: 'Híbrido',
     statusGeral: 'Atenção',
+    icp: 94,
+    crm: 86,
+    vp: 88,
+    ct: 72,
+    ft: 90,
+    budgetBrl: 3200000,
     oportunidadePrincipal: 'Renovação multi-unidade 2026',
     possuiOportunidade: true,
     proximaMelhorAcao: 'Executar reunião executiva com VP de Operações e Sponsor de TI.',
@@ -210,7 +223,7 @@ export const contasMock: Conta[] = [
   {
     id: '2', slug: 'finaxis-tech', nome: 'Finaxis Tech', dominio: 'finaxis.io', vertical: 'Finanças', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'Curitiba, Brasil',
     ownerPrincipal: 'Rafael Prado', ownersSecundarios: ['Lia Azevedo'], etapa: 'Prospecção', tipoEstrategico: 'ABM', potencial: 86, risco: 22, prontidao: 71, coberturaRelacional: 48,
-    ultimaMovimentacao: '2026-03-27', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Saudável', oportunidadePrincipal: 'Primeiro contrato plataforma ops', possuiOportunidade: true,
+    ultimaMovimentacao: '2026-03-27', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 82, crm: 68, vp: 74, ct: 52, ft: 78, budgetBrl: 550000, oportunidadePrincipal: 'Primeiro contrato plataforma ops', possuiOportunidade: true,
     proximaMelhorAcao: 'Ativar campanha ABM focada em eficiência operacional do backoffice.', resumoExecutivo: 'Conta com fit relevante e sinais de interesse, ainda em fase inicial de relacionamento.',
     leituraFactual: ['2 reuniões de descoberta realizadas.', 'Champion técnico identificado.'], leituraInferida: ['Jornada deve acelerar com prova de caso no segmento financeiro.'], leituraSugerida: ['Executar play ABM de entrada com conteúdo por persona.'],
     sinais: [{ id:'s3', titulo:'Acesso recorrente ao case financeiro', tipo:'Tendência', impacto:'Médio', owner:'Rafael Prado', recomendacao:'Priorizar contato com diretoria de operações.', contexto:'3 acessos em 5 dias no material de caso.', data:'2026-03-25' }],
@@ -226,7 +239,7 @@ export const contasMock: Conta[] = [
   {
     id: '3', slug: 'logprime-supply', nome: 'LogPrime Supply', dominio: 'logprime.com', vertical: 'Logística', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Campinas, Brasil',
     ownerPrincipal: 'Daniel Moreira', ownersSecundarios: ['Ana Beatriz'], etapa: 'Renovação', tipoEstrategico: 'ABX', potencial: 74, risco: 79, prontidao: 58, coberturaRelacional: 39,
-    ultimaMovimentacao: '2026-03-30', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Crítico', oportunidadePrincipal: 'Renovação anual plataforma core', possuiOportunidade: true,
+    ultimaMovimentacao: '2026-03-30', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Crítico', icp: 70, crm: 42, vp: 38, ct: 34, ft: 65, budgetBrl: 1800000, oportunidadePrincipal: 'Renovação anual plataforma core', possuiOportunidade: true,
     proximaMelhorAcao: 'Executar plano de recuperação com sponsor alternativo e revisão de valor percebido.', resumoExecutivo: 'Conta com risco elevado de estagnação e baixa cobertura relacional em áreas críticas.',
     leituraFactual: ['2 ações atrasadas.', 'Queda de uso em módulo de planejamento.', 'Renovação vence em 65 dias.'], leituraInferida: ['Sem reforço executivo, chance de churn parcial aumenta.'], leituraSugerida: ['Ativar play ABX de retenção e expansão assistida.'],
     sinais: [{ id:'s4', titulo:'Queda de uso do módulo core', tipo:'Alerta', impacto:'Alto', owner:'Daniel Moreira', recomendacao:'Entrar com squad de adoção em 7 dias.', contexto:'Uso semanal caiu 27% no último mês.', data:'2026-03-30' }],
