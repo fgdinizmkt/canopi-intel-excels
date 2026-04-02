@@ -251,6 +251,58 @@ export const contasMock: Conta[] = [
     abx: { motivo:'Conta de base instalada em risco de renovação.', evolucaoJornada:'Piloto > adoção > risco de retração.', maturidadeRelacional:'Média-baixa', sponsorAtivo:'Ausente no último ciclo', profundidadeComite:'Baixa', continuidade:'Ameaçada', expansao:'Congelada', retencao:'Prioridade máxima', riscoEstagnacao:'Alto' },
     inteligencia: { sucessos:['Picos de adoção após treinamentos dirigidos.'], insucessos:['Sem sponsor ativo houve travamento de roadmap.'], padroes:['Contas com baixa cobertura financeira renovam com desconto agressivo.'], learnings:['Plano de valor contínuo precisa envolver diretoria.'], hipoteses:['Comitê quinzenal de valor reduz risco em 20 p.p.'], fatoresRecomendacao:['Risco elevado','Cobertura relacional baixa','Renovação próxima'] },
     historico:[{data:'2026-03-30', tipo:'Sinal', descricao:'Queda de uso detectada no módulo core.'}]
+  },
+  {
+    id: '4', slug: 'alphabank-sa', nome: 'AlphaBank S.A.', dominio: 'alphabank.com.br', vertical: 'Financeiro', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
+    ownerPrincipal: 'Beatriz Lima', ownersSecundarios: ['Rafael Prado'], etapa: 'Prospecção', tipoEstrategico: 'ABM', potencial: 88, risco: 15, prontidao: 82, coberturaRelacional: 74,
+    ultimaMovimentacao: '2026-04-01', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 87, crm: 45, vp: 82, ct: 78, ft: 84, budgetBrl: 4200000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Apresentar diagnóstico de AI Readiness para diretoria executiva.', resumoExecutivo: 'Conta estratégica com alto fit e budget mapeado, aguardando validação de roadmap.',
+    leituraFactual: ['Budget de R$ 4.2M identificado.', 'Alta atividade em materiais de IA.'], leituraInferida: ['Momento ideal para entrada com oferta de governança.'], leituraSugerida: ['Ativar play ABM de entrada consultiva.'],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'MQL Consultivo', influencias: [] },
+    abm: { motivo: 'Fit ICP excelente.', fit: 'Alto', cluster: 'Financeiro Top', similaridade: '92%', coberturaInicialComite: '74%', playsEntrada: [], potencialAbertura: 'Altíssimo', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    historico: []
+  },
+  {
+    id: '5', slug: 'novasaude-global', nome: 'NovaSaude', dominio: 'novasaude.com', vertical: 'Saúde', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
+    ownerPrincipal: 'Lia Azevedo', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 74, risco: 28, prontidao: 70, coberturaRelacional: 55,
+    ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 72, crm: 80, vp: 68, ct: 55, ft: 70, budgetBrl: 1850000, possuiOportunidade: true,
+    proximaMelhorAcao: 'Mapear decisores técnicos na filial sul.', resumoExecutivo: 'Conta com bom engajamento em marketing, mas com DMU ainda fragmentado.',
+    leituraFactual: ['Engajamento CRM de 80%.', '1 oportunidade em qualificação.'], leituraInferida: ['Possibilidade de expansão via cross-sell precoce.'], leituraSugerida: ['Reforçar cobertura de contatos via LinkedIn.'],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [] },
+    abm: { motivo: 'Vertical prioritária.', fit: 'Médio-alto', cluster: 'Healthcare Enterprise', similaridade: '78%', coberturaInicialComite: '55%', playsEntrada: [], potencialAbertura: 'Médio', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    historico: []
+  },
+  {
+    id: '6', slug: 'mobilitypro-sa', nome: 'MobilityPro', dominio: 'mobilitypro.com.br', vertical: 'Mobilidade', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'Belo Horizonte, Brasil',
+    ownerPrincipal: 'Marcos Oliveira', ownersSecundarios: [], etapa: 'Descoberta', tipoEstrategico: 'ABM', potencial: 50, risco: 40, prontidao: 48, coberturaRelacional: 40,
+    ultimaMovimentacao: '2026-03-25', atividadeRecente: 'Baixa', playAtivo: 'Nenhum', statusGeral: 'Atenção', icp: 45, crm: 35, vp: 60, ct: 40, ft: 48, budgetBrl: 600000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Iniciar sequência de reativação.', resumoExecutivo: 'Conta fria com histórico de interesse em 2025, precisando de nova abordagem.',
+    leituraFactual: ['Atividade recente baixa.', 'Sem oportunidade aberta.'], leituraInferida: ['Risco de perda de timing comercial.'], leituraSugerida: ['Lançar play de reengajamento.'],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Inbound Antigo', influencias: [] },
+    abm: { motivo: 'Potencial de vertical alto.', fit: 'Baixo-médio', cluster: 'Mobilidade Mid', similaridade: '45%', coberturaInicialComite: '40%', playsEntrada: [], potencialAbertura: 'Baixo', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    historico: []
+  },
+  {
+    id: '7', slug: 'agrocloud-sa', nome: 'AgroCloud', dominio: 'agrocloud.com', vertical: 'Agronegócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiânia, Brasil',
+    ownerPrincipal: 'Ricardo Santos', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 65, risco: 20, prontidao: 60, coberturaRelacional: 30,
+    ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 78, crm: 70, vp: 85, ct: 30, ft: 60, budgetBrl: 2100000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Identificar champion na área de tecnologia agrícola.', resumoExecutivo: 'Conta em vertical de alta tração com sinais fortes de expansão de budget tech.',
+    leituraFactual: ['Vertical Potencial de 85%.', 'Baixa cobertura de contatos (30%).'], leituraInferida: ['Grande GAP de mapeamento, mas alto interesse técnico.'], leituraSugerida: ['Executar play de mapeamento de DMU.'],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Field Marketing', influencias: [] },
+    abm: { motivo: 'Liderança em vertical Agro.', fit: 'Médio', cluster: 'Agro Global', similaridade: '65%', coberturaInicialComite: '30%', playsEntrada: [], potencialAbertura: 'Médio-alto', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    historico: []
   }
 ];
 

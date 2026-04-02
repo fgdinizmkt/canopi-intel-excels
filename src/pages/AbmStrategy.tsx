@@ -61,22 +61,7 @@ import { contasMock } from '../data/accountsData';
 
 
 
-// ---- 6 ABM HEATMAPS DATA ----
-const abmHeatmapAccounts = [
-  // name, vertical, importance(y), icp, crm, verticalPot, contacts, fit, budget(R$k mapeado da base ABM)
-  { id: 1,  name: 'AlphaBank S.A.',    vertical: 'Financeiro',  imp: 88, icp: 87, crm: 45, vp: 82, ct: 78, ft: 84, budget: 420 },
-  { id: 2,  name: 'NovaSaude',         vertical: 'Saúde',       imp: 74, icp: 72, crm: 80, vp: 68, ct: 55, ft: 70, budget: 185 },
-  { id: 3,  name: 'PaperTech Ind.',    vertical: 'Indústria',   imp: 60, icp: 58, crm: 62, vp: 75, ct: 90, ft: 55, budget: 90  },
-  { id: 4,  name: 'MobilityPro',       vertical: 'Mobilidade',  imp: 50, icp: 45, crm: 35, vp: 60, ct: 40, ft: 48, budget: 60  },
-  { id: 5,  name: 'AgroCloud',         vertical: 'Agronegócio', imp: 65, icp: 78, crm: 70, vp: 85, ct: 30, ft: 60, budget: 210 },
-  { id: 6,  name: 'TelecomMax',        vertical: 'Telecom',     imp: 80, icp: 82, crm: 90, vp: 55, ct: 65, ft: 77, budget: 310 },
-  { id: 7,  name: 'SeguraVida',        vertical: 'Seguros',     imp: 55, icp: 55, crm: 48, vp: 52, ct: 72, ft: 50, budget: 130 },
-  { id: 8,  name: 'RetailTech',        vertical: 'Varejo',      imp: 42, icp: 38, crm: 55, vp: 40, ct: 35, ft: 38, budget: 45  },
-  { id: 9,  name: 'EduVision',         vertical: 'Educação',   imp: 35, icp: 30, crm: 28, vp: 45, ct: 20, ft: 32, budget: 30  },
-  { id: 10, name: 'InfraBuild',        vertical: 'Construção',  imp: 70, icp: 65, crm: 60, vp: 70, ct: 85, ft: 62, budget: 160 },
-  { id: 11, name: 'FinPay Brasil',     vertical: 'Fintech',     imp: 85, icp: 90, crm: 85, vp: 78, ct: 60, ft: 88, budget: 380 },
-  { id: 12, name: 'EnergyCore',        vertical: 'Energia',     imp: 62, icp: 50, crm: 42, vp: 90, ct: 48, ft: 56, budget: 250 },
-];
+// ---- HEATMAP CRITERIA DEFINITION ----
 const abmHeatmapCriteria = [
   {
     id: 'icp',
@@ -85,7 +70,7 @@ const abmHeatmapCriteria = [
     xLabel: 'SCORE ICP',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Eixo X = aderência ao perfil ideal de cliente. Eixo Y = importância estratégica da conta. Contas no quadrante superior direito são prioridade máxima de abordagem.',
-    desc: (a: typeof abmHeatmapAccounts[0]) =>
+    desc: (a: any) =>
       `ICP ${a.icp}% — ${a.icp >= 75 ? 'Alta aderência ao perfil ideal. Prioridade máxima de abordagem.' : a.icp >= 50 ? 'Aderência moderada. Qualificar antes de avançar.' : 'Fora do perfil. Manter em nurturing passivo.'}`,
     scoreKey: 'icp' as const,
   },
@@ -96,7 +81,7 @@ const abmHeatmapCriteria = [
     xLabel: 'NÍVEL DE ENGAJAMENTO',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Eixo X = volume de interações registradas no CRM (calls, e-mails, demos). Eixo Y = relevância da conta. Contas acima de 70% de engajamento devem ser ativadas via SDR imediatamente.',
-    desc: (a: typeof abmHeatmapAccounts[0]) =>
+    desc: (a: any) =>
       `Engajamento ${a.crm}% — ${a.crm >= 70 ? 'Conta ativa com múltiplas interações. Acionar SDR imediatamente.' : a.crm >= 45 ? 'Engajamento médio. Intensificar conteúdo 1:1.' : 'Conta fria. Iniciar reativação com campanha de reconhecimento.'}`,
     scoreKey: 'crm' as const,
   },
@@ -107,7 +92,7 @@ const abmHeatmapCriteria = [
     xLabel: 'POTENCIAL DE MERCADO',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Cada bolha representa uma vertical de mercado. Eixo X = potencial de expansão e TAM da vertical. Eixo Y = peso estratégico. Verticais no quadrante quente indicam onde concentrar budget de marketing.',
-    desc: (a: typeof abmHeatmapAccounts[0]) =>
+    desc: (a: any) =>
       `Vertical ${a.vp}% — ${a.vp >= 75 ? 'Vertical de alta tração. Há benchmarks e cases aplicáveis.' : a.vp >= 50 ? 'Potencial moderado. Desenvolver case específico.' : 'Vertical emergente. Avaliar ROI antes de investir.'}`,
     scoreKey: 'vp' as const,
   },
@@ -118,7 +103,7 @@ const abmHeatmapCriteria = [
     xLabel: 'COBERTURA DE CONTATOS',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Eixo X = cobertura do DMU (Decision Making Unit) — percentual de stakeholders mapeados na conta. Priorize contas estratégicas com baixa cobertura: maior gap, maior oportunidade de expansão.',
-    desc: (a: typeof abmHeatmapAccounts[0]) =>
+    desc: (a: any) =>
       `Contatos ${a.ct}% — ${a.ct >= 75 ? 'DMU bem mapeado. Champion e Decisor identificados.' : a.ct >= 45 ? 'Contatos parciais. Expandir rede via LinkedIn Sales Nav.' : 'Poucos contatos. Estratégia de entrada via eventos ou parceiros.'}`,
     scoreKey: 'ct' as const,
   },
@@ -129,7 +114,7 @@ const abmHeatmapCriteria = [
     xLabel: 'FIT CANOPI',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Eixo X = alinhamento da conta com o stack tecnológico, maturidade analítica e timing comercial da Canopi. Contas com fit alto e importância alta são candidatas a fast-track no pipeline.',
-    desc: (a: typeof abmHeatmapAccounts[0]) =>
+    desc: (a: any) =>
       `Fit ${a.ft}% — ${a.ft >= 75 ? 'Fit excelente. Stack tecnológica e maturidade analítica alinhadas.' : a.ft >= 50 ? 'Fit parcial. Identificar gaps e propor roadmap gradual.' : 'Fit baixo. Considerar parceiros integradores antes de avançar.'}`,
     scoreKey: 'ft' as const,
   },
@@ -140,17 +125,18 @@ const abmHeatmapCriteria = [
     xLabel: 'SCORE CONSOLIDADO',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
     note: 'Score composto = média de ICP, Engajamento CRM, Potencial da Vertical, Contatos Mapeados e Fit Canopi. Contas acima de 72% são classificadas como TOP TIER e recebem SDR + AE dedicados.',
-    desc: (a: typeof abmHeatmapAccounts[0]) => {
+    desc: (a: any) => {
       const avg = Math.round((a.icp + a.crm + a.vp + a.ct + a.ft) / 5);
       return `Média ${avg}% — ${avg >= 72 ? 'TOP TIER: Alocar SDR + AE dedicados. Iniciar play imediatamente.' : avg >= 55 ? 'MID TIER: Incluir em sequência nurturing avançada.' : 'LOW TIER: Manter em watch list e reavaliar em 90 dias.'}`;
     },
     scoreKey: 'avg' as const,
   },
 ];
+
 // Helper to get score for 'avg'
-const getHmScore = (acc: typeof abmHeatmapAccounts[0], key: string): number => {
+const getHmScore = (acc: any, key: string): number => {
   if (key === 'avg') return Math.round((acc.icp + acc.crm + acc.vp + acc.ct + acc.ft) / 5);
-  return acc[key as keyof typeof acc] as number;
+  return acc[key];
 };
 
 export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
@@ -160,6 +146,22 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [icpWeights, setIcpWeights] = useState({ receita: 30, stack: 25, equipe: 20, setor: 25 });
 
   const { openAccount } = useAccountDetail();
+
+  // Camada Derivada: Transforma contasMock para o formato do Heatmap
+  const abmHeatmapAccounts = useMemo(() => {
+    return contasMock.map(c => ({
+      id:       c.id,
+      name:     c.nome,
+      vertical: c.vertical,
+      imp:      c.potencial, // Usamos potencial como prox de importância estratégica (eixo Y)
+      icp:      c.icp,
+      crm:      c.crm,
+      vp:       c.vp,
+      ct:       c.ct,
+      ft:       c.ft,
+      budget:   Math.round(c.budgetBrl / 1000) // Converte BRL absoluto para k para UI
+    }));
+  }, []);
 
   // TAL Table derivada de contasMock
   const abmAccounts = useMemo(() => {
@@ -177,7 +179,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   }, []);
 
   // Score ICP ponderado pelos pesos configurados (normalizado 0-100)
-  const getWeightedIcp = (acc: typeof abmHeatmapAccounts[0]) => {
+  const getWeightedIcp = (acc: any) => {
     const base = acc.icp;
     const weightedDelta = ((icpWeights.receita - 30) * 0.4 + (icpWeights.stack - 25) * 0.3 + (icpWeights.equipe - 20) * 0.2 + (icpWeights.setor - 25) * 0.3) / 10;
     return Math.max(1, Math.min(99, Math.round(base + weightedDelta)));
@@ -211,11 +213,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
         <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100 z-10">
            <div className="px-6 py-2 text-center border-r border-slate-200">
               <p className="text-[9px] font-bold text-slate-400 uppercase">Target Accounts</p>
-              <p className="text-lg font-bold text-slate-900">142</p>
+              <p className="text-lg font-bold text-slate-900">{contasMock.length}</p>
            </div>
            <div className="px-6 py-2 text-center">
               <p className="text-[9px] font-bold text-slate-400 uppercase">Health Score</p>
-              <p className="text-lg font-bold text-emerald-600">8.4/10</p>
+              <p className="text-lg font-bold text-emerald-600">{(contasMock.reduce((acc, c) => acc + c.prontidao, 0) / (contasMock.length * 10)).toFixed(1)}/10</p>
            </div>
            <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none">Refinar TAL</Button>
         </div>
@@ -763,7 +765,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         {/* Grid lines 4x4 */}
                         {[1,2,3].map(i => <line key={`v${i}`} x1={i*200} y1="0" x2={i*200} y2="500" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />)}
                         {[1,2,3].map(i => <line key={`h${i}`} x1="0" y1={i*125} x2="800" y2={i*125} stroke="rgba(255,255,255,0.18)" strokeWidth="1" />)}
-                        {abmHeatmapAccounts.map((acc) => {
+                        {abmHeatmapAccounts.map((acc, i) => {
                           const score = criterion.scoreKey === 'icp' ? getWeightedIcp(acc) : getHmScore(acc, criterion.scoreKey);
                           const cx = 28 + (score / 100) * 744;
                           const cy = 470 - (acc.imp / 100) * 440;
@@ -779,7 +781,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           const labelW = Math.min(shortLabel.length * 5.5 + 12, 90);
 
                           // Alterna posição do callout (acima/abaixo) para minimizar sobreposição
-                          const above = acc.id % 2 === 1;
+                          const above = i % 2 === 1;
                           const lineY1 = above ? cy - 12 : cy + 12;
                           const lineY2 = above ? cy - 28 : cy + 28;
                           const labelY = above ? lineY2 - 12 : lineY2 + 1;
@@ -814,7 +816,9 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         <text x="14" y="250" textAnchor="middle" fill="rgba(255,255,255,0.65)" fontSize="10" fontWeight="700" fontFamily="sans-serif" letterSpacing="3" transform="rotate(-90,14,250)">{criterion.yLabel}</text>
                         {/* Tooltip — apenas para este heatmap */}
                         {hmTooltip && hmTooltip.criterionId === criterion.id && (() => {
-                          const tipTemp = (hmTooltip.score + abmHeatmapAccounts.find(a => a.name === hmTooltip.name)!.imp) / 2;
+                          const targetAcc = abmHeatmapAccounts.find(a => a.name === hmTooltip.name);
+                          const imp = targetAcc ? targetAcc.imp : 50;
+                          const tipTemp = (hmTooltip.score + imp) / 2;
                           const tipColor = tipTemp >= 78 ? '#e74c3c' : tipTemp >= 62 ? '#f39c12' : tipTemp >= 46 ? '#d4ac0d' : '#27ae60';
                           return (
                             <g transform={`translate(${Math.min(hmTooltip.x + 14, 610)}, ${hmTooltip.y > 380 ? hmTooltip.y - 130 : hmTooltip.y + 14})`}>
