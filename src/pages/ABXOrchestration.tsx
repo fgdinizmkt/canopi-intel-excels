@@ -177,32 +177,7 @@ const bigNumbers = calculateBigNumbers(processedAccounts);
 
 // --- MOCK DATA FOR ORCHESTRATION ---
 
-const committeeRoles = ['Sponsor Executivo', 'Técnico', 'Usuário Final', 'Operações', 'Financeiro', 'Segurança', 'Procurement', 'Champion'];
 const orchestrationChannels = ['SDR / Outbound', 'Email', 'LinkedIn', 'Paid Media', 'Content', 'Events', 'Website', 'Exec Sync', 'Product', 'CS Touch'];
-
-const pipelineByVertical = [
-  { name: 'Varejo', open: 450, won: 120, lost: 30, expansion: 210, risk: 45 },
-  { name: 'Indústria', open: 320, won: 450, lost: 80, expansion: 340, risk: 120 },
-  { name: 'Saúde', open: 580, won: 200, lost: 40, expansion: 150, risk: 20 },
-  { name: 'Financeiro', open: 890, won: 600, lost: 110, expansion: 450, risk: 85 },
-  { name: 'Telecom', open: 210, won: 340, lost: 20, expansion: 120, risk: 10 },
-  { name: 'Energia', open: 150, won: 80, lost: 15, expansion: 90, risk: 35 },
-];
-
-const funnelEvolution = [
-  { date: 'Jan', advance: 12, regress: 2, stay: 45 },
-  { date: 'Fev', advance: 18, regress: 4, stay: 40 },
-  { date: 'Mar', advance: 24, regress: 1, stay: 35 },
-];
-
-const channelInfluence = [
-  { name: 'Outbound', value: 35 },
-  { name: 'Email', value: 20 },
-  { name: 'LinkedIn', value: 15 },
-  { name: 'Paid Media', value: 15 },
-  { name: 'Net Relationship', value: 10 },
-  { name: 'CS Signals', value: 5 },
-];
 
 const coordinatedTimeline = [
   { id: 1, account: 'Global Bank S.A.', type: 'Exec Sync', action: 'Reunião estratégica com VP de TI confirmada', owner: 'Rafael Mendes', time: 'Há 2h', icon: <Users className="w-3.5 h-3.5" /> },
@@ -453,7 +428,7 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
   </div>
 );
 
-const ActionRoutesLayer: React.FC<{ accounts: any[] }> = ({ accounts }) => {
+const ActionRoutesLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => void }> = ({ accounts, onSelect }) => {
   const routes = [
     { id: 'upsell', title: 'Acelerar Upsell', icon: <TrendingUp className="w-5 h-5" />, color: 'emerald', accounts: accounts.filter(a => a.actionRoute === 'Acelerar Upsell').slice(0, 2) },
     { id: 'cross', title: 'Acelerar Cross-sell', icon: <ShoppingBag className="w-5 h-5" />, color: 'blue', accounts: accounts.filter(a => a.actionRoute === 'Acelerar Cross-sell').slice(0, 2) },
@@ -471,7 +446,7 @@ const ActionRoutesLayer: React.FC<{ accounts: any[] }> = ({ accounts }) => {
           </div>
           <div className="space-y-4">
             {route.accounts.map((acc, idx) => (
-              <div key={idx} className="p-4 bg-slate-50 rounded-2xl space-y-3 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 group/item">
+              <div key={idx} className="p-4 bg-slate-50 rounded-2xl space-y-3 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 group/item" onClick={() => onSelect(acc)}>
                 <div className="flex justify-between items-start">
                   <p className="text-[11px] font-black text-slate-900 truncate pr-2">{acc.name}</p>
                   <Badge variant={route.color as any} className="text-[8px] font-black uppercase px-2 py-0 border-none bg-opacity-20">{acc.score}</Badge>
@@ -1238,7 +1213,7 @@ export const ABXOrchestration: React.FC = () => {
         <HeroLayer hotUpsell={hotUpsell} highRiskChurn={highRiskChurn} bigNumbers={bigNumbers} />
 
         {/* LAYER 3: INTERVENTION ROUTES (NEW) */}
-        <ActionRoutesLayer accounts={processedAccounts} />
+        <ActionRoutesLayer accounts={processedAccounts} onSelect={handleAccountSelect} />
 
         {/* LAYER 4: PIPELINE 360° */}
         <Pipeline360Layer pipelineData={pipelineByVertical} channelData={channelInfluence} />
