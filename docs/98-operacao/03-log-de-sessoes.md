@@ -441,3 +441,41 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - A plataforma agora possui uma camada de inteligência política transversal.
 - O custo de navegação para entender um stakeholder importante em qualquer conta foi reduzido ao clique mínimo.
 - Próximo passo definido como nova frente de refino (Recorte 9).
+
+---
+
+## 2026-04-01 — 9º Recorte da Fase 5: ABM TAL Real Data
+
+**Commit:** `1fda339` — feat: conecta tal de abmstrategy ao centro de comando
+
+**Arquivo alterado:**
+- `src/pages/AbmStrategy.tsx`
+
+**Contexto:**
+- `AbmStrategy.tsx` é o maior arquivo do projeto (2627 linhas), com três listas de contas fictícias (`abmAccounts`, `scatterAccounts`, `abmHeatmapAccounts`) totalmente desconectadas de `contasMock`.
+- Auditoria técnica completa realizada antes da implementação — identificou a TAL Table como o único bloco com equivalente canônico direto em `contasMock` e ponto de acoplamento correto com o `AccountDetailContext`.
+- A IIFE (~1000 linhas), a função `openDetailedModal` (~1080 linhas, 20 cases), os heatmaps, scatter, persona matrix, benchmarks, clusters e entry plays foram mantidos fora do escopo por risco de regressão.
+
+**O que foi feito:**
+
+`AbmStrategy.tsx`:
+- Array `abmAccounts` hardcoded (12 empresas fictícias) removido do escopo de módulo
+- Adicionados imports: `useAccountDetail` e `contasMock`
+- `const { openAccount } = useAccountDetail()` adicionado dentro do componente
+- `useMemo` derivando `abmAccounts` de `contasMock`: `nome→name`, iniciais derivadas das primeiras letras de cada palavra, `vertical→vertical`, `prontidao/10→fitScore`, `prontidao→engagement`, `statusGeral→status` (`Crítico→HOT / Atenção→PLAYBOOK / Saudável→MAPEANDO`), `prontidao>70→mqa`
+- TAL Table row click: `openDetailedModal('ACCOUNT', acc)` → `openAccount(acc.id)` — agora abre o Centro de Comando com o perfil real da conta em vez de modal fictício
+
+**Decisões:**
+- Apenas `abmAccounts` substituído — único array com equivalente canônico direto em `contasMock`
+- `scatterAccounts` e `abmHeatmapAccounts` mantidos hardcoded — dados aspiracionais sem fonte equivalente no projeto
+- A IIFE não foi tocada — risco de cascata em todas as 6 visualizações simultâneas
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings novos
+- `git diff --stat`: 1 arquivo, 21 insertions, 15 deletions
+- Working tree limpa antes do commit
+
+**Resultado:**
+- A TAL Table de ABMStrategy agora exibe as contas reais do projeto ordenadas por `contasMock`
+- Clicar em qualquer conta na TAL abre o Centro de Comando com perfil completo — mesma UX das demais páginas da plataforma
+- Zero impacto em heatmaps, modais, scatter ou qualquer outra seção da página

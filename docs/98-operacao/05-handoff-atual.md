@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último recorte concluído:** Stakeholder Intelligence (Recorte 8)
-- **Último commit relevante:** `d8a184b` — feat: transforma contacts em radar transversal de stakeholders
+- **Último recorte concluído:** ABM TAL Real Data (Recorte 9)
+- **Último commit relevante:** `1fda339` — feat: conecta tal de abmstrategy ao centro de comando
 - **Data:** 2026-04-01
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -18,24 +18,24 @@
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## O que foi entregue nesta sessão
-- Transformação de `Contacts.tsx` em Radar Transversal de Inteligência.
-- Expansão do `AccountDetailContext` para suportar `selectedContactId` global.
-- Implementação de Deep Link direto entre o Radar de Contatos e o Centro de Comando.
-- Sincronismo de profundidade: abertura da conta já focada no perfil do contato (Fase 3).
+- Auditoria técnica de `AbmStrategy.tsx` (2627 linhas, maior arquivo do projeto).
+- Substituição do array `abmAccounts` hardcoded por derivação real de `contasMock` via `useMemo`.
+- Conexão da TAL Table ao `AccountDetailContext`: clique em conta abre o Centro de Comando.
+- IIFE, heatmaps, scatter, modais e benchmarks mantidos intencionalmente fora do escopo.
 
 ---
 
 ## Próximos passos (Roadmap)
-1. Iniciar o 9º Recorte da Fase 5 (frente a definir).
+1. Iniciar o 10º Recorte da Fase 5 (frente a definir).
 2. Candidatos priorizados:
-   - Auditoria de `ABMStrategy.tsx` (maior risco de dívida técnica).
-   - `ABXOrchestration.tsx` (unificação com AccountDetailContext).
-   - Central de Playbooks (orquestração cross-channel).
+   - `ABXOrchestration.tsx` (sem `AccountDetailContext`, usa `abxData` próprio sem audit recente).
+   - Continuação do saneamento de `AbmStrategy.tsx` (IIFE, modais e benchmarks ainda hardcoded).
+   - Central de Playbooks (orquestração cross-channel corporativa).
 3. Manter a estética premium e a densidade operacional nos próximos refinos.
 
 ## Pendências / Backlog
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente — migração fora do escopo do 7º recorte.
-- **ABMStrategy.tsx:** sem audit recente; maior arquivo do projeto; sem `AccountDetailContext`.
+- **AbmStrategy.tsx:** TAL conectada. IIFE (~1000 linhas), `openDetailedModal` (20 cases, ~1080 linhas), benchmarks, clusters e scatter ainda hardcoded — fora do escopo do 9º recorte.
 - **ABXOrchestration.tsx:** sem `AccountDetailContext`; usa `abxData` próprio sem audit recente.
 
 ## Arquivos que sempre precisam ser lidos

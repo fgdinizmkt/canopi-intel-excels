@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Stakeholder Intelligence — 8º Recorte Fase 5)
+`main` — atualizada em 2026-04-01 (ABM TAL Real Data — 9º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -128,6 +128,15 @@
 - Heurísticas reais: Identificação de Sponsors em risco e metas de cobertura por conta.
 - Eliminação de CRUD estático em favor de inteligência operacional dinâmica.
 
+### Fase 5 — Nono recorte: ABM TAL Real Data (2026-04-01)
+
+**AbmStrategy.tsx** — commit `1fda339`
+- Array `abmAccounts` hardcoded (12 empresas fictícias) removido do escopo de módulo
+- `abmAccounts` agora derivado de `contasMock` via `useMemo`: `nome→name`, iniciais derivadas, `vertical→vertical`, `prontidao/10→fitScore`, `prontidao→engagement`, `statusGeral→status` (Crítico→HOT / Atenção→PLAYBOOK / Saudável→MAPEANDO), `prontidao>70→mqa`
+- Clique na TAL Table: `openDetailedModal('ACCOUNT', acc)` substituído por `openAccount(acc.id)` — agora abre o Centro de Comando com o perfil real da conta
+- `useAccountDetail` e `contasMock` adicionados aos imports
+- IIFE, heatmaps, scatter, persona matrix, `openDetailedModal`, benchmarks, clusters, `journeyTimeline`, `entryPlays` mantidos intencionalmente fora do escopo
+
 ---
 
 ## O que está em andamento
@@ -138,10 +147,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 9º Recorte da Fase 5 (frente a definir).
+- Iniciar o 10º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
-  2. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
+  1. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
+  2. Continuação do saneamento de `AbmStrategy.tsx` — IIFE, modais e benchmarks ainda hardcoded
   3. Central de Playbooks — orquestração cross-channel corporativa
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
@@ -153,5 +162,6 @@ Nenhuma implementação funcional em andamento.
 | Assistant Contextual | 6º Recorte Concluído | KPIs reais, fila operacional, contexto injetado no Gemini |
 | Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
 | Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
+| ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 9 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 10 — Frente a definir |
