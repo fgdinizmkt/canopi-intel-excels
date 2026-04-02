@@ -5,9 +5,10 @@ import {
   X, Maximize2, Minimize2, Building2, Target, Zap, TrendingUp,
   Activity, ExternalLink, Mail, Clock, ArrowUpRight, Layout,
   ChevronRight, Lightbulb, LogsIcon, List as ListIcon, Network,
-  Sparkles as SparkleIcon, CheckCircle2, Brain, MapPin, Users
+  Sparkles as SparkleIcon, CheckCircle2, Brain, MapPin, Users,
+  AlertTriangle, ShieldCheck
 } from 'lucide-react';
-import { contasMock, ContatoConta } from '../../data/accountsData';
+import { contasMock, ContatoConta, SinalConta } from '../../data/accountsData';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 
@@ -52,15 +53,51 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
   const isFullscreen = shellViewMode === 'fullscreen';
 
+  // Radar Relacional Logic (RECORTE 26)
+  const getRadarRelacional = () => {
+    const tension = account.contatos.filter(c => 
+      (c.classificacao.includes('Blocker') || c.influencia > 7) && 
+      account.sinais.some(s => s.contexto === c.area && s.impacto === 'Alto')
+    );
+    const support = account.contatos.filter(c => 
+      (c.classificacao.includes('Champion') || c.classificacao.includes('Sponsor')) && 
+      account.sinais.some(s => s.contexto === c.area && (s.tipo === 'Tendência' || s.tipo === 'Mudança'))
+    );
+    const areasComSinais = Array.from(new Set(account.sinais.filter(s => s.impacto === 'Alto').map(s => s.contexto)));
+    const areasComContatos = Array.from(new Set(account.contatos.map(c => c.area)));
+    const gaps = areasComSinais.filter(a => !areasComContatos.includes(a));
+
+    return { tension, support, gaps };
+  };
+
+  const radar = getRadarRelacional();
+
   const renderTree = (contatos: ContatoConta[], parentId?: string, level = 0) => {
     const children = contatos.filter(c => c.liderId === parentId);
     if (children.length === 0) return null;
-    return children.map(contact => (
-      <div key={contact.id}>
-        <OrganogramNode contact={contact} level={level} isFullscreen={isFullscreen} onSelect={setSelectedContactId} />
-        {renderTree(contatos, contact.id, level + 1)}
-      </div>
-    ));
+    return children.map(contact => {
+      const sinaisNaArea = account.sinais.filter(s => s.contexto === contact.area);
+      return (
+        <div key={contact.id} className="relative">
+          {/* Micro-badges de Sinais (RECORTE 26) */}
+          {sinaisNaArea.length > 0 && (
+            <div className="absolute top-0 right-0 z-10 -mt-1 -mr-1 flex gap-1">
+              {sinaisNaArea.some(s => s.impacto === 'Alto' || s.tipo === 'Alerta') ? (
+                <div className="w-5 h-5 rounded-full bg-red-500 border-2 border-slate-900 flex items-center justify-center shadow-lg" title={`${sinaisNaArea.length} sinais nesta área`}>
+                  <AlertTriangle className="w-3 h-3 text-white" />
+                </div>
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-blue-500 border-2 border-slate-900 flex items-center justify-center shadow-lg" title={`${sinaisNaArea.length} sinais nesta área`}>
+                  <SparkleIcon className="w-3 h-3 text-white" />
+                </div>
+              )}
+            </div>
+          )}
+          <OrganogramNode contact={contact} level={level} isFullscreen={isFullscreen} onSelect={setSelectedContactId} />
+          {renderTree(contatos, contact.id, level + 1)}
+        </div>
+      );
+    });
   };
 
   const statusAcaoStyle: Record<string, string> = {
@@ -110,7 +147,6 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           </div>
         </div>
 
-        {/* Sub-header: Owner / Playbook / Potencial */}
         <div className="flex items-center justify-between text-sm mb-3">
           <div className="flex items-center gap-5">
             <div className="flex flex-col">
@@ -134,7 +170,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           </div>
         </div>
 
-        {/* Firmografia enriquecida */}
+        {/* Firmografia enriquecida (Recorte 25) */}
         <div className="flex flex-wrap gap-x-4 gap-y-1 pt-3 border-t border-slate-700/40 text-[10px] text-slate-500">
           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{account.localizacao}</span>
           <span>{account.segmento} · {account.porte}</span>
@@ -146,7 +182,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           )}
         </div>
 
-        {/* Scores ICP / CRM / VP / CT / FT */}
+        {/* Scores ICP / CRM / VP / CT / FT (Recorte 25) */}
         <div className="flex gap-3 mt-3">
           {[
             { label: 'ICP', val: account.icp },
@@ -178,14 +214,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             ))}
           </div>
 
-          {/* LEITURA ESTRUTURADA — 3 camadas */}
+          {/* Leitura Estruturada AI (Recorte 25) */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <SparkleIcon className="w-4 h-4 text-blue-500" />
               <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Leitura Canopi AI</h2>
             </div>
-
-            {/* Factual */}
             <div className="p-4 rounded-xl bg-slate-800/40 border border-emerald-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -201,175 +235,140 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 </ul>
               ) : <p className="text-xs text-slate-600 italic">Sem dados factuais registrados.</p>}
             </div>
-
-            {/* Inferida */}
             <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <Brain className="w-3.5 h-3.5 text-amber-400" />
                 <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest">Inferências — Padrão AI</span>
               </div>
-              {account.leituraInferida.length > 0 ? (
-                <ul className="space-y-1.5">
-                  {account.leituraInferida.map((f, i) => (
-                    <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                      <span className="text-amber-500 mt-0.5 flex-shrink-0">~</span>{f}
-                    </li>
-                  ))}
-                </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem inferências disponíveis.</p>}
+              {account.leituraInferida.map((f, i) => (
+                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                  <span className="text-amber-500 mt-0.5 flex-shrink-0">~</span>{f}
+                </li>
+              ))}
             </div>
-
-            {/* Sugerida */}
             <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Recomendações — Ação Sugerida</span>
               </div>
-              {account.leituraSugerida.length > 0 ? (
-                <ul className="space-y-1.5">
-                  {account.leituraSugerida.map((f, i) => (
-                    <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                      <span className="text-blue-400 mt-0.5 flex-shrink-0">→</span>{f}
-                    </li>
-                  ))}
-                </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem recomendações disponíveis.</p>}
+              {account.leituraSugerida.map((f, i) => (
+                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                  <span className="text-blue-400 mt-0.5 flex-shrink-0">→</span>{f}
+                </li>
+              ))}
             </div>
           </div>
 
-          {/* AÇÕES DA CONTA */}
-          <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Zap className="w-4 h-4" /> Ações Operacionais
-              <span className="ml-auto text-[10px] text-slate-600 font-normal">{account.acoes.length} registradas</span>
-            </h3>
-            {account.acoes.length > 0 ? (
+          {/* Operacional: Ações e Oportunidades (Recorte 25) */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <Zap className="w-4 h-4" /> Ações Operacionais
+              </h3>
               <div className="space-y-3">
                 {account.acoes.map(a => (
-                  <div key={a.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800 hover:border-slate-700 transition-colors">
+                  <div key={a.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
                     <div className="flex justify-between items-start gap-2 mb-1.5">
-                      <p className="text-sm font-bold text-slate-100 leading-tight">{a.titulo}</p>
-                      <span className={`flex-shrink-0 px-2 py-0.5 rounded-md text-[10px] font-black border ${statusAcaoStyle[a.status] || 'text-slate-400 bg-slate-700 border-slate-600'}`}>
-                        {a.status}
-                      </span>
+                      <p className="text-sm font-bold text-slate-100">{a.titulo}</p>
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${statusAcaoStyle[a.status]}`}>{a.status}</span>
                     </div>
-                    <div className="flex items-center gap-4 text-[10px] text-slate-500">
-                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{a.owner}</span>
-                      <span className={`font-bold ${prioStyle[a.prioridade]}`}>{a.prioridade}</span>
-                      <span className="flex items-center gap-1 ml-auto"><Clock className="w-3 h-3" />{a.prazo}</span>
-                    </div>
+                    <div className="text-[10px] text-slate-500">{a.owner} • {a.prazo}</div>
                   </div>
                 ))}
               </div>
-            ) : <p className="text-xs text-slate-600 italic text-center py-3">Nenhuma ação registrada para esta conta.</p>}
-          </div>
-
-          {/* OPORTUNIDADES */}
-          <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" /> Pipeline & Oportunidades
-              <span className="ml-auto text-[10px] text-slate-600 font-normal">{account.oportunidades.length} registradas</span>
-            </h3>
-            {account.oportunidades.length > 0 ? (
-              <div className="space-y-4">
+            </div>
+            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" /> Pipeline
+              </h3>
+              <div className="space-y-3">
                 {account.oportunidades.map(op => (
-                  <div key={op.id} className="p-4 bg-slate-900/50 rounded-xl border border-slate-800">
-                    <div className="flex justify-between items-start mb-3 gap-2">
-                      <div>
-                        <p className="text-sm font-bold text-slate-100">{op.nome}</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5">Etapa: <span className="text-slate-300">{op.etapa}</span> · Owner: {op.owner}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className="text-base font-black text-emerald-400">{fmt(op.valor)}</div>
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-black border ${riscoOpStyle[op.risco]}`}>Risco {op.risco}</span>
-                      </div>
+                  <div key={op.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="text-sm font-bold text-slate-100">{op.nome}</p>
+                      <span className="text-emerald-400 font-black">{fmt(op.valor)}</span>
                     </div>
-                    <div className="mb-2">
-                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                        <span>Probabilidade de Fechamento</span>
-                        <span className="font-bold text-slate-300">{op.probabilidade}%</span>
-                      </div>
-                      <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${op.probabilidade}%` }} />
-                      </div>
+                    <div className="text-[10px] text-slate-500">{op.etapa} • Risco <span className={riscoOpStyle[op.risco].split(' ')[0]}>{op.risco}</span></div>
+                    <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: `${op.probabilidade}%` }} />
                     </div>
-                    {op.historico.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {op.historico.map((h, i) => (
-                          <span key={i} className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{h}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
-            ) : <p className="text-xs text-slate-600 italic text-center py-3">Nenhuma oportunidade registrada para esta conta.</p>}
+            </div>
           </div>
 
-          {/* HISTÓRICO E SINAIS */}
-          <div className={`grid gap-6 ${isFullscreen ? 'grid-cols-2' : 'grid-cols-1'}`}>
-            {/* Histórico */}
-            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Histórico Recente
-              </h3>
-              {account.historico.length > 0 ? (
-                <div className="space-y-5 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-slate-700">
-                  {account.historico.map((h, i) => (
-                    <div key={i} className="relative pl-8">
-                      <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-slate-900 border-2 border-slate-700" />
-                      <div>
-                        <div className="text-[10px] font-black text-blue-400 uppercase">{h.data} · {h.tipo}</div>
-                        <p className="text-sm text-slate-300 mt-0.5">{h.descricao}</p>
-                      </div>
+          {/* ────── RADAR RELACIONAL (RECORTE 26) ────── */}
+          <div className="p-6 bg-blue-500/5 rounded-[28px] border border-blue-500/10 shadow-lg">
+            <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-5 flex items-center gap-3">
+              <Network className="w-5 h-5" /> Radar de Inteligência Relacional
+              <div className="flex-1 h-px bg-blue-500/20" />
+              <span className="text-[10px] font-normal text-blue-500/60 lowercase italic">cruzamento de sinais x comitê</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Pontos de Tensão */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Tensão</span>
+                </div>
+                {radar.tension.length > 0 ? radar.tension.map(c => (
+                  <div key={c.id} className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-[10px] font-bold text-red-400">
+                      {c.nome.substring(0, 2).toUpperCase()}
                     </div>
-                  ))}
-                </div>
-              ) : <p className="text-xs text-slate-600 italic text-center py-3">Sem histórico registrado.</p>}
-            </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-slate-100 truncate">{c.nome}</p>
+                      <p className="text-[9px] text-red-400 uppercase font-black">{c.area} • Exposição Crítica</p>
+                    </div>
+                  </div>
+                )) : <p className="text-[10px] text-slate-600 italic">Nenhum stakeholder influente sob alerta imediato.</p>}
+              </div>
 
-            {/* Sinais Ampliados */}
-            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
-                <Target className="w-4 h-4" /> Sinais Ativos
-                <span className="ml-auto text-[10px] font-normal text-slate-600">{account.sinais.length} detectados</span>
-              </h3>
-              {account.sinais.length > 0 ? (
-                <div className="space-y-3">
-                  {account.sinais.map(s => {
-                    const impactoColor = s.impacto === 'Alto' ? 'text-red-400 bg-red-500/10 border-red-500/20' : s.impacto === 'Médio' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 'text-slate-400 bg-slate-700/50 border-slate-600';
-                    return (
-                      <div key={s.id} className="p-4 bg-slate-900/50 rounded-xl border border-slate-800 hover:border-blue-500/30 transition-colors">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{s.tipo}</span>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border ${impactoColor}`}>Impacto {s.impacto}</span>
-                            <ArrowUpRight className="w-3.5 h-3.5 text-slate-600" />
-                          </div>
-                        </div>
-                        <h4 className="text-sm font-bold text-slate-100 mb-1">{s.titulo}</h4>
-                        <p className="text-[11px] text-slate-500 italic mb-2">&quot;{s.recomendacao}&quot;</p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[10px] text-slate-600 border-t border-slate-800 pt-2">
-                          <span className="flex items-center gap-1"><Users className="w-3 h-3" />{s.owner}</span>
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.data}</span>
-                          {s.contexto && <span className="w-full mt-0.5 text-slate-600 italic">{s.contexto}</span>}
-                        </div>
-                      </div>
-                    );
-                  })}
+              {/* Pontos de Apoio */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Apoio</span>
                 </div>
-              ) : <p className="text-xs text-slate-600 italic text-center py-3">Nenhum sinal ativo para esta conta.</p>}
+                {radar.support.length > 0 ? radar.support.map(c => (
+                  <div key={c.id} className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-400">
+                      {c.nome.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-slate-100 truncate">{c.nome}</p>
+                      <p className="text-[9px] text-emerald-400 uppercase font-black">{c.area} • Driver de Sucesso</p>
+                    </div>
+                  </div>
+                )) : <p className="text-[10px] text-slate-600 italic">Sem sponsors ativos para os sinais atuais.</p>}
+              </div>
+
+              {/* Gaps de Interlocução */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Target className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gaps de Cobertura</span>
+                </div>
+                {radar.gaps.length > 0 ? radar.gaps.map((area, i) => (
+                  <div key={i} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
+                    <p className="text-[11px] font-bold text-slate-100">{area}</p>
+                    <p className="text-[9px] text-blue-400 uppercase font-black">Sinal Crítico Detectado • Sem Contato</p>
+                  </div>
+                )) : <p className="text-[10px] text-slate-600 italic">Toda área crítica possui interlocutor mapeado.</p>}
+              </div>
             </div>
           </div>
 
-          {/* COMITÊ DE COMPRAS — sem alteração */}
+          {/* COMITÊ DE COMPRAS (Com micro-badges do Recorte 26) */}
           <div className="space-y-5">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h3 className="text-xl font-black text-slate-100 uppercase tracking-tight flex items-center gap-3">
                   <Network className="w-5 h-5 text-blue-500" /> Comitê de Compras & Influência
                 </h3>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">Mapeamento hierárquico e força relacional dos stakeholders</p>
+                <p className="text-[11px] text-slate-500 font-medium mt-1">Mapeamento hierárquico enriquecido com sinais de área</p>
               </div>
               <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
                 <button onClick={() => setOrgView('tree')} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>
@@ -389,8 +388,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       const topLevel = account.contatos.filter(c => !c.liderId || !account.contatos.find(p => p.id === c.liderId));
                       return topLevel.map(contact => (
                         <div key={contact.id}>
-                          <OrganogramNode contact={contact} level={0} isFullscreen={isFullscreen} onSelect={setSelectedContactId} />
-                          {renderTree(account.contatos, contact.id, 1)}
+                          {renderTree(account.contatos, contact.liderId ? undefined : contact.id, 0)}
                         </div>
                       ));
                     })()}
@@ -400,53 +398,92 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <thead>
                       <tr className="bg-slate-800/40 border-b border-slate-800">
                         <th className="pl-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Stakeholder</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Área / Senioridade</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Influência</th>
-                        <th className="pr-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Relacional</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Área / Inteligência</th>
+                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Relacional</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800">
-                      {account.contatos.map(contact => (
-                        <tr key={contact.id} onClick={() => setSelectedContactId(contact.id)} className="group hover:bg-blue-500/5 transition-all cursor-pointer">
-                          <td className="py-3 px-8">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">{contact.nome.substring(0, 2).toUpperCase()}</div>
-                              <div>
-                                <div className="text-sm font-bold text-slate-100">{contact.nome}</div>
-                                <div className="text-[10px] text-slate-500">{contact.cargo}</div>
+                      {account.contatos.map(contact => {
+                        const sinaisNaArea = account.sinais.filter(s => s.contexto === contact.area);
+                        const hasCriticalSignal = sinaisNaArea.some(s => s.impacto === 'Alto');
+                        return (
+                          <tr key={contact.id} onClick={() => setSelectedContactId(contact.id)} className="group hover:bg-blue-500/5 transition-all cursor-pointer">
+                            <td className="py-3 px-8">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">{contact.nome.substring(0, 2).toUpperCase()}</div>
+                                <div>
+                                  <div className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors">{contact.nome}</div>
+                                  <div className="text-[10px] text-slate-500">{contact.cargo}</div>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="text-xs text-slate-100 font-bold uppercase">{contact.area}</div>
-                            <div className="text-[10px] text-slate-500">{contact.senioridade}</div>
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex gap-0.5 mb-1">
-                              {[...Array(5)].map((_, i) => <div key={i} className={`w-2 h-1 rounded-sm ${i < contact.influencia / 2 ? 'bg-blue-500' : 'bg-slate-800'}`} />)}
-                            </div>
-                            <div className="text-[10px] font-bold text-slate-500 uppercase">Inf: {contact.influencia}/10</div>
-                          </td>
-                          <td className="py-3 px-8 text-right">
-                            <div className="text-sm font-black text-emerald-400">{contact.forcaRelacional}%</div>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-slate-100 font-bold uppercase">{contact.area}</span>
+                                {sinaisNaArea.length > 0 && (
+                                  <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${hasCriticalSignal ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                                    {hasCriticalSignal ? <AlertTriangle className="w-2.5 h-2.5" /> : <SparkleIcon className="w-2.5 h-2.5" />}
+                                    {sinaisNaArea.length} SINAL
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-8 text-right">
+                              <div className="text-sm font-black text-emerald-400">{contact.forcaRelacional}%</div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 )}
               </div>
-            ) : (
-              <div className="p-8 rounded-2xl border border-slate-800 text-center">
-                <p className="text-xs text-slate-600 italic">Nenhum contato mapeado para esta conta.</p>
+            ) : <div className="p-8 border border-slate-800 text-center text-xs italic text-slate-600">Nenhum contato mapeado.</div>}
+          </div>
+
+          {/* Histórico e Sinais (RESTAURADOS ao nível de riqueza do Recorte 25) */}
+          <div className={`grid gap-6 ${isFullscreen ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <Activity className="w-4 h-4" /> Histórico Recente
+              </h3>
+              <div className="space-y-4">
+                {account.historico.slice(0, 3).map((h, i) => (
+                  <div key={i} className="pl-4 border-l border-slate-700">
+                    <p className="text-[10px] font-bold text-blue-400">{h.data}</p>
+                    <p className="text-xs text-slate-300">{h.descricao}</p>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+            <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <Target className="w-4 h-4" /> Sinais Ativos
+              </h3>
+              <div className="space-y-3">
+                {account.sinais.map(s => (
+                  <div key={s.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+                    <div className="flex justify-between items-start mb-1.5">
+                      <p className="text-sm font-bold text-slate-100">{s.titulo}</p>
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${s.tipo === 'Alerta' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>{s.tipo}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 italic mb-2">&quot;{s.recomendacao}&quot;</p>
+                    <div className="flex flex-wrap gap-2 text-[9px] text-slate-500 uppercase font-black tracking-tighter">
+                      <span className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">{s.contexto}</span>
+                      <span>Impacto: <span className={s.impacto === 'Alto' ? 'text-red-400' : 'text-blue-400'}>{s.impacto}</span></span>
+                      <span>Owner: {s.owner}</span>
+                      <span>Data: {s.data}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
         </div>
       </div>
 
-      {/* ── FOOTER ── */}
+      {/* FOOTER (RESTAURADO ao estado preservado do Recorte 25) */}
       <div className="flex-shrink-0 p-4 border-t border-slate-700/50 bg-slate-800/80 flex justify-between items-center backdrop-blur-md">
         <div className="flex gap-2">
           <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold transition-all text-slate-100 shadow-lg active:scale-95">
@@ -467,16 +504,17 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         </div>
       </div>
 
-      {/* ── OVERLAY: PERFIL DO CONTATO ── */}
+      {/* ── OVERLAY: FILTRO CONTEXTUAL (RECORTE 26) ── */}
       {selectedContactId && (
         <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300" onClick={() => setSelectedContactId(null)} />
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setSelectedContactId(null)} />
           <div className={`relative h-full shadow-2xl transition-all duration-300 ${isFullscreen ? 'w-full md:w-[45%]' : 'w-full'}`}>
             {(() => {
               const contact = account.contatos.find(c => c.id === selectedContactId);
               if (!contact) return null;
-              const sinaisAssociados = account.sinais.filter(s => s.contexto.includes(contact.area));
-              const acoesAssociadas = account.acoes.filter(a => a.titulo.includes(contact.area));
+              // FILTRO RIGOROSO POR ÁREA DO CONTATO
+              const sinaisAssociados = account.sinais.filter(s => s.contexto === contact.area);
+              const acoesAssociadas = account.acoes.filter(a => a.titulo.toLowerCase().includes(contact.area.toLowerCase()) || a.owner.includes(contact.nome));
               return (
                 <ContactDetailProfile
                   contact={contact}
