@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último recorte concluído:** Saneamento de entryPlays (17º Recorte Fase 5)
-- **Último commit relevante:** `bd306c4` — refactor: remove hardcoded entryPlays visualization from AbmStrategy (17º recorte)
+- **Último recorte concluído:** Auditoria técnica de abmHeatmapAccounts (18º Recorte Fase 5)
+- **Último commit relevante:** Documentação do 18º recorte (auditoria, sem código)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -17,23 +17,26 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## O que foi entregue (17º Recorte — Saneamento de entryPlays)
-- `entryPlays` constant removido (5 linhas): hardcoded array com 3 playbooks fictícios (Relatório Setorial, Webinar, Campanha Social Ads) e eficácia hardcoded.
-- Visualização "Plays de Entrada Recomendados" removida (31 linhas): card grande com grid 3-colunas, header fictício, botões "Executar Play" e "Ver Todos os Playbooks" sem ação.
-- Total: `0 insertions(+), 34 deletions(-)` — zero impacto visual ou funcional.
-- Justificativa: dados fictícios não derivados de fonte real; botões sem ação/handler; descrição enganosa; sem função operacional no cockpit ABM.
+## O que foi entregue (18º Recorte — Auditoria Técnica de abmHeatmapAccounts)
+- **Tipo:** Auditoria técnica (research/validation, sem código alterado).
+- **Achado:** `abmHeatmapAccounts` não pode ser saneado com `contasMock` no estado atual.
+- **Motivo:** Ausência de campos numéricos exigidos (icp, crm, vp, ft, budget) em `contasMock`; volume insuficiente (3 contas vs. 12); dependência estrutural em 6+ pontos do código.
+- **Decisão:** `abmHeatmapAccounts` formalmente **BLOQUEADO** até que `contasMock` evolua.
+- **Total:** `0 insertions(+), 0 deletions(-)` — zero impacto no código; apenas documentação estratégica.
+- **Justificativa:** Evitar trabalho especulativo; documentar pré-requisitos mínimos para saneamento futuro.
 
 ---
 
 ## Próximos passos (Roadmap)
-1. Iniciar o **18º Recorte da Fase 5** (frente a definir).
+1. Iniciar o **19º Recorte da Fase 5** (frente a definir).
 2. Candidatos priorizados:
-   - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs (~1000 linhas) e `abmHeatmapAccounts` ainda ativos.
+   - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs (~1000 linhas) ainda ativos.
    - Central de Playbooks — orquestração cross-channel corporativa.
-3. ABX encerrado — sem dívidas imediatas.
+3. **Bloqueio formal:** `abmHeatmapAccounts` saneável apenas após evolução de `contasMock` (pré-requisitos registrados).
+4. ABX encerrado — sem dívidas imediatas.
 
 ## Pendências / Backlog
-- **AbmStrategy.tsx:** Saneamento de dead code, journeyTimeline, benchmarks, verticalClusters e entryPlays concluído. IIFEs (~1000 linhas), `abmHeatmapAccounts` — ainda ativos no render (escopo do 18º recorte e adiante).
+- **AbmStrategy.tsx:** Saneamento de dead code, journeyTimeline, benchmarks, verticalClusters e entryPlays concluído. IIFEs (~1000 linhas) — ainda ativos no render (escopo do 19º recorte e adiante). **`abmHeatmapAccounts` — BLOQUEADO** (auditoria 18º recorte concluída: pré-requisitos = adicionar icp, crm, vp, ft, budget numéricos a contasMock + garantir 6-12 contas).
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
 - **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução.
 - **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (aceito como estado definitivo).

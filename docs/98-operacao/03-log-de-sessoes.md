@@ -5,6 +5,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 18º Recorte: Auditoria Técnica de abmHeatmapAccounts em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Auditoria técnica completa de `abmHeatmapAccounts` (12 contas fictícias com scores numéricos).
+- Mapeamento de requisitos estruturais: campos necessários (id, name, vertical, imp, icp, crm, vp, ct, ft, budget).
+- Análise de dependências de `contasMock`: possui id, nome (requer mapping), vertical, potencial (proxy para imp); **faltam**: icp (0-100), crm (0-100), vp (0-100), ft (0-100), budget; apenas 3 contas vs. 12 necessárias.
+- Identificação de 6+ pontos de acoplamento estrutural: `getHmScore` helper, `getWeightedIcp` function, `abmHeatmapCriteria` descriptor functions, heatmap rendering logic (lines 151, 180, 293-301, 459, 520, 523, 766, 817), tooltip logic.
+- **Decisão formal:** `abmHeatmapAccounts` fica **BLOQUEADO** — não é saneável com `contasMock` no estado atual.
+- **Pré-requisitos mínimos identificados:** (1) adicionar campos numéricos (icp, crm, vp, ft, budget) a `contasMock`; (2) garantir ao menos 6-12 contas em `contasMock` para volume de dados.
+
+**Commits:**
+- Nenhum commit de código — apenas documentação.
+
+**PRs:** nenhum
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` mantém integridade funcional completa — heatmaps continuam operacionais com dados fictícios.
+- Bloqueio registrado formalmente previne trabalho especulativo no saneamento de `abmHeatmapAccounts`.
+- Caminho futuro documentado: evolução de `contasMock` (adicionar campos numéricos) será pré-requisito para próxima rodada de saneamento ABM.
+- Zero impacto imediato — recorte foi auditoria (research), não implementação.
+
+---
+
 ## 2026-04-02 — 17º Recorte: Saneamento de entryPlays em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

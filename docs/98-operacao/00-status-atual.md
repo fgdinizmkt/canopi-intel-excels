@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Saneamento de entryPlays — 17º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Auditoria técnica de abmHeatmapAccounts — 18º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -217,9 +217,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 18º Recorte da Fase 5 (frente a definir).
+- **18º Recorte Concluído (Auditoria):** `abmHeatmapAccounts` auditado e formalmente BLOQUEADO.
+- Iniciar o 19º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `AbmStrategy.tsx` — IIFEs (~1000 linhas) e `abmHeatmapAccounts` ainda ativos (saneamento continuado)
+  1. `AbmStrategy.tsx` — IIFEs (~1000 linhas) ainda ativos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
@@ -239,6 +240,7 @@ Nenhuma implementação funcional em andamento.
 | Saneamento benchmarks | 15º Recorte Concluído | benchmarks constant + "Elite Benchmarks Grid" removidas — KPIs fictícios e grid decorativo |
 | Saneamento verticalClusters | 16º Recorte Concluído | verticalClusters constant + "Clusterização ABM" removidas — dados fictícios, botões não funcionais |
 | Saneamento entryPlays | 17º Recorte Concluído | entryPlays constant + "Plays de Entrada Recomendados" removidas — dados fictícios, botões sem ação |
+| Auditoria abmHeatmapAccounts | 18º Recorte Concluído (Auditoria) | Bloqueado: ausência de campos numéricos em contasMock; dependência estrutural de 6 heatmaps identificada |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 18 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 19 — Frente a definir |
