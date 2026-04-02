@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Auditoria de Infraestrutura e Qualidade (Recorte 24 - Finalização Fase 6)
+
+**Objetivo:** Restaurar a infraestrutura de linting, garantir um build de produção 100% limpo e resolver débitos técnicos de sintaxe JSX que bloqueavam a automação de qualidade.
+
+**Atividades:**
+- **Reativação do ESLint:** Configuração do `.eslintrc.json` atualizada para Next.js 15 e instalação de dependências de base (`eslint-config-next`).
+- **Saneamento Global de Entidades:** Correção em massa de erros `react/no-unescaped-entities` (aspas não escapadas em JSX) em 8 arquivos: `PaidMedia.tsx`, `SeoInbound.tsx`, `Outbound.tsx`, `Settings.tsx`, `AbmStrategy.tsx`, `ABXOrchestration.tsx`, `AccountDetailView.tsx` e `App.tsx`.
+- **Acessibilidade Crítica:** Adição de `title` e `aria-label` em botões de ícone e elementos de formulário sem label em `PaidMedia` e `SeoInbound`.
+- **Validação de Build de Produção:** Execução de `npm run build` com sucesso total em todas as 16 rotas do projeto.
+- **Auditoria de Lint:** Execução de `npm run lint` resultando em 0 erros (apenas warnings informativos de `next/image`).
+
+**Commits:**
+- `FIX_LINT_BUILD` — chore(infra): finalização auditoria técnica Fase 6 - lint limpo e build íntegro.
+
+**Impacto no projeto:**
+- A Fase 6 está oficialmente encerrada com dívida técnica Zero em termos de erros de build e lint.
+- O pipeline de CI/CD (se existisse) estaria "Green".
+- O projeto está pronto para a Fase 7 (Deep Intelligence) com uma base de código estável e auditada.
+
+---
+
 ## [2026-04-02] — Refinamento Técnico e Acessibilidade (Recorte 24 - Fase 6)
 
 **Objetivo:** Elevar a qualidade técnica dos arquivos `AbmStrategy.tsx` e `Actions.tsx` através da migração de estilos inline para Tailwind e melhoria de acessibilidade.

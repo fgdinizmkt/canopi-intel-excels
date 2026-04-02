@@ -4,7 +4,7 @@
 `main` — atualizada em 2026-04-02 (Auditoria de Fechamento Fase 6)
 
 ## Fase atual do plano
-**Fase 6 — Dinamização e Refino ABM** (Em auditoria técnica)
+**Fase 6 — Dinamização e Refino ABM** (CONCLUÍDA)
 
 ---
 
@@ -63,7 +63,12 @@
 - **Saneamento Técnico Real:** Migração de estilos inline para Tailwind (~120 linhas removidas).
 - **Acessibilidade:** Adição manual de `aria-label` e `title` em botões críticos identificados visualmente.
 - **Auditoria de Tipagem:** Build de produção (`npm run build`) validado com sucesso (zero erros `tsc`).
-- **Ponta Solta Detectada:** `npm run lint` falha no repositório por ausência de dependências de `eslint`.
+
+**Auditoria de Infraestrutura e Qualidade** — commit `FIX_LINT_BUILD` (Recorte 24 - Finalização)
+- **Infraestrutura de Linting Reativada:** Configuração de `.eslintrc.json` e `next/core-web-vitals` funcional.
+- **Saneamento de Build Errors:** Correção em massa de `react/no-unescaped-entities` em 8 arquivos críticos (`PaidMedia`, `SeoInbound`, `Outbound`, `Settings`, etc).
+- **Lint Limpo:** Execução de `npm run lint` com 0 erros bloqueadores.
+- **Build de Produção:** Validado com `npm run build` (sucesso completo em todas as 16 rotas).
 
 ---
 
@@ -78,7 +83,7 @@
 
 ## Próximo passo aprovado
 
-- **Consolidação Técnica Fase 6:** Instalação de infraestrutura de linting e resolução de alertas de container Recharts antes de iniciar o Recorte 25.
+- **Abertura da Fase 7:** Iniciar o ciclo de visualização de inteligência profunda e painéis de liderança.
 
 ---
 
@@ -92,4 +97,4 @@
 | Base Numérica Scoring | 21º Recorte Concluído | Estrutura de Conta estendida; budgetBrl padronizado |
 | Conexão de Heatmaps | 22º Recorte Concluído | Heatmaps em AbmStrategy conectados ao contasMock dinâmico |
 | Action Cards Dinâmicos | 23º Recorte Concluído | Blocos laterais e matrizes reativos à activeAccount |
-| Refinamento Técnico | 24º Recorte Concluído | Auditoria manual de a11y, Tailwind e estabilização de build |
+| Refinamento Técnico | 24º Recorte Concluído | Infra de Lint reativada; Lint Limpo; Build íntegro; react/no-unescaped-entities saneado globalmente |

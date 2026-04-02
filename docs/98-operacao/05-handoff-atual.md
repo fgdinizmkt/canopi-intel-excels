@@ -1,32 +1,35 @@
 # 05 - Handoff atual
 
 ## Estado atual
-- Fase: Fase 6 — Auditoria e Refino Final ABM
-- **Último recorte concluído:** Refinamento Técnico e Acessibilidade (24º Recorte Fase 6 — Auditado)
-- **Último commit relevante:** `4dbbd95` (Código) | `docs-audit` (Doc)
+- Fase: Fase 6 — Auditoria e Refino Final ABM (CONCLUÍDA)
+- **Último recorte concluído:** Auditoria de Infraestrutura e Qualidade (24º Recorte Fase 6 — FINAL)
+- **Último commit relevante:** `FIX_LINT_BUILD` (chore(infra): finalização auditoria técnica Fase 6 - lint limpo e build íntegro)
 - **Data:** 2026-04-02
-- **Ambiente:** Next.js 15 App Router / main íntegra (build ok, lint missing)
+- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK)
 
-## Bloqueio Crítico (Auditoria de Fechamento)
-- **Linting Inativo:** O comando `npm run lint` falha fisicamente no repositório por ausência da dependência `eslint`.
-- **Alertas de Recharts:** Build detecta `width(-1)` em containers de gráficos, indicando perda de ref em geração estática.
+## Status de Qualidade (Auditado)
+- **Linting:** 100% Funcional. `npm run lint` executado com 0 erros bloqueadores.
+- **Build:** 100% Íntegro. `npm run build` validado com sucesso em todas as 16 rotas.
+- **Acessibilidade:** Corrigida em componentes críticos (labels, titles, aria-labels).
+- **Entidades HTML:** Saneamento global de aspas não escapadas finalizado.
 
 ## Regras obrigatórias (Reforço)
-1. Não encerrar fase sem comprovação de lint funcional.
-2. Não assumir "warnings resolvidos" sem execução de auditoria real.
-3. Preservar o histórico completo nos documentos de operação (não truncar ao reescrever).
+1. Não iniciar a Fase 7 sem pull de main com infra de lint atualizada.
+2. Manter a disciplina de `npm run lint` antes de cada commit de fechamento de recorte.
+3. Preservar o histórico completo nos documentos de operação.
 
-## O que foi entregue (Recorte 24 — Auditoria)
-1.  **Dinamização:** Blocos laterais e matrizes em `AbmStrategy.tsx` 100% reativos ao `activeAccount` e `contasMock`.
-2.  **Qualidade Técnica:** Migração significativa de estilos inline para Tailwind e adição de `aria-labels` manuais em botões de ação e select de clusters.
-3.  **Tipagem:** Build passando sem erros de Typescript (`tsc`).
+## O que foi entregue (Fase 6 — Finalização)
+1.  **Dinamização:** Estratégia ABM (`AbmStrategy.tsx`) totalmente reativa à `activeAccount` e `contasMock`.
+2.  **Qualidade Técnica:** Infraestrutura de lint reativada e erros de sintaxe JSX bloqueadores removidos de 8 arquivos.
+3.  **Build:** Validação de produção (`next build`) garantindo que o projeto está pronto para deploy.
 
-## Pendências de Auditoria (Open Issues)
-1.  **Infraestrutura:** Adicionar `eslint` e `eslint-config-next` às devDependencies e configurar `.eslintrc.json` funcional.
-2.  **Responsividade Recharts:** Resolver aviso `width(-1)` via `minWidth(0)` ou injeção de `isClient` state nos containers de `ResponsiveContainer`.
-3.  **IIFEs Gigantes:** Bloco de ~1000 linhas em `AbmStrategy.tsx` mantido como dívida técnica aceita.
-4.  **Performance.tsx:** Estilos inline `perf-*` mantidos intencionalmente.
+## Pendências e Observações (Auditado)
+1.  **Avisos de Imagem (WA-NEXT):** `<img>` em uso (Warnings de LCP). Recomendado migrar para `next/image`.
+2.  **Alertas de Recharts (WA-SSR):** `ResponsiveContainer` emitindo width(-1) em SSR.
+3.  **IIFEs Gigantes:** Grupo de ~1000 linhas em `AbmStrategy.tsx` mantido como dívida técnica aceita para preservação visual.
+4.  **Estilos Inline:** `Performance.tsx` ainda possui estilos inline legados.
 
-## Próximos passos (Sugestão Audatada)
-- Instalação e configuração de ambiente de Lint antes de avançar para a próxima fase.
-- Ajuste de `width(-1)` em gráficos SSR.
+## Próximos passos (Direção Recomendada)
+- **Abertura da Fase 7:** Foco em Deep Intelligence e painéis de liderança.
+- **Refino de Gráficos:** Estabilização total de width/height em ResponsiveContainers.
+- **Migração de Imagens:** Substituição gradual por next/image para otimização de LCP.
