@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Recorte 26 - Fase 7)
+`main` — atualizada em 2026-04-02 (Recorte 27 - Fase 7)
 
 ## Fase atual do plano
 **Fase 7 — Deep Intelligence** (Em andamento)
@@ -100,3 +100,4 @@
 | Refinamento Técnico | 24º Recorte Concluído | Infra de Lint reativada; Lint Limpo; Build íntegro; react/no-unescaped-entities saneado globalmente |
 | Deep Intelligence (Perfil) | 25º Recorte Concluído | Perfil da Empresa com leitura estruturada, ações, oportunidades e scores (AccountDetailView) |
 | Inteligência Relacional | 26º Recorte Concluído | Radar de cruzamento sinais x stakeholders; micro-badges dinâmicos e filtro contextual |
+| Inteligência Cumulativa | 27º Recorte Concluído | Seção de Insights Históricos, Padrões e Lições Aprendidas (inteligencia{}) |

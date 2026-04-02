@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Inteligência Cumulativa e Insights Históricos (Recorte 27 - Fase 7)
+
+**Objetivo:** Adicionar seção de memória persistente da conta ao perfil, consumindo o campo `inteligencia{}`.
+
+**Atividades:**
+- **Insights Históricos:** Implementação de bloco triplo que separa Memória de Prospecção (Sucessos/Insucessos), Padrões & Learnings (Conhecimento Extraído) e Hipóteses de Destrave (Implicação Operacional).
+- **Consumo de Dados:** Integração completa dos arrays de inteligência do `contasMock`.
+- **Qualidade & Lint:** Saneamento de `react/no-unescaped-entities` para garantir build limpo (Exit 0).
+- **Design:** Manutenção da hierarquia premium, posicionando a inteligência cumulativa entre a operação e o radar relacional.
+
+---
+
 ## [2026-04-02] — Radar Relacional e Cruzamento de Sinais (Recorte 26 - Fase 7)
 
 **Objetivo:** Transformar o Comitê de Compras em núcleo de inteligência relacional, cruzando stakeholders com sinais ativos da conta.
