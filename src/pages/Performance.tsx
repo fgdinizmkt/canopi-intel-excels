@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { contasMock } from '../data/accountsData';
+import { advancedSignals } from '../data/signalsV6';
  
 // ─── CSS (prefixado perf- para não colidir) ───────────────────────────────────
 const CSS = `
@@ -121,23 +123,11 @@ const CHANNELS = [
   { name:'Outbound', value:'250k', delta:'-4%',  pct:19, color:'#ef4444', score:42 },
 ];
  
-const ACCOUNTS = [
-  {name:'MSD Saúde',meta:'Cliente ativo · Enterprise Saúde · Expansão em avaliação interna',color:'#2b44ff',canal:'ABM',status:'Em expansão',statusClass:'bb',valor:'R$ 180k adicionais',owner:'Pablo Diniz',lifetime:'R$ 2,4M total',lastContact:'Há 2 dias',spark:'5,18 30,16 55,14 80,12 105,10 130,8 155,6 195,4',sparkArea:'5,18 30,16 55,14 80,12 105,10 130,8 155,6 195,4 195,22 5,22',signals:[{id:'SIG-4055',title:'Sinal de expansão detectado',sev:'oportunidade'}],actions:[{title:'Agendar reunião executiva',owner:'Pablo Diniz',status:'Em andamento'},{title:'Preparar proposta de expansão',owner:'Pablo Diniz',status:'Nova'}]},
-  {name:'Nexus Fintech',meta:'Enterprise Fintech · Estágio de Decisão · Proposta de R$ 280k enviada há 8 dias',color:'#ef4444',canal:'ABM',status:'Em risco',statusClass:'br',valor:'R$ 280k em risco',owner:'Pablo Diniz',lifetime:'R$ 280k prospecto',lastContact:'Há 3 horas',spark:'5,6 30,8 55,10 80,12 105,14 130,16 155,18 195,20',sparkArea:'5,6 30,8 55,10 80,12 105,14 130,16 155,18 195,20 195,22 5,22',signals:[{id:'SIG-4068',title:'Sponsor principal saiu da empresa',sev:'crítico'}],actions:[{title:'Mapear novo decisor urgente',owner:'Pablo Diniz',status:'Em andamento'}]},
-  {name:'Minerva Foods',meta:'Enterprise Industrial · ABX em playbook · Avaliação de fornecedor em andamento',color:'#f59e0b',canal:'ABX + Orgânico',status:'Monitorando',statusClass:'bam',valor:'Janela de 2-3 semanas',owner:'Elber Costa',lifetime:'R$ 650k histórico',lastContact:'Há 1 dia',spark:'5,14 30,12 55,16 80,10 105,8 130,12 155,10 195,8',sparkArea:'5,14 30,12 55,16 80,10 105,8 130,12 155,10 195,8 195,22 5,22',signals:[{id:'SIG-4041',title:'Intenção de pesquisa crescente +220%',sev:'oportunidade'},{id:'SIG-4092',title:'Queda de performance no Google Ads',sev:'crítico'}],actions:[{title:'Intensificar cadência ABX',owner:'Elber Costa',status:'Em andamento'}]},
-  {name:'Carteira Seguros Enterprise',meta:'Tier 1 · Lead inbound qualificado · Score 98',color:'#10b981',canal:'Inbound',status:'SLA em risco',statusClass:'bam',valor:'Alta conversão estimada',owner:'Ligia Martins',lifetime:'Novo prospecto',lastContact:'Há 1 hora',spark:'5,20 30,18 55,16 80,14 105,12 130,10 155,8 195,6',sparkArea:'5,20 30,18 55,16 80,14 105,12 130,10 155,8 195,6 195,22 5,22',signals:[{id:'SIG-4088',title:'Lead quente sem owner — SLA excedido',sev:'alerta'}],actions:[{title:'Atribuir owner e primeiro contato',owner:'Ligia Martins',status:'Nova'}]},
-];
  
 const LOSS_REASONS  = [{label:'Mudança de sponsor',pct:38},{label:'Orçamento cortado',pct:27},{label:'Concorrente eleito',pct:21},{label:'Projeto adiado',pct:14}];
 const OBJECTIONS    = [{label:'Preço alto',pct:42},{label:'Integração complexa',pct:31},{label:'Falta de caso similar',pct:18},{label:'Time interno pequeno',pct:9}];
 const ACCELERATORS  = [{label:'Case setorial relevante',pct:34},{label:'Reunião executiva',pct:28},{label:'Trial ou POC',pct:19},{label:'Desconto por urgência',pct:11}];
  
-const ALERTS = [
-  {id:'SIG-4068',severity:'Crítico',   badgeClass:'br',  icon:'🚨', bg:'#fef2f2', border:'#fecaca', iconBg:'#fee2e2', linkColor:'#dc2626', title:'Nexus Fintech em risco — sponsor saiu',             desc:'R$ 280k em risco de perda ou atraso de 60-90 dias. Ação necessária nas próximas 24h.'},
-  {id:'SIG-4034',severity:'Alerta',    badgeClass:'bam', icon:'⚠️', bg:'#fffbeb', border:'#fde68a', iconBg:'#fef3c7', linkColor:'#d97706', title:'Outbound abaixo do benchmark — Cluster Manufatura', desc:'Taxa de resposta 3,2% vs benchmark 8%. Perda estimada de 18 oportunidades no trimestre.'},
-  {id:'SIG-4075',severity:'Oportunidade',badgeClass:'bb',icon:'⚡', bg:'#eff2ff', border:'#c7d2fe', iconBg:'#e0e7ff', linkColor:'#2b44ff', title:'Cluster Fintech Sudeste — janela de oportunidade',  desc:'300% de crescimento em tráfego. Potencial de R$ 500k em pipeline novo nos próximos 30 dias.'},
-  {id:'SIG-4055',severity:'Oportunidade',badgeClass:'bg',icon:'📈', bg:'#f0fdf4', border:'#bbf7d0', iconBg:'#dcfce7', linkColor:'#16a34a', title:'MSD Saúde — expansão detectada',                   desc:'3 novos decisores acessaram o deck de expansão. Janela de 48h para R$ 180k adicionais.'},
-] as const;
  
 const SQUAD_OWNERS = [
   {name:'Pablo Diniz',    role:'ABM Lead',      acoes:'5 ações', sla:82},
@@ -199,6 +189,74 @@ export default function Performance() {
  
   const m  = METRICS[period] ?? METRICS['30d'];
   const pl = PERIOD_LABEL[period] ?? 'Personalizado';
+
+  // ─── Derivações de dados reais ───────────────────────────────────────────
+  const ACCOUNTS = useMemo(() => {
+    const statusOrder: Record<string, number> = { 'Crítico': 0, 'Atenção': 1, 'Saudável': 2 };
+    const colorMap:   Record<string, string>  = { 'Saudável': '#10b981', 'Atenção': '#f59e0b', 'Crítico': '#ef4444' };
+    const classMap:   Record<string, string>  = { 'Saudável': 'bg', 'Atenção': 'bam', 'Crítico': 'br' };
+    const sevMap:     Record<string, string>  = { 'Alto': 'crítico', 'Médio': 'alerta', 'Baixo': 'oportunidade' };
+    const canalMap:   Record<string, string>  = { 'ABM': 'ABM', 'ABX': 'ABX', 'Híbrido': 'ABM + ABX', 'Nenhum': 'Orgânico' };
+
+    return [...contasMock]
+      .sort((a, b) => {
+        const so = (statusOrder[a.statusGeral] ?? 9) - (statusOrder[b.statusGeral] ?? 9);
+        return so !== 0 ? so : b.potencial - a.potencial;
+      })
+      .slice(0, 4)
+      .map(c => {
+        const valorNum    = c.oportunidades?.[0]?.valor ?? 0;
+        const valorStr    = valorNum > 0 ? `R$ ${(valorNum / 1000).toFixed(0)}k em jogo` : 'Sem oportunidade ativa';
+        const totalVal    = c.oportunidades?.reduce((s, o) => s + o.valor, 0) ?? 0;
+        const lifetimeStr = totalVal > 0 ? `R$ ${(totalVal / 1000000).toFixed(1)}M total` : 'Novo prospecto';
+        const diffDays    = Math.floor((Date.now() - new Date(c.ultimaMovimentacao).getTime()) / 86400000);
+        const lastContact = diffDays <= 0 ? 'Hoje' : diffDays === 1 ? 'Há 1 dia' : `Há ${diffDays} dias`;
+        return {
+          name:        c.nome,
+          meta:        c.resumoExecutivo,
+          color:       colorMap[c.statusGeral] ?? '#94a3b8',
+          canal:       canalMap[c.playAtivo]   ?? c.playAtivo,
+          status:      c.statusGeral,
+          statusClass: classMap[c.statusGeral] ?? 'bsl',
+          valor:       valorStr,
+          owner:       c.ownerPrincipal,
+          lifetime:    lifetimeStr,
+          lastContact,
+          spark:     '5,16 30,14 55,12 80,14 105,10 130,12 155,10 195,8',
+          sparkArea: '5,16 30,14 55,12 80,14 105,10 130,12 155,10 195,8 195,22 5,22',
+          signals: c.sinais.slice(0, 3).map(s => ({ id: s.id, title: s.titulo, sev: sevMap[s.impacto] ?? 'oportunidade' })),
+          actions: c.acoes.slice(0, 3).map(a => ({ title: a.titulo, owner: a.owner, status: a.status })),
+        };
+      });
+  }, []);
+
+  const ALERTS = useMemo(() => {
+    const severityOrder:  Record<string, number> = { 'crítico': 0, 'alerta': 1, 'oportunidade': 2 };
+    const severityLabel:  Record<string, string>  = { 'crítico': 'Crítico', 'alerta': 'Alerta', 'oportunidade': 'Oportunidade' };
+    const badgeClassMap:  Record<string, string>  = { 'crítico': 'br', 'alerta': 'bam', 'oportunidade': 'bb' };
+    const iconMap:        Record<string, string>  = { 'crítico': '🚨', 'alerta': '⚠️', 'oportunidade': '⚡' };
+    const bgMap:          Record<string, string>  = { 'crítico': '#fef2f2', 'alerta': '#fffbeb', 'oportunidade': '#eff2ff' };
+    const borderMap:      Record<string, string>  = { 'crítico': '#fecaca', 'alerta': '#fde68a', 'oportunidade': '#c7d2fe' };
+    const iconBgMap:      Record<string, string>  = { 'crítico': '#fee2e2', 'alerta': '#fef3c7', 'oportunidade': '#e0e7ff' };
+    const linkColorMap:   Record<string, string>  = { 'crítico': '#dc2626', 'alerta': '#d97706', 'oportunidade': '#2b44ff' };
+
+    return advancedSignals
+      .filter(s => !s.archived && !s.resolved)
+      .sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9))
+      .slice(0, 4)
+      .map(s => ({
+        id:        s.id,
+        severity:  severityLabel[s.severity]  ?? s.severity,
+        badgeClass: badgeClassMap[s.severity] ?? 'bsl',
+        icon:      iconMap[s.severity]        ?? '📌',
+        bg:        bgMap[s.severity]          ?? '#f8fafc',
+        border:    borderMap[s.severity]      ?? '#e2e8f0',
+        iconBg:    iconBgMap[s.severity]      ?? '#f1f5f9',
+        linkColor: linkColorMap[s.severity]   ?? '#475569',
+        title:     s.title,
+        desc:      s.description,
+      }));
+  }, []);
  
   function showToast(msg: string, sub?: string) {
     setToast({msg, sub});
