@@ -208,10 +208,10 @@ const generatePeopleData = (accounts: any[]) => {
   return Array.from({ length: 40 }).map((_, i) => {
     const acc = accounts[i % accounts.length];
     const role = roles[i % roles.length];
-    const influence = Math.floor(Math.random() * 100);
-    const accessibility = Math.floor(Math.random() * 100);
-    const engagement = Math.floor(Math.random() * 100);
-    
+    const influence    = ((i * 17 + 23) % 91) + 9;
+    const accessibility = ((i * 31 + 47) % 85) + 15;
+    const engagement   = ((i * 53 + 7)  % 80) + 20;
+
     return {
       id: `person-${i}`,
       name: ['Fábio Diniz', 'Alice Souza', 'Marco Aurélio', 'Elena Silva', 'Ricardo Mello', 'Paula Torres', 'Gustavo Lima', 'Sandra Oh'][i % 8],
@@ -225,7 +225,7 @@ const generatePeopleData = (accounts: any[]) => {
       power: influence > 70 ? 'High' : (influence > 40 ? 'Medium' : 'Low'),
       status: engagement > 60 ? 'Active' : (engagement > 30 ? 'Neutral' : 'Cold'),
       channel: channels[i % channels.length],
-      lastTouch: `${Math.floor(Math.random() * 15)}d atrás`,
+      lastTouch: `${(i * 3 % 14) + 1}d atrás`,
       owner: acc.owner,
       risk: i % 7 === 0 ? 'High' : 'Low',
       impact: influence * (engagement / 100),
@@ -527,7 +527,7 @@ const RankingsLayer: React.FC<{ hotUpsell: any[]; hotCrossSell: any[]; highRiskC
   </div>
 );
 
-const CommercialMemoryLayer: React.FC<{ accounts: any[] }> = ({ accounts }) => (
+const CommercialMemoryLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => void }> = ({ accounts, onSelect }) => (
   <div className="space-y-6">
     <SectionHeader title="Memória Comercial Canopi" subtitle="Histórico de vitórias, perdas e projetos ativos nas top contas" icon={<History className="w-5 h-5" />} />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -562,7 +562,7 @@ const CommercialMemoryLayer: React.FC<{ accounts: any[] }> = ({ accounts }) => (
               {acc.memory.active.length === 0 && <p className="text-[10px] italic text-slate-400">Aguardando início</p>}
             </div>
           </div>
-          <Button variant="ghost" className="w-full mt-6 text-[9px] font-black uppercase text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-slate-100 py-3 rounded-xl transition-all">Explorar Ficha 360°</Button>
+          <Button variant="ghost" onClick={() => onSelect(acc)} className="w-full mt-6 text-[9px] font-black uppercase text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-slate-100 py-3 rounded-xl transition-all">Explorar Ficha 360°</Button>
         </Card>
       ))}
     </div>
@@ -992,7 +992,7 @@ const ContactAnalyticsLayer: React.FC<{ people: any[] }> = ({ people }) => (
   </div>
 );
 
-const ContactOperationalFilaLayer: React.FC<{ people: any[] }> = ({ people }) => (
+const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any) => void }> = ({ people, onSelect }) => (
   <Card className="p-0 border-slate-200 shadow-xl rounded-[48px] bg-white overflow-hidden border-t-8 border-t-indigo-600 mt-12 pb-8">
     <div className="p-10 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-slate-50/50">
       <div>
@@ -1061,7 +1061,7 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[] }> = ({ people }) =>
                  <span className="text-[11px] font-black text-slate-700">{p.lastTouch}</span>
               </td>
               <td className="px-8 py-6 text-right">
-                 <Button size="sm" className="bg-white border border-slate-200 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 rounded-xl font-black text-[9px] uppercase px-4 transition-all">Ação</Button>
+                 <Button size="sm" onClick={() => { const account = processedAccounts.find(a => a.id === p.accountId); if (account) onSelect(account); }} className="bg-white border border-slate-200 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 rounded-xl font-black text-[9px] uppercase px-4 transition-all">Ação</Button>
               </td>
             </tr>
           ))}
@@ -1094,7 +1094,6 @@ const ContactActionsLayer: React.FC = () => (
               <p className="text-[9px] font-black text-slate-800 uppercase mb-2">Ação Recomendada</p>
               <p className="text-[11px] font-medium text-slate-700 leading-tight">{action.action}</p>
            </div>
-           <Button className={`w-full bg-${action.color}-600 text-white font-black text-[10px] uppercase py-3 rounded-2xl shadow-md hover:opacity-90 transition-all`}>Acionar Play</Button>
         </div>
       </Card>
     ))}
@@ -1222,7 +1221,7 @@ export const ABXOrchestration: React.FC = () => {
         <RankingsLayer hotUpsell={hotUpsell} hotCrossSell={hotCrossSell} highRiskChurn={highRiskChurn} />
 
         {/* LAYER 6: COMMERCIAL MEMORY */}
-        <CommercialMemoryLayer accounts={processedAccounts} />
+        <CommercialMemoryLayer accounts={processedAccounts} onSelect={handleAccountSelect} />
 
         {/* LAYER 7: ABX HEATMAPS */}
         <HeatmapsLayer accounts={processedAccounts} committeeRoles={committeeRoles} />
@@ -1248,7 +1247,7 @@ export const ABXOrchestration: React.FC = () => {
           
           <ContactAnalyticsLayer people={peopleData} />
           
-          <ContactOperationalFilaLayer people={peopleData} />
+          <ContactOperationalFilaLayer people={peopleData} onSelect={handleAccountSelect} />
           
           <ContactActionsLayer />
         </div>
