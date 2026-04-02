@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Auditoria de Fechamento Fase 6)
+`main` — atualizada em 2026-04-02 (Recorte 25 - Fase 7)
 
 ## Fase atual do plano
-**Fase 6 — Dinamização e Refino ABM** (CONCLUÍDA)
+**Fase 7 — Deep Intelligence** (Em andamento)
 
 ---
 
@@ -98,3 +98,4 @@
 | Conexão de Heatmaps | 22º Recorte Concluído | Heatmaps em AbmStrategy conectados ao contasMock dinâmico |
 | Action Cards Dinâmicos | 23º Recorte Concluído | Blocos laterais e matrizes reativos à activeAccount |
 | Refinamento Técnico | 24º Recorte Concluído | Infra de Lint reativada; Lint Limpo; Build íntegro; react/no-unescaped-entities saneado globalmente |
+| Deep Intelligence (Perfil) | 25º Recorte Concluído | Perfil da Empresa com leitura estruturada, ações, oportunidades e scores (AccountDetailView) |

@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Deep Intelligence Perfil (Recorte 25 - Início Fase 7)
+
+**Objetivo:** Evoluir o Perfil da Empresa (AccountDetailView) para uma camada de inteligência profunda, expondo dados estruturados e operacionais preexistentes.
+
+**Atividades:**
+- **Enriquecimento Firmográfico:** Exposição de localização, segmento, porte, etapa, budgetBrl e cobertura relacional no header.
+- **Dinamização de Scores:** Implementação de mini-bars visuais para ICP, CRM, VP, CT e FT com cores adaptativas.
+- **Leitura Estruturada AI:** Migração do briefing de texto corrido para uma estrutura tripla: Factual (Dados Verificáveis), Inferida (Padrões AI) e Sugerida (Ações Sugeridas).
+- **Visibilidade Operacional:** Inclusão de blocos dedicados para Ações Operacionais (com status e dono) e Pipeline de Oportunidades (com valor, probabilidade e risco).
+- **Sinais Ampliados:** Adição de metadados críticos aos sinais (impacto, owner, data e contexto).
+- **Validação Técnica:** Build de produção aprovado e preservação integral dos componentes de Comitê e Histórico.
+
+**Commits:**
+- `a0bd8f6` — feat(command-center): Recorte 25 - perfil empresa com leitura estruturada, ações, oportunidades e scores.
+
+**Impacto no projeto:**
+- O Perfil da Empresa deixa de ser meramente informativo e passa a ser o núcleo de tomada de decisão tática.
+- Alinhamento total entre a riqueza de dados do backend (mock) e a interface do Command Center.
+- Preparação da base para o próximo passo de inteligência relacional.
+
+---
+
 ## [2026-04-02] — Auditoria de Infraestrutura e Qualidade (Recorte 24 - Finalização Fase 6)
 
 **Objetivo:** Restaurar a infraestrutura de linting, garantir um build de produção 100% limpo e resolver débitos técnicos de sintaxe JSX que bloqueavam a automação de qualidade.
