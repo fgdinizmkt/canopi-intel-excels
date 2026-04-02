@@ -3,7 +3,7 @@
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
 - **Último recorte concluído:** Auditoria técnica de abmHeatmapAccounts (18º Recorte Fase 5)
-- **Último commit relevante:** Documentação do 18º recorte (auditoria, sem código)
+- **Último commit relevante:** `137fd17` — docs: registra conclusao do 18º recorte (auditoria tecnica de abmHeatmapAccounts)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
