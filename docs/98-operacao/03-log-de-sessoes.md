@@ -584,3 +584,39 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - Todos os botões clicáveis de `ABXOrchestration.tsx` têm comportamento real
 - People Layer é determinístico e estável
 - Frente ABX encerrada definitivamente — sem dívidas imediatas no backlog
+
+---
+
+## 2026-04-02 — 12º Recorte da Fase 5: ABM Modal Fictício
+
+**Commit de código:** `6d416a6` — feat: remove modal ficticio e neutraliza interatividade artificial em abmstrategy
+**Arquivo:** `src/pages/AbmStrategy.tsx`
+
+**Contexto:**
+- `AbmStrategy.tsx` possuía uma infraestrutura de modal própria (`openDetailedModal`) com switch de 20 cases e ~1074 linhas de JSX fictício completamente desconectado de dados reais.
+- A implementação já estava presente no working tree (não commitada) de sessão anterior. Auditoria de ambiente confirmou a integridade das mudanças antes do commit.
+
+**O que foi feito:**
+
+`AbmStrategy.tsx`:
+- Import `Modal` removido de `../components/ui`
+- Estados `modalOpen` e `modalData` removidos do componente
+- Função `openDetailedModal` removida integralmente: switch de 20 cases (ACCOUNT, METRIC, PLAY, CLUSTER, PRIORITY_POINT e 15 cases adicionais), ~1074 linhas de JSX
+- ~40 handlers `onClick={() => openDetailedModal(...)}` removidos de todos os pontos de chamada na página
+- `cursor-pointer` removido das 3 tech-fit cards (Stack Cloud, CRM, AI Readiness) que não têm ação real
+- `<Modal />` removida do JSX final do componente
+
+**Preservado intencionalmente:**
+- `openAccount(acc.id)` na TAL Table — único ponto de interação real, conectado ao Centro de Comando
+- Toda estrutura visual, IIFEs, datasets hardcoded, sliders reativos e visualizações
+- Botões sem ação real mantidos visualmente (sem `onClick` e sem `cursor-pointer` falso)
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings
+- `git diff --stat`: 1 arquivo, 108 insertions, 1182 deletions
+- Working tree limpa após commit
+
+**Resultado:**
+- `AbmStrategy.tsx` não possui mais nenhuma affordance falsa ligada ao sistema de modal fictício
+- A única interação real da página (TAL → Centro de Comando) permanece funcional
+- Próximo candidato: 13º recorte — saneamento continuado de AbmStrategy.tsx ou Central de Playbooks

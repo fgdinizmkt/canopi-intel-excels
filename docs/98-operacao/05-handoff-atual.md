@@ -2,8 +2,9 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último commit relevante:** `7354f33` — feat: estabiliza people layer e ativa acoes reais em abxorchestration
-- **Data:** 2026-04-01
+- **Último recorte concluído:** ABM Modal Fictício (12º Recorte Fase 5)
+- **Último commit relevante:** `6d416a6` — feat: remove modal ficticio e neutraliza interatividade artificial em abmstrategy
+- **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
 ## Regras obrigatórias
@@ -16,27 +17,30 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## O que foi entregue (fechamento definitivo da frente ABX — complementação do 10º recorte)
-- `generatePeopleData`: `Math.random()` eliminado — fórmulas determinísticas estabilizam People Layer entre reloads.
-- `CommercialMemoryLayer`: "Explorar Ficha 360°" agora abre modal 360° real via `handleAccountSelect`.
-- `ContactOperationalFilaLayer`: "Ação" localiza conta por `p.accountId` e abre modal 360° real.
-- `ContactActionsLayer`: 4 botões "Acionar Play" fictícios removidos — UX honesta.
-- **Decisão arquitetural registrada:** ABX mantém profundidade própria via `compiladoClientesData`; integração com `contasMock` descartada definitivamente.
+## O que foi entregue (12º Recorte — ABM Modal Fictício)
+- `openDetailedModal` removida: switch de 20 cases, ~1074 linhas de JSX fictício eliminadas de `AbmStrategy.tsx`.
+- Estados `modalOpen` e `modalData` removidos.
+- Import `Modal` removido.
+- ~40 `onClick={() => openDetailedModal(...)}` removidos de todos os pontos de chamada.
+- `cursor-pointer` removido das tech-fit cards sem ação real.
+- `<Modal />` removida do JSX final.
+- `openAccount(acc.id)` na TAL Table preservado — único ponto de interação real da página.
+- Toda estrutura visual, IIFEs, datasets, sliders e visualizações preservados intactos.
 
 ---
 
 ## Próximos passos (Roadmap)
-1. Iniciar o **12º Recorte da Fase 5** (frente a definir).
+1. Iniciar o **13º Recorte da Fase 5** (frente a definir).
 2. Candidatos priorizados:
-   - Continuação do saneamento de `AbmStrategy.tsx` (IIFE, modais e benchmarks ainda hardcoded).
-   - Central de Playbooks (orquestração cross-channel corporativa).
+   - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs, datasets hardcoded e benchmarks ainda intactos.
+   - Central de Playbooks — orquestração cross-channel corporativa.
 3. ABX encerrado — sem dívidas imediatas.
 
 ## Pendências / Backlog
-- **AbmStrategy.tsx:** TAL conectada. IIFE (~1000 linhas), `openDetailedModal` (20 cases), benchmarks, clusters e scatter ainda hardcoded.
+- **AbmStrategy.tsx:** Modal fictício removido. IIFEs (~1000 linhas), datasets hardcoded (`abmHeatmapAccounts`, `scatterAccounts`, `entryPlays`, benchmarks, clusters) ainda intactos — fora do escopo do 12º recorte.
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
 - **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução.
-- **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (sem fonte de dados real disponível — aceito como estado definitivo).
+- **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (aceito como estado definitivo).
 
 ## Arquivos que sempre precisam ser lidos
 - AGENTS.md

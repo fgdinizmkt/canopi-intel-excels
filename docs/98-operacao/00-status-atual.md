@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (ABX Fechamento Definitivo — complementação do 10º Recorte)
+`main` — atualizada em 2026-04-02 (ABM Modal Fictício Removido — 12º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -150,6 +150,18 @@
   - `ContactActionsLayer`: 4 botões "Acionar Play" fictícios removidos; cards mantidos como bloco narrativo
 - **Decisão arquitetural definitiva:** ABX mantém profundidade própria via `compiladoClientesData`; não integrar `processedAccounts` com `contasMock` (IDs incompatíveis; modal interno já é mais rico para contexto ABX)
 
+### Fase 5 — Décimo segundo recorte: ABM Modal Fictício (2026-04-02)
+
+**AbmStrategy.tsx** — commit `6d416a6`
+- `openDetailedModal` removida: switch de 20 cases, ~1074 linhas de JSX fictício eliminadas
+- Estados `modalOpen` e `modalData` removidos
+- Import `Modal` removido
+- ~40 handlers `onClick={() => openDetailedModal(...)}` removidos de todos os pontos de chamada
+- `cursor-pointer` removido de 3 tech-fit cards sem ação real
+- `<Modal />` removida do JSX final do componente
+- `openAccount(acc.id)` na TAL Table preservado — único ponto de interação real
+- Toda estrutura visual, IIFEs, datasets, sliders e visualizações preservados intactos
+
 ---
 
 ## O que está em andamento
@@ -160,11 +172,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 12º Recorte da Fase 5 (frente a definir).
+- Iniciar o 13º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. Continuação do saneamento de `AbmStrategy.tsx` — IIFE, modais e benchmarks ainda hardcoded
+  1. `AbmStrategy.tsx` — IIFEs, datasets hardcoded e benchmarks ainda intactos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
-  3. `ABXOrchestration.tsx` — frente encerrada; sem dívidas imediatas
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -177,6 +188,7 @@ Nenhuma implementação funcional em andamento.
 | Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
 | ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
 | ABX Action Routes | 10º Recorte Concluído (fechado) | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
+| ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
 | Roadmap | Próximo Passo | Recorte 12 — Frente a definir |
