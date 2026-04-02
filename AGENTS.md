@@ -4,6 +4,25 @@
 Este projeto é a plataforma Canopi | intel excels.
 É um SaaS B2B de inteligência operacional, account intelligence, marketing e receita.
 
+---
+
+## Guia Operacional Rápido (Protocolo Obrigatório)
+
+### Especialidades e Agentes
+1. **Claude Code:** Auditoria técnica, refactor pesado e implementação de lógica/código.
+2. **Antigravity:** Direção visual (Premium), UX/UI, hierarquia e narrativa de dados.
+3. **ChatGPT:** Orquestração geral, corte de escopo e revisão crítica de coerência.
+
+### Protocolo Diário
+- **Sync:** Validar `git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`. Só dar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
+- **Contexto:** Leitura obrigatória dos docs de governança (`docs/98-operacao/`) e status atual.
+- **Seleção:** Informar explicitamente qual agente assumirá a tarefa antes de agir.
+- **Aprovação:** Seguir o fluxo: *Executar → Build → Diff Stat → Diff Real → Aprovação Usuário → Commit*.
+- **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
+- **Retomada:** Em caso de quebra, usar estritamente a documentação como fonte da verdade.
+
+---
+
 ## Idioma
 - Toda a interface e os textos devem estar em português do Brasil.
 - Evitar termos em inglês na UI quando houver equivalente claro em português.

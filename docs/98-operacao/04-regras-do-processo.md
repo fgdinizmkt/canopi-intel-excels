@@ -5,6 +5,26 @@ Tornar explícito o que deve acontecer após cada evento do projeto. Nada aqui �
 
 ---
 
+## Protocolo Fixo de Operação
+
+A operação do projeto é orquestrada por uma combinação de agentes especializados. Antes de qualquer prompt, a escolha do agente deve ser explícita.
+
+### Papéis dos Agentes
+
+#### 1. Claude Code (Terminal/Agente de Execução)
+- **Especialidade:** Auditoria técnica, refatoração de alta precisão, implementação de lógica e código.
+- **Responsabilidade:** Execução de comandos, validação de build, geração de diffs, commits de código e fechamentos documentais operacionais.
+
+#### 2. Antigravity (Agente de Design/UX)
+- **Especialidade:** Direção visual, estrutural de página, densidade de dados e narrativa visual.
+- **Responsabilidade:** Garantir a estética premium e hierarquia de informação. Implementa quando o foco principal for a experiência visual aplicada ao componente.
+
+#### 3. ChatGPT (Orquestrador)
+- **Especialidade:** Visão estratégica, corte de escopo, escolha do agente ideal e revisão crítica.
+- **Responsabilidade:** Garantir a coerência com a memória operacional total e evitar deriva rítmica das fases do roadmap.
+
+---
+
 ## Regra 0 — Fluxo obrigatório antes de qualquer commit
 
 Toda implementação segue esta sequência, sem exceção:
@@ -126,3 +146,22 @@ Cada entrada deve conter:
 - Fatos que não estejam verificados no repositório ou no histórico git
 - Detalhes de UX ou código que já ficam legíveis nos commits
 - Listas genéricas sem contexto operacional
+
+---
+
+## Regras Adicionais de Execução
+
+### 1. Sincronismo e Leitura
+- **Sync Global:** Antes de qualquer trabalho em pasta local, o agente deve garantir sincronia total (`git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`).
+- **Git Pull:** Só realizar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
+- **Leitura Mandatória:** É obrigatório ler os arquivos de governança (`docs/98-operacao/`) e o status atual antes de agir.
+
+### 2. Fluxo de Diálogo
+- **Seleção de Agente:** O usuário deve ser informado de qual agente executará a tarefa antes do envio do prompt de ação.
+- **Última Mensagem:** O agente nunca deve ignorar o contexto ou instruções contidas na última mensagem do usuário.
+- **Retomada:** Em caso de interrupção (limite de tokens ou crash), a retomada deve ser orientada estritamente pela memória operacional (`00-status-atual.md` e `05-handoff-atual.md`).
+
+### 3. Critério de Pronto
+- **Aprovação Documental:** Um recorte só é considerado fechado quando a documentação operacional estiver completa e o usuário concordar explicitamente. Se o usuário considerar incompleto, a tarefa continua aberta.
+
+---
