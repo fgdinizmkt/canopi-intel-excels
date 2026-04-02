@@ -59,7 +59,7 @@ import {
   Info,
   Network
 } from 'lucide-react';
-import { Card, Badge, Button, Modal } from '../components/ui';
+import { Card, Badge, Button } from '../components/ui';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
@@ -242,8 +242,6 @@ const getHmScore = (acc: typeof abmHeatmapAccounts[0], key: string): number => {
 };
 
 export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalData, setModalData] = useState<{ title: string; content: React.ReactNode; size?: 'sm' | 'md' | 'lg' | 'xl' } | null>(null);
   const [hmTooltip, setHmTooltip] = useState<any>(null);
   // Sliders reativos
   const [icpThreshold, setIcpThreshold] = useState(70);
@@ -275,1074 +273,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     return Math.max(1, Math.min(99, Math.round(base + weightedDelta)));
   };
 
-  const openDetailedModal = (type: string, data: any) => {
-    let content;
-    switch(type) {
-      case 'ACCOUNT':
-        content = (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-blue-600 text-lg shadow-sm">
-                {data.initials}
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">{data.name}</h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{data.industry} • TIER 1</p>
-              </div>
-              <Badge variant="emerald" className="ml-auto">HOT ACCOUNT</Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-2"><Users className="w-3 h-3"/> Comitê de Compra</p>
-                <div className="space-y-3">
-                  {[{ role: 'Champion', name: 'Ana Souza', status: 'Engajada' }, { role: 'Buyer', name: 'Marcos Reais', status: 'Conectado' }, { role: 'Influencer', name: 'Carla Dias', status: 'Pendente' }].map((p, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-slate-600">{p.role}</span>
-                      <span className="text-[10px] font-bold text-slate-900 px-2 py-0.5 bg-slate-50 rounded border border-slate-100">{p.status}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-2"><Settings2 className="w-3 h-3"/> Tech Match</p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="blue" className="bg-blue-50 text-blue-600 border-none text-[9px]">AWS Cloud</Badge>
-                  <Badge variant="blue" className="bg-indigo-50 text-indigo-600 border-none text-[9px]">Salesforce CRM</Badge>
-                  <Badge variant="blue" className="bg-purple-50 text-purple-600 border-none text-[9px]">Hubspot Inbound</Badge>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 bg-slate-900 text-white rounded-2xl shadow-lg">
-              <div className="flex justify-between items-center mb-4">
-                <h5 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2"><Zap className="w-3 h-3 fill-amber-400 text-amber-400"/> Next Best Action</h5>
-                <Badge variant="slate" className="bg-white/10 text-white border-none text-[8px]">IA SUGGESTION</Badge>
-              </div>
-              <p className="text-sm font-medium mb-4 text-slate-300">Enviar convite para mesa redonda de C-Levels sobre Finanças 4.0. Ana Souza (Champion) demonstrou interesse em posts relacionados ontem.</p>
-              <Button size="sm" className="w-full bg-blue-600 border-none font-bold">Agendar via SDR</Button>
-            </div>
-          </div>
-        );
-        setModalData({ title: `Estratégia: ${data.name}`, content, size: 'lg' });
-        break;
-      case 'METRIC':
-        content = (
-          <div className="space-y-6">
-             <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
-                <p className="text-[10px] font-bold text-blue-600 uppercase mb-1">{data.label}</p>
-                <p className="text-3xl font-bold text-slate-900">{data.val}</p>
-                <p className="text-xs text-slate-500 font-medium mt-1">{data.desc}</p>
-             </div>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                   <h5 className="text-[10px] font-bold text-slate-400 uppercase">vs Métodos Tradicionais</h5>
-                   <div className="flex items-end gap-3 h-32">
-                      <div className="w-10 bg-slate-200 rounded-t-lg h-12 flex items-center justify-center"><span className="text-[10px] -rotate-90 font-bold">Trad.</span></div>
-                      <div className="w-10 bg-blue-600 rounded-t-lg h-[90%] flex items-center justify-center"><span className="text-[10px] -rotate-90 font-bold text-white">ABM</span></div>
-                   </div>
-                   <p className="text-[10px] font-bold text-emerald-600 uppercase">↑ 2.4x Eficiência</p>
-                </div>
-                <div className="space-y-2">
-                   <h5 className="text-[10px] font-bold text-slate-400 uppercase">Benchmark Elite</h5>
-                   <p className="text-sm font-bold text-slate-900">{data.elite}</p>
-                </div>
-            </div>
-          </div>
-        );
-        setModalData({ title: `Analítico: ${data.label}`, content, size: 'md' });
-        break;
-      case 'PLAY':
-         content = (
-            <div className="space-y-6">
-               <div className="flex items-center gap-6 p-6 bg-slate-50 rounded-2xl border border-slate-200">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-600">{data.icon}</div>
-                  <div>
-                     <h4 className="text-lg font-bold text-slate-900">{data.title}</h4>
-                     <p className="text-xs text-slate-500 font-medium tracking-tight">Eficácia Estimada: {data.efficacy}%</p>
-                  </div>
-               </div>
-               <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-4 shadow-sm">
-                  <h5 className="text-[10px] font-bold text-slate-400 uppercase">Roteiro de Ativação</h5>
-                  {[
-                     { step: '1', task: 'Validar lista de contatos no LinkedIn Sales Navigator' },
-                     { step: '2', task: 'Disparar e-mail 1:1 personalizado com o Champion' },
-                     { step: '3', task: 'Ativar Social Ads focados no cluster Manufatura' },
-                     { step: '4', task: 'Ligação de agendamento via BDR/SDR' }
-                  ].map((s, i) => (
-                     <div key={i} className="flex gap-4 items-start pb-4 border-b border-slate-50 last:border-none">
-                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">{s.step}</div>
-                        <p className="text-xs text-slate-700 font-medium leading-relaxed">{s.task}</p>
-                     </div>
-                  ))}
-               </div>
-               <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase shadow-lg shadow-slate-900/10">Orquestrar Agora</Button>
-            </div>
-         );
-         setModalData({ title: `Playbook: ${data.title}`, content });
-         break;
-      case 'CLUSTER':
-         content = (
-            <div className="space-y-6">
-               <div className="flex justify-between items-start p-6 bg-blue-600 rounded-2xl text-white shadow-xl shadow-blue-500/20">
-                  <div>
-                     <h4 className="text-xl font-bold uppercase tracking-tight">{data.name}</h4>
-                     <p className="text-[10px] font-bold opacity-80 mt-1">{data.count} CONTAS ATIVAS NO CLUSTER</p>
-                  </div>
-                  <Badge variant="slate" className="bg-white/20 text-white border-none text-[9px] font-bold uppercase">{data.health}</Badge>
-               </div>
-               <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
-                  <h5 className="text-[10px] font-bold text-slate-400 uppercase">Resumo de Atividade</h5>
-                  <div className="grid grid-cols-2 gap-4">
-                     <div className="p-4 bg-slate-50 rounded-xl">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Engajamento Médio</p>
-                        <p className="text-lg font-bold text-slate-900">{data.val}%</p>
-                     </div>
-                     <div className="p-4 bg-slate-50 rounded-xl">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Novas MQAs (7d)</p>
-                        <p className="text-lg font-bold text-emerald-600">+4</p>
-                     </div>
-                  </div>
-                  <div className="pt-4">
-                     <p className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><Layout className="w-3 h-3"/> Playbook Ativo</p>
-                     <p className="text-sm font-bold text-slate-900 bg-slate-50 p-3 rounded-lg border border-slate-100">{data.playbook}</p>
-                  </div>
-               </div>
-               <Button className="w-full bg-blue-600 text-white rounded-xl py-6 font-bold uppercase shadow-lg shadow-blue-500/20">Expandir Cluster</Button>
-            </div>
-         );
-         setModalData({ title: `Análise de Cluster: ${data.name}`, content });
-         break;
-      case 'PRIORITY_POINT':
-        const riskColors: Record<string, string> = { critical: 'bg-red-600', high: 'bg-orange-500', moderate: 'bg-yellow-400', low: 'bg-green-500' };
-        const riskLabels: Record<string, string> = { critical: 'Crítico', high: 'Alto Risco', moderate: 'Moderado', low: 'Baixo Risco' };
-        const riskTexts: Record<string, string> = { critical: 'text-red-600', high: 'text-orange-500', moderate: 'text-yellow-600', low: 'text-green-600' };
-        content = (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100">
-              <div>
-                <h4 className="text-base font-bold text-slate-900 uppercase tracking-tight">{data.account}</h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-widest">{data.vertical} • {data.tier}</p>
-              </div>
-              <div className={`${riskColors[data.risk]} text-white text-[9px] font-bold uppercase px-3 py-1.5 rounded-lg`}>{riskLabels[data.risk]}</div>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl text-center shadow-sm">
-                <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">ARR Potencial</p>
-                <p className="text-sm font-bold text-slate-900">{data.arr}</p>
-              </div>
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl text-center shadow-sm">
-                <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Probabilidade</p>
-                <p className={`text-sm font-bold ${riskTexts[data.risk]}`}>{data.y}%</p>
-              </div>
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl text-center shadow-sm">
-                <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Impacto Score</p>
-                <p className="text-sm font-bold text-slate-900">{data.x}/100</p>
-              </div>
-            </div>
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-2"><Zap className="w-3 h-3 text-amber-500" /> Ação Recomendada ({data.action})</h5>
-              <p className="text-sm font-medium text-slate-700 leading-relaxed">{data.actionDesc}</p>
-            </div>
-            <div className="p-5 bg-slate-900 text-white rounded-2xl space-y-4">
-              <h5 className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"><BrainCircuit className="w-3 h-3 fill-blue-400 text-blue-400" /> Próximos Passos (IA)</h5>
-              <div className="space-y-3">
-                {['Mapear Comitê de Compra (DMU) no LinkedIn Sales Navigator', 'Criar sequência de abordagem personalizada por perfil de cargo', 'Ativar play de intenção com conteúdo setorial exclusivo'].map((step, i) => (
-                  <div key={i} className="flex gap-3 items-start">
-                    <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">{i + 1}</div>
-                    <p className="text-xs text-slate-300 font-medium leading-relaxed">{step}</p>
-                  </div>
-                ))}
-              </div>
-              <Button size="sm" className="w-full bg-blue-600 border-none font-bold mt-2">Lançar Sequência de Ativação</Button>
-            </div>
-          </div>
-        );
-        setModalData({ title: `Análise de Conta: ${data.account}`, content, size: 'md' });
-        break;
-      case 'HEX_CELL':
-        const scoreDisplay = data.score as number;
-        const hexRisk = scoreDisplay >= 80 ? 'Muito Alta' : scoreDisplay >= 60 ? 'Moderada' : scoreDisplay >= 40 ? 'Baixa' : 'Muito Baixa';
-        const hexColor = scoreDisplay >= 80 ? '#c0392b' : scoreDisplay >= 60 ? '#f39c12' : scoreDisplay >= 40 ? '#27ae60' : '#1abc9c';
-        const contentTypes: Record<string, string[]> = {
-          'LinkedIn Ads 1:1 + Outreach Executive': ['Case Study Executivo', 'Convite para Evento Exclusivo', 'Insights de Mercado Personalizados'],
-          'Email Marketing + Webinar Exclusivo': ['Newsletter Setorial', 'Webinar Temático', 'Relatório de Benchmark'],
-          'Social Ads + Conteúdo Educacional': ['Article LinkedIn', 'Infográfico de Setor', 'Mini-curso Online'],
-          'Newsletter + Trial Gratuito': ['Trial Freemium', 'Post Educacional', 'White Paper'],
-        };
-        const contents = contentTypes[data.channel as string] || ['Conteúdo genérico'];
-        content = (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-5 rounded-2xl" style={{ backgroundColor: hexColor + '15', border: `1px solid ${hexColor}30` }}>
-              <div>
-                <h4 className="text-base font-bold text-slate-900 uppercase">{data.persona}</h4>
-                <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Vertical: {data.vertical}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold" style={{ color: hexColor }}>{scoreDisplay}%</p>
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Sinergia {hexRisk}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                <p className="text-[9px] font-bold text-slate-400 uppercase mb-2">Canal Principal</p>
-                <p className="text-xs font-bold text-slate-800">{data.channel}</p>
-              </div>
-              <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                <p className="text-[9px] font-bold text-slate-400 uppercase mb-2">Abordagem</p>
-                <p className="text-xs font-bold text-slate-800">{scoreDisplay >= 60 ? '1:1 Personalizada' : 'Nurturing Escalável'}</p>
-              </div>
-            </div>
-            <div className="p-5 bg-white border border-slate-200 rounded-2xl space-y-3">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase">Conteúdos Recomendados</h5>
-              {contents.map((c, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: hexColor }}>
-                    <CheckCircle2 className="w-3 h-3 text-white" />
-                  </div>
-                  <span className="text-xs font-medium text-slate-700">{c}</span>
-                </div>
-              ))}
-            </div>
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <p className="text-[9px] font-bold text-slate-400 uppercase mb-2">Estimativa de Tempo de Resposta</p>
-              <p className="text-sm font-bold text-slate-900">{scoreDisplay >= 80 ? '3-7 dias' : scoreDisplay >= 60 ? '7-14 dias' : scoreDisplay >= 40 ? '14-30 dias' : '+30 dias'}</p>
-            </div>
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-3 font-bold uppercase">Criar Sequência para Esta Combinação</Button>
-          </div>
-        );
-        setModalData({ title: `Sinergia: ${data.persona} x ${data.vertical}`, content, size: 'md' });
-        break;
-      case 'EXPORT':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-slate-900 rounded-2xl text-white shadow-xl relative overflow-hidden">
-              <div className="absolute right-4 bottom-4 opacity-10"><FileText className="w-24 h-24"/></div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Exportar Lista ABM</p>
-              <h4 className="text-xl font-bold">{data.label || 'Ranking ABM'}</h4>
-              <p className="text-[11px] opacity-70 mt-1">142 registros prontos para exportação</p>
-            </div>
-            <div className="space-y-2">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase">Colunas a incluir</h5>
-              {[
-                {col:'Empresa', checked:true}, {col:'ICP Score', checked:true}, {col:'CRM Engajamento', checked:true},
-                {col:'Potencial de Vertical', checked:true}, {col:'Contatos Mapeados', checked:false},
-                {col:'Fit Canopi', checked:true}, {col:'Nota Média', checked:true},
-              ].map((c,i)=>(
-                <label key={i} className="flex items-center gap-3 p-2 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-                  <input type="checkbox" defaultChecked={c.checked} className="accent-blue-600 w-3.5 h-3.5"/>
-                  <span className="text-[9px] font-bold text-slate-700">{c.col}</span>
-                </label>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {['CSV', 'Salesforce', 'HubSpot'].map((fmt,i)=>(
-                <button key={i} className={`p-3 rounded-xl border text-center text-[9px] font-bold transition-colors ${i===0?'bg-blue-600 text-white border-blue-600':'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}>{fmt}</button>
-              ))}
-            </div>
-            <Button className="w-full bg-blue-600 text-white rounded-xl py-6 font-bold uppercase">Gerar Exportação</Button>
-          </div>
-        );
-        setModalData({ title: 'Exportar Lista ABM', content, size: 'md' });
-        break;
-
-      case 'ASSIGN':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Atribuição de Contas</p>
-              <h4 className="text-xl font-bold">Selecionar Account Executive</h4>
-              <p className="text-[11px] opacity-80 mt-1">23 contas TOP TIER sem AE atribuído</p>
-            </div>
-            <div className="space-y-3">
-              {[
-                {name:'Rafael Mendes', role:'AE Enterprise', load:8, max:12, avatar:'RM', color:'bg-blue-600'},
-                {name:'Carolina Lima', role:'AE Mid-Market', load:11, max:12, avatar:'CL', color:'bg-violet-600'},
-                {name:'Diego Faria', role:'AE Estratégico', load:5, max:10, avatar:'DF', color:'bg-emerald-600'},
-                {name:'Juliana Costa', role:'AE SMB', load:9, max:15, avatar:'JC', color:'bg-amber-600'},
-              ].map((ae,i)=>(
-                <label key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl cursor-pointer hover:border-indigo-200 transition-all shadow-sm group">
-                  <input type="radio" name="ae" className="accent-indigo-600" defaultChecked={i===2}/>
-                  <div className={`w-9 h-9 rounded-xl ${ae.color} text-white font-black text-[11px] flex items-center justify-center shrink-0`}>{ae.avatar}</div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-slate-800">{ae.name}</p>
-                    <p className="text-[9px] text-slate-400 font-medium">{ae.role}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-slate-700">{ae.load}/{ae.max}</p>
-                    <div className="w-14 h-1.5 bg-slate-100 rounded-full mt-1"><div className="h-full bg-indigo-400 rounded-full" style={{width:`${(ae.load/ae.max)*100}%`}}/></div>
-                    <p className="text-[7px] font-bold text-slate-400 uppercase mt-0.5">contas</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-            <Button className="w-full bg-indigo-600 text-white rounded-xl py-6 font-bold uppercase">Confirmar Atribuição</Button>
-          </div>
-        );
-        setModalData({ title: 'Atribuir Account Executive', content, size: 'lg' });
-        break;
-
-      case 'GOAL':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-emerald-600 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">OKR — Objetivo</p>
-              <h4 className="text-xl font-bold">Criar Meta de Pipeline</h4>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Objetivo (O)</label>
-                <input type="text" defaultValue="Converter 15 contas Tier 1 em oportunidades até Q2 2025" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"/>
-              </div>
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Resultado-Chave 1 (KR)</label>
-                <input type="text" defaultValue="Atingir 80%+ de ICP qualificado nas 15 contas" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none"/>
-              </div>
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Resultado-Chave 2 (KR)</label>
-                <input type="text" defaultValue="Mapear 3+ contatos DMU por conta (Decision-Making Unit)" className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs focus:border-emerald-500 outline-none"/>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Prazo</label>
-                  <select className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs bg-white">
-                    <option>Q2 2025 (Jun 30)</option>
-                    <option>Q3 2025 (Set 30)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Responsável</label>
-                  <select className="w-full border border-slate-200 rounded-xl px-4 py-3 text-xs bg-white">
-                    <option>Rafael Mendes</option>
-                    <option>Diego Faria</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <Button className="w-full bg-emerald-600 text-white rounded-xl py-6 font-bold uppercase">Registrar OKR no CRM</Button>
-          </div>
-        );
-        setModalData({ title: 'Criar Meta de Pipeline (OKR)', content, size: 'lg' });
-        break;
-
-      case 'REACTIVATE':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl">
-              <div className="flex items-center gap-3 mb-2">
-                <Bell className="w-5 h-5 text-amber-500 shrink-0"/>
-                <h4 className="text-sm font-bold text-amber-800">Reativar: {data.name || 'Conta Inativa'}</h4>
-              </div>
-              <p className="text-[10px] font-medium text-amber-600">Engajamento CRM: <strong>{data.crm || '28'}%</strong> · Última atividade: <strong>47 dias atrás</strong></p>
-            </div>
-            <div className="space-y-3">
-              <h5 className="text-[9px] font-bold text-slate-400 uppercase">Escolha a abordagem de reativação</h5>
-              {[
-                {titulo:'Email Executivo Direto', desc:'Template 1:1 personalizado com insight sobre o setor da conta. Taxa de abertura estimada: 42%.', tag:'Recomendado', tagCor:'bg-emerald-100 text-emerald-700'},
-                {titulo:'LinkedIn InMail + Conexão', desc:'Cold InMail via SDR com contexto de match de conteúdo recente publicado pela conta.', tag:'2° opção', tagCor:'bg-blue-100 text-blue-700'},
-                {titulo:'Gifting / Direct Mail', desc:'Envio físico personalizado para o endereço da empresa. Alto impacto para contas acima de R$500k.', tag:'Alto custo', tagCor:'bg-amber-100 text-amber-700'},
-              ].map((o,i)=>(
-                <label key={i} className="flex items-start gap-3 p-4 bg-white border border-slate-100 rounded-2xl cursor-pointer hover:border-amber-200 shadow-sm">
-                  <input type="radio" name="react" className="accent-amber-500 mt-1" defaultChecked={i===0}/>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-[10px] font-bold text-slate-800">{o.titulo}</p>
-                      <span className={`text-[7px] font-bold px-1.5 py-0.5 rounded ${o.tagCor}`}>{o.tag}</span>
-                    </div>
-                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed">{o.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-            <Button className="w-full bg-amber-500 text-white rounded-xl py-6 font-bold uppercase">Iniciar Reativação</Button>
-          </div>
-        );
-        setModalData({ title: `Playbook de Reativação`, content, size: 'lg' });
-        break;
-
-      case 'NEW_PLAY':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-slate-900 rounded-2xl text-white relative overflow-hidden">
-              <div className="absolute right-4 bottom-4 opacity-10"><Layout className="w-20 h-20"/></div>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Biblioteca de Playbooks</p>
-              <h4 className="text-xl font-bold">Escolha ou crie um Play</h4>
-            </div>
-            <div className="space-y-2">
-              {[
-                {nome:'Expansão Tier 1', desc:'Email D0 + LinkedIn D2 + Cold Call D5 + Gift D10', verticais:'Finance, Tech', rodando:true, cor:'bg-red-600'},
-                {nome:'Reengajamento C-Level', desc:'InMail personalizado + Evento VIP + Introdução indireta', verticais:'Saúde, Indústria', rodando:true, cor:'bg-violet-600'},
-                {nome:'Nurturing Mid-Market', desc:'Conteúdo educativo semanal + Webinar mensal + SDR trimestral', verticais:'Todas', rodando:true, cor:'bg-blue-600'},
-                {nome:'Upsell Champions', desc:'CS Touch + Caso de Sucesso + AE Check-in', verticais:'Tech, Seguros', rodando:false, cor:'bg-emerald-600'},
-                {nome:'Cold Break Enterprise', desc:'PR/Conteúdo → Evento → Reabordagem com contexto', verticais:'Finance, Agro', rodando:false, cor:'bg-amber-600'},
-              ].map((p,i)=>(
-                <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl hover:border-violet-200 cursor-pointer transition-all shadow-sm">
-                  <div className={`w-2 h-full min-h-[40px] rounded-full ${p.cor} shrink-0`}/>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[10px] font-bold text-slate-800">{p.nome}</p>
-                      {p.rodando && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"/>}
-                    </div>
-                    <p className="text-[9px] text-slate-400 font-medium mt-0.5">{p.desc}</p>
-                    <p className="text-[8px] text-slate-300 mt-0.5">Verticais: {p.verticais}</p>
-                  </div>
-                  <button className="text-[8px] font-bold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-violet-100 hover:text-violet-600 transition-colors shrink-0">{p.rodando ? 'Clonar' : 'Ativar'}</button>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase">Criar Novo Playbook</Button>
-          </div>
-        );
-        setModalData({ title: 'Biblioteca de Playbooks ABM', content, size: 'xl' });
-        break;
-
-      case 'PERF':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl text-white shadow-xl">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Analytics de Playbooks</p>
-              <h4 className="text-xl font-bold">Performance das Sequências</h4>
-              <p className="text-[11px] opacity-80 mt-1">Últimos 30 dias · 3 plays ativos</p>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                {label:'Taxa de Abertura', val:'47%', delta:'+6pp', cor:'text-emerald-600'},
-                {label:'Taxa de Reply', val:'18%', delta:'+2pp', cor:'text-emerald-600'},
-                {label:'Oportunidades Geradas', val:'11', delta:'+4', cor:'text-emerald-600'},
-              ].map((m,i)=>(
-                <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm text-center">
-                  <p className="text-2xl font-black text-slate-900">{m.val}</p>
-                  <p className="text-[7px] font-bold text-slate-400 uppercase mt-0.5">{m.label}</p>
-                  <p className={`text-[9px] font-bold mt-1 ${m.cor}`}>{m.delta} vs mês ant.</p>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-2">
-              <h5 className="text-[9px] font-bold text-slate-400 uppercase">Desempenho por Play</h5>
-              {[
-                {nome:'Expansão Tier 1', abertura:62, reply:28, opps:7, cor:'bg-red-500'},
-                {nome:'Reengajamento C-Level', abertura:45, reply:14, opps:3, cor:'bg-violet-500'},
-                {nome:'Nurturing Mid-Market', abertura:38, reply:11, opps:1, cor:'bg-blue-500'},
-              ].map((p,i)=>(
-                <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className={`w-2 h-5 rounded-full ${p.cor} shrink-0`}/>
-                    <p className="text-[10px] font-bold text-slate-800">{p.nome}</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    {[{l:'Abertura',v:`${p.abertura}%`},{l:'Reply',v:`${p.reply}%`},{l:'Opps',v:p.opps}].map((m,j)=>(
-                      <div key={j}><p className="text-sm font-black text-slate-800">{m.v}</p><p className="text-[7px] font-bold text-slate-400 uppercase">{m.l}</p></div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase">Exportar Relatório de Performance</Button>
-          </div>
-        );
-        setModalData({ title: 'Performance de Playbooks', content, size: 'xl' });
-        break;
-
-      case 'FAST_TRACK':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-emerald-600 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Fast-Track Pipeline</p>
-              <h4 className="text-xl font-bold">Mover para Oportunidade</h4>
-              <p className="text-[11px] opacity-80 mt-1">{abmHeatmapAccounts?.filter((a:{ft:number})=>a.ft>=75).length || 6} contas com Fit ≥75% elegíveis para avanço imediato</p>
-            </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
-              <h5 className="text-[9px] font-bold text-slate-400 uppercase">Contas selecionadas para fast-track</h5>
-              {(abmHeatmapAccounts || []).filter((a:{ft:number})=>a.ft>=75).slice(0,4).map((acc,i)=>(
-                <div key={i} className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-800">{acc.name}</p>
-                    <p className="text-[8px] text-emerald-600 font-bold uppercase">Fit {acc.ft}% · Budget R${acc.budget}k</p>
-                  </div>
-                  <div className="text-right">
-                    <label className="flex items-center gap-1.5">
-                      <input type="checkbox" defaultChecked className="accent-emerald-600 w-3.5 h-3.5"/>
-                      <span className="text-[8px] font-bold text-slate-500">Incluir</span>
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">Fase no CRM</label>
-                <select className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs bg-white">
-                  <option>Descoberta Qualificada</option>
-                  <option>Proposta em Preparação</option>
-                  <option>Negociação</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1.5">AE Responsável</label>
-                <select className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs bg-white">
-                  <option>Diego Faria (5/10)</option>
-                  <option>Rafael Mendes (8/12)</option>
-                </select>
-              </div>
-            </div>
-            <Button className="w-full bg-emerald-600 text-white rounded-xl py-6 font-bold uppercase">Confirmar Fast-Track → CRM</Button>
-          </div>
-        );
-        setModalData({ title: 'Fast-Track: Mover para Oportunidade', content, size: 'xl' });
-        break;
-
-      case 'LINKEDIN':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-[#0A66C2] rounded-2xl text-white shadow-lg shadow-blue-700/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">LinkedIn Sales Navigator</p>
-              <h4 className="text-xl font-bold">Prospecção de Contatos DMU</h4>
-              <p className="text-[11px] opacity-80 mt-1">Busca inteligente de contatos faltantes no comitê de decisão</p>
-            </div>
-            <div className="space-y-2">
-              <h5 className="text-[9px] font-bold text-slate-400 uppercase">Filtros de busca automáticos</h5>
-              {[
-                {filtro:'Empresa', valor:'TechCorp, IndPrev, AgroX + 6 contas com gap'},
-                {filtro:'Cargo', valor:'CEO, CFO, VP Comercial, Head de Compras'},
-                {filtro:'Senioridade', valor:'Diretor / VP / C-Level'},
-                {filtro:'Engajamento', valor:'Postou em LinkedIn nos últimos 30 dias'},
-                {filtro:'Localização', valor:'São Paulo, Rio, Curitiba, Campinas'},
-              ].map((f,i)=>(
-                <div key={i} className="flex gap-3 p-3 bg-slate-50 rounded-xl">
-                  <span className="text-[8px] font-black text-[#0A66C2] uppercase w-16 shrink-0">{f.filtro}</span>
-                  <span className="text-[9px] font-medium text-slate-700">{f.valor}</span>
-                </div>
-              ))}
-            </div>
-            <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-2">
-              <Bot className="w-4 h-4 text-blue-600 shrink-0"/>
-              <p className="text-[9px] font-medium text-blue-700">Estimativa: 18-26 contatos de decisão encontrados com esses filtros</p>
-            </div>
-            <Button className="w-full bg-[#0A66C2] text-white rounded-xl py-6 font-bold uppercase">Abrir no Sales Navigator</Button>
-          </div>
-        );
-        setModalData({ title: 'LinkedIn Sales Navigator — Prospecção DMU', content, size: 'lg' });
-        break;
-
-      case 'POT_PRIORITY':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl text-white shadow-xl shadow-emerald-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Sequência de Ataque — Potencial Máximo</p>
-              <h4 className="text-xl font-black">Priorização de Cruzamentos</h4>
-              <p className="text-[11px] font-medium opacity-80 mt-1">23 contas x 3 cargos com potencial {'>'}70% sem atividade nos últimos 14 dias</p>
-            </div>
-            <div className="space-y-3">
-              {[
-                {rank:1, combo:'Varejo × Diretor', score:91, action:'Direct Mail Executivo', horizon:'D+0'},
-                {rank:2, combo:'Saúde × Gerente', score:87, action:'LinkedIn Outreach + Gift', horizon:'D+2'},
-                {rank:3, combo:'Indústria × Coord.', score:82, action:'Cold Call SDR', horizon:'D+3'},
-                {rank:4, combo:'Agro × Diretor', score:78, action:'Email Nurturing 1:1', horizon:'D+5'},
-              ].map((r,i) => (
-                <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-emerald-200 cursor-pointer transition-all">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 font-black text-sm flex items-center justify-center shrink-0">#{r.rank}</div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-slate-800">{r.combo}</p>
-                    <p className="text-[9px] text-slate-400 font-medium">{r.action} · {r.horizon}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-emerald-600">{r.score}</p>
-                    <div className="w-12 h-1 bg-slate-100 rounded-full mt-1"><div className="h-full bg-emerald-400 rounded-full" style={{width:`${r.score}%`}}/></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-emerald-600 text-white rounded-xl py-6 font-bold uppercase shadow-lg shadow-emerald-500/20">Orquestrar Todos em Bloco</Button>
-          </div>
-        );
-        setModalData({ title: 'Sequência de Ataque por Prioridade', content, size: 'lg' });
-        break;
-
-      case 'BUDGET_BREAKDOWN':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-violet-600 rounded-2xl text-white shadow-lg shadow-violet-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Budget Mapeado ABM</p>
-              <h4 className="text-2xl font-black">R$ 480.000 <span className="text-[14px] font-medium opacity-80">total disponível</span></h4>
-            </div>
-            <div className="space-y-2">
-              {[
-                {label:'Financeiro', pct:35, val:'R$168k', color:'bg-violet-500'},
-                {label:'Saúde', pct:20, val:'R$96k', color:'bg-blue-500'},
-                {label:'Agro', pct:18, val:'R$86k', color:'bg-emerald-500'},
-                {label:'Telecom', pct:15, val:'R$72k', color:'bg-amber-500'},
-                {label:'Outros', pct:12, val:'R$58k', color:'bg-slate-300'},
-              ].map((v,i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
-                  <div className="w-2 h-8 rounded-full shrink-0 " style={{background: v.color.replace('bg-','').replace('-500','')}} />
-                  <div className={`w-2 h-8 rounded-full shrink-0 ${v.color}`}/>
-                  <span className="text-xs font-bold text-slate-700 w-20">{v.label}</span>
-                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full ${v.color} rounded-full`} style={{width:`${v.pct}%`}}/>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-500 w-8 text-right">{v.pct}%</span>
-                  <span className="text-[10px] font-black text-slate-800 w-14 text-right">{v.val}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <Button className="flex-1 bg-violet-600 text-white rounded-xl font-bold">Rebalancear Budget</Button>
-              <Button variant="ghost" className="border border-slate-200 rounded-xl font-bold px-6">Exportar</Button>
-            </div>
-          </div>
-        );
-        setModalData({ title: 'Breakdown de Budget por Vertical', content, size: 'md' });
-        break;
-
-      case 'BATCH_POT':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-slate-900 rounded-2xl text-white">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-base font-bold uppercase tracking-tight">Orquestração em Lote</h4>
-                <Badge variant="emerald" className="text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border-none">23 CONTAS</Badge>
-              </div>
-              <p className="text-[11px] font-medium text-slate-300">Contas com Potencial {'>'}70% sem atividade nos últimos 14 dias — prontas para ativação imediata</p>
-            </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase">Linha do Tempo de Ativação</h5>
-              {[
-                {d:'D+0', action:'Direct Mail para Diretores de Varejo', icon:'📧', active:true},
-                {d:'D+2', action:'LinkedIn Ads segmentados por vertical', icon:'💼', active:false},
-                {d:'D+5', action:'SDR Cold Call para Gerentes de Saúde', icon:'📞', active:false},
-                {d:'D+7', action:'Conteúdo educativo par Coordenadores', icon:'📄', active:false},
-              ].map((s,i) => (
-                <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${s.active ? 'bg-blue-50 border border-blue-100' : 'bg-slate-50'}`}>
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${s.active ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'}`}>{s.d}</div>
-                  <span className="text-[10px] font-medium text-slate-700">{s.icon} {s.action}</span>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase">Lançar Sequência Imediatamente</Button>
-          </div>
-        );
-        setModalData({ title: 'Orquestração em Lote — Potencial >70%', content, size: 'lg' });
-        break;
-
-      case 'RAPPORT_EMAIL':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Template de Email de Rapport</p>
-              <h4 className="text-base font-bold">Personalizado por Cargo</h4>
-            </div>
-            <div className="space-y-3">
-              {[
-                {cargo:'C-Level', assunto:'[Nome], insights exclusivos sobre [Vertical] para 2025', linha:'Caro [Nome], dado nosso trabalho com [empresa similar], mapeamos uma oportunidade específica para [empresa]...', vibe:'Executivo · Estratégico', cor:'text-violet-600 bg-violet-50'},
-                {cargo:'Gerente', assunto:'[Nome], benchmark operacional que pode impactar seu time', linha:'Olá [Nome], estamos trabalhando com equipes de [área] em [setor] e encontramos um padrão recorrente...', vibe:'Técnico · Prático', cor:'text-blue-600 bg-blue-50'},
-                {cargo:'Analista', assunto:'Ferramenta gratuita para [dor específica do cargo]', linha:'Oi [Nome], sei que você lida diariamente com [dor]. Desenvolvemos algo que pode simplificar isso...', vibe:'Direto · Funcional', cor:'text-emerald-600 bg-emerald-50'},
-              ].map((t,i) => (
-                <div key={i} className={`p-4 rounded-2xl border ${t.cor.split(' ')[1]} border-transparent`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-[9px] font-bold uppercase ${t.cor.split(' ')[0]}`}>{t.cargo}</span>
-                    <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${t.cor}`}>{t.vibe}</span>
-                  </div>
-                  <p className="text-[9px] font-bold text-slate-700 mb-1">Assunto: {t.assunto}</p>
-                  <p className="text-[9px] text-slate-500 font-medium leading-relaxed">{t.linha}</p>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-blue-600 text-white rounded-xl py-6 font-bold uppercase">Exportar para Sequência Outreach</Button>
-          </div>
-        );
-        setModalData({ title: 'Templates de Email de Rapport por Cargo', content, size: 'lg' });
-        break;
-
-      case 'EVENTO_VIP':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl text-white shadow-xl shadow-indigo-500/20">
-              <Badge variant="slate" className="bg-white/20 text-white border-none text-[9px] mb-3">PRÓXIMO · ABR 12</Badge>
-              <h4 className="text-xl font-bold">Jantar de C-Levels</h4>
-              <p className="text-[11px] font-medium opacity-80">Saúde & Indústria · 12 vagas · 7 confirmadas</p>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[{l:'Confirmados',v:'7',c:'text-emerald-600 bg-emerald-50'},{l:'Pendentes',v:'3',c:'text-amber-600 bg-amber-50'},{l:'Convidados',v:'12',c:'text-blue-600 bg-blue-50'}].map((s,i)=>(
-                <div key={i} className={`p-3 rounded-2xl text-center ${s.c.split(' ')[1]}`}>
-                  <p className={`text-2xl font-black ${s.c.split(' ')[0]}`}>{s.v}</p>
-                  <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{s.l}</p>
-                </div>
-              ))}
-            </div>
-            <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase">Roteiro do Evento</h5>
-              {[
-                {h:'19:00', a:'Recepção e welcome drink exclusivo'},
-                {h:'19:45', a:'Mesa redonda: Tendências Financeiras 2025'},
-                {h:'21:00', a:'Jantar temático — networking 1:1 facilitado'},
-                {h:'22:30', a:'Sessão de insights Canopi + Q&A'},
-              ].map((s,i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-[9px] font-black text-indigo-600 w-10 shrink-0">{s.h}</span>
-                  <span className="text-[9px] font-medium text-slate-600">{s.a}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <Button className="flex-1 bg-indigo-600 text-white rounded-xl font-bold">Gerenciar Inscrições</Button>
-              <Button variant="ghost" className="border border-slate-200 rounded-xl font-bold px-5">Enviar Lembretes</Button>
-            </div>
-          </div>
-        );
-        setModalData({ title: 'Evento VIP — Jantar de C-Levels', content, size: 'lg' });
-        break;
-
-      case 'BREAKICE_PLAY':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-amber-50 border border-amber-200 rounded-2xl">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5"/>
-                <div>
-                  <h4 className="text-sm font-bold text-amber-800">Receptividade Crítica — Finance & Seguros</h4>
-                  <p className="text-[10px] font-medium text-amber-600 mt-1">C-Levels abaixo de 35% de abertura. Abordagem direta falhou em 8/10 tentativas recentes.</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {[
-                {step:'1', title:'Conteúdo de Alta Autoridade', desc:'Publicar white paper "Riscos Operacionais Financeiros 2025" com assinatura de analista Canopi + parceiro do setor', tipo:'Conteúdo', dias:'Hoje'},
-                {step:'2', title:'Patrocínio de Evento Setorial', desc:'Associar a marca Canopi a evento finance de Março — garantir presença e fala de 5min no palco principal', tipo:'Evento', dias:'30 dias'},
-                {step:'3', title:'Menção por Terceiros (PR)', desc:'Ativar assessora de imprensa para publicar case anonymizado em veículo finance (Razão Contábil, Exame, etc)', tipo:'PR', dias:'45 dias'},
-                {step:'4', title:'Reabordagem com Contexto', desc:'Após steps 1-3, o C-Level já terá ouvido a Canopi de 3 fontes diferentes. Reabordar com referência específica.', tipo:'Outreach', dias:'60 dias'},
-              ].map((s,i) => (
-                <div key={i} className="flex gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                  <div className="w-7 h-7 rounded-xl bg-amber-100 text-amber-700 font-black text-[11px] flex items-center justify-center shrink-0">{s.step}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-[11px] font-bold text-slate-800">{s.title}</p>
-                      <span className="text-[8px] font-bold text-slate-400 uppercase">{s.dias}</span>
-                    </div>
-                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase">Ativar Playbook de Quebra-Gelo</Button>
-          </div>
-        );
-        setModalData({ title: 'Playbook de Quebra-Gelo — Finance & Seguros', content, size: 'xl' });
-        break;
-
-      case 'FLYWHEEL_INBOUND':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-emerald-600 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Flywheel de Inbound</p>
-              <h4 className="text-xl font-bold">Ativação para Rotas Livres</h4>
-              <p className="text-[11px] opacity-80 mt-1">Camadas de Analistas e Especialistas têm 87% de taxa de abertura de email e nenhum Gatekeeper mapeado</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                {label:'Agro → Analista', pct:92, canal:'LinkedIn Ads'},
-                {label:'Saúde → Espec.', pct:88, canal:'Cold Email'},
-                {label:'Telecom → Coord.', pct:79, canal:'SDR Call'},
-                {label:'Varejo → Analista', pct:76, canal:'LinkedIn DM'},
-              ].map((r,i)=>(
-                <div key={i} className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                  <p className="text-[9px] font-bold text-emerald-800 mb-1">{r.label}</p>
-                  <p className="text-lg font-black text-emerald-600">{r.pct}%</p>
-                  <p className="text-[8px] font-bold text-emerald-400 uppercase">{r.canal}</p>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-emerald-600 text-white rounded-xl py-6 font-bold uppercase">Iniciar Flywheel Automaticamente</Button>
-          </div>
-        );
-        setModalData({ title: 'Flywheel Inbound — Rotas Livres', content, size: 'md' });
-        break;
-
-      case 'GATEKEEPER_BYPASS':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5"/>
-              <div>
-                <h4 className="text-sm font-bold text-red-800">Playbook: Bypassar Gatekeepers</h4>
-                <p className="text-[10px] font-medium text-red-500 mt-1">3 gatekeepers críticos identificados. Abordagem direta ao C-Level está bloqueada — use play de flanco.</p>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {[
-                {titulo:'Wave 1: Bottom-Up via Analista', desc:'Conecte-se com 3 Analistas da conta via LinkedIn. Ofereça acesso gratuito a relatório setorial. Eles organicamente levam a informação ao Gerente.', icon:'📊'},
-                {titulo:'Wave 2: Influenciador Lateral', desc:'Identifique alguém que conhece o C-Level fora do trabalho (associação setorial, evento passado). Peça uma introdução informal.', icon:'🤝'},
-                {titulo:'Wave 3: Conteúdo + PR', desc:'Publicar insight relevante sobre a conta ou seu setor. Marcar o C-Level (não o Gatekeeper) em comentário. Gera atenção legítima.', icon:'📢'},
-                {titulo:'Wave 4: Evento Neutro', desc:'Convidar o C-Level para mesa redonda setorial não-comercial. O Gatekeeper não filtra convites externos de prestígio.', icon:'🎯'},
-              ].map((w,i)=>(
-                <div key={i} className="flex gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                  <span className="text-2xl shrink-0">{w.icon}</span>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-800 mb-0.5">{w.titulo}</p>
-                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed">{w.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-red-600 text-white rounded-xl py-6 font-bold uppercase">Iniciar Operação de Bypass</Button>
-          </div>
-        );
-        setModalData({ title: 'Playbook: Bypassar Gatekeepers', content, size: 'xl' });
-        break;
-
-      case 'DMU_HUNT':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-amber-500 rounded-2xl text-white shadow-lg shadow-amber-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">LinkedIn Sales Navigator</p>
-              <h4 className="text-xl font-bold">Caçada de Compradores</h4>
-              <p className="text-[11px] opacity-80 mt-1">Gap crítico: 3 verticais sem Procurement mapeado = ciclo de venda travado</p>
-            </div>
-            <div className="space-y-2">
-              <h5 className="text-[10px] font-bold text-slate-400 uppercase">Filtros de Busca Recomendados</h5>
-              {[
-                {label:'Cargo', value:'"Gerente de Compras" OR "Procurement" OR "Supply Chain"'},
-                {label:'Empresa', value:'TechCorp, IndPrev, AgroX, + 4 contas gap'},
-                {label:'Senioridade', value:'Gerente / Coordenador / Diretor'},
-                {label:'Última atividade', value:'Postou no LinkedIn nos últimos 30 dias'},
-              ].map((f,i)=>(
-                <div key={i} className="flex gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase w-16 shrink-0">{f.label}</span>
-                  <span className="text-[9px] font-medium text-slate-700 font-mono">{f.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0"/>
-              <p className="text-[9px] font-medium text-emerald-700">Estimativa: 11-17 contatos de Procurement a serem mapeados com esses filtros</p>
-            </div>
-            <Button className="w-full bg-amber-500 text-white rounded-xl py-6 font-bold uppercase">Abrir no Sales Navigator</Button>
-          </div>
-        );
-        setModalData({ title: 'Caçada de Compradores — LinkedIn', content, size: 'lg' });
-        break;
-
-      case 'DETRACTOR_PLAN':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-slate-900 rounded-2xl text-white">
-              <h4 className="text-xl font-bold mb-1">Plano de Neutralização</h4>
-              <p className="text-[11px] font-medium text-slate-300">3 detratores ativos representam risco de bloqueio em contas de alto potencial</p>
-            </div>
-            {[
-              {conta:'TechCorp', perfil:'Gerente TI', status:'BLOQUEIO ATIVO', cor:'bg-red-600', tactic:'Mapear Champion alternativo no mesmo nível. Pedir apoio ao CTO que já está engajado para fazer apresentação interna.'},
-              {conta:'IndPrev', perfil:'Dir. Operações', status:'EM OBSERVAÇÃO', cor:'bg-amber-500', tactic:'Criar material técnico focado especificamente nas preocupações de Ops. Endereçar ROI de implantação diretamente com dados.'},
-              {conta:'AgroX', perfil:'Coord. Compras', status:'ALERTA MÉDIO', cor:'bg-slate-400', tactic:'Incluir Coord. em webinar de melhores práticas. Gerar rapport antes da próxima proposta.'},
-            ].map((d,i)=>(
-              <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">{d.conta}</p>
-                    <p className="text-[9px] text-slate-400">{d.perfil}</p>
-                  </div>
-                  <span className={`text-[8px] font-bold px-2 py-1 rounded-lg text-white ${d.cor}`}>{d.status}</span>
-                </div>
-                <p className="text-[9px] font-medium text-slate-600 leading-relaxed p-3 bg-slate-50 rounded-xl">{d.tactic}</p>
-              </div>
-            ))}
-            <Button className="w-full bg-slate-900 text-white rounded-xl py-6 font-bold uppercase">Registrar Plano no CRM</Button>
-          </div>
-        );
-        setModalData({ title: 'Plano de Neutralização de Detratores', content, size: 'xl' });
-        break;
-
-      case 'AMBASSADOR_PLAY':
-        content = (
-          <div className="space-y-5">
-            <div className="p-5 bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl text-white shadow-xl shadow-orange-500/20">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Programa de Embaixadores</p>
-              <h4 className="text-xl font-bold">8 Embaixadores Identificados</h4>
-              <p className="text-[11px] opacity-80 mt-1">Tech (4) e Seguros (3) com alta densidade de promotores orgânicos da Canopi</p>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                {titulo:'Incentivo Tech', desc:'Co-branded case study + menção em LinkedIn oficial Canopi', cor:'bg-blue-50 border-blue-100'},
-                {titulo:'Incentivo Seguros', desc:'Acesso antecipado a nova feature + certificado de parceria', cor:'bg-amber-50 border-amber-100'},
-                {titulo:'Referral Program', desc:'10% desconto na renovação por cada indicação ativa', cor:'bg-emerald-50 border-emerald-100'},
-                {titulo:'Advisory Board', desc:'Convite para advisory board 2025 com 4 vagas disponíveis', cor:'bg-violet-50 border-violet-100'},
-              ].map((p,i)=>(
-                <div key={i} className={`p-4 rounded-2xl border ${p.cor}`}>
-                  <p className="text-[10px] font-bold text-slate-800 mb-1">{p.titulo}</p>
-                  <p className="text-[9px] font-medium text-slate-500 leading-relaxed">{p.desc}</p>
-                </div>
-              ))}
-            </div>
-            <Button className="w-full bg-orange-500 text-white rounded-xl py-6 font-bold uppercase">Ativar Programa Formalmente</Button>
-          </div>
-        );
-        setModalData({ title: 'Programa de Incentivo a Embaixadores', content, size: 'lg' });
-        break;
-
-      default:
-        // Categóricas ricas baseadas no "type"
-        const typeStr = String(type);
-        const isForm = ['GOAL', 'OPP', 'SEG', 'CREATE_CLUSTER', 'CRM_ALERT', 'FUND', 'ALERT', 'CRM_UPDATE', 'ASSIGN', 'CANOPI', 'RSVP', 'PERF'].includes(typeStr);
-        const isList = ['EXPORT', 'SYNC', 'HIST', 'SHARE', 'AUDIENCE', 'LOOKALIKE', 'REFINE_IA', 'ENR_IA', 'SEND_SALES', 'SS', 'REP'].includes(typeStr);
-        const isCamp = ['BATCH', 'CAMP', 'SEQ', 'CAMP_REACT', 'EMAIL', 'CLEVEL_PLAY', 'PLAY', 'NEW_PLAY', 'SDR', 'AE'].includes(typeStr);
-        const isAgenda = ['SCHED', 'ACTIVITY', 'CONNECT', 'DEMO', 'EVENT', 'EXEC_SYNC', 'GIFT'].includes(typeStr);
-        
-        let ui;
-
-        if (isForm) {
-            ui = (
-              <div className="space-y-4">
-                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                    <h5 className="text-sm font-bold text-slate-800">{data.label || 'Nova Entrada'}</h5>
-                    <p className="text-[10px] text-slate-500 mt-1">Preencha os dados necessários para o registro sistêmico.</p>
-                 </div>
-                 <div className="space-y-3">
-                    <div>
-                      <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block">Nome / Referência</label>
-                      <input type="text" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500" defaultValue={data.account?.name || data.label} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                       <div>
-                         <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block">Proprietário (Owner)</label>
-                         <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-white"><option>SDR Team Lead</option><option>AE Enterprise</option></select>
-                       </div>
-                       <div>
-                         <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block">Prioridade</label>
-                         <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-white"><option>ALTA</option><option>NORMAL</option></select>
-                       </div>
-                    </div>
-                    <div>
-                      <label className="text-[9px] font-bold text-slate-400 uppercase mb-1 block">Anotações Adicionais</label>
-                      <textarea className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs h-20" placeholder="Insira o contexto ou instruções..."></textarea>
-                    </div>
-                 </div>
-              </div>
-            );
-        } else if (isList) {
-            ui = (
-              <div className="space-y-4">
-                 <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h5 className="text-sm font-bold text-emerald-800">Preview de Dados (Sync)</h5>
-                      <p className="text-[10px] text-emerald-600 mt-0.5">74 registros selecionados para {data.label}</p>
-                    </div>
-                    <Button size="sm" className="bg-emerald-600 text-white font-bold text-[9px] uppercase px-4 h-7">Validar Schema</Button>
-                 </div>
-                 <div className="border border-slate-200 rounded-xl overflow-hidden">
-                    <table className="w-full text-left">
-                       <thead className="bg-slate-50">
-                          <tr><th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase">Objeto</th><th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase">Match Score</th><th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase text-right">Ação</th></tr>
-                       </thead>
-                       <tbody className="divide-y divide-slate-100 text-[10px] font-medium text-slate-700">
-                          <tr><td className="px-3 py-2 font-bold">{data.account?.name || 'Globex Corporation'}</td><td className="px-3 py-2 text-emerald-600">98% Fit</td><td className="px-3 py-2 text-right"><span className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded">Update</span></td></tr>
-                          <tr><td className="px-3 py-2 font-bold">Acme Corp South</td><td className="px-3 py-2 text-blue-600">85% Fit</td><td className="px-3 py-2 text-right"><span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Insert</span></td></tr>
-                          <tr><td className="px-3 py-2 font-bold">Initech Financial</td><td className="px-3 py-2 text-blue-600">77% Fit</td><td className="px-3 py-2 text-right"><span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Insert</span></td></tr>
-                       </tbody>
-                    </table>
-                 </div>
-                 <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0"/>
-                    <p className="text-[9px] text-amber-700 font-medium">Atenção: A sincronização com Salesforce/Outreach consome tokens da API da Canopi.</p>
-                 </div>
-              </div>
-            );
-        } else if (isCamp) {
-            ui = (
-              <div className="space-y-4">
-                 <div className="text-center p-6 border border-slate-100 rounded-xl bg-gradient-to-br from-slate-50 to-white shadow-sm relative overflow-hidden">
-                    <Zap className="w-12 h-12 text-blue-200 absolute -right-2 -bottom-2" />
-                    <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3"><Mail className="w-5 h-5"/></div>
-                    <h5 className="text-base font-bold text-slate-800 tracking-tight">{data.label || 'Lançar Playbook'}</h5>
-                    <p className="text-[10px] text-slate-500 mt-1 max-w-xs mx-auto">Esta ação ativará a orquestração multicanal (Email, LinkedIn, Ads) para as contas em lote.</p>
-                 </div>
-                 <div className="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase mb-3">Linha do Tempo de Ativação (Preview)</p>
-                    <div className="space-y-3 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                       <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                          <div className="flex items-center justify-center w-6 h-6 rounded-full border border-white bg-slate-100 group-[.is-active]:bg-blue-600 text-slate-500 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 text-[8px] font-bold z-10">D0</div>
-                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded-xl border border-blue-100 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)]"><p className="text-[10px] font-bold text-slate-800">Email 1: Introdução Executiva</p></div>
-                       </div>
-                       <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                          <div className="flex items-center justify-center w-6 h-6 rounded-full border border-white bg-slate-100 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 text-[8px] font-bold z-10">D3</div>
-                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded-xl border border-slate-100 bg-white"><p className="text-[10px] font-bold text-slate-600">LinkedIn: Visualização do SDR</p></div>
-                       </div>
-                       <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                          <div className="flex items-center justify-center w-6 h-6 rounded-full border border-white bg-slate-100 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 text-[8px] font-bold z-10">D5</div>
-                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-3 rounded-xl border border-slate-100 bg-white"><p className="text-[10px] font-bold text-slate-600">Task CRM: Ligar para Champion</p></div>
-                       </div>
-                    </div>
-                 </div>
-              </div>
-            );
-        } else if (isAgenda) {
-            ui = (
-              <div className="space-y-4">
-                 <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
-                    <h5 className="text-sm font-bold text-indigo-900 border-b border-indigo-200 pb-2 mb-2">{data.label || 'Agendamento e Agenda'}</h5>
-                    <div className="grid grid-cols-7 gap-1 mt-4">
-                       {['D','S','T','Q','Q','S','S'].map((d,i)=><div key={i} className="text-center text-[8px] font-bold text-indigo-400">{d}</div>)}
-                       {[...Array(30)].map((_,i)=><div key={i} className={`h-8 rounded flex items-center justify-center text-[10px] font-medium ${i===14 ? 'bg-indigo-600 text-white font-bold shadow-md' : i>10 && i<18 ? 'bg-indigo-100/50 text-indigo-800 hover:bg-indigo-200 cursor-pointer' : 'text-slate-400'}`}>{i+1}</div>)}
-                    </div>
-                 </div>
-                 <div className="space-y-2">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">Horários Disponíveis (15 Nov)</p>
-                    <div className="flex gap-2">
-                       <Button size="sm" variant="outline" className="flex-1 text-[10px]">10:00 AM</Button>
-                       <Button size="sm" className="flex-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-none font-bold text-[10px]">14:30 PM</Button>
-                       <Button size="sm" variant="outline" className="flex-1 text-[10px]">16:00 PM</Button>
-                    </div>
-                 </div>
-              </div>
-            );
-        } else {
-            // Dashboard / Análise Genérica para o restante
-            ui = (
-              <div className="space-y-4">
-                 <div className="p-5 bg-slate-900 rounded-xl relative overflow-hidden text-white shadow-xl">
-                    <BarChart3 className="absolute right-[-20%] top-[-20%] w-48 h-48 opacity-10" />
-                    <h5 className="text-lg font-bold tracking-tight mb-1">{data.label || 'Relatório Analítico'}</h5>
-                    <p className="text-xs text-slate-400 font-medium max-w-[80%]">Visualização macro de gaps e engajamento da conta ou lote selecionado.</p>
-                 </div>
-                 <div className="grid grid-cols-3 gap-3">
-                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg text-center">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Média Hit-Rate</p>
-                       <p className="text-lg font-black text-slate-800">42%</p>
-                    </div>
-                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg text-center">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">CAC Est.</p>
-                       <p className="text-lg font-black text-rose-500">R$3k</p>
-                    </div>
-                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-lg text-center">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Velocidade</p>
-                       <p className="text-lg font-black text-emerald-500">+12d</p>
-                    </div>
-                 </div>
-                 <div className="p-4 border border-slate-200 rounded-xl">
-                    <p className="text-[9px] font-bold text-slate-700 uppercase mb-3 text-center">Desempenho em 30 dias</p>
-                    <div className="flex items-end justify-between h-16 pt-2">
-                       {[30, 45, 20, 60, 85, 50, 95].map((v, i) => (
-                          <div key={i} className="w-[10%] bg-blue-100 rounded-t-sm hover:bg-blue-300 transition-colors relative group">
-                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-slate-800 text-white text-[8px] px-1 py-0.5 rounded opacity-0 group-hover:opacity-100">{v}</div>
-                             <div className="w-full bg-blue-500 rounded-t-sm" style={{ height: `${v}%` }}></div>
-                          </div>
-                       ))}
-                    </div>
-                 </div>
-              </div>
-            );
-        }
-
-        content = (
-          <div className="space-y-6">
-            {ui}
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-               <Button variant="ghost" size="sm" className="font-bold text-[10px] uppercase text-slate-500" onClick={() => setModalOpen(false)}>Cancelar</Button>
-               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] uppercase px-6 border-none shadow-md shadow-blue-500/20" onClick={() => setModalOpen(false)}>{isForm ? 'Salvar Configuração' : isCamp ? 'Iniciar Sequência' : isAgenda ? 'Confirmar Agendamento' : 'Confirmar Ação Sistêmica'}</Button>
-            </div>
-          </div>
-        );
-        setModalData({ title: `${data.label || type}`, content, size: isList || isCamp ? 'lg' as any : 'md' as any });
-        break;
-    }
-    setModalOpen(true);
-  };
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32 max-w-[1700px] mx-auto font-sans text-slate-900">
@@ -1377,7 +307,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
               <p className="text-[9px] font-bold text-slate-400 uppercase">Health Score</p>
               <p className="text-lg font-bold text-emerald-600">8.4/10</p>
            </div>
-           <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none" onClick={() => openDetailedModal('TAL_CONFIG', {})}>Refinar TAL</Button>
+           <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none">Refinar TAL</Button>
         </div>
       </div>
 
@@ -1387,7 +317,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
           <motion.div 
             key={i} 
             whileHover={{ y: -5 }}
-            onClick={() => openDetailedModal('METRIC', b)}
             className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm relative group cursor-pointer hover:border-blue-400 transition-all"
           >
              <div className="flex justify-between items-center mb-4">
@@ -1493,7 +422,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
             </div>
             <div className="p-5 space-y-3">
               {verticalClusters.map((c, i) => (
-                <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-300 transition-all cursor-pointer group" onClick={() => openDetailedModal('CLUSTER', c)}>
+                <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-300 transition-all group">
                   <div className="flex justify-between items-center mb-2">
                     <div><p className="text-[11px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{c.name}</p><p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{c.count} CONTAS</p></div>
                     <Badge variant={c.health === 'Estável' ? 'blue' : c.health === 'Em Queda' ? 'amber' : 'red'} className="text-[7px] font-bold border-none uppercase">{c.health}</Badge>
@@ -1527,14 +456,14 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
               const hotCrm = abmHeatmapAccounts.filter(a => a.crm >= 70);
               const coldCrm = abmHeatmapAccounts.filter(a => a.crm < 45);
 
-              const MiniActions = ({ actions }: { actions: { icon: React.ReactNode; label: string; onClick: () => void }[] }) => (
+              const MiniActions = ({ actions }: { actions: { icon: React.ReactNode; label: string }[] }) => (
                 <div className="pt-3 border-t border-slate-100 grid grid-cols-3 gap-1.5 mt-auto">
                   {actions.map((a, i) => (
-                    <button key={i} onClick={a.onClick}
-                      className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-blue-200 transition-all text-center group">
-                      <span className="text-slate-400 group-hover:text-blue-500 transition-colors">{a.icon}</span>
-                      <span className="text-[7px] font-bold text-slate-400 group-hover:text-blue-500 uppercase tracking-wide leading-tight">{a.label}</span>
-                    </button>
+                    <div key={i}
+                      className="flex flex-col items-center gap-1 p-2 rounded-xl border border-slate-100 text-center opacity-40">
+                      <span className="text-slate-400">{a.icon}</span>
+                      <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wide leading-tight">{a.label}</span>
+                    </div>
                   ))}
                 </div>
               );
@@ -1551,7 +480,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         const avg = Math.round((acc.icp+acc.crm+acc.vp+acc.ct+acc.ft)/5);
                         const tier = avg >= 72 ? { label:'TOP', cls:'bg-red-100 text-red-600' } : avg >= 55 ? { label:'MID', cls:'bg-amber-100 text-amber-600' } : { label:'LOW', cls:'bg-slate-100 text-slate-500' };
                         return (
-                          <div key={acc.id} className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => openDetailedModal('ACCOUNT', acc)}>
+                          <div key={acc.id} className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 transition-colors">
                             <span className="text-[10px] font-bold text-slate-300 w-4">{i+1}</span>
                             <div className="flex-1 min-w-0"><p className="text-[10px] font-bold text-slate-800 truncate">{acc.name}</p></div>
                             <span className={`text-[8px] font-bold px-2 py-0.5 rounded-md ${tier.cls}`}>{tier.label}</span>
@@ -1561,9 +490,9 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       })}
                     </div>
                     <MiniActions actions={[
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Exportar CSV', onClick: () => openDetailedModal('EXPORT', { label: 'Ranking ABM' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Atribuir AE', onClick: () => openDetailedModal('ASSIGN', { label: 'Atribuição de AE' }) },
-                      { icon: <Flag className="w-3 h-3"/>, label: 'Criar Meta', onClick: () => openDetailedModal('GOAL', { label: 'Meta de Pipeline' }) },
+                      { icon: <FileText className="w-3 h-3"/>, label: 'Exportar CSV' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Atribuir AE' },
+                      { icon: <Flag className="w-3 h-3"/>, label: 'Criar Meta' },
                     ]} />
                   </div>,
                   <div key="avg-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1574,16 +503,16 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         { label:'Nurturing MID TIER', sub:`${ranked.filter(a=>{const s=Math.round((a.icp+a.crm+a.vp+a.ct+a.ft)/5);return s>=55&&s<72;}).length} contas em espera`, cls:'bg-amber-500 hover:bg-amber-600 text-white', icon:<Activity className="w-3 h-3"/>, type:'BATCH_MID' },
                         { label:'Watch List LOW TIER', sub:`${ranked.filter(a=>Math.round((a.icp+a.crm+a.vp+a.ct+a.ft)/5)<55).length} contas`, cls:'bg-slate-200 hover:bg-slate-300 text-slate-700', icon:<Clock className="w-3 h-3"/>, type:'BATCH_LOW' },
                       ].map((btn, i) => (
-                        <button key={i} onClick={() => openDetailedModal('BATCH', { label: btn.label, type: btn.type })} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${btn.cls}`}>
+                        <button key={i} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${btn.cls}`}>
                           {btn.icon}
                           <div><p className="text-[10px] font-bold">{btn.label}</p><p className="text-[8px] opacity-70">{btn.sub}</p></div>
                         </button>
                       ))}
                     </div>
                     <MiniActions actions={[
-                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Criar Oport.', onClick: () => openDetailedModal('OPP', { label: 'Nova Oportunidade CRM' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Agendar', onClick: () => openDetailedModal('SCHED', { label: 'Agendar Revisão de Pipeline' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM', onClick: () => openDetailedModal('SYNC', { label: 'Sincronizar com Salesforce' }) },
+                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Criar Oport.' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Agendar' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
                     ]} />
                   </div>,
 
@@ -1597,11 +526,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                     </div>
-                    <button onClick={() => openDetailedModal('NEW_PLAY', { label: 'Novo Playbook de Orquestração' })} className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Biblioteca de Plays</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Biblioteca de Plays</button>
                     <MiniActions actions={[
-                      { icon: <Activity className="w-3 h-3"/>, label: 'Performance', onClick: () => openDetailedModal('PERF', { label: 'Performance de Playbooks' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Templates', onClick: () => openDetailedModal('TPL', { label: 'Templates de Sequences' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Audiência', onClick: () => openDetailedModal('AUDIENCE', { label: 'Audiência dos Playbooks' }) },
+                      { icon: <Activity className="w-3 h-3"/>, label: 'Performance' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Templates' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Audiência' },
                     ]} />
                   </div>,
                 ],
@@ -1620,7 +549,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       </div>
                       <div className="space-y-1.5">
                         {qualifiedIcp.slice(0,4).map(acc => (
-                          <div key={acc.id} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors" onClick={() => openDetailedModal('ACCOUNT', acc)}>
+                          <div key={acc.id} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                             <span className="text-[9px] font-bold text-slate-700 truncate max-w-[110px]">{acc.name}</span>
                             <span className="text-[10px] font-black text-blue-700">{getWeightedIcp(acc)}%</span>
                           </div>
@@ -1628,11 +557,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         {qualifiedIcp.length === 0 && <p className="text-[9px] text-slate-400 text-center py-2">Nenhuma conta nesse threshold</p>}
                       </div>
                     </div>
-                    <button onClick={() => openDetailedModal('EXPORT', { label: `Lista ICP ≥${icpThreshold}%` })} className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Exportar Lista Qualificada</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Exportar Lista Qualificada</button>
                     <MiniActions actions={[
-                      { icon: <FileSearch className="w-3 h-3"/>, label: 'Segmento', onClick: () => openDetailedModal('SEG', { label: 'Segmento ICP' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM', onClick: () => openDetailedModal('SYNC', { label: 'Sync ICP → Salesforce' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Revisão', onClick: () => openDetailedModal('SCHED', { label: 'Agendar Revisão de ICP' }) },
+                      { icon: <FileSearch className="w-3 h-3"/>, label: 'Segmento' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Revisão' },
                     ]} />
                   </div>,
                   <div key="icp-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1653,11 +582,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('CONFIG', { label: 'Config Pesos ICP', weights: icpWeights })} className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Salvar Configuração</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Salvar Configuração</button>
                     <MiniActions actions={[
-                      { icon: <History className="w-3 h-3"/>, label: 'Histórico', onClick: () => openDetailedModal('HIST', { label: 'Histórico de Configs' }) },
-                      { icon: <Share2 className="w-3 h-3"/>, label: 'Compartilhar', onClick: () => openDetailedModal('SHARE', { label: 'Compartilhar Config' }) },
-                      { icon: <Bell className="w-3 h-3"/>, label: 'Alertas', onClick: () => openDetailedModal('ALERT', { label: 'Alertas de ICP' }) },
+                      { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
+                      { icon: <Share2 className="w-3 h-3"/>, label: 'Compartilhar' },
+                      { icon: <Bell className="w-3 h-3"/>, label: 'Alertas' },
                     ]} />
                   </div>,
 
@@ -1671,11 +600,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          <p className="text-[8px] text-emerald-600 font-bold uppercase">Sinergia &gt; 85% com o tier 1</p>
                        </div>
                     </div>
-                    <button onClick={() => openDetailedModal('LOOKALIKE', { label: 'Gerar Lista IA Lookalike' })} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Importar do Canopi Intel</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Importar do Canopi Intel</button>
                     <MiniActions actions={[
-                      { icon: <Search className="w-3 h-3"/>, label: 'Refinar IA', onClick: () => openDetailedModal('REFINE_IA', { label: 'Refinar Parâmetros de IA' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Enriquecer', onClick: () => openDetailedModal('ENR_IA', { label: 'Enriquecer via Claro/BDR' }) },
-                      { icon: <Share2 className="w-3 h-3"/>, label: 'Enviar Vendas', onClick: () => openDetailedModal('SEND_SALES', { label: 'Enviar Lista para SDR' }) },
+                      { icon: <Search className="w-3 h-3"/>, label: 'Refinar IA' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Enriquecer' },
+                      { icon: <Share2 className="w-3 h-3"/>, label: 'Enviar Vendas' },
                     ]} />
                   </div>,
                 ],
@@ -1687,17 +616,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         <div key={acc.id} className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-100 rounded-xl">
                           <AlertCircle className="w-3 h-3 text-amber-500 shrink-0"/>
                           <div className="flex-1 min-w-0"><p className="text-[9px] font-bold text-slate-800 truncate">{acc.name}</p><p className="text-[8px] text-slate-400">{acc.ct}% mapeado</p></div>
-                          <button onClick={() => openDetailedModal('ENRICH', acc)} className="text-[8px] bg-indigo-600 text-white px-2 py-1 rounded-lg font-bold hover:bg-indigo-700 transition-colors shrink-0">Enriquecer</button>
+                          <button className="text-[8px] bg-indigo-600 text-white px-2 py-1 rounded-lg font-bold hover:bg-indigo-700 transition-colors shrink-0">Enriquecer</button>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('LINKEDIN', { label: 'LinkedIn Sales Navigator' })} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2">
                       <ExternalLink className="w-3 h-3"/>LinkedIn Sales Nav
                     </button>
                     <MiniActions actions={[
-                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM', onClick: () => openDetailedModal('CRM_UPDATE', { label: 'Atualizar Contatos no CRM' }) },
-                      { icon: <CheckCircle className="w-3 h-3"/>, label: 'Atribuir', onClick: () => openDetailedModal('ASSIGN', { label: 'Atribuir SDR por Conta' }) },
-                      { icon: <Smartphone className="w-3 h-3"/>, label: 'Canopi', onClick: () => openDetailedModal('CANOPI', { label: 'Registrar no Canopi' }) },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM' },
+                      { icon: <CheckCircle className="w-3 h-3"/>, label: 'Atribuir' },
+                      { icon: <Smartphone className="w-3 h-3"/>, label: 'Canopi' },
                     ]} />
                   </div>,
                   <div key="ct-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1710,18 +639,18 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         { cargo:'VP Comercial', status:'gap', pct:30 },
                         { cargo:'Head de Produto', status:'ok', pct:65 },
                       ].map((c, i) => (
-                        <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer" onClick={() => openDetailedModal('ROLE', c)}>
+                        <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50">
                           <div className={`w-2 h-2 rounded-full shrink-0 ${c.status === 'ok' ? 'bg-emerald-400' : 'bg-red-400'}`}/>
                           <span className="text-[9px] font-medium text-slate-600 flex-1">{c.cargo}</span>
                           <span className={`text-[9px] font-bold ${c.status === 'ok' ? 'text-emerald-600' : 'text-red-500'}`}>{c.pct}%</span>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('SEQ', { label: 'Sequência por Cargo' })} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência por Cargo</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência por Cargo</button>
                     <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Campanha', onClick: () => openDetailedModal('CAMP', { label: 'Campanha por Cargo' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade', onClick: () => openDetailedModal('ACTIVITY', { label: 'Atribuir Atividade Canopi' }) },
-                      { icon: <MessageSquare className="w-3 h-3"/>, label: 'Conectar', onClick: () => openDetailedModal('CONNECT', { label: 'Conectar no LinkedIn' }) },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'Campanha' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
+                      { icon: <MessageSquare className="w-3 h-3"/>, label: 'Conectar' },
                     ]} />
                   </div>,
 
@@ -1732,11 +661,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50"><p className="text-[12px] font-black text-blue-600">14</p><p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Champions</p></div>
                        <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50"><p className="text-[12px] font-black text-amber-500">8</p><p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Bloqueadores</p></div>
                     </div>
-                    <button onClick={() => openDetailedModal('INFLUENCE_MAP', { label: 'Extrair Mapa de Influência' })} className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Mapear Conexões</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Mapear Conexões</button>
                     <MiniActions actions={[
-                      { icon: <Share2 className="w-3 h-3"/>, label: 'Social Selling', onClick: () => openDetailedModal('SS', { label: 'Rede de Contatos - Social Selling' }) },
-                      { icon: <TrendingUp className="w-3 h-3"/>, label: 'Evolução', onClick: () => openDetailedModal('MAP_EVO', { label: 'Evolução do Comitê' }) },
-                      { icon: <Zap className="w-3 h-3"/>, label: 'Ação C-Level', onClick: () => openDetailedModal('CLEVEL_PLAY', { label: 'Abordagem Executiva' }) },
+                      { icon: <Share2 className="w-3 h-3"/>, label: 'Social Selling' },
+                      { icon: <TrendingUp className="w-3 h-3"/>, label: 'Evolução' },
+                      { icon: <Zap className="w-3 h-3"/>, label: 'Ação C-Level' },
                     ]} />
                   </div>,
                 ],
@@ -1748,17 +677,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     </div>
                     <div className="space-y-1.5">
                       {abmHeatmapAccounts.filter(a => a.ft >= 75).slice(0,4).map(acc => (
-                        <div key={acc.id} className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl group cursor-pointer hover:border-emerald-300 transition-all" onClick={() => openDetailedModal('ACCOUNT', acc)}>
+                        <div key={acc.id} className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl group hover:border-emerald-300 transition-all">
                           <div><p className="text-[9px] font-bold text-slate-800">{acc.name}</p><p className="text-[8px] text-emerald-600">Fit {acc.ft}% — Budget R${acc.budget}k</p></div>
-                          <button onClick={e => { e.stopPropagation(); openDetailedModal('MOVE', { label: `Mover ${acc.name} → Oportunidade` }); }} className="text-[8px] bg-emerald-600 text-white px-2 py-1 rounded-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">Mover</button>
+                          <button className="text-[8px] bg-emerald-600 text-white px-2 py-1 rounded-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">Mover</button>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('FAST_TRACK', { label: 'Mover Elegíveis → Oportunidade' })} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Mover Todas para Oportunidade</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Mover Todas para Oportunidade</button>
                     <MiniActions actions={[
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Proposta', onClick: () => openDetailedModal('PROP', { label: 'Criar Proposta Comercial' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Demo', onClick: () => openDetailedModal('DEMO', { label: 'Marcar Demo' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Criar Oport.', onClick: () => openDetailedModal('OPP', { label: 'Criar Oportunidade CRM' }) },
+                      { icon: <FileText className="w-3 h-3"/>, label: 'Proposta' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Demo' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Criar Oport.' },
                     ]} />
                   </div>,
                   <div key="ft-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1770,17 +699,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         { label:'Timing Comercial', val:44, color:'bg-amber-500' },
                         { label:'Cultura de Dados', val:35, color:'bg-red-500' },
                       ].map((g, i) => (
-                        <div key={i} className="space-y-0.5 cursor-pointer" onClick={() => openDetailedModal('GAP', g)}>
+                        <div key={i} className="space-y-0.5">
                           <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase"><span>{g.label}</span><span>{g.val}%</span></div>
                           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${g.color} rounded-full`} style={{ width: `${g.val}%` }}/></div>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('ROADMAP', { label: 'Roadmap de Fit' })} className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Propor Roadmap de Fit</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Propor Roadmap de Fit</button>
                     <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Campanha Fit', onClick: () => openDetailedModal('CAMP', { label: 'Campanha de Fit Tecnológico' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Workshop', onClick: () => openDetailedModal('EVENT', { label: 'Workshop de Maturidade' }) },
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Case Study', onClick: () => openDetailedModal('CASE', { label: 'Enviar Case de Sucesso' }) },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'Campanha Fit' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Workshop' },
+                      { icon: <FileText className="w-3 h-3"/>, label: 'Case Study' },
                     ]} />
                   </div>,
 
@@ -1795,11 +724,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                     </div>
-                    <button onClick={() => openDetailedModal('INTENT', { label: 'Sinais de Intenção Totais' })} className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Monitorar Concorrentes</button>
+                    <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Monitorar Concorrentes</button>
                     <MiniActions actions={[
-                      { icon: <Search className="w-3 h-3"/>, label: 'Tech Stack', onClick: () => openDetailedModal('TECH_STACK', { label: 'Scrape de Tecnologias' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Alerta CRM', onClick: () => openDetailedModal('CRM_ALERT', { label: 'Criar Alerta SDR CRM' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'G2 / Capterra', onClick: () => openDetailedModal('G2_INTENT', { label: 'Analisar Intent G2' }) },
+                      { icon: <Search className="w-3 h-3"/>, label: 'Tech Stack' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Alerta CRM' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'G2 / Capterra' },
                     ]} />
                   </div>,
                 ],
@@ -1822,17 +751,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                               { label:'AE / Vendas', color:'bg-indigo-600 hover:bg-indigo-700', type:'AE' },
                               { label:'Campanha', color:'bg-purple-600 hover:bg-purple-700', type:'CAMP' },
                             ].map(b => (
-                              <button key={b.type} onClick={() => openDetailedModal(b.type, { label: `${b.label}: ${acc.name}`, account: acc })} className={`flex-1 text-[7px] ${b.color} text-white py-1 rounded-lg font-bold transition-colors`}>{b.label}</button>
+                              <button key={b.type} className={`flex-1 text-[7px] ${b.color} text-white py-1 rounded-lg font-bold transition-colors`}>{b.label}</button>
                             ))}
                           </div>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('SEQ', { label: 'Sequência Multicanal — Contas Quentes' })} className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência Multicanal</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência Multicanal</button>
                     <MiniActions actions={[
-                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Oportunidade', onClick: () => openDetailedModal('OPP', { label: 'Criar Oportunidade no CRM' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade', onClick: () => openDetailedModal('ACTIVITY', { label: 'Atribuir Atividade Canopi' }) },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM', onClick: () => openDetailedModal('CRM_UPDATE', { label: 'Atualizar Status CRM' }) },
+                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Oportunidade' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM' },
                     ]} />
                   </div>,
                   <div key="crm-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1842,15 +771,15 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         <div key={acc.id} className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
                           <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"/>
                           <div className="flex-1 min-w-0"><p className="text-[9px] font-bold text-slate-800 truncate">{acc.name}</p><p className="text-[8px] text-slate-400">{acc.crm}% engaj. — {acc.vertical}</p></div>
-                          <button onClick={() => openDetailedModal('REACTIVATE', acc)} className="text-[8px] bg-amber-500 text-white px-2 py-1 rounded-lg font-bold hover:bg-amber-600 transition-colors shrink-0">Reativar</button>
+                          <button className="text-[8px] bg-amber-500 text-white px-2 py-1 rounded-lg font-bold hover:bg-amber-600 transition-colors shrink-0">Reativar</button>
                         </div>
                       ))}
                     </div>
-                    <button onClick={() => openDetailedModal('CAMP_REACT', { label: 'Campanha de Reengajamento' })} className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Lançar Campanha Reengajamento</button>
+                    <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Lançar Campanha Reengajamento</button>
                     <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Email Flow', onClick: () => openDetailedModal('EMAIL', { label: 'Fluxo E-mail Reativação' }) },
-                      { icon: <Eye className="w-3 h-3"/>, label: 'Diagnóstico', onClick: () => openDetailedModal('DIAG', { label: 'Diagnóstico de Churn Risk' }) },
-                      { icon: <ZapOff className="w-3 h-3"/>, label: 'Pausar', onClick: () => openDetailedModal('PAUSE', { label: 'Pausar Contas Inativas' }) },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'Email Flow' },
+                      { icon: <Eye className="w-3 h-3"/>, label: 'Diagnóstico' },
+                      { icon: <ZapOff className="w-3 h-3"/>, label: 'Pausar' },
                     ]} />
                   </div>,
 
@@ -1861,11 +790,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <div className="flex-1 bg-slate-100 rounded-t-lg h-full flex items-center justify-center flex-col"><p className="text-[11px] font-black">28</p><p className="text-[6px] text-slate-400 uppercase font-bold">Inativo</p></div>
                        <div className="flex-1 bg-emerald-500 rounded-t-lg h-[45%] flex items-center justify-center flex-col text-white"><p className="text-[11px] font-black">12</p><p className="text-[6px] text-emerald-100 uppercase font-bold">ABM</p></div>
                     </div>
-                    <button onClick={() => openDetailedModal('VELOCITY', { label: 'Dashboard de Análise de Pipeline' })} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Analisar Gargalos</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Analisar Gargalos</button>
                     <MiniActions actions={[
-                      { icon: <History className="w-3 h-3"/>, label: 'Histórico', onClick: () => openDetailedModal('HIST_PIPE', { label: 'Histórico de Conversões' }) },
-                      { icon: <Activity className="w-3 h-3"/>, label: 'Forecasting', onClick: () => openDetailedModal('FORECAST', { label: 'Forecasting ABM' }) },
-                      { icon: <Share2 className="w-3 h-3"/>, label: 'RevOps', onClick: () => openDetailedModal('REVOPS', { label: 'Ajuste de SLA RevOps' }) },
+                      { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
+                      { icon: <Activity className="w-3 h-3"/>, label: 'Forecasting' },
+                      { icon: <Share2 className="w-3 h-3"/>, label: 'RevOps' },
                     ]} />
                   </div>,
                 ],
@@ -1893,11 +822,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         );
                       })}
                     </div>
-                    <button onClick={() => openDetailedModal('REP', { label: 'Análise Profunda de Budget Setorial' })} className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Dados Financeiros</button>
+                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Dados Financeiros</button>
                     <MiniActions actions={[
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Exportar PDF', onClick: () => openDetailedModal('REP_PDF', { label: 'Exportar PDF de Budget' }) },
-                      { icon: <Flag className="w-3 h-3"/>, label: 'Alocar Verba', onClick: () => openDetailedModal('FUND', { label: 'Alocar Verba no Canopi' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Compartilhar', onClick: () => openDetailedModal('SHARE_BUDGET', { label: 'Compartilhar C-Level' }) },
+                      { icon: <FileText className="w-3 h-3"/>, label: 'Exportar PDF' },
+                      { icon: <Flag className="w-3 h-3"/>, label: 'Alocar Verba' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Compartilhar' },
                     ]} />
                   </div>,
                   <div key="vp-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -1918,11 +847,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         <input type="range" min="40" max="90" defaultValue="65" className="w-full h-1.5 accent-indigo-600 rounded-full cursor-pointer"/>
                       </div>
                     </div>
-                    <button onClick={() => openDetailedModal('CREATE_CLUSTER', { label: 'Criar Cluster de Vertical' })} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2"><Plus className="w-3 h-3"/>Criar Cluster</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2"><Plus className="w-3 h-3"/>Criar Cluster</button>
                     <MiniActions actions={[
-                      { icon: <Users className="w-3 h-3"/>, label: 'Ver Contas', onClick: () => openDetailedModal('CLUSTER_ACCS', { label: 'Contas por Vertical' }) },
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Play', onClick: () => openDetailedModal('PLAY', { label: 'Executar Play de Vertical' }) },
-                      { icon: <Crosshair className="w-3 h-3"/>, label: 'Segmentar', onClick: () => openDetailedModal('SEG', { label: 'Criar Segmento por Vertical' }) },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Ver Contas' },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'Play' },
+                      { icon: <Crosshair className="w-3 h-3"/>, label: 'Segmentar' },
                     ]} />
                   </div>,
 
@@ -1937,11 +866,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                     </div>
-                    <button onClick={() => openDetailedModal('EVENT_ROI', { label: 'Gestão de Eventos ABM' })} className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Planejar Evento Regional</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Planejar Evento Regional</button>
                     <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'RSVP', onClick: () => openDetailedModal('RSVP', { label: 'Gestão de RSVP VIP' }) },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Presentes', onClick: () => openDetailedModal('GIFT', { label: 'Enviar Direct Mail / Brinde' }) },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Executivo', onClick: () => openDetailedModal('EXEC_SYNC', { label: 'Alinhamento com Founders' }) },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'RSVP' },
+                      { icon: <Users className="w-3 h-3"/>, label: 'Presentes' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Executivo' },
                     ]} />
                   </div>,
                 ],
@@ -2172,7 +1101,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                      </div>
-                     <button onClick={() => openDetailedModal('POT_PRIORITY', {label:'Sequência de Ataque por Prioridade'})} className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Zap className="w-3 h-3"/>Priorizar Ataque</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Zap className="w-3 h-3"/>Priorizar Ataque</button>
                    </div>,
                    <div key="bp1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-violet-500"/>Budget Mapeado</p>
@@ -2189,7 +1118,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        </div>
                      </div>
                      <p className="text-[9px] text-center text-slate-500 font-medium">R$326k dos R$480k mapeados com potencial qualificado</p>
-                     <button onClick={() => openDetailedModal('BUDGET_BREAKDOWN', {label:'Breakdown de Budget por Vertical'})} className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><BarChart className="w-3 h-3"/>Ver Distribuição</button>
+                     <button className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><BarChart className="w-3 h-3"/>Ver Distribuição</button>
                    </div>,
                    <div key="bp2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <div className="flex items-center justify-between">
@@ -2200,7 +1129,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                      <div className="p-2.5 bg-blue-50 rounded-xl border border-blue-100">
                        <p className="text-[9px] font-bold text-blue-700">Play: Direct Mail + LinkedIn Ads para Diretores de Varejo em bloco</p>
                      </div>
-                     <button onClick={() => openDetailedModal('BATCH_POT', {label:'Orquestração em Lote — Potencial >70%'})} className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Lançar Sequência</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Lançar Sequência</button>
                    </div>
                  ],
                  recept: [
@@ -2214,7 +1143,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                      </div>
-                     <button onClick={() => openDetailedModal('RAPPORT_EMAIL', {label:'Criar Email de Rapport por Cargo'})} className="w-full text-[9px] h-7 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Mail className="w-3 h-3"/>Criar Email de Rapport</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Mail className="w-3 h-3"/>Criar Email de Rapport</button>
                    </div>,
                    <div key="r1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <div className="flex items-center justify-between">
@@ -2226,7 +1155,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <div className="p-2 bg-indigo-50 rounded-xl text-center"><p className="text-[8px] font-bold text-indigo-400 uppercase">Próximo</p><p className="text-[10px] font-black text-indigo-700">Abr 12</p></div>
                        <div className="p-2 bg-slate-50 rounded-xl text-center"><p className="text-[8px] font-bold text-slate-400 uppercase">Inscritos</p><p className="text-[10px] font-black text-slate-700">7 / 12</p></div>
                      </div>
-                     <button onClick={() => openDetailedModal('EVENTO_VIP', {label:'Planejar Evento VIP / Jantar de C-Levels'})} className="w-full text-[9px] h-7 font-bold border border-indigo-200 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><Sparkles className="w-3 h-3"/>Planejar Evento</button>
+                     <button className="w-full text-[9px] h-7 font-bold border border-indigo-200 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><Sparkles className="w-3 h-3"/>Planejar Evento</button>
                    </div>,
                    <div key="r2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Handshake className="w-3 h-3 text-emerald-500"/>Quebra-Gelo Finance</p>
@@ -2234,7 +1163,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <p className="text-[8px] font-bold text-amber-700 uppercase">Alerta: Baixa Receptividade</p>
                        <p className="text-[9px] font-medium text-amber-600 leading-relaxed">Setor <strong>Finance + Seguros</strong>: C-Levels com receptividade abaixo de 35%. Exige material consultivo de alto valor antes de qualquer abordagem direta.</p>
                      </div>
-                     <button onClick={() => openDetailedModal('BREAKICE_PLAY', {label:'Playbook de Quebra-Gelo para Finance'})} className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><BrainCircuit className="w-3 h-3"/>Criar Conteúdo Consultivo</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><BrainCircuit className="w-3 h-3"/>Criar Conteúdo Consultivo</button>
                    </div>
                  ],
                  access: [
@@ -2251,7 +1180,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                      </div>
-                     <button onClick={() => openDetailedModal('FLYWHEEL_INBOUND', {label:'Ativar Flywheel Inbound para Rotas Livres'})} className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Ativar Flywheel Inbound</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Ativar Flywheel Inbound</button>
                    </div>,
                    <div key="a1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Network className="w-3 h-3 text-red-500"/>Blindagem C-Level</p>
@@ -2264,7 +1193,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                      </div>
-                     <button onClick={() => openDetailedModal('GATEKEEPER_BYPASS', {label:'Playbook: Bypassar Gatekeepers'})} className="w-full text-[9px] h-7 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Network className="w-3 h-3"/>Bypassar via Bottom-Up</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Network className="w-3 h-3"/>Bypassar via Bottom-Up</button>
                    </div>,
                    <div key="a2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layers className="w-3 h-3 text-purple-500"/>Abordagem Mista</p>
@@ -2275,8 +1204,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        ))}
                      </div>
                      <div className="grid grid-cols-2 gap-2">
-                       <button onClick={() => openDetailedModal('BOTTOM_UP_PLAY', {label:'Play Bottom-Up por Vertical'})} className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Zap className="w-3 h-3"/>Ativar</button>
-                       <button onClick={() => openDetailedModal('ACCESS_REPORT', {label:'Relatório de Acessibilidade'})} className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><BarChart className="w-3 h-3"/>Relatório</button>
+                       <button className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Zap className="w-3 h-3"/>Ativar</button>
+                       <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><BarChart className="w-3 h-3"/>Relatório</button>
                      </div>
                    </div>
                  ],
@@ -2291,8 +1220,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <p className="text-[9px] font-medium text-amber-600 leading-relaxed">Indústria, Agro e Varejo <strong>não têm Compradores</strong> (Procurement) mapeados. O ciclo de compra trava sem esse elo.</p>
                      </div>
                      <div className="flex gap-2">
-                       <button onClick={() => openDetailedModal('DMU_HUNT', {label:'Caçada de Compradores no LinkedIn'})} className="flex-1 text-[9px] h-7 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Mapear Compradores</button>
-                       <button onClick={() => openDetailedModal('DMU_OVERLAY', {label:'Mapa DMU Completo'})} className="text-[9px] h-7 px-3 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center"><ExternalLink className="w-3 h-3"/></button>
+                       <button className="flex-1 text-[9px] h-7 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Mapear Compradores</button>
+                       <button className="text-[9px] h-7 px-3 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center"><ExternalLink className="w-3 h-3"/></button>
                      </div>
                    </div>,
                    <div key="p1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -2308,7 +1237,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                      </div>
-                     <button onClick={() => openDetailedModal('AMBASSADOR_PLAY', {label:'Programa de Incentivo a Embaixadores'})} className="w-full text-[9px] h-7 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Handshake className="w-3 h-3"/>Ativar Programa</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Handshake className="w-3 h-3"/>Ativar Programa</button>
                    </div>,
                    <div key="p2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                      <div className="flex items-center justify-between">
@@ -2324,8 +1253,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        ))}
                      </div>
                      <div className="grid grid-cols-2 gap-2">
-                       <button onClick={() => openDetailedModal('DETRACTOR_PLAN', {label:'Plano de Conversão de Detratores'})} className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Flag className="w-3 h-3"/>Neutralizar</button>
-                       <button onClick={() => openDetailedModal('DETRACTOR_RISK', {label:'Relatório de Riscos de Pipeline'})} className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Riscos</button>
+                       <button className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Flag className="w-3 h-3"/>Neutralizar</button>
+                       <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Riscos</button>
                      </div>
                    </div>
                  ]
@@ -2564,17 +1493,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
         <div className="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm space-y-6">
           <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3"/> Fit Tecnográfico ABM</h4>
           <div className="space-y-3">
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group cursor-pointer hover:border-blue-300 transition-all" onClick={() => openDetailedModal('TECH', { label: 'Stack Cloud' })}>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group hover:border-blue-300 transition-all">
               <Cloud className="w-4 h-4 text-blue-600" />
               <div className="flex-1"><p className="text-[10px] font-bold text-slate-900 uppercase tracking-tight">Stack Cloud</p><p className="text-[9px] font-bold text-slate-400 uppercase">AWS / Azure Dominante</p></div>
               <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-blue-600" />
             </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group cursor-pointer hover:border-blue-300 transition-all" onClick={() => openDetailedModal('TECH', { label: 'CRM' })}>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group hover:border-blue-300 transition-all">
               <Database className="w-4 h-4 text-blue-600" />
               <div className="flex-1"><p className="text-[10px] font-bold text-slate-900 uppercase tracking-tight">CRM Utilizado</p><p className="text-[9px] font-bold text-slate-400 uppercase">Salesforce (85%)</p></div>
               <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-blue-600" />
             </div>
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group cursor-pointer hover:border-blue-300 transition-all" onClick={() => openDetailedModal('TECH', { label: 'AI Readiness' })}>
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group hover:border-blue-300 transition-all">
               <Sparkles className="w-4 h-4 text-blue-600" />
               <div className="flex-1"><p className="text-[10px] font-bold text-slate-900 uppercase tracking-tight">AI Readiness</p><p className="text-[9px] font-bold text-slate-400 uppercase">Alta Maturidade</p></div>
               <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-blue-600" />
@@ -2605,16 +1534,13 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   <p className="text-sm text-slate-500 font-medium leading-relaxed mb-8 flex-1">{play.desc}</p>
                   <div className="pt-6 border-t border-slate-100 flex justify-between items-center">
                      <div><p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Eficácia</p><p className="text-sm font-bold text-slate-900 tracking-tighter">{play.efficacy}%</p></div>
-                     <Button className="bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase py-3 px-6 hover:bg-black border-none" onClick={() => openDetailedModal('PLAY', play)}>Executar Play</Button>
+                     <Button className="bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase py-3 px-6 hover:bg-black border-none">Executar Play</Button>
                   </div>
                </motion.div>
             ))}
          </div>
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalData?.title || 'Canopi ABM Intelligence'}>
-        <div className="py-2">{modalData?.content}</div>
-      </Modal>
 
     </div>
   );
