@@ -9,7 +9,7 @@ import { AccountDetailView } from './AccountDetailView';
  * Manager Responsável por renderizar o Perfil da Conta no modo correto (Drawer ou Fullscreen)
  */
 export const AccountDetailManager: React.FC = () => {
-  const { selectedAccountId, isOpen, viewMode, closeAccount, toggleViewMode } = useAccountDetail();
+  const { selectedAccountId, selectedContactId, isOpen, viewMode, closeAccount, toggleViewMode } = useAccountDetail();
 
   // Bloquear scroll do body quando o fullscreen estiver aberto
   useEffect(() => {
@@ -50,6 +50,7 @@ export const AccountDetailManager: React.FC = () => {
           >
             <AccountDetailView 
               accountId={selectedAccountId}
+              initialContactId={selectedContactId}
               viewMode={viewMode}
               onClose={closeAccount}
               onToggleViewMode={toggleViewMode}

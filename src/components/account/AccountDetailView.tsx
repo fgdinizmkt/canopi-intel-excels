@@ -31,6 +31,7 @@ import { ContactDetailProfile } from './ContactDetailProfile';
 
 interface AccountDetailViewProps {
   accountId: string;
+  initialContactId?: string | null;
   viewMode: 'drawer' | 'fullscreen';
   onClose: () => void;
   onToggleViewMode: () => void;
@@ -42,6 +43,7 @@ interface AccountDetailViewProps {
  */
 export const AccountDetailView: React.FC<AccountDetailViewProps> = ({ 
   accountId, 
+  initialContactId,
   viewMode: shellViewMode, 
   onClose, 
   onToggleViewMode 
@@ -49,7 +51,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   // 1. Busca de dados e estados locais
   const account = useMemo(() => contasMock.find(c => c.id === accountId), [accountId]);
   const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
-  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(initialContactId || null);
+
+  // Sincronizar contato inicial se mudar (ex: navegação externa)
+  React.useEffect(() => {
+    if (initialContactId) {
+      setSelectedContactId(initialContactId);
+    }
+  }, [initialContactId]);
   
   if (!account) return null;
 

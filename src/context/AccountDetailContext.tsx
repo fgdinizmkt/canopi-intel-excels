@@ -9,9 +9,10 @@ export type AccountViewMode = 'drawer' | 'fullscreen';
 
 interface AccountDetailContextType {
   selectedAccountId: string | null;
+  selectedContactId: string | null;
   isOpen: boolean;
   viewMode: AccountViewMode;
-  openAccount: (accountId: string, mode?: AccountViewMode) => void;
+  openAccount: (accountId: string, contactId?: string, mode?: AccountViewMode) => void;
   closeAccount: () => void;
   toggleViewMode: () => void;
 }
@@ -23,20 +24,23 @@ const AccountDetailContext = createContext<AccountDetailContextType | undefined>
  */
 export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<AccountViewMode>('drawer');
 
-  const openAccount = useCallback((accountId: string, mode: AccountViewMode = 'drawer') => {
+  const openAccount = useCallback((accountId: string, contactId?: string, mode: AccountViewMode = 'drawer') => {
     setSelectedAccountId(accountId);
+    setSelectedContactId(contactId || null);
     setViewMode(mode);
     setIsOpen(true);
   }, []);
 
   const closeAccount = useCallback(() => {
     setIsOpen(false);
-    // Não limpamos o ID imediatamente para evitar "flicker" no fechamento da transição
+    // Não limpamos os IDs imediatamente para evitar "flicker" no fechamento da transição
     setTimeout(() => {
       setSelectedAccountId(null);
+      setSelectedContactId(null);
     }, 300);
   }, []);
 
@@ -48,6 +52,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
     <AccountDetailContext.Provider
       value={{
         selectedAccountId,
+        selectedContactId,
         isOpen,
         viewMode,
         openAccount,

@@ -1,140 +1,108 @@
-import React, { useState } from 'react';
-import { Card, Button, Badge, Modal } from '../components/ui';
-import { Plus, Edit2, Trash2, Search, User } from 'lucide-react';
+'use client';
 
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  role: string;
-  accessibilityScore: number;
-  receptivityScore: number;
-  persona: string;
-  reportsTo?: string;
-}
+import React, { useMemo, useState } from 'react';
+import { Search, Filter, ShieldCheck, Zap, AlertCircle, Users } from 'lucide-react';
+import { contasMock } from '../data/accountsData';
+import { StakeholderPulse } from '../components/contacts/StakeholderPulse';
+import { StakeholderRadar, EnrichedContact } from '../components/contacts/StakeholderRadar';
 
 export const Contacts: React.FC = () => {
-  const [contacts, setContacts] = useState<Contact[]>([
-    { id: '1', name: 'Ana Silva', email: 'ana@ibm.com', phone: '(11) 99999-9999', company: 'IBM Brasil', role: 'Gerente de Marketing', accessibilityScore: 5, receptivityScore: 4, persona: 'Decisor' },
-    { id: '2', name: 'Carlos Souza', email: 'carlos@itau.com', phone: '(11) 88888-8888', company: 'Itaú Unibanco', role: 'Analista de Dados', accessibilityScore: 3, receptivityScore: 5, persona: 'Influenciador' },
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [filter, setFilter] = useState<string>('todos');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDelete = (id: string) => {
-    setContacts(contacts.filter(c => c.id !== id));
-  };
+  // 1. Flattening e Enriquecimento de Dados
+  const allStakeholders = useMemo(() => {
+    return contasMock.flatMap(account => 
+      account.contatos.map(contact => ({
+        ...contact,
+        accountId: account.id,
+        accountName: account.nome,
+        vertical: account.vertical,
+      }))
+    );
+  }, []);
 
-  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const newContact: Contact = {
-      id: editingContact ? editingContact.id : Date.now().toString(),
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      phone: formData.get('phone') as string,
-      company: formData.get('company') as string,
-      role: formData.get('role') as string,
-      accessibilityScore: Number(formData.get('accessibilityScore')),
-      receptivityScore: Number(formData.get('receptivityScore')),
-      persona: formData.get('persona') as string,
-      reportsTo: formData.get('reportsTo') as string || undefined,
+  // 2. Cálculos de Estatísticas (Heurísticas Reais)
+  const stats = useMemo(() => {
+    return {
+      total: allStakeholders.length,
+      decisors: allStakeholders.filter(s => s.classificacao.includes('Decisor')).length,
+      sponsors: allStakeholders.filter(s => s.classificacao.includes('Sponsor')).length,
+      blockers: allStakeholders.filter(s => s.classificacao.includes('Blocker')).length,
+      criticalRisk: allStakeholders.filter(s => s.influencia > 7 && s.forcaRelacional < 45).length,
     };
+  }, [allStakeholders]);
 
-    if (editingContact) {
-      setContacts(contacts.map(c => c.id === newContact.id ? newContact : c));
-    } else {
-      setContacts([...contacts, newContact]);
-    }
-    setIsModalOpen(false);
-    setEditingContact(null);
-  };
+  // 3. Lógica de Filtragem
+  const filteredStakeholders = useMemo(() => {
+    return allStakeholders.filter(s => {
+      const matchesFilter = filter === 'todos' || s.classificacao.some(c => c.toLowerCase() === filter.toLowerCase());
+      const matchesSearch = s.nome.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            s.accountName.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
+  }, [allStakeholders, filter, searchQuery]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex justify-between items-start">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      
+      {/* --- HEADER --- */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contatos</h1>
-          <p className="text-slate-500 mt-1">Gerencie sua base de contatos estratégicos.</p>
+          <h1 className="text-3xl font-black text-slate-100 tracking-tight flex items-center gap-3">
+            <Users className="w-8 h-8 text-blue-500" />
+            Stakeholder Intelligence
+          </h1>
+          <p className="text-slate-500 mt-1 font-medium italic">Radar transversal de influência e cobertura do portfólio.</p>
         </div>
-        <Button onClick={() => { setEditingContact(null); setIsModalOpen(true); }} className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800">
-          <Plus className="w-4 h-4" />
-          Novo Contato
-        </Button>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative w-full sm:w-64 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Buscar por nome ou empresa..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-800/40 border border-slate-700/50 rounded-xl text-sm placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-all text-slate-100"
+            />
+          </div>
+          
+          <div className="flex bg-slate-800/60 p-1 rounded-xl border border-slate-700 shadow-inner">
+            {[
+              { id: 'todos', label: 'Todos', icon: Users },
+              { id: 'decisor', label: 'Decisores', icon: ShieldCheck },
+              { id: 'sponsor', label: 'Sponsors', icon: Zap },
+              { id: 'blocker', label: 'Blockers', icon: AlertCircle },
+            ].map(f => (
+              <button 
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                <f.icon className="w-3.5 h-3.5" /> {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <Card className="p-6">
-        <table className="w-full text-sm">
-            <thead className="text-slate-400 text-xs uppercase">
-                <tr>
-                    <th className="text-left pb-4">Nome</th>
-                    <th className="text-left pb-4">Empresa</th>
-                    <th className="text-left pb-4">Cargo</th>
-                    <th className="text-left pb-4">Acess.</th>
-                    <th className="text-left pb-4">Recep.</th>
-                    <th className="text-left pb-4">Papel</th>
-                    <th className="text-right pb-4">Ações</th>
-                </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-                {contacts.map((contact) => (
-                    <tr key={contact.id}>
-                        <td className="py-4 font-medium">{contact.name}</td>
-                        <td className="py-4 text-slate-600">{contact.company}</td>
-                        <td className="py-4 text-slate-600">{contact.role}</td>
-                        <td className="py-4 text-slate-600">{contact.accessibilityScore}</td>
-                        <td className="py-4 text-slate-600">{contact.receptivityScore}</td>
-                        <td className="py-4 text-slate-600"><Badge>{contact.persona}</Badge></td>
-                        <td className="py-4 text-right flex justify-end gap-2">
-                            <Button variant="outline" size="sm" onClick={() => { setEditingContact(contact); setIsModalOpen(true); }}><Edit2 className="w-4 h-4"/></Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(contact.id)} className="text-red-600"><Trash2 className="w-4 h-4"/></Button>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-      </Card>
+      {/* --- KPIs PULSE --- */}
+      <StakeholderPulse stats={stats} />
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingContact ? 'Editar Contato' : 'Novo Contato'}>
-        <form onSubmit={handleSave} className="space-y-4">
-            <input name="name" defaultValue={editingContact?.name} placeholder="Nome" className="w-full p-2 border rounded-lg" required />
-            <input name="email" defaultValue={editingContact?.email} placeholder="Email" className="w-full p-2 border rounded-lg" required />
-            <input name="phone" defaultValue={editingContact?.phone} placeholder="Telefone" className="w-full p-2 border rounded-lg" />
-            <select name="company" defaultValue={editingContact?.company} className="w-full p-2 border rounded-lg" required>
-                <option value="">Selecione a Empresa</option>
-                {Array.from(new Set(contacts.map(c => c.company))).map(c => <option key={c} value={c}>{c}</option>)}
-                <option value="NEW">Adicionar nova empresa...</option>
-            </select>
-            <input name="role" defaultValue={editingContact?.role} placeholder="Cargo" className="w-full p-2 border rounded-lg" />
-            <div className="grid grid-cols-2 gap-4">
-                <select name="accessibilityScore" defaultValue={editingContact?.accessibilityScore} className="w-full p-2 border rounded-lg" required>
-                    <option value="">Acessibilidade (0-5)</option>
-                    {[0,1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
-                <select name="receptivityScore" defaultValue={editingContact?.receptivityScore} className="w-full p-2 border rounded-lg" required>
-                    <option value="">Receptividade (0-5)</option>
-                    {[0,1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
-            </div>
-            <select name="persona" defaultValue={editingContact?.persona} className="w-full p-2 border rounded-lg" required>
-                <option value="">Selecione o Papel</option>
-                {['Decisor', 'Embaixador', 'Detrator', 'Comprador', 'Stakeholder', 'Gatekeeper', 'Influenciador'].map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
-            <div className="flex gap-2">
-                <select name="reportsTo" defaultValue={editingContact?.reportsTo} className="w-full p-2 border rounded-lg">
-                    <option value="">Responde a quem?</option>
-                    {contacts.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-                <Button type="button" variant="outline" size="sm">Criar Equipe</Button>
-            </div>
-            <Button type="submit" className="w-full">Salvar</Button>
-        </form>
-      </Modal>
+      {/* --- RADAR GRID --- */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+           <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 italic">
+               <Filter className="w-3 h-3" /> Resultados Filtrados ({filteredStakeholders.length})
+           </h2>
+        </div>
+
+        <StakeholderRadar contacts={filteredStakeholders} />
+      </div>
+
     </div>
   );
 };
-
 
 export default Contacts;
