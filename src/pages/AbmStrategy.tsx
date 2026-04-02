@@ -61,6 +61,8 @@ import {
 } from 'lucide-react';
 import { Card, Badge, Button, Modal } from '../components/ui';
 import { motion, AnimatePresence } from 'motion/react';
+import { useAccountDetail } from '../context/AccountDetailContext';
+import { contasMock } from '../data/accountsData';
 
 // --- MOCK DATA ---
 
@@ -71,20 +73,6 @@ const benchmarks = [
   { id: 'prog', label: 'Progression Rate', val: '42%', trend: '+8%', elite: 'Elite: 40%+', desc: 'Contas que avançaram no funil' },
 ];
 
-const abmAccounts = [
-  { id: '1',  initials: 'GB', name: 'Global Bank S.A.',   vertical: 'Financeiro',  fitScore: 9.8, status: 'HOT',       engagement: 92, mqa: true  },
-  { id: '2',  initials: 'MN', name: 'Manufatura Norte',   vertical: 'Manufactura', fitScore: 7.5, status: 'PLAYBOOK',  engagement: 45, mqa: false },
-  { id: '3',  initials: 'SB', name: 'ScalePay Brasil',    vertical: 'Financeiro',  fitScore: 9.2, status: 'MAPEANDO',  engagement: 88, mqa: true  },
-  { id: '4',  initials: 'IH', name: 'Innova Health',      vertical: 'Saúde',       fitScore: 8.9, status: 'HOT',       engagement: 74, mqa: true  },
-  { id: '5',  initials: 'AB', name: 'AlphaBank S.A.',     vertical: 'Financeiro',  fitScore: 9.0, status: 'HOT',       engagement: 85, mqa: true  },
-  { id: '6',  initials: 'FP', name: 'FinPay Brasil',      vertical: 'Fintech',     fitScore: 8.7, status: 'HOT',       engagement: 80, mqa: true  },
-  { id: '7',  initials: 'TM', name: 'TelecomMax',         vertical: 'Telecom',     fitScore: 8.4, status: 'MAPEANDO',  engagement: 72, mqa: true  },
-  { id: '8',  initials: 'AG', name: 'AgroCloud',          vertical: 'Agronegócio', fitScore: 7.8, status: 'PLAYBOOK',  engagement: 68, mqa: false },
-  { id: '9',  initials: 'IB', name: 'InfraBuild',         vertical: 'Construção',  fitScore: 7.2, status: 'MAPEANDO',  engagement: 60, mqa: false },
-  { id: '10', initials: 'EC', name: 'EnergyCore',         vertical: 'Energia',     fitScore: 6.8, status: 'WATCH',     engagement: 42, mqa: false },
-  { id: '11', initials: 'NS', name: 'NovaSaude',          vertical: 'Saúde',       fitScore: 7.0, status: 'MAPEANDO',  engagement: 55, mqa: false },
-  { id: '12', initials: 'PT', name: 'PaperTech Ind.',     vertical: 'Indústria',   fitScore: 6.5, status: 'WATCH',     engagement: 38, mqa: false },
-];
 
 // ABM Priority accounts - scatter data: x=Impacto, y=Probabilidade (% de 0-100)
 const scatterAccounts = [
@@ -262,6 +250,24 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [icpWeights, setIcpWeights] = useState({ receita: 30, stack: 25, equipe: 20, setor: 25 });
   const [budgetAlloc, setBudgetAlloc] = useState({ financeiro: 35, saude: 20, agro: 18, telecom: 15, outros: 12 });
   const totalBudget = 480; // R$480k budget total ABM mapeado da base
+
+  const { openAccount } = useAccountDetail();
+
+  // TAL Table derivada de contasMock
+  const abmAccounts = useMemo(() => {
+    const statusMap: Record<string, string> = { 'Crítico': 'HOT', 'Atenção': 'PLAYBOOK', 'Saudável': 'MAPEANDO' };
+    return contasMock.map(c => ({
+      id:         c.id,
+      initials:   c.nome.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+      name:       c.nome,
+      vertical:   c.vertical,
+      fitScore:   parseFloat((c.prontidao / 10).toFixed(1)),
+      status:     statusMap[c.statusGeral] ?? 'WATCH',
+      engagement: c.prontidao,
+      mqa:        c.prontidao > 70,
+    }));
+  }, []);
+
   // Score ICP ponderado pelos pesos configurados (normalizado 0-100)
   const getWeightedIcp = (acc: typeof abmHeatmapAccounts[0]) => {
     const base = acc.icp;
@@ -1426,7 +1432,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {abmAccounts.map(acc => (
-                    <tr key={acc.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => openDetailedModal('ACCOUNT', acc)}>
+                    <tr key={acc.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => openAccount(acc.id)}>
                       <td className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400 text-xs group-hover:border-blue-400 transition-all shadow-sm">{acc.initials}</div>
