@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 17º Recorte: Saneamento de entryPlays em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Remoção de `entryPlays`: constant hardcoded com 3 playbooks fictícios (Relatório Setorial, Webinar, Campanha Social Ads 1:1) e eficácia hardcoded (88, 72, 94).
+- Remoção da visualização "Plays de Entrada Recomendados": card grande com grid 3-colunas, header fictício ("Ações táticas validadas para os clusters ativos"), botões "Executar Play" e "Ver Todos os Playbooks" sem ação/handler.
+- Justificativa: dados fictícios não derivados de fonte real; botões sem ação; descrição enganosa; sem função operacional no cockpit ABM.
+
+**Commits:**
+- `bd306c4` — refactor: remove hardcoded entryPlays visualization from AbmStrategy (17º recorte)
+
+**PRs:** nenhum (commit direto em main)
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` passa de 1467 para 1433 linhas (34 linhas a menos).
+- Bundle reduzido significativamente: 62.3 kB → 22.2 kB (ícones Lucide de entryPlays removidos do build).
+- Zero impacto visual ou funcional — card decorativo grande removido; todas as funcionalidades core mantidas.
+- Continuação bem-sucida do saneamento progressivo de hardcodes não-operacionais.
+
+---
+
 ## 2026-04-02 — 16º Recorte: Saneamento de verticalClusters em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

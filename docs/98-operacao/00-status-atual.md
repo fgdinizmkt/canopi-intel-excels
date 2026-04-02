@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Saneamento de verticalClusters — 16º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Saneamento de entryPlays — 17º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -199,6 +199,14 @@
 - Total: `1 insertion(+), 31 deletions(-)` — zero impacto visual ou funcional.
 - Justificativa: dados fictícios não derivados de fonte real; botões/links não funcionais; sem função operacional no cockpit ABM.
 
+### Fase 5 — Décimo sétimo recorte: Saneamento de entryPlays (2026-04-02)
+
+**AbmStrategy.tsx** — commit `bd306c4`
+- Remoção de `entryPlays` constant (5 linhas): hardcoded array com 3 playbooks fictícios (Relatório Setorial, Webinar, Campanha Social Ads) com eficácia hardcoded.
+- Remoção da visualização "Plays de Entrada Recomendados" (31 linhas): card grande com grid 3-colunas, header fictício, botões "Executar Play" e "Ver Todos os Playbooks" sem ação.
+- Total: `0 insertions(+), 34 deletions(-)` — zero impacto visual ou funcional.
+- Justificativa: dados fictícios não derivados de fonte real; botões sem ação/handler; descrição enganosa ("Ações táticas validadas" mas são decorações); sem função operacional no cockpit ABM.
+
 ---
 
 ## O que está em andamento
@@ -209,9 +217,9 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 17º Recorte da Fase 5 (frente a definir).
+- Iniciar o 18º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
+  1. `AbmStrategy.tsx` — IIFEs (~1000 linhas) e `abmHeatmapAccounts` ainda ativos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
@@ -230,6 +238,7 @@ Nenhuma implementação funcional em andamento.
 | Saneamento journeyTimeline | 14º Recorte Concluído | journeyTimeline constant + visualização "Jornada de Contas" removidas — dados decorativos não operacionais |
 | Saneamento benchmarks | 15º Recorte Concluído | benchmarks constant + "Elite Benchmarks Grid" removidas — KPIs fictícios e grid decorativo |
 | Saneamento verticalClusters | 16º Recorte Concluído | verticalClusters constant + "Clusterização ABM" removidas — dados fictícios, botões não funcionais |
+| Saneamento entryPlays | 17º Recorte Concluído | entryPlays constant + "Plays de Entrada Recomendados" removidas — dados fictícios, botões sem ação |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 17 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 18 — Frente a definir |
