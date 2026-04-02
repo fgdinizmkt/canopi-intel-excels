@@ -168,7 +168,7 @@ export const SeoInbound: React.FC = () => {
              <p>[OK] Autenticando com CMS / Vercel Deployments</p>
              <p className="opacity-70">&gt; GET /sitemap.xml... HTTP 200</p>
              <p className="opacity-70">&gt; Scanning Citation Signals para Perplexity...</p>
-             <p className="text-rose-400 mt-2">[ALERTA GEO] As 4 Pillar Pages de "Enterprise Solutions" não possuem formatação estruturada de FAQ (Schema.org) necessária para gatilhos de Answer Engine.</p>
+             <p className="text-rose-400 mt-2">[ALERTA GEO] As 4 Pillar Pages de &quot;Enterprise Solutions&quot; não possuem formatação estruturada de FAQ (Schema.org) necessária para gatilhos de Answer Engine.</p>
              <div className="mt-4 border-t border-slate-700 pt-3">
                <button className="bg-indigo-600 text-white border border-indigo-500/30 px-3 py-2 rounded hover:bg-indigo-700 transition-colors w-full font-sans font-bold text-xs" onClick={() => setModalOpen(false)}>Injetar JSON-LD Automático via Edge</button>
              </div>
@@ -183,7 +183,7 @@ export const SeoInbound: React.FC = () => {
                 <div>
                   <h4 className="font-bold text-slate-800 text-sm">Alerta Hand-Raiser Direcionado</h4>
                   <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                     Esta Oportunidade de ABM foi roteada para a fila prioritária ("Fast-Lane") dos SDRs no CRM. O Lead consumiu 3 ativos técnicos e acionou nosso alerta de <strong className="text-emerald-700">High-Intent Hand-Raiser</strong>.
+                     Esta Oportunidade de ABM foi roteada para a fila prioritária (&quot;Fast-Lane&quot;) dos SDRs no CRM. O Lead consumiu 3 ativos técnicos e acionou nosso alerta de <strong className="text-emerald-700">High-Intent Hand-Raiser</strong>.
                   </p>
                 </div>
              </div>
@@ -252,7 +252,7 @@ export const SeoInbound: React.FC = () => {
          contentNode = (
            <div className="space-y-4">
               <h4 className="font-bold text-slate-800 flex items-center gap-2"><HandMetal className="w-4 h-4 text-amber-600"/> Filtro de Hand-Raisers</h4>
-              <p className="text-sm text-slate-600 leading-relaxed mb-4">A conta de "Hand-Raisers" inclui apenas Leads qualificadissimos (High Intent) que pediram uma Demo, preencheram formulário de contato ativo (Fale Conosco) ou realizaram Trials originados da Busca Orgânica ou LLMs.</p>
+              <p className="text-sm text-slate-600 leading-relaxed mb-4">A conta de &quot;Hand-Raisers&quot; inclui apenas Leads qualificadissimos (High Intent) que pediram uma Demo, preencheram formulário de contato ativo (Fale Conosco) ou realizaram Trials originados da Busca Orgânica ou LLMs.</p>
               <div className="grid grid-cols-2 gap-3 mb-2">
                  <div className="p-3 bg-white border border-slate-200 rounded-lg text-center">
                     <span className="block text-2xl font-bold text-blue-700">{Math.round(412 * currFilter.inbVol)}</span>
@@ -286,8 +286,8 @@ export const SeoInbound: React.FC = () => {
               <h4 className="font-bold text-slate-800 mb-2">Editor de Conteúdo Híbrido</h4>
               <label className="text-[10px] font-bold text-slate-400 uppercase">Tags Críticas de AEO/SEO Detectadas na URL:</label>
               <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 space-y-2 mt-2">
-                 <div className="text-xs text-emerald-400 font-mono flex items-center gap-2"><CheckCircle2 className="w-3 h-3"/> &lt;meta name="robots" content="index, follow, max-snippet:-1" /&gt;</div>
-                 <div className="text-xs text-blue-400 font-mono flex items-center gap-2"><CheckCircle2 className="w-3 h-3"/> &lt;script type="application/ld+json"&gt;FAQPage...</div>
+                 <div className="text-xs text-emerald-400 font-mono flex items-center gap-2"><CheckCircle2 className="w-3 h-3"/> &lt;meta name=&quot;robots&quot; content=&quot;index, follow, max-snippet:-1&quot; /&gt;</div>
+                 <div className="text-xs text-blue-400 font-mono flex items-center gap-2"><CheckCircle2 className="w-3 h-3"/> &lt;script type=&quot;application/ld+json&quot;&gt;FAQPage...</div>
                  <div className="text-xs text-rose-400 font-mono flex items-center gap-2">Erro: Faltam Author Credentials e EEAT signals nítidos.</div>
               </div>
            </div>
@@ -313,7 +313,7 @@ export const SeoInbound: React.FC = () => {
          contentNode = (
            <div className="space-y-4">
               <h4 className="font-bold text-slate-800 flex items-center gap-2"><MousePointer2 className="w-4 h-4 text-blue-600"/> Mapa de Calor de Conversão</h4>
-              <p className="text-sm text-slate-600">As Landing Pages com foco em "Enterprise" estão 22% abaixo do benchmark. Demos estão se perdendo no formulário estendido.</p>
+              <p className="text-sm text-slate-600">As Landing Pages com foco em &quot;Enterprise&quot; estão 22% abaixo do benchmark. Demos estão se perdendo no formulário estendido.</p>
               <button className="w-full text-xs font-bold bg-blue-50 text-blue-700 py-2.5 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors" onClick={() => setModalOpen(false)}>Integrar com Hotjar / Clarity</button>
            </div>
          );
@@ -322,7 +322,7 @@ export const SeoInbound: React.FC = () => {
          contentNode = (
            <div className="space-y-4">
               <h4 className="font-bold text-slate-800 flex items-center gap-2"><Youtube className="w-4 h-4 text-rose-600"/> Dark Funnel (YouTube)</h4>
-              <p className="text-sm text-slate-600 text-left bg-slate-50 p-4 rounded-xl border border-slate-100">Visualização do "Watch Time" cruzado com o pipeline B2B. O vídeo de "Product Tour" influenciou R$ 1.2M do seu pipeline orgânico de Janeiro.</p>
+              <p className="text-sm text-slate-600 text-left bg-slate-50 p-4 rounded-xl border border-slate-100">Visualização do &quot;Watch Time&quot; cruzado com o pipeline B2B. O vídeo de &quot;Product Tour&quot; influenciou R$ 1.2M do seu pipeline orgânico de Janeiro.</p>
            </div>
          );
          break;
@@ -570,7 +570,7 @@ export const SeoInbound: React.FC = () => {
                     <div key={idx} className="flex items-center justify-between group hover:bg-slate-50 p-2 rounded-lg -mx-2 transition-colors cursor-pointer" onClick={() => openSimModal('Posicionamentos da Keyword', 'RANK_TRACKER')}>
                       <div className="flex items-center gap-3">
                         <TrendingUp className={`w-3.5 h-3.5 ${item.trend.includes('-') ? 'text-rose-500' : 'text-emerald-500'}`} />
-                        <span className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">"{item.kw}"</span>
+                        <span className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">&quot;{item.kw}&quot;</span>
                       </div>
                       <span className="text-[10.5px] font-bold text-slate-500">Pos. {item.pos} <span className={`${item.color} ml-1 font-extrabold`}>({item.trend})</span></span>
                     </div>
@@ -641,7 +641,7 @@ export const SeoInbound: React.FC = () => {
                     <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div> Anomalia AEO/Schema</span>
                   </div>
                   <p className="text-sm text-slate-300 font-medium leading-relaxed mb-5">
-                    14 URls sem JSON-LD FAQ/HowTo Schemas. Isso quebra as respostas na SGE e ChatGPT para o Cluster de "Enterprise".
+                    14 URls sem JSON-LD FAQ/HowTo Schemas. Isso quebra as respostas na SGE e ChatGPT para o Cluster de &quot;Enterprise&quot;.
                   </p>
                   <button onClick={() => openSimModal('Investigação de SEO Estrutural', 'INVESTIGAR_SITEMAP')} className="text-[10px] w-full py-2 bg-blue-600/20 rounded-lg border border-blue-500/30 font-bold text-blue-400 uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-600/40 transition-colors">
                     Investigar / Corrigir <ArrowRight className="w-3 h-3" />
@@ -654,7 +654,7 @@ export const SeoInbound: React.FC = () => {
                     <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_2px_#10b981]"></div> Levantada de Mão (Intent)</span>
                   </div>
                   <p className="text-sm text-slate-300 font-medium leading-relaxed mb-5">
-                    A página "ROI de Vendas" registrou o formulário de um C-Level logado <strong className="text-white">Conta Tier 1 IBM Brasil</strong>.
+                    A página &quot;ROI de Vendas&quot; registrou o formulário de um C-Level logado <strong className="text-white">Conta Tier 1 IBM Brasil</strong>.
                   </p>
                   <button onClick={() => openSimModal('Criar Ponte Agêntica entre SEO e Outbound', 'SDR_PLAY')} className="text-[10px] w-full py-2 bg-emerald-600/10 rounded-lg border border-emerald-500/20 font-bold text-emerald-400 uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-600/30 transition-colors">
                     Rotear Fast-Lane (SDR) <ArrowRight className="w-3 h-3" />

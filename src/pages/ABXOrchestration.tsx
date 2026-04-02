@@ -1163,7 +1163,7 @@ export const ABXOrchestration: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-100">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pain Point Prioritário</p>
-                <p className="text-sm font-medium text-slate-700 italic">"{acc.obs}"</p>
+                <p className="text-sm font-medium text-slate-700 italic">&quot;{acc.obs}&quot;</p>
               </div>
               <div className="p-6 bg-blue-50 rounded-[32px] border border-blue-100">
                 <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Rota Recomendada</p>

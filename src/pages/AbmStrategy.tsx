@@ -612,7 +612,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2 flex-1">
                        <p className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-2">Sinal de Receptividade</p>
                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
-                         "{activeAccount.crm > 60 ? 'A conta demonstra interações consistentes com SDRs nos últimos 15 dias.' : 'Baixa tração orgânica. Requer abordagem consultiva Tier 2 para destravar.'}"
+                         &quot;{activeAccount.crm > 60 ? 'A conta demonstra interações consistentes com SDRs nos últimos 15 dias.' : 'Baixa tração orgânica. Requer abordagem consultiva Tier 2 para destravar.'}&quot;
                        </p>
                     </div>
                     <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Timeline CRM</button>
@@ -643,7 +643,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Send className="w-3 h-3 text-blue-500"/>Playbook Sugerido</p>
                     <p className="text-[9px] text-slate-500 leading-relaxed font-medium">Campanha para a vertical <strong>{activeAccount.vertical}</strong> baseada no score atual de CRM (<strong>{activeAccount.crm}%</strong>).</p>
                     <div className="flex-1 p-3 bg-blue-50 border border-blue-100 rounded-xl border-dashed">
-                       <p className="text-[10px] font-bold text-blue-800">"Desafios de {activeAccount.vertical} 2024"</p>
+                       <p className="text-[10px] font-bold text-blue-800">&quot;Desafios de {activeAccount.vertical} 2024&quot;</p>
                        <p className="text-[8px] text-blue-600 mt-1 uppercase font-bold">3 e-mails | 2 calls | 1 LinkedIn</p>
                     </div>
                     <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Injetar na Fila</button>
@@ -655,7 +655,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-2 flex-1">
                        <p className="text-[9px] font-bold text-purple-700 uppercase">Contexto de Vertical</p>
                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
-                         "{activeAccount.vertical === 'Tecnologia' ? 'Alta propensão a adoção de novas stacks. Focar em ROI de infraestrutura.' : 'Vertical com ciclo de venda longo. Focar em conformidade e segurança.'}"
+                         &quot;{activeAccount.vertical === 'Tecnologia' ? 'Alta propensão a adoção de novas stacks. Focar em ROI de infraestrutura.' : 'Vertical com ciclo de venda longo. Focar em conformidade e segurança.'}&quot;
                        </p>
                     </div>
                     <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Ver Cluster {activeAccount.vertical}</button>
@@ -927,7 +927,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1 flex-1">
                        <p className="text-[9px] font-bold text-slate-600 uppercase flex items-center gap-2">Score ICP: {activeAccount.icp}%</p>
                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
-                         "{activeAccount.icp > 80 ? 'Conta estratégica com budget de '+new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)+' e fit tecnológico ideal.' : 'Conta qualificável para abordagem Tier 2.'}"
+                         &quot;{activeAccount.icp > 80 ? 'Conta estratégica com budget de '+new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)+' e fit tecnológico ideal.' : 'Conta qualificável para abordagem Tier 2.'}&quot;
                        </p>
                     </div>
                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]" aria-label="Mover conta estratégica para o pipeline de vendas">Mover para Pipeline</button>
@@ -982,7 +982,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
                        <p className="text-[8px] font-bold text-slate-500 uppercase">Sinal de Receptividade</p>
                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
-                         "{activeAccount.crm > 50 ? 'Momentum favorável para introduzir novas features de AI.' : 'Prioridade: Ganhar confiança via conteúdo técnico de '+activeAccount.vertical+'.'}"
+                         &quot;{activeAccount.crm > 50 ? 'Momentum favorável para introduzir novas features de AI.' : 'Prioridade: Ganhar confiança via conteúdo técnico de '+activeAccount.vertical+'.'}&quot;
                        </p>
                     </div>
                     <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors">Criar Draft</button>
@@ -1031,7 +1031,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex-1">
                        <p className="text-[9px] font-bold text-slate-500 uppercase mb-1">Mapeamento de Comitê</p>
                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
-                         "{activeAccount.ct > 60 ? 'Comitê de '+activeAccount.vertical+' bem estruturado. Pronto para orquestração AE.' : 'Mapeamento incompleto. Requer identificação de Procurement.'}"
+                         &quot;{activeAccount.ct > 60 ? 'Comitê de '+activeAccount.vertical+' bem estruturado. Pronto para orquestração AE.' : 'Mapeamento incompleto. Requer identificação de Procurement.'}&quot;
                        </p>
                     </div>
                     <button className="w-full text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5"><Users className="w-3 h-3"/> Ver Decisores</button>

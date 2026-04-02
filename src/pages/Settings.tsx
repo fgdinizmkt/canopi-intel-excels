@@ -105,7 +105,7 @@ export const Settings: React.FC = () => {
                   onChange={(e) => setEnginePower(parseInt(e.target.value))}
                 />
                 <p className="text-[10px] text-slate-500 mt-4 leading-relaxed italic">
-                  Define o nível de "ousadia" da IA ao sugerir ações de expansão baseadas em sinais fracos.
+                  Define o nível de &quot;ousadia&quot; da IA ao sugerir ações de expansão baseadas em sinais fracos.
                 </p>
               </div>
 

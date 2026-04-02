@@ -339,7 +339,7 @@ export const PaidMedia: React.FC = () => {
                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
                  <div className="relative z-10 font-mono text-[10px] text-emerald-400 space-y-2">
                     <p className="opacity-50">&gt; running canopi-paid-intelligence --audit all</p>
-                    <p className="text-white font-bold">[!] DETECTADO: 14% de "Wasteful Spend" no Google Ads (Display Network)</p>
+                    <p className="text-white font-bold">[!] DETECTADO: 14% de &quot;Wasteful Spend&quot; no Google Ads (Display Network)</p>
                     <p className="text-slate-400">&gt; Recomendação: Negativar canais de apps infantis e focar em clusters ABM.</p>
                     <p className="bg-blue-900/40 p-2 rounded border border-blue-500/30 text-blue-300 mt-2">ECONOMIA ESTIMADA: R$ 4.250 / mês</p>
                  </div>

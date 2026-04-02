@@ -169,7 +169,7 @@ export const Outbound: React.FC = () => {
                       <Bot className="w-3 h-3" /> Racional de Execução
                    </p>
                    <p className="text-xs text-slate-700 italic font-medium leading-relaxed">
-                      "{signal.recommendation}"
+                      &quot;{signal.recommendation}&quot;
                    </p>
                 </div>
                 <div className="mt-4 p-3 bg-white rounded-xl border border-slate-200">

@@ -122,6 +122,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <button 
               onClick={onClose}
               className="p-2 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-colors text-slate-400"
+              title="Fechar"
             >
               <X className="w-5 h-5" />
             </button>
@@ -194,7 +195,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               <h2 className="text-xs font-bold uppercase tracking-widest text-slate-100">Briefing Estratégico Canopi AI</h2>
             </div>
             <p className="text-slate-300 leading-relaxed text-lg italic font-medium">
-              "{account.resumoExecutivo}"
+              &quot;{account.resumoExecutivo}&quot;
             </p>
           </div>
 
@@ -321,7 +322,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       <ArrowUpRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
                     </div>
                     <h4 className="text-sm font-bold text-slate-100 mb-1">{s.titulo}</h4>
-                    <p className="text-[11px] text-slate-500 italic">"{s.recomendacao}"</p>
+                    <p className="text-[11px] text-slate-500 italic">&quot;{s.recomendacao}&quot;</p>
                   </div>
                 ))}
               </div>
