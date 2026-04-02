@@ -6,7 +6,7 @@ import {
   Activity, ExternalLink, Mail, Clock, ArrowUpRight, Layout,
   ChevronRight, Lightbulb, LogsIcon, List as ListIcon, Network,
   Sparkles as SparkleIcon, CheckCircle2, Brain, MapPin, Users,
-  AlertTriangle, ShieldCheck
+  AlertTriangle, ShieldCheck, Flame, Users2
 } from 'lucide-react';
 import { contasMock, ContatoConta, SinalConta } from '../../data/accountsData';
 import { OrganogramNode } from './OrganogramNode';
@@ -257,6 +257,112 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 </li>
               ))}
             </div>
+          </div>
+
+          {/* ────── FILA DE FOGO / FIRE QUEUE (RECORTE 28) ────── */}
+          <div className="relative p-6 bg-gradient-to-br from-red-500/5 to-transparent rounded-[32px] border border-red-500/10 overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                 <Flame className="w-32 h-32 text-red-500" />
+              </div>
+              
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                   <div className="p-2 bg-red-500/10 rounded-lg shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                      <Flame className="w-4 h-4 text-red-500" />
+                   </div>
+                   <div>
+                      <h2 className="text-xs font-black text-slate-100 uppercase tracking-[0.2em]">Fila de Fogo: Priorização Estratégica</h2>
+                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Cruzamento de Sinais, Memória e Radar Relacional</p>
+                   </div>
+                </div>
+                <div className="flex gap-2">
+                   <span className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[9px] font-black text-red-400">NEXT BEST PLAY</span>
+                   <span className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-[9px] font-black text-slate-500 uppercase tracking-widest">Calculado agora</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {/* Item 1: Inteligência Relacional + Sinais */}
+                 <div className="group p-5 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-red-500/30 transition-all cursor-default">
+                    <div className="flex items-center justify-between mb-4">
+                       <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-500" />
+                          <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">ALERTA CRÍTICO</span>
+                       </div>
+                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #1</span>
+                    </div>
+                    <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
+                       Executivo em área crítica + histórico positivo com sponsor → priorizar abordagem executiva
+                    </p>
+                    <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Sinal Atual</span>
+                          <p className="text-[11px] text-slate-400">{account.sinais[0]?.titulo || 'Mudança Detectada'}</p>
+                       </div>
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Aprendizado Histórico</span>
+                          <p className="text-[11px] text-slate-400 italic">&quot;{account.inteligencia.padroes[0] || 'Aceleração via decisores técnicos.'}&quot;</p>
+                       </div>
+                    </div>
+                    <button className="w-full mt-5 py-2.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all">
+                       Ativar Play de Blindagem
+                    </button>
+                 </div>
+
+                 {/* Item 2: Radar Gaps + Sucessos */}
+                 <div className="group p-5 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-blue-500/30 transition-all cursor-default">
+                    <div className="flex items-center justify-between mb-4">
+                       <div className="flex items-center gap-2">
+                          <Users2 className="w-4 h-4 text-blue-500" />
+                          <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">GAP DE COBERTURA</span>
+                       </div>
+                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #2</span>
+                    </div>
+                    <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
+                       Sinal de alerta em área sem cobertura + padrão histórico de bloqueio → priorizar preenchimento de gap
+                    </p>
+                    <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Ponto de Tensão</span>
+                          <p className="text-[11px] text-slate-400">{account.contatos.find(c => c.classificacao.includes('Blocker'))?.nome || 'Stakeholder Crítico'}</p>
+                       </div>
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Sucesso Base</span>
+                          <p className="text-[11px] text-slate-400 italic">&quot;{account.inteligencia.sucessos[0] || 'Abertura via outbound consultivo.'}&quot;</p>
+                       </div>
+                    </div>
+                    <button className="w-full mt-5 py-2.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all">
+                       Alocar Champion Técnico
+                    </button>
+                 </div>
+
+                 {/* Item 3: Hipóteses + Contexto Recente */}
+                 <div className="group p-5 rounded-2xl bg-slate-900/40 border border-slate-800 hover:border-emerald-500/30 transition-all cursor-default">
+                    <div className="flex items-center justify-between mb-4">
+                       <div className="flex items-center gap-2">
+                          <Zap className="w-4 h-4 text-emerald-500" />
+                          <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">ESTRATÉGIA AI</span>
+                       </div>
+                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #3</span>
+                    </div>
+                    <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
+                       Conta com hipótese recorrente e contexto favorável → priorizar play de destrave comercial
+                    </p>
+                    <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese AI</span>
+                          <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Workshop executivo sugerido.'}</p>
+                       </div>
+                       <div className="flex flex-col gap-1.5">
+                          <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Contexto</span>
+                          <p className="text-[11px] text-slate-400">Janela de renovação ativa e sinais de engajamento.</p>
+                       </div>
+                    </div>
+                    <button className="w-full mt-5 py-2.5 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-500 uppercase tracking-widest transition-all">
+                       Simular Valor do ROI
+                    </button>
+                 </div>
+              </div>
           </div>
 
           {/* Operacional: Ações e Oportunidades (Recorte 25) */}
