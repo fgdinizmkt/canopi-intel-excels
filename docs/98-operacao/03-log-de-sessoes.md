@@ -814,3 +814,23 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - A página `Actions` agora opera como um centro de comando tático-estratégico consolidado.
 - Build validado com sucesso e integração visual preservada.
 - Próximo passo: Evolução de `contasMock` para suporte a scoring numérico de heatmaps.
+
+---
+
+### Sessão: 2026-04-02 (Tarde 2) — 21º Recorte (Fase 6)
+**Agente:** Antigravity
+
+**Objetivo:** Implementar a base numérica estrutural para Scoring (Preparação Estrutural da Fase 6).
+
+**Ações:**
+1.  **Expansão de Tipagem:** Adicionados campos mandatórios `icp`, `crm`, `vp`, `ct`, `ft` e `budgetBrl` (todos do tipo `number`) à interface `Conta` em `src/data/accountsData.ts`.
+2.  **Padronização Semântica:** Adotada a **Opção A (Reais Absolutos)** para o campo `budgetBrl`, garantindo simetria com a estrutura de oportunidades (`valor`) já existente.
+3.  **Documentação de Dados:** Incluído comentário JSDoc explicitando a convenção de valores absolutos em BRL para evitar ambiguidades futuras.
+4.  **Enriquecimento de Mocks:** Atualizados os 3 registros em `contasMock` com valores numéricos calibrados conforme a prontidão e potencial estratégico (ID 1 > ID 2 > ID 3).
+5.  **Validação Técnica:** Executado `npm run build` com sucesso (Exit code: 0), confirmando que a mudança obrigatória de interface não gerou quebras de tipagem em outros módulos (`AbmStrategy.tsx`, `Actions.tsx`, etc.).
+
+**Decisões:**
+- Manter nomenclatura explícita (`budgetBrl`) para garantir transparência semântica.
+- Limitar o escopo à preparação estrutural, deixando a integração funcional dos heatmaps como próximo passo formal.
+
+**Status:** 21º Recorte (Fase 6 — Estrutural) concluído. Ponto de restauração estável em `85ca5af`.

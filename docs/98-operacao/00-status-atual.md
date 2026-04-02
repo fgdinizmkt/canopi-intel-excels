@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Central de Playbooks e injeção rastreável — 20º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Base numérica estrutural para scoring — 21º Recorte Fase 6)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -218,6 +218,15 @@
 - Adição de badges de origem visuais ("Playbook: [Name]") nos cards de Lista e Kanban.
 - Conformidade técnica: Build verificado e estética Soft Slate preservada.
 
+### Fase 6 — 21º recorte: Base numérica estrutural para Scoring (2026-04-02)
+
+**accountsData.ts** — commit `85ca5af`
+- Expansão da interface `Conta` com campos mandatórios de scoring: `icp`, `crm`, `vp`, `ct`, `ft` e `budgetBrl`.
+- Padronização semântica: `budgetBrl` definido como valor absoluto em BRL (Reais) através de nomenclatura e comentário JSDoc.
+- Enriquecimento dos 3 mocks de `contasMock` com valores numéricos coerentes com a prontidão e potencial de cada conta.
+- Validação técnica: Build de produção verificado com sucesso, garantindo integridade de tipagem em todo o projeto.
+- Status operacional: Preparação estrutural concluída; conexão funcional com os 6 heatmaps de `AbmStrategy.tsx` pendente para a próxima etapa.
+
 ---
 
 ## O que está em andamento
@@ -228,10 +237,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- **20º Recorte Concluído:** Central de Playbooks implementada em `Actions.tsx` com injeção rastreável.
+- **21º Recorte Concluído:** Base numérica estrutural para Scoring (Fase 6) implementada em `accountsData.ts`.
 - Iniciar o próxima fase operacional (frente a definir).
 - Candidatos priorizados:
-  1. Evolução de `contasMock` (Scoring numérico) para desbloqueio de heatmaps em ABM.
+  1. **Evolução de AbmStrategy.tsx (Conexão Funcional):** Consumir os novos campos `icp`, `crm`, `vp`, `ct`, `ft` e `budgetBrl` nos 6 heatmaps dinâmicos.
   2. Refactor defensivo de helpers globais (`getHmScore`, `getWeightedIcp`, scoring) — Fase 6+
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
@@ -255,5 +264,6 @@ Nenhuma implementação funcional em andamento.
 | Auditoria IIFEs AbmStrategy | 19º Recorte Concluído (Auditoria) | Bloqueado: 2 IIFEs (~1000 linhas) acopladas em dados, estado e SVG rendering; fora do escopo de refactor incremental |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Central de Playbooks | 20º Recorte Concluído | Biblioteca retrátil e injeção rastreável na fila operacional de Actions |
+| Base Numérica Scoring | 21º Recorte Concluído | Estrutura de Conta estendida; budgetBrl padronizado (Preparação Estrutural Fase 6) |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Evolução de contasMock para desbloqueio de heatmaps |
+| Roadmap | Próximo Passo | Conexão funcional dos heatmaps em AbmStrategy.tsx |
