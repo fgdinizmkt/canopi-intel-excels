@@ -4,8 +4,10 @@
 - Fase: Fase 5 — Refino e endurecimento
 - Último recorte concluído: 7º Recorte — Performance com dados reais
 - Último commit relevante: `165dc40` — feat: conecta performance a contas e sinais reais
-- Branch atual: main
-- Status do push: local em sincronia com origin/main
+- **Data:** 2026-04-01
+- **Último recorte concluído:** Stakeholder Intelligence (Recorte 8)
+- **Último commit relevante:** `d8a184b`
+- **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
 ## Regras obrigatórias
 - Executar apenas o recorte autorizado
@@ -17,13 +19,21 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## Próximo passo correto
-- Iniciar o 8º Recorte da Fase 5 (frente a definir pelo usuário).
-- Candidatos priorizados:
-  1. `Contacts.tsx` — requer primeiro decisão arquitetural: página independente vs extensão de Contas
-  2. Auditoria de `ABMStrategy.tsx` (maior arquivo do projeto, maior risco de dívida técnica)
-  3. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
-- Manter foco em refino funcional e preservação da estética premium.
+## O que foi entregue nesta sessão
+- Transformação de `Contacts.tsx` em Radar Transversal de Inteligência.
+- Expansão do `AccountDetailContext` para suportar `selectedContactId` global.
+- Implementação de Deep Link direto entre o Radar de Contatos e o Centro de Comando.
+- Sincronismo de profundidade: abertura da conta já focada no perfil do contato (Fase 3).
+
+---
+
+## Próximos passos (Roadmap)
+1. Iniciar o 9º Recorte da Fase 5 (frente a definir).
+2. Candidatos priorizados:
+   - Auditoria de `ABMStrategy.tsx` (maior risco de dívida técnica).
+   - `ABXOrchestration.tsx` (unificação com AccountDetailContext).
+   - Central de Playbooks (orquestração cross-channel).
+3. Manter a estética premium e a densidade operacional nos próximos refinos.
 
 ## Pendências / Backlog
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente — migração fora do escopo do 7º recorte.

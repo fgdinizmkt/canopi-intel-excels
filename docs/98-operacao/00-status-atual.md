@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Performance Real Data — 7º Recorte Fase 5)
+`main` — atualizada em 2026-04-01 (Stakeholder Intelligence — 8º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -118,7 +118,15 @@
 - Mapeamento `statusGeral` → cor e classe de badge para consistência visual
 - Alerts: filtra `!archived && !resolved`, ordena por severidade, top 4, mapeia campos visuais completos
 - CSS inline `perf-*` mantido intencionalmente — migração fora do escopo deste recorte
-- Escopo cirúrgico: 1 arquivo, zero impacto em outros módulos
+### Fase 5 — Oitavo recorte: Stakeholder Intelligence (2026-04-01)
+
+**Contacts.tsx** — commit `d8a184b`
+- Transformação da página em Radar Transversal de Influence & Coverage.
+- Implementação do `StakeholderPulse` (KPIs) e `StakeholderRadar` (Cards).
+- Expansão do `AccountDetailContext` para suportar `selectedContactId` global.
+- Implementação de Deep Link: clique no radar abre o Centro de Comando focado no perfil do contato (Fase 3).
+- Heurísticas reais: Identificação de Sponsors em risco e metas de cobertura por conta.
+- Eliminação de CRUD estático em favor de inteligência operacional dinâmica.
 
 ---
 
@@ -142,7 +150,8 @@ Nenhuma implementação funcional em andamento.
 | Centro de Comando | Fase 1 Concluída | Perfil da Conta integrado e costurado globalmente |
 | Centro de Comando | Fase 2 Concluída | Organograma Visual recursivo funcional |
 | Centro de Comando | Fase 3 Concluída | Perfil Granular do Contato com inteligência Canopi |
-| Roadmap | Sincronismo | Memória operacional e remoto atualizados |
 | Assistant Contextual | 6º Recorte Concluído | KPIs reais, fila operacional, contexto injetado no Gemini |
 | Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
-| Roadmap | Próximo Passo | Recorte 8 — Frente a definir |
+| Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
+| Roadmap | Sincronismo | Memória operacional e remoto atualizados |
+| Roadmap | Próximo Passo | Recorte 9 — Frente a definir |
