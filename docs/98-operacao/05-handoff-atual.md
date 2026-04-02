@@ -3,7 +3,7 @@
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
 - **Último recorte concluído:** Auditoria técnica das IIFEs (19º Recorte Fase 5)
-- **Último commit relevante:** Documentação do 19º recorte (auditoria técnica das IIFEs, sem código)
+- **Último commit relevante:** `4065760` — docs: registra conclusao do 19º recorte (auditoria tecnica das IIFEs)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
