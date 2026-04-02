@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Base numérica estrutural para scoring — 21º Recorte Fase 6)
+`main` — atualizada em 2026-04-02 (Conexão Funcional de Heatmaps — 22º Recorte Fase 6)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -227,6 +227,16 @@
 - Validação técnica: Build de produção verificado com sucesso, garantindo integridade de tipagem em todo o projeto.
 - Status operacional: Preparação estrutural concluída; conexão funcional com os 6 heatmaps de `AbmStrategy.tsx` pendente para a próxima etapa.
 
+### Fase 6 — 22º recorte: Conexão Funcional de Heatmaps (2026-04-02)
+
+**AbmStrategy.tsx** + **accountsData.ts** — commit `c8565fd`
+- **Massa de Dados:** Expansão de `contasMock` de 3 para 7 contas com dados de scoring completos (`icp`, `crm`, `vp`, `ct`, `ft`, `budgetBrl`).
+- **Conexão Dinâmica:** Substituição de `abmHeatmapAccounts` (12 mocks fixos) por `useMemo` conectado diretamente ao `contasMock`.
+- **Normalização Financeira:** `budgetBrl` (valor absoluto) convertido para escala `k` (milhares) para exibição SVG.
+- **Hero Stats:** Indicadores de "Target Accounts" e "Health Score" agora derivam do estado real da base filtrada.
+- **Correção Técnica:** Resolvido erro de tipagem na alternância de callouts (módulo em string vs number).
+- **Integridade:** Build de produção validado com sucesso (Exit code: 0).
+
 ---
 
 ## O que está em andamento
@@ -237,11 +247,8 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- **21º Recorte Concluído:** Base numérica estrutural para Scoring (Fase 6) implementada em `accountsData.ts`.
-- Iniciar o próxima fase operacional (frente a definir).
-- Candidatos priorizados:
-  1. **Evolução de AbmStrategy.tsx (Conexão Funcional):** Consumir os novos campos `icp`, `crm`, `vp`, `ct`, `ft` e `budgetBrl` nos 6 heatmaps dinâmicos.
-  2. Refactor defensivo de helpers globais (`getHmScore`, `getWeightedIcp`, scoring) — Fase 6+
+- **22º Recorte Concluído:** Conexão Funcional de Heatmaps (Fase 6) em `AbmStrategy.tsx`.
+- **23º Recorte — Refatoração de Action Cards Dinâmicos:** Consumir os campos reais da base de dados nos blocos de ação lateral de ABM.
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -265,5 +272,6 @@ Nenhuma implementação funcional em andamento.
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Central de Playbooks | 20º Recorte Concluído | Biblioteca retrátil e injeção rastreável na fila operacional de Actions |
 | Base Numérica Scoring | 21º Recorte Concluído | Estrutura de Conta estendida; budgetBrl padronizado (Preparação Estrutural Fase 6) |
+| Conexão de Heatmaps | 22º Recorte Concluído | Heatmaps em AbmStrategy conectados ao contasMock dinâmico |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Conexão funcional dos heatmaps em AbmStrategy.tsx |
+| Roadmap | Próximo Passo | 23º Recorte — Refatoração de Action Cards Dinâmicos |

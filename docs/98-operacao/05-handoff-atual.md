@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 6 — Estruturação de Inteligência de Scoring
-- **Último recorte concluído:** Base numérica estrutural para Scoring (21º Recorte Fase 6)
-- **Último commit relevante:** `85ca5af` — feat(data): implementa base numerica estrutural para scoring (budgetBrl)
+- **Último recorte concluído:** Conexão Funcional de Heatmaps (22º Recorte Fase 6)
+- **Último commit relevante:** `c8565fd` — feat(abm): connect heatmap scoring to dynamic accountsMock and enrich data
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -17,21 +17,42 @@
 - **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
 - **Estética:** Preservar experiênca premium durante refinamentos operacionais.
 
-## O que foi entregue (21º Recorte — Fase 6)
-- **Tipo:** Preparação estrutural de base de dados.
-- **Feat:** Expansão da interface `Conta` com campos mandatórios de scoring (`icp`, `crm`, `vp`, `ct`, `ft`, `budgetBrl`).
-- **Padronização:** Campo `budgetBrl` definido como valor absoluto em BRL (Reais) com comentário JSDoc.
-- **Dados:** Enriquecimento de `contasMock` com valores numéricos coerentes com a realidade das contas.
-- **Integridade:** Build de produção validado (Exit code: 0); sem regressões de tipagem.
-- **Total:** `15 insertions(+), 2 deletions(-)` — entrega documental e de dados íntegra.
+## O que foi entregue (22º Recorte — Fase 6)
+- **Tipo:** Conexão funcional e inteligência de dados.
+- **Massa:** Expansão de `contasMock` para 7 registros com parâmetros de inteligência completos.
+- **Integração:** 6 heatmaps de ABM conectados à base real via `useMemo`.
+- **Normalização:** Conversão de budget real para escala visual concluída.
+- **Hero:** Estatísticas de topo agora refletem a realidade do TAL.
+- **Estabilidade:** Fix de bugs de tipagem em loops de renderização SVG.
+- **Integridade:** Build de produção validado com sucesso.
+
+## 2026-04-02 — 22º Recorte: Conexão Funcional de Heatmaps em AbmStrategy
+
+**Fase:** Fase 6 — Estruturação de Inteligência de Scoring
+
+**O que foi feito:**
+- **Expansão de Massa:** Enriquecimento do `contasMock` em `accountsData.ts` de 3 para 7 contas estratégicas.
+- **Camada de Dados Dinâmica:** Implementação de `useMemo` em `AbmStrategy.tsx` para derivar `abmHeatmapAccounts` do `contasMock`.
+- **Cálculo de Scoring Real:** Heatmaps agora consomem campos dinâmicos (`icp`, `crm`, `vp`, `ct`, `ft`) e calculam score via `getHmScore` e `getWeightedIcp`.
+- **Normalização Financeira:** Tratamento de `budgetBrl` para conversão de escala real para escala visual (milhares).
+- **Hero dinâmico:** "Target Accounts" e "Health Score" sincronizados com a fonte canônica de dados.
+- **Bugfix de Tipagem:** Correção do erro de aritmética onde IDs (strings) eram usados em operações de módulo (`% 2`) na renderização de callouts.
+
+**Commits:**
+- `c8565fd` — feat(abm): connect heatmap scoring to dynamic accountsMock and enrich data
+
+**Impacto no projeto:**
+- Heatmaps em `AbmStrategy.tsx` agora refletem a realidade dos dados, eliminando mocks hardcoded.
+- Página ganha densidade visual e interativa real.
+- Build de produção 100% íntegro.
 
 ---
 
+
 ## Próximos passos (Roadmap)
-1. Iniciar o **22º Recorte da Fase 6**.
+1. Iniciar o **23º Recorte da Fase 6**.
 2. Candidato priorizado:
-   - **Conexão Funcional de Heatmaps:** Alterar `AbmStrategy.tsx` para consumir dinamicamente os novos campos de scoring (`icp`, `crm`, `vp`, `ct`, `ft`, `budgetBrl`) nos 6 heatmaps.
-3. **Escopo:** Substituir o cálculo estático/placeholder pela leitura real dos campos estendidos na interface `Conta`.
+   - **Refatoração de Action Cards Dinâmicos:** Alterar os blocos de ação lateral em `AbmStrategy.tsx` para consumir insights reais da conta (`contasMock`).
 
 ## Pendências / Backlog
 - **Actions.tsx:** CSS inline em botões novos (Migrar para classes se necessário).
