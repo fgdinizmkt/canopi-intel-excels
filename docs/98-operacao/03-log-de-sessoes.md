@@ -550,3 +550,37 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - O Canopi agora possui um terminal centralizado de Governança e Confiabilidade técnica.
 - A página de configurações transicionou de um formulário administrativo passivo para um cockpit operacional estratégico.
 - Próximo passo definido como 12º Recorte da Fase 5.
+
+---
+
+## 2026-04-02 — Fechamento definitivo da frente ABX (complementação do 10º recorte)
+
+**Commit de código:** `7354f33` — feat: estabiliza people layer e ativa acoes reais em abxorchestration
+**Arquivo:** `src/pages/ABXOrchestration.tsx`
+
+**Contexto:**
+- O 10º recorte havia conectado `ActionRoutesLayer` e removido dead code, mas deixou três pendências abertas: `Math.random()` no People Layer, botões mortos em `CommercialMemoryLayer` e `ContactOperationalFilaLayer`, e affordance falsa em `ContactActionsLayer`.
+- Auditoria de fechamento confirmou que integração com `contasMock` não é o caminho correto — IDs incompatíveis e modal interno já é mais rico para o contexto ABX.
+
+**O que foi feito:**
+
+`ABXOrchestration.tsx`:
+- `generatePeopleData`: substituição de 4 chamadas `Math.random()` por fórmulas determinísticas (`((i * 17 + 23) % 91) + 9`, `((i * 31 + 47) % 85) + 15`, `((i * 53 + 7) % 80) + 20`, `(i * 3 % 14) + 1`) — People Layer estável entre reloads e deploys
+- `CommercialMemoryLayer`: adicionada prop `onSelect: (acc: any) => void`; botão "Explorar Ficha 360°" conectado via `onClick={() => onSelect(acc)}`; chamada no render passa `onSelect={handleAccountSelect}`
+- `ContactOperationalFilaLayer`: adicionada prop `onSelect: (acc: any) => void`; botão "Ação" conectado via `onClick` que localiza conta com `processedAccounts.find(a => a.id === p.accountId)` e chama `onSelect(account)`; chamada no render passa `onSelect={handleAccountSelect}`
+- `ContactActionsLayer`: 4 botões "Acionar Play" removidos — cards mantidos como bloco narrativo sem affordance falsa
+
+**Decisão arquitetural registrada:**
+- ABX mantém profundidade própria via `compiladoClientesData` (Excel-derivado)
+- Não integrar `processedAccounts` com `contasMock`: IDs incompatíveis (`acc-0`/`acc-1` vs UUIDs), universos de dados distintos, modal 360° interno já expõe `obs`, `financial`, `solutions`, `memory` — campos sem equivalente em `contasMock`
+- Esta decisão é definitiva e está documentada no status e handoff
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings novos
+- `git diff --stat`: 1 arquivo, 11 insertions, 12 deletions
+- Working tree limpa antes do commit
+
+**Resultado:**
+- Todos os botões clicáveis de `ABXOrchestration.tsx` têm comportamento real
+- People Layer é determinístico e estável
+- Frente ABX encerrada definitivamente — sem dívidas imediatas no backlog

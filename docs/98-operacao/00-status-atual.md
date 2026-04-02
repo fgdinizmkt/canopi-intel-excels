@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Settings Control Tower V1 — 11º Recorte Fase 5)
+`main` — atualizada em 2026-04-01 (ABX Fechamento Definitivo — complementação do 10º Recorte)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -139,12 +139,16 @@
 
 ### Fase 5 — Décimo recorte: ABX Action Routes + Dead Code (2026-04-01)
 
-**ABXOrchestration.tsx** — commit `a52dd2e`
+**ABXOrchestration.tsx** — commit `a52dd2e` + fechamento `7354f33`
 - Auditoria técnica completa: 1307 linhas, fonte exclusiva `compiladoClientesData` (abxData), sem `AccountDetailContext`
-- `ActionRoutesLayer` agora recebe prop `onSelect: (acc: any) => void`; cards de conta têm `onClick={() => onSelect(acc)}` → abre modal 360° interno (`handleAccountSelect`) ao clicar
-- Dead code removido do module scope: `pipelineByVertical`, `channelInfluence`, `committeeRoles` e `funnelEvolution` — todos confirmados como shadowed por versões locais do componente
-- `AccountDetailContext`, `generatePeopleData`, `peopleData`, `Math.random()`, heatmaps e bloco de pessoas mantidos intencionalmente fora do escopo
-- Incompatibilidade de IDs (abxData vs contasMock) documentada no backlog
+- `ActionRoutesLayer` conectado ao `handleAccountSelect` (commit `a52dd2e`)
+- Dead code removido do module scope: `pipelineByVertical`, `channelInfluence`, `committeeRoles`, `funnelEvolution` (commit `a52dd2e`)
+- **Fechamento definitivo da frente ABX** (commit `7354f33`):
+  - `generatePeopleData`: 4 chamadas `Math.random()` substituídas por fórmulas determinísticas (`((i * 17 + 23) % 91) + 9` etc.) — People Layer estável entre reloads
+  - `CommercialMemoryLayer`: prop `onSelect` adicionada; botão "Explorar Ficha 360°" conectado ao modal 360° real
+  - `ContactOperationalFilaLayer`: prop `onSelect` adicionada; botão "Ação" localiza conta via `processedAccounts.find(a => a.id === p.accountId)` e abre modal 360°
+  - `ContactActionsLayer`: 4 botões "Acionar Play" fictícios removidos; cards mantidos como bloco narrativo
+- **Decisão arquitetural definitiva:** ABX mantém profundidade própria via `compiladoClientesData`; não integrar `processedAccounts` com `contasMock` (IDs incompatíveis; modal interno já é mais rico para contexto ABX)
 
 ---
 
@@ -160,7 +164,7 @@ Nenhuma implementação funcional em andamento.
 - Candidatos priorizados:
   1. Continuação do saneamento de `AbmStrategy.tsx` — IIFE, modais e benchmarks ainda hardcoded
   2. Central de Playbooks — orquestração cross-channel corporativa
-  3. `ABXOrchestration.tsx` — conexão final de pessoas (People Layer) com dados reais
+  3. `ABXOrchestration.tsx` — frente encerrada; sem dívidas imediatas
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -172,7 +176,7 @@ Nenhuma implementação funcional em andamento.
 | Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
 | Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
 | ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
-| ABX Action Routes | 10º Recorte Concluído | ActionRoutesLayer conectado ao handleAccountSelect; dead code removido |
+| ABX Action Routes | 10º Recorte Concluído (fechado) | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
 | Roadmap | Próximo Passo | Recorte 12 — Frente a definir |

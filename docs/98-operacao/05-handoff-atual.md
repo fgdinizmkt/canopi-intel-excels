@@ -2,8 +2,7 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- **Último recorte concluído:** Settings — Control Tower V1 (Recorte 11)
-- **Último commit relevante:** `75f3426` — feat: transforma settings em control tower v1
+- **Último commit relevante:** `7354f33` — feat: estabiliza people layer e ativa acoes reais em abxorchestration
 - **Data:** 2026-04-01
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -14,13 +13,15 @@
 - Atualizar a memória operacional ao fechar cada recorte
 - Não avançar para outra frente sem fechar corretamente a atual
 - Não inventar contexto, resultados ou análises
+- **Mudança Visual:** Propor e validar direção visual antes de mudanças estruturais de UI.
+- **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
-## O que foi entregue nestes últimos recortes (10-11)
-- **ABX Orquestração (10º):** Ativação de `ActionRoutesLayer` com modal 360° funcional e limpeza de dead code shadowed no módulo.
-- **Settings Tower (11º):** Transformação total da página de configurações em **Control Tower V1**.
-- **Nexus Core Engine:** Implementação do centro de controle da engine (`BrainCircuit`) com slider de agressividade e monitor de instância Gemmini 1.5 Pro.
-- **Workspace Health:** Dashboard Hero de integridade técnica e latência.
-- **Data Governance:** Monitoramento rítmico de fontes (CRM, Apollo, Minerva, Ads).
+## O que foi entregue (fechamento definitivo da frente ABX — complementação do 10º recorte)
+- `generatePeopleData`: `Math.random()` eliminado — fórmulas determinísticas estabilizam People Layer entre reloads.
+- `CommercialMemoryLayer`: "Explorar Ficha 360°" agora abre modal 360° real via `handleAccountSelect`.
+- `ContactOperationalFilaLayer`: "Ação" localiza conta por `p.accountId` e abre modal 360° real.
+- `ContactActionsLayer`: 4 botões "Acionar Play" fictícios removidos — UX honesta.
+- **Decisão arquitetural registrada:** ABX mantém profundidade própria via `compiladoClientesData`; integração com `contasMock` descartada definitivamente.
 
 ---
 
@@ -29,11 +30,13 @@
 2. Candidatos priorizados:
    - Continuação do saneamento de `AbmStrategy.tsx` (IIFE, modais e benchmarks ainda hardcoded).
    - Central de Playbooks (orquestração cross-channel corporativa).
-   - `ABXOrchestration.tsx` — conexão final de pessoas (People Layer) com dados reais.
+3. ABX encerrado — sem dívidas imediatas.
 
-## Pendências Críticas
-- **ABXOrchestration.tsx:** IDs de `processedAccounts` (abxData) incompatíveis com `contasMock`. `generatePeopleData` usa `Math.random()`. Botões de ação em contatos sem handlers reais.
+## Pendências / Backlog
+- **AbmStrategy.tsx:** TAL conectada. IIFE (~1000 linhas), `openDetailedModal` (20 cases), benchmarks, clusters e scatter ainda hardcoded.
+- **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
 - **Playbooks:** Orquestração corporativa ainda é conceito; requer estrutura de execução.
+- **ABXOrchestration.tsx:** `HumanMappingDiagnosis` e `contactsBigNumbers` com valores hardcoded (sem fonte de dados real disponível — aceito como estado definitivo).
 
 ## Arquivos que sempre precisam ser lidos
 - AGENTS.md
