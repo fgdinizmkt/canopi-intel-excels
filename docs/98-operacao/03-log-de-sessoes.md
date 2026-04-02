@@ -29,6 +29,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Ajuste Estrutural: Subpágina de Detalhe da Conta (Finalização Fase 7)
+
+**Objetivo:** Otimizar a performance e a experiência de navegação migrando o detalhe da conta de um overlay global para uma rota dedicada.
+
+**Atividades:**
+- **Rota Dinâmica:** Implementação de `/contas/[slug]` como container oficial do `AccountDetailView`.
+- **Resolução Semântica:** A subpágina agora resolve o objeto da conta via `slug` (ex: `/contas/nubank`), mantendo o identificador tático `id` para lógica interna.
+- **Navegação Resiliente:** `openAccount` agora dispara `router.push`. `closeAccount` e o botão de fechar utilizam lógica de fallback (tenta `router.back()` ou redireciona para `/contas` se não houver histórico).
+- **Desativação de Overlay:** Remoção do `AccountDetailManager` do layout global, reduzindo o peso do DOM inicial e do Main Thread.
+- **Refino de UI:** Cabeçalho do perfil ajustado para modo tela cheia, com maior respiro e botão de saída explícito.
+- **Validação de Build:** Build de produção 100% íntegro (Exit 0) em todas as rotas dinâmicas.
+
+**Commit:** `92f1c23`
+
+---
+
 ## [2026-04-02] — Radar Relacional e Cruzamento de Sinais (Recorte 26 - Fase 7)
 
 **Objetivo:** Transformar o Comitê de Compras em núcleo de inteligência relacional, cruzando stakeholders com sinais ativos da conta.

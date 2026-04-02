@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 7 — Deep Intelligence (Em andamento)
-- **Último recorte concluído:** Fila de Fogo / Fire Queue (28º Recorte Fase 7)
-- **Último commit relevante:** `a670d6e` (feat(intel): implementação Recorte 28 - Fila de Fogo (Fire Queue) com cruzamento de inteligência e sinais)
+- **Último recorte concluído:** Ajuste Estrutural - Subpágina de Conta (Finalização Fase 7)
+- **Último commit relevante:** `92f1c23` (feat(intel): ajuste estrutural Fase 7 - migração do detalhe da conta para subpágina dedicada (/contas/[slug]) com resolução semântica e saída resiliente)
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK)
 
