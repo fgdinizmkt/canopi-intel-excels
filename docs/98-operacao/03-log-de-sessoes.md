@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 15º Recorte: Saneamento de benchmarks em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Remoção de `benchmarks`: constant hardcoded com 4 KPIs fictícios (Target Account Reach: 72%, ABM Win Rate: 48%, Account-Based ROI: 432%, Progression Rate: 42%).
+- Remoção da visualização "Elite Benchmarks Grid": grid 4-colunas com cards animados, ícone BarChart3 e badges de trend (+15%, +12%, +5%, +8%).
+- Justificativa: dados decorativos puros não derivados de fonte real; sem função operacional no cockpit ABM.
+
+**Commits:**
+- `1f6922e` — refactor: remove hardcoded benchmarks grid from AbmStrategy (15º recorte)
+
+**PRs:** nenhum (commit direto em main)
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` passa de 1527 para 1498 linhas (29 linhas a menos).
+- Zero impacto visual ou funcional — grid decorativo removido; todas as funcionalidades core mantidas.
+- Continuação bem-sucida do saneamento progressivo de hardcodes não-operacionais.
+
+---
+
 ## 2026-04-02 — 14º Recorte: Saneamento de journeyTimeline em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

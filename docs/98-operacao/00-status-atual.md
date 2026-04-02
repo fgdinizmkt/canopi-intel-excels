@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Saneamento de journeyTimeline — 14º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Saneamento de benchmarks — 15º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -183,6 +183,14 @@
 - Total: `0 insertions(+), 32 deletions(-)` — zero impacto visual ou funcional.
 - Justificativa: dados decorativos não derivados de fonte real; não alinha com operacionalidade do cockpit.
 
+### Fase 5 — Décimo quinto recorte: Saneamento de benchmarks (2026-04-02)
+
+**AbmStrategy.tsx** — commit `1f6922e`
+- Remoção de `benchmarks` constant (8 linhas): hardcoded array com 4 KPIs fictícios (72%, 48%, 432%, 42%).
+- Remoção da visualização "Elite Benchmarks Grid" (20 linhas): grid 4-colunas com cards animados, ícone BarChart3, badges de trend.
+- Total: `0 insertions(+), 29 deletions(-)` — zero impacto visual ou funcional.
+- Justificativa: dados decorativos puros não derivados de fonte real; sem função operacional no cockpit ABM.
+
 ---
 
 ## O que está em andamento
@@ -193,7 +201,7 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 15º Recorte da Fase 5 (frente a definir).
+- Iniciar o 16º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
   1. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
@@ -212,6 +220,7 @@ Nenhuma implementação funcional em andamento.
 | ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
 | Saneamento Dead Code | 13º Recorte Concluído | 8 imports órfãos, 5 constantes/helpers, 1 useState, 1 component — todos resíduos do modal removido |
 | Saneamento journeyTimeline | 14º Recorte Concluído | journeyTimeline constant + visualização "Jornada de Contas" removidas — dados decorativos não operacionais |
+| Saneamento benchmarks | 15º Recorte Concluído | benchmarks constant + "Elite Benchmarks Grid" removidas — KPIs fictícios e grid decorativo |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 15 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 16 — Frente a definir |
