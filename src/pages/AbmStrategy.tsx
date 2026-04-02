@@ -59,14 +59,6 @@ import { contasMock } from '../data/accountsData';
 
 // --- MOCK DATA ---
 
-const benchmarks = [
-  { id: 'reach', label: 'Target Account Reach', val: '72%', trend: '+15%', elite: 'Elite: 70%+', desc: 'Alcance total do comitê de compra' },
-  { id: 'winrate', label: 'ABM Win Rate', val: '48%', trend: '+12%', elite: 'Elite: 45%+', desc: 'Taxa de fechamento vs marketing trad.' },
-  { id: 'roi', label: 'Account-Based ROI', val: '432%', trend: '+5%', elite: 'Elite: 400%+', desc: 'Retorno financeiro por real investido' },
-  { id: 'prog', label: 'Progression Rate', val: '42%', trend: '+8%', elite: 'Elite: 40%+', desc: 'Contas que avançaram no funil' },
-];
-
-
 
 const entryPlays = [
   { id: 'p1', title: 'Relatório Setorial Customizado', desc: 'Envio de PDF personalizado com comparativo de eficácia para C-Levels do setor Industrial.', efficacy: 88, icon: <FileText className="w-5 h-5" /> },
@@ -240,27 +232,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
            </div>
            <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none">Refinar TAL</Button>
         </div>
-      </div>
-
-      {/* 2. ELITE BENCHMARKS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {benchmarks.map((b, i) => (
-          <motion.div 
-            key={i} 
-            whileHover={{ y: -5 }}
-            className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm relative group cursor-pointer hover:border-blue-400 transition-all"
-          >
-             <div className="flex justify-between items-center mb-4">
-                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
-                   <BarChart3 className="w-5 h-5" />
-                </div>
-                <Badge variant="emerald" className="text-[9px] font-bold border-none uppercase">{b.trend}</Badge>
-             </div>
-             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{b.label}</p>
-             <h3 className="text-3xl font-bold text-slate-900 mb-2">{b.val}</h3>
-             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{b.elite}</p>
-          </motion.div>
-        ))}
       </div>
 
       {/* GRID PRINCIPAL: TAL (7/12) + Funil ABM + Clusters (5/12) */}
