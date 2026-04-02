@@ -48,8 +48,11 @@ import {
   FileSearch,
   ZapOff,
   Crosshair,
-  Rocket,
+  Briefcase,
+  Phone,
+  Send,
   Handshake,
+  Rocket,
   Network
 } from 'lucide-react';
 import { Card, Badge, Button } from '../components/ui';
@@ -146,6 +149,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [icpWeights, setIcpWeights] = useState({ receita: 30, stack: 25, equipe: 20, setor: 25 });
 
   const { openAccount } = useAccountDetail();
+  const [activeAccountId, setActiveAccountId] = useState<string | null>(contasMock[0]?.id || null);
+
+  const activeAccount = useMemo(() => {
+    return contasMock.find(a => a.id === activeAccountId) || contasMock[0];
+  }, [activeAccountId]);
 
   // Camada Derivada: Transforma contasMock para o formato do Heatmap
   const abmHeatmapAccounts = useMemo(() => {
@@ -252,7 +260,9 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {abmAccounts.map(acc => (
-                    <tr key={acc.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => openAccount(acc.id)}>
+                    <tr key={acc.id} 
+                        className={`hover:bg-slate-50/50 transition-colors group cursor-pointer ${activeAccountId === acc.id ? 'bg-blue-50/30' : ''}`} 
+                        onClick={() => { setActiveAccountId(acc.id); openAccount(acc.id); }}>
                       <td className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400 text-xs group-hover:border-blue-400 transition-all shadow-sm">{acc.initials}</div>
@@ -319,14 +329,15 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   <div key="avg-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-blue-500"/>Ranking ABM</p>
-                      <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">AO VIVO</Badge>
+                      <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {contasMock.indexOf(activeAccount) + 1}º</Badge>
                     </div>
                     <div className="space-y-1.5">
                       {ranked.slice(0,5).map((acc, i) => {
                         const avg = Math.round((acc.icp+acc.crm+acc.vp+acc.ct+acc.ft)/5);
+                        const isCurrent = acc.id === activeAccountId;
                         const tier = avg >= 72 ? { label:'TOP', cls:'bg-red-100 text-red-600' } : avg >= 55 ? { label:'MID', cls:'bg-amber-100 text-amber-600' } : { label:'LOW', cls:'bg-slate-100 text-slate-500' };
                         return (
-                          <div key={acc.id} className="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                          <div key={acc.id} className={`flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 transition-colors ${isCurrent ? 'bg-blue-50 border border-blue-100' : ''}`}>
                             <span className="text-[10px] font-bold text-slate-300 w-4">{i+1}</span>
                             <div className="flex-1 min-w-0"><p className="text-[10px] font-bold text-slate-800 truncate">{acc.name}</p></div>
                             <span className={`text-[8px] font-bold px-2 py-0.5 rounded-md ${tier.cls}`}>{tier.label}</span>
@@ -342,12 +353,12 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="avg-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Zap className="w-3 h-3 text-amber-500"/>Orquestrar em Lote</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Zap className="w-3 h-3 text-amber-500"/>Próxima Ação: {activeAccount.nome}</p>
                     <div className="space-y-2">
                       {[
-                        { label:'Ativar TOP TIER', sub:`${ranked.filter(a=>Math.round((a.icp+a.crm+a.vp+a.ct+a.ft)/5)>=72).length} contas prontas`, cls:'bg-red-600 hover:bg-red-700 text-white', icon:<Zap className="w-3 h-3"/>, type:'BATCH_TOP' },
-                        { label:'Nurturing MID TIER', sub:`${ranked.filter(a=>{const s=Math.round((a.icp+a.crm+a.vp+a.ct+a.ft)/5);return s>=55&&s<72;}).length} contas em espera`, cls:'bg-amber-500 hover:bg-amber-600 text-white', icon:<Activity className="w-3 h-3"/>, type:'BATCH_MID' },
-                        { label:'Watch List LOW TIER', sub:`${ranked.filter(a=>Math.round((a.icp+a.crm+a.vp+a.ct+a.ft)/5)<55).length} contas`, cls:'bg-slate-200 hover:bg-slate-300 text-slate-700', icon:<Clock className="w-3 h-3"/>, type:'BATCH_LOW' },
+                        { label: activeAccount.prontidao > 70 ? 'Ativação Prioritária (MQA)' : 'Nurturing Estratégico', sub: activeAccount.statusGeral === 'Crítico' ? 'Ação imediata exigida' : 'Acompanhamento semanal', cls: activeAccount.prontidao > 70 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-200 hover:bg-slate-300 text-slate-700', icon: <Zap className="w-3 h-3"/> },
+                        { label: 'Briefing da Vertical', sub: `Foco em ${activeAccount.vertical}`, cls: 'bg-blue-600 hover:bg-blue-700 text-white', icon: <Target className="w-3 h-3"/> },
+                        { label: 'Revisão de Comitê', sub: activeAccount.ct < 50 ? 'Gaps identificados' : 'DMU Mapeada', cls: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700', icon: <Network className="w-3 h-3"/> }
                       ].map((btn, i) => (
                         <button key={i} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${btn.cls}`}>
                           {btn.icon}
@@ -356,23 +367,27 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       ))}
                     </div>
                     <MiniActions actions={[
-                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Criar Oport.' },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Agendar' },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
+                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Oportunidade' },
+                      { icon: <Calendar className="w-3 h-3"/>, label: 'Agendar Day' },
+                      { icon: <Database className="w-3 h-3"/>, label: 'Sync Account' },
                     ]} />
                   </div>,
 
                   <div key="avg-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layout className="w-3 h-3 text-indigo-500"/>Playbooks em Execução</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layout className="w-3 h-3 text-indigo-500"/>Playbooks Sugeridos</p>
                     <div className="space-y-2">
-                       {['Expansão Tier 1', 'Reengajamento C-Level', 'Nurturing Mid-Market'].map((p, i) => (
-                         <div key={i} className="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+                       {[
+                         activeAccount.icp > 80 ? 'Expansão Tier 1 (ICP Alto)' : 'Infiltração Tech Stack',
+                         activeAccount.ct < 50 ? 'Mapeamento de DMU' : 'Reengajamento C-Level',
+                         activeAccount.budgetBrl > 1000000 ? 'Executivo Lead (High Budget)' : 'Nurturing Mid-Market'
+                       ].map((p, i) => (
+                         <div key={i} className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
                            <span className="text-[9px] font-bold text-slate-700">{p}</span>
-                           <Badge variant="blue" className="text-[7px] border-none">ATIVO</Badge>
+                           <Badge variant="blue" className="text-[7px] border-none bg-blue-50 text-blue-600">RECOMENDADO</Badge>
                          </div>
                        ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Biblioteca de Plays</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Ativar Playbook Selecionado</button>
                     <MiniActions actions={[
                       { icon: <Activity className="w-3 h-3"/>, label: 'Performance' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Templates' },
@@ -456,34 +471,33 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 ],
                 ct: [
                   <div key="ct-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widests flex items-center gap-2"><Users className="w-3 h-3 text-indigo-500"/>Gap de Contatos (DMU)</p>
-                    <div className="space-y-1.5">
-                      {abmHeatmapAccounts.filter(a => a.ct < 50 && a.imp > 60).slice(0,4).map(acc => (
-                        <div key={acc.id} className="flex items-center gap-2 p-2.5 bg-amber-50 border border-amber-100 rounded-xl">
-                          <AlertCircle className="w-3 h-3 text-amber-500 shrink-0"/>
-                          <div className="flex-1 min-w-0"><p className="text-[9px] font-bold text-slate-800 truncate">{acc.name}</p><p className="text-[8px] text-slate-400">{acc.ct}% mapeado</p></div>
-                          <button className="text-[8px] bg-indigo-600 text-white px-2 py-1 rounded-lg font-bold hover:bg-indigo-700 transition-colors shrink-0">Enriquecer</button>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users className="w-3 h-3 text-indigo-500"/>Gap de Comitê: {activeAccount.nome}</p>
+                    <div className="space-y-1.5 flex-1">
+                      <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2">
+                         <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/>
+                         <div>
+                            <p className="text-[9px] font-bold text-slate-800">Mapeamento Incompleto ({activeAccount.ct}%)</p>
+                            <p className="text-[8px] text-slate-500 leading-tight">Faltam decisores estratégicos de <strong>{activeAccount.vertical}</strong>.</p>
+                         </div>
+                      </div>
+                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-2">Contatos Recomendados</p>
+                      {['VP of Engineering', 'Director of Finance', 'Head of Growth'].map((role, i) => (
+                        <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg group hover:border-indigo-300 border border-transparent transition-all">
+                           <span className="text-[9px] font-bold text-slate-700">{role}</span>
+                           <Button size="icon" className="w-6 h-6 bg-indigo-600 text-white rounded-md"><Plus className="w-3 h-3"/></Button>
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2">
-                      <ExternalLink className="w-3 h-3"/>LinkedIn Sales Nav
-                    </button>
-                    <MiniActions actions={[
-                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM' },
-                      { icon: <CheckCircle className="w-3 h-3"/>, label: 'Atribuir' },
-                      { icon: <Smartphone className="w-3 h-3"/>, label: 'Canopi' },
-                    ]} />
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Enriquecer via Apollo</button>
                   </div>,
                   <div key="ct-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-emerald-500"/>Cargos Críticos DMU</p>
-                    <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-emerald-500"/>Status DMU</p>
+                    <div className="space-y-1.5 flex-1">
                       {[
-                        { cargo:'CEO / Presidente', status:'gap', pct:38 },
-                        { cargo:'CFO / Dir. Finanças', status:'gap', pct:42 },
-                        { cargo:'CTO / Dir. TI', status:'ok', pct:78 },
-                        { cargo:'VP Comercial', status:'gap', pct:30 },
-                        { cargo:'Head de Produto', status:'ok', pct:65 },
+                        { cargo:'CEO / Board', status: activeAccount.ct > 80 ? 'ok' : 'gap', pct: activeAccount.ct > 80 ? 88 : 12 },
+                        { cargo:'CFO / Finance', status: activeAccount.ct > 70 ? 'ok' : 'gap', pct: activeAccount.ct > 70 ? 75 : 28 },
+                        { cargo:'CTO / TI', status: activeAccount.ct > 50 ? 'ok' : 'gap', pct: activeAccount.ct > 50 ? 92 : 35 },
+                        { cargo:'Marketing Lead', status: 'ok', pct: 65 },
                       ].map((c, i) => (
                         <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50">
                           <div className={`w-2 h-2 rounded-full shrink-0 ${c.status === 'ok' ? 'bg-emerald-400' : 'bg-red-400'}`}/>
@@ -492,22 +506,27 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência por Cargo</button>
+                    <button className="w-full py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Iniciar Sequência Multi-Thread</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'Campanha' },
                       { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
                       { icon: <MessageSquare className="w-3 h-3"/>, label: 'Conectar' },
                     ]} />
                   </div>,
-
                   <div key="ct-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Map className="w-3 h-3 text-blue-500"/>Mapa de Influência</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Identifique os bloqueadores e campeões dentro dos comitês mapeados.</p>
-                    <div className="grid grid-cols-2 gap-2">
-                       <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50"><p className="text-[12px] font-black text-blue-600">14</p><p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Champions</p></div>
-                       <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50"><p className="text-[12px] font-black text-amber-500">8</p><p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Bloqueadores</p></div>
+                    <p className="text-[8px] text-slate-400 leading-relaxed font-medium">Visualizando bloqueadores e campeões em <strong>{activeAccount.vertical}</strong>.</p>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                       <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50">
+                          <p className={`text-[12px] font-black ${activeAccount.ct > 50 ? 'text-blue-600' : 'text-slate-400'}`}>{activeAccount.ct > 50 ? '12' : '02'}</p>
+                          <p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Champions</p>
+                       </div>
+                       <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50">
+                          <p className={`text-[12px] font-black ${activeAccount.ct < 40 ? 'text-amber-500' : 'text-slate-400'}`}>{activeAccount.ct < 40 ? '08' : '01'}</p>
+                          <p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Bloqueadores</p>
+                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Mapear Conexões</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Iniciar Radar de Influência</button>
                     <MiniActions actions={[
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Social Selling' },
                       { icon: <TrendingUp className="w-3 h-3"/>, label: 'Evolução' },
@@ -518,23 +537,22 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 ft: [
                   <div key="ft-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ArrowUpRight className="w-3 h-3 text-emerald-500"/>Fast-Track Pipeline</p>
-                      <Badge variant="emerald" className="text-[8px] border-none bg-emerald-50 text-emerald-600 font-bold">{abmHeatmapAccounts.filter(a=>a.ft>=75).length} elegíveis</Badge>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ArrowUpRight className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
+                      <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${activeAccount.ft > 70 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-500'}`}>
+                         {activeAccount.ft > 70 ? 'HIGH FIT' : 'FIT STAND.'}
+                      </span>
                     </div>
-                    <div className="space-y-1.5">
-                      {abmHeatmapAccounts.filter(a => a.ft >= 75).slice(0,4).map(acc => (
-                        <div key={acc.id} className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-100 rounded-xl group hover:border-emerald-300 transition-all">
-                          <div><p className="text-[9px] font-bold text-slate-800">{acc.name}</p><p className="text-[8px] text-emerald-600">Fit {acc.ft}% — Budget R${acc.budget}k</p></div>
-                          <button className="text-[8px] bg-emerald-600 text-white px-2 py-1 rounded-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity">Mover</button>
-                        </div>
-                      ))}
+                    <div className="space-y-1.5 flex-1 pt-1">
+                       <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                          <p className="text-[9px] font-bold text-emerald-700 uppercase">Análise de Budget</p>
+                          <p className="text-[10px] font-bold text-slate-800">R$ {(activeAccount.budgetBrl / 1000).toFixed(0)}k <span className="text-[8px] font-medium text-slate-400">identificado</span></p>
+                          <p className="text-[8px] text-emerald-600 font-bold mt-1 uppercase">
+                             {activeAccount.budgetBrl > 1000000 ? 'Prioridade Tier A (VP Level)' : 'Prioridade Tier B'}
+                          </p>
+                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Mover Todas para Oportunidade</button>
-                    <MiniActions actions={[
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Proposta' },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Demo' },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Criar Oport.' },
-                    ]} />
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Gerar Proposta Estrutural</button>
+                    <MiniActions actions={[{icon:<BarChart className="w-3 h-3"/>, label:'ROI'}, {icon:<CheckCircle2 className="w-3 h-3"/>, label:'Validar'}]} />
                   </div>,
                   <div key="ft-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BarChart3 className="w-3 h-3 text-blue-500"/>Análise de Gaps de Fit</p>
@@ -551,26 +569,19 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Propor Roadmap de Fit</button>
-                    <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Campanha Fit' },
-                      { icon: <Users className="w-3 h-3"/>, label: 'Workshop' },
-                      { icon: <FileText className="w-3 h-3"/>, label: 'Case Study' },
-                    ]} />
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Benchmarking {activeAccount.vertical}</button>
                   </div>,
 
                   <div key="ft-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3 text-amber-500"/>Sinais Tecnológicos</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Contas indicando mudanças de infraestrutura ou adoção de concorrentes.</p>
-                    <div className="space-y-1.5">
-                       {[{name: 'TechInsure Co.', signal:'Pesquisa Cloud AWS'},{name:'ScalePay Brasil', signal:'Fim contratação Hubspot'}].map((a, i) => (
-                         <div key={i} className="p-2 bg-amber-50 rounded-lg">
-                           <p className="text-[9px] font-bold text-slate-800">{a.name}</p>
-                           <p className="text-[8px] text-amber-600 uppercase font-bold mt-0.5"><Zap className="inline w-2 h-2 mr-1"/>{a.signal}</p>
-                         </div>
-                       ))}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3 text-amber-500"/>Sinais de Intenção</p>
+                    <p className="text-[8px] text-slate-400 leading-relaxed font-medium">Detectando picos de interesse para o perfil de <strong>{activeAccount.vertical}</strong>.</p>
+                    <div className="space-y-1.5 pt-2 flex-1">
+                       <div className="p-2 bg-amber-50 rounded-lg border border-amber-100">
+                          <p className="text-[9px] font-bold text-slate-800">{activeAccount.nome}</p>
+                          <p className="text-[8px] text-amber-600 uppercase font-bold mt-1"><Zap className="inline w-2 h-2 mr-1"/>Picos de Acesso Recentes</p>
+                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Monitorar Concorrentes</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Monitorar Signals</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Tech Stack' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Alerta CRM' },
@@ -581,94 +592,61 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 crm: [
                   <div key="crm-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Activity className="w-3 h-3 text-blue-500"/>Contas Quentes</p>
-                      <span className="w-5 h-5 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">{hotCrm.length}</span>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Activity className="w-3 h-3 text-orange-500"/>Engajamento: {activeAccount.nome}</p>
+                      <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${activeAccount.crm > 65 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                         {activeAccount.crm > 65 ? 'ATIVO' : 'AQUECENDO'}
+                      </span>
                     </div>
-                    <div className="space-y-1.5">
-                      {hotCrm.slice(0,3).map(acc => (
-                        <div key={acc.id} className="p-2.5 bg-blue-50 border border-blue-100 rounded-xl">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0"/><p className="text-[9px] font-bold text-slate-800 truncate max-w-[90px]">{acc.name}</p></div>
-                            <span className="text-[8px] font-bold text-blue-700">{acc.crm}%</span>
-                          </div>
-                          <div className="flex gap-1">
-                            {[
-                              { label:'SDR', color:'bg-blue-600 hover:bg-blue-700', type:'SDR' },
-                              { label:'AE / Vendas', color:'bg-indigo-600 hover:bg-indigo-700', type:'AE' },
-                              { label:'Campanha', color:'bg-purple-600 hover:bg-purple-700', type:'CAMP' },
-                            ].map(b => (
-                              <button key={b.type} className={`flex-1 text-[7px] ${b.color} text-white py-1 rounded-lg font-bold transition-colors`}>{b.label}</button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2 flex-1">
+                       <p className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-2">Sinal de Receptividade</p>
+                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                         "{activeAccount.crm > 60 ? 'A conta demonstra interações consistentes com SDRs nos últimos 15 dias.' : 'Baixa tração orgânica. Requer abordagem consultiva Tier 2 para destravar.'}"
+                       </p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Criar Sequência Multicanal</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Timeline CRM</button>
                     <MiniActions actions={[
-                      { icon: <ArrowUpRight className="w-3 h-3"/>, label: 'Oportunidade' },
-                      { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
-                      { icon: <Database className="w-3 h-3"/>, label: 'Atual. CRM' },
+                      { icon: <Briefcase className="w-3 h-3"/>, label: 'Atividade' },
+                      { icon: <Mail className="w-3 h-3"/>, label: 'Seq. E-mail' },
+                      { icon: <Phone className="w-3 h-3"/>, label: 'Ligar' },
                     ]} />
                   </div>,
                   <div key="crm-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Bell className="w-3 h-3 text-amber-500"/>Reativação de Frias</p>
-                    <div className="space-y-1.5">
-                      {coldCrm.slice(0,4).map(acc => (
-                        <div key={acc.id} className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
-                          <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"/>
-                          <div className="flex-1 min-w-0"><p className="text-[9px] font-bold text-slate-800 truncate">{acc.name}</p><p className="text-[8px] text-slate-400">{acc.crm}% engaj. — {acc.vertical}</p></div>
-                          <button className="text-[8px] bg-amber-500 text-white px-2 py-1 rounded-lg font-bold hover:bg-amber-600 transition-colors shrink-0">Reativar</button>
-                        </div>
-                      ))}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><AlertCircle className="w-3 h-3 text-red-500"/>Gargalos Detectados</p>
+                    <div className="space-y-2 flex-1">
+                       {[
+                         { l: 'Fricção de Contato', s: activeAccount.crm < 50 ? 'ALTA' : 'BAIXA', c: activeAccount.crm < 50 ? 'text-red-600 bg-red-50' : 'text-slate-400 bg-slate-50 border-none' },
+                         { l: 'Tempo de Resposta', s: activeAccount.crm < 40 ? 'LENTO' : 'OK', c: activeAccount.crm < 40 ? 'text-red-600 bg-red-50' : 'text-slate-400 bg-slate-50 border-none' },
+                         { l: 'Aderência Tech', s: activeAccount.icp > 70 ? 'ALTA' : 'MODERADA', c: 'text-blue-600 bg-blue-50 border-none' }
+                       ].map((g, i) => (
+                         <div key={i} className="flex justify-between items-center p-2 rounded-lg border border-slate-50">
+                           <span className="text-[9px] font-bold text-slate-600 uppercase">{g.l}</span>
+                           <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${g.c}`}>{g.s}</span>
+                         </div>
+                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Lançar Campanha Reengajamento</button>
-                    <MiniActions actions={[
-                      { icon: <Mail className="w-3 h-3"/>, label: 'Email Flow' },
-                      { icon: <Eye className="w-3 h-3"/>, label: 'Diagnóstico' },
-                      { icon: <ZapOff className="w-3 h-3"/>, label: 'Pausar' },
-                    ]} />
+                    <button className="w-full py-2 font-bold text-[9px] text-red-600 border border-red-100 hover:bg-red-50 rounded-xl uppercase">Escalar Fluxo</button>
                   </div>,
 
                   <div key="crm-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Target className="w-3 h-3 text-emerald-500"/>Velocidade do Pipeline</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Dias médios na fase atual de contas mapeadas vs contas ignoradas.</p>
-                    <div className="flex items-end gap-3 h-16 mt-2 pt-2 border-t border-slate-50">
-                       <div className="flex-1 bg-slate-100 rounded-t-lg h-full flex items-center justify-center flex-col"><p className="text-[11px] font-black">28</p><p className="text-[6px] text-slate-400 uppercase font-bold">Inativo</p></div>
-                       <div className="flex-1 bg-emerald-500 rounded-t-lg h-[45%] flex items-center justify-center flex-col text-white"><p className="text-[11px] font-black">12</p><p className="text-[6px] text-emerald-100 uppercase font-bold">ABM</p></div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Send className="w-3 h-3 text-blue-500"/>Playbook Sugerido</p>
+                    <p className="text-[9px] text-slate-500 leading-relaxed font-medium">Campanha para a vertical <strong>{activeAccount.vertical}</strong> baseada no score atual de CRM (<strong>{activeAccount.crm}%</strong>).</p>
+                    <div className="flex-1 p-3 bg-blue-50 border border-blue-100 rounded-xl border-dashed">
+                       <p className="text-[10px] font-bold text-blue-800">"Desafios de {activeAccount.vertical} 2024"</p>
+                       <p className="text-[8px] text-blue-600 mt-1 uppercase font-bold">3 e-mails | 2 calls | 1 LinkedIn</p>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Analisar Gargalos</button>
-                    <MiniActions actions={[
-                      { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
-                      { icon: <Activity className="w-3 h-3"/>, label: 'Forecasting' },
-                      { icon: <Share2 className="w-3 h-3"/>, label: 'RevOps' },
-                    ]} />
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Injetar na Fila</button>
                   </div>,
                 ],
                 vp: [
                   <div key="vp-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-purple-500"/>Budget Mapeado (Contexto)</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Budget ABM real extraído do histórico da base de clientes por setor. Pool total identificado: <span className="font-bold text-slate-700">R$480k</span></p>
-                    <div className="space-y-1.5 pt-1">
-                      {([
-                        { label:'Financeiro', pct:35, color:'bg-blue-600' },
-                        { label:'Saúde', pct:20, color:'bg-emerald-600' },
-                        { label:'Agronegócio', pct:18, color:'bg-lime-600' },
-                        { label:'Telecom', pct:15, color:'bg-indigo-600' },
-                        { label:'Outros', pct:12, color:'bg-slate-400' },
-                      ] as const).map(v => {
-                        const rsk = Math.round(480 * v.pct / 100);
-                        return (
-                          <div key={v.label} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg">
-                             <div className="flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full ${v.color}`}></span>
-                                <span className="text-[9px] font-bold text-slate-700 uppercase">{v.label}</span>
-                             </div>
-                             <span className="text-[10px] font-black text-purple-700">R${rsk}k <span className="text-[8px] text-slate-400 opacity-60">({v.pct}%)</span></span>
-                          </div>
-                        );
-                      })}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-purple-500"/>Clusterização: {activeAccount.nome}</p>
+                    <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-2 flex-1">
+                       <p className="text-[9px] font-bold text-purple-700 uppercase">Contexto de Vertical</p>
+                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                         "{activeAccount.vertical === 'Tecnologia' ? 'Alta propensão a adoção de novas stacks. Focar em ROI de infraestrutura.' : 'Vertical com ciclo de venda longo. Focar em conformidade e segurança.'}"
+                       </p>
                     </div>
-                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Explorar Dados Financeiros</button>
+                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Ver Cluster {activeAccount.vertical}</button>
                     <MiniActions actions={[
                       { icon: <FileText className="w-3 h-3"/>, label: 'Exportar PDF' },
                       { icon: <Flag className="w-3 h-3"/>, label: 'Alocar Verba' },
@@ -676,24 +654,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="vp-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-indigo-500"/>Criar Cluster ABM</p>
-                    <div className="space-y-2">
-                      <div>
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Nome do Cluster</label>
-                        <input type="text" placeholder="Ex: Fintech High Growth" className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-blue-400 text-slate-700 font-medium"/>
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Vertical Alvo</label>
-                        <select className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-blue-400 text-slate-700 font-medium bg-white">
-                          {['Financeiro','Saúde','Agronegócio','Telecom','Indústria','Mobilidade','Seguros','Varejo','Educação','Construção','Energia'].map(v => <option key={v}>{v}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Score Mínimo de Vertical</label>
-                        <input type="range" min="40" max="90" defaultValue="65" className="w-full h-1.5 accent-indigo-600 rounded-full cursor-pointer"/>
-                      </div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-indigo-500"/>Mover para Cluster</p>
+                    <div className="space-y-1.5 flex-1 pt-1">
+                       <p className="text-[9px] text-slate-400 font-medium">Atribua {activeAccount.nome} a um cluster estratégico para disparar playbooks orquestrados.</p>
+                       <select className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 mt-2">
+                          <option>Selecione um Cluster...</option>
+                          <option>Tier 1 - High Priority</option>
+                          <option>Churn Risk - Winback</option>
+                          <option>Expansion - Cross-sell</option>
+                       </select>
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors flex items-center justify-center gap-2"><Plus className="w-3 h-3"/>Criar Cluster</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Confirmar Alocação</button>
                     <MiniActions actions={[
                       { icon: <Users className="w-3 h-3"/>, label: 'Ver Contas' },
                       { icon: <Mail className="w-3 h-3"/>, label: 'Play' },
@@ -702,17 +673,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   </div>,
 
                   <div key="vp-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3 text-blue-500"/>Eventos & Relacionamento</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Orquestração offline para clusters de altíssimo valor (Eventos, Jantares).</p>
-                    <div className="space-y-1.5 pt-1">
-                       {[{name:'Jantar C-Level', date:'12 Nov, SP', cluster:'Fintech Top'},{name:'Workshop Tech', date:'20 Nov, Online', cluster:'Saúde Mid'}].map((e,i) => (
-                         <div key={i} className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                            <div><p className="text-[9px] font-bold text-slate-800">{e.name}</p><p className="text-[7px] font-bold text-blue-500 uppercase">{e.cluster}</p></div>
-                            <span className="text-[8px] font-bold text-slate-400 text-right">{e.date}</span>
-                         </div>
-                       ))}
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3 text-blue-500"/>Influência & Rapport</p>
+                    <div className="space-y-1.5 flex-1 pt-1">
+                       <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
+                          <span className="text-[9px] font-bold text-slate-600 uppercase">Acesso Decisor</span>
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${activeAccount.ct > 60 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                             {activeAccount.ct > 60 ? 'MAPEADO' : 'PENDENTE'}
+                          </span>
+                       </div>
+                       <p className="text-[8px] text-slate-400 leading-relaxed mt-1">Status de mapeamento do comitê de compras (CT Score: {activeAccount.ct}%).</p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Planejar Evento Regional</button>
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Visualizar Comitê</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'RSVP' },
                       { icon: <Users className="w-3 h-3"/>, label: 'Presentes' },
@@ -923,189 +894,150 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                    let vol = 0.5;
                    if (pId === 'C-Level') vol = 0.15 + (seed/100)*0.25; // Small bubbles
                    else if (pId === 'Diretor') vol = 0.3 + (seed/100)*0.3; // Medium
-                   else if (pId === 'Analista' || pId === 'Espec.') vol = 0.6 + (seed/100)*0.4; // Large
-                   else vol = 0.4 + (seed/100)*0.4;
-                   base = vol;
-                 }
-
-                 return Math.max(0.01, Math.min(0.99, base));
+                    else if (pId === 'Analista' || pId === 'Espec.') vol = 0.6 + (seed/100)*0.4;
+                    else vol = 0.4 + (seed/100)*0.4;
+                    base = vol;
+                  }
+                  return Math.max(0.01, Math.min(0.99, base));
                };
-
                const matrixCardsMap: Record<string, React.ReactNode[]> = {
-                 pot: [
-                   <div key="bp0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-emerald-500"/>Top Cruzamentos</p>
-                       <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">LIVE</span>
-                     </div>
-                     <div className="space-y-1.5 flex-1">
-                       {[{v:'Varejo',c:'Diretor',s:91},{v:'Saúde',c:'Gerente',s:87},{v:'Indústria',c:'Coord.',s:82}].map((row,i)=>(
-                         <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded-xl">
-                           <span className="text-[9px] font-bold text-slate-700">{row.v} × {row.c}</span>
-                           <div className="flex items-center gap-1.5">
-                             <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width:`${row.s}%`}}/></div>
-                             <span className="text-[9px] font-black text-emerald-600">{row.s}</span>
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Zap className="w-3 h-3"/>Priorizar Ataque</button>
-                   </div>,
-                   <div key="bp1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-violet-500"/>Budget Mapeado</p>
-                     <div className="flex-1 flex items-center justify-center">
-                       <div className="relative w-24 h-24">
-                         <svg viewBox="0 0 36 36" className="w-24 h-24 -rotate-90">
-                           <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" strokeWidth="3"/>
-                           <circle cx="18" cy="18" r="15.9" fill="none" stroke="#7c3aed" strokeWidth="3" strokeDasharray="68 32" strokeLinecap="round"/>
-                         </svg>
-                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                           <span className="text-lg font-black text-slate-900">68%</span>
-                           <span className="text-[8px] font-bold text-slate-400 uppercase">cobert.</span>
-                         </div>
+                pot: [
+                  <div key="bp0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
+                      <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${activeAccount.icp > 75 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                         {activeAccount.icp > 75 ? 'ALTO FIT' : 'FIT MÉDIO'}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1 flex-1">
+                       <p className="text-[9px] font-bold text-slate-600 uppercase flex items-center gap-2">Score ICP: {activeAccount.icp}%</p>
+                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                         "{activeAccount.icp > 80 ? 'Conta estratégica com budget de '+new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)+' e fit tecnológico ideal.' : 'Conta qualificável para abordagem Tier 2.'}"
+                       </p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5">Mover para Pipeline</button>
+                  </div>,
+                  <div key="bp1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-violet-500"/>Budget Mapeado</p>
+                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-2">
+                       <p className="text-xl font-black text-slate-900">{new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)}</p>
+                       <p className="text-[9px] font-bold text-slate-400 uppercase leading-tight">Valor Identificado em {activeAccount.vertical}</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-colors flex items-center justify-center gap-1.5">Ver Histórico</button>
+                  </div>,
+                  <div key="bp2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-500"/>Ativação {activeAccount.nome}</p>
+                      <span className="text-[8px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Recomendado</span>
+                    </div>
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex-1">
+                      <p className="text-[9px] font-bold text-blue-700 uppercase">Ação Imediata</p>
+                      <p className="text-[10px] font-medium text-blue-600 leading-relaxed mt-1">Disparar Playbook de <strong>Exploração {activeAccount.vertical}</strong> para o Comitê de Compras.</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Lançar Sequência</button>
+                  </div>
+                ],
+                recept: [
+                  <div key="r0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users className="w-3 h-3 text-blue-500"/>Gauge de Rapport</p>
+                    <div className="flex-1 space-y-3 flex flex-col justify-center">
+                       <div className="space-y-1">
+                          <div className="flex justify-between items-center"><span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Relação Geral</span><span className="text-[10px] font-black text-slate-700">{activeAccount.crm}%</span></div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                             <div className={`h-full ${activeAccount.crm > 65 ? 'bg-emerald-500' : 'bg-amber-500'} rounded-full`} style={{width:`${activeAccount.crm}%`}}/>
+                          </div>
                        </div>
-                     </div>
-                     <p className="text-[9px] text-center text-slate-500 font-medium">R$326k dos R$480k mapeados com potencial qualificado</p>
-                     <button className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><BarChart className="w-3 h-3"/>Ver Distribuição</button>
-                   </div>,
-                   <div key="bp2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-blue-500"/>Ativação em Lote</p>
-                       <span className="text-[8px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">23 contas</span>
-                     </div>
-                     <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">Há <strong>23 contas</strong> com potencial acima de 70% sem nenhuma atividade nos últimos 14 dias.</p>
-                     <div className="p-2.5 bg-blue-50 rounded-xl border border-blue-100">
-                       <p className="text-[9px] font-bold text-blue-700">Play: Direct Mail + LinkedIn Ads para Diretores de Varejo em bloco</p>
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Lançar Sequência</button>
-                   </div>
-                 ],
-                 recept: [
-                   <div key="r0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users className="w-3 h-3 text-blue-500"/>Gauge de Rapport</p>
-                     <div className="flex-1 space-y-2">
-                       {[{label:'C-Level',pct:31,color:'bg-red-400'},{label:'Diretor',pct:52,color:'bg-amber-400'},{label:'Gerente',pct:74,color:'bg-emerald-400'},{label:'Analista',pct:86,color:'bg-emerald-500'}].map((r,i)=>(
-                         <div key={i} className="space-y-0.5">
-                           <div className="flex justify-between"><span className="text-[9px] font-bold text-slate-600">{r.label}</span><span className="text-[9px] font-black text-slate-700">{r.pct}%</span></div>
-                           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${r.color} rounded-full`} style={{width:`${r.pct}%`}}/></div>
-                         </div>
-                       ))}
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Mail className="w-3 h-3"/>Criar Email de Rapport</button>
-                   </div>,
-                   <div key="r1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar className="w-3 h-3 text-indigo-500"/>Evento VIP</p>
-                       <span className="text-[8px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">+38% abertura</span>
-                     </div>
-                     <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">C-Levels de Saúde e Indústria responderam <strong>2.8x mais</strong> quando abordados em contexto de roundtable presencial exclusivo.</p>
-                     <div className="grid grid-cols-2 gap-2">
-                       <div className="p-2 bg-indigo-50 rounded-xl text-center"><p className="text-[8px] font-bold text-indigo-400 uppercase">Próximo</p><p className="text-[10px] font-black text-indigo-700">Abr 12</p></div>
-                       <div className="p-2 bg-slate-50 rounded-xl text-center"><p className="text-[8px] font-bold text-slate-400 uppercase">Inscritos</p><p className="text-[10px] font-black text-slate-700">7 / 12</p></div>
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold border border-indigo-200 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"><Sparkles className="w-3 h-3"/>Planejar Evento</button>
-                   </div>,
-                   <div key="r2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Handshake className="w-3 h-3 text-emerald-500"/>Quebra-Gelo Finance</p>
-                     <div className="flex-1 p-3 bg-amber-50 border border-amber-100 rounded-xl space-y-2">
-                       <p className="text-[8px] font-bold text-amber-700 uppercase">Alerta: Baixa Receptividade</p>
-                       <p className="text-[9px] font-medium text-amber-600 leading-relaxed">Setor <strong>Finance + Seguros</strong>: C-Levels com receptividade abaixo de 35%. Exige material consultivo de alto valor antes de qualquer abordagem direta.</p>
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><BrainCircuit className="w-3 h-3"/>Criar Conteúdo Consultivo</button>
-                   </div>
-                 ],
-                 access: [
-                   <div key="a0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><CheckCircle className="w-3 h-3 text-emerald-500"/>Rotas Livres</p>
-                       <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">ALTA</span>
-                     </div>
-                     <div className="flex-1 space-y-1.5">
-                       {[{v:'Agro',c:'Analista',pct:92},{v:'Saúde',c:'Espec.',pct:88},{v:'Telecom',c:'Coord.',pct:79}].map((r,i)=>(
-                         <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-emerald-50">
-                           <span className="text-[9px] font-bold text-emerald-800">{r.v} → {r.c}</span>
-                           <span className="text-[9px] font-black text-emerald-600">{r.pct}%</span>
-                         </div>
-                       ))}
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Ativar Flywheel Inbound</button>
-                   </div>,
-                   <div key="a1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Network className="w-3 h-3 text-red-500"/>Blindagem C-Level</p>
-                     <div className="flex-1 p-3 bg-red-50 border border-red-100 rounded-xl">
-                       <p className="text-[9px] font-bold text-red-700 mb-2">Gatekeepers Identificados</p>
-                       {[{n:'Varejo',g:'Assist. Exec.',risk:'CRÍTICO'},{n:'Finance',g:'Chefe de Gab.',risk:'ALTO'},{n:'Indústria',g:'Sec. Diretoria',risk:'ALTO'}].map((r,i)=>(
-                         <div key={i} className="flex items-center justify-between py-1 border-b border-red-100 last:border-none">
-                           <span className="text-[8px] font-bold text-red-600">{r.n} — {r.g}</span>
-                           <span className={`text-[7px] font-bold px-1.5 py-0.5 rounded ${r.risk==='CRÍTICO'?'bg-red-600 text-white':'bg-orange-100 text-orange-600'}`}>{r.risk}</span>
-                         </div>
-                       ))}
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Network className="w-3 h-3"/>Bypassar via Bottom-Up</button>
-                   </div>,
-                   <div key="a2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layers className="w-3 h-3 text-purple-500"/>Abordagem Mista</p>
-                     <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">Use Influenciadores com acesso rápido para gerar <strong>buzz interno</strong> e fazer Decisores pedirem eles mesmos por uma apresentação.</p>
-                     <div className="flex gap-2 my-1">
-                       {['Influencer','→ Buzz','→ Decisor'].map((s,i)=>(
-                         <div key={i} className={`flex-1 p-2 rounded-xl text-center text-[8px] font-black ${i===0?'bg-purple-50 text-purple-600':i===1?'bg-slate-100 text-slate-500':'bg-emerald-50 text-emerald-600'}`}>{s}</div>
-                       ))}
-                     </div>
-                     <div className="grid grid-cols-2 gap-2">
-                       <button className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Zap className="w-3 h-3"/>Ativar</button>
-                       <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><BarChart className="w-3 h-3"/>Relatório</button>
-                     </div>
-                   </div>
-                 ],
-                 pos: [
-                   <div key="p0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-amber-500"/>Alerta DMU</p>
-                       <span className="text-[8px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">WATCH</span>
-                     </div>
-                     <div className="p-3 bg-amber-50 border border-amber-100 rounded-2xl flex-1">
-                       <p className="text-[9px] font-bold text-amber-700 uppercase mb-1">Gap Crítico: Compradores</p>
-                       <p className="text-[9px] font-medium text-amber-600 leading-relaxed">Indústria, Agro e Varejo <strong>não têm Compradores</strong> (Procurement) mapeados. O ciclo de compra trava sem esse elo.</p>
-                     </div>
-                     <div className="flex gap-2">
-                       <button className="flex-1 text-[9px] h-7 font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Mapear Compradores</button>
-                       <button className="text-[9px] h-7 px-3 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center"><ExternalLink className="w-3 h-3"/></button>
-                     </div>
-                   </div>,
-                   <div key="p1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-orange-500"/>Rede de Embaixadores</p>
-                     <div className="flex-1 space-y-2">
-                       {[{v:'Tech',n:'4 Embaixadores',hot:true},{v:'Seguros',n:'3 Embaixadores',hot:true},{v:'Saúde',n:'1 Embaixador',hot:false}].map((r,i)=>(
-                         <div key={i} className="flex items-center justify-between p-2 bg-orange-50 rounded-xl">
-                           <span className="text-[9px] font-bold text-orange-800">{r.v}</span>
-                           <div className="flex items-center gap-1.5">
-                             <span className="text-[9px] font-medium text-orange-600">{r.n}</span>
-                             {r.hot && <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"/>}
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5"><Handshake className="w-3 h-3"/>Ativar Programa</button>
-                   </div>,
-                   <div key="p2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                     <div className="flex items-center justify-between">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ShieldCheck className="w-3 h-3 text-blue-500"/>Risco de Detratores</p>
-                       <span className="text-[8px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">3 ativos</span>
-                     </div>
-                     <div className="flex-1 space-y-1.5">
-                       {[{n:'TechCorp',r:'Gerente TI',s:'BLOQUEIO'},{n:'IndPrev',r:'Dir. Ops',s:'OBSERVAÇÃO'},{n:'AgroX',r:'Coord. Compras',s:'ALERTA'}].map((d,i)=>(
-                         <div key={i} className="flex items-start justify-between p-2 bg-slate-50 rounded-xl gap-2">
-                           <div><p className="text-[9px] font-bold text-slate-800">{d.n}</p><p className="text-[8px] text-slate-400">{d.r}</p></div>
-                           <span className={`text-[7px] font-black px-1.5 py-0.5 rounded shrink-0 ${i===0?'bg-red-600 text-white':i===1?'bg-amber-400 text-white':'bg-slate-200 text-slate-600'}`}>{d.s}</span>
-                         </div>
-                       ))}
-                     </div>
-                     <div className="grid grid-cols-2 gap-2">
-                       <button className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1"><Flag className="w-3 h-3"/>Neutralizar</button>
-                       <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1"><Eye className="w-3 h-3"/>Riscos</button>
-                     </div>
-                   </div>
-                 ]
+                       <p className="text-[8px] text-slate-400 font-medium">Status de engajamento do histórico no CRM para a conta {activeAccount.nome}.</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors">Ver Contatos</button>
+                  </div>,
+                  <div key="r1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar className="w-3 h-3 text-indigo-500"/>Evento Estratégico</p>
+                      <span className="text-[8px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">MATCH ALTO</span>
+                    </div>
+                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">C-Levels de <strong>{activeAccount.vertical}</strong> respondem com alta receptividade a convites de Roundtables exclusivos.</p>
+                    <button className="w-full text-[9px] h-7 font-bold border border-indigo-200 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">Convidar para VIP Dinner</button>
+                  </div>,
+                  <div key="r2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Handshake className="w-3 h-3 text-emerald-500"/>Abordagem Consultiva</p>
+                    <div className="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2">
+                       <p className="text-[8px] font-bold text-slate-500 uppercase">Sinal de Receptividade</p>
+                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                         "{activeAccount.crm > 50 ? 'Momentum favorável para introduzir novas features de AI.' : 'Prioridade: Ganhar confiança via conteúdo técnico de '+activeAccount.vertical+'.'}"
+                       </p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors">Criar Draft</button>
+                  </div>
+                ],
+                access: [
+                  <div key="a0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><CheckCircle className="w-3 h-3 text-emerald-500"/>Mapeamento Decisores</p>
+                      <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${activeAccount.ct > 65 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                         {activeAccount.ct > 65 ? 'MAPEADO' : 'BLOQUEADO'}
+                      </span>
+                    </div>
+                    <div className="flex-1 space-y-2 flex flex-col justify-center">
+                       <div className="flex justify-between items-center"><span className="text-[9px] font-bold text-slate-600">Acesso a Comitê</span><span className="text-[9px] font-black text-slate-700">{activeAccount.ct}%</span></div>
+                       <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width:`${activeAccount.ct}%`}}/></div>
+                       <p className="text-[8px] text-slate-400 leading-tight">Mapeamento de <strong>{activeAccount.ct > 60 ? '3+ contatos chave' : 'Contatos insuficientes'}</strong> em {activeAccount.nome}.</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5">Enriquecer Contatos</button>
+                  </div>,
+                  <div key="a1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Network className="w-3 h-3 text-blue-500"/>Inteligência de Networking</p>
+                    <div className="flex-1 p-3 bg-blue-50 border border-blue-100 rounded-xl space-y-2">
+                       <p className="text-[9px] font-bold text-blue-800 uppercase flex items-center gap-1.5"><Users className="w-3 h-3"/> Gatekeepers</p>
+                       <p className="text-[9px] text-blue-600 leading-relaxed font-medium">Conta de vertical <strong>{activeAccount.vertical}</strong> possui blindagem média. Recomendação: abordagem Bottom-Up via Middle-Mgmt.</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors">Ver Conexões</button>
+                  </div>,
+                  <div key="a2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layers className="w-3 h-3 text-purple-500"/>Mix de Mensagens</p>
+                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">Use influenciadores com acesso rápido para gerar <strong>buzz interno</strong> em {activeAccount.nome} e acelerar o CT Score.</p>
+                    <div className="grid grid-cols-2 gap-2">
+                       <button className="text-[9px] h-7 font-bold bg-purple-600 text-white rounded-xl hover:bg-purple-700 flex items-center justify-center gap-1">Draft LinkedIn</button>
+                       <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1">Relatório</button>
+                    </div>
+                  </div>
+                ],
+                pos: [
+                  <div key="p0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-amber-500"/>Status DMU</p>
+                      <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${activeAccount.ct > 50 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                         {activeAccount.ct > 50 ? 'VÁLIDO' : 'GAP'}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex-1">
+                       <p className="text-[9px] font-bold text-slate-500 uppercase mb-1">Mapeamento de Comitê</p>
+                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                         "{activeAccount.ct > 60 ? 'Comitê de '+activeAccount.vertical+' bem estruturado. Pronto para orquestração AE.' : 'Mapeamento incompleto. Requer identificação de Procurement.'}"
+                       </p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5"><Users className="w-3 h-3"/> Ver Decisores</button>
+                  </div>,
+                  <div key="p1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-orange-500"/>Ativo Estratégico</p>
+                    <div className="flex-1 p-3 bg-orange-50 border border-orange-100 rounded-2xl space-y-2">
+                       <p className="text-[9px] font-bold text-orange-800 uppercase flex items-center gap-1.5"><Handshake className="w-3 h-3"/> Embaixador</p>
+                       <p className="text-[10px] text-orange-700 leading-relaxed font-medium">Conta possui {activeAccount.crm > 70 ? 'receptividade alta' : 'receptividade moderada'}. Identificamos sinais de expansão via cross-sell.</p>
+                    </div>
+                    <button className="w-full text-[9px] h-7 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors">Ativar Referral</button>
+                  </div>,
+                  <div key="p2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ShieldCheck className="w-3 h-3 text-blue-500"/>Blindagem</p>
+                      <span className="text-[8px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">OK</span>
+                    </div>
+                    <p className="text-[9px] font-medium text-slate-500 leading-relaxed flex-1">Monitoramento de riscos em <strong>{activeAccount.nome}</strong>. Nenhum detrator crítico identificado no score de {activeAccount.crm}%.</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button className="text-[9px] h-7 font-bold bg-slate-900 text-white rounded-xl hover:bg-black flex items-center justify-center gap-1">Auditar Riscos</button>
+                      <button className="text-[9px] h-7 font-bold border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 flex items-center justify-center">Dashboard</button>
+                    </div>
+                  </div>
+                ]
                };
 
                return matrixViews.map((view, vIdx) => {
