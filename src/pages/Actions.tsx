@@ -754,10 +754,10 @@ function sortByPriorityAndSla(items: ActionItem[]) {
 
 function MetricCard({ label, value, helper, icon }: { label: string; value: number; helper?: string; icon: React.ReactNode }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, padding: '16px 18px', backdropFilter: 'blur(8px)' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.16em', marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>{value}</div>
-      {helper && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{helper}</div>}
+    <div className="bg-white/10 border border-white/10 rounded-[20px] p-4 flex flex-col justify-center backdrop-blur-md">
+      <div className="text-[10px] font-bold text-white/50 uppercase tracking-[0.16em] mb-2">{label}</div>
+      <div className="text-[28px] font-extrabold tracking-tighter leading-none text-white">{value}</div>
+      {helper && <div className="text-[11px] text-white/50 mt-1 font-medium">{helper}</div>}
     </div>
   );
 }
@@ -803,29 +803,31 @@ function QuickButton({
   onClick: () => void;
   small?: boolean;
 }) {
-  const s: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 14,
-    fontWeight: 600,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    padding: small ? '6px 12px' : '9px 18px',
-    fontSize: small ? 12 : 13,
-    background: tone === 'primary' ? '#2b44ff' : tone === 'danger' ? '#fef2f2' : 'white',
-    color: tone === 'primary' ? 'white' : tone === 'danger' ? '#dc2626' : '#334155',
-    border: tone === 'primary' ? 'none' : tone === 'danger' ? '1px solid #fecaca' : '1px solid #e2e8f0',
-  };
-  return <button type="button" onClick={onClick} style={s}>{label}</button>;
+  const baseClasses = "inline-flex items-center justify-center font-semibold cursor-pointer transition-all active:scale-95";
+  const sizeClasses = small ? "rounded-xl px-3 py-1.5 text-xs" : "rounded-[14px] px-[18px] py-[9px] text-[13px]";
+  const toneClasses = 
+    tone === 'primary' ? "bg-[#2b44ff] text-white border-none hover:bg-[#1a33ee]" : 
+    tone === 'danger' ? "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100" : 
+    "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50";
+
+  return (
+    <button 
+      type="button" 
+      onClick={onClick} 
+      className={cx(baseClasses, sizeClasses, toneClasses)}
+      aria-label={label}
+    >
+      {label}
+    </button>
+  );
 }
 
 function InfoBlock({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div style={{ borderRadius: 14, background: 'rgba(255,255,255,0.85)', padding: '12px 14px' }}>
-      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>{label}</p>
-      <p style={{ marginTop: 6, fontSize: 13, fontWeight: 700, lineHeight: 1.5, color: '#0f172a' }}>{value}</p>
-      <p style={{ marginTop: 3, fontSize: 11, lineHeight: 1.5, color: '#64748b' }}>{helper}</p>
+    <div className="bg-white/85 p-3 rounded-[14px]">
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
+      <p className="mt-1.5 text-[13px] font-bold leading-relaxed text-slate-900">{value}</p>
+      <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{helper}</p>
     </div>
   );
 }
@@ -972,56 +974,60 @@ function ActionListCard({
   });
 
   return (
-    <div style={cardStyle}>
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+    <div style={cardStyle} className="transition-all hover:border-slate-300">
+      <div className="flex gap-6 items-start">
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex-1 min-w-0">
           {/* Badges */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-            <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span style={priorityBadgeStyle[item.priority]} className="rounded-full px-2.5 py-1 text-[11px] font-bold">
               {item.priority}
             </span>
-            <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>
+            <span style={statusBadgeStyle[item.status]} className="rounded-full px-2.5 py-1 text-[11px] font-bold">
               {item.status}
             </span>
-            <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
               {item.channel}
             </span>
-            <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
               {item.category}
             </span>
             {item.sourceType === "playbook" && (
-              <span style={{ borderRadius: 100, border: '1px solid #e0f2fe', background: '#f0f9ff', padding: '3px 10px', fontSize: 11, fontWeight: 700, color: '#0284c7' }}>
+              <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-600">
                 Playbook: {item.playbookName}
               </span>
             )}
           </div>
 
           {/* Title & description */}
-          <div style={{ marginTop: 16 }}>
-            <div style={{ textAlign: 'left', background: 'none', border: 'none', padding: 0 }}>
+          <div className="mt-4">
+            <div className="text-left bg-none border-none p-0">
               <p 
                 onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
-                className="hover:text-blue-600 transition-colors cursor-pointer"
-                style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a' }}
+                className="hover:text-blue-600 transition-colors cursor-pointer text-[22px] font-black tracking-[-0.03em] leading-tight text-slate-900"
               >
                 {item.accountName}
               </p>
-              <button type="button" onClick={() => onTitleClick(item)} style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                <p style={{ marginTop: 4, fontSize: 14, fontWeight: 600, color: '#475569' }}>{item.title}</p>
+              <button 
+                type="button" 
+                onClick={() => onTitleClick(item)} 
+                className="text-left bg-none border-none cursor-pointer p-0 block mt-1"
+                aria-label={`Ver detalhes da ação: ${item.title}`}
+              >
+                <p className="text-sm font-semibold text-slate-600">{item.title}</p>
               </button>
             </div>
             {density !== 'compacta' && (
-              <p style={{ marginTop: 12, fontSize: 13, lineHeight: 1.7, color: '#64748b', maxWidth: 880 }}>{item.description}</p>
+              <p className="mt-3 text-[13px] leading-relaxed text-slate-500 max-w-[880px]">{item.description}</p>
             )}
             {density === 'compacta' && item.origin && (
-              <p style={{ marginTop: 8, fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>{item.origin}</p>
+              <p className="mt-2 text-[11px] text-slate-400 font-medium">{item.origin}</p>
             )}
           </div>
 
           {/* Info blocks — hide on compacta */}
           {density === 'expandida' && (
-            <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+            <div className="mt-5 grid grid-cols-5 gap-3">
               <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
               <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={item.ownerTeam} />
               <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
@@ -1030,7 +1036,7 @@ function ActionListCard({
             </div>
           )}
           {density === 'media' && (
-            <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <div className="mt-4 grid grid-cols-3 gap-3">
               <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={item.ownerTeam} />
               <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
               <InfoBlock label="SLA" value={item.slaText} helper={item.status} />
@@ -1039,20 +1045,22 @@ function ActionListCard({
         </div>
 
         {/* Action sidebar */}
-        <div style={{ width: 180, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="w-[180px] shrink-0 flex flex-col gap-2">
           {item.buttons.map((button) => (
             <button
               key={button.id}
               type="button"
               style={btnStyle(button.tone)}
               onClick={() => onButtonAction(item, button.action)}
+              className="hover:brightness-95 transition-all active:scale-[0.98]"
+              aria-label={button.label}
             >
               {button.label}
             </button>
           ))}
-          <div style={{ borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '10px 12px' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>SLA</p>
-            <p style={{ marginTop: 5, fontSize: 13, ...slaColorStyle[item.slaStatus] }}>{item.slaText}</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">SLA</p>
+            <p className={cx("mt-1.25 text-[13px] font-bold", item.slaStatus === 'vencido' ? 'text-red-600' : item.slaStatus === 'alerta' ? 'text-amber-600' : 'text-emerald-600')}>{item.slaText}</p>
           </div>
         </div>
       </div>
@@ -1297,8 +1305,13 @@ function PlaybookActivationOverlay({
               <h2 className="mt-6 text-4xl font-black text-slate-900 letter-spacing-[-0.03em]">{template.name}</h2>
               <p className="mt-4 text-base text-slate-500 font-medium max-w-xl">{template.objective}</p>
             </div>
-            <button onClick={onClose} className="w-12 h-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
-              <X className="w-6 h-6" />
+            <button 
+              onClick={onClose} 
+              className="w-12 h-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors active:scale-90"
+              aria-label="Fechar modal de ativação"
+              title="Fechar"
+            >
+              <X className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -1312,12 +1325,14 @@ function PlaybookActivationOverlay({
                   <div key={acc.id} className="flex items-center gap-5 p-5 rounded-2xl border border-slate-200 bg-slate-50/50">
                     <input 
                       type="checkbox" 
-                      className="w-5 h-5 rounded-md border-slate-300 text-slate-900 focus:ring-slate-900" 
+                      id={`acc-${acc.id}`}
+                      className="w-5 h-5 rounded-md border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer" 
                       checked={selectedAccs.includes(acc.id)}
                       onChange={(e) => {
                         if (e.target.checked) setSelectedAccs(prev => [...prev, acc.id]);
                         else setSelectedAccs(prev => prev.filter(id => id !== acc.id));
                       }}
+                      aria-label={`Selecionar conta ${acc.nome}`}
                     />
                     <div className="flex-1">
                       <p className="text-lg font-black text-slate-900">{acc.nome}</p>

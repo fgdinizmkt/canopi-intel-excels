@@ -406,7 +406,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                         <input type="range" min="40" max="95" value={icpThreshold}
                           onChange={e => setIcpThreshold(Number(e.target.value))}
-                          className="w-full h-1.5 accent-blue-600 rounded-full cursor-pointer"/>
+                          className="w-full h-1.5 accent-blue-600 rounded-full cursor-pointer"
+                          aria-label="Ajustar threshold de qualificação ICP"
+                          title={`Threshold atual: ${icpThreshold}%`}
+                        />
                       </div>
                       <div className="space-y-1.5">
                         {qualifiedIcp.slice(0,4).map(acc => (
@@ -418,7 +421,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         {qualifiedIcp.length === 0 && <p className="text-[9px] text-slate-400 text-center py-2">Nenhuma conta nesse threshold</p>}
                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Exportar Lista Qualificada</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" aria-label="Exportar lista de contas qualificadas">Exportar Lista Qualificada</button>
                     <MiniActions actions={[
                       { icon: <FileSearch className="w-3 h-3"/>, label: 'Segmento' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
@@ -439,11 +442,14 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase"><span>{w.label}</span><span className="text-slate-700">{w.val}%</span></div>
                           <input type="range" min="0" max="50" value={w.val}
                             onChange={e => setIcpWeights(prev => ({ ...prev, [w.key]: Number(e.target.value) }))}
-                            className="w-full h-1.5 accent-slate-600 rounded-full cursor-pointer"/>
+                            className="w-full h-1.5 accent-slate-600 rounded-full cursor-pointer"
+                            aria-label={`Ajustar peso para ${w.label}`}
+                            title={`Peso atual: ${w.val}%`}
+                          />
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Salvar Configuração</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" aria-label="Salvar pesos de qualificação ICP">Salvar Configuração</button>
                     <MiniActions actions={[
                       { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Compartilhar' },
@@ -484,7 +490,13 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       {['VP of Engineering', 'Director of Finance', 'Head of Growth'].map((role, i) => (
                         <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg group hover:border-indigo-300 border border-transparent transition-all">
                            <span className="text-[9px] font-bold text-slate-700">{role}</span>
-                           <Button size="icon" className="w-6 h-6 bg-indigo-600 text-white rounded-md"><Plus className="w-3 h-3"/></Button>
+                           <button 
+                             className="w-6 h-6 flex items-center justify-center bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors active:scale-90"
+                             aria-label={`Adicionar contato recomendado: ${role}`}
+                             title="Adicionar contato"
+                           >
+                             <Plus className="w-3 h-3" aria-hidden="true"/>
+                           </button>
                         </div>
                       ))}
                     </div>
@@ -657,11 +669,14 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-indigo-500"/>Mover para Cluster</p>
                     <div className="space-y-1.5 flex-1 pt-1">
                        <p className="text-[9px] text-slate-400 font-medium">Atribua {activeAccount.nome} a um cluster estratégico para disparar playbooks orquestrados.</p>
-                       <select className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 mt-2">
-                          <option>Selecione um Cluster...</option>
-                          <option>Tier 1 - High Priority</option>
-                          <option>Churn Risk - Winback</option>
-                          <option>Expansion - Cross-sell</option>
+                       <select 
+                         className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 mt-2 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                         aria-label="Selecionar cluster estratégico para a conta"
+                       >
+                          <option value="">Selecione um Cluster...</option>
+                          <option value="tier1">Tier 1 - High Priority</option>
+                          <option value="churn">Churn Risk - Winback</option>
+                          <option value="expansion">Expansion - Cross-sell</option>
                        </select>
                     </div>
                     <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Confirmar Alocação</button>
@@ -915,7 +930,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          "{activeAccount.icp > 80 ? 'Conta estratégica com budget de '+new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)+' e fit tecnológico ideal.' : 'Conta qualificável para abordagem Tier 2.'}"
                        </p>
                     </div>
-                    <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors flex items-center justify-center gap-1.5">Mover para Pipeline</button>
+                    <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]" aria-label="Mover conta estratégica para o pipeline de vendas">Mover para Pipeline</button>
                   </div>,
                   <div key="bp1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-violet-500"/>Budget Mapeado</p>
@@ -923,7 +938,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <p className="text-xl font-black text-slate-900">{new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(activeAccount.budgetBrl)}</p>
                        <p className="text-[9px] font-bold text-slate-400 uppercase leading-tight">Valor Identificado em {activeAccount.vertical}</p>
                     </div>
-                    <button className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-colors flex items-center justify-center gap-1.5">Ver Histórico</button>
+                    <button className="w-full text-[9px] h-7 font-bold border border-violet-200 text-violet-600 hover:bg-violet-50 rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]" aria-label="Ver histórico de interações da conta">Ver Histórico</button>
                   </div>,
                   <div key="bp2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
@@ -934,7 +949,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       <p className="text-[9px] font-bold text-blue-700 uppercase">Ação Imediata</p>
                       <p className="text-[10px] font-medium text-blue-600 leading-relaxed mt-1">Disparar Playbook de <strong>Exploração {activeAccount.vertical}</strong> para o Comitê de Compras.</p>
                     </div>
-                    <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-colors flex items-center justify-center gap-1.5"><Rocket className="w-3 h-3"/>Lançar Sequência</button>
+                    <button className="w-full text-[9px] h-7 font-bold bg-slate-900 text-white hover:bg-black rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]" aria-label="Lançar sequência de prospecção">
+                      <Rocket className="w-3 h-3" aria-hidden="true"/>
+                      Lançar Sequência
+                    </button>
                   </div>
                 ],
                 recept: [
