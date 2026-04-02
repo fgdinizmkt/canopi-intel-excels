@@ -81,15 +81,6 @@ const verticalClusters = [
   { id: 'v4', name: 'AgroTech Expansion', count: 21, playbook: 'Penetração em Mercados de Alto Potencial', val: 67, health: 'Estável' },
 ];
 
-const journeyTimeline = [
-  { stage: 'Awareness', count: 142, status: 'complete', color: 'bg-blue-400' },
-  { stage: 'Engagement', count: 85, status: 'active', color: 'bg-indigo-500' },
-  { stage: 'MQA', count: 24, status: 'pending', color: 'bg-emerald-500' },
-  { stage: 'Opportunity', count: 12, status: 'pending', color: 'bg-amber-500' },
-  { stage: 'Win', count: 5, status: 'pending', color: 'bg-emerald-600' },
-];
-
-
 
 // ---- 6 ABM HEATMAPS DATA ----
 const abmHeatmapAccounts = [
@@ -331,29 +322,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
 
         {/* RIGHT: Funil ABM + Clusterização */}
         <div className="xl:col-span-5 space-y-5">
-          {/* FUNIL ABM */}
-          <div className="bg-white p-6 rounded-[28px] border border-slate-200 shadow-sm space-y-5">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold text-slate-900 uppercase">Jornada de Contas (Funil ABM)</h3>
-              <Badge variant="slate" className="bg-slate-50 text-slate-400 border-none font-bold text-[8px] uppercase tracking-tighter">PROGRESSION</Badge>
-            </div>
-            <div className="space-y-3.5">
-              {journeyTimeline.map((j, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className="w-20 text-[9px] font-bold text-slate-400 uppercase tracking-widest">{j.stage}</div>
-                  <div className="flex-1 relative h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-50">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${(j.count / journeyTimeline[0].count) * 100}%` }} transition={{ duration: 1.5, delay: i * 0.1 }} className={`h-full ${j.color} shadow-sm`}></motion.div>
-                  </div>
-                  <div className="w-8 text-right text-[11px] font-bold text-slate-900">{j.count}</div>
-                </div>
-              ))}
-              <div className="pt-3 border-t border-slate-50 flex justify-between items-center">
-                <p className="text-[9px] font-bold text-slate-400 uppercase">Velocity Index ABM</p>
-                <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] uppercase"><TrendingUp className="w-3 h-3" /> 15% ACCEL.</div>
-              </div>
-            </div>
-          </div>
-
           {/* CLUSTERIZAÇÃO */}
           <div className="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-6 pt-5 pb-4 bg-slate-50/20 border-b border-slate-50 flex justify-between items-center">
