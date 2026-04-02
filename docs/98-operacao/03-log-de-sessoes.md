@@ -360,3 +360,40 @@ Transformar o Assistant de chat genérico em camada operacional conectada ao est
 - O histórico da conversa é transmitido corretamente para o Gemini — memória real de multi-turno.
 - KPIs e fila passam a refletir o estado real da operação, sem nenhum valor inventado.
 - Zero impacto em outros módulos.
+
+---
+
+## 2026-04-01 — Fase 5 · 7º Recorte: Performance com dados reais
+
+**Commit:** `165dc40` — feat: conecta performance a contas e sinais reais
+
+**Arquivo alterado:**
+- `src/pages/Performance.tsx`
+
+**O que foi feito:**
+
+`Performance.tsx`:
+- Constante `ACCOUNTS` (4 entradas hardcoded fictícias) removida do escopo de módulo
+- Constante `ALERTS` (4 entradas hardcoded) removida do escopo de módulo
+- Adicionado `useMemo` ao import de React
+- Adicionados imports de `contasMock` e `advancedSignals`
+- `ACCOUNTS` agora é `useMemo` derivado de `contasMock`: ordena Crítico→Atenção→Saudável, desempate por `potencial` desc, top 4; mapeia `sinais` com `impacto→sev` ('Alto'→'crítico', 'Médio'→'alerta', 'Baixo'→'oportunidade'); mapeia `acoes` com `titulo/status/owner`; deriva `valor` da primeira oportunidade, `lifetime` da soma total, `lastContact` a partir de `ultimaMovimentacao`
+- `ALERTS` agora é `useMemo` derivado de `advancedSignals`: filtra `!archived && !resolved`, ordena por severidade, top 4; mapeia todos os campos visuais (badge, cores, ícone, bg, border, iconBg, linkColor) a partir de `s.severity`; usa `s.title` e `s.description`
+- CSS inline `perf-*` (74 linhas) mantido intencionalmente — migração Tailwind fora do escopo deste recorte
+- Todos os outros dados do módulo (METRICS, CHANNELS, FRENTES, SQUAD_OWNERS, INTEGRATIONS, etc.) permanecem hardcoded — sem fonte equivalente no projeto
+
+**Decisões:**
+- `perf-*` CSS não migrado: alto blast radius, sem bug funcional associado, decisão explícita do usuário
+- Spark/sparkArea mantidos como string estática neutra — sem série temporal real disponível
+- Apenas `ACCOUNTS` e `ALERTS` tinham equivalentes canônicos em `contasMock` e `advancedSignals`
+
+**Validação:**
+- Build `✓ Compiled successfully` — zero erros de tipo, zero warnings novos
+- `git diff --stat`: 1 arquivo, 71 insertions, 13 deletions
+- Working tree limpa antes do commit
+- `build_log.txt` excluído do diff antes do commit
+
+**Resultado:**
+- A seção "Contas · Sinais, Ações e Atribuição" de Performance passa a exibir contas reais do projeto, ordenadas por criticidade
+- A seção "Alertas de Desempenho" passa a exibir sinais reais ativos de `advancedSignals`, sem valores inventados
+- Zero impacto em outros módulos — escopo cirúrgico de 1 arquivo

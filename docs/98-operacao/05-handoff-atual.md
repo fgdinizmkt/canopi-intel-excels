@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 5 — Refino e endurecimento
-- Último recorte concluído: 6º Recorte — Assistant Contextual
-- Último commit relevante: `0dd95a0` — feat: contextualiza assistant com dados reais da plataforma
+- Último recorte concluído: 7º Recorte — Performance com dados reais
+- Último commit relevante: `165dc40` — feat: conecta performance a contas e sinais reais
 - Branch atual: main
 - Status do push: local em sincronia com origin/main
 
@@ -18,15 +18,15 @@
 - **Estética:** Preservar experiência premium durante refinamentos operacionais.
 
 ## Próximo passo correto
-- Iniciar o 7º Recorte da Fase 5 (frente a definir pelo usuário).
-- Candidatos priorizados pela varredura técnica:
-  1. `Performance.tsx` — conexão com dados reais + decisão CSS inline vs Tailwind (pendência arquitetural registrada)
-  2. `Contacts.tsx` — requer primeiro decisão arquitetural: página independente vs extensão de Contas
-  3. Auditoria de `ABMStrategy.tsx` (2627 linhas, maior risco de dívida técnica)
+- Iniciar o 8º Recorte da Fase 5 (frente a definir pelo usuário).
+- Candidatos priorizados:
+  1. `Contacts.tsx` — requer primeiro decisão arquitetural: página independente vs extensão de Contas
+  2. Auditoria de `ABMStrategy.tsx` (maior arquivo do projeto, maior risco de dívida técnica)
+  3. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
 - Manter foco em refino funcional e preservação da estética premium.
 
 ## Pendências / Backlog
-- **Performance.tsx:** dados hardcoded desconectados de `contasMock` e `advancedSignals`; CSS inline `perf-*` em aberto.
+- **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente — migração fora do escopo do 7º recorte.
 - **Contacts.tsx:** decisão arquitetural pendente (página independente vs extensão de Contas).
 - **ABMStrategy.tsx:** sem audit recente; maior arquivo do projeto; sem `AccountDetailContext`.
 - **ABXOrchestration.tsx:** sem `AccountDetailContext`; usa `abxData` próprio sem audit recente.

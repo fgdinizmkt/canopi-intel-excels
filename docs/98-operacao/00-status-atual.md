@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Assistant Contextual — 6º Recorte Fase 5)
+`main` — atualizada em 2026-04-01 (Performance Real Data — 7º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -108,6 +108,18 @@
 - `handleSend` monta `contextBlock` compacto e envia `{ message, history, context }` à API
 - `route.ts`: histórico mapeado para formato Gemini (`model`/`parts`), contexto injetado no `systemInstruction`
 
+### Fase 5 — Sétimo recorte: Performance com dados reais (2026-04-01)
+
+**Performance.tsx** — commit `165dc40`
+- Constante `ACCOUNTS` hardcoded removida → substituída por `useMemo` derivado de `contasMock`
+- Constante `ALERTS` hardcoded removida → substituída por `useMemo` derivado de `advancedSignals`
+- Ordenação de contas: Crítico → Atenção → Saudável, desempate por `potencial` desc, top 4
+- Mapeamento `impacto` → `sev`: `'Alto'→'crítico'`, `'Médio'→'alerta'`, `'Baixo'→'oportunidade'`
+- Mapeamento `statusGeral` → cor e classe de badge para consistência visual
+- Alerts: filtra `!archived && !resolved`, ordena por severidade, top 4, mapeia campos visuais completos
+- CSS inline `perf-*` mantido intencionalmente — migração fora do escopo deste recorte
+- Escopo cirúrgico: 1 arquivo, zero impacto em outros módulos
+
 ---
 
 ## O que está em andamento
@@ -118,11 +130,11 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 7º Recorte da Fase 5 (frente a definir).
+- Iniciar o 8º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. `Performance.tsx` — conexão com dados reais + decisão CSS inline vs Tailwind (pendência arquitetural registrada)
-  2. `Contacts.tsx` — requer decisão arquitetural prévia (página independente vs extensão de Contas)
-  3. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
+  1. `Contacts.tsx` — requer decisão arquitetural prévia (página independente vs extensão de Contas)
+  2. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
+  3. `ABXOrchestration.tsx` — sem `AccountDetailContext`; usa `abxData` próprio sem audit recente
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -132,4 +144,5 @@ Nenhuma implementação funcional em andamento.
 | Centro de Comando | Fase 3 Concluída | Perfil Granular do Contato com inteligência Canopi |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
 | Assistant Contextual | 6º Recorte Concluído | KPIs reais, fila operacional, contexto injetado no Gemini |
-| Roadmap | Próximo Passo | Recorte 7 — Frente a definir |
+| Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
+| Roadmap | Próximo Passo | Recorte 8 — Frente a definir |
