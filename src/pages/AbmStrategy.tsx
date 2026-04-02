@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { 
-  Target, 
-  Filter, 
-  Plus, 
-  ChevronRight, 
-  BarChart3, 
-  Database, 
-  Cpu, 
-  Search, 
-  CheckCircle2, 
-  Loader2, 
+import {
+  Target,
+  Filter,
+  Plus,
+  ChevronRight,
+  BarChart3,
+  Database,
+  Cpu,
+  Search,
+  CheckCircle2,
   Sparkles,
   Zap,
   Layout,
@@ -35,17 +34,12 @@ import {
   Calendar,
   Eye,
   ArrowUpRight,
-  MoreVertical,
   Flag,
-  Maximize2,
-  TrendingDown,
   BarChart,
-  Building2,
   Cloud,
   BrainCircuit,
   Settings2,
   History,
-  MousePointer2,
   Smartphone,
   Share2,
   Bell,
@@ -56,11 +50,10 @@ import {
   Crosshair,
   Rocket,
   Handshake,
-  Info,
   Network
 } from 'lucide-react';
 import { Card, Badge, Button } from '../components/ui';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 
@@ -74,57 +67,6 @@ const benchmarks = [
 ];
 
 
-// ABM Priority accounts - scatter data: x=Impacto, y=Probabilidade (% de 0-100)
-const scatterAccounts = [
-  { id: 1,  x: 78, y: 82, label: '10', account: 'Global Bank S.A.',   vertical: 'Financeiro',  tier: 'TIER 1', arr: 'R$ 450k', action: 'Ação 1', risk: 'critical',  actionDesc: 'Reunião executiva + Proposta personalizada Finanças 4.0' },
-  { id: 2,  x: 85, y: 88, label: '8',  account: 'ScalePay Brasil',    vertical: 'Financeiro',  tier: 'TIER 1', arr: 'R$ 280k', action: 'Ação 1', risk: 'critical',  actionDesc: 'Sequência de nurturing via LinkedIn + Social Ads 1:1' },
-  { id: 3,  x: 62, y: 75, label: '9',  account: 'Innova Health',      vertical: 'Saúde',       tier: 'TIER 1', arr: 'R$ 620k', action: 'Ação 3', risk: 'high',      actionDesc: 'Webinar exclusivo Compliance HealthTech + Follow-up SDR' },
-  { id: 4,  x: 90, y: 60, label: '12', account: 'TechInsure Co.',     vertical: 'Seguros',     tier: 'TIER 1', arr: 'R$ 390k', action: 'Ação 1', risk: 'high',      actionDesc: 'Conteúdo de prova social + Relatório ROI personalizado' },
-  { id: 5,  x: 50, y: 68, label: '9',  account: 'AgroCloud Latam',    vertical: 'Agronegócio', tier: 'MID',    arr: 'R$ 170k', action: 'Ação 3', risk: 'high',      actionDesc: 'Demo guiada do produto + Parceria de canal' },
-  { id: 6,  x: 38, y: 55, label: '10', account: 'Manufatura Norte',   vertical: 'Manufatura',  tier: 'MID',    arr: 'R$ 120k', action: 'Ação 4', risk: 'moderate', actionDesc: 'Relatório de eficiência operacional + Indicação interna' },
-  { id: 7,  x: 25, y: 78, label: '10', account: 'EduTech S.A.',       vertical: 'Educação',    tier: 'MID',    arr: 'R$ 95k',  action: 'Ação 4', risk: 'moderate', actionDesc: 'Programa de trial + Parceria acadêmica' },
-  { id: 8,  x: 70, y: 42, label: '4',  account: 'RetailMax Brasil',   vertical: 'Varejo',      tier: 'SMB',    arr: 'R$ 55k',  action: 'Ação 2', risk: 'moderate', actionDesc: 'Campanha de reengajamento por e-mail + Ads Remarketing' },
-  { id: 9,  x: 55, y: 38, label: '9',  account: 'LogParcel Group',    vertical: 'Logística',   tier: 'SMB',    arr: 'R$ 72k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Sequência de outbound fria com personalização por vertical' },
-  { id: 10, x: 18, y: 32, label: '10', account: 'StartupX',           vertical: 'SaaS',        tier: 'SMB',    arr: 'R$ 30k',  action: 'Ação 4', risk: 'low',      actionDesc: 'Inclusão em newsletter + Trial gratuito' },
-  { id: 11, x: 42, y: 22, label: '7',  account: 'GovTech MG',        vertical: 'Governo',     tier: 'SMB',    arr: 'R$ 48k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Webinar público + Levantamento de necessidades via BDR' },
-  { id: 12, x: 82, y: 28, label: '5',  account: 'MediaGroup Brasil', vertical: 'Mídia',       tier: 'SMB',    arr: 'R$ 42k',  action: 'Ação 2', risk: 'low',      actionDesc: 'Estratégia de conteúdo co-criado + Campanha de influência' },
-];
-
-// Hexbin: organic multi-hotspot distribution
-const personas = ['CEO / Presidente', 'CFO / Dir. Finanças', 'CTO / Dir. TI', 'CMO / Dir. Mkt', 'COO / Dir. Ops', 'CISO / Seg. Info', 'VP Comercial', 'Head de Produto', 'Gerente de TI', 'Analista Sênior'];
-const hexVerticals = ['Financeiro', 'Saúde', 'Manufatura', 'SaaS', 'Logística', 'Varejo', 'Seguros', 'Educação', 'Energia', 'Agroneg.'];
-
-// Organic distribution: manually set hotspot intensities per (row=persona, col=vertical)
-// Values 0..1 → color scale
-const hexIntensityMap: Record<string, number> = {
-  '0,0':0.95, '0,1':0.45, '0,2':0.35, '0,3':0.60, '0,4':0.30, '0,5':0.25, '0,6':0.70, '0,7':0.20, '0,8':0.40, '0,9':0.50,
-  '1,0':0.85, '1,1':0.50, '1,2':0.30, '1,3':0.45, '1,4':0.20, '1,5':0.15, '1,6':0.65, '1,7':0.15, '1,8':0.35, '1,9':0.40,
-  '2,0':0.55, '2,1':0.75, '2,2':0.60, '2,3':0.90, '2,4':0.55, '2,5':0.80, '2,6':0.40, '2,7':0.50, '2,8':0.30, '2,9':0.35,
-  '3,0':0.40, '3,1':0.45, '3,2':0.35, '3,3':0.70, '3,4':0.30, '3,5':0.25, '3,6':0.35, '3,7':0.60, '3,8':0.25, '3,9':0.30,
-  '4,0':0.50, '4,1':0.40, '4,2':0.85, '4,3':0.50, '4,4':0.75, '4,5':0.30, '4,6':0.45, '4,7':0.35, '4,8':0.60, '4,9':0.70,
-  '5,0':0.60, '5,1':0.80, '5,2':0.45, '5,3':0.55, '5,4':0.35, '5,5':0.90, '5,6':0.55, '5,7':0.30, '5,8':0.25, '5,9':0.20,
-  '6,0':0.70, '6,1':0.50, '6,2':0.40, '6,3':0.55, '6,4':0.45, '6,5':0.35, '6,6':0.80, '6,7':0.40, '6,8':0.50, '6,9':0.60,
-  '7,0':0.45, '7,1':0.60, '7,2':0.70, '7,3':0.80, '7,4':0.50, '7,5':0.40, '7,6':0.35, '7,7':0.75, '7,8':0.30, '7,9':0.45,
-  '8,0':0.30, '8,1':0.35, '8,2':0.55, '8,3':0.45, '8,4':0.65, '8,5':0.30, '8,6':0.40, '8,7':0.50, '8,8':0.85, '8,9':0.55,
-  '9,0':0.20, '9,1':0.25, '9,2':0.40, '9,3':0.35, '9,4':0.50, '9,5':0.20, '9,6':0.30, '9,7':0.40, '9,8':0.60, '9,9':0.75,
-};
-const getHexCellColor = (intensity: number): string => {
-  if (intensity >= 0.90) return '#c0392b';
-  if (intensity >= 0.80) return '#e74c3c';
-  if (intensity >= 0.70) return '#e67e22';
-  if (intensity >= 0.60) return '#f39c12';
-  if (intensity >= 0.50) return '#f9ca24';
-  if (intensity >= 0.40) return '#a8e6cf';
-  if (intensity >= 0.30) return '#27ae60';
-  if (intensity >= 0.20) return '#2ecc71';
-  return '#1abc9c';
-};
-const channelByIntensity = (v: number) => {
-  if (v >= 0.80) return 'LinkedIn Ads 1:1 + Outreach Executive';
-  if (v >= 0.60) return 'Email Marketing + Webinar Exclusivo';
-  if (v >= 0.40) return 'Social Ads + Conteúdo Educacional';
-  return 'Newsletter + Trial Gratuito';
-};
 
 const entryPlays = [
   { id: 'p1', title: 'Relatório Setorial Customizado', desc: 'Envio de PDF personalizado com comparativo de eficácia para C-Levels do setor Industrial.', efficacy: 88, icon: <FileText className="w-5 h-5" /> },
@@ -246,8 +188,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   // Sliders reativos
   const [icpThreshold, setIcpThreshold] = useState(70);
   const [icpWeights, setIcpWeights] = useState({ receita: 30, stack: 25, equipe: 20, setor: 25 });
-  const [budgetAlloc, setBudgetAlloc] = useState({ financeiro: 35, saude: 20, agro: 18, telecom: 15, outros: 12 });
-  const totalBudget = 480; // R$480k budget total ABM mapeado da base
 
   const { openAccount } = useAccountDetail();
 
@@ -1552,8 +1492,5 @@ const Circle: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="2" /></svg>
 );
 
-const Hexagon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" /></svg>
-);
 
 export default ABMStrategy;
