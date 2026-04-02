@@ -187,8 +187,8 @@ Nenhuma implementação funcional em andamento.
 
 - Iniciar o 14º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
-  1. Central de Playbooks — orquestração cross-channel corporativa
-  2. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
+  1. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
+  2. Central de Playbooks — orquestração cross-channel corporativa
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---

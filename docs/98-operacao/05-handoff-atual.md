@@ -33,8 +33,8 @@
 ## Próximos passos (Roadmap)
 1. Iniciar o **14º Recorte da Fase 5** (frente a definir).
 2. Candidatos priorizados:
-   - Central de Playbooks — orquestração cross-channel corporativa.
    - Continuação do saneamento de `AbmStrategy.tsx` — IIFEs ainda intactos.
+   - Central de Playbooks — orquestração cross-channel corporativa.
 3. ABX encerrado — sem dívidas imediatas.
 
 ## Pendências / Backlog
