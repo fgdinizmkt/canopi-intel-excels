@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Auditoria técnica das IIFEs de AbmStrategy — 19º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Central de Playbooks e injeção rastreável — 20º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -207,6 +207,17 @@
 - Total: `0 insertions(+), 34 deletions(-)` — zero impacto visual ou funcional.
 - Justificativa: dados fictícios não derivados de fonte real; botões sem ação/handler; descrição enganosa ("Ações táticas validadas" mas são decorações); sem função operacional no cockpit ABM.
 
+### Fase 5 — 20º recorte: Central de Playbooks (2026-04-02)
+
+**Actions.tsx** — commit `3ea4daa`
+- Expansão do tipo `ActionItem` com metadados de rastreabilidade estratégica (`sourceType`, `playbookName`, `playbookRunId`, `playbookStepId`, `relatedAccountId`).
+- Implementação da `PlaybookLibraryBar`: seção horizontal retrátil entre hero e filtros.
+- Criação do template exemplar `Escudo de Renovação Enterprise` com 3 ações automatizadas (ROI, Auditoria, Briefing).
+- Implementação do `PlaybookActivationOverlay` com lógica de injeção em lote para contas elegíveis (`LogPrime Supply` ID 3).
+- Injeção funcional garantindo entrada no topo da fila (`items`) e preenchimento de metadados de auditoria.
+- Adição de badges de origem visuais ("Playbook: [Name]") nos cards de Lista e Kanban.
+- Conformidade técnica: Build verificado e estética Soft Slate preservada.
+
 ---
 
 ## O que está em andamento
@@ -217,11 +228,10 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- **18º Recorte Concluído (Auditoria):** `abmHeatmapAccounts` auditado e formalmente BLOQUEADO.
-- **19º Recorte Concluído (Auditoria):** IIFEs de AbmStrategy auditadas e formalmente fora do escopo de saneamento incremental.
-- Iniciar o 20º Recorte da Fase 5 (frente a definir).
+- **20º Recorte Concluído:** Central de Playbooks implementada em `Actions.tsx` com injeção rastreável.
+- Iniciar o próxima fase operacional (frente a definir).
 - Candidatos priorizados:
-  1. Central de Playbooks — orquestração cross-channel corporativa
+  1. Evolução de `contasMock` (Scoring numérico) para desbloqueio de heatmaps em ABM.
   2. Refactor defensivo de helpers globais (`getHmScore`, `getWeightedIcp`, scoring) — Fase 6+
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
@@ -244,5 +254,6 @@ Nenhuma implementação funcional em andamento.
 | Auditoria abmHeatmapAccounts | 18º Recorte Concluído (Auditoria) | Bloqueado: ausência de campos numéricos em contasMock; dependência estrutural de 6 heatmaps identificada |
 | Auditoria IIFEs AbmStrategy | 19º Recorte Concluído (Auditoria) | Bloqueado: 2 IIFEs (~1000 linhas) acopladas em dados, estado e SVG rendering; fora do escopo de refactor incremental |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
+| Central de Playbooks | 20º Recorte Concluído | Biblioteca retrátil e injeção rastreável na fila operacional de Actions |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 20 — Frente a definir |
+| Roadmap | Próximo Passo | Evolução de contasMock para desbloqueio de heatmaps |

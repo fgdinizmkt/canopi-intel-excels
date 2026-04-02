@@ -790,6 +790,27 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - Working tree limpa após commit
 
 **Resultado:**
-- `AbmStrategy.tsx` não possui mais nenhuma affordance falsa ligada ao sistema de modal fictício
-- A única interação real da página (TAL → Centro de Comando) permanece funcional
-- Próximo candidato: 13º recorte — saneamento continuado de AbmStrategy.tsx ou Central de Playbooks
+---
+
+## 2026-04-02 — 20º Recorte da Fase 5: Central de Playbooks
+
+**Commit de código:** `3ea4daa` — feat(actions): implementa biblioteca de playbooks e injecao rastreavel na fila operacional
+**Arquivo:** `src/pages/Actions.tsx`
+
+**Contexto:**
+- Implementação de uma camada de orquestração estratégica sobre a fila operacional existente em `Actions.tsx`.
+- Objetivo: permitir a ativação de playbooks (templates de ações) que injetam itens reais na `Execution Queue` com rastreabilidade total e estética Soft Slate.
+
+**O que foi feito em Actions.tsx:**
+- **Rastreabilidade de Dados:** Expansão do tipo `ActionItem` com campos: `sourceType` (playbook), `playbookName`, `playbookRunId`, `playbookStepId` e `relatedAccountId`.
+- **Biblioteca de Playbooks:**
+  - `PlaybookLibraryBar`: Barra horizontal retrátil entre o Hero e os Filtros.
+  - `PlaybookCard`: Card premium com badge de categoria, objetivo e contagem de oportunidades.
+  - `PlaybookActivationOverlay`: Interface de configuração para seleção de contas elegíveis e preview de injeção coordenado (LogPrime Supply ID 3).
+- **Lógica de Injeção:** Função `handleActivatePlaybook` que orquestra a geração de UUIDs de execução e a inserção de `ActionItem[]` no topo da fila local.
+- **Rastreabilidade Visual:** Inclusão de badges de origem ("Playbook: [Name]") nos componentes de card de Lista e Kanban para auditoria imediata.
+
+**Resultado:**
+- A página `Actions` agora opera como um centro de comando tático-estratégico consolidado.
+- Build validado com sucesso e integração visual preservada.
+- Próximo passo: Evolução de `contasMock` para suporte a scoring numérico de heatmaps.
