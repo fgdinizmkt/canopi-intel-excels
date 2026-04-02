@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Saneamento de benchmarks — 15º Recorte Fase 5)
+`main` — atualizada em 2026-04-02 (Saneamento de verticalClusters — 16º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -191,6 +191,14 @@
 - Total: `0 insertions(+), 29 deletions(-)` — zero impacto visual ou funcional.
 - Justificativa: dados decorativos puros não derivados de fonte real; sem função operacional no cockpit ABM.
 
+### Fase 5 — Décimo sexto recorte: Saneamento de verticalClusters (2026-04-02)
+
+**AbmStrategy.tsx** — commit `d4fb5e4`
+- Remoção de `verticalClusters` constant (8 linhas): hardcoded array com 4 verticais fictícias (Manufatura, Fintech, HealthTech, AgroTech) e counts/health/eficiência hardcoded.
+- Remoção da visualização "Clusterização ABM" (22 linhas): card com 4 items, progress bars, health badges, botões "+ Novo" e links "Playbook" fictícios.
+- Total: `1 insertion(+), 31 deletions(-)` — zero impacto visual ou funcional.
+- Justificativa: dados fictícios não derivados de fonte real; botões/links não funcionais; sem função operacional no cockpit ABM.
+
 ---
 
 ## O que está em andamento
@@ -201,7 +209,7 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- Iniciar o 16º Recorte da Fase 5 (frente a definir).
+- Iniciar o 17º Recorte da Fase 5 (frente a definir).
 - Candidatos priorizados:
   1. `AbmStrategy.tsx` — IIFEs e datasets hardcoded ainda intactos (saneamento continuado)
   2. Central de Playbooks — orquestração cross-channel corporativa
@@ -221,6 +229,7 @@ Nenhuma implementação funcional em andamento.
 | Saneamento Dead Code | 13º Recorte Concluído | 8 imports órfãos, 5 constantes/helpers, 1 useState, 1 component — todos resíduos do modal removido |
 | Saneamento journeyTimeline | 14º Recorte Concluído | journeyTimeline constant + visualização "Jornada de Contas" removidas — dados decorativos não operacionais |
 | Saneamento benchmarks | 15º Recorte Concluído | benchmarks constant + "Elite Benchmarks Grid" removidas — KPIs fictícios e grid decorativo |
+| Saneamento verticalClusters | 16º Recorte Concluído | verticalClusters constant + "Clusterização ABM" removidas — dados fictícios, botões não funcionais |
 | Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 16 — Frente a definir |
+| Roadmap | Próximo Passo | Recorte 17 — Frente a definir |

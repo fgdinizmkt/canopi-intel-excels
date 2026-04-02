@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## 2026-04-02 — 16º Recorte: Saneamento de verticalClusters em AbmStrategy
+
+**Fase:** Fase 5 — Refino e endurecimento
+
+**O que foi feito:**
+- Remoção de `verticalClusters`: constant hardcoded com 4 verticais fictícias (Manufatura Enterprise: 32 contas, Fintech Mid-market: 48, HealthTech Tier 1: 15, AgroTech Expansion: 21).
+- Remoção da visualização "Clusterização ABM": card com 4 items, progress bars, health badges (Estável/Em Queda/Crítico), botão "+ Novo" e links "Playbook" não funcionais.
+- Justificativa: dados fictícios não derivados de fonte real; botões/links sem ação; sem função operacional no cockpit ABM.
+
+**Commits:**
+- `d4fb5e4` — refactor: remove hardcoded verticalClusters visualization from AbmStrategy (16º recorte)
+
+**PRs:** nenhum (commit direto em main)
+
+**Impacto no projeto:**
+- `AbmStrategy.tsx` passa de 1498 para 1467 linhas (31 linhas a menos).
+- Zero impacto visual ou funcional — grid decorativo removido; todas as funcionalidades core mantidas.
+- Container right agora reservado para conteúdo operacional futuro (placeholder).
+- Continuação bem-sucida do saneamento progressivo de hardcodes não-operacionais.
+
+---
+
 ## 2026-04-02 — 15º Recorte: Saneamento de benchmarks em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento
