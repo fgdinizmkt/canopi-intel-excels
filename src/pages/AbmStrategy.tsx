@@ -66,14 +66,6 @@ const entryPlays = [
   { id: 'p3', title: 'Campanha Social Ads 1:1', desc: 'Ads altamente focados em dor específica de segurança de dados para o Tier 1 de HealthTech.', efficacy: 94, icon: <Layout className="w-5 h-5" /> },
 ];
 
-const verticalClusters = [
-  { id: 'v1', name: 'Manufatura Enterprise', count: 32, playbook: 'Eficiência Operacional 4.0', val: 85, health: 'Estável' },
-  { id: 'v2', name: 'Fintech Mid-market', count: 48, playbook: 'Scaling High Velocity', val: 72, health: 'Em Queda' },
-  { id: 'v3', name: 'HealthTech Tier 1', count: 15, playbook: 'Compliance & Privacy First', val: 94, health: 'Crítico' },
-  { id: 'v4', name: 'AgroTech Expansion', count: 21, playbook: 'Penetração em Mercados de Alto Potencial', val: 67, health: 'Estável' },
-];
-
-
 // ---- 6 ABM HEATMAPS DATA ----
 const abmHeatmapAccounts = [
   // name, vertical, importance(y), icp, crm, verticalPot, contacts, fit, budget(R$k mapeado da base ABM)
@@ -291,30 +283,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
           </div>
         </div>
 
-        {/* RIGHT: Funil ABM + Clusterização */}
+        {/* RIGHT: Reserved for future operational content */}
         <div className="xl:col-span-5 space-y-5">
-          {/* CLUSTERIZAÇÃO */}
-          <div className="bg-white rounded-[28px] border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 pt-5 pb-4 bg-slate-50/20 border-b border-slate-50 flex justify-between items-center">
-              <h3 className="text-sm font-bold text-slate-900 uppercase flex items-center gap-2"><Box className="w-4 h-4 text-blue-600" /> Clusterização ABM</h3>
-              <Button variant="ghost" size="sm" className="text-[9px] font-bold text-slate-400 uppercase">+ Novo</Button>
-            </div>
-            <div className="p-5 space-y-3">
-              {verticalClusters.map((c, i) => (
-                <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-blue-300 transition-all group">
-                  <div className="flex justify-between items-center mb-2">
-                    <div><p className="text-[11px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{c.name}</p><p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{c.count} CONTAS</p></div>
-                    <Badge variant={c.health === 'Estável' ? 'blue' : c.health === 'Em Queda' ? 'amber' : 'red'} className="text-[7px] font-bold border-none uppercase">{c.health}</Badge>
-                  </div>
-                  <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden mb-2 border border-slate-100"><div className="h-full bg-blue-600" style={{ width: `${c.val}%` }}></div></div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[8px] font-bold text-slate-400 uppercase">Efficiency: {c.val}%</span>
-                    <span className="text-[8px] font-bold text-blue-600 uppercase flex items-center gap-1 group-hover:translate-x-1 transition-transform">Playbook <ArrowRight className="w-2 h-2" /></span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
       {/* FIM GRID PRINCIPAL */}
