@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Action Cards Dinâmicos ABM — 23º Recorte Fase 6)
+`main` — atualizada em 2026-04-02 (Refinamento Técnico e Acessibilidade — 24º Recorte Fase 6)
 
 ## Fase atual do plano
-**Fase 5 — Refino e endurecimento** (em andamento)
+**Fase 6 — Dinamização e Refino ABM** (Em finalização)
 
 ---
 
@@ -50,202 +50,22 @@
 - Campo `origin` visível nas densidades compacta e super-compacta
 - Métrica SLA renomeada para "Em risco de SLA" (vencido + alerta)
 
-### Fase 5 — Primeiro recorte de CrossIntelligence (2026-04-01)
+### Fase 6 — Conexão e Refino ABM (2026-04-02)
 
-**CrossIntelligence.tsx** — commit `c1a4c95`
-- Injeção de sinais reais no fluxo operacional, incluindo Nexus e Minerva
-- Persistência em `localStorage('canopi_actions')`
-- Conexão dos CTAs finais para alimentar a fila global de ações
+**AbmStrategy.tsx** — commit `c8565fd` (Recorte 22)
+- Conexão funcional dos heatmaps ao `contasMock`.
+- Expansão da base para 7 contas reais.
+- Normalização financeira para escala SVG.
 
-### Fase 5 — Segundo recorte de Restauração UI/Runtime (2026-04-01)
+**AbmStrategy.tsx** — commit `4dbbd95` (Recorte 23)
+- Dinamização reativa dos Action Cards e Matrizes via `activeAccount`.
+- Reparo de corrupção JSX em `matrixCardsMap`.
 
-**Estabilização Global** — commit `0bd0822`
-- Correção de falha de injeção de CSS (Tailwind v4) no App Router.
-- Criação de `src/app/globals.css` com ordem correta de `@import`.
-- Atualização do Root Layout (`src/app/layout.tsx`).
-- Eliminação de erro de runtime (`_document.js`) via limpeza de cache (.next) e rebuild íntegro.
-
-### Fase 5 — Terceiro recorte de Fortalecimento de Integrações (2026-04-01)
-
-**Integrations.tsx** — commit `cdea929`
-- Transformação da página em um Painel de Confiabilidade do Stack.
-- Implementação de KPIs de saúde (Confiança, Fontes Críticas, Gaps).
-- Categorização funcional (CRM, Ads, Dados, Destino).
-- Metadados de impacto operacional por fonte de dados.
-- CTAs funcionais baseados no status do conector.
-
-### Fase 5 — Quarto recorte de Cockpit de Outbound (2026-04-01)
-
-**Outbound.tsx** — commit `281613e`
-- Cockpit tático orientado por sinais (Nexus/Minerva/Local).
-- Fila de intervenção com classificação ABM / ABX / Growth / Híbrido.
-- Drawer funcional de playbook com roteamento de alçada (SDR vs. Global Actions).
-- Aba Contexto ICP completa com Personas e Benchmarks.
-- Costura arquitetural e semântica de navegação finalizada.
-
-### Fase 5 — Quinto recorte de Centro de Comando (2026-04-01)
-
-**Centro de Comando (Completo — Fases 1, 2 e 3)** — commit `8135da4`
-- Fase 1 (Perfil da Conta): `AccountDetailContext` + `AccountDetailManager` + `AccountDetailView` estrutural.
-- Fase 2 (Organograma Visual): Implementação de árvore recursiva (`liderId`) e componente `OrganogramNode` (Power Grid).
-- Fase 3 (Perfil do Contato): Camada de profundidade granular (`ContactDetailProfile`) com Manual Canopi AI, Matriz de Poder e Acesso, e Dimming Background.
-- Saneamento Técnico: Correção de warnings de `width(-1)` em gráficos via wrapper `ClientOnly`, estabilização do Pages Router via `_app.tsx` e ajuste de `@import` no CSS.
-- Costura Global Final: Injeção de pontos de contato em **Accounts**, **Outbound**, **Actions** e **Signals**.
-
-### Limpeza de branches
-- `feat/evolucao-produto` deletada do remote em 2026-04-01
-- PR #11 fechada e merged (squash) em main
-
----
-
-### Fase 5 — Sexto recorte: Assistant Contextual (2026-04-01)
-
-**Assistant.tsx** + **route.ts** — commit `0dd95a0`
-- `useAccountDetail` conectado: Assistant detecta conta aberta em tempo real
-- `localStorage('canopi_actions')` lido defensivamente em `useEffect`
-- 5 KPIs derivados de dados reais: ações na fila, sinais ativos, sinais críticos, contas prioritárias, confiança média
-- Fila operacional: ações reais com fallback em sinais críticos quando fila vazia
-- `handleSend` monta `contextBlock` compacto e envia `{ message, history, context }` à API
-- `route.ts`: histórico mapeado para formato Gemini (`model`/`parts`), contexto injetado no `systemInstruction`
-
-### Fase 5 — Sétimo recorte: Performance com dados reais (2026-04-01)
-
-**Performance.tsx** — commit `165dc40`
-- Constante `ACCOUNTS` hardcoded removida → substituída por `useMemo` derivado de `contasMock`
-- Constante `ALERTS` hardcoded removida → substituída por `useMemo` derivado de `advancedSignals`
-- Ordenação de contas: Crítico → Atenção → Saudável, desempate por `potencial` desc, top 4
-- Mapeamento `impacto` → `sev`: `'Alto'→'crítico'`, `'Médio'→'alerta'`, `'Baixo'→'oportunidade'`
-- Mapeamento `statusGeral` → cor e classe de badge para consistência visual
-- Alerts: filtra `!archived && !resolved`, ordena por severidade, top 4, mapeia campos visuais completos
-- CSS inline `perf-*` mantido intencionalmente — migração fora do escopo deste recorte
-### Fase 5 — Oitavo recorte: Stakeholder Intelligence (2026-04-01)
-
-**Contacts.tsx** — commit `d8a184b`
-- Transformação da página em Radar Transversal de Influence & Coverage.
-- Implementação do `StakeholderPulse` (KPIs) e `StakeholderRadar` (Cards).
-- Expansão do `AccountDetailContext` para suportar `selectedContactId` global.
-- Implementação de Deep Link: clique no radar abre o Centro de Comando focado no perfil do contato (Fase 3).
-- Heurísticas reais: Identificação de Sponsors em risco e metas de cobertura por conta.
-- Eliminação de CRUD estático em favor de inteligência operacional dinâmica.
-
-### Fase 5 — Nono recorte: ABM TAL Real Data (2026-04-01)
-
-**AbmStrategy.tsx** — commit `1fda339`
-- Array `abmAccounts` hardcoded (12 empresas fictícias) removido do escopo de módulo
-- `abmAccounts` agora derivado de `contasMock` via `useMemo`: `nome→name`, iniciais derivadas, `vertical→vertical`, `prontidao/10→fitScore`, `prontidao→engagement`, `statusGeral→status` (Crítico→HOT / Atenção→PLAYBOOK / Saudável→MAPEANDO), `prontidao>70→mqa`
-- Clique na TAL Table: `openDetailedModal('ACCOUNT', acc)` substituído por `openAccount(acc.id)` — agora abre o Centro de Comando com o perfil real da conta
-- `useAccountDetail` e `contasMock` adicionados aos imports
-- IIFE, heatmaps, scatter, persona matrix, `openDetailedModal`, benchmarks, clusters, `journeyTimeline`, `entryPlays` mantidos intencionalmente fora do escopo
-
-### Fase 5 — Décimo recorte: ABX Action Routes + Dead Code (2026-04-01)
-
-**ABXOrchestration.tsx** — commit `a52dd2e` + fechamento `7354f33`
-- Auditoria técnica completa: 1307 linhas, fonte exclusiva `compiladoClientesData` (abxData), sem `AccountDetailContext`
-- `ActionRoutesLayer` conectado ao `handleAccountSelect` (commit `a52dd2e`)
-- Dead code removido do module scope: `pipelineByVertical`, `channelInfluence`, `committeeRoles`, `funnelEvolution` (commit `a52dd2e`)
-- **Fechamento definitivo da frente ABX** (commit `7354f33`):
-  - `generatePeopleData`: 4 chamadas `Math.random()` substituídas por fórmulas determinísticas (`((i * 17 + 23) % 91) + 9` etc.) — People Layer estável entre reloads
-  - `CommercialMemoryLayer`: prop `onSelect` adicionada; botão "Explorar Ficha 360°" conectado ao modal 360° real
-  - `ContactOperationalFilaLayer`: prop `onSelect` adicionada; botão "Ação" localiza conta via `processedAccounts.find(a => a.id === p.accountId)` e abre modal 360°
-  - `ContactActionsLayer`: 4 botões "Acionar Play" fictícios removidos; cards mantidos como bloco narrativo
-- **Decisão arquitetural definitiva:** ABX mantém profundidade própria via `compiladoClientesData`; não integrar `processedAccounts` com `contasMock` (IDs incompatíveis; modal interno já é mais rico para contexto ABX)
-
-### Fase 5 — Décimo segundo recorte: ABM Modal Fictício (2026-04-02)
-
-**AbmStrategy.tsx** — commit `6d416a6`
-- `openDetailedModal` removida: switch de 20 cases, ~1074 linhas de JSX fictício eliminadas
-- Estados `modalOpen` e `modalData` removidos
-- Import `Modal` removido
-- ~40 handlers `onClick={() => openDetailedModal(...)}` removidos de todos os pontos de chamada
-- `cursor-pointer` removido de 3 tech-fit cards sem ação real
-- `<Modal />` removida do JSX final do componente
-- `openAccount(acc.id)` na TAL Table preservado — único ponto de interação real
-- Toda estrutura visual, IIFEs, datasets, sliders e visualizações preservados intactos
-
-### Fase 5 — Décimo terceiro recorte: Saneamento de Dead Code (2026-04-02)
-
-**AbmStrategy.tsx** — commit `fef12eb`
-- 7 imports Lucide órfãos removidos: `Loader2`, `MoreVertical`, `Maximize2`, `TrendingDown`, `Building2`, `MousePointer2`, `Info`
-- `AnimatePresence` removido de `motion/react` (não referenciado após exclusão do modal)
-- `scatterAccounts` removido (scatter data exclusivo do modal — 12 contas fictícias)
-- `personas`, `hexVerticals` removidos (arrays do hexbin do modal)
-- `hexIntensityMap` removido (Record 10×10 de intensidades do hexbin)
-- `getHexCellColor`, `channelByIntensity` removidos (helpers do hexbin)
-- `budgetAlloc`/`setBudgetAlloc`, `totalBudget` removidos (estado do modal de budget)
-- `Hexagon` removido (helper component SVG sem referência no JSX)
-- Total: `11 insertions(+), 74 deletions(-)` — zero impacto visual ou funcional
-
-### Fase 5 — Décimo quarto recorte: Saneamento de journeyTimeline (2026-04-02)
-
-**AbmStrategy.tsx** — commit `9af5011`
-- Remoção de `journeyTimeline` constant (7 linhas): hardcoded array com 5 estágios (Awareness, Engagement, MQA, Opportunity, Win) e contagens fictícias.
-- Remoção da visualização "Jornada de Contas (Funil ABM)" (23 linhas): card com progress bars animadas, badge "PROGRESSION" e footer "Velocity Index ABM".
-- Total: `0 insertions(+), 32 deletions(-)` — zero impacto visual ou funcional.
-- Justificativa: dados decorativos não derivados de fonte real; não alinha com operacionalidade do cockpit.
-
-### Fase 5 — Décimo quinto recorte: Saneamento de benchmarks (2026-04-02)
-
-**AbmStrategy.tsx** — commit `1f6922e`
-- Remoção de `benchmarks` constant (8 linhas): hardcoded array com 4 KPIs fictícios (72%, 48%, 432%, 42%).
-- Remoção da visualização "Elite Benchmarks Grid" (20 linhas): grid 4-colunas com cards animados, ícone BarChart3, badges de trend.
-- Total: `0 insertions(+), 29 deletions(-)` — zero impacto visual ou funcional.
-- Justificativa: dados decorativos puros não derivados de fonte real; sem função operacional no cockpit ABM.
-
-### Fase 5 — Décimo sexto recorte: Saneamento de verticalClusters (2026-04-02)
-
-**AbmStrategy.tsx** — commit `d4fb5e4`
-- Remoção de `verticalClusters` constant (8 linhas): hardcoded array com 4 verticais fictícias (Manufatura, Fintech, HealthTech, AgroTech) e counts/health/eficiência hardcoded.
-- Remoção da visualização "Clusterização ABM" (22 linhas): card com 4 items, progress bars, health badges, botões "+ Novo" e links "Playbook" fictícios.
-- Total: `1 insertion(+), 31 deletions(-)` — zero impacto visual ou funcional.
-- Justificativa: dados fictícios não derivados de fonte real; botões/links não funcionais; sem função operacional no cockpit ABM.
-
-### Fase 5 — Décimo sétimo recorte: Saneamento de entryPlays (2026-04-02)
-
-**AbmStrategy.tsx** — commit `bd306c4`
-- Remoção de `entryPlays` constant (5 linhas): hardcoded array com 3 playbooks fictícios (Relatório Setorial, Webinar, Campanha Social Ads) com eficácia hardcoded.
-- Remoção da visualização "Plays de Entrada Recomendados" (31 linhas): card grande com grid 3-colunas, header fictício, botões "Executar Play" e "Ver Todos os Playbooks" sem ação.
-- Total: `0 insertions(+), 34 deletions(-)` — zero impacto visual ou funcional.
-- Justificativa: dados fictícios não derivados de fonte real; botões sem ação/handler; descrição enganosa ("Ações táticas validadas" mas são decorações); sem função operacional no cockpit ABM.
-
-### Fase 5 — 20º recorte: Central de Playbooks (2026-04-02)
-
-**Actions.tsx** — commit `3ea4daa`
-- Expansão do tipo `ActionItem` com metadados de rastreabilidade estratégica (`sourceType`, `playbookName`, `playbookRunId`, `playbookStepId`, `relatedAccountId`).
-- Implementação da `PlaybookLibraryBar`: seção horizontal retrátil entre hero e filtros.
-- Criação do template exemplar `Escudo de Renovação Enterprise` com 3 ações automatizadas (ROI, Auditoria, Briefing).
-- Implementação do `PlaybookActivationOverlay` com lógica de injeção em lote para contas elegíveis (`LogPrime Supply` ID 3).
-- Injeção funcional garantindo entrada no topo da fila (`items`) e preenchimento de metadados de auditoria.
-- Adição de badges de origem visuais ("Playbook: [Name]") nos cards de Lista e Kanban.
-- Conformidade técnica: Build verificado e estética Soft Slate preservada.
-
-### Fase 6 — 21º recorte: Base numérica estrutural para Scoring (2026-04-02)
-
-**accountsData.ts** — commit `85ca5af`
-- Expansão da interface `Conta` com campos mandatórios de scoring: `icp`, `crm`, `vp`, `ct`, `ft` e `budgetBrl`.
-- Padronização semântica: `budgetBrl` definido como valor absoluto em BRL (Reais) através de nomenclatura e comentário JSDoc.
-- Enriquecimento dos 3 mocks de `contasMock` com valores numéricos coerentes com a prontidão e potencial de cada conta.
-- Validação técnica: Build de produção verificado com sucesso, garantindo integridade de tipagem em todo o projeto.
-- Status operacional: Preparação estrutural concluída; conexão funcional com os 6 heatmaps de `AbmStrategy.tsx` pendente para a próxima etapa.
-
-### Fase 6 — 22º recorte: Conexão Funcional de Heatmaps (2026-04-02)
-
-**AbmStrategy.tsx** + **accountsData.ts** — commit `c8565fd`
-- **Massa de Dados:** Expansão de `contasMock` de 3 para 7 contas com dados de scoring completos (`icp`, `crm`, `vp`, `ct`, `ft`, `budgetBrl`).
-- **Conexão Dinâmica:** Substituição de `abmHeatmapAccounts` (12 mocks fixos) por `useMemo` conectado diretamente ao `contasMock`.
-- **Normalização Financeira:** `budgetBrl` (valor absoluto) convertido para escala `k` (milhares) para exibição SVG.
-- **Hero Stats:** Indicadores de "Target Accounts" e "Health Score" agora derivam do estado real da base filtrada.
-- **Correção Técnica:** Resolvido erro de tipagem na alternância de callouts (módulo em string vs number).
-- **Integridade:** Build de produção validado com sucesso (Exit code: 0).
-
-### Fase 6 — 23º Recorte: Action Cards Dinâmicos ABM (2026-04-02)
-
-**AbmStrategy.tsx** — commit `7b985ecbe533563cde93e7f8363a69dc47420c8a`
-- **Mensagem:** `feat(strategy): dinamizacao reativa dos action cards e matrizes`
-- **Reparo de Corrupção:** Saneamento de fragmentação de sintaxe JSX e caracteres inválidos (encoding) no objeto `matrixCardsMap`.
-- **Contexto Reativo:** Introdução de `activeAccountId` e derivação de `activeAccount` via `useMemo` a partir de `contasMock`.
-- **Dinamização Lateral:** Refatoração dos action cards (VP, Potencial, Receptividade, Acesso, Posicionamento) para consumo de dados reais.
-- **Inteligência de Dados:** Formatação dinâmica de `budgetBrl`, `icp` e `crm` via `Intl.NumberFormat`.
-- **Integridade:** Build validado com sucesso (`npm run build`).
+**AbmStrategy.tsx + Actions.tsx** — commit `4dbbd95` (Recorte 24)
+- **Saneamento Técnico:** Migração de estilos inline para Tailwind (~120 linhas removidas).
+- **Acessibilidade:** Adição de `aria-label`, `title`, e `role="img"` em todos os controles interativos.
+- **Linting & Tipagem:** Resolução de erro tsc no componente `Button` e avisos de acessibilidade.
+- **Integridade:** Build de produção validado (Exit code: 0).
 
 ---
 
@@ -257,9 +77,8 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- **23º Recorte Concluído:** Action Cards Dinâmicos ABM (Fase 6) em `AbmStrategy.tsx`.
-- **24º Recorte — Refinamento Stylistic & Lints:** Resolver avisos de linting (CSS inline, labels, buttons) remanescentes em AbmStrategy e Actions.
-- Manter foco em refino funcional e preservação da estética premium (Regra 6).
+- **Recorte 24 Concluído:** Refinamento técnico e acessibilidade finalizados.
+- **Recorte 25:** Consolidação de Feedback e Entrega Final da Fase 6.
 
 ---
 
@@ -270,19 +89,10 @@ Nenhuma implementação funcional em andamento.
 | Performance Real Data | 7º Recorte Concluído | ACCOUNTS e ALERTS derivados de contasMock e advancedSignals |
 | Stakeholder Intelligence | 8º Recorte Concluído | Contacts transversal conectado via Deep Link ao Centro de Comando |
 | ABM TAL Real Data | 9º Recorte Concluído | TAL de ABMStrategy derivada de contasMock e conectada ao Centro de Comando |
-| ABX Action Routes | 10º Recorte Concluído (fechado) | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
+| ABX Action Routes | 10º Recorte Concluído | People Layer determinístico; CommercialMemory, ContactFila e ActionRoutes com ações reais; decisão arquitetural ABX finalizada |
 | ABM Modal Fictício | 12º Recorte Concluído | openDetailedModal (20 cases, ~1074 linhas) removida; interatividade artificial eliminada |
-| Saneamento Dead Code | 13º Recorte Concluído | 8 imports órfãos, 5 constantes/helpers, 1 useState, 1 component — todos resíduos do modal removido |
-| Saneamento journeyTimeline | 14º Recorte Concluído | journeyTimeline constant + visualização "Jornada de Contas" removidas — dados decorativos não operacionais |
-| Saneamento benchmarks | 15º Recorte Concluído | benchmarks constant + "Elite Benchmarks Grid" removidas — KPIs fictícios e grid decorativo |
-| Saneamento verticalClusters | 16º Recorte Concluído | verticalClusters constant + "Clusterização ABM" removidas — dados fictícios, botões não funcionais |
-| Saneamento entryPlays | 17º Recorte Concluído | entryPlays constant + "Plays de Entrada Recomendados" removidas — dados fictícios, botões sem ação |
-| Auditoria abmHeatmapAccounts | 18º Recorte Concluído (Auditoria) | Bloqueado: ausência de campos numéricos em contasMock; dependência estrutural de 6 heatmaps identificada |
-| Auditoria IIFEs AbmStrategy | 19º Recorte Concluído (Auditoria) | Bloqueado: 2 IIFEs (~1000 linhas) acopladas em dados, estado e SVG rendering; fora do escopo de refactor incremental |
-| Control Tower V1 | 11º Recorte Concluído | Settings.tsx transformado em cockpit de governança e inteligência |
 | Central de Playbooks | 20º Recorte Concluído | Biblioteca retrátil e injeção rastreável na fila operacional de Actions |
 | Base Numérica Scoring | 21º Recorte Concluído | Estrutura de Conta estendida; budgetBrl padronizado (Preparação Estrutural Fase 6) |
 | Conexão de Heatmaps | 22º Recorte Concluído | Heatmaps em AbmStrategy conectados ao contasMock dinâmico |
 | Action Cards Dinâmicos | 23º Recorte Concluído | Blocos laterais e matrizes reativos à activeAccount e budgetBrl |
-| Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | 24º Recorte — Refinamento Stylistic & Lints |
+| Refinamento Técnico | 24º Recorte Concluído | Acessibilidade, Tailwind e fix de tipagem em AbmStrategy e Actions |
