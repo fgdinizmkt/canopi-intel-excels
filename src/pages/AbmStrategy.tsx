@@ -60,11 +60,6 @@ import { contasMock } from '../data/accountsData';
 // --- MOCK DATA ---
 
 
-const entryPlays = [
-  { id: 'p1', title: 'Relatório Setorial Customizado', desc: 'Envio de PDF personalizado com comparativo de eficácia para C-Levels do setor Industrial.', efficacy: 88, icon: <FileText className="w-5 h-5" /> },
-  { id: 'p2', title: 'Webinar de Mesa Redonda', desc: 'Convite exclusivo para diretores financeiros de Fintechs Mid-market discutirem Open Banking.', efficacy: 72, icon: <Users className="w-5 h-5" /> },
-  { id: 'p3', title: 'Campanha Social Ads 1:1', desc: 'Ads altamente focados em dor específica de segurança de dados para o Tier 1 de HealthTech.', efficacy: 94, icon: <Layout className="w-5 h-5" /> },
-];
 
 // ---- 6 ABM HEATMAPS DATA ----
 const abmHeatmapAccounts = [
@@ -1359,35 +1354,6 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* 3. PLAYS DE ENTRADA RECOMENDADOS (RESTORED) */}
-      <div className="bg-white p-10 rounded-[40px] border border-slate-200 shadow-sm space-y-10">
-         <div className="flex justify-between items-center bg-white">
-            <div>
-               <h3 className="text-xl font-bold text-slate-900 uppercase">Plays de Entrada Recomendados</h3>
-               <p className="text-sm text-slate-500 font-medium mt-1">Ações táticas validadas para os clusters ativos</p>
-            </div>
-            <Button variant="ghost" className="text-[10px] font-bold text-blue-600 uppercase tracking-widest border border-blue-100 px-6 py-2 rounded-xl">Ver Todos os Playbooks</Button>
-         </div>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {entryPlays.map((play) => (
-               <motion.div key={play.id} whileHover={{ y: -8 }} className="bg-white border border-slate-100 p-8 rounded-[32px] shadow-sm hover:shadow-xl hover:border-blue-400 transition-all flex flex-col h-full group">
-                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-inner relative overflow-hidden">
-                     <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Sparkles className="w-full h-full p-2" />
-                     </div>
-                     {play.icon}
-                  </div>
-                  <h4 className="text-lg font-bold text-slate-900 mb-4 uppercase tracking-tight leading-tight">{play.title}</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed mb-8 flex-1">{play.desc}</p>
-                  <div className="pt-6 border-t border-slate-100 flex justify-between items-center">
-                     <div><p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Eficácia</p><p className="text-sm font-bold text-slate-900 tracking-tighter">{play.efficacy}%</p></div>
-                     <Button className="bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase py-3 px-6 hover:bg-black border-none">Executar Play</Button>
-                  </div>
-               </motion.div>
-            ))}
-         </div>
       </div>
 
 
