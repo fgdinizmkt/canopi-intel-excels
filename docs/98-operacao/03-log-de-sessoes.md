@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Radar Relacional e Cruzamento de Sinais (Recorte 26 - Fase 7)
+
+**Objetivo:** Transformar o Comitê de Compras em núcleo de inteligência relacional, cruzando stakeholders com sinais ativos da conta.
+
+**Atividades:**
+- **Radar Relacional:** Bloco dinâmico calculando Tensão (Influência > 7 em áreas sob Alerta), Apoio (Sponsors em áreas de Tendência) e Gaps (Áreas sob sinal crítico sem contato mapeado).
+- **Micro-badges de Sinais:** Injeção visual de indicação de severidade (lucide-react) no Organograma e na Lista de Contatos.
+- **Filtro Contextual:** Overlay de contato passou a filtrar sinais e ações por correspondência exata de área (`contexto === area`).
+- **Build & QA:** Correção de erros de aspas não escapadas (lint) e validação de build completa (16 rotas íntegras).
+
+---
+
 ## [2026-04-02] — Deep Intelligence Perfil (Recorte 25 - Início Fase 7)
 
 **Objetivo:** Evoluir o Perfil da Empresa (AccountDetailView) para uma camada de inteligência profunda, expondo dados estruturados e operacionais preexistentes.
