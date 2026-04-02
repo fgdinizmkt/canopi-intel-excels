@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-01 (Centro de Comando Completo)
+`main` — atualizada em 2026-04-01 (Assistant Contextual — 6º Recorte Fase 5)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -119,7 +119,10 @@ Nenhuma implementação funcional em andamento.
 ## Próximo passo aprovado
 
 - Iniciar o 7º Recorte da Fase 5 (frente a definir).
-- Candidatos naturais: `Contacts.tsx` (após decisão arquitetural sobre página independente vs extensão de Contas), `Performance.tsx` (conexão com dados reais e decisão CSS inline vs Tailwind), ou auditoria de `ABMStrategy.tsx`.
+- Candidatos priorizados:
+  1. `Performance.tsx` — conexão com dados reais + decisão CSS inline vs Tailwind (pendência arquitetural registrada)
+  2. `Contacts.tsx` — requer decisão arquitetural prévia (página independente vs extensão de Contas)
+  3. Auditoria de `ABMStrategy.tsx` — maior arquivo do projeto, maior risco de dívida técnica
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -128,4 +131,5 @@ Nenhuma implementação funcional em andamento.
 | Centro de Comando | Fase 2 Concluída | Organograma Visual recursivo funcional |
 | Centro de Comando | Fase 3 Concluída | Perfil Granular do Contato com inteligência Canopi |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | Recorte 6 — Nova frente estratégica |
+| Assistant Contextual | 6º Recorte Concluído | KPIs reais, fila operacional, contexto injetado no Gemini |
+| Roadmap | Próximo Passo | Recorte 7 — Frente a definir |
