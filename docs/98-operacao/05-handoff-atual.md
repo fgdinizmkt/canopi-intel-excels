@@ -2,8 +2,8 @@
 
 ## Estado atual
 - Fase: Fase 6 — Estruturação de Inteligência de Scoring
-- **Último recorte concluído:** Conexão Funcional de Heatmaps (22º Recorte Fase 6)
-- **Último commit relevante:** `c8565fd` — feat(abm): connect heatmap scoring to dynamic accountsMock and enrich data
+- **Último recorte concluído:** Action Cards Dinâmicos ABM (23º Recorte Fase 6)
+- **Último commit relevante:** `7b985ecbe533563cde93e7f8363a69dc47420c8a` — feat(strategy): dinamizacao reativa dos action cards e matrizes
 - **Data:** 2026-04-02
 - **Ambiente:** Next.js 15 App Router / main íntegra (build ok)
 
@@ -25,6 +25,32 @@
 - **Hero:** Estatísticas de topo agora refletem a realidade do TAL.
 - **Estabilidade:** Fix de bugs de tipagem em loops de renderização SVG.
 - **Integridade:** Build de produção validado com sucesso.
+
+## O que foi entregue (23º Recorte — Fase 6)
+- **Tipo:** Dinamização reativa e inteligência tática lateral.
+- **Contexto:** Consolidação plena de `activeAccount` nos Action Cards e Matrix views em `AbmStrategy.tsx`.
+- **Saneamento:** Reparo estrutural de JSX mangled e correção de encoding ("FIT MÉDIO") via script `sed`.
+- **Dinamização:** Blocos de VP, Potencial, Receptividade, Acesso e Posicionamento consomem dados dinâmicos de `icp`, `crm`, `budgetBrl` e `vertical`.
+- **Integridade:** Build restaurado e funcionalidade validada em tempo real ao alternar contas.
+
+## 2026-04-02 — 23º Recorte: Action Cards Dinâmicos em AbmStrategy
+
+**Fase:** Fase 6 — Estruturação de Inteligência de Scoring
+
+**O que foi feito:**
+- **Reparo de Sintaxe:** Saneamento cirúrgico de fragmentação de código JSX no objeto `matrixCardsMap` (reparação de recortes de AI anteriores).
+- **Consolidação de Estado:** Introdução de `activeAccountId` e `activeAccount` (via `useMemo`) para garantir fonte única de verdade na página.
+- **Dinamização de Insights:** Refatoração de ~30 cards de ação para reagir dinamicamente aos metadados da conta ativa (`vertical`, `icp`, `crm`, `ct`).
+- **Formatação de Valores:** Implementação de `Intl.NumberFormat` para exibição de orçamentos fiscais (`budgetBrl`) em formato monetário real.
+- **Sincronização de TAL:** O clique na Target Account List agora atualiza instantaneamente o contexto de todos os cards laterais e do Centro de Comando.
+
+**Commits:**
+- `7b985ecbe533563cde93e7f8363a69dc47420c8a` — feat(strategy): dinamizacao reativa dos action cards e matrizes
+
+**Impacto no projeto:**
+- Eliminação do comportamento estático/fictício na camada de recomendações da estratégia ABM.
+- Restaurada a integridade do build após corrupção acidental em iterações de larga escala.
+- UX operacional de alta fidelidade: o usuário vê dados reais da conta em todos os pontos de contato da tela.
 
 ## 2026-04-02 — 22º Recorte: Conexão Funcional de Heatmaps em AbmStrategy
 
@@ -50,14 +76,14 @@
 
 
 ## Próximos passos (Roadmap)
-1. Iniciar o **23º Recorte da Fase 6**.
+1. Iniciar o **24º Recorte da Fase 6**.
 2. Candidato priorizado:
-   - **Refatoração de Action Cards Dinâmicos:** Alterar os blocos de ação lateral em `AbmStrategy.tsx` para consumir insights reais da conta (`contasMock`).
+   - **Refinamento Stylistic & Lints:** Resolver avisos de linting (CSS inline, labels discerníveis, buttons) remanescentes em `AbmStrategy.tsx` e `Actions.tsx`.
 
 ## Pendências / Backlog
 - **Actions.tsx:** CSS inline em botões novos (Migrar para classes se necessário).
 - **AbmStrategy.tsx:** 
-  - **Conexão Funcional — PENDENTE:** Integrar a nova base financeira aos gráficos dinâmicos.
+  - **Linting:** Diversos botões Lucide sem label e botões sem texto discernível.
   - **IIFEs (~1016 linhas) — BLOQUEADO:** Refactor eventual em Fase 6+, fora do escopo incremental atual.
 - **Performance.tsx:** CSS inline `perf-*` mantido intencionalmente.
 

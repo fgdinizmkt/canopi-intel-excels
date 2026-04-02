@@ -5,6 +5,43 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-02] — Dinamização Reativa e Saneamento ABM (Recorte 23 - Fase 6)
+
+**Objetivo:** Dinamizar os Action Cards e Matrizes de `AbmStrategy.tsx` para reagirem à conta selecionada em tempo real, eliminando comportamentos estáticos e corrigindo corrupções de código.
+
+**Atividades:**
+- **Saneamento de Emergência:** Identificada e corrigida corrupção sintática no objeto `matrixCardsMap` (JSX mangled entre linhas 890-1040) e problemas de encoding em strings ("FIT MÉDIO").
+- **Dinamização Contextual:** Implementação de `activeAccountId` sincronizado com a TAL Table e derivação de `activeAccount` via `contasMock`.
+- **Inteligência Tática Lateral:** Refatoração integral de ~30 blocos de ação (VP, Potencial, Receptividade, Acesso, Posicionamento) para exibir insights baseados em `icp`, `crm`, `ct` e `vertical` da conta ativa.
+- **Formatação Financeira:** Uso de `Intl.NumberFormat` para exibição dinâmica do `budgetBrl` nos cards de Potencial e Matrizes.
+- **Conformidade Técnica:** Validação de build completa, garantindo que o reparo restaurou a integridade do projeto.
+
+**Commits:**
+- `7b985ecbe533563cde93e7f8363a69dc47420c8a` — feat(strategy): dinamizacao reativa dos action cards e matrizes
+
+**Impacto no projeto:**
+- A página de Estratégia ABM agora é 100% funcional e reativa: trocar de conta na lista atualiza instantaneamente todos os dashboards, heatmaps, matrizes e recomendações laterais.
+- Remoção definitiva de dependências hardcoded na camada de recomendações.
+- Estabilidade de runtime garantida após o reparo da corrupção de JSX.
+- Preparação concluída para o refinamento de UI e linting (Recorte 24).
+
+---
+
+## [2026-04-02] — Conexão Funcional de Heatmaps (Recorte 22 - Fase 6)
+
+**Objetivo:** Conectar a base numérica dinâmica de `contasMock` aos 6 heatmaps de ABM.
+
+**Atividades:**
+- **Expansão de Massa:** Enriquecimento do `contasMock` para 7 registros estratégicos.
+- **Camada useMemo:** Implementação de derivação dinâmica de `abmHeatmapAccounts`.
+- **Normalização:** Conversão de `budgetBrl` para escala visual `k` e cálculo de scoring via `getHmScore`.
+- **Integridade:** Build de produção validado (Exit code: 0).
+
+**Commits:**
+- `c8565fd` — feat(abm): connect heatmap scoring to dynamic accountsMock and enrich data
+
+---
+
 ## 2026-04-02 — 19º Recorte: Auditoria Técnica das IIFEs em AbmStrategy
 
 **Fase:** Fase 5 — Refino e endurecimento

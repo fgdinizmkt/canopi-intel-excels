@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Conexão Funcional de Heatmaps — 22º Recorte Fase 6)
+`main` — atualizada em 2026-04-02 (Action Cards Dinâmicos ABM — 23º Recorte Fase 6)
 
 ## Fase atual do plano
 **Fase 5 — Refino e endurecimento** (em andamento)
@@ -237,6 +237,16 @@
 - **Correção Técnica:** Resolvido erro de tipagem na alternância de callouts (módulo em string vs number).
 - **Integridade:** Build de produção validado com sucesso (Exit code: 0).
 
+### Fase 6 — 23º Recorte: Action Cards Dinâmicos ABM (2026-04-02)
+
+**AbmStrategy.tsx** — commit `7b985ecbe533563cde93e7f8363a69dc47420c8a`
+- **Mensagem:** `feat(strategy): dinamizacao reativa dos action cards e matrizes`
+- **Reparo de Corrupção:** Saneamento de fragmentação de sintaxe JSX e caracteres inválidos (encoding) no objeto `matrixCardsMap`.
+- **Contexto Reativo:** Introdução de `activeAccountId` e derivação de `activeAccount` via `useMemo` a partir de `contasMock`.
+- **Dinamização Lateral:** Refatoração dos action cards (VP, Potencial, Receptividade, Acesso, Posicionamento) para consumo de dados reais.
+- **Inteligência de Dados:** Formatação dinâmica de `budgetBrl`, `icp` e `crm` via `Intl.NumberFormat`.
+- **Integridade:** Build validado com sucesso (`npm run build`).
+
 ---
 
 ## O que está em andamento
@@ -247,8 +257,8 @@ Nenhuma implementação funcional em andamento.
 
 ## Próximo passo aprovado
 
-- **22º Recorte Concluído:** Conexão Funcional de Heatmaps (Fase 6) em `AbmStrategy.tsx`.
-- **23º Recorte — Refatoração de Action Cards Dinâmicos:** Consumir os campos reais da base de dados nos blocos de ação lateral de ABM.
+- **23º Recorte Concluído:** Action Cards Dinâmicos ABM (Fase 6) em `AbmStrategy.tsx`.
+- **24º Recorte — Refinamento Stylistic & Lints:** Resolver avisos de linting (CSS inline, labels, buttons) remanescentes em AbmStrategy e Actions.
 - Manter foco em refino funcional e preservação da estética premium (Regra 6).
 
 ---
@@ -273,5 +283,6 @@ Nenhuma implementação funcional em andamento.
 | Central de Playbooks | 20º Recorte Concluído | Biblioteca retrátil e injeção rastreável na fila operacional de Actions |
 | Base Numérica Scoring | 21º Recorte Concluído | Estrutura de Conta estendida; budgetBrl padronizado (Preparação Estrutural Fase 6) |
 | Conexão de Heatmaps | 22º Recorte Concluído | Heatmaps em AbmStrategy conectados ao contasMock dinâmico |
+| Action Cards Dinâmicos | 23º Recorte Concluído | Blocos laterais e matrizes reativos à activeAccount e budgetBrl |
 | Roadmap | Sincronismo | Memória operacional e remoto atualizados |
-| Roadmap | Próximo Passo | 23º Recorte — Refatoração de Action Cards Dinâmicos |
+| Roadmap | Próximo Passo | 24º Recorte — Refinamento Stylistic & Lints |
