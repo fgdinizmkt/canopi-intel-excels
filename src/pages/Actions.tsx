@@ -71,6 +71,13 @@ type ActionItem = {
   projectSuccess: string;
   projectSteps: ProjectStep[];
   buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
+  
+  // Rastreabilidade (Recorte 20)
+  sourceType?: "manual" | "signal" | "playbook";
+  playbookName?: string;
+  playbookRunId?: string;
+  playbookStepId?: string;
+  relatedAccountId?: string;
 };
 
 // ─── Style helpers (inline para garantir compilação no Tailwind v4) ─────────
@@ -983,6 +990,11 @@ function ActionListCard({
             <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>
               {item.category}
             </span>
+            {item.sourceType === "playbook" && (
+              <span style={{ borderRadius: 100, border: '1px solid #e0f2fe', background: '#f0f9ff', padding: '3px 10px', fontSize: 11, fontWeight: 700, color: '#0284c7' }}>
+                Playbook: {item.playbookName}
+              </span>
+            )}
           </div>
 
           {/* Title & description */}
@@ -1097,6 +1109,11 @@ function KanbanCard({
           <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '2px 8px', fontSize: 10, fontWeight: 600, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {item.category}
           </span>
+          {item.sourceType === "playbook" && (
+            <span style={{ borderRadius: 100, border: '1px solid #e0f2fe', background: '#f0f9ff', padding: '2px 8px', fontSize: 10, fontWeight: 700, color: '#0284c7', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              PB: {item.playbookName}
+            </span>
+          )}
         </div>
         {!compact && (
           <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8', flexShrink: 0 }}>
@@ -1175,6 +1192,196 @@ function KanbanCard({
         >
           {item.status === 'Concluída' ? 'Reabrir' : 'Executar'}
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Playbook Library (Recorte 20) ──────────────────────────────────────────
+
+type PlaybookCategory = "Retenção Crítica" | "Expansão" | "Novos Logos" | "Upsell";
+
+interface PlaybookTemplateAction {
+  id: string;
+  title: string;
+  priority: Priority;
+  category: string;
+  channel: string;
+  expectedImpact: string;
+}
+
+interface PlaybookTemplate {
+  id: string;
+  name: string;
+  category: PlaybookCategory;
+  objective: string;
+  criteria: string;
+  actions: PlaybookTemplateAction[];
+}
+
+const playbookTemplates: PlaybookTemplate[] = [
+  {
+    id: "pb-retention-enterprise",
+    name: "Escudo de Renovação Enterprise",
+    category: "Retenção Crítica",
+    objective: "Reverter risco de churn em contas Tier 1 e blindar a renovação ativando sponsors secundários.",
+    criteria: "Status Geral = Crítico ou Risco > 70%",
+    actions: [
+      { id: "step-1-roi", title: "Reunião Executiva: Validação de ROI", priority: "Crítica", category: "ABX", channel: "Executivo", expectedImpact: "Blindagem de Pipeline" },
+      { id: "step-2-audit", title: "Auditoria de Adoção: Módulo Core", priority: "Alta", category: "CS", channel: "Técnico", expectedImpact: "Redução de Atrito" },
+      { id: "step-3-briefing", title: "Briefing de Renovação Blindada", priority: "Alta", category: "Revenue", channel: "Sales", expectedImpact: "Fechamento de Ciclo" },
+    ]
+  }
+];
+
+function PlaybookCard({ template, potentialCount, onConfigure }: { template: PlaybookTemplate; potentialCount: number; onConfigure: (template: PlaybookTemplate) => void }) {
+  return (
+    <div className="min-w-[280px] rounded-[24px] border border-slate-200 bg-slate-50 p-6 flex flex-col gap-4 shadow-sm hover:border-slate-300 transition-all group">
+      <div className="flex items-center justify-between">
+        <div className="p-2.5 bg-white border border-slate-200 rounded-xl">
+          <FolderKanban className="w-5 h-5 text-slate-700" />
+        </div>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-100 px-3 py-1 rounded-full">
+          {template.category}
+        </span>
+      </div>
+      <div>
+        <h4 className="text-lg font-black text-slate-900 leading-tight letter-spacing-[-0.03em]">{template.name}</h4>
+        <p className="mt-2 text-xs text-slate-500 font-medium leading-relaxed">{template.objective}</p>
+      </div>
+      <div className="mt-auto pt-4 border-t border-slate-200/60 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Oportunidade</p>
+          <p className="text-xs font-bold text-slate-700">{potentialCount} {potentialCount === 1 ? 'conta' : 'contas'}</p>
+        </div>
+        <button 
+          onClick={() => onConfigure(template)}
+          className="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-black transition-colors"
+        >
+          Configurar Play
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PlaybookActivationOverlay({ 
+  template, 
+  onClose, 
+  onConfirm 
+}: { 
+  template: PlaybookTemplate | null; 
+  onClose: () => void; 
+  onConfirm: (templateId: string, accountIds: string[]) => void 
+}) {
+  const [selectedAccs, setSelectedAccs] = useState<string[]>([]);
+  const eligibleAccounts = useMemo(() => {
+    if (!template) return [];
+    // LogPrime (ID 3) é o alvo do template 01
+    return contasMock.filter(c => c.id === '3');
+  }, [template]);
+
+  useEffect(() => {
+    if (eligibleAccounts.length > 0) setSelectedAccs([eligibleAccounts[0].id]);
+  }, [eligibleAccounts]);
+
+  if (!template) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm p-20 flex items-stretch animate-in fade-in duration-300">
+      <div className="m-auto flex flex-col w-full max-w-[1000px] overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-2xl">
+        <div className="border-bottom border-slate-200 p-10 bg-slate-50/50">
+          <div className="flex items-start justify-between gap-10">
+            <div>
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest py-1 px-3 border border-blue-100 bg-blue-50 rounded-full">Configurando Ativação</span>
+              <h2 className="mt-6 text-4xl font-black text-slate-900 letter-spacing-[-0.03em]">{template.name}</h2>
+              <p className="mt-4 text-base text-slate-500 font-medium max-w-xl">{template.objective}</p>
+            </div>
+            <button onClick={onClose} className="w-12 h-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-10 grid grid-cols-[1fr_320px] gap-10">
+          <div className="space-y-8">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Contas Elegíveis para este Playbook</p>
+              <div className="space-y-3">
+                {eligibleAccounts.map(acc => (
+                  <div key={acc.id} className="flex items-center gap-5 p-5 rounded-2xl border border-slate-200 bg-slate-50/50">
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded-md border-slate-300 text-slate-900 focus:ring-slate-900" 
+                      checked={selectedAccs.includes(acc.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) setSelectedAccs(prev => [...prev, acc.id]);
+                        else setSelectedAccs(prev => prev.filter(id => id !== acc.id));
+                      }}
+                    />
+                    <div className="flex-1">
+                      <p className="text-lg font-black text-slate-900">{acc.nome}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                         <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 py-0.5 px-2 rounded">Risco {acc.risco}%</span>
+                         <span className="text-[10px] uppercase font-bold text-amber-600 bg-amber-50 py-0.5 px-2 rounded">Renovação em 65 dias</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[10px] font-bold text-slate-400 uppercase">Owner Sugerido</p>
+                       <p className="text-sm font-bold text-slate-700">{acc.ownerPrincipal}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Injeção Operacional (3 Ações)</p>
+              <div className="space-y-2">
+                {template.actions.map((act, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 rounded-xl border border-dashed border-slate-200 bg-white">
+                    <div className="flex items-center gap-4">
+                      <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">{idx+1}</span>
+                      <p className="text-sm font-bold text-slate-700">{act.title}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                       <span className="text-[10px] font-bold text-slate-400 uppercase">{act.channel}</span>
+                       <span className="text-[10px] font-bold text-slate-400 uppercase border border-slate-100 py-1 px-2 rounded">{act.priority}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="p-8 rounded-3xl bg-slate-900 text-white flex flex-col gap-6">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resumo da Ativação</p>
+                <p className="mt-4 text-base font-medium leading-relaxed">
+                   Ao ativar, o sistema injetará <span className="font-black text-blue-400">3 ações</span> diretamente na fila operacional para a conta selecionada.
+                </p>
+              </div>
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between text-xs pb-2 border-b border-white/10">
+                  <span className="text-white/50">Total de Ações</span>
+                  <span className="font-bold">3</span>
+                </div>
+                <div className="flex justify-between text-xs pb-2 border-b border-white/10">
+                  <span className="text-white/50">Contas</span>
+                  <span className="font-bold">{selectedAccs.length}</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => onConfirm(template.id, selectedAccs)}
+                disabled={selectedAccs.length === 0}
+                className="w-full mt-6 bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Injetar 3 ações na fila
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1494,6 +1701,67 @@ export const Actions: React.FC = () => {
   const [showNewAction, setShowNewAction] = useState(false);
   const [newActionForm, setNewActionForm] = useState({ account: '', title: '', owner: '', priority: 'Alta' as Priority });
 
+  // Estados Recorte 20
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [activatingTemplate, setActivatingTemplate] = useState<PlaybookTemplate | null>(null);
+
+  const handleActivatePlaybook = (templateId: string, accountIds: string[]) => {
+    const template = playbookTemplates.find(t => t.id === templateId);
+    if (!template) return;
+    
+    const runId = `pb-run-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const newActions: ActionItem[] = [];
+
+    accountIds.forEach(accId => {
+      const account = contasMock.find(c => c.id === accId);
+      if (!account) return;
+
+      template.actions.forEach(step => {
+        newActions.push({
+          id: `act-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          priority: step.priority,
+          status: "Nova",
+          category: step.category,
+          channel: step.channel,
+          title: step.title,
+          description: `Ação estratégica gerada pelo Playbook ${template.name} para mitigar riscos na conta ${account.nome}.`,
+          accountName: account.nome,
+          accountContext: account.segmento + " · " + account.vertical,
+          origin: `Playbook: ${template.name}`,
+          relatedSignal: "Gatilho de risco de renovação / timing crítico",
+          ownerName: account.ownerPrincipal,
+          suggestedOwner: account.ownerPrincipal,
+          ownerTeam: `Squad ${account.vertical}`,
+          slaText: "48h",
+          slaStatus: "ok",
+          expectedImpact: step.expectedImpact,
+          nextStep: "Validar agenda com stakeholders prioritários",
+          dependencies: [],
+          evidence: ["Critério de elegibilidade: Risco > 70% ou Renovação < 90 dias"],
+          history: [{ id: `h-${Date.now()}`, when: "Hoje", actor: "Canopi", type: "evidência", text: `Injeção automática via Playbook: ${template.name}` }],
+          projectObjective: template.objective,
+          projectSuccess: "Contrato renovado sem concessões críticas de margem",
+          projectSteps: [],
+          buttons: [
+            { id: "view", label: "Ver detalhes", tone: "secondary", action: "open" },
+            { id: "start", label: "Executar", tone: "primary", action: "start" },
+          ],
+          
+          // Rastreabilidade
+          sourceType: "playbook",
+          playbookName: template.name,
+          playbookRunId: runId,
+          playbookStepId: step.id,
+          relatedAccountId: accId,
+        });
+      });
+    });
+
+    setItems(prev => [...newActions, ...prev]);
+    setActivatingTemplate(null);
+    // Notificação implícita via entrada na fila
+  };
+
   const ownerOptions = useMemo(() => {
     const uniqueOwners = Array.from(new Set(items.map((item) => item.ownerName ?? "Sem owner")));
     return ["Todos", ...uniqueOwners];
@@ -1712,6 +1980,44 @@ export const Actions: React.FC = () => {
             <MetricCard label="Sem owner" value={metrics.noOwner} helper="pedem atribuição" icon={<Users className="h-5 w-5" />} />
           </div>
         </section>
+        
+        {/* Playbook Library Bar (Recorte 20) */}
+        <div className="mt-8">
+           <div className="flex items-center justify-between px-2 mb-4">
+              <div className="flex items-center gap-3">
+                 <FolderKanban className="w-5 h-5 text-slate-400" />
+                 <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Biblioteca de Playbooks</h3>
+              </div>
+              <button 
+                onClick={() => setIsLibraryOpen(!isLibraryOpen)}
+                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-white hover:text-slate-900 transition-all"
+              >
+                {isLibraryOpen ? 'Recolher Biblioteca' : 'Ver Biblioteca'}
+              </button>
+           </div>
+           
+           {isLibraryOpen && (
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide animate-in slide-in-from-top-4 duration-300">
+                 {playbookTemplates.map(template => (
+                    <PlaybookCard 
+                      key={template.id} 
+                      template={template} 
+                      potentialCount={contasMock.filter(c => c.id === '3').length}
+                      onConfigure={setActivatingTemplate}
+                    />
+                 ))}
+                 
+                 {/* Placeholder for future templates */}
+                 <div className="min-w-[280px] rounded-[24px] border border-dashed border-slate-200 bg-white/50 p-6 flex flex-col items-center justify-center text-center opacity-60">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                       <Plus className="w-5 h-5 text-slate-300" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Novo Template</p>
+                    <p className="mt-1 text-[10px] text-slate-400">Em breve: Playbooks customizados</p>
+                 </div>
+              </div>
+           )}
+        </div>
 
         <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -1989,6 +2295,13 @@ export const Actions: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Playbook Activation Overlay (Recorte 20) */}
+      <PlaybookActivationOverlay
+        template={activatingTemplate}
+        onClose={() => setActivatingTemplate(null)}
+        onConfirm={handleActivatePlaybook}
+      />
     </div>
   );
 };
