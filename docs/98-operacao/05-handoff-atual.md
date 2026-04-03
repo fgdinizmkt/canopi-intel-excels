@@ -32,11 +32,11 @@
 6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 13).
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 13:** Arquivo alvo `PaidMedia.tsx` para saneamento técnico de estilos inline.
-2.  **AccountDetailView & Topbar:** Próximos na fila de auditoria de conformidade pós-saneamento de hotspots supremos.
-3.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` via `ClientOnly`.
+1.  **Auditoria Recorte 14:** Arquivo alvo `AccountDetailView.tsx` para saneamento técnico de estilos inline.
+2.  **Topbar:** Próximo na fila de auditoria de conformidade pós-saneamento de hotspots supremos.
+3.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 13:** Iniciar auditoria e saneamento do arquivo `PaidMedia.tsx`.
+- **Recorte 14:** Iniciar auditoria e saneamento do arquivo `AccountDetailView.tsx`.
 - **Consistency Check:** Validar se o `colorMap` precisa de extensões para novos tipos de status.

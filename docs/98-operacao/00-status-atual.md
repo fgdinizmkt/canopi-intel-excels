@@ -26,13 +26,6 @@
 - **Commit de Código:** `7f58aa4` — refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13).
 
 
-**Recorte 13 — Saneamento Técnico: PaidMedia.tsx**
-- **Saneamento Total:** Remoção de 100% dos estilos inline estáticos (VTR, Retention, Bid Control) para Tailwind v4 native.
-- **Dinamismo Legítimo:** Preservação de 1 única ocorrência (Eficiência de Segmento) baseada em dados de mock iterativos.
-- **Estabilização Recharts:** Mitigação de warnings de hidratação via `ClientOnly` validada no build.
-- **Build de Produção:** Validado com `npm run build` (Exit 0).
-- **Commit de Código:** `7f58aa4` — refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13).
-
 **Recorte 12 — Saneamento Técnico: SeoInbound.tsx**
 - **Saneamento Total:** Remoção de estilos inline estáticos (82% e 14.5%) e migração para Tailwind v4 native.
 - **Estabilização de Build:** Integridade JSX restaurada via reparações cirúrgicas e validação de `npm run build` (Exit 0).

@@ -20,21 +20,6 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
-## [2026-04-03] — Saneamento Técnico de PaidMedia.tsx (Recorte 13 - Fase 8)
-**Agente:** Antigravity
-
-**Objetivo:** Saneamento técnico integral de `PaidMedia.tsx`, eliminando dívida técnica de estilos inline e estabilizando o build.
-
-**Ações:**
-1.  **Saneamento de Estilos:** Conversão massiva de estilos inline estáticos (VTR 38.4%, Retention 52.1%, Bids 75%) para utilitários Tailwind v4 native.
-2.  **Dinamismo Legítimo:** Preservação de 1 única ocorrência de `style={{` para Eficiência de Segmento, justificada por dados iterativos.
-3.  **Estabilização Recharts:** Garantia de integridade JSX via `ClientOnly` e containers flexíveis.
-4.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
-
-**Status:** Recorte 13 (Fase 8 — Saneamento) concluído. Commit: `7f58aa4` — refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13)
-
----
-
 ## [2026-04-03] — Saneamento Técnico de SeoInbound.tsx (Recorte 12 - Fase 8)
 **Agente:** Antigravity
 
