@@ -201,3 +201,9 @@ Toda comunicação operacional e documental deste repositório deve ocorrer excl
 - Não alternar idioma sem solicitação explícita do usuário.
 - Prompts, diagnósticos, handoffs, aprovações, checklists e relatórios devem permanecer em PT-BR.
 - Comentários técnicos em arquivos de código podem seguir o padrão do arquivo original (geralmente inglês), mas o contexto operacional de suporte deve ser em português.
+
+### 9. Governança e Precisão Técnica (Documento Complementar Oficial)
+Para reduzir a recorrência de retrabalho e garantir a integridade da comunicação operacional, as regras de **Aderência Semântica**, **Reenquadramento Obrigatório**, **Taxonomia Técnica** e **Pré-validação** estão consolidadas no documento oficial:
+- [06-governanca-complementar.md](./06-governanca-complementar.md)
+
+Toda entrega deste repositório deve obrigatoriamente seguir as diretrizes contidas no arquivo acima, sob risco de bloqueio automático de aprovação em caso de imprecisão técnica ou semântica.

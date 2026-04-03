@@ -317,7 +317,7 @@ const TacticalMatrixHeatmap: React.FC<{
   <div className="w-full h-full flex flex-col justify-center min-w-[500px]">
     <div className="flex shrink-0 h-10 mb-2">
       <div className="w-[90px] shrink-0" />
-      <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` }}>
+      <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` } as React.CSSProperties}>
         {matrixVerticals.map(vertical => (
           <div key={vertical} className="flex items-end justify-center pb-1">
             <span className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter truncate text-center max-w-[60px]">{vertical}</span>
@@ -329,14 +329,14 @@ const TacticalMatrixHeatmap: React.FC<{
       {currentYAxis.map(yLabel => (
         <div key={yLabel} className="flex-1 flex min-h-[32px]">
           <div className="w-[90px] shrink-0 flex items-center justify-end pr-3 text-[10px] font-bold text-slate-500 uppercase tracking-tighter truncate">{yLabel}</div>
-          <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` }}>
+          <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` } as React.CSSProperties}>
             {matrixVerticals.map(vertical => {
               const score = getMatrixScore(viewId, vertical, yLabel);
               const color = score >= 0.85 ? '#c0392b' : score >= 0.7 ? '#e67e22' : score >= 0.55 ? '#f9ca24' : score >= 0.4 ? '#a8e6cf' : '#27ae60';
               const textColor = score >= 0.7 || score <= 0.4 ? 'text-white' : 'text-slate-900';
               const scoreVal = Math.round(score * 100);
               return (
-                <div key={vertical} className="relative group transition-all rounded-[6px] cursor-pointer hover:border-slate-800 border-2 border-transparent hover:z-30 shadow-inner flex items-center justify-center isolate" style={{ backgroundColor: color }}>
+                <div key={vertical} className="relative group transition-all rounded-[6px] cursor-pointer hover:border-slate-800 border-2 border-transparent hover:z-30 shadow-inner flex items-center justify-center isolate" style={{ backgroundColor: color } as React.CSSProperties}>
                   <span className={`text-[10px] font-black ${textColor} opacity-90`}>{scoreVal}</span>
                   <div className="absolute opacity-0 group-hover:opacity-100 z-50 bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 border border-slate-700 w-52 rounded-xl shadow-2xl p-3 pointer-events-none transition-opacity">
                     <div className="flex justify-between items-center mb-1.5">
@@ -378,7 +378,7 @@ const FirmographicSection: React.FC = React.memo(() => (
           <div key={i} className="space-y-2">
             <div className="flex justify-between text-[9px] font-bold text-slate-600 uppercase"><span>{item.label}</span><span>{item.val}%</span></div>
             <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-              <div className="h-full bg-blue-600" style={{ width: `${item.val}%` }}></div>
+              <div className="h-full bg-blue-600" style={{ width: `${item.val}%` } as React.CSSProperties}></div>
             </div>
           </div>
         ))}
@@ -496,7 +496,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
               <p className="text-[9px] font-bold text-slate-400 uppercase">Health Score</p>
               <p className="text-lg font-bold text-emerald-600">{(contasMock.reduce((acc, c) => acc + c.prontidao, 0) / (contasMock.length * 10)).toFixed(1)}/10</p>
            </div>
-           <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none">Refinar TAL</Button>
+           <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none" title="Refinar lista de contas-alvo" aria-label="Refinar lista de contas-alvo">Refinar TAL</Button>
         </div>
       </div>
 
@@ -545,7 +545,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       <td className="px-3 py-3.5">
                         <div className="flex items-center gap-1.5">
                           <div className="h-1.5 w-14 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                            <div className={`h-full ${acc.engagement > 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${acc.engagement}%` }}></div>
+                            <div className={`h-full ${acc.engagement > 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${acc.engagement}%` } as React.CSSProperties}></div>
                           </div>
                           <span className="text-[9px] font-bold text-slate-900">{acc.engagement}%</span>
                         </div>
@@ -656,7 +656,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Ativar Playbook Selecionado</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Ativar playbook para esta conta" aria-label="Ativar playbook para esta conta">Ativar Playbook Selecionado</button>
                     <MiniActions actions={[
                       { icon: <Activity className="w-3 h-3"/>, label: 'Performance' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Templates' },
@@ -690,7 +690,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         {qualifiedIcp.length === 0 && <p className="text-[9px] text-slate-400 text-center py-2">Nenhuma conta nesse threshold</p>}
                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" aria-label="Exportar lista de contas qualificadas">Exportar Lista Qualificada</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Exportar contas qualificadas" aria-label="Exportar lista de contas qualificadas">Exportar Lista Qualificada</button>
                     <MiniActions actions={[
                       { icon: <FileSearch className="w-3 h-3"/>, label: 'Segmento' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
@@ -718,7 +718,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" aria-label="Salvar pesos de qualificação ICP">Salvar Configuração</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Salvar pesos de qualificação ICP" aria-label="Salvar pesos de qualificação ICP">Salvar Configuração</button>
                     <MiniActions actions={[
                       { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Compartilhar' },
@@ -736,7 +736,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          <p className="text-[8px] text-emerald-600 font-bold uppercase">Sinergia &gt; 85% com o tier 1</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Importar do Canopi Intel</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Importar contas via IA" aria-label="Importar do Canopi Intel">Importar do Canopi Intel</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Refinar IA' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Enriquecer' },
@@ -769,7 +769,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Enriquecer via Apollo</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Enriquecer dados via Apollo" aria-label="Enriquecer via Apollo">Enriquecer via Apollo</button>
                   </div>,
                   <div key="ct-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-emerald-500"/>Status DMU</p>
@@ -787,7 +787,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Iniciar Sequência Multi-Thread</button>
+                    <button className="w-full py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title="Iniciar sequência multi-thread" aria-label="Iniciar Sequência Multi-Thread">Iniciar Sequência Multi-Thread</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'Campanha' },
                       { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
@@ -807,7 +807,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Bloqueadores</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Iniciar Radar de Influência</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Analisar radar de influência" aria-label="Iniciar Radar de Influência">Iniciar Radar de Influência</button>
                     <MiniActions actions={[
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Social Selling' },
                       { icon: <TrendingUp className="w-3 h-3"/>, label: 'Evolução' },
@@ -832,7 +832,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           </p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Gerar Proposta Estrutural</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Gerar proposta comercial" aria-label="Gerar Proposta Estrutural">Gerar Proposta Estrutural</button>
                     <MiniActions actions={[{icon:<BarChart className="w-3 h-3"/>, label:'ROI'}, {icon:<CheckCircle2 className="w-3 h-3"/>, label:'Validar'}]} />
                   </div>,
                   <div key="ft-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -846,11 +846,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       ].map((g, i) => (
                         <div key={i} className="space-y-0.5">
                           <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase"><span>{g.label}</span><span>{g.val}%</span></div>
-                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${g.color} rounded-full`} style={{ width: `${g.val}%` }}/></div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${g.color} rounded-full`} style={{ width: `${g.val}%` } as React.CSSProperties}/></div>
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Benchmarking {activeAccount.vertical}</button>
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title={`Benchmarking da vertical ${activeAccount.vertical}`} aria-label={`Benchmarking ${activeAccount.vertical}`}>Benchmarking {activeAccount.vertical}</button>
                   </div>,
 
                   <div key="ft-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -862,7 +862,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <p className="text-[8px] text-amber-600 uppercase font-bold mt-1"><Zap className="inline w-2 h-2 mr-1"/>Picos de Acesso Recentes</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2">Monitorar Signals</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Visualizar sinais de intenção" aria-label="Monitorar Signals">Monitorar Signals</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Tech Stack' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Alerta CRM' },
@@ -884,7 +884,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          &quot;{activeAccount.crm > 60 ? 'A conta demonstra interações consistentes com SDRs nos últimos 15 dias.' : 'Baixa tração orgânica. Requer abordagem consultiva Tier 2 para destravar.'}&quot;
                        </p>
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Timeline CRM</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Timeline de atividades no CRM" aria-label="Timeline CRM">Timeline CRM</button>
                     <MiniActions actions={[
                       { icon: <Briefcase className="w-3 h-3"/>, label: 'Atividade' },
                       { icon: <Mail className="w-3 h-3"/>, label: 'Seq. E-mail' },
@@ -905,7 +905,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          </div>
                        ))}
                     </div>
-                    <button className="w-full py-2 font-bold text-[9px] text-red-600 border border-red-100 hover:bg-red-50 rounded-xl uppercase">Escalar Fluxo</button>
+                    <button className="w-full py-2 font-bold text-[9px] text-red-600 border border-red-100 hover:bg-red-50 rounded-xl uppercase" title="Escalar fluxo de atendimento crítico" aria-label="Escalar Fluxo">Escalar Fluxo</button>
                   </div>,
 
                   <div key="crm-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
@@ -915,7 +915,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        <p className="text-[10px] font-bold text-blue-800">&quot;Desafios de {activeAccount.vertical} 2024&quot;</p>
                        <p className="text-[8px] text-blue-600 mt-1 uppercase font-bold">3 e-mails | 2 calls | 1 LinkedIn</p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Injetar na Fila</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Injetar playbooks no pipeline" aria-label="Injetar na Fila">Injetar na Fila</button>
                   </div>,
                 ],
                 vp: [
@@ -927,7 +927,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          &quot;{activeAccount.vertical === 'Tecnologia' ? 'Alta propensão a adoção de novas stacks. Focar em ROI de infraestrutura.' : 'Vertical com ciclo de venda longo. Focar em conformidade e segurança.'}&quot;
                        </p>
                     </div>
-                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Ver Cluster {activeAccount.vertical}</button>
+                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title={`Ver detalhes do cluster ${activeAccount.vertical}`} aria-label={`Ver Cluster ${activeAccount.vertical}`}>Ver Cluster {activeAccount.vertical}</button>
                     <MiniActions actions={[
                       { icon: <FileText className="w-3 h-3"/>, label: 'Exportar PDF' },
                       { icon: <Flag className="w-3 h-3"/>, label: 'Alocar Verba' },
@@ -948,7 +948,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <option value="expansion">Expansion - Cross-sell</option>
                        </select>
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors">Confirmar Alocação</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Confirmar alocação estratégica" aria-label="Confirmar Alocação">Confirmar Alocação</button>
                     <MiniActions actions={[
                       { icon: <Users className="w-3 h-3"/>, label: 'Ver Contas' },
                       { icon: <Mail className="w-3 h-3"/>, label: 'Play' },
@@ -967,7 +967,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        </div>
                        <p className="text-[8px] text-slate-400 leading-relaxed mt-1">Status de mapeamento do comitê de compras (CT Score: {activeAccount.ct}%).</p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors">Visualizar Comitê</button>
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title="Mapa detalhado do comitê" aria-label="Visualizar Comitê">Visualizar Comitê</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'RSVP' },
                       { icon: <Users className="w-3 h-3"/>, label: 'Presentes' },
@@ -1090,7 +1090,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         <p className="text-[9px] font-bold text-slate-600 uppercase">Score ICP {activeAccount.icp}%</p>
                         <p className="text-[10px] font-medium text-slate-700 leading-relaxed mt-1">Conta estratégica para vertical {activeAccount.vertical}.</p>
                      </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 text-white rounded-xl">Playbook Especialista</button>
+                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 text-white rounded-xl" title="Iniciar playbook para especialista" aria-label="Playbook Especialista">Playbook Especialista</button>
                    </div>
                  ]
                };
