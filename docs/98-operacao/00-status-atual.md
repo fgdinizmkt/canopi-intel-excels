@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 12)
+ `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 13)
 
 ## Fase atual do plano
 **Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
@@ -18,6 +18,20 @@
 - **Dinamismo Legítimo:** Consolidado em 31 ocorrências (barras de progresso e branding dinâmico).
 - **Build de Produção:** Validado com `npm run build` (Exit 0). Commit: `7a3d2192424e07dfde19dd5be16a37c1513022f4`.
 
+**Recorte 13 — Saneamento Técnico: PaidMedia.tsx**
+- **Saneamento Total:** Remoção de 100% dos estilos inline estáticos (VTR, Retention, Bid Control) para Tailwind v4 native.
+- **Dinamismo Legítimo:** Preservação de 1 única ocorrência (Eficiência de Segmento) baseada em dados de mock iterativos.
+- **Estabilização Recharts:** Mitigação de warnings de hidratação via `ClientOnly` validada no build.
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+- **Commit de Código:** `7f58aa4` — refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13).
+
+
+**Recorte 13 — Saneamento Técnico: PaidMedia.tsx**
+- **Saneamento Total:** Remoção de 100% dos estilos inline estáticos (VTR, Retention, Bid Control) para Tailwind v4 native.
+- **Dinamismo Legítimo:** Preservação de 1 única ocorrência (Eficiência de Segmento) baseada em dados de mock iterativos.
+- **Estabilização Recharts:** Mitigação de warnings de hidratação via `ClientOnly` validada no build.
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+- **Commit de Código:** `7f58aa4` — refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13).
 
 **Recorte 12 — Saneamento Técnico: SeoInbound.tsx**
 - **Saneamento Total:** Remoção de estilos inline estáticos (82% e 14.5%) e migração para Tailwind v4 native.
@@ -120,7 +134,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `PaidMedia.tsx` (Recorte 13), prosseguindo com o roteiro de eficiência operacional.
+- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `AccountDetailView.tsx` (Recorte 14), prosseguindo com o roteiro de eficiência operacional.
 
 ---
 
