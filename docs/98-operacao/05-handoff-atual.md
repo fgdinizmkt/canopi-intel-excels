@@ -1,7 +1,7 @@
 # 05 - Handoff atual
 
 ## Estado atual
-- Fase: Fase 7 — Deep Intelligence (Em andamento)
+- Fase: Fase 7 — Deep Intelligence (Concluída)
 - **Último recorte concluído:** Ajuste Estrutural - Subpágina de Conta (Finalização Fase 7)
 - **Último commit relevante:** `92f1c23` (feat(intel): ajuste estrutural Fase 7 - migração do detalhe da conta para subpágina dedicada (/contas/[slug]) com resolução semântica e saída resiliente)
 - **Data:** 2026-04-02
@@ -31,6 +31,7 @@
 4.  **Estilos Inline:** Legados em páginas de estratégia e performance.
 
 ## Próximos passos (Direção Recomendada)
-- **Fase 8 — Operational Automation (Início):** Evoluir a "Fila de Fogo" para interações reais (e-mail drafting via IA, log automático no CRM).
+- **Fase 8 — Operational Efficiency (Início):** Ciclo de saneamento técnico e performance.
+- **Migration next/image:** Substituir `<img>` por `next/image` em Topbar e SeoInbound.
+- **Refactor CSS:** Saneamento de estilos inline em massa nas páginas legadas (AbmStrategy, Actions).
 - **Consolidação de Scores:** Unificar a visualização de scores corporativos no header do perfil.
-- **Limpeza de Débitos:** Saneamento de estilos inline em massa nas páginas legadas.

@@ -83,7 +83,7 @@
 
 ## Próximo passo aprovado
 
-- **Abertura da Fase 7:** Iniciar o ciclo de visualização de inteligência profunda e painéis de liderança.
+- **Fase 8 — Operational Efficiency:** Iniciar o ciclo de saneamento de débitos técnicos, performance (next/image) e refatoração de estilos inline.
 
 ---
 

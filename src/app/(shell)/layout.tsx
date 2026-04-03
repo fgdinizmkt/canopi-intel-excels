@@ -6,7 +6,6 @@ import { Topbar } from '../../components/layout/Topbar';
 import { Modal, Button } from '../../components/ui';
 import { Rocket, Target, Users, Zap } from 'lucide-react';
 import { AccountDetailProvider } from '../../context/AccountDetailContext';
-import { AccountDetailManager } from '../../components/account/AccountDetailManager';
 
 export default function ShellLayout({ children }: { children: React.ReactNode }) {
   const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
