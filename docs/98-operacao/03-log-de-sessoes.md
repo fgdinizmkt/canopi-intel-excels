@@ -5,6 +5,35 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-03] — Saneamento Estrutural do ActionOverlay (Recorte 5 - Fase 8)
+
+**Objetivo:** Migrar integralmente o layout interno do `ActionOverlay` para Tailwind CSS, eliminando centenas de linhas de estilos inline complexos e estabilizando a performance de renderização.
+
+**Atividades:**
+- **Refatoração de Layout:** Conversão do container principal, backdrop blur e sistema de abas para Tailwind.
+- **Dinamização do Gantt:** Migração do gráfico de projeto (Gantt) para classes utilitárias dinâmicas, mantendo a precisão das escalas (Semana, Mês, Trimestre).
+- **Consolidação de Conteúdo:** Refatoração das visões de "Resumo" e "Histórico", padronizando grids e listagens táticas.
+- **Higiene Técnica:** Eliminação de resíduos de estilos inline remanescentes nas seções de impacto e próximos passos.
+- **Build & QA:** Validação de build produtivo confirmando zero regressões no `Actions.tsx`.
+
+---
+
+## [2026-04-03] — Estabilização e Saneamento Tático (Recorte 4 - Fase 8)
+
+**Objetivo:** Resolver erros fatais de compilação em `Actions.tsx` e iniciar a migração massiva de estilos para Tailwind no Header, Filtros e Modal.
+
+**Atividades:**
+- **Fix de Compilação:** Resolução de erros `Cannot find name` (referências órfãs de constantes de estilo removidas) via mapeadores dinâmicos de classes Tailwind.
+- **Saneamento do Header:** Migração completa da seção hero e métricas de `Actions.tsx`.
+- **Barra de Filtros:** Refatoração integral e correção de acessibilidade (`aria-label`) nos seletores operacionais.
+- **Modal Nova Ação:** Conversão total para o design system Canopi via Tailwind, incluindo estados de hover e foco.
+- **Acessibilidade PaidMedia:** Adição de labels e estados de foco em componentes de select críticos.
+- **Build Sync:** Validação de integridade sistêmica com build produtivo bem-sucedido.
+
+**Commit:** `857c0fb` — perf(Phase 8): Optimize Actions.tsx (Header/Filters/Modal) and fix PaidMedia a11y
+
+---
+
 ## [2026-04-03] — Saneamento de Performance (Recorte 3 - Fase 8)
 
 **Objetivo:** Reduzir os custos de reconciliação do React e estabilizar a infraestrutura de imagem para máxima eficiência operacional.

@@ -1375,6 +1375,7 @@ function ActionOverlay({
     const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
     return account ? account.id : '1';
   };
+  
   useEffect(() => {
     if (!item) return;
     const previousOverflow = document.body.style.overflow;
@@ -1389,40 +1390,40 @@ function ActionOverlay({
   const config = scaleConfig(projectScale);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(15,23,42,0.5)', padding: 20, backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'stretch' }}>
-      <div style={{ margin: '0 auto', display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 1380, overflow: 'hidden', borderRadius: 34, border: '1px solid #e2e8f0', background: 'white', boxShadow: '0 32px 80px rgba(0,0,0,0.18)' }}>
+    <div className="fixed inset-0 z-50 bg-slate-900/50 p-5 lg:p-10 backdrop-blur-md flex items-stretch animate-in fade-in duration-300">
+      <div className="m-auto flex flex-col w-full max-w-[1380px] h-full overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-[0_32px_80px_rgba(0,0,0,0.18)]">
         {/* Header */}
-        <div style={{ borderBottom: '1px solid #e2e8f0', padding: '24px 32px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20 }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
+        <div className="border-b border-slate-200 p-8 lg:px-10 bg-slate-50/30">
+          <div className="flex items-start justify-between gap-8">
+            <div className="min-w-0 flex-1">
               <div className="flex flex-wrap gap-2">
                 <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold border", priorityClasses[item.priority])}>{item.priority}</span>
                 <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold", statusClasses[item.status])}>{item.status}</span>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500">{item.channel}</span>
-                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-400">{item.category}</span>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{item.channel}</span>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.category}</span>
               </div>
               <p 
                 onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
-                className="hover:text-blue-600 transition-colors cursor-pointer"
-                style={{ marginTop: 16, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}
+                className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600 hover:text-blue-700 transition-colors cursor-pointer inline-block"
               >
                 {item.accountName}
               </p>
-              <h2 style={{ marginTop: 8, fontSize: 40, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05, color: '#0f172a', maxWidth: 900 }}>{item.title}</h2>
-              <p style={{ marginTop: 12, fontSize: 16, lineHeight: 1.7, color: '#475569', maxWidth: 860 }}>{item.description}</p>
+              <h2 className="mt-3 text-4xl lg:text-5xl font-black tracking-tight leading-[1.05] text-slate-900 max-w-4xl">{item.title}</h2>
+              <p className="mt-4 text-base lg:text-lg leading-relaxed text-slate-500 max-w-3xl font-medium">{item.description}</p>
             </div>
             <button
               type="button"
               onClick={onClose}
-              style={{ width: 48, height: 48, borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+              className="w-12 h-12 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 transition-all flex items-center justify-center shrink-0 shadow-sm active:scale-95"
+              aria-label="Fechar overlay"
             >
-              <X style={{ width: 20, height: 20 }} />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Tabs + Actions */}
-          <div style={{ marginTop: 24, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
-            <div style={{ display: 'flex', borderRadius: 14, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 4, gap: 2 }}>
+          <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-slate-200/50 pt-6">
+            <div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1 gap-1">
               {[
                 { id: 'resumo', label: 'Resumo' },
                 { id: 'projeto', label: 'Projeto' },
@@ -1432,40 +1433,31 @@ function ActionOverlay({
                   key={entry.id}
                   type="button"
                   onClick={() => setTab(entry.id as ModalTab)}
-                  style={{
-                    borderRadius: 10,
-                    padding: '8px 18px',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: tab === entry.id ? 'white' : 'transparent',
-                    color: tab === entry.id ? '#0f172a' : '#64748b',
-                    boxShadow: tab === entry.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-                  }}
+                  className={cx(
+                    "rounded-xl px-5 py-2 text-sm font-bold transition-all border-none cursor-pointer",
+                    tab === entry.id ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-500 hover:text-slate-700"
+                  )}
                 >
                   {entry.label}
                 </button>
               ))}
             </div>
 
-            <div style={{ marginLeft: 'auto', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <div className="lg:ml-auto flex flex-wrap gap-2">
               <QuickButton label={item.ownerName ? 'Reatribuir owner' : 'Atribuir owner sugerido'} tone="secondary" onClick={() => onAssignOwner(item.id)} />
               <QuickButton label="Escalar risco" tone="danger" onClick={() => onEscalate(item.id)} />
             </div>
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
+        <div className="flex-1 overflow-y-auto p-10 bg-white">
           {tab === 'resumo' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: 24 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="grid lg:grid-cols-[1.3fr_0.9fr] gap-8">
+              <div className="flex flex-col gap-8">
                 {/* Info grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                  <div onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }} className="cursor-pointer group">
-                    <div className="group-hover:border-blue-300 transition-colors">
-                      <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
-                    </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }} className="cursor-pointer">
+                    <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
                   </div>
                   <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={`Time: ${item.ownerTeam}`} />
                   <InfoBlock label="Origem" value={item.origin} helper={item.relatedSignal} />
@@ -1473,48 +1465,48 @@ function ActionOverlay({
                 </div>
 
                 {/* Impact + Next step */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Impacto esperado</p>
-                    <p style={{ marginTop: 12, fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.3, color: '#0f172a' }}>{item.expectedImpact}</p>
+                <div className="grid lg:grid-cols-2 gap-4">
+                  <div className="rounded-[28px] border border-slate-200 bg-slate-50/50 p-8 flex flex-col justify-center">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Impacto esperado</p>
+                    <p className="mt-4 text-3xl font-black tracking-tight leading-tight text-slate-900">{item.expectedImpact}</p>
                   </div>
-                  <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Próximo passo</p>
-                    <p style={{ marginTop: 12, fontSize: 15, fontWeight: 600, lineHeight: 1.6, color: '#0f172a' }}>{item.nextStep}</p>
-                    <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+                  <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Próximo passo</p>
+                    <p className="mt-4 text-lg font-bold leading-relaxed text-slate-700">{item.nextStep}</p>
+                    <div className="mt-8 flex gap-3">
                       <QuickButton label="Abrir projeto" tone="secondary" onClick={() => setTab('projeto')} />
-                      <QuickButton label="Marcar em andamento" tone="primary" onClick={() => onChangeStatus(item.id, 'Em andamento')} />
+                      <QuickButton label="Executar agora" tone="primary" onClick={() => onChangeStatus(item.id, 'Em andamento')} />
                     </div>
                   </div>
                 </div>
 
                 {/* Evidence + Dependencies */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="grid lg:grid-cols-2 gap-4">
                   <DetailList title="Evidências" items={item.evidence} emptyLabel="Sem evidências registradas." />
                   <DetailList title="Dependências" items={item.dependencies} emptyLabel="Nenhuma dependência registrada." />
                 </div>
               </div>
 
               {/* Right sidebar */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Ações operacionais</p>
-                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div className="flex flex-col gap-6">
+                <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Ações operacionais</p>
+                  <div className="flex flex-col gap-2">
                     <QuickButton label="Executar esta ação" tone="primary" onClick={() => onChangeStatus(item.id, 'Em andamento')} />
                     <QuickButton label="Mover para bloqueada" tone="secondary" onClick={() => onChangeStatus(item.id, 'Bloqueada')} />
                     <QuickButton label="Aguardando aprovação" tone="secondary" onClick={() => onChangeStatus(item.id, 'Aguardando aprovação')} />
                     <QuickButton label="Concluir ação" tone="secondary" onClick={() => onChangeStatus(item.id, 'Concluída')} />
                   </div>
                 </div>
-                <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico recente</p>
-                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Histórico recente</p>
+                  <div className="flex flex-col gap-6">
                     {item.history.slice(0, 4).map((entry) => (
-                      <div key={entry.id} className="flex gap-3">
+                      <div key={entry.id} className="flex gap-4">
                         <span className={cx("w-2.5 h-2.5 rounded-full shrink-0 mt-1", historyDotClasses[entry.type])} />
                         <div>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
-                          <p style={{ marginTop: 3, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when}</p>
+                          <p className="text-sm font-bold text-slate-900 leading-tight">{entry.text}</p>
+                          <p className="mt-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{entry.actor} · {entry.when}</p>
                         </div>
                       </div>
                     ))}
@@ -1525,80 +1517,93 @@ function ActionOverlay({
           )}
 
           {tab === 'projeto' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{ borderRadius: 24, border: '1px solid #e2e8f0', background: 'white', padding: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
+            <div className="flex flex-col gap-8">
+              <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                   <div>
-                    <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Projeto operacional da ação</p>
-                    <h3 style={{ marginTop: 10, fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.2, color: '#0f172a', maxWidth: 760 }}>{item.projectObjective}</h3>
-                    <p style={{ marginTop: 10, fontSize: 14, lineHeight: 1.7, color: '#64748b' }}>Critério de sucesso: {item.projectSuccess}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Projeto operacional da ação</p>
+                    <h3 className="mt-4 text-3xl font-black tracking-tight leading-tight text-slate-900">{item.projectObjective}</h3>
+                    <p className="mt-3 text-sm font-bold text-slate-500">Critério de sucesso: {item.projectSuccess}</p>
                   </div>
-                  <div style={{ display: 'flex', borderRadius: 12, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 4, gap: 4 }}>
+                  <div className="flex rounded-2xl border border-slate-200 bg-slate-50 p-1 gap-1">
                     {[{ id: 'semana', label: 'Semana' }, { id: 'mes', label: 'Mês' }, { id: 'trimestre', label: 'Trimestre' }].map((o) => (
                       <button
                         key={o.id}
                         type="button"
                         onClick={() => setProjectScale(o.id as ProjectScale)}
-                        style={{ borderRadius: 8, padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none', background: projectScale === o.id ? 'white' : 'transparent', color: projectScale === o.id ? '#0f172a' : '#64748b', boxShadow: projectScale === o.id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                        className={cx(
+                            "rounded-xl px-5 py-2 text-xs font-bold transition-all border-none cursor-pointer",
+                            projectScale === o.id ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-500 hover:text-slate-700"
+                        )}
                       >{o.label}</button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div style={{ borderRadius: 24, border: '1px solid #e2e8f0', background: 'white', padding: 24, overflowX: 'auto' }}>
-                <div style={{ minWidth: 1000 }}>
+              <div className="rounded-[32px] border border-slate-200 bg-white p-1 shadow-sm overflow-hidden scrollbar-hide">
+                <div className="min-w-[1200px] p-10">
                   {/* Gantt header */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '160px 300px 140px 1fr', gap: 16, paddingBottom: 14, borderBottom: '1px solid #e2e8f0', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', color: '#94a3b8' }}>
+                  <div className="grid grid-cols-[200px_350px_160px_1fr] gap-6 pb-6 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
                     <div>Fase</div><div>Entregável</div><div>Owner</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
-                      {config.labels.map((l) => <div key={l} style={{ textAlign: 'center' }}>{l}</div>)}
+                    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                      {config.labels.map((l) => <div key={l} className="text-center">{l}</div>)}
                     </div>
                   </div>
                   {/* Gantt rows */}
-                  {item.projectSteps.map((step) => {
-                    const norm = normalizeStep(step, projectScale);
-                    const left = ((norm.start - 1) / config.units) * 100;
-                    const width = (norm.duration / config.units) * 100;
-                    const barBg = step.status === 'done' ? '#10b981' : step.status === 'active' ? '#2563eb' : step.status === 'risk' ? '#ef4444' : '#cbd5e1';
-                    return (
-                      <div key={step.id} style={{ display: 'grid', gridTemplateColumns: '160px 300px 140px 1fr', gap: 16, paddingTop: 18, paddingBottom: 18, borderBottom: '1px solid #f1f5f9' }}>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{step.lane}</p>
-                        <div><p style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{step.label}</p><p style={{ marginTop: 6, fontSize: 12, lineHeight: 1.5, color: '#64748b' }}>{step.detail}</p></div>
-                        <p style={{ fontSize: 13, color: '#475569' }}>{step.owner}</p>
-                        <div style={{ position: 'relative', height: 48, borderRadius: 12, background: '#f8fafc' }}>
-                          <div style={{ position: 'absolute', inset: 0, display: 'grid', gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
-                            {config.labels.map((l) => <div key={l} style={{ borderLeft: '1px solid rgba(226,232,240,0.7)' }} />)}
+                  <div className="divide-y divide-slate-50">
+                    {item.projectSteps.map((step) => {
+                      const norm = normalizeStep(step, projectScale);
+                      const left = ((norm.start - 1) / config.units) * 100;
+                      const width = (norm.duration / config.units) * 100;
+                      return (
+                        <div key={step.id} className="grid grid-cols-[200px_350px_160px_1fr] gap-6 py-6 group hover:bg-slate-50/50 transition-colors">
+                          <p className="text-xs font-black text-slate-900 uppercase tracking-widest">{step.lane}</p>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">{step.label}</p>
+                            <p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{step.detail}</p>
                           </div>
-                          <div style={{ position: 'absolute', top: 6, height: 36, borderRadius: 8, background: barBg, left: `${left}%`, width: `${Math.max(width, 8)}%`, padding: '6px 10px', fontSize: 12, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {step.label}
+                          <p className="text-xs font-bold text-slate-600">{step.owner}</p>
+                          <div className="relative h-12 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
+                            <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                              {config.labels.map((l) => <div key={l} className="border-l border-slate-200/50 first:border-none" />)}
+                            </div>
+                            <div 
+                              style={{ left: `${left}%`, width: `${Math.max(width, 10)}%` }}
+                              className={cx(
+                                "absolute top-2 h-8 rounded-xl shadow-lg flex items-center px-4 text-[10px] font-black text-white uppercase tracking-widest transition-all",
+                                ganttBarClasses[step.status]
+                              )}
+                            >
+                              {step.label}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {tab === 'historico' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 24 }}>
-              <div style={{ borderRadius: 20, border: '1px solid #e2e8f0', background: 'white', padding: 20 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico da ação</p>
-                <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8">
+              <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-8">Histórico completo da ação</p>
+                <div className="flex flex-col gap-8">
                   {item.history.map((entry) => (
-                    <div key={entry.id} className="flex gap-3.5">
-                      <span className={cx("w-3 h-3 rounded-full shrink-0 mt-1", historyDotClasses[entry.type])} />
+                    <div key={entry.id} className="flex gap-6">
+                      <span className={cx("w-5 h-5 rounded-full shrink-0 border-4 border-white shadow-sm ring-1 ring-slate-100 mt-0.5", historyDotClasses[entry.type])} />
                       <div>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
-                        <p style={{ marginTop: 4, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when} · {entry.type}</p>
+                        <p className="text-base font-bold text-slate-900 leading-tight">{entry.text}</p>
+                        <p className="mt-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{entry.actor} · {entry.when} · {entry.type}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="flex flex-col gap-6">
                 <DetailList title="Dependências em aberto" items={item.dependencies} emptyLabel="Nenhuma dependência em aberto." />
                 <DetailList title="Evidências-chave" items={item.evidence} emptyLabel="Sem evidências-chave." />
               </div>

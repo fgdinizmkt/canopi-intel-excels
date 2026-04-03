@@ -165,3 +165,33 @@ Cada entrada deve conter:
 - **Aprovação Documental:** Um recorte só é considerado fechado quando a documentação operacional estiver completa e o usuário concordar explicitamente. Se o usuário considerar incompleto, a tarefa continua aberta.
 
 ---
+
+## Governança, Política e Regras Complementares
+
+Para garantir a continuidade e a transparência em chats subsequentes ou trocas de contexto, as seguintes políticas são mandatórias:
+
+### 1. Prompt de Continuidade Obrigatório
+Toda resposta de fechamento de recorte deve, obrigatoriamente, propor o próximo prompt de continuidade. A próxima ação nunca deve ficar implícita ou dependente da memória de curto prazo do chat.
+
+### 2. Separação entre Pedido Explícito e Inferência
+O orquestrador deve distinguir claramente o que foi solicitado literalmente pelo usuário (Escopo Explícito) do que é uma recomendação estratégica baseada na memória operacional (Escopo de Inferência). Recomendações não devem ser apresentadas como obrigações sem validação prévia.
+
+### 3. Política de "Nenhuma Ponta Solta"
+Toda pendência identificada durante um recorte deve ter um encaminhamento formal. Se não for resolvida no micro-recorte atual, deve entrar explicitamente no próximo prompt de continuidade ou ser registrada como risco/pendência em `00-status-atual.md`.
+
+### 4. Aprovação Baseada em Evidência Técnica
+A aprovação de um recorte depende da apresentação formal do seguinte conjunto mínimo:
+- Lista de arquivos efetivamente alterados.
+- Saída literal do `npm run build` (sucesso ou falha).
+- `git diff --stat` do recorte.
+- Diff real literal (completo ou segmentado por blocos).
+- Checklist final de integridade.
+
+### 5. Arquivos Grandes exigem Diff Segmentado
+Para arquivos extensos (ex: `Actions.tsx`, `Performance.tsx`), o diff real deve ser entregue segmentado por blocos alterados (ex: Header, Filtros, Modal). Deve-se explicitar o que foi convertido para Tailwind, o que foi apenas estabilizado e o que permaneceu pendente.
+
+### 6. Fidelidade da Lista de Alterações
+Se um arquivo for mencionado como alterado em um relatório, ele deve obrigatoriamente aparecer no diff real correspondente. Se não houver alteração técnica, o arquivo não deve ser citado.
+
+### 7. Prompts de Alta Densidade e Baixa Redundância
+Priorizar instruções práticas, definições de escopo e evidências. Evitar repetições de contexto óbvio ou saudações desnecessárias que consomem tokens e reduzem a clareza operativa.
