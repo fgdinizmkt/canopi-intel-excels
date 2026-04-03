@@ -87,6 +87,19 @@ import {
 } from 'recharts';
 import { compiladoClientesData } from '../data/abxData';
 
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
+const colorMap: Record<string, { bg: string; text: string; border: string; dot: string; badge: string; shadow: string; icon: string; borderB: string }> = {
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100', dot: 'bg-blue-500', badge: 'bg-blue-500/10 text-blue-700 border-blue-200', shadow: 'shadow-blue-200/20', icon: 'text-blue-400', borderB: 'border-b-blue-500' },
+  indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-100', dot: 'bg-indigo-500', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-200', shadow: 'shadow-indigo-200/20', icon: 'text-indigo-400', borderB: 'border-b-indigo-500' },
+  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-200', shadow: 'shadow-emerald-200/20', icon: 'text-emerald-400', borderB: 'border-b-emerald-500' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-700 border-amber-200', shadow: 'shadow-amber-200/20', icon: 'text-amber-400', borderB: 'border-b-amber-500' },
+  red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100', dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-700 border-red-200', shadow: 'shadow-red-200/20', icon: 'text-red-400', borderB: 'border-b-red-500' },
+  slate: { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400', borderB: 'border-b-slate-400' },
+};
+
 // --- DATA PROCESSING & MAPPING ---
 
 const processABXData = (data: any[]) => {
@@ -257,7 +270,7 @@ const SectionHeader: React.FC<{
 }> = ({ title, subtitle, icon, badge, badgeColor = 'blue' }) => (
   <div className="flex justify-between items-start mb-6">
     <div className="flex items-center gap-4">
-      <div className={`p-3 rounded-2xl bg-${badgeColor}-50 text-${badgeColor}-600 shadow-sm border border-${badgeColor}-100`}>
+      <div className={cx("p-3 rounded-2xl shadow-sm border", colorMap[badgeColor]?.bg, colorMap[badgeColor]?.text, colorMap[badgeColor]?.border)}>
         {icon}
       </div>
       <div>
@@ -266,7 +279,7 @@ const SectionHeader: React.FC<{
       </div>
     </div>
     {badge && (
-      <Badge className={`bg-${badgeColor}-500/10 text-${badgeColor}-700 border-${badgeColor}-200 text-[10px] font-black uppercase tracking-widest px-3 py-1 shadow-sm`}>
+      <Badge className={cx("text-[10px] font-black uppercase tracking-widest px-3 py-1 shadow-sm", colorMap[badgeColor]?.badge)}>
         {badge}
       </Badge>
     )}
@@ -353,8 +366,8 @@ const HeroLayer: React.FC<{
             color: 'amber'
           },
         ].map((item, i) => (
-          <Card key={i} className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white hover:scale-[1.02] transition-all flex items-center gap-6 border-b-8" style={{ borderBottomColor: item.color === 'emerald' ? '#10b981' : item.color === 'red' ? '#ef4444' : '#f59e0b' }}>
-            <div className={`p-4 rounded-3xl bg-${item.color}-50 text-${item.color}-600 shadow-inner`}>
+          <Card key={i} className={cx("p-8 border-slate-200 shadow-sm rounded-[40px] bg-white hover:scale-[1.02] transition-all flex items-center gap-6 border-b-8", colorMap[item.color]?.borderB)}>
+            <div className={cx("p-4 rounded-3xl shadow-inner", colorMap[item.color]?.bg, colorMap[item.color]?.text)}>
               {item.icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -362,7 +375,7 @@ const HeroLayer: React.FC<{
               <h4 className="text-base font-black text-slate-900 truncate">{item.account}</h4>
               <p className="text-[11px] font-medium text-slate-500 mb-2 truncate">{item.desc}</p>
               <div className="flex items-center gap-2">
-                <Badge variant={item.color as any} className="text-[9px] font-black uppercase px-2 py-0 border-none bg-opacity-10">{item.val}</Badge>
+                <Badge className={cx("text-[9px] font-black uppercase px-2 py-0 border-none", colorMap[item.color]?.badge)}>{item.val}</Badge>
                 <div className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Impacto Est.</div>
               </div>
             </div>
@@ -385,9 +398,12 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
-            <ReTooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }} itemStyle={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }} />
-            <Bar dataKey="won" name="Ganho" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} barSize={40} />
-            <Bar dataKey="expansion" name="Expansão" stackId="a" fill="#3b82f6" radius={[0, 0, 0, 0]} />
+            <ReTooltip 
+              contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }} 
+              itemStyle={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase' }} 
+            />
+            <Bar dataKey="won" name="Ganho" stackId="a" fill="#10b981" barSize={40} />
+            <Bar dataKey="expansion" name="Expansão" stackId="a" fill="#3b82f6" />
             <Bar dataKey="open" name="Aberto" stackId="a" fill="#94a3b8" radius={[8, 8, 0, 0]} />
             <Bar dataKey="risk" name="Risco" fill="#ef4444" radius={[8, 8, 8, 8]} barSize={10} />
           </ReBarChart>
@@ -418,7 +434,7 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
       <div className="grid grid-cols-2 gap-2 mt-6">
         {channelData.slice(0, 4).map((c, i) => (
           <div key={i} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#3b82f6', '#6366f1', '#8b5cf6', '#d946ef'][i] }}></div>
+            <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-indigo-500' : i === 2 ? 'bg-violet-500' : 'bg-fuchsia-500')}></div>
             <span className="text-[9px] font-bold text-slate-600 truncate">{c.name}</span>
             <span className="ml-auto text-[9px] font-black">{c.value}%</span>
           </div>
@@ -441,7 +457,9 @@ const ActionRoutesLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => voi
       {routes.map((route, i) => (
         <Card key={i} className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white relative overflow-hidden group">
           <div className="flex items-center gap-3 mb-8">
-            <div className={`p-2 rounded-xl bg-${route.color}-50 text-${route.color}-600`}>{route.icon}</div>
+            <div className={cx("p-2 rounded-xl border border-transparent transition-colors", colorMap[route.color]?.bg, colorMap[route.color]?.text)}>
+              {route.icon}
+            </div>
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">{route.title}</h4>
           </div>
           <div className="space-y-4">
@@ -449,7 +467,7 @@ const ActionRoutesLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => voi
               <div key={idx} className="p-4 bg-slate-50 rounded-2xl space-y-3 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 group/item" onClick={() => onSelect(acc)}>
                 <div className="flex justify-between items-start">
                   <p className="text-[11px] font-black text-slate-900 truncate pr-2">{acc.name}</p>
-                  <Badge variant={route.color as any} className="text-[8px] font-black uppercase px-2 py-0 border-none bg-opacity-20">{acc.score}</Badge>
+                  <Badge className={cx("text-[8px] font-black uppercase px-2 py-0 border-none shadow-sm", colorMap[route.color]?.badge)}>{acc.score}</Badge>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Intervenção Sugerida</p>
@@ -487,13 +505,15 @@ const RankingsLayer: React.FC<{ hotUpsell: any[]; hotCrossSell: any[]; highRiskC
       { title: 'Cross-sell Momentum', icon: <ShoppingBag className="w-5 h-5 text-blue-500" />, data: hotCrossSell, badge: 'Whitespace', color: 'blue', tactic: 'Play de DataViz' },
       { title: 'Critical Churn Risk', icon: <ZapOff className="w-5 h-5 text-red-500" />, data: highRiskChurn, badge: 'Low Score', color: 'red', tactic: 'Play de Retenção' },
     ].map((rank, i) => (
-      <Card key={i} className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white hover:shadow-lg transition-all border-b-8" style={{ borderBottomColor: rank.color === 'emerald' ? '#10b981' : rank.color === 'blue' ? '#3b82f6' : '#ef4444' }}>
+      <Card key={i} className={cx("p-8 border-slate-200 shadow-sm rounded-[40px] bg-white hover:shadow-lg transition-all border-b-8", colorMap[rank.color]?.borderB)}>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl bg-${rank.color}-50 text-${rank.color}-600`}>{rank.icon}</div>
+            <div className={cx("p-2 rounded-xl border border-transparent transition-colors", colorMap[rank.color]?.bg, colorMap[rank.color]?.text)}>
+              {rank.icon}
+            </div>
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">{rank.title}</h4>
           </div>
-          <Badge variant={rank.color as any} className="text-[9px] font-black tracking-widest uppercase px-2 py-0 border-none bg-opacity-10">{rank.badge}</Badge>
+          <Badge className={cx("text-[9px] font-black tracking-widest uppercase px-2 py-0 border-none shadow-sm", colorMap[rank.color]?.badge)}>{rank.badge}</Badge>
         </div>
         <div className="space-y-4">
           {rank.data.slice(0, 4).map((acc, idx) => (
@@ -574,7 +594,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
     <Card className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white">
       <SectionHeader title="Cobertura do Comitê Comprador" subtitle="Engajamento por papel (Vermelho = Risco / Azul = Seguro)" icon={<Users className="w-5 h-5" />} badge="Critical Ops" />
       <div className="overflow-x-auto mt-6">
-        <table className="w-full text-left border-separate border-spacing-[2px]">
+        <table className="w-full text-left border-separate border-spacing-0.5">
           <thead>
             <tr>
               <th className="p-2 min-w-[140px]"></th>
@@ -595,11 +615,19 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
                 {committeeRoles.map((_, idx) => {
                   const intensity = (acc.score / 20) - (idx % 3);
                   const score = Math.max(0, Math.min(5, Math.floor(intensity)));
-                  // Red-Blue Scale: 0-1 (Red/Orange), 2-3 (Amber/Slate), 4-5 (Blue/DarkBlue)
-                  const colors = ['#fee2e2', '#fecaca', '#fdba74', '#94a3b8', '#3b82f6', '#1e3a8a'];
+                  // Scale: 0-1 (Red), 2-3 (Slate), 4-5 (Blue/DarkBlue)
                   return (
                     <td key={idx} className="p-0">
-                      <div className="w-full h-10 rounded-[4px] border border-white transition-all hover:scale-[1.1] hover:z-10 relative cursor-pointer" style={{ backgroundColor: colors[score] }} title={`${acc.name} - ${committeeRoles[idx]}: Intensity ${score}`}></div>
+                      <div 
+                        className={cx("w-full h-10 rounded-[4px] border border-white transition-all hover:scale-[1.1] hover:z-10 relative cursor-pointer",
+                          score === 0 ? 'bg-red-50' : 
+                          score === 1 ? 'bg-red-100' : 
+                          score === 2 ? 'bg-orange-100' : 
+                          score === 3 ? 'bg-slate-400' : 
+                          score === 4 ? 'bg-blue-500' : 'bg-blue-900'
+                        )}
+                        title={`${acc.name} - ${committeeRoles[idx]}: Intensity ${score}`}
+                      ></div>
                     </td>
                   );
                 })}
@@ -611,7 +639,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
       <div className="flex gap-4 mt-6">
         {['Risco', 'Baixo', 'Médio', 'Forte', 'Bluechip'].map((l, i) => (
           <div key={i} className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#ef4444', '#f87171', '#fb923c', '#94a3b8', '#3b82f6'][i] }}></div>
+            <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-red-500' : i === 1 ? 'bg-red-400' : i === 2 ? 'bg-orange-400' : i === 3 ? 'bg-slate-400' : 'bg-blue-500')}></div>
             <span className="text-[8px] font-black text-slate-400 uppercase">{l}</span>
           </div>
         ))}
@@ -621,7 +649,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
     <Card className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white">
       <SectionHeader title="Matriz de Whitespace Operacional" subtitle="Status de Solução por Departamento (Categorias)" icon={<Target className="w-5 h-5" />} badgeColor="indigo" />
       <div className="overflow-x-auto mt-6">
-        <table className="w-full text-left border-separate border-spacing-[4px]">
+        <table className="w-full text-left border-separate border-spacing-1">
           <thead>
             <tr>
               <th className="p-2 min-w-[120px]"></th>
@@ -780,7 +808,7 @@ const ContactsSummaryLayer: React.FC<{ stats: any }> = ({ stats }) => (
     ].map((s, i) => (
       <div key={i} className="space-y-1 relative z-10 border-r border-white/5 last:border-none pr-4">
         <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{s.label}</p>
-        <h3 className={`text-xl font-black tracking-tighter ${s.color}`}>{s.val}</h3>
+        <h3 className={cx("text-xl font-black tracking-tighter", s.color)}>{s.val}</h3>
         <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">{s.sub}</p>
       </div>
     ))}
@@ -789,14 +817,14 @@ const ContactsSummaryLayer: React.FC<{ stats: any }> = ({ stats }) => (
 
 const HumanMappingDiagnosis: React.FC<{ accounts: any[] }> = ({ accounts }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-    {[
+    { [
       { title: 'Excelência Humana', accounts: 12, percentage: 30, color: 'blue', icon: <UserCheck className="w-4 h-4" /> },
       { title: 'Dependência Unitária', accounts: 8, percentage: 20, color: 'red', icon: <AlertCircle className="w-4 h-4" /> },
       { title: 'Sem Sponsor Executivo', accounts: 14, percentage: 35, color: 'amber', icon: <ZapOff className="w-4 h-4" /> },
       { title: 'Mapeamento Parcial', accounts: 6, percentage: 15, color: 'slate', icon: <Search className="w-4 h-4" /> },
     ].map((d, i) => (
       <Card key={i} className="p-6 border-slate-200 shadow-sm rounded-3xl bg-white flex items-center gap-4 group hover:border-blue-200 transition-all">
-        <div className={`p-3 rounded-2xl bg-${d.color}-50 text-${d.color}-600 group-hover:scale-110 transition-transform`}>
+        <div className={cx("p-3 rounded-2xl group-hover:scale-110 transition-transform", colorMap[d.color]?.bg, colorMap[d.color]?.text)}>
            {d.icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -806,7 +834,7 @@ const HumanMappingDiagnosis: React.FC<{ accounts: any[] }> = ({ accounts }) => (
               <span className="text-[10px] font-bold text-slate-400 mb-1">contas</span>
            </div>
            <div className="w-full h-1 bg-slate-100 rounded-full mt-2 overflow-hidden">
-              <div className={`h-full bg-${d.color}-500`} style={{ width: `${d.percentage}%` }}></div>
+              <div className={cx("h-full transition-all duration-1000", d.color === 'blue' ? 'bg-blue-500' : d.color === 'red' ? 'bg-red-500' : d.color === 'amber' ? 'bg-amber-500' : 'bg-slate-500')} style={{ width: `${d.percentage}%` } as React.CSSProperties}></div>
            </div>
         </div>
       </Card>
@@ -823,7 +851,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
       <Card className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white">
         <SectionHeader title="Matriz de Cobertura Humana" subtitle="Status do Buying Group por Conta (Lines = Accounts / Cols = Roles)" icon={<Users className="w-5 h-5" />} badge="Gap Analysis" />
         <div className="overflow-x-auto mt-6">
-          <table className="w-full text-left border-separate border-spacing-[2px]">
+          <table className="w-full text-left border-separate border-spacing-0.5">
             <thead>
               <tr>
                 <th className="p-2 min-w-[140px]"></th>
@@ -843,11 +871,10 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
                   {roles.map((role, idx) => {
                     const person = people.find(p => p.accountId === acc.id && p.role === role);
                     const status = person ? (person.engagement > 60 ? 'Quente' : 'Frio') : 'Ausente';
-                    const colors = { 'Quente': '#3b82f6', 'Frio': '#93c5fd', 'Ausente': '#f1f5f9' };
                     return (
                       <td key={idx} className="p-0">
-                        <div className="w-full h-8 rounded-[4px] border border-white transition-all hover:scale-[1.1] hover:z-10 relative cursor-pointer" 
-                             style={{ backgroundColor: colors[status] }} 
+                        <div className={cx("w-full h-8 rounded-[4px] border border-white transition-all hover:scale-[1.1] hover:z-10 relative cursor-pointer",
+                             status === 'Quente' ? 'bg-blue-500' : status === 'Frio' ? 'bg-blue-300' : 'bg-slate-100')} 
                              title={`${acc.name} - ${role}: ${status}`}>
                            {person?.isChampion && <div className="absolute inset-0 flex items-center justify-center"><Star className="w-2.5 h-2.5 text-white" /></div>}
                         </div>
@@ -862,7 +889,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
         <div className="flex gap-4 mt-6">
           {['Relacionamento Ativo', 'Mapeado (Frio)', 'Gap de Perfil'].map((l, i) => (
             <div key={i} className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#3b82f6', '#93c5fd', '#f1f5f9'][i] }}></div>
+              <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-blue-300' : 'bg-slate-100')}></div>
               <span className="text-[8px] font-black text-slate-500 uppercase">{l}</span>
             </div>
           ))}
@@ -872,7 +899,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
       <Card className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white">
         <SectionHeader title="Engajamento por Canal" subtitle="Tração de interação por contato chave" icon={<Activity className="w-5 h-5" />} badgeColor="emerald" />
         <div className="overflow-x-auto mt-6">
-          <table className="w-full text-left border-separate border-spacing-[2px]">
+          <table className="w-full text-left border-separate border-spacing-0.5">
             <thead>
               <tr>
                 <th className="p-2 min-w-[140px]"></th>
@@ -893,11 +920,11 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
                     const engagement = isActive ? p.engagement : 0;
                     return (
                       <td key={idx} className="p-0">
-                        <div className={`w-full h-8 rounded-lg flex items-center justify-center transition-all hover:scale-[1.05] cursor-pointer ${
+                        <div className={cx("w-full h-8 rounded-lg flex items-center justify-center transition-all hover:scale-[1.05] cursor-pointer",
                           engagement > 70 ? 'bg-emerald-500' : 
                           engagement > 40 ? 'bg-emerald-300' : 
                           engagement > 0 ? 'bg-emerald-100' : 'bg-slate-50 opacity-40'
-                        }`} />
+                        )} />
                       </td>
                     );
                   })}
@@ -1025,7 +1052,7 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
             <tr key={i} className="hover:bg-indigo-50/30 transition-all group cursor-pointer text-slate-900">
               <td className="px-8 py-6">
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs text-white ${p.isChampion ? 'bg-emerald-500' : p.isBlocker ? 'bg-red-500' : 'bg-slate-300'}`}>
+                  <div className={cx("w-10 h-10 rounded-full flex items-center justify-center font-black text-xs text-white shadow-sm", p.isChampion ? 'bg-emerald-500' : p.isBlocker ? 'bg-red-500' : 'bg-slate-300')}>
                     {p.name.substring(0, 1)}
                   </div>
                   <div>
@@ -1038,17 +1065,17 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
                  <p className="text-[11px] font-black text-slate-800">{p.account}</p>
               </td>
               <td className="px-6 py-6 text-center">
-                <Badge className={`px-2 py-0.5 font-black text-[8px] uppercase tracking-widest border-none ${
+                <Badge className={cx("px-2 py-0.5 font-black text-[8px] uppercase tracking-widest border-none shadow-sm",
                     p.role.includes('Sponsor') ? 'bg-blue-100 text-blue-700' :
                     p.role.includes('Champion') ? 'bg-emerald-100 text-emerald-700' :
                     p.role.includes('Bloqueador') ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500'
-                }`}>
+                )}>
                   {p.role}
                 </Badge>
               </td>
               <td className="px-6 py-6">
                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full ${p.influence > 70 ? 'bg-blue-600' : 'bg-slate-400'}`} style={{ width: `${p.influence}%` }}></div>
+                    <div className={cx("h-full transition-all duration-700", p.influence > 70 ? 'bg-blue-600' : 'bg-slate-400')} style={{ width: `${p.influence}%` } as React.CSSProperties}></div>
                  </div>
               </td>
               <td className="px-6 py-6">
@@ -1073,16 +1100,16 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
 
 const ContactActionsLayer: React.FC = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pb-12">
-    {[
+    { [
       { title: 'Aproximar Sponsor', person: 'Elena Silva', account: 'Global Bank S.A.', action: 'Agendar Intro Executiva via CEO Canopi', color: 'blue', tag: 'High Priority' },
       { title: 'Contornar Bloqueador', person: 'Ricardo Mello', account: 'Innova Retail', action: 'Enviar prova social de TI específica do setor', color: 'red', tag: 'Critical' },
       { title: 'Reativar Champion', person: 'Paula Torres', account: 'TechCorp S.A.', action: 'Compartilhar novo Case Study de Automação', color: 'emerald', tag: 'Opportunity' },
       { title: 'Blindar Conta', person: 'Gustavo Lima', account: 'Sky Logistics', action: 'Incluir em Newsletter Premium Persona-based', color: 'indigo', tag: 'Retention' },
     ].map((action, i) => (
-      <Card key={i} className={`p-8 border-slate-200 shadow-sm rounded-[40px] bg-white border-l-8 border-l-${action.color}-500 group hover:shadow-lg transition-all`}>
+      <Card key={i} className={cx("p-8 border-slate-200 shadow-sm rounded-[40px] bg-white border-l-8 group hover:shadow-lg transition-all", action.color === 'blue' ? 'border-l-blue-500' : action.color === 'red' ? 'border-l-red-500' : action.color === 'emerald' ? 'border-l-emerald-500' : 'border-l-indigo-500')}>
         <div className="flex justify-between items-start mb-6">
-           <Badge className={`bg-${action.color}-50 text-${action.color}-600 border-none text-[8px] font-black uppercase`}>{action.tag}</Badge>
-           <Zap className={`w-4 h-4 text-${action.color}-400 group-hover:animate-pulse`} />
+           <Badge className={cx("border-none text-[8px] font-black uppercase", colorMap[action.color]?.badge)}>{action.tag}</Badge>
+           <Zap className={cx("w-4 h-4 group-hover:animate-pulse shadow-sm rounded-full", colorMap[action.color]?.icon)} />
         </div>
         <div className="space-y-4">
            <div>
