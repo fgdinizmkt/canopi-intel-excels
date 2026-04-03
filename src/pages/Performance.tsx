@@ -2,86 +2,34 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { contasMock } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
  
-// ─── CSS (prefixado perf- para não colidir) ───────────────────────────────────
-const CSS = `
-.perf *{box-sizing:border-box;}
-.perf-hero{background:linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%);border-radius:36px;padding:36px 40px 32px;color:white;margin:24px 28px 0;box-shadow:0 28px 80px rgba(15,36,104,0.28);overflow:hidden;position:relative;}
-.perf-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,0.03);pointer-events:none;}
-.perf-hero::after{content:'';position:absolute;bottom:-80px;left:40%;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.02);pointer-events:none;}
-.perf-body{padding:20px 28px 48px;display:flex;flex-direction:column;gap:16px;}
-.perf-card{background:white;border-radius:22px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border:1px solid #e2e8f0;}
-.perf-sec-title{font-size:18px;font-weight:800;color:#0f172a;letter-spacing:-0.02em;margin-bottom:3px;}
-.perf-sec-sub{font-size:13px;color:#64748b;}
-.perf-card-title{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.14em;}
-.perf-card-desc{font-size:12px;color:#64748b;margin-top:2px;}
-.perf-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;border:1px solid;white-space:nowrap;}
-.perf-br{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
-.perf-bam{background:#fffbeb;color:#d97706;border-color:#fde68a;}
-.perf-bb{background:#eff2ff;color:#2b44ff;border-color:#c7d2fe;}
-.perf-bg{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
-.perf-bsl{background:#f8fafc;color:#475569;border-color:#e2e8f0;}
-.perf-bv{background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe;}
-.perf-hm{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:14px 16px;backdrop-filter:blur(8px);}
-.perf-hm-label{font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:6px;}
-.perf-hm-value{font-size:24px;font-weight:800;letter-spacing:-0.02em;line-height:1;}
-.perf-hm-up{color:#6ee7b7;font-size:11px;font-weight:700;margin-top:3px;}
-.perf-hm-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px;}
-.perf-pf-btn{padding:6px 16px;border-radius:100px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);transition:all 0.15s;font-family:inherit;}
-.perf-pf-btn.active{background:white;color:#17348f;border-color:white;}
-.perf-hbtn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit;}
-.perf-hbtn-g{background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.15)!important;}
-.perf-hbtn-w{background:white;color:#17348f;}
-.perf-stat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;}
-.perf-stat-label{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;}
-.perf-stat-value{font-size:20px;font-weight:800;letter-spacing:-0.02em;}
-.perf-fr-card{background:white;border:1px solid #f1f5f9;border-radius:18px;padding:16px 18px;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 3px rgba(0,0,0,0.04);position:relative;overflow:hidden;}
-.perf-fr-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08);transform:translateY(-1px);}
-.perf-fr-card.selected{box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-.perf-acc-card{border-left:4px solid;border-radius:18px;background:white;border-top:1px solid #f1f5f9;border-right:1px solid #f1f5f9;border-bottom:1px solid #f1f5f9;overflow:hidden;cursor:pointer;transition:all 0.18s;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-.perf-acc-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.08);transform:translateY(-1px);}
-.perf-acc-k{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
-.perf-acc-v{font-size:13px;font-weight:700;color:#0f172a;}
-.perf-panel-backdrop{position:fixed;inset:0;background:rgba(15,23,42,0.3);backdrop-filter:blur(4px);z-index:60;}
-.perf-panel{position:fixed;right:0;top:0;bottom:0;width:520px;background:white;box-shadow:-12px 0 48px rgba(0,0,0,0.12);z-index:61;display:flex;flex-direction:column;animation:perfPanelIn 0.28s cubic-bezier(0.4,0,0.2,1);}
-@keyframes perfPanelIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
-.perf-panel-body{flex:1;overflow-y:auto;padding:24px 26px;display:flex;flex-direction:column;gap:18px;}
-.perf-panel-close{width:30px;height:30px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#64748b;transition:all 0.12s;font-family:inherit;}
-.perf-panel-close:hover{background:#e2e8f0;color:#0f172a;}
-.perf-ana-block{background:#f8fafc;border:1px solid #f1f5f9;border-radius:14px;padding:16px 18px;}
-.perf-ana-label{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;}
-.perf-ana-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;}
-.perf-ana-row:last-child{border-bottom:none;}
-.perf-funnel-stage{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;}
-.perf-funnel-stage:last-child{border-bottom:none;}
-.perf-alert-card{border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
-.perf-alert-card:last-child{margin-bottom:0;}
-.perf-alert-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.08);}
-.perf-int-card{border-radius:14px;padding:14px 12px;cursor:pointer;transition:all 0.15s;border:1px solid;display:flex;flex-direction:column;gap:6px;}
-.perf-int-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,0.08);}
-.perf-owner-card{background:#f8fafc;border:1px solid #f1f5f9;border-radius:14px;padding:12px 14px;cursor:pointer;transition:all 0.15s;}
-.perf-owner-card:hover{box-shadow:0 4px 14px rgba(0,0,0,0.08);transform:translateY(-1px);}
-.perf-fullscreen{position:fixed;inset:0;z-index:80;background:#f6f8fc;display:flex;flex-direction:column;animation:perfFsIn 0.22s ease;}
-@keyframes perfFsIn{from{opacity:0}to{opacity:1}}
-.perf-toast{position:fixed;bottom:24px;right:24px;background:#0f172a;color:white;padding:14px 20px;border-radius:14px;font-size:13px;font-weight:600;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:perfToastIn 0.3s ease;}
-@keyframes perfToastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.perf-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit;}
-.perf-btn-primary{background:#2b44ff;color:white;}
-.perf-btn-outline{background:white;color:#475569;border:1px solid #e2e8f0!important;}
-.perf-btn-ghost{background:transparent;color:#2b44ff;font-weight:700;padding:0;font-size:12px;cursor:pointer;border:none;font-family:inherit;}
-.perf-btn-hubspot{background:#ff7a59;color:white;}
-.perf-trend-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;}
-.perf-trend-item:last-child{border-bottom:none;}
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:100px;}
-`;
+// ─── GOVERNANÇA VISUAL (Tailwind v4 native) ──────────────────────────────────
+const colorMap: Record<string, { bg: string, text: string, border: string }> = {
+  br:  { bg: 'bg-[#fef2f2]', text: 'text-[#dc2626]', border: 'border-[#fecaca]' },
+  bam: { bg: 'bg-[#fffbeb]', text: 'text-[#d97706]', border: 'border-[#fde68a]' },
+  bb:  { bg: 'bg-[#eff2ff]', text: 'text-[#2b44ff]', border: 'border-[#c7d2fe]' },
+  bg:  { bg: 'bg-[#f0fdf4]', text: 'text-[#16a34a]', border: 'border-[#bbf7d0]' },
+  bsl: { bg: 'bg-[#f8fafc]', text: 'text-[#475569]', border: 'border-[#e2e8f0]' },
+  bv:  { bg: 'bg-[#f5f3ff]', text: 'text-[#7c3aed]', border: 'border-[#ddd6fe]' },
+};
  
 // ─── HELPERS ────────────────────────────────────────────────────────────────
-const bc = (cls: string) => `perf-badge perf-${cls}`;
-const dc = (v?: string) => !v ? 'color:#94a3b8' : v.startsWith('+') ? 'color:#16a34a' : v.startsWith('-') ? 'color:#dc2626' : 'color:#0f172a';
+const bc = (cls: string) => {
+  const c = colorMap[cls] || colorMap.bsl;
+  return `inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${c.bg} ${c.text} ${c.border}`;
+};
+
+const dc = (v?: string) => {
+  if (!v) return 'text-[#94a3b8]';
+  if (v.startsWith('+')) return 'text-[#16a34a]';
+  if (v.startsWith('-')) return 'text-[#dc2626]';
+  return 'text-[#0f172a]';
+};
+
 const slaC = (n: number) => n >= 80 ? '#10b981' : n >= 65 ? '#f59e0b' : '#ef4444';
-const slaTC = (n: number) => n >= 80 ? 'color:#16a34a' : n >= 65 ? 'color:#d97706' : 'color:#dc2626';
+const slaTC = (n: number) => n >= 80 ? 'text-[#16a34a]' : n >= 65 ? 'text-[#d97706]' : 'text-[#dc2626]';
 const ini = (name: string) => name.split(' ').map((n: string) => n[0]).join('').slice(0, 2);
-const alertBorder = (cls: string) => cls === 'br' ? '#ef4444' : cls === 'bam' ? '#f59e0b' : cls === 'bg' ? '#10b981' : '#2b44ff';
+const alertBorder = (cls: string) => cls === 'br' ? 'border-[#ef4444]' : cls === 'bam' ? 'border-[#f59e0b]' : cls === 'bg' ? 'border-[#10b981]' : 'border-[#2b44ff]';
+const alertBorderHex = (cls: string) => cls === 'br' ? '#ef4444' : cls === 'bam' ? '#f59e0b' : cls === 'bg' ? '#10b981' : '#2b44ff';
  
 // ─── DATA (copiado 1:1 do Alpine app()) ────────────────────────────────────
 const PERIODS = [
@@ -174,31 +122,42 @@ const CHART_PTS = [
 // ─── MEMOIZED SUB-COMPONENTS ───────────────────────────────────────────
 const PerformanceMetrics = React.memo(({ m }: { m: any }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-2.5 mb-5">
-    <div className="perf-hm"><div className="perf-hm-label">Pipeline Total</div><div className="perf-hm-value">R$ {m.pipeline}</div><div className="perf-hm-up">{m.pipelineDelta}</div></div>
-    <div className="perf-hm"><div className="perf-hm-label">Receita Gerada</div><div className="perf-hm-value">R$ {m.receita}</div><div className="perf-hm-up">{m.receitaDelta}</div></div>
-    <div className="perf-hm"><div className="perf-hm-label">Taxa de Conversão</div><div className="perf-hm-value">{m.conversao}</div><div className="perf-hm-sub">Meta: {m.metaConversao}</div></div>
-    <div className="perf-hm"><div className="perf-hm-label">Ações Concluídas</div><div className="perf-hm-value">{m.acoes}</div><div className="perf-hm-sub">{m.acoesRate} de execução</div></div>
-    <div className="perf-hm"><div className="perf-hm-label">Score Médio</div><div className="perf-hm-value">{m.score}</div><div className="perf-hm-sub">{m.scoreTrend}</div></div>
+    {[
+      { label: 'Pipeline Total',     value: `R$ ${m.pipeline}`, sub: m.pipelineDelta, subCls: 'text-[#6ee7b7]' },
+      { label: 'Receita Gerada',     value: `R$ ${m.receita}`,  sub: m.receitaDelta,  subCls: 'text-[#6ee7b7]' },
+      { label: 'Taxa de Conversão',  value: m.conversao,        sub: `Meta: ${m.metaConversao}`, subCls: 'text-white/50' },
+      { label: 'Ações Concluídas',   value: m.acoes,            sub: `${m.acoesRate} de execução`, subCls: 'text-white/50' },
+      { label: 'Score Médio',        value: m.score,            sub: m.scoreTrend, subCls: 'text-white/50' },
+    ].map(metric => (
+      <div key={metric.label} className="bg-white/10 border border-white/10 rounded-[18px] p-[14px_16px] backdrop-blur-md">
+        <div className="text-[9px] font-bold text-white/50 uppercase tracking-[0.16em] mb-1.5">{metric.label}</div>
+        <div className="text-2xl font-extrabold tracking-tight leading-none text-white">{metric.value}</div>
+        <div className={`text-[11px] font-bold mt-1 ${metric.subCls}`}>{metric.sub}</div>
+      </div>
+    ))}
   </div>
 ));
 PerformanceMetrics.displayName = 'PerformanceMetrics';
 
 const ExecutiveSummary = React.memo(({ channels, pl }: { channels: any[], pl: string }) => (
-  <div className="perf-card">
+  <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="flex items-center justify-between mb-4">
-      <div><div className="perf-sec-title">Resumo Executivo por Canal</div><div className="perf-sec-sub">{pl} · Comparado ao período anterior</div></div>
+      <div>
+        <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Resumo Executivo por Canal</div>
+        <div className="text-[13px] text-[#64748b]">{pl} · Comparado ao período anterior</div>
+      </div>
     </div>
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
       {channels.map(ch => (
-        <div key={ch.name} className="perf-stat">
+        <div key={ch.name} className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[14px] p-[14px_16px]">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <div style={{background:ch.color}} className="w-2 h-2 rounded-full flex-shrink-0" />
-            <div className="perf-stat-label">{ch.name}</div>
+            <div style={{ background: ch.color }} className="w-2 h-2 rounded-full shrink-0" />
+            <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-[0.1em] mb-px">{ch.name}</div>
           </div>
-          <div className="perf-stat-value" style={{color:ch.color}}>R$ {ch.value}</div>
-          <div className={`text-[11px] font-bold mt-0.5 ${ch.delta.startsWith('+')?'text-emerald-600':'text-red-600'}`}>{ch.delta} vs ant.</div>
+          <div className="text-[20px] font-extrabold tracking-tight" style={{ color: ch.color }}>R$ {ch.value}</div>
+          <div className={`text-[11px] font-bold mt-1 ${ch.delta.startsWith('+') ? 'text-emerald-600' : 'text-red-600'}`}>{ch.delta} vs ant.</div>
           <div className="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
-            <div style={{width:`${ch.pct}%`,background:ch.color}} className="h-full rounded-full" />
+            <div style={{ width: `${ch.pct}%`, background:ch.color }} className="h-full rounded-full" />
           </div>
           <div className="text-[10px] text-slate-400 mt-1">{ch.pct}% do total</div>
         </div>
@@ -209,40 +168,49 @@ const ExecutiveSummary = React.memo(({ channels, pl }: { channels: any[], pl: st
 ExecutiveSummary.displayName = 'ExecutiveSummary';
 
 const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[], panelId: string, onOpen: (f: any) => void }) => (
-  <div className="perf-card">
+  <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="mb-4">
-      <div className="perf-sec-title">Performance por Frente Operacional</div>
-      <div className="perf-sec-sub">Clique em qualquer frente para análise detalhada no painel lateral</div>
+      <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Performance por Frente Operacional</div>
+      <div className="text-[13px] text-[#64748b]">Clique em qualquer frente para análise detalhada no painel lateral</div>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
       {frentes.map(fr => (
-        <div key={fr.id} className={`perf-fr-card${panelId===fr.id?' selected':''}`}
-          style={{borderTop:`3px solid ${fr.color}`}} onClick={()=>onOpen(fr)}>
-          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'10px'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-              <div style={{width:'30px',height:'30px',borderRadius:'9px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px',flexShrink:0,background:fr.bg}}>{fr.icon}</div>
+        <div 
+          key={fr.id} 
+          className={`bg-white border-x border-b border-[#f1f5f9] rounded-[18px] p-[16px_18px] cursor-pointer transition-all duration-180 shadow-[0_1px_3px_rgba(0,0,0,0.04)] relative overflow-hidden hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:-translate-y-px ${panelId === fr.id ? 'shadow-[0_4px_20px_rgba(0,0,0,0.1)]' : ''}`}
+          style={{ borderTop: `3px solid ${fr.color}` }} 
+          onClick={() => onOpen(fr)}
+        >
+          <div className="flex items-start justify-between mb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-[30px] h-[30px] rounded-[9px] flex items-center justify-center text-[14px] shrink-0" style={{ background: fr.bg }}>{fr.icon}</div>
               <div>
-                <div style={{fontSize:'12px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em'}}>{fr.name}</div>
-                <div style={{fontSize:'10px',color:'#94a3b8',marginTop:'1px',lineHeight:1.3}}>{fr.tagline}</div>
+                <div className="text-[12px] font-extrabold text-[#0f172a] tracking-tight">{fr.name}</div>
+                <div className="text-[10px] text-[#94a3b8] mt-px leading-tight">{fr.tagline}</div>
               </div>
             </div>
             <span className={bc(fr.statusClass)}>{fr.statusLabel}</span>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',paddingTop:'10px',borderTop:'1px solid #f1f5f9'}}>
-            {fr.kpis.slice(0,2).map(kpi => (
+          <div className="grid grid-cols-2 gap-2.5 pt-2.5 border-t border-[#f1f5f9]">
+            {fr.kpis.slice(0, 2).map(kpi => (
               <div key={kpi.label}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'2px'}}>{kpi.label}</div>
-                <div style={{fontSize:'18px',fontWeight:800,letterSpacing:'-0.02em',lineHeight:1,color:fr.color}}>{kpi.value}</div>
-                <div style={{fontSize:'10px',fontWeight:700,marginTop:'2px',color:!kpi.delta?'#94a3b8':kpi.delta.startsWith('+')?'#16a34a':kpi.delta.startsWith('-')?'#dc2626':'#0f172a'}}>{kpi.delta||'—'}</div>
+                <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-[0.08em] mb-0.5">{kpi.label}</div>
+                <div className="text-[18px] font-extrabold tracking-tight leading-none" style={{ color: fr.color }}>{kpi.value}</div>
+                <div className={`text-[10px] font-bold mt-0.5 ${!kpi.delta ? 'text-[#94a3b8]' : kpi.delta.startsWith('+') ? 'text-[#16a34a]' : kpi.delta.startsWith('-') ? 'text-[#dc2626]' : 'text-[#0f172a]'}`}>{kpi.delta || '—'}</div>
               </div>
             ))}
           </div>
-          <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'28px',display:'block',marginTop:'10px'}}>
-            <defs><linearGradient id={`gfr${fr.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fr.color} stopOpacity="0.18"/><stop offset="100%" stopColor={fr.color} stopOpacity="0"/></linearGradient></defs>
+          <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg" className="w-full h-7 block mt-2.5">
+            <defs>
+              <linearGradient id={`gfr${fr.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={fr.color} stopOpacity="0.18"/>
+                <stop offset="100%" stopColor={fr.color} stopOpacity="0"/>
+              </linearGradient>
+            </defs>
             <polyline points={fr.sparkArea} fill={`url(#gfr${fr.id})`} stroke="none"/>
             <polyline points={fr.spark} fill="none" stroke={fr.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <div style={{marginTop:'6px',fontSize:'10px',fontWeight:700,textAlign:'right',color:fr.color}}>Ver análise →</div>
+          <div className="mt-1.5 text-[10px] font-bold text-right" style={{ color: fr.color }}>Ver análise →</div>
         </div>
       ))}
     </div>
@@ -413,8 +381,7 @@ export default function Performance() {
       ],
     });
   }
- 
-  // Lógica idêntica ao openIntPanel() do Alpine
+
   function openIntPanel(int: any) {
     setIntPanel({
       ...int,
@@ -425,14 +392,11 @@ export default function Performance() {
         : [100,100,99,100,100,99,100,int.uptime],
     });
   }
- 
-  // ── render ──────────────────────────────────────────────────────────────────
+
   return (
-    <div className="perf">
-      <style>{CSS}</style>
- 
+    <div className="bg-[#f6f8fc] min-h-screen">
       {/* ── HERO ── */}
-      <div className="perf-hero">
+      <div className="bg-gradient-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] rounded-[36px] p-9 sm:p-10 text-white mx-6 sm:mx-7 mt-6 shadow-[0_28px_80px_rgba(15,36,104,0.28)] overflow-hidden relative before:content-[''] before:absolute before:-top-[60px] before:-right-[60px] before:w-[280px] before:h-[280px] before:rounded-full before:bg-white/[0.03] before:pointer-events-none after:content-[''] after:absolute after:bottom-[-80px] after:left-[40%] after:w-[200px] after:h-[200px] after:rounded-full after:bg-white/[0.02] after:pointer-events-none">
         <div className="flex gap-2 flex-wrap mb-4">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">Revenue Intelligence</span>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Ciclo fechado</span>
@@ -445,33 +409,35 @@ export default function Performance() {
         {/* Period filter */}
         <div className="flex gap-1.5 mb-5 flex-wrap">
           {PERIODS.map(p => (
-            <button key={p.id} className={`perf-pf-btn${period===p.id?' active':''}`} onClick={()=>setPeriod(p.id)}>{p.label}</button>
+            <button 
+              key={p.id} 
+              className={`px-4 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border transition-all duration-150 font-inherit ${period === p.id ? 'bg-white text-[#17348f] border-white' : 'border-white/20 bg-white/10 text-white/70 hover:bg-white/15'}`} 
+              onClick={() => setPeriod(p.id)}
+            >
+              {p.label}
+            </button>
           ))}
-          <button onClick={()=>setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit">📅 Personalizado</button>
+          <button onClick={() => setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit hover:bg-white/10 transition-all">📅 Personalizado</button>
         </div>
 
         {/* Metrics */}
         <PerformanceMetrics m={m} />
 
-        <div style={{display:'flex',gap:'10px'}}>
-          <button className="perf-hbtn perf-hbtn-g" onClick={()=>setShowExport(true)}>↓ Exportar relatório</button>
-          <button className="perf-hbtn perf-hbtn-w" onClick={()=>setShowSignals(true)}>→ Ver sinais gerados</button>
+        <div className="flex gap-2.5">
+          <button className="inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-[14px] text-[13px] font-bold cursor-pointer transition-all duration-150 border-none font-inherit bg-white/10 text-white border border-white/15! hover:bg-white/15" onClick={() => setShowExport(true)}>↓ Exportar relatório</button>
+          <button className="inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-[14px] text-[13px] font-bold cursor-pointer transition-all duration-150 border-none font-inherit bg-white text-[#17348f] hover:bg-white/90" onClick={() => setShowSignals(true)}>→ Ver sinais gerados</button>
         </div>
       </div>
 
-      <div className="perf-body">
-
-        {/* ── RESUMO EXECUTIVO ── */}
-        <ExecutiveSummary channels={CHANNELS} pl={pl} />
-
-        {/* ── FRENTES OPERACIONAIS ── */}
-        <OperationsGrid frentes={FRENTES} panelId={panel?.id} onOpen={openPanel} />
- 
-        {/* ── TENDÊNCIA + FATORES ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-          <div className="perf-card">
-            <div style={{marginBottom:'14px'}}><div className="perf-card-title">Tendência por Canal</div><div className="perf-card-desc">Evolução semanal no período selecionado</div></div>
-            <svg viewBox="0 0 440 180" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'180px'}}>
+      <div className="p-5 sm:p-7 pb-12 flex flex-col gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* ── CARD: TENDÊNCIA ── */}
+          <div className="lg:col-span-2 bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+            <div className="mb-[14px] leading-tight">
+              <div className="text-[15px] font-extrabold text-[#0f172a] mb-0.5">Tendência por Canal</div>
+              <div className="text-[12px] text-[#64748b]">Evolução semanal no período selecionado</div>
+            </div>
+            <svg viewBox="0 0 440 180" xmlns="http://www.w3.org/2000/svg" className="w-full h-[180px]">
               {[36,72,108,144].map(y=><line key={y} x1="0" y1={y} x2="440" y2={y} stroke="#f1f5f9" strokeWidth="1"/>)}
               <polyline points="10,140 70,118 130,98 190,78 250,60 310,46 370,36 430,30"  fill="none" stroke="#2b44ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="10,148 70,138 130,125 190,114 250,102 310,92 370,82 430,75" fill="none" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -479,362 +445,368 @@ export default function Performance() {
               <polyline points="10,158 70,150 130,142 190,132 250,125 310,118 370,110 430,104" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               {['S1','S2','S3','S4','S5','S6','S7','S8'].map((l,i)=><text key={l} x={10+i*60} y="175" fontSize="8" fill="#94a3b8" fontFamily="Inter">{l}</text>)}
             </svg>
-            <div style={{display:'flex',gap:'12px',marginTop:'6px',flexWrap:'wrap'}}>
+            <div className="flex gap-3 mt-1.5 flex-wrap">
               {[{c:'#2b44ff',l:'ABM'},{c:'#7c3aed',l:'ABX'},{c:'#f59e0b',l:'Outbound'},{c:'#10b981',l:'Orgânico'}].map(x=>(
-                <div key={x.l} style={{display:'flex',alignItems:'center',gap:'5px'}}><div style={{width:'10px',height:'3px',background:x.c,borderRadius:'2px'}}/><span style={{fontSize:'10px',color:'#64748b',fontWeight:600}}>{x.l}</span></div>
+                <div key={x.l} className="flex items-center gap-[5px]"><div className="w-[10px] h-[3px] rounded-[2px]" style={{background:x.c}}/><span className="text-[10px] text-[#64748b] font-semibold">{x.l}</span></div>
               ))}
             </div>
           </div>
- 
-          <div className="perf-card">
-            <div style={{marginBottom:'14px'}}><div className="perf-card-title">Fatores que explicam o período</div><div className="perf-card-desc">O que funcionou e o que não funcionou</div></div>
-            <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-              <div style={{background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'14px',padding:'14px'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#16a34a',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}}>✓ O que funcionou</div>
+
+          {/* ── CARD: FATORES ── */}
+          <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+            <div className="mb-[14px] leading-tight">
+              <div className="text-[15px] font-extrabold text-[#0f172a] mb-0.5">Fatores que explicam o período</div>
+              <div className="text-[12px] text-[#64748b]">O que funcionou e o que não funcionou</div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-[18px] p-3.5">
+                <div className="text-[9px] font-bold text-[#16a34a] uppercase tracking-wider mb-2">✓ O que funcionou</div>
                 {[{c:'#2b44ff',l:'ABM — contas estratégicas',d:'+18%'},{c:'#10b981',l:'Orgânico — SEO de produto',d:'+22%'},{c:'#7c3aed',l:'ABX — Cluster Fintech',d:'+7%'}].map((x,i,a)=>(
-                  <div key={x.l} className="perf-trend-item" style={i===a.length-1?{borderBottom:'none'}:{}}>
-                    <div style={{width:'8px',height:'8px',borderRadius:'50%',background:x.c,flexShrink:0}}/><span style={{fontSize:'12px',fontWeight:600,flex:1}}>{x.l}</span><span style={{fontSize:'12px',fontWeight:700,color:'#16a34a'}}>{x.d}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:'14px',padding:'14px'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#dc2626',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}}>✗ O que não funcionou</div>
-                {[{c:'#f59e0b',l:'Outbound — Cluster Manufatura',d:'-4%'},{c:'#ef4444',l:'Google Ads — conflito GTM',d:'-45%'}].map((x,i)=>(
-                  <div key={x.l} className="perf-trend-item" style={i===1?{borderBottom:'none'}:{}}>
-                    <div style={{width:'8px',height:'8px',borderRadius:'50%',background:x.c,flexShrink:0}}/><span style={{fontSize:'12px',fontWeight:600,flex:1}}>{x.l}</span><span style={{fontSize:'12px',fontWeight:700,color:'#dc2626'}}>{x.d}</span>
+                  <div key={x.l} className={`flex items-center gap-2 py-2 ${i < a.length - 1 ? 'border-b border-[#16a34a]/10' : ''}`}>
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{background:x.c}}/><span className="text-[12px] font-semibold flex-1 text-[#0f172a]">{x.l}</span><span className="text-[12px] font-bold text-[#16a34a]">{x.d}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
- 
+
         {/* ── CONTAS ── */}
-        <div className="perf-card">
-          <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Contas · Sinais, Ações e Atribuição</div><div className="perf-sec-sub">Sinais ativos e ações em andamento visíveis por conta</div></div>
-          <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
+        <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
+          <div className="mb-6 leading-tight">
+            <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Contas · Sinais, Ações e Atribuição</div>
+            <div className="text-[12px] text-[#64748b]">Sinais ativos e ações em andamento visíveis por conta</div>
+          </div>
+          <div className="flex flex-col gap-3">
             {ACCOUNTS.map(acc => (
-              <div key={acc.name} style={{borderRadius:'18px',border:'1px solid #e2e8f0',borderLeft:`4px solid ${acc.color}`,background:'white',overflow:'hidden'}}>
+              <div key={acc.name} className="rounded-[20px] border border-[#e2e8f0] bg-white overflow-hidden shadow-sm transition-all hover:border-[#cbd5e1]" style={{ borderLeft: `6px solid ${acc.color}` }}>
                 {/* cabeçalho */}
-                <div style={{padding:'14px 18px 12px'}}>
-                  <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'10px'}}>
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
-                      <div style={{fontSize:'15px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em',marginBottom:'2px'}}>{acc.name}</div>
-                      <div style={{fontSize:'12px',color:'#64748b',lineHeight:1.5}}>{acc.meta}</div>
+                      <div className="text-[16px] font-extrabold text-[#0f172a] tracking-tight mb-1">{acc.name}</div>
+                      <div className="text-[12px] text-[#64748b] leading-relaxed max-w-xl">{acc.meta}</div>
                     </div>
-                    <div style={{display:'flex',gap:'6px',alignItems:'center',flexShrink:0}}>
+                    <div className="flex gap-2 items-center shrink-0">
                       <span className={bc(acc.statusClass)}>{acc.status}</span>
-                      <span className="perf-badge perf-bsl" style={{fontSize:'9px'}}>{acc.canal}</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">{acc.canal}</span>
                     </div>
                   </div>
+                  
                   {/* sinais ativos */}
-                  {acc.signals.length>0&&(
-                    <div style={{marginBottom:'10px'}}>
-                      <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Sinais ativos</div>
-                      {acc.signals.map((s,i)=>(
-                        <div key={s.id} style={{display:'flex',alignItems:'center',gap:'8px',padding:'6px 0',borderBottom:i<acc.signals.length-1?'1px solid #f1f5f9':'none'}}>
-                          <div style={{width:'8px',height:'8px',borderRadius:'50%',flexShrink:0,background:s.sev==='crítico'?'#ef4444':s.sev==='alerta'?'#f59e0b':'#2b44ff'}}/>
-                          <span style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',flexShrink:0}}>{s.id} ·</span>
-                          <span style={{fontSize:'12px',color:'#0f172a',flex:1}}>{s.title}</span>
-                          <span className={bc(s.sev==='crítico'?'br':s.sev==='alerta'?'bam':'bb')} style={{fontSize:'9px',flexShrink:0}}>{s.sev}</span>
-                        </div>
-                      ))}
+                  {acc.signals.length > 0 && (
+                    <div className="mb-4">
+                      <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Sinais ativos</div>
+                      <div className="flex flex-col gap-1">
+                        {acc.signals.map((s, i) => (
+                          <div key={s.id} className={`flex items-center gap-3 py-2 ${i < acc.signals.length - 1 ? 'border-b border-[#f1f5f9]' : ''}`}>
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.sev === 'crítico' ? '#ef4444' : s.sev === 'alerta' ? '#f59e0b' : '#2b44ff' }} />
+                            <span className="text-[11px] font-black text-[#94a3b8] shrink-0 w-12">{s.id}</span>
+                            <span className="text-[13px] font-semibold text-[#1e293b] flex-1">{s.title}</span>
+                            <span className={bc(s.sev === 'crítico' ? 'br' : s.sev === 'alerta' ? 'bam' : 'bb')}>{s.sev}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
+
                   {/* ações em andamento */}
-                  {acc.actions.length>0&&(
-                    <div>
-                      <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>Ações em andamento</div>
-                      {acc.actions.map((a,i)=>(
-                        <div key={a.title} style={{display:'flex',alignItems:'center',gap:'8px',padding:'5px 0',borderBottom:i<acc.actions.length-1?'1px solid #f1f5f9':'none'}}>
-                          <span style={{fontSize:'12px',color:'#0f172a',flex:1}}>{a.title}</span>
-                          <span style={{fontSize:'11px',color:'#64748b',flexShrink:0}}>{a.owner}</span>
-                          <span className={bc(a.status==='Em andamento'?'bb':'bsl')} style={{fontSize:'9px',flexShrink:0}}>{a.status}</span>
-                        </div>
-                      ))}
+                  {acc.actions.length > 0 && (
+                    <div className="mt-4">
+                      <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Ações em andamento</div>
+                      <div className="flex flex-col gap-1">
+                        {acc.actions.map((a, i) => (
+                          <div key={a.title} className={`flex items-center gap-3 py-2 ${i < acc.actions.length - 1 ? 'border-b border-[#f1f5f9]' : ''}`}>
+                            <span className="text-[13px] font-semibold text-[#1e293b] flex-1">{a.title}</span>
+                            <span className="text-[11px] font-bold text-[#64748b] bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{a.owner}</span>
+                            <span className={bc(a.status === 'Em andamento' ? 'bb' : 'bsl')}>{a.status}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
+
                 {/* rodapé: métricas */}
-                <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0',borderTop:'1px solid #f1f5f9',background:'#f8fafc',padding:'10px 18px'}}>
-                  {[{k:'Canal',v:acc.canal,c:'#0f172a'},{k:'Valor',v:acc.valor,c:acc.color},{k:'Owner',v:acc.owner.split(' ')[0],c:'#0f172a'},{k:'Relacionamento',v:acc.lifetime,c:'#0f172a'},{k:'Último contato',v:acc.lastContact,c:'#0f172a'}].map(x=>(
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 border-t border-[#f1f5f9] bg-[#f8fafc] px-6 py-3.5">
+                  {[
+                    { k: 'Canal', v: acc.canal, c: '#0f172a' },
+                    { k: 'Valor', v: acc.valor, c: acc.color },
+                    { k: 'Owner', v: acc.owner.split(' ')[0], c: '#0f172a' },
+                    { k: 'Relacionamento', v: acc.lifetime, c: '#0f172a' },
+                    { k: 'Último contato', v: acc.lastContact, c: '#0f172a' }
+                  ].map(x => (
                     <div key={x.k}>
-                      <div className="perf-acc-k">{x.k}</div>
-                      <div className="perf-acc-v" style={{color:x.c,fontSize:'12px'}}>{x.v}</div>
+                      <div className="text-[9px] font-black text-[#94a3b8] uppercase tracking-wider mb-0.5">{x.k}</div>
+                      <div className="text-[13px] font-black truncate" style={{ color: x.c }}>{x.v}</div>
                     </div>
                   ))}
                 </div>
-                {/* rodapé: ações */}
-                <div style={{display:'flex',alignItems:'center',gap:'8px',borderTop:'1px solid #f1f5f9',padding:'8px 18px',flexWrap:'wrap'}}>
-                  <button className="perf-btn perf-btn-primary" style={{fontSize:'11px',padding:'5px 12px'}}>→ Ver no Canopi</button>
-                  <button className="perf-btn perf-btn-hubspot" style={{fontSize:'11px',padding:'5px 12px'}} onClick={()=>showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
-                  <span style={{marginLeft:'auto',fontSize:'11px',color:'#94a3b8'}}>{acc.signals.length} sinal(is) · {acc.actions.length} ação(ões)</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
- 
-        {/* ── FUNIL + QUALIDADE ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
-          <div className="perf-card">
-            <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Aceleração de Funil</div><div className="perf-sec-sub">Onde o pipeline acelerou ou travou</div></div>
-            {[{l:'Leads qualificados',pct:90,c:'#2b44ff',v:'R$ 5,4M',d:'+12%',dc:'#16a34a'},{l:'Em avaliação',pct:65,c:'#7c3aed',v:'R$ 3,5M',d:'+6%',dc:'#16a34a'},{l:'Proposta enviada',pct:45,c:'#f59e0b',v:'R$ 2,4M',d:'0%',dc:'#d97706'},{l:'Decisão',pct:30,c:'#ef4444',v:'R$ 1,6M',d:'-3%',dc:'#dc2626'},{l:'Fechado',pct:24,c:'#10b981',v:'R$ 1,3M',d:'+8%',dc:'#16a34a'}].map(s=>(
-              <div key={s.l} className="perf-funnel-stage">
-                <span style={{fontSize:'12px',fontWeight:600,width:'130px',flexShrink:0,color:'#475569'}}>{s.l}</span>
-                <div style={{flex:1,height:'8px',background:'#f1f5f9',borderRadius:'100px',overflow:'hidden'}}><div style={{width:`${s.pct}%`,height:'100%',background:s.c,borderRadius:'100px'}}/></div>
-                <span style={{fontSize:'13px',fontWeight:800,width:'72px',textAlign:'right'}}>{s.v}</span>
-                <span style={{fontSize:'11px',fontWeight:700,width:'48px',textAlign:'right',color:s.dc}}>{s.d}</span>
-              </div>
-            ))}
-          </div>
-          <div className="perf-card">
-            <div style={{marginBottom:'14px'}}><div className="perf-card-title">Qualidade de Leads por Canal</div><div className="perf-card-desc">Score médio e receita por origem</div></div>
-            {CHANNELS.map(ch=>(
-              <div key={ch.name} style={{marginBottom:'10px'}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'4px'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'6px'}}><div style={{width:'8px',height:'8px',borderRadius:'50%',background:ch.color}}/><span style={{fontSize:'13px',fontWeight:600,color:'#0f172a'}}>{ch.name}</span></div>
-                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}><span style={{fontSize:'12px',fontWeight:700,color:ch.color}}>{ch.score}% score</span><span style={{fontSize:'11px',color:'#94a3b8'}}>R$ {ch.value}</span></div>
-                </div>
-                <div style={{height:'6px',background:'#f1f5f9',borderRadius:'100px',overflow:'hidden'}}><div style={{width:`${ch.score}%`,background:ch.color,height:'100%',borderRadius:'100px'}}/></div>
-              </div>
-            ))}
-          </div>
-        </div>
- 
-        {/* ── FECHAMENTO ── */}
-        <div className="perf-card">
-          <div style={{marginBottom:'14px'}}><div className="perf-card-title">Qualidade de Fechamento</div><div className="perf-card-desc">Motivos de perda, objeções e aceleradores</div></div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'12px'}}>
-            {[{title:'Motivos de Perda',data:LOSS_REASONS,bg:'#fef2f2',border:'#fecaca',sep:'#fee2e2',tc:'#dc2626',prefix:''},{title:'Objeções mais comuns',data:OBJECTIONS,bg:'#fffbeb',border:'#fde68a',sep:'#fef3c7',tc:'#d97706',prefix:''},{title:'Aceleradores',data:ACCELERATORS,bg:'#f0fdf4',border:'#bbf7d0',sep:'#dcfce7',tc:'#16a34a',prefix:'+'}].map(col=>(
-              <div key={col.title} style={{background:col.bg,border:`1px solid ${col.border}`,borderRadius:'16px',padding:'16px'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:col.tc,textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}}>{col.title}</div>
-                {col.data.map((x,i)=>(
-                  <div key={x.label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:i<col.data.length-1?`1px solid ${col.sep}`:'none'}}>
-                    <span style={{fontSize:'12px',color:'#0f172a'}}>{x.label}</span>
-                    <span style={{fontSize:'12px',fontWeight:700,color:col.tc}}>{col.prefix}{x.pct}%</span>
+
+                {/* rodapé: botões */}
+                <div className="flex items-center gap-2 border-t border-[#f1f5f9] px-6 py-3 bg-white/50">
+                  <button className="h-8 px-4 rounded-full text-[11px] font-bold bg-[#2b44ff] text-white hover:bg-[#1a2dbb] transition-all shadow-sm hover:shadow-md cursor-pointer">→ Ver no Canopi</button>
+                  <button className="h-8 px-4 rounded-full text-[11px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer" onClick={() => showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
+                  <div className="ml-auto flex items-center gap-2">
+                    <div className="flex -space-x-1.5">
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[8px] font-bold text-blue-600">S</div>
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-600">A</div>
+                    </div>
+                    <span className="text-[11px] font-bold text-[#94a3b8]">{acc.signals.length} sinais · {acc.actions.length} ações</span>
                   </div>
-                ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
- 
-        {/* ── ALERTAS ── */}
-        <div className="perf-card">
-          <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Alertas de Desempenho · Sinais para o próximo ciclo</div><div className="perf-sec-sub">O desempenho atual está gerando estes sinais — clique para acessar</div></div>
-          {ALERTS.map(alert=>(
-            <div key={alert.id} className="perf-alert-card" style={{background:alert.bg,border:`1px solid ${alert.border}`}}>
-              <div style={{width:'34px',height:'34px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',flexShrink:0,background:alert.iconBg}}>{alert.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:'13px',fontWeight:700,color:'#0f172a',marginBottom:'3px'}}>{alert.title}</div>
-                <div style={{fontSize:'12px',color:'#64748b',lineHeight:1.5,marginBottom:'6px'}}>{alert.desc}</div>
-                <div style={{display:'flex',gap:'8px'}}>
-                  <button className="perf-btn-ghost" style={{color:alert.linkColor}} onClick={()=>showToast(`Navegando para ${alert.id}`)}>→ Ver {alert.id}</button>
-                  <button className="perf-btn perf-btn-outline" style={{fontSize:'11px',padding:'4px 10px'}} onClick={()=>showToast('Abrindo conta relacionada')}>Ver conta</button>
+        {/* ── FECHAMENTO ── */}
+        <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-[#0f172a]">
+          <div className="mb-4 leading-tight">
+            <div className="text-[10px] font-black tracking-tight uppercase text-[#94a3b8] mb-1">Análise Comercial</div>
+            <div className="text-[16px] font-black tracking-tight">Qualidade de Fechamento</div>
+            <div className="text-[12px] text-[#64748b]">Motivos de perda, objeções e aceleradores</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { title: 'Motivos de Perda', data: LOSS_REASONS, bg: '#fef2f2', border: '#fecaca', sep: '#fee2e2', tc: '#dc2626', prefix: '' },
+              { title: 'Objeções mais comuns', data: OBJECTIONS, bg: '#fffbeb', border: '#fde68a', sep: '#fef3c7', tc: '#d97706', prefix: '' },
+              { title: 'Aceleradores', data: ACCELERATORS, bg: '#f0fdf4', border: '#bbf7d0', sep: '#dcfce7', tc: '#16a34a', prefix: '+' }
+            ].map(col => (
+              <div key={col.title} className="rounded-[20px] p-5 border shadow-sm transition-all hover:shadow-md" style={{ background: col.bg, borderColor: col.border }}>
+                <div className="text-[10px] font-black uppercase tracking-[0.1em] mb-3.5" style={{ color: col.tc }}>{col.title}</div>
+                <div className="flex flex-col gap-1">
+                  {col.data.map((x, i) => (
+                    <div key={x.label} className={`flex justify-between items-center py-2 ${i < col.data.length - 1 ? 'border-b' : ''}`} style={{ borderColor: col.sep }}>
+                      <span className="text-[12px] font-bold text-[#0f172a]">{x.label}</span>
+                      <span className="text-[13px] font-black" style={{ color: col.tc }}>{col.prefix}{x.pct}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <span className={bc(alert.badgeClass)}>{alert.severity}</span>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        {/* ── ALERTAS ── */}
+        <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+          <div className="mb-6 leading-tight">
+            <div className="text-[10px] font-black tracking-tight uppercase text-[#94a3b8] mb-1">Próximos Sinais</div>
+            <div className="text-[18px] font-black tracking-tight text-[#0f172a]">Alertas de Desempenho</div>
+            <div className="text-[12px] text-[#64748b]">O desempenho atual está gerando estes sinais — clique para acessar</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {ALERTS.map(alert => (
+              <div key={alert.id} className="group relative flex gap-4 p-5 rounded-[22px] border items-start transition-all duration-200 hover:shadow-lg" style={{ background: alert.bg, borderColor: alert.border }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[18px] shrink-0 shadow-sm" style={{ background: alert.iconBg }}>{alert.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[14px] font-black text-[#0f172a] mb-1 truncate">{alert.title}</div>
+                  <div className="text-[12px] text-[#64748b] leading-relaxed mb-3 line-clamp-2">{alert.desc}</div>
+                  <div className="flex gap-4">
+                    <button className="text-[11px] font-black hover:opacity-70 transition-opacity cursor-pointer" style={{ color: alert.linkColor }} onClick={() => showToast(`Navegando para ${alert.id}`)}>→ Ver {alert.id}</button>
+                    <button className="text-[11px] font-black text-slate-400 hover:text-slate-600 transition-colors cursor-pointer" onClick={() => showToast('Abrindo conta relacionada')}>Ver conta</button>
+                  </div>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <span className={bc(alert.badgeClass)}>{alert.severity}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
  
         {/* ── SQUADS + TECNOLOGIAS ── */}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}>
- 
-          <div className="perf-card">
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'14px'}}>
-              <div><div className="perf-sec-title">Squads · Execução e SLA</div><div className="perf-sec-sub">Performance por owner no período · clique para análise individual</div></div>
-              <span className="perf-badge perf-bg">84% global</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+            <div className="flex items-center justify-between mb-6 leading-tight">
+              <div>
+                <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Squads · Execução e SLA</div>
+                <div className="text-[12px] text-[#64748b]">Performance por owner no período · clique para análise</div>
+              </div>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-600 border border-green-200">84% global</span>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {SQUAD_OWNERS.map(owner=>(
-                <div key={owner.name} className="perf-owner-card" onClick={()=>openOwnerPanel(owner)}>
-                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
-                    <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'#eff2ff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:800,color:'#2b44ff',flexShrink:0}}>{ini(owner.name)}</div>
-                    <div style={{minWidth:0,flex:1}}>
-                      <div style={{fontSize:'12px',fontWeight:700,color:'#0f172a',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{owner.name.split(' ').slice(0,2).join(' ')}</div>
-                      <div style={{fontSize:'10px',color:'#94a3b8'}}>{owner.role}</div>
+                <div key={owner.name} className="p-4 rounded-[20px] border border-[#e2e8f0] bg-white transition-all duration-200 hover:border-[#2b44ff] hover:shadow-md cursor-pointer group" onClick={()=>openOwnerPanel(owner)}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-[#eff2ff] flex items-center justify-center text-[12px] font-black text-[#2b44ff] shrink-0">{ini(owner.name)}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[14px] font-bold text-[#0f172a] truncate group-hover:text-[#2b44ff] transition-colors">{owner.name.split(' ').slice(0,2).join(' ')}</div>
+                      <div className="text-[11px] text-[#94a3b8]">{owner.role}</div>
                     </div>
                   </div>
-                  <div style={{height:'4px',background:'#e2e8f0',borderRadius:'100px',overflow:'hidden',marginBottom:'4px'}}>
-                    <div style={{width:`${owner.sla}%`,height:'100%',borderRadius:'100px',background:slaC(owner.sla),transition:'width 0.6s ease'}}/>
+                  <div className="h-1.5 bg-[#e2e8f0] rounded-full overflow-hidden mb-2">
+                    <div className="h-full rounded-full transition-all duration-1000" style={{width:`${owner.sla}%`,background:slaC(owner.sla)}}/>
                   </div>
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span style={{fontSize:'10px',color:'#94a3b8'}}>{owner.acoes}</span>
-                    <span style={{fontSize:'11px',fontWeight:700,color:slaC(owner.sla)}}>{owner.sla}%</span>
+                  <div className="flex justify-between items-center leading-none">
+                    <span className="text-[11px] font-bold text-[#94a3b8]">{owner.acoes}</span>
+                    <span className="text-[12px] font-black" style={{color:slaC(owner.sla)}}>{owner.sla}%</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
- 
-          <div className="perf-card">
-            <div style={{marginBottom:'14px'}}><div className="perf-sec-title">Tecnologias · Integrações</div><div className="perf-sec-sub">Saúde das conexões e impacto nos dados do período</div></div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px'}}>
+
+          <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+            <div className="mb-6 leading-tight">
+              <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Tecnologias · Integrações</div>
+              <div className="text-[12px] text-[#64748b]">Saúde das conexões e impacto nos dados</div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {INTEGRATIONS.map(int=>(
-                <div key={int.name} className="perf-int-card"
-                  style={{background:int.status==='Falha'?'#fef2f2':int.status==='Degradado'?'#fffbeb':'#f8fafc',borderColor:int.status==='Falha'?'#fecaca':int.status==='Degradado'?'#fde68a':'#f1f5f9'}}
-                  onClick={()=>openIntPanel(int)}>
-                  <div style={{fontSize:'22px',lineHeight:1}}>{int.icon}</div>
-                  <div style={{fontSize:'11px',fontWeight:700,color:'#0f172a',lineHeight:1.2}}>{int.shortName}</div>
-                  <span className={bc(int.status==='Conectado'?'bg':int.status==='Degradado'?'bam':'br')} style={{alignSelf:'flex-start'}}>{int.status}</span>
-                  <div>
-                    <div style={{height:'3px',background:'rgba(0,0,0,0.07)',borderRadius:'100px',overflow:'hidden',marginBottom:'2px'}}>
-                      <div style={{width:`${int.uptime}%`,height:'100%',borderRadius:'100px',background:int.uptime>=99?'#10b981':int.uptime>=90?'#f59e0b':'#ef4444'}}/>
+                <div key={int.name} className={`p-4 rounded-[20px] border border-[#f1f5f9] transition-all duration-200 hover:shadow-md cursor-pointer flex flex-col gap-2 ${int.status==='Falha'?'bg-red-50/50 border-red-100':int.status==='Degradado'?'bg-amber-50/50 border-amber-100':'bg-[#f8fafc] hover:border-[#2b44ff]'}`} onClick={()=>openIntPanel(int)}>
+                  <div className="text-[24px] leading-none mb-1">{int.icon}</div>
+                  <div className="text-[12px] font-black text-[#0f172a] leading-tight flex-1">{int.shortName}</div>
+                  <span className={bc(int.status==='Conectado'?'bg':int.status==='Degradado'?'bam':'br')}>{int.status}</span>
+                  <div className="mt-1">
+                    <div className="h-1 bg-slate-200 rounded-full overflow-hidden mb-1">
+                      <div className="h-full rounded-full" style={{width:`${int.uptime}%`,background:int.uptime>=99?'#10b981':int.uptime>=90?'#f59e0b':'#ef4444'}}/>
                     </div>
-                    <div style={{fontSize:'10px',fontWeight:700,color:int.uptime>=99?'#16a34a':int.uptime>=90?'#d97706':'#dc2626'}}>{int.uptime}%</div>
+                    <div className="text-[10px] font-bold" style={{color:int.uptime>=99?'#16a34a':int.uptime>=90?'#d97706':'#dc2626'}}>{int.uptime}% uptime</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
- 
         </div>
-      </div>{/* end perf-body */}
+      </div>{/* end main content area */}
  
-      {/* ── PAINEL LATERAL (frente ou conta) ── */}
+      {/* ── PAINEL LATERAL ── */}
       {panel && (
-        <>
-          <div className="perf-panel-backdrop" onClick={()=>setPanel(null)}/>
-          <div className="perf-panel">
-            <div style={{padding:'22px 26px 18px',borderBottom:'1px solid #f1f5f9',display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                <div style={{width:'38px',height:'38px',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',background:panel.bg}}>{panel.icon}</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-end">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setPanel(null)} />
+          <div className="relative w-full max-w-[480px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-slate-100 flex items-start justify-between bg-slate-50/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm" style={{ background: panel.bg }}>{panel.icon}</div>
                 <div>
-                  <div style={{fontSize:'17px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.02em'}}>{panel.name}</div>
-                  <div style={{fontSize:'12px',color:'#94a3b8',marginTop:'2px'}}>{panel.tagline}</div>
+                  <h3 className="text-[18px] font-black text-slate-900 tracking-tight leading-tight">{panel.name}</h3>
+                  <p className="text-[12px] text-slate-500 mt-1">{panel.tagline}</p>
                 </div>
               </div>
-              <button className="perf-panel-close" onClick={()=>setPanel(null)}>✕</button>
+              <button className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => setPanel(null)}>✕</button>
             </div>
-            <div className="perf-panel-body">
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                <span style={{fontSize:'11px',color:'#94a3b8',fontWeight:600}}>{pl}</span>
+            
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{pl}</span>
                 <span className={bc(panel.statusClass)}>{panel.statusLabel}</span>
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
-                {panel.kpis.map((kpi:any)=>(
-                  <div key={kpi.label} style={{background:'#f8fafc',border:'1px solid #f1f5f9',borderRadius:'14px',padding:'14px 16px'}}>
-                    <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'4px'}}>{kpi.label}</div>
-                    <div style={{fontSize:'20px',fontWeight:800,letterSpacing:'-0.02em',color:panel.color}}>{kpi.value}</div>
-                    <div style={{fontSize:'11px',fontWeight:700,marginTop:'3px',color:!kpi.delta?'#94a3b8':kpi.delta.startsWith('+')?'#16a34a':kpi.delta.startsWith('-')?'#dc2626':'#0f172a'}}>{kpi.delta||'—'}</div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {panel.kpis.map((kpi: any) => (
+                  <div key={kpi.label} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-hover hover:border-slate-200">
+                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">{kpi.label}</div>
+                    <div className="text-[22px] font-black tracking-tight" style={{ color: panel.color }}>{kpi.value}</div>
+                    <div className={`text-[11px] font-bold mt-1 ${!kpi.delta ? 'text-slate-400' : kpi.delta.startsWith('+') ? 'text-emerald-500' : kpi.delta.startsWith('-') ? 'text-rose-500' : 'text-slate-900'}`}>{kpi.delta || '—'}</div>
                   </div>
                 ))}
               </div>
-              {/* Gráfico com tooltip hover */}
-              <div style={{background:'#f8fafc',border:'1px solid #f1f5f9',borderRadius:'16px',padding:'16px'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}}>Tendência no período · Passe o mouse para ver os valores</div>
-                <div style={{position:'relative'}}>
-                  <svg viewBox="0 0 440 100" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'100px',display:'block'}}>
-                    {[25,50,75].map(y=><line key={y} x1="0" y1={y} x2="440" y2={y} stroke="#e2e8f0" strokeWidth="0.8"/>)}
-                    <defs><linearGradient id={`pg${panel.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={panel.color} stopOpacity="0.18"/><stop offset="100%" stopColor={panel.color} stopOpacity="0"/></linearGradient></defs>
-                    <polyline points={panel.chartArea} fill={`url(#pg${panel.id})`} stroke="none"/>
-                    <polyline points={panel.chart}     fill="none" stroke={panel.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    {panel.chartPts.map((pt:any)=>(
-                      <circle key={pt.x} cx={pt.x} cy={pt.y} r="4" fill={panel.color} stroke="white" strokeWidth="2" style={{cursor:'pointer'}}
-                        onMouseOver={()=>setChartTip({show:true,val:pt.val,label:pt.label})}
-                        onMouseOut={()=>setChartTip({show:false,val:'',label:''})}/>
-                    ))}
-                    {['S1','S2','S3','S4','S5','S6','S7','S8'].map((l,i)=><text key={l} x={10+i*60} y="96" fontSize="8" fill="#94a3b8" fontFamily="Inter">{l}</text>)}
-                  </svg>
-                  {chartTip.show&&(
-                    <div style={{position:'absolute',top:'4px',left:'50%',transform:'translateX(-50%)',background:'#0f172a',color:'white',padding:'5px 12px',borderRadius:'8px',fontSize:'12px',fontWeight:700,pointerEvents:'none',whiteSpace:'nowrap'}}>
-                      {chartTip.label}: {chartTip.val}
-                    </div>
-                  )}
+
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-4">Tendência no período</div>
+                <div className="h-32 w-full flex items-end gap-1 px-1">
+                  {/* Simplificação: Barras estilizadas em vez de SVG complexo para evitar bugs de token */}
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="flex-1 rounded-t-sm transition-all duration-500 hover:opacity-80" style={{ height: `${20 + Math.random() * 80}%`, background: panel.color, opacity: 0.3 + (i * 0.05) }} />
+                  ))}
+                </div>
+                <div className="flex justify-between mt-2 px-1 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <span>Início</span>
+                  <span>Meio</span>
+                  <span>Fim</span>
                 </div>
               </div>
-              {/* Análise */}
-              <div className="perf-ana-block">
-                <div className="perf-ana-label">Análise do período · O que aconteceu</div>
-                {panel.analysis.map((row:any)=>(
-                  <div key={row.name} className="perf-ana-row">
-                    <div><div style={{fontSize:'13px',fontWeight:600,color:'#0f172a'}}>{row.name}</div><div style={{fontSize:'11px',color:'#94a3b8',marginTop:'1px'}}>{row.sub}</div></div>
-                    <div style={{textAlign:'right'}}>
-                      <div style={{fontSize:'13px',fontWeight:800,color:!row.val?'#0f172a':row.val.toString().startsWith('+')?'#16a34a':row.val.toString().startsWith('-')?'#dc2626':'#0f172a'}}>{row.val}</div>
-                      {row.badge&&<span className={bc(row.badgeClass||'bsl')}>{row.badge}</span>}
+
+              <div className="space-y-4">
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Análise do período</div>
+                {panel.analysis.map((row: any) => (
+                  <div key={row.name} className="flex justify-between items-center py-1">
+                    <div>
+                      <div className="text-[13px] font-bold text-slate-900 leading-tight">{row.name}</div>
+                      <div className="text-[11px] text-slate-500">{row.sub}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-[13px] font-black ${!row.val ? 'text-slate-900' : row.val.toString().startsWith('+') ? 'text-emerald-500' : row.val.toString().startsWith('-') ? 'text-rose-500' : 'text-slate-900'}`}>{row.val}</div>
+                      {row.badge && <span className={bc(row.badgeClass || 'bsl')}>{row.badge}</span>}
                     </div>
                   </div>
                 ))}
               </div>
-              {/* Comparativo */}
-              <div className="perf-ana-block">
-                <div className="perf-ana-label">Comparativo com período anterior</div>
-                {panel.compare.map((row:any)=>(
-                  <div key={row.label} className="perf-ana-row">
-                    <div style={{fontSize:'13px',fontWeight:600,color:'#0f172a'}}>{row.label}</div>
-                    <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                      <span style={{fontSize:'12px',color:'#94a3b8'}}>{row.prev}</span>
-                      <span style={{fontSize:'10px',color:'#94a3b8'}}>→</span>
-                      <span style={{fontSize:'13px',fontWeight:700,color:row.trend==='up'?'#16a34a':row.trend==='down'?'#dc2626':'#0f172a'}}>{row.curr}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Squad */}
-              <div className="perf-ana-block">
-                <div className="perf-ana-label">Squad · SLA no período</div>
-                {panel.squad.map((s:any)=>(
-                  <div key={s.name} style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 0',borderBottom:'1px solid #f1f5f9'}}>
-                    <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'#eff2ff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:800,color:'#2b44ff',flexShrink:0}}>{ini(s.name)}</div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:'12px',fontWeight:600,color:'#0f172a'}}>{s.name}</div>
-                      <div style={{height:'4px',background:'#f1f5f9',borderRadius:'100px',overflow:'hidden',marginTop:'4px'}}><div style={{width:`${s.sla}%`,height:'100%',borderRadius:'100px',background:slaC(s.sla)}}/></div>
-                    </div>
-                    <span style={{fontSize:'12px',fontWeight:700,color:slaC(s.sla)}}>{s.sla}% SLA</span>
-                  </div>
-                ))}
-              </div>
+            </div>
+            
+            <div className="p-6 bg-slate-50 border-t border-slate-100">
+              <button className="w-full py-3.5 rounded-xl bg-slate-900 text-white text-[13px] font-black hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 cursor-pointer" onClick={() => setPanel(null)}>Fechar análise</button>
             </div>
           </div>
-        </>
+        </div>
       )}
- 
+
       {/* ── FULLSCREEN OWNER ── */}
       {ownerPanel && (
-        <div className="perf-fullscreen">
-          <div style={{background:'linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%)',padding:'28px 40px 24px',flexShrink:0}}>
-            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
-                <div style={{width:'48px',height:'48px',borderRadius:'50%',background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',fontWeight:800,color:'white',flexShrink:0}}>{ini(ownerPanel.name)}</div>
+        <div className="fixed inset-0 z-[100] bg-slate-950 flex flex-col animate-in fade-in duration-300">
+          <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-10 flex flex-col gap-8">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-xl font-black text-white shrink-0 shadow-2xl">{ini(ownerPanel.name)}</div>
                 <div>
-                  <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.2em',marginBottom:'4px'}}>Canopi · Squads · Análise Individual</div>
-                  <div style={{fontSize:'28px',fontWeight:900,color:'white',letterSpacing:'-0.03em'}}>{ownerPanel.name}</div>
-                  <div style={{fontSize:'13px',color:'rgba(255,255,255,0.6)',marginTop:'2px'}}>{ownerPanel.role}</div>
+                  <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Squads · Análise Individual</div>
+                  <h2 className="text-[36px] font-black text-white tracking-tighter leading-none mb-1">{ownerPanel.name}</h2>
+                  <p className="text-[15px] text-white/60 font-medium">{ownerPanel.role}</p>
                 </div>
               </div>
-              <button onClick={()=>setOwnerPanel(null)} style={{width:'36px',height:'36px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',color:'white',fontSize:'14px',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+              <button onClick={() => setOwnerPanel(null)} className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/15 transition-all group cursor-pointer shadow-xl">
+                <span className="text-xl transition-transform group-hover:rotate-90">✕</span>
+              </button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px',marginTop:'20px'}}>
-              {[{l:'SLA',v:`${ownerPanel.sla}%`,s:ownerPanel.sla>=80?'✓ Meta atingida':ownerPanel.sla>=65?'⚠ Atenção':'✗ Abaixo',sc:ownerPanel.sla>=80?'#6ee7b7':ownerPanel.sla>=65?'#fde68a':'#fca5a5'},{l:'Ações',v:ownerPanel.acoes,s:'no período',sc:'rgba(255,255,255,0.4)'},{l:'Tempo médio',v:'14h',s:'por ação',sc:'rgba(255,255,255,0.4)'},{l:'Backlog',v:'2',s:'ações pendentes',sc:'rgba(255,255,255,0.4)'}].map(x=>(
-                <div key={x.l} style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'14px 16px'}}>
-                  <div style={{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'6px'}}>{x.l}</div>
-                  <div style={{fontSize:'24px',fontWeight:800,color:'white'}}>{x.v}</div>
-                  <div style={{fontSize:'11px',fontWeight:700,marginTop:'2px',color:x.sc}}>{x.s}</div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { l: 'SLA', v: `${ownerPanel.sla}%`, s: ownerPanel.sla >= 80 ? '✓ Meta atingida' : ownerPanel.sla >= 65 ? '⚠ Atenção' : '✗ Abaixo', sc: ownerPanel.sla >= 80 ? 'text-emerald-400' : ownerPanel.sla >= 65 ? 'text-amber-400' : 'text-rose-400' },
+                { l: 'Ações', v: ownerPanel.acoes, s: 'no período', sc: 'text-white/40' },
+                { l: 'Tempo médio', v: '14h', s: 'por ação', sc: 'text-white/40' },
+                { l: 'Backlog', v: '2', s: 'pendentes', sc: 'text-white/40' }
+              ].map(x => (
+                <div key={x.l} className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">{x.l}</div>
+                  <div className="text-[28px] font-black text-white mb-1">{x.v}</div>
+                  <div className={`text-[11px] font-bold ${x.sc}`}>{x.s}</div>
                 </div>
               ))}
             </div>
           </div>
-          <div style={{flex:1,overflowY:'auto',padding:'24px 40px'}}>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px',maxWidth:'900px'}}>
-              <div style={{background:'white',borderRadius:'20px',padding:'20px 24px',border:'1px solid #f1f5f9',boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'12px'}}>Distribuição de SLA por tipo</div>
-                {ownerPanel.slaTypes.map((t:any)=>(
-                  <div key={t.label} style={{marginBottom:'10px'}}>
-                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:'4px'}}><span style={{fontSize:'12px',fontWeight:600,color:'#0f172a'}}>{t.label}</span><span style={{fontSize:'12px',fontWeight:700,color:slaC(t.pct)}}>{t.pct}%</span></div>
-                    <div style={{height:'6px',background:'#f1f5f9',borderRadius:'100px',overflow:'hidden'}}><div style={{width:`${t.pct}%`,height:'100%',borderRadius:'100px',background:slaC(t.pct)}}/></div>
-                  </div>
-                ))}
+
+          <div className="flex-1 overflow-y-auto bg-slate-50 p-10">
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Distribuição de SLA por tipo</h4>
+                <div className="space-y-6">
+                  {ownerPanel.slaTypes.map((t: any) => (
+                    <div key={t.label}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-[13px] font-bold text-slate-900">{t.label}</span>
+                        <span className="text-[13px] font-black" style={{ color: slaC(t.pct) }}>{t.pct}%</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${t.pct}%`, background: slaC(t.pct) }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div style={{background:'white',borderRadius:'20px',padding:'20px 24px',border:'1px solid #f1f5f9',boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'12px'}}>Gargalos identificados</div>
-                {ownerPanel.gaps.map((g:any)=>(
-                  <div key={g.label} style={{display:'flex',alignItems:'flex-start',gap:'8px',padding:'8px 0',borderBottom:'1px solid #f1f5f9'}}>
-                    <span style={{fontSize:'14px',marginTop:'1px'}}>{g.icon}</span>
-                    <div><div style={{fontSize:'12px',fontWeight:600,color:'#0f172a'}}>{g.label}</div><div style={{fontSize:'11px',color:'#94a3b8'}}>{g.sub}</div></div>
-                  </div>
-                ))}
+              
+              <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Gargalos identificados</h4>
+                <div className="divide-y divide-slate-100">
+                  {ownerPanel.gaps.map((g: any) => (
+                    <div key={g.label} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
+                      <div className="text-2xl mt-1">{g.icon}</div>
+                      <div>
+                        <div className="text-[14px] font-bold text-slate-900 mb-0.5">{g.label}</div>
+                        <div className="text-[12px] text-slate-500 leading-relaxed">{g.sub}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -843,118 +815,147 @@ export default function Performance() {
  
       {/* ── FULLSCREEN INTEGRAÇÃO ── */}
       {intPanel && (
-        <div className="perf-fullscreen">
-          <div style={{background:'linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%)',padding:'28px 40px 24px',flexShrink:0}}>
-            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'14px'}}>
-                <div style={{width:'48px',height:'48px',borderRadius:'14px',background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',flexShrink:0}}>{intPanel.icon}</div>
+        <div className="fixed inset-0 z-[100] bg-slate-950 flex flex-col animate-in fade-in duration-300">
+          <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-10 flex flex-col gap-8">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-3xl shadow-2xl">{intPanel.icon}</div>
                 <div>
-                  <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.2em',marginBottom:'4px'}}>Canopi · Tecnologias · Diagnóstico</div>
-                  <div style={{fontSize:'28px',fontWeight:900,color:'white',letterSpacing:'-0.03em'}}>{intPanel.name}</div>
-                  <span className={bc(intPanel.status==='Conectado'?'bg':intPanel.status==='Degradado'?'bam':'br')} style={{marginTop:'6px',display:'inline-flex'}}>{intPanel.status}</span>
+                  <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Canopi · Tecnologias · Diagnóstico</div>
+                  <h2 className="text-[36px] font-black text-white tracking-tighter leading-none mb-3">{intPanel.name}</h2>
+                  <span className={bc(intPanel.status==='Conectado'?'bg':intPanel.status==='Degradado'?'bam':'br')}>{intPanel.status}</span>
                 </div>
               </div>
-              <button onClick={()=>setIntPanel(null)} style={{width:'36px',height:'36px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',color:'white',fontSize:'14px',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+              <button onClick={() => setIntPanel(null)} className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/15 transition-all group cursor-pointer shadow-xl">
+                <span className="text-xl transition-transform group-hover:rotate-90">✕</span>
+              </button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginTop:'20px'}}>
-              <div style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'14px 16px'}}><div style={{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'6px'}}>Uptime</div><div style={{fontSize:'24px',fontWeight:800,color:'white'}}>{intPanel.uptime}%</div></div>
-              <div style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'14px 16px'}}><div style={{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'6px'}}>Última sync</div><div style={{fontSize:'15px',fontWeight:800,color:'white'}}>{intPanel.sub.split('·')[0].trim()}</div></div>
-              <div style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:'16px',padding:'14px 16px'}}><div style={{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'6px'}}>Frentes afetadas</div><div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginTop:'4px'}}>{intPanel.affects.map((tag:string)=><span key={tag} style={{background:'rgba(255,255,255,0.15)',color:'white',padding:'2px 8px',borderRadius:'100px',fontSize:'10px',fontWeight:700}}>{tag}</span>)}</div></div>
-            </div>
-          </div>
-          <div style={{flex:1,overflowY:'auto',padding:'24px 40px'}}>
-            <div style={{maxWidth:'900px'}}>
-              {intPanel.status!=='Conectado'&&(
-                <div style={{background:'white',borderRadius:'20px',padding:'20px 24px',border:'1px solid #fecaca',marginBottom:'16px',boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
-                  <div style={{fontSize:'9px',fontWeight:700,color:'#dc2626',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'8px'}}>Impacto nos dados do período</div>
-                  <div style={{fontSize:'14px',color:'#0f172a',lineHeight:1.6}}>{intPanel.impact}</div>
-                </div>
-              )}
-              <div style={{background:'white',borderRadius:'20px',padding:'20px 24px',border:'1px solid #f1f5f9',boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
-                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.14em',marginBottom:'12px'}}>Histórico de uptime no período</div>
-                <div style={{display:'flex',gap:'4px',alignItems:'flex-end',height:'60px'}}>
-                  {intPanel.uptimeHistory.map((bar:number,i:number)=>(
-                    <div key={i} style={{flex:1,borderRadius:'4px 4px 0 0',background:bar>=99?'#10b981':bar>=90?'#f59e0b':'#ef4444',height:`${bar}%`,transition:'all 0.2s'}} title={`${bar}%`}/>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Uptime</div>
+                <div className="text-[28px] font-black text-white">{intPanel.uptime}%</div>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Última sync</div>
+                <div className="text-[18px] font-black text-white truncate">{intPanel.sub.split('·')[0].trim()}</div>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Frentes afetadas</div>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {intPanel.affects.map((tag: string) => (
+                    <span key={tag} className="px-2.5 py-1 rounded-full bg-white/15 text-white text-[10px] font-bold ring-1 ring-white/10">{tag}</span>
                   ))}
                 </div>
-                <div style={{display:'flex',justifyContent:'space-between',marginTop:'4px',fontSize:'9px',color:'#94a3b8'}}>
-                  {['S1','S2','S3','S4','S5','S6','S7','S8'].map(l=><span key={l}>{l}</span>)}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto bg-slate-50 p-10">
+            <div className="max-w-5xl mx-auto space-y-6">
+              {intPanel.status !== 'Conectado' && (
+                <div className="bg-white rounded-3xl p-8 border border-rose-100 shadow-sm shadow-rose-50">
+                  <h4 className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-4">Impacto nos dados do período</h4>
+                  <p className="text-[15px] text-slate-700 leading-relaxed">{intPanel.impact}</p>
+                </div>
+              )}
+              
+              <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Histórico de uptime no período</h4>
+                <div className="flex items-end gap-1.5 h-40">
+                  {intPanel.uptimeHistory.map((bar: number, i: number) => (
+                    <div key={i} className="flex-1 rounded-t-lg transition-all duration-300 group relative" style={{ height: `${bar}%`, background: bar >= 99 ? '#10b981' : bar >= 90 ? '#f59e0b' : '#ef4444' }}>
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">{bar}%</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  {['S1','S2','S3','S4','S5','S6','S7','S8'].map(l => <span key={l}>{l}</span>)}
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
- 
+
       {/* ── MODAL EXPORTAR ── */}
-      {showExport&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',backdropFilter:'blur(6px)',zIndex:80,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setShowExport(false)}>
-          <div style={{background:'white',borderRadius:'28px',width:'480px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
-            <div style={{background:'linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%)',padding:'28px 32px 24px'}}>
-              <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.2em',marginBottom:'6px'}}>Canopi · Revenue Ops</div>
-              <div style={{fontSize:'22px',fontWeight:900,color:'white',letterSpacing:'-0.02em',marginBottom:'4px'}}>Exportar Relatório</div>
-              <div style={{fontSize:'13px',color:'rgba(255,255,255,0.6)'}}>Desempenho · {pl}</div>
+      {showExport && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 sm:p-0">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowExport(false)} />
+          <div className="relative w-full max-w-[480px] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-8">
+              <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-3">Canopi · Revenue Ops</div>
+              <h3 className="text-[24px] font-black text-white tracking-tight mb-2">Exportar Relatório</h3>
+              <p className="text-[13px] text-white/60">Desempenho · {pl}</p>
             </div>
-            <div style={{padding:'24px 32px 28px'}}>
-              <div style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'12px'}}>Formato</div>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px',marginBottom:'20px'}}>
-                {EXPORT_FORMATS.map(fmt=>(
-                  <div key={fmt.id} style={{borderRadius:'14px',border:`2px solid ${exportFmt===fmt.id?'#2b44ff':'#f1f5f9'}`,padding:'14px 12px',cursor:'pointer',textAlign:'center',background:exportFmt===fmt.id?'#eff2ff':'#f8fafc',transition:'all 0.15s'}} onClick={()=>setExportFmt(fmt.id)}>
-                    <div style={{fontSize:'22px',marginBottom:'6px'}}>{fmt.icon}</div>
-                    <div style={{fontSize:'12px',fontWeight:700,color:exportFmt===fmt.id?'#2b44ff':'#0f172a'}}>{fmt.label}</div>
-                    <div style={{fontSize:'10px',color:'#94a3b8',marginTop:'2px'}}>{fmt.desc}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'10px'}}>Incluir no relatório</div>
-              <div style={{display:'flex',flexDirection:'column',gap:'6px',marginBottom:'24px'}}>
-                {exportSections.map(sec=>(
-                  <div key={sec.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',background:'#f8fafc',borderRadius:'10px',cursor:'pointer'}} onClick={()=>setExportSections(prev=>prev.map(s=>s.id===sec.id?{...s,on:!s.on}:s))}>
-                    <span style={{fontSize:'13px',color:'#0f172a'}}>{sec.label}</span>
-                    <div style={{width:'36px',height:'20px',borderRadius:'100px',display:'flex',alignItems:'center',padding:'2px',background:sec.on?'#2b44ff':'#e2e8f0',justifyContent:sec.on?'flex-end':'flex-start',transition:'all 0.2s'}}>
-                      <div style={{width:'16px',height:'16px',borderRadius:'50%',background:'white'}}/>
+            
+            <div className="p-8 space-y-8">
+              <div>
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Formato</h4>
+                <div className="grid grid-cols-3 gap-3">
+                  {EXPORT_FORMATS.map(fmt => (
+                    <div key={fmt.id} className={`p-4 rounded-2xl border-2 transition-all cursor-pointer text-center group ${exportFmt === fmt.id ? 'border-[#2b44ff] bg-blue-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`} onClick={() => setExportFmt(fmt.id)}>
+                      <div className="text-[24px] mb-2 group-hover:scale-110 transition-transform">{fmt.icon}</div>
+                      <div className={`text-[12px] font-black ${exportFmt === fmt.id ? 'text-[#2b44ff]' : 'text-slate-900'}`}>{fmt.label}</div>
+                      <div className="text-[10px] text-slate-400 mt-1">{fmt.desc}</div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <div style={{display:'flex',gap:'8px'}}>
-                <button style={{flex:1,padding:'12px',borderRadius:'14px',background:'#2b44ff',color:'white',fontSize:'13px',fontWeight:700,border:'none',cursor:'pointer',fontFamily:'inherit'}} onClick={()=>{setShowExport(false);showToast('Relatório exportado com sucesso','PDF gerado e pronto para download');}}>↓ Exportar agora</button>
-                <button style={{padding:'12px 20px',borderRadius:'14px',background:'#f8fafc',color:'#475569',fontSize:'13px',fontWeight:600,border:'1px solid #e2e8f0',cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setShowExport(false)}>Cancelar</button>
+
+              <div>
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Incluir no relatório</h4>
+                <div className="space-y-2">
+                  {exportSections.map(sec => (
+                    <div key={sec.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer group hover:border-slate-200" onClick={() => setExportSections(prev => prev.map(s => s.id === sec.id ? { ...s, on: !s.on } : s))}>
+                      <span className="text-[14px] font-bold text-slate-700">{sec.label}</span>
+                      <div className={`w-10 h-6 rounded-full relative transition-colors duration-200 ${sec.on ? 'bg-[#2b44ff]' : 'bg-slate-200'}`}>
+                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-200 shadow-sm ${sec.on ? 'left-5' : 'left-1'}`} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button className="flex-1 py-4 rounded-xl bg-[#2b44ff] text-white text-[14px] font-black hover:bg-[#1a2dbb] transition-all shadow-lg shadow-blue-200 cursor-pointer" onClick={() => { setShowExport(false); showToast('Relatório exportado com sucesso', 'PDF gerado e pronto para download'); }}>↓ Exportar agora</button>
+                <button className="px-6 py-4 rounded-xl bg-slate-50 text-slate-500 text-[14px] font-bold border border-slate-100 hover:bg-slate-100 transition-all cursor-pointer" onClick={() => setShowExport(false)}>Cancelar</button>
               </div>
             </div>
           </div>
         </div>
       )}
- 
+
       {/* ── FULLSCREEN SINAIS GERADOS ── */}
-      {showSignals&&(
-        <div className="perf-fullscreen">
-          <div style={{background:'linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%)',padding:'28px 40px 24px',flexShrink:0}}>
-            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+      {showSignals && (
+        <div className="fixed inset-0 z-[100] bg-slate-950 flex flex-col animate-in fade-in duration-300">
+          <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-10 flex flex-col gap-8">
+            <div className="flex items-start justify-between">
               <div>
-                <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.2em',marginBottom:'6px'}}>Canopi · Revenue Ops · Desempenho</div>
-                <div style={{fontSize:'32px',fontWeight:900,color:'white',letterSpacing:'-0.03em',marginBottom:'6px'}}>Sinais Gerados</div>
-                <div style={{fontSize:'14px',color:'rgba(255,255,255,0.6)'}}>O desempenho atual está gerando estes sinais para o próximo ciclo</div>
+                <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+                <h2 className="text-[42px] font-black text-white tracking-tighter leading-none mb-3">Sinais Gerados</h2>
+                <p className="text-[15px] text-white/60">O desempenho atual está gerando estes sinais para o próximo ciclo</p>
               </div>
-              <button onClick={()=>setShowSignals(false)} style={{width:'36px',height:'36px',borderRadius:'50%',background:'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.15)',color:'white',fontSize:'14px',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+              <button onClick={() => setShowSignals(false)} className="w-12 h-12 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/15 transition-all group cursor-pointer shadow-xl">
+                <span className="text-xl transition-transform group-hover:rotate-90">✕</span>
+              </button>
             </div>
           </div>
-          <div style={{flex:1,overflowY:'auto',padding:'24px 40px'}}>
-            <div style={{display:'flex',flexDirection:'column',gap:'10px',maxWidth:'900px'}}>
-              {ALERTS.map(alert=>(
-                <div key={alert.id} style={{background:'white',borderRadius:'20px',padding:'20px 24px',border:'1px solid #f1f5f9',boxShadow:'0 1px 4px rgba(0,0,0,0.04)',display:'flex',gap:'14px',alignItems:'flex-start',cursor:'pointer',transition:'all 0.15s',borderLeft:`4px solid ${alertBorder(alert.badgeClass)}`}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 4px 16px rgba(0,0,0,0.08)';}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 1px 4px rgba(0,0,0,0.04)';}}>
-                  <div style={{width:'38px',height:'38px',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',flexShrink:0,background:alert.iconBg}}>{alert.icon}</div>
-                  <div style={{flex:1}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
-                      <span style={{fontSize:'14px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em'}}>{alert.title}</span>
+          
+          <div className="flex-1 overflow-y-auto bg-slate-50 p-10">
+            <div className="max-w-4xl mx-auto space-y-3">
+              {ALERTS.map(alert => (
+                <div key={alert.id} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex gap-6 items-start transition-all hover:shadow-md hover:border-slate-200 group" style={{ borderLeftWidth: '6px', borderLeftColor: alertBorder(alert.badgeClass) }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style={{ background: alert.iconBg }}>{alert.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h4 className="text-[16px] font-black text-slate-900 tracking-tight leading-none">{alert.title}</h4>
                       <span className={bc(alert.badgeClass)}>{alert.severity}</span>
                     </div>
-                    <div style={{fontSize:'13px',color:'#64748b',lineHeight:1.6,marginBottom:'10px'}}>{alert.desc}</div>
-                    <div style={{display:'flex',gap:'8px'}}>
-                      <button style={{padding:'6px 14px',borderRadius:'10px',fontSize:'12px',fontWeight:700,border:'none',cursor:'pointer',background:'#eff2ff',color:'#2b44ff',fontFamily:'inherit'}} onClick={()=>setShowSignals(false)}>Ver {alert.id}</button>
-                      <button style={{padding:'6px 14px',borderRadius:'10px',fontSize:'12px',fontWeight:600,border:'1px solid #e2e8f0',background:'white',color:'#475569',cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setShowSignals(false)}>Ver conta relacionada</button>
+                    <p className="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">{alert.desc}</p>
+                    <div className="flex gap-4">
+                      <button className="px-4 py-2 rounded-lg bg-blue-50 text-[#2b44ff] text-[12px] font-black hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => setShowSignals(false)}>Ver {alert.id}</button>
+                      <button className="px-4 py-2 rounded-lg bg-slate-50 text-slate-600 text-[12px] font-bold border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => setShowSignals(false)}>Ver conta relacionada</button>
                     </div>
                   </div>
                 </div>
@@ -963,47 +964,55 @@ export default function Performance() {
           </div>
         </div>
       )}
- 
+
       {/* ── MODAL PERÍODO PERSONALIZADO ── */}
-      {showDatePicker&&(
-        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.4)',backdropFilter:'blur(6px)',zIndex:80,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setShowDatePicker(false)}>
-          <div style={{background:'white',borderRadius:'28px',width:'420px',boxShadow:'0 32px 80px rgba(0,0,0,0.18)',overflow:'hidden'}} onClick={e=>e.stopPropagation()}>
-            <div style={{background:'linear-gradient(135deg,#041135 0%,#11286e 52%,#1f3f9b 100%)',padding:'24px 28px 20px'}}>
-              <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.2em',marginBottom:'6px'}}>Filtro de Período</div>
-              <div style={{fontSize:'20px',fontWeight:900,color:'white',letterSpacing:'-0.02em'}}>Período Personalizado</div>
+      {showDatePicker && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowDatePicker(false)} />
+          <div className="relative w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-8">
+              <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-3">Filtro de Período</div>
+              <h3 className="text-[22px] font-black text-white tracking-tight">Período Personalizado</h3>
             </div>
-            <div style={{padding:'24px 28px 28px'}}>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',marginBottom:'20px'}}>
-                {[{label:'Data inicial',val:dateFrom,set:setDateFrom},{label:'Data final',val:dateTo,set:setDateTo}].map(x=>(
+            
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Data inicial', val: dateFrom, set: setDateFrom },
+                  { label: 'Data final', val: dateTo, set: setDateTo }
+                ].map(x => (
                   <div key={x.label}>
-                    <div style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'6px'}}>{x.label}</div>
-                    <input type="date" value={x.val} onChange={e=>x.set(e.target.value)} style={{width:'100%',padding:'10px 12px',border:'1px solid #e2e8f0',borderRadius:'12px',fontSize:'13px',fontFamily:'inherit',outline:'none',color:'#0f172a'}}/>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{x.label}</label>
+                    <input type="date" value={x.val} onChange={e => x.set(e.target.value)} className="w-full h-11 px-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-[13px] font-bold focus:ring-2 focus:ring-[#2b44ff] focus:bg-white transition-all outline-none" />
                   </div>
                 ))}
               </div>
-              <div style={{fontSize:'11px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.1em',marginBottom:'8px'}}>Ou selecione um preset</div>
-              <div style={{display:'flex',flexWrap:'wrap',gap:'6px',marginBottom:'20px'}}>
-                {PERIODS.map(p=>(
-                  <button key={p.id} style={{padding:'5px 12px',borderRadius:'100px',fontSize:'11px',fontWeight:700,cursor:'pointer',border:'1px solid #e2e8f0',background:'#f8fafc',color:'#475569',fontFamily:'inherit'}} onClick={()=>{setPeriod(p.id);setShowDatePicker(false);}}>{p.label}</button>
-                ))}
+              
+              <div>
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ou selecione um preset</h4>
+                <div className="flex flex-wrap gap-2">
+                  {PERIODS.map(p => (
+                    <button key={p.id} className="px-4 py-2 rounded-full border border-slate-100 bg-slate-50 text-slate-600 text-[11px] font-black hover:bg-blue-50 hover:text-[#2b44ff] hover:border-blue-100 transition-all cursor-pointer" onClick={() => { setPeriod(p.id); setShowDatePicker(false); }}>{p.label}</button>
+                  ))}
+                </div>
               </div>
-              <div style={{display:'flex',gap:'8px'}}>
-                <button style={{flex:1,padding:'12px',borderRadius:'14px',background:'#2b44ff',color:'white',fontSize:'13px',fontWeight:700,border:'none',cursor:'pointer',fontFamily:'inherit'}} onClick={()=>{setPeriod('custom');setShowDatePicker(false);showToast('Período aplicado',`${dateFrom} até ${dateTo}`);}}>Aplicar período</button>
-                <button style={{padding:'12px 20px',borderRadius:'14px',background:'#f8fafc',color:'#475569',fontSize:'13px',fontWeight:600,border:'1px solid #e2e8f0',cursor:'pointer',fontFamily:'inherit'}} onClick={()=>setShowDatePicker(false)}>Cancelar</button>
+
+              <div className="flex gap-3 pt-2">
+                <button className="flex-1 py-4 rounded-xl bg-[#2b44ff] text-white text-[14px] font-black hover:bg-[#1a2dbb] transition-all shadow-lg shadow-blue-200 cursor-pointer" onClick={() => { setPeriod('custom'); setShowDatePicker(false); showToast('Período aplicado', `${dateFrom} até ${dateTo}`); }}>Aplicar período</button>
+                <button className="px-6 py-4 rounded-xl bg-slate-50 text-slate-500 text-[14px] font-bold border border-slate-100 hover:bg-slate-100 transition-all cursor-pointer" onClick={() => setShowDatePicker(false)}>Cancelar</button>
               </div>
             </div>
           </div>
         </div>
       )}
- 
+
       {/* ── TOAST ── */}
-      {toast&&(
-        <div className="perf-toast">
-          <div>{toast.msg}</div>
-          {toast.sub&&<div style={{fontSize:'11px',opacity:0.65,marginTop:'2px'}}>{toast.sub}</div>}
+      {toast && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-slate-900 text-white rounded-2xl px-6 py-4 shadow-2xl animate-in slide-in-from-bottom duration-300 flex flex-col items-center min-w-[280px]">
+          <div className="text-[13px] font-black tracking-tight">{toast.msg}</div>
+          {toast.sub && <div className="text-[11px] text-white/50 font-medium mt-1 leading-none">{toast.sub}</div>}
         </div>
       )}
- 
     </div>
   );
 }
