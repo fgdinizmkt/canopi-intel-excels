@@ -49,6 +49,23 @@ import { advancedSignals } from '../data/signalsV6';
 import { contasMock } from '../data/accountsData';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
+/**
+ * Utilitário para composição de classes Tailwind de forma segura e legível.
+ */
+function cx(...classes: (string | undefined | null | boolean)[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
+const colorMap: Record<string, { bg: string; text: string; border: string; dot: string; badge: string; shadow: string; icon: string }> = {
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100', dot: 'bg-blue-500', badge: 'bg-blue-500/10 text-blue-700 border-blue-200', shadow: 'shadow-blue-200/20', icon: 'text-blue-400' },
+  indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-100', dot: 'bg-indigo-500', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-200', shadow: 'shadow-indigo-200/20', icon: 'text-indigo-400' },
+  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-200', shadow: 'shadow-emerald-200/20', icon: 'text-emerald-400' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-700 border-amber-200', shadow: 'shadow-amber-200/20', icon: 'text-amber-400' },
+  red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100', dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-700 border-red-200', shadow: 'shadow-red-200/20', icon: 'text-red-400' },
+  slate: { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100', dot: 'bg-purple-500', badge: 'bg-purple-500/10 text-purple-700 border-purple-200', shadow: 'shadow-purple-200/20', icon: 'text-purple-400' },
+};
+
 // --- MOCK DATA PARA ICP / PERSONAS ---
 const personaData = [
   { 
@@ -79,16 +96,18 @@ const personaData = [
 
 // --- AUX COMPONENTS (FASE 2: Identificação de Fonte) ---
 const SourceBadge: React.FC<{ source: string }> = ({ source }) => {
-  const isNexus = source.toLowerCase().includes('nexus');
-  const isMinerva = source.toLowerCase().includes('minerva');
-  const isCross = source.toLowerCase().includes('cross');
+  const s = source.toLowerCase();
+  const variant = s.includes('nexus') ? 'indigo' : 
+                  s.includes('minerva') ? 'amber' : 
+                  s.includes('cross') ? 'purple' : 'slate';
   
   return (
-    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter shadow-sm
-      ${isNexus ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 
-        isMinerva ? 'bg-amber-50 border-amber-100 text-amber-600' : 
-        isCross ? 'bg-purple-50 border-purple-100 text-purple-600' : 
-        'bg-slate-50 border-slate-100 text-slate-500'}`}>
+    <div className={cx(
+      "flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter shadow-sm",
+      colorMap[variant].bg,
+      colorMap[variant].border,
+      colorMap[variant].text
+    )}>
        <Cpu className="w-2.5 h-2.5" /> {source}
     </div>
   );
@@ -175,7 +194,7 @@ export const Outbound: React.FC = () => {
                 <div className="mt-4 p-3 bg-white rounded-xl border border-slate-200">
                    <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Roteamento Sugerido</p>
                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${signal.isGlobal ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
+                      <div className={cx("w-2 h-2 rounded-full", signal.isGlobal ? 'bg-amber-500' : 'bg-emerald-500')}></div>
                       <span className="text-[10px] font-bold text-slate-900">{signal.isGlobal ? 'Página de AÇÕES (Interdisciplinar)' : 'Execução Local (SDR)'}</span>
                    </div>
                 </div>
@@ -195,12 +214,16 @@ export const Outbound: React.FC = () => {
 
           <div className="flex flex-col gap-3">
              <div className="flex gap-3">
-                <button className={`flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2
-                   ${signal.isGlobal ? 'bg-white border-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-slate-900 border-slate-900 text-white hover:bg-black'}`}>
+                <button className={cx(
+                  "flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
+                  signal.isGlobal ? 'bg-white border-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-slate-900 border-slate-900 text-white hover:bg-black'
+                )}>
                    <Zap className="w-4 h-4" /> Executar Local (Outbound)
                 </button>
-                <button className={`flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2
-                   ${signal.isGlobal ? 'bg-amber-600 border-amber-600 text-white hover:bg-amber-700' : 'bg-white border-slate-900 text-slate-900 hover:bg-slate-50'}`}>
+                <button className={cx(
+                  "flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
+                  signal.isGlobal ? 'bg-amber-600 border-amber-600 text-white hover:bg-amber-700' : 'bg-white border-slate-100 text-slate-900 hover:bg-slate-50'
+                )}>
                    <ExternalLink className="w-4 h-4" /> Enviar para Ações
                 </button>
              </div>
@@ -253,13 +276,19 @@ export const Outbound: React.FC = () => {
           <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
              <button 
                 onClick={() => setActiveTab('queue')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'queue' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
+                className={cx(
+                  "px-4 py-1.5 rounded-lg text-xs font-bold transition-all",
+                  activeTab === 'queue' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'
+                )}
              >
                 Fila de Intervenção
              </button>
              <button 
                 onClick={() => setActiveTab('personas')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'personas' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'}`}
+                className={cx(
+                  "px-4 py-1.5 rounded-lg text-xs font-bold transition-all",
+                  activeTab === 'personas' ? 'bg-white text-slate-900 shadow-sm border border-slate-200/50' : 'text-slate-500 hover:text-slate-700'
+                )}
              >
                 Contexto ICP
              </button>
@@ -274,14 +303,14 @@ export const Outbound: React.FC = () => {
       {/* Cockpit KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Em Fila Hoje', val: '42', detail: '12 urgentes', icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { label: 'Connect Rate', val: '58%', detail: '+4.2% vs ontem', icon: Phone, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'SLA em Risco', val: '04', detail: 'Abordagem atrasada', icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50' },
-          { label: 'Novos Sinais', val: '18', detail: 'Nexus/Minerva (24h)', icon: Sparkles, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: 'Em Fila Hoje', val: '42', detail: '12 urgentes', icon: Clock, color: 'blue' },
+          { label: 'Connect Rate', val: '58%', detail: '+4.2% vs ontem', icon: Phone, color: 'emerald' },
+          { label: 'SLA em Risco', val: '04', detail: 'Abordagem atrasada', icon: AlertTriangle, color: 'red' },
+          { label: 'Novos Sinais', val: '18', detail: 'Nexus/Minerva (24h)', icon: Sparkles, color: 'amber' },
         ].map((kpi, i) => (
           <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:border-slate-200 transition-all group">
             <div className="flex items-center justify-between mb-3 text-slate-300 group-hover:text-slate-400">
-              <div className={`w-10 h-10 rounded-xl ${kpi.bg} ${kpi.color} flex items-center justify-center shadow-inner`}>
+              <div className={cx("w-10 h-10 rounded-xl flex items-center justify-center shadow-inner", colorMap[kpi.color as string]?.bg, colorMap[kpi.color as string]?.text)}>
                 <kpi.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
               </div>
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -311,7 +340,10 @@ export const Outbound: React.FC = () => {
           {/* Top Intervention Area */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
              {outboundSignals.slice(0, 3).map((signal, i) => (
-               <div key={i} className={`relative overflow-hidden bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group border-l-4 ${signal.isGlobal ? 'border-l-amber-500' : 'border-l-blue-500'}`}>
+               <div key={i} className={cx(
+                 "relative overflow-hidden bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group border-l-4",
+                 signal.isGlobal ? 'border-l-amber-500' : 'border-l-blue-500'
+               )}>
                   <div className="flex justify-between items-start mb-4">
                      <div className="flex flex-col gap-1.5">
                         <SourceBadge source={signal.source} />
@@ -338,8 +370,10 @@ export const Outbound: React.FC = () => {
                         <span className="text-[10px] font-extrabold text-slate-700 tracking-tighter hover:text-blue-600 transition-colors truncate max-w-[80px]">{signal.account}</span>
                         <ArrowUpRight className="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/item:opacity-100 transition-all" />
                      </div>
-                     <button onClick={() => openPlaybookDrawer(signal)} className={`text-[10px] font-black px-4 py-2 rounded-xl transition-all flex items-center gap-2 shadow-sm
-                        ${signal.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-slate-900 text-white hover:bg-black'}`}>
+                     <button onClick={() => openPlaybookDrawer(signal)} className={cx(
+                       "text-[10px] font-black px-4 py-2 rounded-xl transition-all flex items-center gap-2 shadow-sm",
+                       signal.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-slate-900 text-white hover:bg-black'
+                     )}>
                         {signal.isGlobal ? 'Escalar para Ações' : 'Executar Playbook'} <ArrowRight className="w-3 h-3" />
                      </button>
                   </div>
@@ -416,8 +450,10 @@ export const Outbound: React.FC = () => {
 
                     {/* CTAs Finalizada (Costura Semântica) */}
                     <div className="flex items-center gap-3 ml-auto shrink-0 pt-4 lg:pt-0 border-t lg:border-none border-slate-50">
-                       <button onClick={() => openPlaybookDrawer(item)} className={`h-11 px-6 rounded-[16px] text-[10px] font-black uppercase tracking-[0.05em] transition-all shadow-xl flex items-center gap-2
-                          ${item.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-600/10' : 'bg-slate-900 text-white hover:bg-black shadow-slate-900/10'}`}>
+                       <button onClick={() => openPlaybookDrawer(item)} className={cx(
+                         "h-11 px-6 rounded-[16px] text-[10px] font-black uppercase tracking-[0.05em] transition-all shadow-xl flex items-center gap-2",
+                         item.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-600/10' : 'bg-slate-900 text-white hover:bg-black shadow-slate-900/10'
+                       )}>
                           {item.isGlobal ? 'Escalar para Ações' : 'Executar Playbook'} <ArrowRight className="w-4 h-4" />
                        </button>
                        <div className="flex gap-1.5">
@@ -473,7 +509,10 @@ export const Outbound: React.FC = () => {
                           </div>
                           <div className="text-right">
                              <p className="text-[16px] font-black text-slate-900 tracking-tight">{v.benchmark}</p>
-                             <div className={`flex items-center justify-end gap-1 text-[9px] font-black uppercase mt-0.5 ${v.trend === 'up' ? 'text-emerald-600' : v.trend === 'down' ? 'text-rose-600' : 'text-slate-400'}`}>
+                             <div className={cx(
+                               "flex items-center justify-end gap-1 text-[9px] font-black uppercase mt-0.5",
+                               v.trend === 'up' ? 'text-emerald-600' : v.trend === 'down' ? 'text-rose-600' : 'text-slate-400'
+                             )}>
                                 {v.trend === 'up' ? <TrendingUp className="w-2.5 h-2.5" /> : v.trend === 'down' ? <Activity className="w-2.5 h-2.5" /> : null}
                                 {v.trend === 'up' ? 'CRESCENTE' : v.trend === 'down' ? 'EM QUEDA' : 'ESTÁVEL'}
                              </div>
@@ -497,25 +536,25 @@ export const Outbound: React.FC = () => {
                     </div>
 
                     <div className="space-y-6">
-                       {[
-                          { persona: 'C-Level', channel: 'Personalized Email', pct: 68, color: 'bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.5)]' },
-                          { persona: 'Heads / VPs', channel: 'LinkedIn Voice', pct: 42, color: 'bg-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.5)]' },
-                          { persona: 'Managers', channel: 'Direct Cold Call', pct: 24, color: 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]' },
-                       ].map((p, i) => (
-                          <div key={i} className="space-y-2">
-                             <div className="flex justify-between items-center">
-                                <span className="text-xs font-extrabold">{p.persona}</span>
-                                <span className={`text-xs font-black ${p.persona === 'C-Level' ? 'text-blue-400' : ''}`}>{p.pct}%</span>
-                             </div>
-                             <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5 relative">
-                                <div className={`h-full rounded-full ${p.color} transition-all duration-1000`} style={{ width: `${p.pct}%` }}></div>
-                             </div>
-                             <div className="flex items-center gap-1.5 opacity-60">
-                                <span className="text-[9px] font-bold uppercase text-slate-400">Canal Vencedor:</span>
-                                <span className="text-[9px] font-black text-slate-300">{p.channel}</span>
-                             </div>
-                          </div>
-                       ))}
+                        {[
+                           { persona: 'C-Level', channel: 'Personalized Email', pct: 68, variant: 'blue' },
+                           { persona: 'Heads / VPs', channel: 'LinkedIn Voice', pct: 42, variant: 'purple' },
+                           { persona: 'Managers', channel: 'Direct Cold Call', pct: 24, variant: 'emerald' },
+                        ].map((p, i) => (
+                           <div key={i} className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                 <span className="text-xs font-extrabold">{p.persona}</span>
+                                 <span className={cx("text-xs font-black", p.persona === 'C-Level' && 'text-blue-400')}>{p.pct}%</span>
+                              </div>
+                              <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5 relative">
+                                 <div className={cx("h-full rounded-full transition-all duration-1000", colorMap[p.variant]?.dot, colorMap[p.variant]?.shadow)} style={{ width: `${p.pct}%` } as React.CSSProperties}></div>
+                              </div>
+                              <div className="flex items-center gap-1.5 opacity-60">
+                                 <span className="text-[9px] font-bold uppercase text-slate-400">Canal Vencedor:</span>
+                                 <span className="text-[9px] font-black text-slate-300">{p.channel}</span>
+                              </div>
+                           </div>
+                        ))}
                     </div>
 
                     <div className="pt-6 border-t border-white/5 flex items-center gap-3">
