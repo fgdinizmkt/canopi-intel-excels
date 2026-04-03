@@ -195,3 +195,9 @@ Se um arquivo for mencionado como alterado em um relatório, ele deve obrigatori
 
 ### 7. Prompts de Alta Densidade e Baixa Redundância
 Priorizar instruções práticas, definições de escopo e evidências. Evitar repetições de contexto óbvio ou saudações desnecessárias que consomem tokens e reduzem a clareza operativa.
+
+### 8. Idioma Operacional (PT-BR)
+Toda comunicação operacional e documental deste repositório deve ocorrer exclusivamente em **Português do Brasil**:
+- Não alternar idioma sem solicitação explícita do usuário.
+- Prompts, diagnósticos, handoffs, aprovações, checklists e relatórios devem permanecer em PT-BR.
+- Comentários técnicos em arquivos de código podem seguir o padrão do arquivo original (geralmente inglês), mas o contexto operacional de suporte deve ser em português.
