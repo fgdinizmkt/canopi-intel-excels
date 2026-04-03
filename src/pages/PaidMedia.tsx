@@ -260,7 +260,10 @@ export const PaidMedia: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-500 uppercase">Canal de Origem</label>
-                    <select className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                    <select 
+                       aria-label="Canal de Origem"
+                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none ring-offset-2 focus:ring-2 focus:ring-blue-500 transition-all"
+                    >
                        <option>Google Ads (Search + PMax)</option>
                        <option>LinkedIn Ads (Matched Audience)</option>
                        <option>Meta Ads (Direct Response)</option>
@@ -269,7 +272,10 @@ export const PaidMedia: React.FC = () => {
                  </div>
                  <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo Agêntico</label>
-                    <select className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none">
+                    <select 
+                       aria-label="Objetivo Agêntico"
+                       className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none ring-offset-2 focus:ring-2 focus:ring-blue-500 transition-all"
+                    >
                        <option>Maximização de Pipeline</option>
                        <option>Atração de Contas Tier 1</option>
                        <option>Retenção de Base (Churn Prev)</option>

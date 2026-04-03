@@ -82,42 +82,7 @@ type ActionItem = {
 
 // ─── Style helpers (inline para garantir compilação no Tailwind v4) ─────────
 
-const priorityBadgeStyle: Record<Priority, React.CSSProperties> = {
-  Crítica: { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' },
-  Alta:    { background: '#eff2ff', color: '#2b44ff', border: '1px solid #c7d2fe' },
-  Média:   { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' },
-  Baixa:   { background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0' },
-};
 
-const statusBadgeStyle: Record<ActionStatus, React.CSSProperties> = {
-  Nova:                   { background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0' },
-  'Em andamento':         { background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' },
-  Bloqueada:              { background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a' },
-  'Aguardando aprovação': { background: '#f5f3ff', color: '#6d28d9', border: '1px solid #ddd6fe' },
-  Concluída:              { background: '#f0fdf4', color: '#15803d', border: '1px solid #bbf7d0' },
-};
-
-const slaColorStyle: Record<SlaStatus, React.CSSProperties> = {
-  vencido: { color: '#dc2626', fontWeight: 700 },
-  alerta:  { color: '#d97706', fontWeight: 700 },
-  ok:      { color: '#0f172a', fontWeight: 700 },
-  sem_sla: { color: '#94a3b8', fontWeight: 600 },
-};
-
-const cardBorderStyle: Record<Priority, React.CSSProperties> = {
-  Crítica: { borderLeft: '4px solid #ef4444' },
-  Alta:    { borderLeft: '4px solid #2b44ff' },
-  Média:   { borderLeft: '4px solid #f59e0b' },
-  Baixa:   { borderLeft: '4px solid #94a3b8' },
-};
-
-const cardBgStyle: Record<ActionStatus, React.CSSProperties> = {
-  Nova:                   { background: 'rgba(248,250,252,0.9)' },
-  'Em andamento':         { background: 'rgba(239,246,255,0.7)' },
-  Bloqueada:              { background: 'rgba(255,251,235,0.8)' },
-  'Aguardando aprovação': { background: 'rgba(245,243,255,0.8)' },
-  Concluída:              { background: 'rgba(240,253,244,0.8)' },
-};
 
 // ─── Classes legadas (usadas no Kanban e Overlay) ───────────────────────────
 
@@ -174,13 +139,7 @@ const historyDotClasses: Record<HistoryItem["type"], string> = {
 };
 
 // Inline version for guaranteed rendering
-const historyDotColor: Record<HistoryItem["type"], string> = {
-  mudança: "#2563eb",
-  evidência: "#10b981",
-  risco: "#ef4444",
-  owner: "#7c3aed",
-  "follow-up": "#f59e0b",
-};
+
 
 
 const statusOptions: ActionStatus[] = ["Nova", "Em andamento", "Bloqueada", "Aguardando aprovação", "Concluída"];
@@ -926,64 +885,54 @@ function ActionListCard({
     const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
     return account ? account.id : '1';
   };
-  const cardStyle: React.CSSProperties = {
-    borderRadius: density === 'super-compacta' ? 14 : 24,
-    border: '1px solid #e2e8f0',
-    borderLeft: cardBorderStyle[item.priority].borderLeft,
-    ...cardBgStyle[item.status],
-    padding: density === 'super-compacta' ? '10px 16px' : '20px 24px',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
-  };
+  const getBtnClasses = (tone: string) => cx(
+    "block w-full py-2.25 px-4 rounded-[14px] text-[13px] font-bold transition-all hover:brightness-95 active:scale-[0.98] text-center",
+    tone === 'primary' ? "bg-blue-600 text-white border-none" : 
+    tone === 'danger' ? "bg-rose-50 text-rose-600 border border-rose-200" : 
+    "bg-white text-slate-700 border border-slate-200"
+  );
 
   // ── Super compacta: só título, owner e tags ────────────────────────
   if (density === 'super-compacta') {
     return (
-      <div style={cardStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{item.priority}</span>
-          <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{item.status}</span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
-            style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          >
-            <span className="hover:text-blue-600 transition-colors">{item.accountName}</span> <span style={{ fontWeight: 500, color: '#64748b' }}>— {item.title}</span>
-          </button>
-          <span style={{ fontSize: 12, color: '#64748b', flexShrink: 0 }}>{item.ownerName ?? 'N/A'}</span>
-          <span style={{ ...slaColorStyle[item.slaStatus], fontSize: 12, flexShrink: 0 }}>{item.slaText}</span>
-        </div>
-        {item.origin && (
-          <p style={{ fontSize: 10, color: '#94a3b8', fontWeight: 500, marginTop: 3, paddingLeft: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.origin}</p>
-        )}
+      <div className={cx(
+        "flex items-center gap-2.5 transition-all border shadow-sm",
+        priorityBorderClasses[item.priority],
+        cardSurfaceClasses[item.status],
+        "rounded-[14px] p-[10px_16px]"
+      )}>
+        <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0")}>{item.priority}</span>
+        <span className={cx(statusClasses[item.status], "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0")}>{item.status}</span>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+          className="flex-1 min-w-0 text-left bg-transparent border-none cursor-pointer p-0 text-sm font-extrabold text-slate-900 truncate"
+        >
+          <span className="hover:text-blue-600 transition-colors">{item.accountName}</span> <span className="font-medium text-slate-500">— {item.title}</span>
+        </button>
+        <span className="text-xs text-slate-500 shrink-0 font-medium">{item.ownerName ?? 'N/A'}</span>
+        <span className={cx(slaClasses[item.slaStatus], "text-xs shrink-0 font-bold")}>{item.slaText}</span>
       </div>
     );
   }
 
-  const btnStyle = (tone: string): React.CSSProperties => ({
-    display: 'block',
-    width: '100%',
-    padding: '9px 16px',
-    borderRadius: 14,
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: 'pointer',
-    textAlign: 'center',
-    border: tone === 'primary' ? 'none' : '1px solid #e2e8f0',
-    background: tone === 'primary' ? '#2b44ff' : tone === 'danger' ? '#fef2f2' : 'white',
-    color: tone === 'primary' ? 'white' : tone === 'danger' ? '#dc2626' : '#334155',
-  });
 
   return (
-    <div style={cardStyle} className="transition-all hover:border-slate-300">
+    <div className={cx(
+        "transition-all border shadow-sm hover:border-slate-300",
+        priorityBorderClasses[item.priority],
+        cardSurfaceClasses[item.status],
+        density === 'compacta' ? "rounded-[20px] p-4" : "rounded-[24px] p-[20px_24px]"
+    )}>
       <div className="flex gap-6 items-start">
         {/* Main content */}
         <div className="flex-1 min-w-0">
           {/* Badges */}
           <div className="flex flex-wrap gap-2 items-center">
-            <span style={priorityBadgeStyle[item.priority]} className="rounded-full px-2.5 py-1 text-[11px] font-bold">
+            <span className={cx(priorityClasses[item.priority], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
               {item.priority}
             </span>
-            <span style={statusBadgeStyle[item.status]} className="rounded-full px-2.5 py-1 text-[11px] font-bold">
+            <span className={cx(statusClasses[item.status], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
               {item.status}
             </span>
             <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
@@ -1050,9 +999,8 @@ function ActionListCard({
             <button
               key={button.id}
               type="button"
-              style={btnStyle(button.tone)}
+              className={getBtnClasses(button.tone)}
               onClick={() => onButtonAction(item, button.action)}
-              className="hover:brightness-95 transition-all active:scale-[0.98]"
               aria-label={button.label}
             >
               {button.label}
@@ -1060,7 +1008,7 @@ function ActionListCard({
           ))}
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">SLA</p>
-            <p className={cx("mt-1.25 text-[13px] font-bold", item.slaStatus === 'vencido' ? 'text-red-600' : item.slaStatus === 'alerta' ? 'text-amber-600' : 'text-emerald-600')}>{item.slaText}</p>
+            <p className={cx("mt-1.25 text-[13px] font-bold", slaClasses[item.slaStatus])}>{item.slaText}</p>
           </div>
         </div>
       </div>
@@ -1092,39 +1040,35 @@ function KanbanCard({
 
   const minH = superCompact ? 120 : compact ? 200 : medium ? 248 : 290;
 
-  const cardStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    borderRadius: 20,
-    border: '1px solid #e2e8f0',
-    borderLeft: cardBorderStyle[item.priority].borderLeft,
-    ...cardBgStyle[item.status],
-    padding: 14,
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-    minHeight: minH,
-    cursor: 'grab',
-  };
-
   return (
-    <div draggable onDragStart={() => onDragStart(item.id)} style={cardStyle}>
+    <div 
+      draggable 
+      onDragStart={() => onDragStart(item.id)} 
+      className={cx(
+        "flex flex-col border transition-all cursor-grab active:cursor-grabbing hover:border-slate-400 hover:shadow-lg",
+        priorityBorderClasses[item.priority],
+        cardSurfaceClasses[item.status],
+        superCompact ? "rounded-[16px] p-2.5 min-h-[120px]" : compact ? "rounded-[20px] p-4 min-h-[200px]" : medium ? "rounded-[20px] p-4 min-h-[248px]" : "rounded-[20px] p-4 min-h-[290px]"
+      )}
+    >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-          <GripVertical style={{ width: 14, height: 14, color: '#94a3b8', flexShrink: 0 }} />
-          <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '2px 8px', fontSize: 10, fontWeight: 700 }}>
+      <div className="flex items-center justify-between gap-1.5">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-[10px] font-bold")}>
             {item.priority}
           </span>
-          <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '2px 8px', fontSize: 10, fontWeight: 600, color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500 truncate">
             {item.category}
           </span>
           {item.sourceType === "playbook" && (
-            <span style={{ borderRadius: 100, border: '1px solid #e0f2fe', background: '#f0f9ff', padding: '2px 8px', fontSize: 10, fontWeight: 700, color: '#0284c7', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-sky-600 truncate">
               PB: {item.playbookName}
             </span>
           )}
         </div>
         {!compact && (
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8', flexShrink: 0 }}>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
             {item.channel}
           </span>
         )}
@@ -1132,27 +1076,27 @@ function KanbanCard({
 
       {/* Title */}
       {!superCompact && (
-        <div style={{ marginTop: 12, minWidth: 0 }}>
+        <div className="mt-3 min-w-0">
           <button
             type="button"
             onClick={() => onTitleClick(item)}
-            style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            className="w-full text-left bg-transparent border-none cursor-pointer p-0"
           >
-            <p style={{ fontSize: compact ? 17 : 18, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.25, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p className={cx("font-black tracking-tight leading-tight text-slate-900 truncate", compact ? "text-[17px]" : "text-[18px]")}>
               {item.accountName}
             </p>
-            <p style={{ marginTop: 3, fontSize: 12, fontWeight: 600, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p className="mt-0.5 text-xs font-semibold text-slate-600 truncate">
               {item.title}
             </p>
           </button>
-          <p style={{ marginTop: 8, fontSize: compact ? 11 : 12, lineHeight: 1.5, color: '#64748b' }}>{summary}</p>
+          <p className={cx("mt-2 leading-relaxed text-slate-500", compact ? "text-[11px]" : "text-xs")}>{summary}</p>
         </div>
       )}
       {superCompact && (
         <button
           type="button"
           onClick={() => onTitleClick(item)}
-          style={{ marginTop: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 14, fontWeight: 800, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          className="mt-2 w-full text-left bg-transparent border-none cursor-pointer p-0 text-sm font-black text-slate-900 truncate"
         >
           {item.accountName}
         </button>
@@ -1160,46 +1104,49 @@ function KanbanCard({
 
       {/* Meta — hide on super-compacta */}
       {!superCompact && (
-        <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: compact ? '1fr' : '1fr 1fr', gap: 8 }}>
+        <div className={cx("mt-3 grid gap-2", compact ? "grid-cols-1" : "grid-cols-2")}>
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>Owner</p>
-            <p style={{ marginTop: 4, fontSize: 12, fontWeight: 600, color: '#0f172a' }}>{item.ownerName ?? 'Não atribuído'}</p>
-            <p style={{ marginTop: 2, fontSize: 11, color: '#64748b' }}>{item.ownerTeam}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Owner</p>
+            <p className="mt-1 text-xs font-bold text-slate-900 truncate">{item.ownerName ?? 'Não atribuído'}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500 truncate">{item.ownerTeam}</p>
           </div>
           <div>
-            <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>SLA</p>
-            <p style={{ marginTop: 4, fontSize: 12, ...slaColorStyle[item.slaStatus] }}>{item.slaText}</p>
-            <p style={{ marginTop: 2, fontSize: 11, color: '#64748b' }}>{item.status}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">SLA</p>
+            <p className={cx("mt-1 text-xs font-bold", slaClasses[item.slaStatus])}>{item.slaText}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500 truncate">{item.status}</p>
           </div>
         </div>
       )}
 
       {/* Next step */}
-      {density !== 'compacta' && (
-        <div style={{ marginTop: 10, borderRadius: 12, background: 'rgba(255,255,255,0.8)', padding: '10px 12px' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94a3b8' }}>Próximo passo</p>
-          <p style={{ marginTop: 6, fontSize: 12, lineHeight: 1.5, color: '#334155' }}>
+      {density !== 'compacta' && !superCompact && (
+        <div className="mt-2.5 rounded-xl bg-white/60 p-2.5 border border-white/40">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próximo passo</p>
+          <p className="mt-1 text-xs leading-relaxed text-slate-600">
             {truncateText(item.nextStep, density === 'media' ? 80 : 120)}
           </p>
         </div>
       )}
 
       {/* Buttons */}
-      <div style={{ marginTop: 'auto', paddingTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className="mt-auto pt-3 flex gap-2 flex-wrap">
         <button
           type="button"
           onClick={() => onButtonAction(item, 'open')}
-          style={{ borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer' }}
+          className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 cursor-pointer hover:bg-slate-50 transition-all"
         >
           Ver
         </button>
-        <button
-          type="button"
-          onClick={() => onButtonAction(item, item.status === 'Concluída' ? 'open' : 'start')}
-          style={{ borderRadius: 12, border: 'none', background: '#2b44ff', padding: '6px 12px', fontSize: 12, fontWeight: 600, color: 'white', cursor: 'pointer' }}
-        >
-          {item.status === 'Concluída' ? 'Reabrir' : 'Executar'}
-        </button>
+        {item.buttons.slice(0, 1).map((btn) => (
+          <button
+            key={btn.id}
+            type="button"
+            onClick={() => onButtonAction(item, btn.action)}
+            className="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white cursor-pointer hover:bg-blue-700 transition-all"
+          >
+            {btn.label}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -1448,11 +1395,11 @@ function ActionOverlay({
         <div style={{ borderBottom: '1px solid #e2e8f0', padding: '24px 32px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 20 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ ...priorityBadgeStyle[item.priority], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{item.priority}</span>
-                <span style={{ ...statusBadgeStyle[item.status], borderRadius: 100, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{item.status}</span>
-                <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: '#f8fafc', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#475569' }}>{item.channel}</span>
-                <span style={{ borderRadius: 100, border: '1px solid #e2e8f0', background: 'white', padding: '3px 10px', fontSize: 11, fontWeight: 600, color: '#64748b' }}>{item.category}</span>
+              <div className="flex flex-wrap gap-2">
+                <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold border", priorityClasses[item.priority])}>{item.priority}</span>
+                <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold", statusClasses[item.status])}>{item.status}</span>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-500">{item.channel}</span>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-400">{item.category}</span>
               </div>
               <p 
                 onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
@@ -1563,8 +1510,8 @@ function ActionOverlay({
                   <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico recente</p>
                   <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {item.history.slice(0, 4).map((entry) => (
-                      <div key={entry.id} style={{ display: 'flex', gap: 12 }}>
-                        <span style={{ width: 10, height: 10, borderRadius: '50%', background: historyDotColor[entry.type], flexShrink: 0, marginTop: 4 }} />
+                      <div key={entry.id} className="flex gap-3">
+                        <span className={cx("w-2.5 h-2.5 rounded-full shrink-0 mt-1", historyDotClasses[entry.type])} />
                         <div>
                           <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
                           <p style={{ marginTop: 3, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when}</p>
@@ -1641,8 +1588,8 @@ function ActionOverlay({
                 <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#94a3b8' }}>Histórico da ação</p>
                 <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {item.history.map((entry) => (
-                    <div key={entry.id} style={{ display: 'flex', gap: 14 }}>
-                      <span style={{ width: 12, height: 12, borderRadius: '50%', background: historyDotColor[entry.type], flexShrink: 0, marginTop: 4 }} />
+                    <div key={entry.id} className="flex gap-3.5">
+                      <span className={cx("w-3 h-3 rounded-full shrink-0 mt-1", historyDotClasses[entry.type])} />
                       <div>
                         <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>{entry.text}</p>
                         <p style={{ marginTop: 4, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>{entry.actor} · {entry.when} · {entry.type}</p>
@@ -1942,52 +1889,41 @@ export const Actions: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen px-5 py-8 lg:px-8 2xl:px-10" style={{ background: '#f6f8fc' }}>
+    <div className="min-h-screen px-5 py-8 lg:px-8 2xl:px-10 bg-[#f6f8fc]">
       <div className="mx-auto max-w-[1520px]">
-        <section
-          style={{
-            background: 'linear-gradient(135deg, #041135 0%, #11286e 52%, #1f3f9b 100%)',
-            borderRadius: 36,
-            border: '1px solid #17348f',
-            padding: '32px 32px 36px',
-            color: 'white',
-            boxShadow: '0 28px 80px rgba(15,36,104,0.22)',
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
+        <section className="bg-gradient-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] rounded-[36px] border border-[#17348f] p-8 pb-9 text-white shadow-[0_28px_80px_rgba(15,36,104,0.22)] overflow-hidden relative">
           {/* Buttons — absolute top-right */}
-          <div style={{ position: 'absolute', top: 20, right: 24, display: 'flex', gap: 8, zIndex: 2 }}>
+          <div className="absolute top-5 right-6 flex gap-2 z-[2]">
             <button
               onClick={handleExport}
               title={`Exportar ${filteredItems.length} ações como CSV`}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 10, border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.08)', padding: '6px 13px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)', cursor: 'pointer', backdropFilter: 'blur(4px)' }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 cursor-pointer backdrop-blur-md hover:bg-white/20 transition-all"
             >
-              <Download style={{ width: 13, height: 13 }} /> Exportar
+              <Download className="w-3.5 h-3.5" /> Exportar
             </button>
             <button
               onClick={() => setShowNewAction(true)}
               title="Criar nova ação na fila operacional"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 10, background: 'white', padding: '6px 13px', fontSize: 12, fontWeight: 700, color: '#17348f', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-[#17348f] cursor-pointer shadow-lg hover:bg-slate-50 transition-all active:scale-95"
             >
-              <Plus style={{ width: 13, height: 13 }} /> Nova ação
+              <Plus className="w-3.5 h-3.5" /> Nova ação
             </button>
           </div>
 
-          <div style={{ maxWidth: 680 }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
-                <span style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.85)' }}>Revenue Ops</span>
-                <span style={{ background: 'rgba(52,211,153,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#6ee7b7' }}>Sinais conectados</span>
-                <span style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.7)' }}>Projeto por ação</span>
+          <div className="max-w-[680px]">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="bg-white/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white/90 border border-white/5">Revenue Ops</span>
+                <span className="bg-emerald-500/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-300 border border-emerald-500/10">Sinais conectados</span>
+                <span className="bg-white/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white/70 border border-white/5">Projeto por ação</span>
               </div>
-              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginTop: 20 }}>Canopi · Revenue Ops · Fila de ações</p>
-              <h1 style={{ fontSize: 52, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.02, marginTop: 16 }}>Fila operacional de ações</h1>
-              <p style={{ marginTop: 16, fontSize: 15, lineHeight: 1.7, color: 'rgba(255,255,255,0.65)' }}>
+              <p className="text-[11px] font-bold tracking-[0.24em] uppercase text-white/40 mt-6">Canopi · Revenue Ops · Fila de ações</p>
+              <h1 className="text-5xl font-black tracking-tight leading-[1.05] mt-4">Fila operacional de ações</h1>
+              <p className="mt-5 text-[15px] leading-relaxed text-white/60 font-medium">
                 Orquestração de ações com contexto de conta, sinal, owner, SLA, histórico e fluxo operacional por ação. A leitura geral fica leve, e o detalhe profundo abre em overlay central quando a equipe precisa decidir e agir.
               </p>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             <MetricCard label="Total de ações" value={metrics.total} helper="fila operacional conectada" icon={<LayoutList className="h-5 w-5" />} />
             <MetricCard label="Críticas" value={metrics.critical} helper="exigem atenção executiva" icon={<AlertTriangle className="h-5 w-5" />} />
             <MetricCard label="Em andamento" value={metrics.inProgress} helper="sendo executadas" icon={<Clock3 className="h-5 w-5" />} />
@@ -2034,16 +1970,16 @@ export const Actions: React.FC = () => {
            )}
         </div>
 
-        <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div className="mt-6 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm font-sans">
+          <div className="flex items-center gap-2.5 flex-wrap">
             {/* Search */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, flex: '1 1 220px', borderRadius: 14, border: '1px solid #e2e8f0', background: 'white', padding: '8px 14px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)', minWidth: 180 }}>
-              <Search style={{ width: 15, height: 15, color: '#94a3b8', flexShrink: 0 }} />
+            <label className="flex items-center gap-2.5 flex-1 basis-[220px] rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm transition hover:border-slate-300 min-w-[180px]">
+              <Search className="w-4 h-4 text-slate-400 shrink-0" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Buscar conta, ação, owner..."
-                style={{ width: '100%', background: 'transparent', fontSize: 13, color: '#334155', outline: 'none', border: 'none' }}
+                className="w-full bg-transparent text-[13px] text-slate-700 outline-none border-none placeholder:text-slate-400 font-bold"
               />
             </label>
 
@@ -2054,33 +1990,36 @@ export const Actions: React.FC = () => {
               { label: 'Status', value: statusFilter, options: ['Todos', ...statusOptions], set: setStatusFilter },
               { label: 'Owner', value: ownerFilter, options: ownerOptions, set: setOwnerFilter },
             ].map((f) => (
-              <div key={f.label} style={{ position: 'relative', flexShrink: 0 }}>
+              <div key={f.label} className="relative shrink-0">
                 <select
                   value={f.value}
                   onChange={(e) => f.set(e.target.value)}
-                  style={{ appearance: 'none', WebkitAppearance: 'none', borderRadius: 12, border: '1px solid #e2e8f0', background: 'white', padding: '7px 28px 7px 12px', fontSize: 12, fontWeight: 600, color: '#334155', cursor: 'pointer', outline: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
+                  className="appearance-none rounded-xl border border-slate-200 bg-white pl-3.5 pr-9 py-2 text-xs font-bold text-slate-600 cursor-pointer outline-none shadow-sm hover:border-slate-300"
+                  aria-label={f.label}
                 >
                   {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
-                <ChevronDown style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 13, height: 13, color: '#94a3b8', pointerEvents: 'none' }} />
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               </div>
             ))}
 
-            {/* Spacer */}
-            <div style={{ flex: 1 }} />
+            <div className="flex-1" />
 
             {/* Density (for list view, discrete) */}
             {viewMode === 'Lista' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>Densidade</span>
-                <div style={{ display: 'flex', borderRadius: 10, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2 }}>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Densidade</span>
+                <div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1 gap-1">
                   {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
                     <button
                       key={d}
                       type="button"
                       onClick={() => setListDensity(d)}
                       title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
-                      style={{ borderRadius: 7, padding: '4px 9px', fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none', background: listDensity === d ? 'white' : 'transparent', color: listDensity === d ? '#0f172a' : '#94a3b8', boxShadow: listDensity === d ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                      className={cx(
+                        "rounded-lg px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-all border-none",
+                        listDensity === d ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-400"
+                      )}
                     >
                       {{ 'super-compacta': 'S', compacta: 'C', media: 'M', expandida: 'E' }[d]}
                     </button>
@@ -2090,7 +2029,7 @@ export const Actions: React.FC = () => {
             )}
 
             {/* View toggle */}
-            <div style={{ display: 'flex', borderRadius: 12, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2, flexShrink: 0 }}>
+            <div className="flex rounded-2xl border border-slate-200 bg-slate-50 p-1 gap-1 shrink-0">
               {[
                 { id: 'Lista', label: 'Lista', Icon: LayoutList },
                 { id: 'Kanban', label: 'Kanban', Icon: FolderKanban },
@@ -2099,9 +2038,12 @@ export const Actions: React.FC = () => {
                   key={id}
                   type="button"
                   onClick={() => setViewMode(id as ViewMode)}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 9, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: viewMode === id ? 'white' : 'transparent', color: viewMode === id ? '#0f172a' : '#64748b', boxShadow: viewMode === id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                  className={cx(
+                    "inline-flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer transition-all border-none",
+                    viewMode === id ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-500"
+                  )}
                 >
-                  <Icon style={{ width: 14, height: 14 }} /> {label}
+                  <Icon className="w-4 h-4" /> {label}
                 </button>
               ))}
             </div>
@@ -2202,65 +2144,73 @@ export const Actions: React.FC = () => {
 
       {/* ─── Modal Nova Ação ─────────────────────────────────────────── */}
       {showNewAction && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(15,23,42,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backdropFilter: 'blur(3px)' }}>
-          <div style={{ background: 'white', borderRadius: 28, padding: 32, width: '100%', maxWidth: 520, boxShadow: '0 32px 80px rgba(0,0,0,0.2)', position: 'relative' }}>
-            <button onClick={() => setShowNewAction(false)} style={{ position: 'absolute', top: 20, right: 20, width: 36, height: 36, borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
-              <X style={{ width: 16, height: 16 }} />
+        <div className="fixed inset-0 z-[60] bg-slate-900/50 flex items-center justify-center p-6 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-[32px] p-8 w-full max-w-[520px] shadow-[0_32px_80px_rgba(0,0,0,0.2)] relative animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setShowNewAction(false)} 
+              className="absolute top-5 right-5 w-9 h-9 rounded-xl border border-slate-200 bg-white cursor-pointer flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-all"
+              aria-label="Fechar"
+            >
+              <X className="w-4 h-4" />
             </button>
 
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.18em', color: '#2b44ff' }}>Nova ação</p>
-            <h2 style={{ marginTop: 6, fontSize: 24, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Criar ação na fila</h2>
-            <p style={{ marginTop: 6, fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Preencha os campos abaixo para adicionar uma nova ação à fila operacional.</p>
+            <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest">Nova ação</p>
+            <h2 className="mt-1.5 text-2xl font-black tracking-tight text-slate-900">Criar ação na fila</h2>
+            <p className="mt-1.5 text-sm text-slate-500 leading-relaxed font-medium">Preencha os campos abaixo para adicionar uma nova ação à fila operacional.</p>
 
-            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Conta *</label>
+            <div className="mt-7 flex flex-col gap-5">
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Conta *</label>
                 <input
                   value={newActionForm.account}
                   onChange={(e) => setNewActionForm((f) => ({ ...f, account: e.target.value }))}
                   placeholder="Ex: Carteira Seguros Enterprise"
-                  style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                  className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
                 />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Título da ação *</label>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Título da ação *</label>
                 <input
                   value={newActionForm.title}
                   onChange={(e) => setNewActionForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="Ex: Reativar contato com decisor"
-                  style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                  className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
                 />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Owner</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Owner</label>
                   <input
                     value={newActionForm.owner}
                     onChange={(e) => setNewActionForm((f) => ({ ...f, owner: e.target.value }))}
-                    placeholder="Nome do responsável"
-                    style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', boxSizing: 'border-box' }}
+                    placeholder="Responsável"
+                    className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
                   />
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8', marginBottom: 6 }}>Prioridade</label>
-                  <select
-                    value={newActionForm.priority}
-                    onChange={(e) => setNewActionForm((f) => ({ ...f, priority: e.target.value as Priority }))}
-                    style={{ width: '100%', borderRadius: 12, border: '1px solid #e2e8f0', padding: '10px 14px', fontSize: 14, color: '#0f172a', outline: 'none', background: 'white', appearance: 'none', boxSizing: 'border-box' }}
-                  >
-                    <option>Alta</option>
-                    <option>Crítica</option>
-                    <option>Média</option>
-                    <option>Baixa</option>
-                  </select>
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Prioridade</label>
+                  <div className="relative">
+                    <select
+                      value={newActionForm.priority}
+                      onChange={(e) => setNewActionForm((f) => ({ ...f, priority: e.target.value as Priority }))}
+                      className="w-full appearance-none rounded-2xl border border-slate-200 p-4 pr-10 text-sm font-bold text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-white"
+                      aria-label="Selecionar prioridade"
+                    >
+                      <option>Alta</option>
+                      <option>Crítica</option>
+                      <option>Média</option>
+                      <option>Baixa</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ marginTop: 28, display: 'flex', gap: 10 }}>
+            <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setShowNewAction(false)}
-                style={{ flex: 1, borderRadius: 14, border: '1px solid #e2e8f0', background: 'white', padding: '11px 0', fontSize: 14, fontWeight: 600, color: '#334155', cursor: 'pointer' }}
+                className="flex-1 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-600 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 border-none"
               >
                 Cancelar
               </button>
@@ -2302,7 +2252,7 @@ export const Actions: React.FC = () => {
                   setShowNewAction(false);
                   setNewActionForm({ account: '', title: '', owner: '', priority: 'Alta' });
                 }}
-                style={{ flex: 2, borderRadius: 14, background: '#2b44ff', border: 'none', padding: '11px 0', fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer' }}
+                className="flex-[2] rounded-2xl bg-blue-600 p-4 text-sm font-bold text-white border-none cursor-pointer hover:bg-blue-700 transition-all shadow-lg active:scale-95"
               >
                 Criar ação
               </button>
