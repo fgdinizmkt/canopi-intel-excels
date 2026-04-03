@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 10)
+`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 11)
 
 ## Fase atual do plano
 **Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
@@ -11,6 +11,12 @@
 ## O que já foi concluído
 
 ### Saneamento de Performance (Fase 8 — 2026-04-03)
+
+**Recorte 11 — Saneamento Técnico: Performance.tsx**
+- **Saneamento Total:** Remoção de 100% das classes `perf-*` e transição para Tailwind v4 native.
+- **Zeragem de Estilos:** Conversão de ~240 blocos de estilo inline para utilitários, garantindo visual premium (blur, gradientes).
+- **Dinamismo Legítimo:** Consolidado em 31 ocorrências (barras de progresso e branding dinâmico).
+- **Build de Produção:** Validado com `npm run build` (Exit 0). Commit: `7a3d2192424e07dfde19dd5be16a37c1513022f4`.
 
 **Recorte 2 — Infra de Imagens & Pipeline Next.js**
 - Configuração de `next.config.mjs` com `remotePatterns` para `api.dicebear.com` e `images.unsplash.com`.
@@ -103,13 +109,12 @@
 1.  **Infraestrutura de Qualidade (BLOQUEADO):** `npm run lint` não está operacional. Falta instalar `eslint` como devDependency para garantir auditoria automatizada Real-Time.
 2.  **Alertas de Runtime (PENDENTE):** `Recharts` emitindo `width(-1)` durante o build em `estrategia-abm` e `acoes`. Requer ajuste de `ResponsiveContainer`.
 3.  **IIFEs Gigantes (BLOQUEADO):** ~1000 linhas de JSX acoplado em `AbmStrategy.tsx` mantidas por complexidade técnica.
-4.  **Estilos Inline (BACKLOG):** `Performance.tsx` ainda utiliza estilos inline `perf-*` por decisão de preservação visual.
 
 ---
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Realizar auditoria objetiva nos arquivos `PaidMedia.tsx`, `SeoInbound.tsx`, `AccountDetailView.tsx` e `Topbar.tsx` para definição e abertura do Recorte 11.
+- **Fase 8 — Operational Efficiency:** Realizar auditoria objetiva nos arquivos `PaidMedia.tsx`, `SeoInbound.tsx`, `AccountDetailView.tsx` e `Topbar.tsx` para definição e abertura do Recorte 12.
 
 ---
 
