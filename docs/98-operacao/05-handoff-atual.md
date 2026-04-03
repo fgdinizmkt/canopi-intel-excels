@@ -3,7 +3,7 @@
 ## Estado atual
 - **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
 - **Último recorte concluído:** Recorte 3 — Otimização de Reconciliação (DOM)
-- **Último commit relevante:** [PENDENTE commit]
+- **Último commit relevante:** `7912fc3` (perf(Phase 8): Optimize Performance.tsx and AccountDetailView reconcilers)
 - **Data:** 2026-04-03
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK)
 
