@@ -2,11 +2,11 @@
 
 ## Estado atual
 - **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
-- **Último recorte concluído:** Recorte 11 — Saneamento Técnico Integral de Performance.tsx
+- **Último recorte concluído:** Recorte 12 — Saneamento Técnico Integral de SeoInbound.tsx
 - **Últimos commits relevantes:** 
+  - `7916b67` (refactor(seo): saneamento técnico integral e migração para Tailwind v4 native (Recorte 12))
+  - `8148241` (docs: formalização do encerramento do Recorte 11 (Fase 8))
   - `7a3d219` (refactor(perf): saneamento técnico integral e migração para Tailwind v4 native (Recorte 11))
-  - `aea96de` (docs: saneamento técnico integral de Outbound.tsx (Recorte 10) - zero interpolações)
-  - `3f871da` (feat(styles): saneamento técnico integral de ABXOrchestration.tsx (Recorte 9))
 - **Data:** 2026-04-03
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK, Reconciliado com origin/main)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
@@ -23,17 +23,19 @@
 3. Preservar o histórico completo nos documentos de operação.
 4. Não introduzir estilos inline em componentes já migrados para Tailwind.
 
-## O que foi entregue (Recortes 9, 10 e 11 — Fase 8)
-1.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
-2.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
-3.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 ocorrência legítima.
-4.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub.
+## O que foi entregue (Recortes 9 a 12 — Fase 8)
+1.  **Saneamento SeoInbound.tsx:** Migração integral para Tailwind v4 utilitário e estabilização de build (`Exit 0`).
+2.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
+3.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
+4.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 ocorrência legítima.
+5.  **Ambiente Reconciliado:** Local e remoto sincronizados até o Recorte 11. Recorte 12 pendente de sincronização final.
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 12:** Necessidade de inspecionar `PaidMedia.tsx`, `SeoInbound.tsx`, `AccountDetailView.tsx` e `Topbar.tsx`.
-2.  **Warnings Recharts:** Alertas de `width(-1)` persistem no build.
+1.  **Auditoria Recorte 13:** Arquivo alvo `PaidMedia.tsx` para saneamento técnico de estilos inline.
+2.  **AccountDetailView & Topbar:** Próximos na fila de auditoria de conformidade pós-saneamento de hotspots supremos.
+3.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 12:** Iniciar auditoria e saneamento do arquivo `PaidMedia.tsx`.
+- **Recorte 13:** Iniciar auditoria e saneamento do arquivo `PaidMedia.tsx`.
 - **Consistency Check:** Validar se o `colorMap` precisa de extensões para novos tipos de status.

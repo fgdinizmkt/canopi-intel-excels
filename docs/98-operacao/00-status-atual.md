@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 11)
+ `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 12)
 
 ## Fase atual do plano
 **Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
@@ -18,6 +18,12 @@
 - **Dinamismo Legítimo:** Consolidado em 31 ocorrências (barras de progresso e branding dinâmico).
 - **Build de Produção:** Validado com `npm run build` (Exit 0). Commit: `7a3d2192424e07dfde19dd5be16a37c1513022f4`.
 
+
+**Recorte 12 — Saneamento Técnico: SeoInbound.tsx**
+- **Saneamento Total:** Remoção de estilos inline estáticos (82% e 14.5%) e migração para Tailwind v4 native.
+- **Estabilização de Build:** Integridade JSX restaurada via reparações cirúrgicas e validação de `npm run build` (Exit 0).
+- **Dinamismo Legítimo:** Preservação de 1 única ocorrência justificável (LP Authority Score).
+- **Commit de Código:** `7916b67` — refactor(seo): saneamento técnico integral e migração para Tailwind v4 native (Recorte 12).
 **Recorte 2 — Infra de Imagens & Pipeline Next.js**
 - Configuração de `next.config.mjs` com `remotePatterns` para `api.dicebear.com` e `images.unsplash.com`.
 - Migração de `<img>` para `next/image` em `Topbar.tsx` e `SeoInbound.tsx`.
@@ -114,7 +120,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Realizar auditoria objetiva nos arquivos `PaidMedia.tsx`, `SeoInbound.tsx`, `AccountDetailView.tsx` e `Topbar.tsx` para definição e abertura do Recorte 12.
+- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `PaidMedia.tsx` (Recorte 13), prosseguindo com o roteiro de eficiência operacional.
 
 ---
 

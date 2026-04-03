@@ -5,6 +5,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-03] — Saneamento Técnico de SeoInbound.tsx (Recorte 12 - Fase 8)
+**Agente:** Antigravity
+
+**Objetivo:** Saneamento técnico integral de `SeoInbound.tsx`, eliminando dívida técnica de estilos inline e estabilizando o build.
+
+**Ações:**
+1.  **Saneamento de Estilos:** Conversão massiva de estilos inline estáticos (82% e 14.5% de largura) para utilitários Tailwind v4 nativos.
+2.  **Dinamismo Legítimo:** Preservação de uma única ocorrência de `style={{` para `LP Authority Score`, baseada em runtime filters.
+3.  **Estabilização Recharts:** Garantia de largura íntegra via `ClientOnly` e containers fixos, prevenindo warnings de `width(-1)`.
+4.  **Reparação JSX:** Correção cirúrgica de malformações sintáticas geradas durante a migração massiva.
+5.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
+
+**Status:** Recorte 12 (Fase 8 — Saneamento) concluído. Commit: `7916b67` — refactor(seo): saneamento técnico integral e migração para Tailwind v4 native (Recorte 12)
+
+---
+
 ## [2026-04-03] — Saneamento Técnico de Performance.tsx (Recorte 11 - Fase 8)
 
 **Objetivo:** Executar o saneamento integral de `Performance.tsx`, eliminando a dívida técnica de estilos inline (`style={{...}}`) e classes legadas (`perf-*`), migrando para utilitários Tailwind v4 nativos.
