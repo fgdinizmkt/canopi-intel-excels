@@ -34,7 +34,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 **Objetivo:** Eliminar inconsistências entre o estado formal da Fase 7 e a implementação efetiva no repositório.
 
 **Atividades:**
-- **Limpaza de Shell:** Remoção do `import` órfão de `AccountDetailManager` em `layout.tsx`.
+- **Limpeza de Shell:** Remoção do `import` órfão de `AccountDetailManager` em `layout.tsx`.
 - **Eliminação de Lixo Técnico:** Deleção física do arquivo `AccountDetailManager.tsx` (substituído pela arquitetura de subpágina dinâmica).
 - **Sincronização Documental:** Atualização do `00-status-atual.md` e `05-handoff-atual.md` para marcar Fase 7 como Concluída.
 - **Redirecionamento Estratégico:** Alinhamento dos próximos passos para a **Fase 8 (Operational Efficiency)**, priorizando saneamento técnico e performance antes de novas automações.
