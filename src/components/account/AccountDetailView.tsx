@@ -49,12 +49,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     if (initialContactId) setSelectedContactId(initialContactId);
   }, [initialContactId]);
 
-  if (!account) return null;
-
   const isFullscreen = shellViewMode === 'fullscreen';
 
   // Radar Relacional Logic (RECORTE 26)
-  const getRadarRelacional = () => {
+  const radar = React.useMemo(() => {
+    if (!account) return { tension: [], support: [], gaps: [] };
     const tension = account.contatos.filter(c => 
       (c.classificacao.includes('Blocker') || c.influencia > 7) && 
       account.sinais.some(s => s.contexto === c.area && s.impacto === 'Alto')
@@ -68,17 +67,15 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     const gaps = areasComSinais.filter(a => !areasComContatos.includes(a));
 
     return { tension, support, gaps };
-  };
+  }, [account]);
 
-  const radar = getRadarRelacional();
-
-  const renderTree = (contatos: ContatoConta[], parentId?: string, level = 0) => {
+  const renderTree = React.useCallback((contatos: ContatoConta[], parentId?: string, level = 0) => {
     const children = contatos.filter(c => c.liderId === parentId);
     if (children.length === 0) return null;
     return children.map(contact => {
-      const sinaisNaArea = account.sinais.filter(s => s.contexto === contact.area);
+      const sinaisNaArea = account?.sinais.filter(s => s.contexto === contact.area) ?? [];
       return (
-        <div key={contact.id} className="relative">
+        <div key={`${contact.id}-${level}`} className="relative">
           {/* Micro-badges de Sinais (RECORTE 26) */}
           {sinaisNaArea.length > 0 && (
             <div className="absolute top-0 right-0 z-10 -mt-1 -mr-1 flex gap-1">
@@ -98,7 +95,9 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         </div>
       );
     });
-  };
+  }, [account?.sinais, isFullscreen, setSelectedContactId]);
+
+  if (!account) return null;
 
   const statusAcaoStyle: Record<string, string> = {
     'Em aberto': 'text-slate-400 bg-slate-700/50 border-slate-600',

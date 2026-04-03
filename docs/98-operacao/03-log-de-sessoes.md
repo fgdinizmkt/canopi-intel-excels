@@ -5,6 +5,19 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-03] — Saneamento de Performance (Recorte 3 - Fase 8)
+
+**Objetivo:** Reduzir os custos de reconciliação do React e estabilizar a infraestrutura de imagem para máxima eficiência operacional.
+
+**Atividades:**
+- **Refatoração de Performance.tsx:** Extração de blocos gigantes de JSX para componentes funcionais memoizados com `React.memo` (`PerformanceMetrics`, `ExecutiveSummary`, `OperationsGrid`).
+- **Saneamento de Sintaxe:** Reparo de corrupções de JSX e referências de variáveis órfãs (`CHART_PTS`, `EXPORT_SECTIONS_INIT`) após o processo de componentização.
+- **Eficiência de Renderização:** Implementação de `useMemo` e `useCallback` estratégicos em `AccountDetailView.tsx` (Radar Relacional e renderTree) para mitigar quedas de frame durante a navegação.
+- **Conformidade React:** Correção de violação de regras de Hooks (chamadas condicionais) em `AccountDetailView.tsx`.
+- **Garantia de Qualidade:** Validação de build completa (`npm run build`) confirmando integridade estrutural e tipagem.
+
+---
+
 ## [2026-04-02] — Fila de Fogo (Fire Queue) e Priorização Estratégica (Recorte 28 - Fase 7)
 
 **Objetivo:** Criar a seção "Fila de Fogo" para unificar sinais, radar relacional e memória histórica em recomendações acionáveis em lote.

@@ -1,14 +1,30 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-02 (Recorte 28 - Fase 7)
+`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 3)
 
 ## Fase atual do plano
-**Fase 7 — Deep Intelligence** (Concluída - Ajuste Estrutural Finalizado)
+**Fase 8 — Operational Efficiency** (Em Andamento - Saneamento de Performance)
 
 ---
 
 ## O que já foi concluído
+
+### Saneamento de Performance (Fase 8 — 2026-04-03)
+
+**Recorte 2 — Infra de Imagens & Pipeline Next.js**
+- Configuração de `next.config.mjs` com `remotePatterns` para `api.dicebear.com` e `images.unsplash.com`.
+- Migração de `<img>` para `next/image` em `Topbar.tsx` e `SeoInbound.tsx`.
+- Desativação de `unoptimized={true}` para habilitar o pipeline nativo do Next.js.
+
+**Recorte 3 — Otimização de Reconciliação (DOM)**
+- **Performance.tsx:** Refatoração integral com extração de blocos densos para sub-componentes memoizados (`PerformanceMetrics`, `ExecutiveSummary`, `OperationsGrid`).
+- **Performance.tsx:** Saneamento de sintaxe JSX e reintrodução de constantes críticas (`CHART_PTS`, `EXPORT_SECTIONS_INIT`).
+- **AccountDetailView.tsx:** Memoização do `Radar Relacional` e `renderTree` para evitar re-cálculos no main thread durante a navegação.
+- **Conformidade de Hooks:** Correção de chamadas condicionais de React Hooks em `AccountDetailView.tsx`.
+- **Build de Produção:** Validado com `npm run build` (Exit 0) em todo o projeto.
+
+### Fase 7 — Deep Intelligence (Concluída - 2026-04-02)
 
 ### Infraestrutura técnica (PR #10 — 2026-03-31)
 - Migração completa do cockpit para Next.js 15 App Router

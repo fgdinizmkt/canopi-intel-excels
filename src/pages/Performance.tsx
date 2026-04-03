@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { contasMock } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
  
@@ -163,13 +163,92 @@ const EXPORT_SECTIONS_INIT = [
   {id:'squads',  label:'Squads e SLA',           on:true},
   {id:'tech',    label:'Performance de tecnologias', on:false},
 ];
- 
+
 const CHART_PTS = [
   {x:10, y:80, val:'S1', label:'Sem 1'},{x:70, y:65, val:'S2', label:'Sem 2'},
   {x:130,y:50, val:'S3', label:'Sem 3'},{x:190,y:38, val:'S4', label:'Sem 4'},
   {x:250,y:28, val:'S5', label:'Sem 5'},{x:310,y:20, val:'S6', label:'Sem 6'},
   {x:370,y:14, val:'S7', label:'Sem 7'},{x:430,y:10, val:'S8', label:'Sem 8'},
 ];
+
+// ─── MEMOIZED SUB-COMPONENTS ───────────────────────────────────────────
+const PerformanceMetrics = React.memo(({ m }: { m: any }) => (
+  <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-2.5 mb-5">
+    <div className="perf-hm"><div className="perf-hm-label">Pipeline Total</div><div className="perf-hm-value">R$ {m.pipeline}</div><div className="perf-hm-up">{m.pipelineDelta}</div></div>
+    <div className="perf-hm"><div className="perf-hm-label">Receita Gerada</div><div className="perf-hm-value">R$ {m.receita}</div><div className="perf-hm-up">{m.receitaDelta}</div></div>
+    <div className="perf-hm"><div className="perf-hm-label">Taxa de Conversão</div><div className="perf-hm-value">{m.conversao}</div><div className="perf-hm-sub">Meta: {m.metaConversao}</div></div>
+    <div className="perf-hm"><div className="perf-hm-label">Ações Concluídas</div><div className="perf-hm-value">{m.acoes}</div><div className="perf-hm-sub">{m.acoesRate} de execução</div></div>
+    <div className="perf-hm"><div className="perf-hm-label">Score Médio</div><div className="perf-hm-value">{m.score}</div><div className="perf-hm-sub">{m.scoreTrend}</div></div>
+  </div>
+));
+PerformanceMetrics.displayName = 'PerformanceMetrics';
+
+const ExecutiveSummary = React.memo(({ channels, pl }: { channels: any[], pl: string }) => (
+  <div className="perf-card">
+    <div className="flex items-center justify-between mb-4">
+      <div><div className="perf-sec-title">Resumo Executivo por Canal</div><div className="perf-sec-sub">{pl} · Comparado ao período anterior</div></div>
+    </div>
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
+      {channels.map(ch => (
+        <div key={ch.name} className="perf-stat">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <div style={{background:ch.color}} className="w-2 h-2 rounded-full flex-shrink-0" />
+            <div className="perf-stat-label">{ch.name}</div>
+          </div>
+          <div className="perf-stat-value" style={{color:ch.color}}>R$ {ch.value}</div>
+          <div className={`text-[11px] font-bold mt-0.5 ${ch.delta.startsWith('+')?'text-emerald-600':'text-red-600'}`}>{ch.delta} vs ant.</div>
+          <div className="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
+            <div style={{width:`${ch.pct}%`,background:ch.color}} className="h-full rounded-full" />
+          </div>
+          <div className="text-[10px] text-slate-400 mt-1">{ch.pct}% do total</div>
+        </div>
+      ))}
+    </div>
+  </div>
+));
+ExecutiveSummary.displayName = 'ExecutiveSummary';
+
+const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[], panelId: string, onOpen: (f: any) => void }) => (
+  <div className="perf-card">
+    <div className="mb-4">
+      <div className="perf-sec-title">Performance por Frente Operacional</div>
+      <div className="perf-sec-sub">Clique em qualquer frente para análise detalhada no painel lateral</div>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
+      {frentes.map(fr => (
+        <div key={fr.id} className={`perf-fr-card${panelId===fr.id?' selected':''}`}
+          style={{borderTop:`3px solid ${fr.color}`}} onClick={()=>onOpen(fr)}>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'10px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              <div style={{width:'30px',height:'30px',borderRadius:'9px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px',flexShrink:0,background:fr.bg}}>{fr.icon}</div>
+              <div>
+                <div style={{fontSize:'12px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em'}}>{fr.name}</div>
+                <div style={{fontSize:'10px',color:'#94a3b8',marginTop:'1px',lineHeight:1.3}}>{fr.tagline}</div>
+              </div>
+            </div>
+            <span className={bc(fr.statusClass)}>{fr.statusLabel}</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',paddingTop:'10px',borderTop:'1px solid #f1f5f9'}}>
+            {fr.kpis.slice(0,2).map(kpi => (
+              <div key={kpi.label}>
+                <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'2px'}}>{kpi.label}</div>
+                <div style={{fontSize:'18px',fontWeight:800,letterSpacing:'-0.02em',lineHeight:1,color:fr.color}}>{kpi.value}</div>
+                <div style={{fontSize:'10px',fontWeight:700,marginTop:'2px',color:!kpi.delta?'#94a3b8':kpi.delta.startsWith('+')?'#16a34a':kpi.delta.startsWith('-')?'#dc2626':'#0f172a'}}>{kpi.delta||'—'}</div>
+              </div>
+            ))}
+          </div>
+          <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'28px',display:'block',marginTop:'10px'}}>
+            <defs><linearGradient id={`gfr${fr.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fr.color} stopOpacity="0.18"/><stop offset="100%" stopColor={fr.color} stopOpacity="0"/></linearGradient></defs>
+            <polyline points={fr.sparkArea} fill={`url(#gfr${fr.id})`} stroke="none"/>
+            <polyline points={fr.spark} fill="none" stroke={fr.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div style={{marginTop:'6px',fontSize:'10px',fontWeight:700,textAlign:'right',color:fr.color}}>Ver análise →</div>
+        </div>
+      ))}
+    </div>
+  </div>
+));
+OperationsGrid.displayName = 'OperationsGrid';
  
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
 export default function Performance() {
@@ -264,7 +343,7 @@ export default function Performance() {
   }
  
   // Lógica idêntica ao openPanel() do Alpine
-  function openPanel(fr: any) {
+  const openPanel = useCallback((fr: any) => {
     setPanel({
       ...fr,
       chart:     fr.chart,
@@ -281,7 +360,7 @@ export default function Performance() {
         {label:fr.kpis[2]?.label, prev:'Período ant.', curr:fr.kpis[2]?.value, trend:fr.kpis[2]?.delta?.startsWith('+')?'up':'down'},
       ],
     });
-  }
+  }, []);
  
   // Lógica idêntica ao openAccPanel() do Alpine
   function openAccPanel(acc: any) {
@@ -362,7 +441,7 @@ export default function Performance() {
         <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Canopi · Revenue Ops · Desempenho</div>
         <div className="text-5xl font-black tracking-tighter leading-none mb-2">Desempenho</div>
         <div className="text-sm text-white/60 leading-relaxed max-w-2xl mb-5">Entenda o que gerou resultado. Feche o ciclo Sinal → Ação → Desempenho → novo Sinal.</div>
- 
+
         {/* Period filter */}
         <div className="flex gap-1.5 mb-5 flex-wrap">
           {PERIODS.map(p => (
@@ -370,86 +449,23 @@ export default function Performance() {
           ))}
           <button onClick={()=>setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit">📅 Personalizado</button>
         </div>
- 
+
         {/* Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-2.5 mb-5">
-          <div className="perf-hm"><div className="perf-hm-label">Pipeline Total</div><div className="perf-hm-value">R$ {m.pipeline}</div><div className="perf-hm-up">{m.pipelineDelta}</div></div>
-          <div className="perf-hm"><div className="perf-hm-label">Receita Gerada</div><div className="perf-hm-value">R$ {m.receita}</div><div className="perf-hm-up">{m.receitaDelta}</div></div>
-          <div className="perf-hm"><div className="perf-hm-label">Taxa de Conversão</div><div className="perf-hm-value">{m.conversao}</div><div className="perf-hm-sub">Meta: {m.metaConversao}</div></div>
-          <div className="perf-hm"><div className="perf-hm-label">Ações Concluídas</div><div className="perf-hm-value">{m.acoes}</div><div className="perf-hm-sub">{m.acoesRate} de execução</div></div>
-          <div className="perf-hm"><div className="perf-hm-label">Score Médio</div><div className="perf-hm-value">{m.score}</div><div className="perf-hm-sub">{m.scoreTrend}</div></div>
-        </div>
- 
+        <PerformanceMetrics m={m} />
+
         <div style={{display:'flex',gap:'10px'}}>
           <button className="perf-hbtn perf-hbtn-g" onClick={()=>setShowExport(true)}>↓ Exportar relatório</button>
           <button className="perf-hbtn perf-hbtn-w" onClick={()=>setShowSignals(true)}>→ Ver sinais gerados</button>
         </div>
       </div>
- 
+
       <div className="perf-body">
- 
+
         {/* ── RESUMO EXECUTIVO ── */}
-        <div className="perf-card">
-          <div className="flex items-center justify-between mb-4">
-            <div><div className="perf-sec-title">Resumo Executivo por Canal</div><div className="perf-sec-sub">{pl} · Comparado ao período anterior</div></div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
-            {CHANNELS.map(ch => (
-              <div key={ch.name} className="perf-stat">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <div style={{background:ch.color}} className="w-2 h-2 rounded-full flex-shrink-0" />
-                  <div className="perf-stat-label">{ch.name}</div>
-                </div>
-                <div className="perf-stat-value" style={{color:ch.color}}>R$ {ch.value}</div>
-                <div className={`text-[11px] font-bold mt-0.5 ${ch.delta.startsWith('+')?'text-emerald-600':'text-red-600'}`}>{ch.delta} vs ant.</div>
-                <div className="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div style={{width:`${ch.pct}%`,background:ch.color}} className="h-full rounded-full" />
-                </div>
-                <div className="text-[10px] text-slate-400 mt-1">{ch.pct}% do total</div>
-              </div>
-            ))}
-          </div>
-        </div>
- 
+        <ExecutiveSummary channels={CHANNELS} pl={pl} />
+
         {/* ── FRENTES OPERACIONAIS ── */}
-        <div className="perf-card">
-          <div className="mb-4">
-            <div className="perf-sec-title">Performance por Frente Operacional</div>
-            <div className="perf-sec-sub">Clique em qualquer frente para análise detalhada no painel lateral</div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
-            {FRENTES.map(fr => (
-              <div key={fr.id} className={`perf-fr-card${panel?.id===fr.id?' selected':''}`}
-                style={{borderTop:`3px solid ${fr.color}`}} onClick={()=>openPanel(fr)}>
-                <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'10px'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                    <div style={{width:'30px',height:'30px',borderRadius:'9px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'14px',flexShrink:0,background:fr.bg}}>{fr.icon}</div>
-                    <div>
-                      <div style={{fontSize:'12px',fontWeight:800,color:'#0f172a',letterSpacing:'-0.01em'}}>{fr.name}</div>
-                      <div style={{fontSize:'10px',color:'#94a3b8',marginTop:'1px',lineHeight:1.3}}>{fr.tagline}</div>
-                    </div>
-                  </div>
-                  <span className={bc(fr.statusClass)}>{fr.statusLabel}</span>
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',paddingTop:'10px',borderTop:'1px solid #f1f5f9'}}>
-                  {fr.kpis.slice(0,2).map(kpi => (
-                    <div key={kpi.label}>
-                      <div style={{fontSize:'9px',fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.08em',marginBottom:'2px'}}>{kpi.label}</div>
-                      <div style={{fontSize:'18px',fontWeight:800,letterSpacing:'-0.02em',lineHeight:1,color:fr.color}}>{kpi.value}</div>
-                      <div style={{fontSize:'10px',fontWeight:700,marginTop:'2px',color:!kpi.delta?'#94a3b8':kpi.delta.startsWith('+')?'#16a34a':kpi.delta.startsWith('-')?'#dc2626':'#0f172a'}}>{kpi.delta||'—'}</div>
-                    </div>
-                  ))}
-                </div>
-                <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg" style={{width:'100%',height:'28px',display:'block',marginTop:'10px'}}>
-                  <defs><linearGradient id={`gfr${fr.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={fr.color} stopOpacity="0.18"/><stop offset="100%" stopColor={fr.color} stopOpacity="0"/></linearGradient></defs>
-                  <polyline points={fr.sparkArea} fill={`url(#gfr${fr.id})`} stroke="none"/>
-                  <polyline points={fr.spark} fill="none" stroke={fr.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <div style={{marginTop:'6px',fontSize:'10px',fontWeight:700,textAlign:'right',color:fr.color}}>Ver análise →</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <OperationsGrid frentes={FRENTES} panelId={panel?.id} onOpen={openPanel} />
  
         {/* ── TENDÊNCIA + FATORES ── */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'14px'}}>
