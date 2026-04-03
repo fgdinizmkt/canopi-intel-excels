@@ -7,6 +7,8 @@ import React, { Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Search, Bell, Settings, ChevronRight } from 'lucide-react';
 
+import Image from 'next/image';
+
 const AbmTabs: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -135,11 +137,12 @@ export const Topbar: React.FC = () => {
               <p className="text-[8px] text-slate-400 font-medium lowercase tracking-tighter">fabio.diniz@canopi.com</p>
             </div>
           </div>
-          <img 
+          <Image 
             src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fabio" 
             alt="Avatar" 
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50"
-            referrerPolicy="no-referrer"
           />
         </div>
       </div>

@@ -24,6 +24,7 @@ import {
   Linkedin,
   MousePointer2
 } from 'lucide-react';
+import Image from 'next/image';
 import { 
   AreaChart, 
   Area, 
@@ -479,8 +480,8 @@ export const SeoInbound: React.FC = () => {
             </div>
           </div>
 
-          <div className="relative h-[280px] w-full rounded-xl overflow-hidden mb-8 mt-2 min-h-[280px]">
-            <ClientOnly fallback={<div className="h-full w-full bg-slate-50 animate-pulse rounded-3xl" />}>
+          <div className="relative h-[280px] w-full rounded-xl overflow-hidden mb-8 mt-2 min-h-[280px] bg-slate-50/50">
+            <ClientOnly fallback={<div className="h-[280px] w-full bg-slate-50 animate-pulse rounded-3xl" />}>
               <ResponsiveContainer width="100%" height="100%">
                 {/* Stacked Area Chart to represent Search+AI mix */}
                 <AreaChart data={basePerformanceData.map((d, i) => ({
@@ -593,7 +594,13 @@ export const SeoInbound: React.FC = () => {
                 ].map((post, idx) => (
                   <div key={idx} className="group bg-slate-50/50 rounded-2xl border border-slate-100 overflow-hidden hover:border-blue-200 transition-all cursor-pointer shadow-sm" onClick={() => openSimModal(post.title, 'PAGE_AUDIT')}>
                     <div className="relative h-32 w-full overflow-hidden">
-                      <img src={post.img} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={post.title} />
+                      <Image 
+                        src={post.img} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        alt={post.title}
+                        width={240}
+                        height={160}
+                      />
                       <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[9px] font-bold text-slate-700 uppercase shadow-sm border border-slate-200">{post.cat}</div>
                     </div>
                     <div className="p-4">

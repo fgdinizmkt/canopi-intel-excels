@@ -354,25 +354,25 @@ export default function Performance() {
  
       {/* ── HERO ── */}
       <div className="perf-hero">
-        <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'16px'}}>
-          <span style={{display:'inline-flex',alignItems:'center',padding:'4px 12px',borderRadius:'100px',fontSize:'10px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',background:'rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.9)',border:'1px solid rgba(255,255,255,0.12)'}}>Revenue Intelligence</span>
-          <span style={{display:'inline-flex',alignItems:'center',padding:'4px 12px',borderRadius:'100px',fontSize:'10px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',background:'rgba(16,185,129,0.15)',color:'#6ee7b7',border:'1px solid rgba(16,185,129,0.2)'}}>Ciclo fechado</span>
-          <span style={{display:'inline-flex',alignItems:'center',padding:'4px 12px',borderRadius:'100px',fontSize:'10px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',background:'rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.9)',border:'1px solid rgba(255,255,255,0.12)'}}>{pl}</span>
+        <div className="flex gap-2 flex-wrap mb-4">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">Revenue Intelligence</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Ciclo fechado</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">{pl}</span>
         </div>
-        <div style={{fontSize:'10px',fontWeight:700,color:'rgba(255,255,255,0.4)',textTransform:'uppercase',letterSpacing:'0.22em',marginBottom:'8px'}}>Canopi · Revenue Ops · Desempenho</div>
-        <div style={{fontSize:'48px',fontWeight:900,letterSpacing:'-0.03em',lineHeight:1,marginBottom:'8px'}}>Desempenho</div>
-        <div style={{fontSize:'14px',color:'rgba(255,255,255,0.65)',lineHeight:1.6,maxWidth:'600px',marginBottom:'20px'}}>Entenda o que gerou resultado. Feche o ciclo Sinal → Ação → Desempenho → novo Sinal.</div>
+        <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+        <div className="text-5xl font-black tracking-tighter leading-none mb-2">Desempenho</div>
+        <div className="text-sm text-white/60 leading-relaxed max-w-2xl mb-5">Entenda o que gerou resultado. Feche o ciclo Sinal → Ação → Desempenho → novo Sinal.</div>
  
         {/* Period filter */}
-        <div style={{display:'flex',gap:'6px',marginBottom:'20px',flexWrap:'wrap'}}>
+        <div className="flex gap-1.5 mb-5 flex-wrap">
           {PERIODS.map(p => (
             <button key={p.id} className={`perf-pf-btn${period===p.id?' active':''}`} onClick={()=>setPeriod(p.id)}>{p.label}</button>
           ))}
-          <button onClick={()=>setShowDatePicker(true)} style={{padding:'6px 14px',borderRadius:'100px',fontSize:'11px',fontWeight:700,cursor:'pointer',border:'1px solid rgba(255,255,255,0.2)',background:'rgba(255,255,255,0.05)',color:'rgba(255,255,255,0.6)',display:'flex',alignItems:'center',gap:'5px',fontFamily:'inherit'}}>📅 Personalizado</button>
+          <button onClick={()=>setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit">📅 Personalizado</button>
         </div>
  
         {/* Metrics */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'10px',marginBottom:'20px'}}>
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-2.5 mb-5">
           <div className="perf-hm"><div className="perf-hm-label">Pipeline Total</div><div className="perf-hm-value">R$ {m.pipeline}</div><div className="perf-hm-up">{m.pipelineDelta}</div></div>
           <div className="perf-hm"><div className="perf-hm-label">Receita Gerada</div><div className="perf-hm-value">R$ {m.receita}</div><div className="perf-hm-up">{m.receitaDelta}</div></div>
           <div className="perf-hm"><div className="perf-hm-label">Taxa de Conversão</div><div className="perf-hm-value">{m.conversao}</div><div className="perf-hm-sub">Meta: {m.metaConversao}</div></div>
@@ -390,22 +390,22 @@ export default function Performance() {
  
         {/* ── RESUMO EXECUTIVO ── */}
         <div className="perf-card">
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'14px'}}>
+          <div className="flex items-center justify-between mb-4">
             <div><div className="perf-sec-title">Resumo Executivo por Canal</div><div className="perf-sec-sub">{pl} · Comparado ao período anterior</div></div>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'10px'}}>
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
             {CHANNELS.map(ch => (
               <div key={ch.name} className="perf-stat">
-                <div style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'6px'}}>
-                  <div style={{width:'8px',height:'8px',borderRadius:'50%',background:ch.color,flexShrink:0}}/>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <div style={{background:ch.color}} className="w-2 h-2 rounded-full flex-shrink-0" />
                   <div className="perf-stat-label">{ch.name}</div>
                 </div>
                 <div className="perf-stat-value" style={{color:ch.color}}>R$ {ch.value}</div>
-                <div style={{fontSize:'11px',fontWeight:700,marginTop:'2px',color:ch.delta.startsWith('+')?'#16a34a':'#dc2626'}}>{ch.delta} vs ant.</div>
-                <div style={{marginTop:'6px',height:'4px',background:'#f1f5f9',borderRadius:'100px',overflow:'hidden'}}>
-                  <div style={{width:`${ch.pct}%`,background:ch.color,height:'100%',borderRadius:'100px'}}/>
+                <div className={`text-[11px] font-bold mt-0.5 ${ch.delta.startsWith('+')?'text-emerald-600':'text-red-600'}`}>{ch.delta} vs ant.</div>
+                <div className="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div style={{width:`${ch.pct}%`,background:ch.color}} className="h-full rounded-full" />
                 </div>
-                <div style={{fontSize:'10px',color:'#94a3b8',marginTop:'3px'}}>{ch.pct}% do total</div>
+                <div className="text-[10px] text-slate-400 mt-1">{ch.pct}% do total</div>
               </div>
             ))}
           </div>
@@ -413,11 +413,11 @@ export default function Performance() {
  
         {/* ── FRENTES OPERACIONAIS ── */}
         <div className="perf-card">
-          <div style={{marginBottom:'14px'}}>
+          <div className="mb-4">
             <div className="perf-sec-title">Performance por Frente Operacional</div>
             <div className="perf-sec-sub">Clique em qualquer frente para análise detalhada no painel lateral</div>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px'}}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
             {FRENTES.map(fr => (
               <div key={fr.id} className={`perf-fr-card${panel?.id===fr.id?' selected':''}`}
                 style={{borderTop:`3px solid ${fr.color}`}} onClick={()=>openPanel(fr)}>
