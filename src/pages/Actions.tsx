@@ -1546,7 +1546,7 @@ function ActionOverlay({
                   {/* Gantt header */}
                   <div className="grid grid-cols-[200px_350px_160px_1fr] gap-6 pb-6 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
                     <div>Fase</div><div>Entregável</div><div>Owner</div>
-                    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                    <div className={cx("grid gap-2", config.units === 8 ? "grid-cols-8" : config.units === 4 ? "grid-cols-4" : "grid-cols-3")}>
                       {config.labels.map((l) => <div key={l} className="text-center">{l}</div>)}
                     </div>
                   </div>
@@ -1565,11 +1565,11 @@ function ActionOverlay({
                           </div>
                           <p className="text-xs font-bold text-slate-600">{step.owner}</p>
                           <div className="relative h-12 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
-                            <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${config.units}, 1fr)` }}>
+                            <div className={cx("absolute inset-0 grid", config.units === 8 ? "grid-cols-8" : config.units === 4 ? "grid-cols-4" : "grid-cols-3")}>
                               {config.labels.map((l) => <div key={l} className="border-l border-slate-200/50 first:border-none" />)}
                             </div>
                             <div 
-                              style={{ left: `${left}%`, width: `${Math.max(width, 10)}%` }}
+                              style={{ left: `${left}%`, width: `${Math.max(width, 10)}%` } as React.CSSProperties}
                               className={cx(
                                 "absolute top-2 h-8 rounded-xl shadow-lg flex items-center px-4 text-[10px] font-black text-white uppercase tracking-widest transition-all",
                                 ganttBarClasses[step.status]
@@ -2021,6 +2021,7 @@ export const Actions: React.FC = () => {
                       type="button"
                       onClick={() => setListDensity(d)}
                       title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
+                      aria-label={`Mudar densidade da lista para ${d}`}
                       className={cx(
                         "rounded-lg px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-all border-none",
                         listDensity === d ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-400"
@@ -2056,7 +2057,7 @@ export const Actions: React.FC = () => {
         </div>
 
         {viewMode === 'Lista' ? (
-          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: listDensity === 'super-compacta' ? 6 : 14 }}>
+          <div className={cx("mt-5 flex flex-col", listDensity === 'super-compacta' ? "gap-1.5" : "gap-3.5")}>
             {visibleListItems.map((item) => (
               <ActionListCard key={item.id} item={item} density={listDensity} onTitleClick={(selected) => openOverlay(selected, 'resumo')} onButtonAction={handleButtonAction} />
             ))}
@@ -2074,18 +2075,22 @@ export const Actions: React.FC = () => {
             ) : null}
           </div>
         ) : (
-          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="mt-5 flex flex-col gap-3.5">
             {/* Density toggle for Kanban — right aligned, compact */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#94a3b8' }}>Densidade</span>
-              <div style={{ display: 'flex', borderRadius: 10, border: '1px solid #e2e8f0', background: '#f8fafc', padding: 3, gap: 2 }}>
+            <div className="flex justify-end items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Densidade</span>
+              <div className="flex rounded-[10px] border border-slate-200 bg-slate-50 p-0.75 gap-0.5">
                 {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
                   <button
                     key={d}
                     type="button"
                     onClick={() => setKanbanDensity(d)}
                     title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
-                    style={{ borderRadius: 7, padding: '4px 9px', fontSize: 11, fontWeight: 600, cursor: 'pointer', border: 'none', background: kanbanDensity === d ? 'white' : 'transparent', color: kanbanDensity === d ? '#0f172a' : '#94a3b8', boxShadow: kanbanDensity === d ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}
+                    aria-label={`Mudar densidade do kanban para ${d}`}
+                    className={cx(
+                      "rounded-[7px] p-[4px_9px] text-[11px] font-semibold cursor-pointer border-none transition-all",
+                      kanbanDensity === d ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-400"
+                    )}
                   >
                     {{ 'super-compacta': 'S', compacta: 'C', media: 'M', expandida: 'E' }[d]}
                   </button>
