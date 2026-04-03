@@ -684,7 +684,7 @@ export const SeoInbound: React.FC = () => {
                      <span className="text-sm font-extrabold text-blue-700">82%</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-blue-600 h-full rounded-full transition-all" style={{width: '82%'}}></div>
+                    <div className="bg-blue-600 h-full rounded-full transition-all w-[82%]" />
                   </div>
                </div>
                <div>
@@ -693,7 +693,7 @@ export const SeoInbound: React.FC = () => {
                      <span className="text-sm font-extrabold text-emerald-600">{(62.4 + currFilter.rateDiff).toFixed(1)}/100</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full rounded-full transition-all" style={{width: `${62.4 + currFilter.rateDiff}%`}}></div>
+                    <div className="bg-emerald-500 h-full rounded-full transition-all" style={{width: `${62.4 + currFilter.rateDiff}%`}} />
                   </div>
                </div>
                <div>
@@ -702,7 +702,7 @@ export const SeoInbound: React.FC = () => {
                      <span className="text-sm font-extrabold text-blue-700">14.5%</span>
                   </div>
                   <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div className="bg-blue-600 h-full rounded-full transition-all" style={{width: '14.5%'}}></div>
+                    <div className="bg-blue-600 h-full rounded-full transition-all w-[14.5%]" />
                   </div>
                </div>
              </div>
