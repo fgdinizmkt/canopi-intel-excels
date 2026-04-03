@@ -1043,3 +1043,35 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - Limitar o escopo à preparação estrutural, deixando a integração funcional dos heatmaps como próximo passo formal.
 
 **Status:** 21º Recorte (Fase 6 — Estrutural) concluído. Ponto de restauração estável em `85ca5af`.
+
+---
+
+### Sessão: 2026-04-03 (Manhã) — Recorte 9 (Fase 8)
+**Agente:** Antigravity
+
+**Objetivo:** Saneamento técnico integral de `ABXOrchestration.tsx`.
+
+**Ações:**
+1.  **Saneamento de Estilos:** Remoção de múltiplos blocos de estilos inline estáticos (`borderBottomColor`, `backgroundColor`).
+2.  **Governança Centralizada:** Implementação da propriedade `borderB` no `colorMap` para gerenciar bordas dinâmicas de cards.
+3.  **Refatoração de Heatmaps:** Conversão de lógicas de cores hexadecimais para classes Tailwind v4 via mapeamento estático.
+4.  **Dinamismo Legítimo:** Auditada e reduzida a contagem de `style={{` para exatamente 2 ocorrências (larguras percentuais de barras de progresso).
+5.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
+
+**Status:** Recorte 9 (Fase 8 — Saneamento) concluído. Commit: `3f871da824cd9112e73fff13f4d1aac77776f023`.
+
+---
+
+### Sessão: 2026-04-03 (Manhã) — Recorte 10 (Fase 8)
+**Agente:** Antigravity
+
+**Objetivo:** Saneamento técnico integral de `Outbound.tsx`.
+
+**Ações:**
+1.  **Eliminação de Interpolações:** Remoção total de padrões inseguros como `bg-${...}`, `text-${...}` e `border-${...}`.
+2.  **Utilitário de Classe:** Introdução da função `cx` para composição segura e legível de classes Tailwind.
+3.  **Mapeamentos de Cor:** Centralização da lógica visual no `colorMap` compartilhado.
+4.  **Dinamismo Legítimo:** Redução de `style={{` para 1 única ocorrência (largura dinâmica no gráfico de mix de canais).
+5.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
+
+**Status:** Recorte 10 (Fase 8 — Saneamento) concluído. Commit: `aea96de7d3e2c68d6eb9426aa648541bb6319eed`.

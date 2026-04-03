@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 3)
+`main` — atualizada em 2026-04-03 (Fase 8 - Recorte 10)
 
 ## Fase atual do plano
-**Fase 8 — Operational Efficiency** (Em Andamento - Saneamento de Performance)
+**Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
 
 ---
 
@@ -18,11 +18,21 @@
 - Desativação de `unoptimized={true}` para habilitar o pipeline nativo do Next.js.
 
 **Recorte 3 — Otimização de Reconciliação (DOM)**
-- **Performance.tsx:** Refatoração integral com extração de blocos densos para sub-componentes memoizados (`PerformanceMetrics`, `ExecutiveSummary`, `OperationsGrid`).
-- **Performance.tsx:** Saneamento de sintaxe JSX e reintrodução de constantes críticas (`CHART_PTS`, `EXPORT_SECTIONS_INIT`).
-- **AccountDetailView.tsx:** Memoização do `Radar Relacional` e `renderTree` para evitar re-cálculos no main thread durante a navegação.
+- **Performance.tsx:** Refatoração integral com extração de blocos densos para sub-componentes memoizados.
 - **Conformidade de Hooks:** Correção de chamadas condicionais de React Hooks em `AccountDetailView.tsx`.
 - **Build de Produção:** Validado com `npm run build` (Exit 0) em todo o projeto.
+
+**Recorte 9 — Saneamento Técnico: ABXOrchestration.tsx**
+- **Saneamento de Estilos:** Remoção total de estilos inline estáticos e conversão para Tailwind v4.
+- **Governança Visual:** Implementação de `colorMap` centralizado para estados de cards e heatmaps.
+- **Dinamismo Legítimo:** Redução de `style={{` para apenas 2 ocorrências (larguras percentuais dinâmicas).
+- **Build de Produção:** Validado com `npm run build` (Exit 0). Commit: `3f871da824cd9112e73fff13f4d1aac77776f023`.
+
+**Recorte 10 — Saneamento Técnico: Outbound.tsx**
+- **Saneamento Massivo:** Remoção de interpolações de classe inseguras (`bg-${`, `text-${`, `border-${`).
+- **Arquitetura de Estilos:** Implementação de utilitário `cx` e centralização de mapeamentos em `colorMap`.
+- **Dinamismo Legítimo:** Consolidado em 1 única ocorrência de `style={{` (largura dinâmica de mix de canais).
+- **Build de Produção:** Validado com `npm run build` (Exit 0). Commit: `aea96de7d3e2c68d6eb9426aa648541bb6319eed`.
 
 ### Fase 7 — Deep Intelligence (Concluída - 2026-04-02)
 
@@ -99,7 +109,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar o ciclo de saneamento de débitos técnicos, performance (next/image) e refatoração de estilos inline.
+- **Fase 8 — Operational Efficiency:** Realizar auditoria objetiva nos arquivos `PaidMedia.tsx`, `SeoInbound.tsx`, `AccountDetailView.tsx` e `Topbar.tsx` para definição e abertura do Recorte 11.
 
 ---
 
