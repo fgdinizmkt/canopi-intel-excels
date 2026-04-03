@@ -184,14 +184,14 @@ export const PaidMedia: React.FC = () => {
                     <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">VTR (View Through Rate)</p>
                     <p className="text-2xl font-black text-slate-900">38.4%</p>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2">
-                       <div className="bg-rose-500 h-full rounded-full" style={{width: '38.4%'}}></div>
+                       <div className="bg-rose-500 h-full rounded-full w-[38.4%]"></div>
                     </div>
                  </div>
                  <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Retention @ 30s</p>
                     <p className="text-2xl font-black text-slate-900">52.1%</p>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2">
-                       <div className="bg-blue-500 h-full rounded-full" style={{width: '52.1%'}}></div>
+                       <div className="bg-blue-500 h-full rounded-full w-[52.1%]"></div>
                     </div>
                  </div>
               </div>
@@ -328,7 +328,7 @@ export const PaidMedia: React.FC = () => {
                        <span>75%</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 rounded-full">
-                       <div className="h-full bg-blue-600 rounded-full transition-all" style={{width: '75%'}}></div>
+                       <div className="h-full bg-blue-600 rounded-full transition-all w-[75%]"></div>
                     </div>
                  </div>
               </div>
