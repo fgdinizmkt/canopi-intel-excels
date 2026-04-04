@@ -15,7 +15,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 2.  **Dinamismo Legítimo:** Preservação de 2 ocorrências de `style={{` para larguras dinâmicas de barras de KPI e pipeline.
 3.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
 
-**Status:** Recorte 14 (Fase 8 — Saneamento) concluído. Commit: `2c2d49e` — refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14)
+**Status:** Recorte 14 (Fase 8 — Saneamento) concluído. Commit: `8485ce6` — refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14)
 
 ---
 

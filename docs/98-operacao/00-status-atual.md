@@ -15,7 +15,7 @@
 - **Saneamento Cirúrgico:** Migração de 100% das cores hexadecimais inline (`ScoreMiniBar`) para utilitários Tailwind v4 native.
 - **Dinamismo Legítimo:** Preservação de apenas 2 ocorrências de `style={{` (largura dinâmica legítima de barras de KPI e pipeline).
 - **Build de Produção:** Validado com `npm run build` (Exit 0).
-- **Commit de Código:** `2c2d49e` — refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14).
+- **Commit de Código:** `8485ce6` — refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14).
 
 **Recorte 11 — Saneamento Técnico: Performance.tsx**
 - **Saneamento Total:** Remoção de 100% das classes `perf-*` e transição para Tailwind v4 native.

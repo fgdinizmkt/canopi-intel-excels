@@ -4,7 +4,7 @@
 - **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
 - **Último recorte concluído:** Recorte 14 — Saneamento Técnico Cirúrgico de AccountDetailView.tsx
 - **Últimos commits relevantes:** 
-  - `2c2d49e` (refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14))
+  - `8485ce6` (refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14))
   - `7f58aa4` (refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13))
   - `7916b67` (refactor(seo): saneamento técnico integral e migração para Tailwind v4 native (Recorte 12))
 - **Data:** 2026-04-03
@@ -29,7 +29,7 @@
 3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
 4.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
 5.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 única ocorrência legítima.
-6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 13).
+6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 14).
 
 ## Pendências e Observações (Auditado)
 1.  **Auditoria Recorte 15:** Arquivo alvo `Topbar.tsx` para saneamento técnico de estilos inline.
