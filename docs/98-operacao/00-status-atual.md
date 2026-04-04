@@ -1,16 +1,28 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 16)
+ `main` — atualizada em 2026-04-04 (Marco Operacional & Analítico Concluído)
 
 ## Fase atual do plano
-**Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
+**Fase 9 — Data Intelligence & Scale** (Próximo Marco - Definição Pendente)
 
 ---
 
-## O que já foi concluído
+### Marco Operacional Local-First (Concluído - 2026-04-04)
 
-### Saneamento de Performance (Fase 8 — 2026-04-03)
+**Operacionalização do Lifecycle (Commits `f0afafd` e `20edc2e`)**
+- **Resultado:** Canopi transformado de protótipo em motor de execução real.
+- **Entidades:** Consolidação de Conta e Contato como hubs de ação.
+- **Persistência:** Implementação de `localStorage` para `sessionActions` e `sessionLogs` no `AccountDetailContext`.
+- **UX Operativa:** CTAs do Command Center (Executar Playbook, Registrar Log) agora materializam ações reais na fila global.
+
+**Camada Analítica Operacional (Commit `098f21d`)**
+- **Métricas de Conversão:** Implementação de cálculo dinâmico de taxa de conclusão (Conversion Rate) na `Actions.tsx`.
+- **Inteligência de Aging:** Rastreamento de ações estagnadas (+48h) via campo `createdAt` injetado no schema.
+- **Dashboard Hero:** Expansão da UI de `Actions` com 7 KPIs críticos (Total, Críticas, Em andamento, Risco SLA, Conversão, Aging, Sem Owner).
+- **Build de Produção:** Validado com `npm run build` (sucesso completo).
+
+---
 **Recorte 18 — Auditoria de Conformidade: Contacts.tsx**
 - **Resultado:** Aprovado por Conformidade Prévia. O arquivo já opera sob Tailwind v4 native e zero estilos inline.
 - **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
@@ -175,3 +187,5 @@
 | Inteligência Relacional | 26º Recorte Concluído | Radar de cruzamento sinais x stakeholders; micro-badges dinâmicos e filtro contextual |
 | Inteligência Cumulativa | 27º Recorte Concluído | Seção de Insights Históricos, Padrões e Lições Aprendidas (inteligencia{}) |
 | Fila de Fogo (Fire Queue) | 28º Recorte Concluído | Cruzamento dinâmico sinais x radar x histórico para priorização de lote |
+| Lifecycle Operacional | Marco Concluído | Transições de status, histórico automático e persistência local (LocalStorage) |
+| Analytics de Conversão | Marco Concluído | Medição de taxa de conclusão, aging e backlog crítico via sessionActions |

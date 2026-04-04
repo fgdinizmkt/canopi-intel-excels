@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-04] — Marco Operacional & Analítico (Fechamento)
+- **Fase:** Fase 8 — Operational Efficiency (Encerramento do Marco)
+- **Escopo:** Operacionalização do Canopi como motor de execução local-first.
+- **Decisões:**
+  - Persistência em `localStorage` centralizada no `AccountDetailContext`.
+  - Hidratação de `createdAt` em todos os mocks para viabilizar cálculos de Aging.
+  - Abordagem "Surgical Patch" em `Actions.tsx` para KPIs de conversão.
+- **Commits:** `f0afafd` (Lifecycle) e `098f21d` (Analytics).
+- **Resultado:** Produto pronto para operação local com métricas reais de performance.
+
+---
+
 ## [2026-04-03] — Sessão: Auditoria de Conformidade Técnica (Recorte 18)
 - **Fase:** Fase 8 — Operational Efficiency
 - **Alvo:** `src/pages/Contacts.tsx`

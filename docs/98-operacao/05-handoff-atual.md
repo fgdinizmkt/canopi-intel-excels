@@ -1,13 +1,12 @@
 # 05 - Handoff atual
 
 ## Estado atual
-- **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
-- **Último recorte concluído:** Recorte 18 — Auditoria de Conformidade: Contacts.tsx (Conformidade prévia)
+- **Fase:** Fase 8 — Operational Efficiency (Marco Concluído)
+- **Último recorte concluído:** Marco Operacional & Analítico (Commits f0afafd, 098f21d)
 - **Últimos commits relevantes:** 
-  - `84cf2f3` (docs: fechamento documental do Recorte 17 (Footer.tsx - Inexistência Técnica))
-  - `ab7eb24` (docs: microreconciliação final de status (Recorte 16 sincronizado))
-  - `2654ad0` (docs: microcorreção de coerência no handoff (Recorte 16 sincronizado))
-- **Data:** 2026-04-03
+  - `098f21d` (feat: adiciona camada analítica operacional à queue da Canopi)
+  - `f0afafd` (feat: implementa lifecycle operacional da fila com reflexo nas entidades)
+- **Data:** 2026-04-04
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK, Reconciliado com origin/main)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 
@@ -36,8 +35,9 @@
 2.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
-- **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 19:** Iniciar auditoria e saneamento do arquivo `src/pages/Settings.tsx`.
+- **Opção A (Escala):** Implementar persistência compartilhada (Supabase/Backend-mock) para colaboração.
+- **Opção B (Inteligência):** Evoluir a leitura de performance por canal/origem e detecção de anomalias na fila.
+- **Marco Atual:** Encerrado. Working tree limpa e sincronizada.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
