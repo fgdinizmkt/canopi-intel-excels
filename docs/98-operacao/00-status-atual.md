@@ -11,6 +11,11 @@
 ## O que já foi concluído
 
 ### Saneamento de Performance (Fase 8 — 2026-04-03)
+**Recorte 15 — Auditoria de Conformidade: Topbar.tsx**
+- **Resultado:** Aprovado por integridade biográfica. O arquivo já opera 100% sob Tailwind v4 native e zero estilos inline.
+- **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+
 **Recorte 14 — Saneamento Técnico: AccountDetailView.tsx**
 - **Saneamento Cirúrgico:** Migração de 100% das cores hexadecimais inline (`ScoreMiniBar`) para utilitários Tailwind v4 native.
 - **Dinamismo Legítimo:** Preservação de apenas 2 ocorrências de `style={{` (largura dinâmica legítima de barras de KPI e pipeline).
@@ -132,7 +137,11 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Topbar.tsx` (Recorte 15), prosseguindo com o roteiro de eficiência operacional.
+- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Navigation.tsx` (Recorte 16), prosseguindo com o roteiro de eficiência operacional.
+
+> [!IMPORTANT]
+> **Governança Operacional: Ordem Canônica**
+> Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
 
 ---
 

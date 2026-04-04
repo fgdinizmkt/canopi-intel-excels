@@ -32,10 +32,14 @@
 6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 14).
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 15:** Arquivo alvo `Topbar.tsx` para saneamento técnico de estilos inline.
+1.  **Auditoria Recorte 16:** Arquivo alvo `Navigation.tsx` para saneamento técnico de estilos inline.
 2.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 15:** Iniciar auditoria e saneamento do arquivo `Topbar.tsx`.
+- **Recorte 16:** Iniciar auditoria e saneamento do arquivo `Navigation.tsx`.
+
+> [!IMPORTANT]
+> **Governança Operacional: Ordem Canônica**
+> Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
 - **Consistency Check:** Validar se o `colorMap` precisa de extensões para novos tipos de status.
