@@ -906,6 +906,8 @@ function ActionOverlay({
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Próximo passo</p>
                     <input 
                       type="text"
+                      id="next-step-input"
+                      title="Próximo passo para esta ação"
                       defaultValue={item.nextStep}
                       onBlur={(e) => handleSaveNextStep(e.target.value)}
                       className="mt-4 w-full bg-slate-50 border border-slate-100 p-2.5 rounded-xl text-lg font-bold leading-relaxed text-slate-700 focus:outline-blue-200"
@@ -1159,11 +1161,8 @@ export const Actions: React.FC = () => {
   const metrics = useMemo(() => {
     const total = allItems.length;
     const critical = allItems.filter(item => item.priority === "Crítica" && item.status !== "Concluída").length;
-    const inProgress = allItems.filter(item => item.status === "Em andamento").length;
-    const concluida = allItems.filter(item => item.status === "Concluída").length;
-    const delayed = allItems.filter(item => item.slaStatus === "vencido" || item.slaStatus === "alerta").length;
-    const noOwner = allItems.filter(item => item.ownerName === null).length;
-    const conversionRate = total > 0 ? (concluida / total) * 100 : 0;
+    const nova = allItems.filter(item => item.status === "Nova").length;
+    const conversionRate = (total - nova) > 0 ? (concluida / (total - nova)) * 100 : 0;
     
     const now = new Date();
     // Aging: mais de 48h (estimado pelos mocks)
@@ -1173,7 +1172,15 @@ export const Actions: React.FC = () => {
       return (now.getTime() - created.getTime()) > (48 * 60 * 60 * 1000);
     }).length;
 
-    return { total, critical, inProgress, delayed, noOwner, conversionRate, aged, concluida };
+    // Ranking Analítico (Top Canais)
+    const channelRanking = Object.entries(
+      allItems.reduce((acc, item) => {
+        acc[item.channel] = (acc[item.channel] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    ).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    return { total, critical, inProgress, delayed, noOwner, conversionRate, aged, concluida, channelRanking };
   }, [allItems]);
 
   const ownerOptions = useMemo(() => {
@@ -1324,14 +1331,25 @@ export const Actions: React.FC = () => {
               </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-7">
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-8">
             <MetricCard label="Total de ações" value={metrics.total} helper="fila operacional conectada" icon={<LayoutList className="h-5 w-5" />} />
             <MetricCard label="Críticas" value={metrics.critical} helper="exigem atenção executiva" icon={<AlertTriangle className="h-5 w-5" />} />
             <MetricCard label="Em andamento" value={metrics.inProgress} helper="sendo executadas" icon={<Clock3 className="h-5 w-5" />} />
             <MetricCard label="Em risco de SLA" value={metrics.delayed} helper="vencido ou em alerta" icon={<History className="h-5 w-5" />} />
-            <MetricCard label="Conversão" value={`${metrics.conversionRate.toFixed(1)}%`} helper="taxa de conclusão" icon={<CheckCircle2 className="h-5 w-5 text-emerald-400" />} />
+            <MetricCard label="Conversão" value={`${metrics.conversionRate.toFixed(1)}%`} helper="taxa (Total - Novas)" icon={<CheckCircle2 className="h-5 w-5 text-emerald-400" />} />
             <MetricCard label="Envelhecidas" value={metrics.aged} helper="+48h sem entrega" icon={<Timer className="h-5 w-5 text-slate-400" />} />
             <MetricCard label="Sem owner" value={metrics.noOwner} helper="pedem atribuição" icon={<Users className="h-5 w-5" />} />
+            <div className="bg-white/10 border border-white/10 rounded-[20px] p-4 flex flex-col justify-center backdrop-blur-md">
+              <div className="text-[10px] font-bold text-white/50 uppercase tracking-[0.16em] mb-2">Ranking Canal</div>
+              <div className="space-y-1">
+                {metrics.channelRanking.map(([channel, count], i) => (
+                  <div key={channel} className="flex items-center justify-between text-[11px]">
+                    <span className="text-white/70 font-bold truncate pr-2 max-w-[80px]">{i+1}. {channel}</span>
+                    <span className="text-white font-black">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
         
