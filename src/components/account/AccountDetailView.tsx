@@ -48,7 +48,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     return found;
   }, [accountId]);
   
-  const { createAction, addLog, sessionLogs } = useAccountDetail();
+  const { createAction, updateAction, addLog, sessionLogs, sessionActions } = useAccountDetail();
   const [orgView, setOrgView] = useState<'tree' | 'list'>('tree');
   const [selectedContactId, setSelectedContactId] = useState<string | null>(initialContactId || null);
   const [isLogging, setIsLogging] = useState(false);
@@ -107,21 +107,29 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     });
   }, [account?.sinais, isFullscreen, setSelectedContactId]);
 
-  if (!account) return null;
-
   const statusAcaoStyle: Record<string, string> = {
     'Em aberto': 'text-slate-400 bg-slate-700/50 border-slate-600',
     'Em andamento': 'text-blue-400 bg-blue-500/10 border-blue-500/20',
     'Atrasada': 'text-red-400 bg-red-500/10 border-red-500/20',
     'Concluída': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
     'Nova': 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+    'Bloqueada': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    'Aguardando aprovação': 'text-violet-400 bg-violet-500/10 border-violet-500/20',
   };
+
+  // Filtragem Operacional Real (RECORTE OPERACIONAL 2.0)
+  const realActions = React.useMemo(() => {
+    return sessionActions.filter(a => a.accountName === (account?.nome || ''));
+  }, [sessionActions, account?.nome]);
+
   const prioStyle: Record<string, string> = { 'Alta': 'text-red-400', 'Média': 'text-amber-400', 'Baixa': 'text-slate-500' };
   const riscoOpStyle: Record<string, string> = {
     'Alto': 'text-red-400 bg-red-500/10 border-red-500/20',
     'Médio': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     'Baixo': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
   };
+
+  if (!account) return null;
 
   const handleSaveLog = () => {
     if (logDraft.trim()) {
@@ -468,15 +476,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <Zap className="w-4 h-4" /> Ações Operacionais
               </h3>
               <div className="space-y-3">
-                {account.acoes.map(a => (
+                {realActions.length > 0 ? realActions.map(a => (
                   <div key={a.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
                     <div className="flex justify-between items-start gap-2 mb-1.5">
-                      <p className="text-sm font-bold text-slate-100">{a.titulo}</p>
+                      <p className="text-sm font-bold text-slate-100">{a.title}</p>
                       <span className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${statusAcaoStyle[a.status]}`}>{a.status}</span>
                     </div>
-                    <div className="text-[10px] text-slate-500">{a.owner} • {a.prazo}</div>
+                    <div className="text-[10px] text-slate-500">{a.ownerName || 'Sem owner'} • {a.category}</div>
+                    {a.nextStep && (
+                      <div className="mt-2 text-[10px] text-blue-400 font-medium italic truncate">
+                        → {a.nextStep}
+                      </div>
+                    )}
                   </div>
-                ))}
+                )) : (
+                  <div className="py-8 text-center border border-dashed border-slate-700/50 rounded-xl">
+                    <p className="text-[10px] text-slate-500 uppercase font-black">Nenhuma ação ativa</p>
+                  </div>
+                )}
               </div>
             </div>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
@@ -862,7 +879,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   contact={contact}
                   onClose={() => setSelectedContactId(null)}
                   sinais={sinaisAssociados}
-                  acoes={acoesAssociadas}
+                  acoes={realActions.filter(a => a.ownerName === contact.nome || a.description.includes(contact.nome))}
                   accountName={account.nome}
                 />
               );

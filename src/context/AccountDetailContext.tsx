@@ -27,6 +27,8 @@ interface AccountDetailContextType {
   sessionLogs: Record<string, string[]>;
   /** Cria uma nova ação operacional */
   createAction: (action: Partial<ActionItem>) => void;
+  /** Atualiza uma ação existente com registro de histórico automático */
+  updateAction: (actionId: string, patch: Partial<ActionItem>, actor?: string) => void;
   /** Adiciona um registro ao histórico da conta */
   addLog: (accountId: string, text: string) => void;
 }
@@ -175,6 +177,55 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   /**
+   * Operacional: Mutação de Ação com Histórico Automático
+   */
+  const updateAction = useCallback((actionId: string, patch: Partial<ActionItem>, actor: string = "Usuário") => {
+    setSessionActions(prev => prev.map(action => {
+      if (action.id !== actionId) return action;
+
+      const historyEntries: HistoryItem[] = [];
+      const now = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      // Detectar mudanças para histórico automático
+      if (patch.status && patch.status !== action.status) {
+        historyEntries.push({
+          id: `hist-status-${Date.now()}`,
+          when: now,
+          actor,
+          type: "mudança",
+          text: `Status alterado de ${action.status} para ${patch.status}.`
+        });
+      }
+
+      if (patch.ownerName && patch.ownerName !== action.ownerName) {
+        historyEntries.push({
+          id: `hist-owner-${Date.now()}`,
+          when: now,
+          actor,
+          type: "owner",
+          text: `Owner alterado para ${patch.ownerName}.`
+        });
+      }
+
+      if (patch.nextStep && patch.nextStep !== action.nextStep) {
+        historyEntries.push({
+          id: `hist-step-${Date.now()}`,
+          when: now,
+          actor,
+          type: "follow-up",
+          text: `Próximo passo atualizado: "${patch.nextStep}".`
+        });
+      }
+
+      return {
+        ...action,
+        ...patch,
+        history: [...historyEntries, ...action.history]
+      };
+    }));
+  }, []);
+
+  /**
    * Operacional: Registro de Log / Timeline
    */
   const addLog = useCallback((accountId: string, text: string) => {
@@ -200,6 +251,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
         sessionActions,
         sessionLogs,
         createAction,
+        updateAction,
         addLog,
       }}
     >

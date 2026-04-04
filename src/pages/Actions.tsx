@@ -1565,7 +1565,7 @@ function ActionOverlay({
 
 
 export const Actions: React.FC = () => {
-  const { openAccount, sessionActions } = useAccountDetail();
+  const { openAccount, sessionActions, updateAction } = useAccountDetail();
   const [items, setItems] = useState<ActionItem[]>(initialActions);
   
   // Consolidar mock + sessão (Recorte Operacional)
@@ -1682,7 +1682,7 @@ export const Actions: React.FC = () => {
   }, [query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
 
   const visibleListItems = showAllList ? filteredItems : filteredItems.slice(0, 5);
-  const selectedItem = items.find((item) => item.id === overlayItemId) ?? null;
+  const selectedItem = allItems.find((item) => item.id === overlayItemId) ?? null;
 
   const metrics = useMemo(() => {
     const total = allItems.length;
@@ -1698,40 +1698,20 @@ export const Actions: React.FC = () => {
     [filteredItems]
   );
 
-  function appendHistory(id: string, entry: Omit<HistoryItem, "id">) {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              history: [{ id: `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, ...entry }, ...item.history],
-            }
-          : item
-      )
-    );
-  }
-
-  function updateItem(id: string, patch: Partial<ActionItem>) {
-    setItems((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
-  }
-
   function handleAssignOwner(id: string) {
-    const target = items.find((item) => item.id === id);
+    const target = allItems.find((item) => item.id === id);
     if (!target) return;
-    updateItem(id, { ownerName: target.suggestedOwner });
-    appendHistory(id, { when: "Agora", actor: "Canopi", type: "owner", text: `Owner atribuído para ${target.suggestedOwner}.` });
+    updateAction(id, { ownerName: target.suggestedOwner });
   }
 
   function handleChangeStatus(id: string, nextStatus: ActionStatus) {
-    const target = items.find((item) => item.id === id);
+    const target = allItems.find((item) => item.id === id);
     if (!target || target.status === nextStatus) return;
-    updateItem(id, { status: nextStatus });
-    appendHistory(id, { when: "Agora", actor: "Canopi", type: "mudança", text: `Status alterado de ${target.status} para ${nextStatus}.` });
+    updateAction(id, { status: nextStatus });
   }
 
   function handleEscalate(id: string) {
-    updateItem(id, { priority: "Crítica", slaStatus: "alerta", status: "Bloqueada" });
-    appendHistory(id, { when: "Agora", actor: "Canopi", type: "risco", text: "Ação escalada por risco operacional e impacto em receita." });
+    updateAction(id, { priority: "Crítica", slaStatus: "alerta", status: "Bloqueada" });
   }
 
   function openOverlay(item: ActionItem, tab: ModalTab = "resumo") {

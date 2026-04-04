@@ -19,14 +19,14 @@ import {
   Sparkles,
   CheckCircle2
 } from 'lucide-react';
-import { ContatoConta, SinalConta, AcaoConta } from '../../data/accountsData';
+import { ContatoConta, SinalConta, ActionItem } from '../../data/accountsData';
 import { useAccountDetail } from '../../context/AccountDetailContext';
 
 interface ContactDetailProfileProps {
   contact: ContatoConta;
   onClose: () => void;
   sinais?: SinalConta[];
-  acoes?: AcaoConta[];
+  acoes?: ActionItem[];
   accountName?: string;
 }
 
@@ -159,8 +159,11 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                 {acoes.map(a => (
                   <div key={a.id} className="p-3 bg-slate-800/40 border border-slate-800 rounded-xl flex justify-between items-center">
                     <div>
-                      <div className="text-xs font-bold text-slate-100">{a.titulo}</div>
-                      <div className="text-[9px] text-slate-500 mt-0.5">Prazo: {a.prazo}</div>
+                      <div className="text-xs font-bold text-slate-100">{a.title}</div>
+                      <div className="flex items-center gap-2 mt-1">
+                         <span className="text-[8px] font-black uppercase text-slate-500">{a.status}</span>
+                         {a.ownerName && <span className="text-[8px] text-blue-500 font-bold tracking-tighter">@{a.ownerName}</span>}
+                      </div>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-700" />
                   </div>
