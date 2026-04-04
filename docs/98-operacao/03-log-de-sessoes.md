@@ -5,6 +5,20 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-03] — Saneamento Técnico de AccountDetailView.tsx (Recorte 14 - Fase 8)
+**Agente:** Antigravity
+
+**Objetivo:** Executar o saneamento técnico cirúrgico de `AccountDetailView.tsx`, migrando cores hexadecimais inline para Tailwind v4 native.
+
+**Ações:**
+1.  **Saneamento de Cores:** Migração de 100% das cores hexadecimais no `ScoreMiniBar` para utilitários `bg-emerald-500`, `bg-blue-500` e `bg-amber-500`.
+2.  **Dinamismo Legítimo:** Preservação de 2 ocorrências de `style={{` para larguras dinâmicas de barras de KPI e pipeline.
+3.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
+
+**Status:** Recorte 14 (Fase 8 — Saneamento) concluído. Commit: `2c2d49e` — refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14)
+
+---
+
 ## [2026-04-03] — Saneamento Técnico de PaidMedia.tsx (Recorte 13 - Fase 8)
 **Agente:** Antigravity
 

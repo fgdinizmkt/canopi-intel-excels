@@ -2,11 +2,11 @@
 
 ## Estado atual
 - **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
-- **Último recorte concluído:** Recorte 13 — Saneamento Técnico Integral de PaidMedia.tsx
+- **Último recorte concluído:** Recorte 14 — Saneamento Técnico Cirúrgico de AccountDetailView.tsx
 - **Últimos commits relevantes:** 
+  - `2c2d49e` (refactor(account): saneamento técnico cirúrgico e migração para Tailwind v4 native (Recorte 14))
   - `7f58aa4` (refactor(paid): saneamento técnico integral e migração para Tailwind v4 native (Recorte 13))
   - `7916b67` (refactor(seo): saneamento técnico integral e migração para Tailwind v4 native (Recorte 12))
-  - `8148241` (docs: formalização do encerramento do Recorte 11 (Fase 8))
 - **Data:** 2026-04-03
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK, Reconciliado com origin/main)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
@@ -32,11 +32,10 @@
 6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 13).
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 14:** Arquivo alvo `AccountDetailView.tsx` para saneamento técnico de estilos inline.
-2.  **Topbar:** Próximo na fila de auditoria de conformidade pós-saneamento de hotspots supremos.
-3.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
+1.  **Auditoria Recorte 15:** Arquivo alvo `Topbar.tsx` para saneamento técnico de estilos inline.
+2.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 14:** Iniciar auditoria e saneamento do arquivo `AccountDetailView.tsx`.
+- **Recorte 15:** Iniciar auditoria e saneamento do arquivo `Topbar.tsx`.
 - **Consistency Check:** Validar se o `colorMap` precisa de extensões para novos tipos de status.
