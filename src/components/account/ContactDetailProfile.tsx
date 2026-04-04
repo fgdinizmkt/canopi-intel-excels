@@ -15,7 +15,8 @@ import {
   TrendingUp,
   BrainCircuit,
   Clock,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import { ContatoConta, SinalConta, AcaoConta } from '../../data/accountsData';
 
@@ -91,23 +92,33 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             <TrendingUp className="w-3.5 h-3.5" /> Poder & Acesso Relacional
           </h3>
           <div className="space-y-4 bg-slate-800/30 p-4 rounded-2xl border border-slate-800">
+            {/* Score de Sucesso (Canônico) */}
+            <div>
+              <div className="flex justify-between text-[10px] font-black uppercase mb-1.5">
+                <span className="text-blue-400">Score de Sucesso (AI)</span>
+                <span className="text-blue-400">{contact.scoreSucesso}%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-blue-500/10 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${contact.scoreSucesso}%` }} />
+              </div>
+            </div>
             {/* Influência */}
             <div>
               <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
                 <span className="text-slate-400">Influência no Comitê</span>
-                <span className="text-blue-400">{contact.influencia}/10</span>
+                <span className="text-slate-300 font-black">{contact.influencia}/10</span>
               </div>
-              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500" style={{ width: `${contact.influencia * 10}%` }} />
+              <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-slate-500" style={{ width: `${contact.influencia * 10}%` }} />
               </div>
             </div>
             {/* Força Relacional */}
             <div>
               <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                <span className="text-slate-400">Força do Relacionamento</span>
+                <span className="text-slate-400">Força Relacional</span>
                 <span className="text-emerald-500">{contact.forcaRelacional}%</span>
               </div>
-              <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
                 <div className="h-full bg-emerald-500" style={{ width: `${contact.forcaRelacional}%` }} />
               </div>
             </div>
@@ -158,37 +169,44 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
         </section>
 
         {/* --- MANUAL DE ABORDAGEM CANOPI AI --- */}
-        <section className="bg-gradient-to-br from-indigo-900/20 to-slate-900 p-5 rounded-2xl border border-indigo-500/20 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-blue-900/20 to-slate-900 p-5 rounded-2xl border border-blue-500/20 relative overflow-hidden shadow-xl">
           <div className="absolute -right-4 -top-4 opacity-10">
-            <BrainCircuit className="w-24 h-24 text-indigo-400" />
+            <BrainCircuit className="w-24 h-24 text-blue-400" />
           </div>
-          <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4" /> Manual Canopi AI
+          <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" /> Inteligência de Abordagem Canopi
           </h3>
           
           <div className="space-y-4">
+            {contact.ganchoReuniao && (
+              <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/20">
+                <span className="text-[9px] font-black text-blue-500 uppercase block mb-1.5 tracking-widest">Gancho para Reunião</span>
+                <p className="text-xs text-slate-100 font-medium italic">&quot;{contact.ganchoReuniao}&quot;</p>
+              </div>
+            )}
+
             <div>
-              <span className="text-[9px] font-black text-slate-500 uppercase block mb-1">Estratégia Recomendada</span>
-              <p className="text-xs text-slate-100 leading-relaxed font-bold italic">
-                {contact.classificacao.includes('Blocker') 
-                  ? "Atuar via Sponsor para neutralização técnica por meio de workshop de ROI." 
-                  : "Engajar em pauta executiva de expansão, focando em ganhos de governança."}
+              <span className="text-[9px] font-black text-slate-500 uppercase block mb-1">Estratégia de Conversão</span>
+              <p className="text-xs text-slate-100 leading-relaxed font-bold">
+                {contact.scoreSucesso > 70 
+                  ? `Engajamento crítico detectado. Recomenda-se abordagem direta via ${contact.papelComite} focando em prova de valor.` 
+                  : `Stakeholder com score moderado (${contact.scoreSucesso}%). Priorizar nutrição técnica antes do convite executivo.`}
               </p>
             </div>
             
             <div className="grid grid-cols-2 gap-3">
               <div className="p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                <span className="text-[8px] font-black text-slate-500 uppercase block">Tom</span>
-                <span className="text-[10px] font-bold text-slate-200">Consultivo / Direto</span>
+                <span className="text-[8px] font-black text-slate-500 uppercase block">Tom de abordagem</span>
+                <span className="text-[10px] font-bold text-slate-200">{contact.senioridade === 'C-Level' ? 'Executivo / ROI' : 'Técnico / Eficiência'}</span>
               </div>
               <div className="p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                <span className="text-[8px] font-black text-slate-500 uppercase block">Timing</span>
-                <span className="text-[10px] font-bold text-slate-200">Imediato</span>
+                <span className="text-[8px] font-black text-slate-500 uppercase block">Recomendação AI</span>
+                <span className="text-[10px] font-bold text-emerald-400">Abordar em 24h</span>
               </div>
             </div>
 
-            <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-900/40 transition-all active:scale-95 flex items-center justify-center gap-2">
-              <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação
+            <button className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-2">
+              <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação Canopi AI
             </button>
           </div>
         </section>

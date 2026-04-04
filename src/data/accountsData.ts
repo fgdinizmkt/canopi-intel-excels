@@ -35,6 +35,10 @@ export interface ContatoConta {
   liderId?: string;
   influencia: number;
   potencialSucesso: number;
+  /** Score consolidado de probabilidade de conversão (0-100) */
+  scoreSucesso: number;
+  /** Sugestão de abertura de conversa Canopi AI */
+  ganchoReuniao?: string;
 }
 
 export interface OportunidadeConta {
@@ -121,7 +125,8 @@ export interface Conta {
     hipoteses: string[];
     fatoresRecomendacao: string[];
   };
-  historico: { data: string; tipo: string; descricao: string }[];
+  tecnografia: string[];
+  historico: { data: string; tipo: string; descricao: string; icone?: string }[];
 }
 
 export const contasMock: Conta[] = [
@@ -169,9 +174,9 @@ export const contasMock: Conta[] = [
       { id: 'a3', titulo: 'Validar proposta de expansão de escopo', status: 'Em andamento', owner: 'Leandro Silva', prioridade: 'Média', prazo: '2026-04-08' }
     ],
     contatos: [
-      { id: 'c1', nome: 'Roberta Lima', cargo: 'VP de Operações', area: 'Operações', senioridade: 'C-Level', papelComite: 'Decisão final', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 90, potencialSucesso: 85 },
-      { id: 'c2', nome: 'Carlos Mendes', cargo: 'Diretor de TI', area: 'Tecnologia', senioridade: 'Diretoria', papelComite: 'Validação técnica', forcaRelacional: 64, receptividade: 'Média', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Influenciador', 'Técnico', 'Champion'], liderId: 'c1', influencia: 82, potencialSucesso: 76 },
-      { id: 'c3', nome: 'Aline Prado', cargo: 'Gerente de Controladoria', area: 'Finanças', senioridade: 'Gerência', papelComite: 'Análise orçamentária', forcaRelacional: 41, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Blocker', 'Negócio'], liderId: 'c1', influencia: 68, potencialSucesso: 48 }
+      { id: 'c1', nome: 'Roberta Lima', cargo: 'VP de Operações', area: 'Operações', senioridade: 'C-Level', papelComite: 'Decisão final', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 90, potencialSucesso: 85, scoreSucesso: 88, ganchoReuniao: 'Pautar expansão de ROI na vertical de logística.' },
+      { id: 'c2', nome: 'Carlos Mendes', cargo: 'Diretor de TI', area: 'Tecnologia', senioridade: 'Diretoria', papelComite: 'Validação técnica', forcaRelacional: 64, receptividade: 'Média', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Influenciador', 'Técnico', 'Champion'], liderId: 'c1', influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Validar stack de observabilidade operacional.' },
+      { id: 'c3', nome: 'Aline Prado', cargo: 'Gerente de Controladoria', area: 'Finanças', senioridade: 'Gerência', papelComite: 'Análise orçamentária', forcaRelacional: 41, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Blocker', 'Negócio'], liderId: 'c1', influencia: 68, potencialSucesso: 48, scoreSucesso: 42, ganchoReuniao: 'Apresentar business case de redução de churn.' }
     ],
     oportunidades: [
       { id: 'o1', nome: 'Renovação multi-unidade 2026', etapa: 'Proposta', valor: 2200000, owner: 'Mariana Costa', risco: 'Médio', probabilidade: 68, historico: ['Diagnóstico concluído', 'Escopo validado com operações'] },
@@ -214,10 +219,11 @@ export const contasMock: Conta[] = [
       hipoteses: ['Workshop financeiro pode elevar probabilidade em 12 p.p.'],
       fatoresRecomendacao: ['Cobertura relacional parcial', 'Risco de dependência de sponsor único']
     },
+    tecnografia: ['Salesforce CRM', 'AWS Cloud', 'SAP S/4HANA', 'Tableau', 'ServiceNow'],
     historico: [
-      { data: '2026-03-29', tipo: 'Sinal', descricao: 'Mudança no comitê de compras detectada.' },
-      { data: '2026-03-26', tipo: 'Ação', descricao: 'Reunião com sponsor adiada.' },
-      { data: '2026-03-20', tipo: 'Oportunidade', descricao: 'Proposta de renovação enviada.' }
+      { data: '2026-03-29', tipo: 'Sinal', descricao: 'Mudança no comitê de compras detectada.', icone: 'AlertTriangle' },
+      { data: '2026-03-26', tipo: 'Ação', descricao: 'Reunião com sponsor adiada.', icone: 'Clock' },
+      { data: '2026-03-20', tipo: 'Oportunidade', descricao: 'Proposta de renovação enviada.', icone: 'TrendingUp' }
     ]
   },
   {
@@ -228,13 +234,14 @@ export const contasMock: Conta[] = [
     leituraFactual: ['2 reuniões de descoberta realizadas.', 'Champion técnico identificado.'], leituraInferida: ['Jornada deve acelerar com prova de caso no segmento financeiro.'], leituraSugerida: ['Executar play ABM de entrada com conteúdo por persona.'],
     sinais: [{ id:'s3', titulo:'Acesso recorrente ao case financeiro', tipo:'Tendência', impacto:'Médio', owner:'Rafael Prado', recomendacao:'Priorizar contato com diretoria de operações.', contexto:'3 acessos em 5 dias no material de caso.', data:'2026-03-25' }],
     acoes: [{ id:'a4', titulo:'Agendar reunião com diretoria de operações', status:'Em andamento', owner:'Rafael Prado', prioridade:'Alta', prazo:'2026-04-04' }],
-    contatos: [{ id:'c4', nome:'Gustavo Rocha', cargo:'Head de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Patrocinador da mudança', forcaRelacional:58, receptividade:'Alta', acessibilidade:'Média', status:'Ativa', classificacao:['Sponsor','Negócio'], influencia:79, potencialSucesso:74 }],
+    contatos: [{ id:'c4', nome:'Gustavo Rocha', cargo:'Head de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Patrocinador da mudança', forcaRelacional:58, receptividade:'Alta', acessibilidade:'Média', status:'Ativa', classificacao:['Sponsor','Negócio'], influencia:79, potencialSucesso:74, scoreSucesso: 70 }],
     oportunidades: [{ id:'o3', nome:'Primeiro contrato plataforma ops', etapa:'Qualificação', valor:550000, owner:'Rafael Prado', risco:'Baixo', probabilidade:44, historico:['Descoberta inicial concluída'] }],
     canaisCampanhas: { origemPrincipal:'Inbound orgânico', influencias:[{ canal:'Inbound', campanha:'SEO - Eficiência financeira', tipo:'Inbound', impacto:'Entrada da conta na base', data:'2026-02-05' }] },
     abm: { motivo:'Conta alvo prioritária para expansão em fintechs.', fit:'Fit alto por maturidade digital e dor operacional.', cluster:'Fintech crescimento - Cluster B', similaridade:'81% com wins recentes.', coberturaInicialComite:'48% com lacuna em TI.', playsEntrada:['Play de valor por persona','Play técnico-funcional'], potencialAbertura:'Alto para frente de observabilidade operacional.', hipoteses:['Conteúdo técnico acelera validação interna.'], contasSimilares:['BrixPay','NexaBank'] },
     abx: { motivo:'Ainda sem maturidade ABX.', evolucaoJornada:'Início de relacionamento.', maturidadeRelacional:'Baixa', sponsorAtivo:'Em formação', profundidadeComite:'Baixa', continuidade:'Não aplicável', expansao:'Mapeamento futuro', retencao:'Não aplicável', riscoEstagnacao:'Baixo no curto prazo' },
     inteligencia: { sucessos:['Entrada via conteúdo de caso real.'], insucessos:['Contato financeiro sem personalização teve baixa resposta.'], padroes:['Diretoria de operações responde melhor que compras no estágio inicial.'], learnings:['Mensagem técnica com impacto financeiro converte mais.'], hipoteses:['Workshop técnico eleva taxa de avanço para proposta.'], fatoresRecomendacao:['Fit ICP alto','Cobertura relacional baixa'] },
-    historico:[{data:'2026-03-27', tipo:'Ação', descricao:'Reunião de descoberta registrada.'}]
+    tecnografia: ['HubSpot CRM', 'Azure Cloud'],
+    historico:[{data:'2026-03-27', tipo:'Ação', descricao:'Reunião de descoberta registrada.', icone: 'Activity'}]
   },
   {
     id: '3', slug: 'logprime-supply', nome: 'LogPrime Supply', dominio: 'logprime.com', vertical: 'Logística', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Campinas, Brasil',
@@ -244,13 +251,14 @@ export const contasMock: Conta[] = [
     leituraFactual: ['2 ações atrasadas.', 'Queda de uso em módulo de planejamento.', 'Renovação vence em 65 dias.'], leituraInferida: ['Sem reforço executivo, chance de churn parcial aumenta.'], leituraSugerida: ['Ativar play ABX de retenção e expansão assistida.'],
     sinais: [{ id:'s4', titulo:'Queda de uso do módulo core', tipo:'Alerta', impacto:'Alto', owner:'Daniel Moreira', recomendacao:'Entrar com squad de adoção em 7 dias.', contexto:'Uso semanal caiu 27% no último mês.', data:'2026-03-30' }],
     acoes: [{ id:'a5', titulo:'Plano de recuperação da renovação', status:'Atrasada', owner:'Daniel Moreira', prioridade:'Alta', prazo:'2026-03-25' }],
-    contatos: [{ id:'c5', nome:'Patrícia Gomes', cargo:'Diretora de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Renovação', forcaRelacional:46, receptividade:'Média', acessibilidade:'Baixa', status:'Risco', classificacao:['Decisor','Negócio'], influencia:84, potencialSucesso:52 }],
+    contatos: [{ id:'c5', nome:'Patrícia Gomes', cargo:'Diretora de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Renovação', forcaRelacional:46, receptividade:'Média', acessibilidade:'Baixa', status:'Risco', classificacao:['Decisor','Negócio'], influencia:84, potencialSucesso:52, scoreSucesso: 45 }],
     oportunidades: [{ id:'o4', nome:'Renovação anual plataforma core', etapa:'Negociação', valor:1800000, owner:'Daniel Moreira', risco:'Alto', probabilidade:36, historico:['Escopo de renovação reduzido pelo cliente'] }],
     canaisCampanhas: { origemPrincipal:'CRM de base instalada', influencias:[{ canal:'CRM', campanha:'Adoção e valor Q1', tipo:'CRM', impacto:'Engajamento de usuários finais', data:'2026-01-18' }] },
     abm: { motivo:'Conta não priorizada para ABM no momento.', fit:'Fit médio.', cluster:'Logística base instalada', similaridade:'64% com contas em retenção.', coberturaInicialComite:'39%', playsEntrada:['Play de retomada executiva'], potencialAbertura:'Moderado', hipoteses:['Fortalecer sponsor secundário reduz risco de churn.'], contasSimilares:['CargoFlux'] },
     abx: { motivo:'Conta de base instalada em risco de renovação.', evolucaoJornada:'Piloto > adoção > risco de retração.', maturidadeRelacional:'Média-baixa', sponsorAtivo:'Ausente no último ciclo', profundidadeComite:'Baixa', continuidade:'Ameaçada', expansao:'Congelada', retencao:'Prioridade máxima', riscoEstagnacao:'Alto' },
     inteligencia: { sucessos:['Picos de adoção após treinamentos dirigidos.'], insucessos:['Sem sponsor ativo houve travamento de roadmap.'], padroes:['Contas com baixa cobertura financeira renovam com desconto agressivo.'], learnings:['Plano de valor contínuo precisa envolver diretoria.'], hipoteses:['Comitê quinzenal de valor reduz risco em 20 p.p.'], fatoresRecomendacao:['Risco elevado','Cobertura relacional baixa','Renovação próxima'] },
-    historico:[{data:'2026-03-30', tipo:'Sinal', descricao:'Queda de uso detectada no módulo core.'}]
+    tecnografia: ['Oracle ERP', 'Google Cloud'],
+    historico:[{data:'2026-03-30', tipo:'Sinal', descricao:'Queda de uso detectada no módulo core.', icone: 'AlertCircle'}]
   },
   {
     id: '4', slug: 'alphabank-sa', nome: 'AlphaBank S.A.', dominio: 'alphabank.com.br', vertical: 'Financeiro', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -263,6 +271,7 @@ export const contasMock: Conta[] = [
     abm: { motivo: 'Fit ICP excelente.', fit: 'Alto', cluster: 'Financeiro Top', similaridade: '92%', coberturaInicialComite: '74%', playsEntrada: [], potencialAbertura: 'Altíssimo', hipoteses: [], contasSimilares: [] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [],
     historico: []
   },
   {
@@ -276,6 +285,7 @@ export const contasMock: Conta[] = [
     abm: { motivo: 'Vertical prioritária.', fit: 'Médio-alto', cluster: 'Healthcare Enterprise', similaridade: '78%', coberturaInicialComite: '55%', playsEntrada: [], potencialAbertura: 'Médio', hipoteses: [], contasSimilares: [] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [],
     historico: []
   },
   {
@@ -289,6 +299,7 @@ export const contasMock: Conta[] = [
     abm: { motivo: 'Potencial de vertical alto.', fit: 'Baixo-médio', cluster: 'Mobilidade Mid', similaridade: '45%', coberturaInicialComite: '40%', playsEntrada: [], potencialAbertura: 'Baixo', hipoteses: [], contasSimilares: [] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [],
     historico: []
   },
   {
@@ -302,6 +313,7 @@ export const contasMock: Conta[] = [
     abm: { motivo: 'Liderança em vertical Agro.', fit: 'Médio', cluster: 'Agro Global', similaridade: '65%', coberturaInicialComite: '30%', playsEntrada: [], potencialAbertura: 'Médio-alto', hipoteses: [], contasSimilares: [] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [],
     historico: []
   }
 ];

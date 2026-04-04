@@ -12,7 +12,13 @@ interface AccountDetailContextType {
   selectedContactId: string | null;
   isOpen: boolean;
   viewMode: AccountViewMode;
-  openAccount: (accountId: string, contactId?: string, mode?: AccountViewMode) => void;
+  /** Módulo de origem para retorno contextual */
+  originModule: string | null;
+  /** URL de origem para retorno contextual */
+  originPath: string | null;
+  /** Chave de estado opcional para filtros/scrolling */
+  originStateKey: string | null;
+  openAccount: (accountId: string, contactId?: string, opts?: { mode?: AccountViewMode, originModule?: string, originPath?: string, stateKey?: string }) => void;
   closeAccount: () => void;
   toggleViewMode: () => void;
 }
@@ -28,19 +34,28 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<AccountViewMode>('drawer');
+  const [originModule, setOriginModule] = useState<string | null>(null);
+  const [originPath, setOriginPath] = useState<string | null>(null);
+  const [originStateKey, setOriginStateKey] = useState<string | null>(null);
 
   /**
    * Abre o detalhe da conta via rota dinâmica (Subpágina)
-   * Prioriza o uso de identificador semântico (slug) na URL
    */
-  const openAccount = useCallback((accountId: string, contactId?: string, mode: AccountViewMode = 'drawer') => {
+  const openAccount = useCallback((
+    accountId: string, 
+    contactId?: string, 
+    opts: { mode?: AccountViewMode, originModule?: string, originPath?: string, stateKey?: string } = {}
+  ) => {
     // Busca o slug da conta para garantir semântica correta na URL
     const account = contasMock.find(c => c.id === accountId);
     const identifier = account?.slug || accountId;
 
     setSelectedAccountId(accountId);
     setSelectedContactId(contactId || null);
-    setViewMode(mode);
+    setViewMode(opts.mode || 'drawer');
+    setOriginModule(opts.originModule || null);
+    setOriginPath(opts.originPath || (typeof window !== 'undefined' ? window.location.pathname : null));
+    setOriginStateKey(opts.stateKey || null);
     setIsOpen(true);
 
     // Navegação física para a subpágina dedicada
@@ -51,17 +66,24 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
    * Fecha o detalhe da conta retornando para a origem
    */
   const closeAccount = useCallback(() => {
+    const path = originPath;
+    
     setIsOpen(false);
     setSelectedAccountId(null);
     setSelectedContactId(null);
+    setOriginModule(null);
+    setOriginPath(null);
+    setOriginStateKey(null);
     
-    // Comportamento de saída flexível: volta ou vai para listagem
-    if (window.history.length > 1) {
+    // Prioriza o retorno para o path de origem registrado
+    if (path && typeof window !== 'undefined' && path !== window.location.pathname) {
+      router.push(path);
+    } else if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back();
     } else {
       router.push('/contas');
     }
-  }, [router]);
+  }, [router, originPath]);
 
   const toggleViewMode = useCallback(() => {
     setViewMode((prev) => (prev === 'drawer' ? 'fullscreen' : 'drawer'));
@@ -74,6 +96,9 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
         selectedContactId,
         isOpen,
         viewMode,
+        originModule,
+        originPath,
+        originStateKey,
         openAccount,
         closeAccount,
         toggleViewMode,

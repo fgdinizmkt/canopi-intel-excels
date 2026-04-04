@@ -531,7 +531,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   {abmAccounts.map(acc => (
                     <tr key={acc.id} 
                         className={`hover:bg-slate-50/50 transition-colors group cursor-pointer ${activeAccountId === acc.id ? 'bg-blue-50/30' : ''}`} 
-                        onClick={() => { setActiveAccountId(acc.id); openAccount(acc.id); }}>
+                        onClick={() => { setActiveAccountId(acc.id); openAccount(acc.id, undefined, { originModule: 'Estratégia ABM' }); }}>
                       <td className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400 text-xs group-hover:border-blue-400 transition-all shadow-sm">{acc.initials}</div>

@@ -905,7 +905,7 @@ function ActionListCard({
         <span className={cx(statusClasses[item.status], "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0")}>{item.status}</span>
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+          onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }}
           className="flex-1 min-w-0 text-left bg-transparent border-none cursor-pointer p-0 text-sm font-extrabold text-slate-900 truncate"
         >
           <span className="hover:text-blue-600 transition-colors">{item.accountName}</span> <span className="font-medium text-slate-500">— {item.title}</span>
@@ -952,7 +952,7 @@ function ActionListCard({
           <div className="mt-4">
             <div className="text-left bg-none border-none p-0">
               <p 
-                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }}
                 className="hover:text-blue-600 transition-colors cursor-pointer text-[22px] font-black tracking-[-0.03em] leading-tight text-slate-900"
               >
                 {item.accountName}
@@ -1403,7 +1403,7 @@ function ActionOverlay({
                 <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.category}</span>
               </div>
               <p 
-                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }}
+                onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }}
                 className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600 hover:text-blue-700 transition-colors cursor-pointer inline-block"
               >
                 {item.accountName}
@@ -1456,7 +1456,7 @@ function ActionOverlay({
               <div className="flex flex-col gap-8">
                 {/* Info grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName)); }} className="cursor-pointer">
+                  <div onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }} className="cursor-pointer">
                     <InfoBlock label="Conta" value={item.accountName} helper={item.accountContext} />
                   </div>
                   <InfoBlock label="Owner" value={item.ownerName ?? 'Não atribuído'} helper={`Time: ${item.ownerTeam}`} />

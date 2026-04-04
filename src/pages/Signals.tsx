@@ -196,7 +196,7 @@ export const Signals: React.FC = () => {
           </div>
         </div>
         <div className="fp-body">
-           <div className="fp-title cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openAccount(getAccountIdByName(subpageData.account))}>{subpageData.account}</div>
+           <div className="fp-title cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openAccount(getAccountIdByName(subpageData.account), undefined, { originModule: 'Sinais' })}>{subpageData.account}</div>
            <div className="fp-subtitle">{subpageData.accountContext || subpageData.description}</div>
            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginTop: '28px', marginBottom: '28px' }}>
              {(subpageData.accountDetails || []).map((d: any) => (
@@ -324,7 +324,7 @@ export const Signals: React.FC = () => {
                     <div><div className="sig-data-label">Causa</div><div className="sig-data-val">{s.probableCause}</div></div>
                     <div><div className="sig-data-label">Impacto</div><div className="sig-data-val" style={{ fontWeight: 700, color: ic(s.severity) }}>{s.impact}</div></div>
                     <div><div className="sig-data-label">Confiança</div><div className="conf-wrap"><div className="conf-bar"><div className="conf-fill" style={{ width: `${s.confidence}%`, background: cc(s.confidence) }}></div></div><span className="conf-val">{s.confidence}%</span></div></div>
-                    <div><div className="sig-data-label">Conta</div><div className="sig-data-val cursor-pointer hover:text-blue-600 transition-colors" onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(s.account)); }}>{s.account}</div></div>
+                    <div><div className="sig-data-label">Conta</div><div className="sig-data-val cursor-pointer hover:text-blue-600 transition-colors" onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(s.account), undefined, { originModule: 'Sinais' }); }}>{s.account}</div></div>
                   </div>
                 </div>
                 <div className="sig-side">

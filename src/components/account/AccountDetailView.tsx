@@ -6,7 +6,8 @@ import {
   Activity, ExternalLink, Mail, Clock, ArrowUpRight, Layout,
   ChevronRight, Lightbulb, LogsIcon, List as ListIcon, Network,
   Sparkles as SparkleIcon, CheckCircle2, Brain, MapPin, Users,
-  AlertTriangle, ShieldCheck, Flame, Users2
+  AlertTriangle, ShieldCheck, Flame, Users2, History as HistoryIcon,
+  Globe, Share2
 } from 'lucide-react';
 import { contasMock, ContatoConta, SinalConta } from '../../data/accountsData';
 import { OrganogramNode } from './OrganogramNode';
@@ -171,15 +172,27 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           </div>
         </div>
 
-        {/* Firmografia enriquecida (Recorte 25) */}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 pt-3 border-t border-slate-700/40 text-[10px] text-slate-500">
+        {/* Firmografia e Tecnografia enriquecida */}
+        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 border-t border-slate-700/40 text-[10px] text-slate-500">
           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{account.localizacao}</span>
-          <span>{account.segmento} · {account.porte}</span>
-          <span>Etapa: <span className="text-slate-300 font-bold">{account.etapa}</span></span>
+          <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">{account.segmento} · {account.porte}</span>
+          <span>Etapa: <span className="text-slate-100 font-bold uppercase">{account.etapa}</span></span>
           <span>Budget: <span className="text-emerald-400 font-bold">{fmt(account.budgetBrl)}</span></span>
           <span>Cobertura Relacional: <span className={`font-bold ${account.coberturaRelacional >= 60 ? 'text-emerald-400' : account.coberturaRelacional >= 40 ? 'text-amber-400' : 'text-red-400'}`}>{account.coberturaRelacional}%</span></span>
+          
           {account.ownersSecundarios.length > 0 && (
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />Time: {account.ownersSecundarios.join(', ')}</span>
+            <span className="flex items-center gap-1 border-l border-slate-700 pl-4"><Users className="w-3 h-3 text-blue-500" />Time: {account.ownersSecundarios.join(', ')}</span>
+          )}
+
+          {account.tecnografia.length > 0 && (
+            <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
+              <span className="text-[9px] font-black uppercase text-slate-600 tracking-tighter">Stack:</span>
+              <div className="flex gap-1.5">
+                {account.tecnografia.map(t => (
+                  <span key={t} className="px-1.5 py-0.5 bg-blue-500/5 border border-blue-500/20 text-blue-400 rounded-md font-bold tracking-tight">{t}</span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -366,7 +379,42 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
           </div>
 
-          {/* Operacional: Ações e Oportunidades (Recorte 25) */}
+          {/* Canais e Campanhas (Evolução Canônica) */}
+          <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
+            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-emerald-500" /> Origem e Influência de Canais
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Origem Principal</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-100">{account.canaisCampanhas.origemPrincipal}</p>
+                    <p className="text-[10px] text-slate-500">Atribuição por Primeiro Toque</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Influência Recente</span>
+                <div className="space-y-3">
+                  {account.canaisCampanhas.influencias.map((inf, i) => (
+                    <div key={i} className="flex justify-between items-center text-xs">
+                      <div className="flex items-center gap-2">
+                        <Share2 className="w-3 h-3 text-blue-400" />
+                        <span className="text-slate-300">{inf.canal} — {inf.campanha}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-500 italic">{inf.data}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Operacional: Ações e Oportunidades */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
               <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -633,15 +681,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           <div className={`grid gap-6 ${isFullscreen ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
               <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Histórico Recente
+                <HistoryIcon className="w-4 h-4" /> Timeline Integrada (360)
               </h3>
-              <div className="space-y-4">
-                {account.historico.slice(0, 3).map((h, i) => (
-                  <div key={i} className="pl-4 border-l border-slate-700">
-                    <p className="text-[10px] font-bold text-blue-400">{h.data}</p>
-                    <p className="text-xs text-slate-300">{h.descricao}</p>
-                  </div>
-                ))}
+              <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-slate-800">
+                {account.historico.map((h, i) => {
+                   const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : HistoryIcon;
+                   return (
+                     <div key={i} className="relative pl-9">
+                       <div className="absolute left-0 top-0 w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center z-10 shadow-lg">
+                          <IconComp className={`w-3 h-3 ${h.tipo === 'Sinal' ? 'text-red-500' : h.tipo === 'Ação' ? 'text-blue-500' : 'text-emerald-500'}`} />
+                       </div>
+                       <div className="flex justify-between items-start mb-0.5">
+                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{h.tipo}</span>
+                         <span className="text-[10px] font-bold text-slate-600 italic">{h.data}</span>
+                       </div>
+                       <p className="text-xs text-slate-300 leading-relaxed font-medium">{h.descricao}</p>
+                     </div>
+                   );
+                })}
               </div>
             </div>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
