@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { contasMock, ActionItem, HistoryItem } from '../data/accountsData';
+import { contasMock, ActionItem, HistoryItem, initialActions } from '../data/accountsData';
 
 /**
  * Tipos de visualização do Perfil da Conta
@@ -28,7 +28,7 @@ interface AccountDetailContextType {
   /** Cria uma nova ação operacional */
   createAction: (action: Partial<ActionItem>) => void;
   /** Atualiza uma ação existente com registro de histórico automático */
-  updateAction: (actionId: string, patch: Partial<ActionItem>, actor?: string) => void;
+  updateAction: (actionId: string, patch: Partial<ActionItem> & { comment?: string }, actor?: string) => void;
   /** Adiciona um registro ao histórico da conta */
   addLog: (accountId: string, text: string) => void;
 }
@@ -59,11 +59,18 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const storedActions = localStorage.getItem('canopi_v1_actions');
         const storedLogs = localStorage.getItem('canopi_v1_logs');
+
+        if (storedActions) {
+           setSessionActions(JSON.parse(storedActions));
+        } else {
+           // Bootstrap inicial
+           setSessionActions(initialActions);
+        }
         
-        if (storedActions) setSessionActions(JSON.parse(storedActions));
         if (storedLogs) setSessionLogs(JSON.parse(storedLogs));
       } catch (e) {
         console.error('Falha ao hidratar camada operacional Canopi:', e);
+        setSessionActions(initialActions);
       } finally {
         setIsHydrated(true);
       }
@@ -170,6 +177,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: "view", label: "Ver perfil completo", tone: "secondary", action: "open" },
         { id: "start", label: "Executar", tone: "primary", action: "start" },
       ],
+      createdAt: new Date().toISOString(),
       ...partialAction
     };
 
@@ -179,7 +187,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   /**
    * Operacional: Mutação de Ação com Histórico Automático
    */
-  const updateAction = useCallback((actionId: string, patch: Partial<ActionItem>, actor: string = "Usuário") => {
+  const updateAction = useCallback((actionId: string, patch: Partial<ActionItem & { comment?: string }>, actor: string = "Usuário") => {
     setSessionActions(prev => prev.map(action => {
       if (action.id !== actionId) return action;
 
@@ -217,9 +225,22 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       }
 
+      if (patch.comment) {
+        historyEntries.push({
+          id: `hist-comment-${Date.now()}`,
+          when: now,
+          actor,
+          type: "comentário",
+          text: patch.comment
+        });
+      }
+
+      // Prevenir que o comentário entre no objeto da ação
+      const { comment, ...restPatch } = patch;
+
       return {
         ...action,
-        ...patch,
+        ...restPatch,
         history: [...historyEntries, ...action.history]
       };
     }));
