@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { contasMock, ActionItem, HistoryItem } from '../data/accountsData';
 
@@ -46,9 +46,35 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   const [originPath, setOriginPath] = useState<string | null>(null);
   const [originStateKey, setOriginStateKey] = useState<string | null>(null);
 
-  // Estados Operacionais da Sessão
+  // Estados Operacionais da Sessão com Persistência Local
   const [sessionActions, setSessionActions] = useState<ActionItem[]>([]);
   const [sessionLogs, setSessionLogs] = useState<Record<string, string[]>>({});
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // 1. Hidratação inicial ao montar
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedActions = localStorage.getItem('canopi_v1_actions');
+        const storedLogs = localStorage.getItem('canopi_v1_logs');
+        
+        if (storedActions) setSessionActions(JSON.parse(storedActions));
+        if (storedLogs) setSessionLogs(JSON.parse(storedLogs));
+      } catch (e) {
+        console.error('Falha ao hidratar camada operacional Canopi:', e);
+      } finally {
+        setIsHydrated(true);
+      }
+    }
+  }, []);
+
+  // 2. Sincronização reativa com o storage
+  useEffect(() => {
+    if (isHydrated && typeof window !== 'undefined') {
+      localStorage.setItem('canopi_v1_actions', JSON.stringify(sessionActions));
+      localStorage.setItem('canopi_v1_logs', JSON.stringify(sessionLogs));
+    }
+  }, [sessionActions, sessionLogs, isHydrated]);
 
   /**
    * Abre o detalhe da conta via rota dinâmica (Subpágina)

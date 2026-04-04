@@ -1562,40 +1562,7 @@ function ActionOverlay({
   );
 }
 
-// ─── Adapter: localStorage action (from Signals) → ActionItem ───────────────
 
-function adaptStoredAction(raw: Record<string, string>): ActionItem {
-  return {
-    id: raw.id,
-    priority: (['Crítica', 'Alta', 'Média', 'Baixa'].includes(raw.priority) ? raw.priority : 'Alta') as Priority,
-    category: raw.category || 'Operacional',
-    channel: raw.category || 'Operacional',
-    status: (['Nova', 'Em andamento', 'Bloqueada', 'Aguardando aprovação', 'Concluída'].includes(raw.status) ? raw.status : 'Nova') as ActionStatus,
-    title: raw.title || '',
-    description: raw.description || '',
-    accountName: raw.account || '',
-    accountContext: raw.origin || '',
-    origin: raw.origin || 'Gerado por Signals',
-    relatedSignal: raw.origin || '',
-    ownerName: raw.owner || null,
-    suggestedOwner: raw.owner || '',
-    ownerTeam: '',
-    slaText: raw.sla || '',
-    slaStatus: (['vencido', 'alerta', 'ok', 'sem_sla'].includes(raw.slaStatus) ? raw.slaStatus : 'ok') as SlaStatus,
-    expectedImpact: '',
-    nextStep: '',
-    dependencies: [],
-    evidence: [],
-    history: [{ id: raw.id + '-h0', when: raw.createdAt || 'Agora', actor: 'Signals', type: 'evidência' as const, text: raw.description || 'Ação criada automaticamente a partir de um sinal detectado.' }],
-    projectObjective: '',
-    projectSuccess: '',
-    projectSteps: [],
-    buttons: [
-      { id: 'view', label: 'Ver detalhes', tone: 'secondary' as const, action: 'open' as const },
-      { id: 'start', label: 'Executar', tone: 'primary' as const, action: 'start' as const },
-    ],
-  };
-}
 
 export const Actions: React.FC = () => {
   const { openAccount, sessionActions } = useAccountDetail();
@@ -1709,28 +1676,6 @@ export const Actions: React.FC = () => {
       })
     );
   }, [allItems, query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
-
-  // ─── Merge com localStorage (ações criadas em Signals) ──────────────────────
-  useEffect(() => {
-    function mergeFromStorage() {
-      try {
-        const stored = JSON.parse(localStorage.getItem('canopi_actions') || '[]');
-        if (!Array.isArray(stored) || stored.length === 0) return;
-        setItems((current) => {
-          const existingIds = new Set(current.map((i) => i.id));
-          const incoming = stored
-            .filter((raw: Record<string, string>) => raw?.id && !existingIds.has(raw.id))
-            .map(adaptStoredAction);
-          return incoming.length === 0 ? current : [...incoming, ...current];
-        });
-      } catch {
-        // ignora localStorage malformado
-      }
-    }
-    mergeFromStorage();
-    window.addEventListener('storage', mergeFromStorage);
-    return () => window.removeEventListener('storage', mergeFromStorage);
-  }, []);
 
   useEffect(() => {
     setShowAllList(false);
