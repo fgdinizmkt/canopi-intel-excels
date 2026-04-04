@@ -16,15 +16,18 @@ import {
   BrainCircuit,
   Clock,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 import { ContatoConta, SinalConta, AcaoConta } from '../../data/accountsData';
+import { useAccountDetail } from '../../context/AccountDetailContext';
 
 interface ContactDetailProfileProps {
   contact: ContatoConta;
   onClose: () => void;
   sinais?: SinalConta[];
   acoes?: AcaoConta[];
+  accountName?: string;
 }
 
 /**
@@ -35,8 +38,11 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
   contact, 
   onClose,
   sinais = [],
-  acoes = []
+  acoes = [],
+  accountName = "Conta não identificada"
 }) => {
+  const { createAction } = useAccountDetail();
+  const [prepStatus, setPrepStatus] = React.useState<string | null>(null);
   // Cores semânticas Baseadas na Classificação
   const getClassColor = (classes: string[]) => {
     if (classes.includes('Blocker')) return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -205,8 +211,36 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
               </div>
             </div>
 
-            <button className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/40 transition-all active:scale-95 flex items-center justify-center gap-2">
-              <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação Canopi AI
+            <button 
+              disabled={!!prepStatus}
+              onClick={() => {
+                createAction({
+                  priority: "Alta",
+                  category: "Prospecção",
+                  channel: "LinkedIn/Email",
+                  status: "Nova",
+                  title: `Interação estratégica AI: ${contact.nome}`,
+                  description: `Preparar abordagem personalizada com foco em ${contact.area}. Gancho sugerido: "${contact.ganchoReuniao || 'Conexão via rede.'}"`,
+                  accountName: accountName,
+                  accountContext: `${contact.cargo}`,
+                  sourceType: "playbook",
+                  suggestedOwner: "Você",
+                  nextStep: "Validar minuta e realizar disparo personalizado"
+                });
+                setPrepStatus('Interação enviada para fila');
+                setTimeout(() => setPrepStatus(null), 3000);
+              }}
+              className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${prepStatus ? 'bg-emerald-600 text-white shadow-emerald-900/20' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/40'}`}
+            >
+              {prepStatus ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" /> {prepStatus}
+                </>
+              ) : (
+                <>
+                  <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação Canopi AI
+                </>
+              )}
             </button>
           </div>
         </section>

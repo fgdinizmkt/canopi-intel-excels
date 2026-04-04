@@ -12,6 +12,7 @@ import {
 import { contasMock, ContatoConta, SinalConta } from '../../data/accountsData';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
+import { useAccountDetail } from '../../context/AccountDetailContext';
 
 interface AccountDetailViewProps {
   accountId: string;
@@ -42,9 +43,17 @@ const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
 export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   accountId, initialContactId, viewMode: shellViewMode, onClose, onToggleViewMode
 }) => {
-  const account = React.useMemo(() => contasMock.find(c => c.id === accountId), [accountId]);
+  const account = React.useMemo(() => {
+    const found = contasMock.find(c => c.id === accountId);
+    return found;
+  }, [accountId]);
+  
+  const { createAction, addLog, sessionLogs } = useAccountDetail();
   const [orgView, setOrgView] = useState<'tree' | 'list'>('tree');
   const [selectedContactId, setSelectedContactId] = useState<string | null>(initialContactId || null);
+  const [isLogging, setIsLogging] = useState(false);
+  const [logDraft, setLogDraft] = useState('');
+  const [showFeedback, setShowFeedback] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -105,12 +114,43 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     'Em andamento': 'text-blue-400 bg-blue-500/10 border-blue-500/20',
     'Atrasada': 'text-red-400 bg-red-500/10 border-red-500/20',
     'Concluída': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+    'Nova': 'text-blue-400 bg-blue-500/10 border-blue-500/20',
   };
   const prioStyle: Record<string, string> = { 'Alta': 'text-red-400', 'Média': 'text-amber-400', 'Baixa': 'text-slate-500' };
   const riscoOpStyle: Record<string, string> = {
     'Alto': 'text-red-400 bg-red-500/10 border-red-500/20',
     'Médio': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
     'Baixo': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  };
+
+  const handleSaveLog = () => {
+    if (logDraft.trim()) {
+      addLog(accountId, logDraft);
+      setLogDraft('');
+      setIsLogging(false);
+      setShowFeedback('Log operacional registrado na timeline.');
+      setTimeout(() => setShowFeedback(null), 3000);
+    }
+  };
+
+  const handleExecPlaybook = () => {
+    createAction({
+      priority: "Alta",
+      category: "Playbook",
+      channel: "ABM",
+      status: "Nova",
+      title: `Ativar blindagem executiva: ${account.nome}`,
+      description: `Ação prioritária gerada via Centro de Comando para mitigar riscos detectados e blindar renovação.`,
+      accountName: account.nome,
+      accountContext: `${account.segmento} · ${account.vertical}`,
+      sourceType: "playbook",
+      playbookName: "Blindagem de Renovação",
+      suggestedOwner: account.ownerPrincipal,
+      ownerName: account.ownerPrincipal,
+      nextStep: "Enviar briefing executivo para stakeholders de área"
+    });
+    setShowFeedback('Playbook ativado. Nova ação enviada para a fila global.');
+    setTimeout(() => setShowFeedback(null), 4000);
   };
 
   return (
@@ -138,6 +178,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {showFeedback && (
+              <div className="px-3 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg animate-in slide-in-from-top-1 fade-in duration-300">
+                <span className="text-[10px] font-black uppercase text-blue-400 tracking-widest flex items-center gap-2">
+                  <SparkleIcon className="w-3 h-3 animate-pulse" /> {showFeedback}
+                </span>
+              </div>
+            )}
             <button 
               onClick={onClose} 
               className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm group"
@@ -684,21 +731,33 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <HistoryIcon className="w-4 h-4" /> Timeline Integrada (360)
               </h3>
               <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-slate-800">
-                {account.historico.map((h, i) => {
-                   const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : HistoryIcon;
-                   return (
-                     <div key={i} className="relative pl-9">
-                       <div className="absolute left-0 top-0 w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center z-10 shadow-lg">
-                          <IconComp className={`w-3 h-3 ${h.tipo === 'Sinal' ? 'text-red-500' : h.tipo === 'Ação' ? 'text-blue-500' : 'text-emerald-500'}`} />
-                       </div>
-                       <div className="flex justify-between items-start mb-0.5">
-                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{h.tipo}</span>
-                         <span className="text-[10px] font-bold text-slate-600 italic">{h.data}</span>
-                       </div>
-                       <p className="text-xs text-slate-300 leading-relaxed font-medium">{h.descricao}</p>
-                     </div>
-                   );
-                })}
+                {(() => {
+                  const sLogs = sessionLogs[accountId] || [];
+                  const combined = [
+                    ...sLogs.map(text => ({ 
+                      tipo: 'Log Manual', 
+                      data: 'Agora', 
+                      descricao: text, 
+                      icone: 'LogsIcon' 
+                    })),
+                    ...account.historico.map(h => ({ ...h, tipo: h.tipo as any }))
+                  ];
+                  return combined.map((h, i) => {
+                    const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : h.icone === 'LogsIcon' ? LogsIcon : HistoryIcon;
+                    return (
+                      <div key={i} className="relative pl-9">
+                        <div className="absolute left-0 top-0 w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center z-10 shadow-lg">
+                           <IconComp className={`w-3 h-3 ${h.tipo.includes('Sinal') ? 'text-red-500' : h.tipo.includes('Ação') ? 'text-blue-500' : 'text-emerald-500'}`} />
+                        </div>
+                        <div className="flex justify-between items-start mb-0.5">
+                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{h.tipo}</span>
+                          <span className="text-[10px] font-bold text-slate-600 italic">{h.data}</span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed font-medium">{h.descricao}</p>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
@@ -728,25 +787,63 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         </div>
       </div>
 
-      {/* FOOTER (RESTAURADO ao estado preservado do Recorte 25) */}
-      <div className="flex-shrink-0 p-4 border-t border-slate-700/50 bg-slate-800/80 flex justify-between items-center backdrop-blur-md">
-        <div className="flex gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold transition-all text-slate-100 shadow-lg active:scale-95">
-            <LogsIcon className="w-4 h-4 text-blue-500" /> Registrar Log
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold transition-all text-slate-100 shadow-lg active:scale-95">
-            <Mail className="w-4 h-4 text-emerald-500" /> E-mail 1:1
-          </button>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex flex-col items-end pr-4 border-r border-slate-700">
-            <span className="text-[9px] text-slate-500 uppercase font-black">Próxima Recomendação</span>
-            <span className="text-[10px] text-blue-400 font-bold truncate max-w-[200px]">{account.proximaMelhorAcao}</span>
+      {/* FOOTER OPERACIONAL (UX REFINADA) */}
+      <div className="flex-shrink-0 p-4 border-t border-slate-700/50 bg-slate-800/80 flex flex-col gap-4 backdrop-blur-md">
+        {isLogging ? (
+          <div className="w-full flex flex-col gap-3 p-3 bg-slate-900 border border-blue-500/30 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-black uppercase text-blue-400 tracking-widest">Novo Registro de Log</span>
+              <LogsIcon className="w-3 h-3 text-blue-500" />
+            </div>
+            <textarea 
+              autoFocus
+              className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-600 transition-all resize-none"
+              placeholder="Descreva a atividade realizada com esta conta..."
+              value={logDraft}
+              onChange={e => setLogDraft(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <button 
+                onClick={() => { setIsLogging(false); setLogDraft(''); }} 
+                className="px-4 py-2 text-[10px] font-black uppercase text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleSaveLog} 
+                className="px-6 py-2 bg-blue-600 text-white text-[10px] font-black uppercase rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-900/40 transition-all active:scale-95"
+              >
+                Salvar Log
+              </button>
+            </div>
           </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-blue-900/40 active:scale-95">
-            Executar Playbook <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+        ) : (
+          <div className="w-full flex justify-between items-center">
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setIsLogging(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold transition-all text-slate-100 shadow-lg active:scale-95"
+              >
+                <LogsIcon className="w-4 h-4 text-blue-500" /> Registrar Log
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-bold transition-all text-slate-100 shadow-lg active:scale-95">
+                <Mail className="w-4 h-4 text-emerald-500" /> E-mail 1:1
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex flex-col items-end pr-4 border-r border-slate-700">
+                <span className="text-[9px] text-slate-500 uppercase font-black">Próxima Recomendação</span>
+                <span className="text-[10px] text-blue-400 font-bold truncate max-w-[200px]">{account.proximaMelhorAcao}</span>
+              </div>
+              <button 
+                onClick={handleExecPlaybook}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-blue-900/40 active:scale-95"
+              >
+                Executar Playbook <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── OVERLAY: FILTRO CONTEXTUAL (RECORTE 26) ── */}
@@ -766,6 +863,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   onClose={() => setSelectedContactId(null)}
                   sinais={sinaisAssociados}
                   acoes={acoesAssociadas}
+                  accountName={account.nome}
                 />
               );
             })()}

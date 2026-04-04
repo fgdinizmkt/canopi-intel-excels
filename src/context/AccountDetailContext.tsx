@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { contasMock } from '../data/accountsData';
+import { contasMock, ActionItem, HistoryItem } from '../data/accountsData';
 
 /**
  * Tipos de visualização do Perfil da Conta
@@ -21,6 +21,14 @@ interface AccountDetailContextType {
   openAccount: (accountId: string, contactId?: string, opts?: { mode?: AccountViewMode, originModule?: string, originPath?: string, stateKey?: string }) => void;
   closeAccount: () => void;
   toggleViewMode: () => void;
+  /** Operação: Lista de ações criadas nesta sessão */
+  sessionActions: ActionItem[];
+  /** Operação: Logs adicionados nesta sessão (por Account ID) */
+  sessionLogs: Record<string, string[]>;
+  /** Cria uma nova ação operacional */
+  createAction: (action: Partial<ActionItem>) => void;
+  /** Adiciona um registro ao histórico da conta */
+  addLog: (accountId: string, text: string) => void;
 }
 
 const AccountDetailContext = createContext<AccountDetailContextType | undefined>(undefined);
@@ -37,6 +45,10 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   const [originModule, setOriginModule] = useState<string | null>(null);
   const [originPath, setOriginPath] = useState<string | null>(null);
   const [originStateKey, setOriginStateKey] = useState<string | null>(null);
+
+  // Estados Operacionais da Sessão
+  const [sessionActions, setSessionActions] = useState<ActionItem[]>([]);
+  const [sessionLogs, setSessionLogs] = useState<Record<string, string[]>>({});
 
   /**
    * Abre o detalhe da conta via rota dinâmica (Subpágina)
@@ -89,6 +101,63 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
     setViewMode((prev) => (prev === 'drawer' ? 'fullscreen' : 'drawer'));
   }, []);
 
+  /**
+   * Operacional: Criação de Ação Real
+   */
+  const createAction = useCallback((partialAction: Partial<ActionItem>) => {
+    const newAction: ActionItem = {
+      id: `session-${Date.now()}`,
+      priority: partialAction.priority || "Média",
+      category: partialAction.category || "Manual",
+      channel: partialAction.channel || "Ops",
+      status: "Nova",
+      title: partialAction.title || "Nova Ação Operacional",
+      description: partialAction.description || "",
+      accountName: partialAction.accountName || "Conta não identificada",
+      accountContext: partialAction.accountContext || "Contexto manual",
+      origin: partialAction.origin || "Canopi Command Center",
+      relatedSignal: partialAction.relatedSignal || "Ação disparada via Centro de Comando",
+      ownerName: partialAction.ownerName || null,
+      suggestedOwner: partialAction.suggestedOwner || "Fábio Diniz",
+      ownerTeam: partialAction.ownerTeam || "Revenue Ops",
+      slaText: "24h",
+      slaStatus: "ok",
+      expectedImpact: "Evolução do engajamento na conta",
+      nextStep: partialAction.nextStep || "Iniciar contato",
+      dependencies: [],
+      evidence: [],
+      history: [
+        {
+          id: `hist-${Date.now()}`,
+          when: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          actor: "Canopi AI",
+          type: "evidência",
+          text: `Ação operacional materializada via ${partialAction.sourceType || 'manual'}.`
+        }
+      ],
+      projectObjective: "Executar tese de abordagem conforme recomendação Canopi.",
+      projectSuccess: "Aprovação do próximo passo pelo stakeholder.",
+      projectSteps: [],
+      buttons: [
+        { id: "view", label: "Ver perfil completo", tone: "secondary", action: "open" },
+        { id: "start", label: "Executar", tone: "primary", action: "start" },
+      ],
+      ...partialAction
+    };
+
+    setSessionActions(prev => [newAction, ...prev]);
+  }, []);
+
+  /**
+   * Operacional: Registro de Log / Timeline
+   */
+  const addLog = useCallback((accountId: string, text: string) => {
+    setSessionLogs(prev => ({
+      ...prev,
+      [accountId]: [text, ...(prev[accountId] || [])]
+    }));
+  }, []);
+
   return (
     <AccountDetailContext.Provider
       value={{
@@ -102,6 +171,10 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
         openAccount,
         closeAccount,
         toggleViewMode,
+        sessionActions,
+        sessionLogs,
+        createAction,
+        addLog,
       }}
     >
       {children}

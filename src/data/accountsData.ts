@@ -52,6 +52,64 @@ export interface OportunidadeConta {
   historico: string[];
 }
 
+// --- TIPAGEM OPERACIONAL (QUEUE GLOBAL) ---
+export type Priority = "Crítica" | "Alta" | "Média" | "Baixa";
+export type ActionStatus = "Nova" | "Em andamento" | "Bloqueada" | "Aguardando aprovação" | "Concluída";
+export type SlaStatus = "vencido" | "alerta" | "ok" | "sem_sla";
+
+export interface ProjectStep {
+  id: string;
+  lane: string;
+  label: string;
+  owner: string;
+  startWeek: number;
+  duration: number;
+  status: "done" | "active" | "pending" | "risk";
+  detail: string;
+}
+
+export interface HistoryItem {
+  id: string;
+  when: string;
+  actor: string;
+  type: "mudança" | "evidência" | "risco" | "owner" | "follow-up";
+  text: string;
+}
+
+export interface ActionItem {
+  id: string;
+  priority: Priority;
+  category: string;
+  channel: string;
+  status: ActionStatus;
+  title: string;
+  description: string;
+  accountName: string;
+  accountContext: string;
+  origin: string;
+  relatedSignal: string;
+  ownerName: string | null;
+  suggestedOwner: string;
+  ownerTeam: string;
+  slaText: string;
+  slaStatus: SlaStatus;
+  expectedImpact: string;
+  nextStep: string;
+  dependencies: string[];
+  evidence: string[];
+  history: HistoryItem[];
+  projectObjective: string;
+  projectSuccess: string;
+  projectSteps: ProjectStep[];
+  buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
+  
+  sourceType?: "manual" | "signal" | "playbook";
+  playbookName?: string;
+  playbookRunId?: string;
+  playbookStepId?: string;
+  relatedAccountId?: string;
+}
+
 export interface Conta {
   id: string;
   slug: string;

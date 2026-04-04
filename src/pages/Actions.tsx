@@ -14,71 +14,18 @@ import {
   Search,
   Users,
   X,
+  Target,
+  TrendingUp,
+  Activity,
+  MessageSquare,
 } from "lucide-react";
 import { Badge, Button, Card } from '../components/ui';
 import { useAccountDetail } from "../context/AccountDetailContext";
-import { contasMock } from "../data/accountsData";
+import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
 
-type Priority = "Crítica" | "Alta" | "Média" | "Baixa";
-type ActionStatus = "Nova" | "Em andamento" | "Bloqueada" | "Aguardando aprovação" | "Concluída";
-type SlaStatus = "vencido" | "alerta" | "ok" | "sem_sla";
 type ViewMode = "Lista" | "Kanban";
 type ModalTab = "resumo" | "projeto" | "historico";
 type CardDensity = "super-compacta" | "compacta" | "media" | "expandida";
-
-type ProjectStep = {
-  id: string;
-  lane: string;
-  label: string;
-  owner: string;
-  startWeek: number;
-  duration: number;
-  status: "done" | "active" | "pending" | "risk";
-  detail: string;
-};
-
-type HistoryItem = {
-  id: string;
-  when: string;
-  actor: string;
-  type: "mudança" | "evidência" | "risco" | "owner" | "follow-up";
-  text: string;
-};
-
-type ActionItem = {
-  id: string;
-  priority: Priority;
-  category: string;
-  channel: string;
-  status: ActionStatus;
-  title: string;
-  description: string;
-  accountName: string;
-  accountContext: string;
-  origin: string;
-  relatedSignal: string;
-  ownerName: string | null;
-  suggestedOwner: string;
-  ownerTeam: string;
-  slaText: string;
-  slaStatus: SlaStatus;
-  expectedImpact: string;
-  nextStep: string;
-  dependencies: string[];
-  evidence: string[];
-  history: HistoryItem[];
-  projectObjective: string;
-  projectSuccess: string;
-  projectSteps: ProjectStep[];
-  buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
-  
-  // Rastreabilidade (Recorte 20)
-  sourceType?: "manual" | "signal" | "playbook";
-  playbookName?: string;
-  playbookRunId?: string;
-  playbookStepId?: string;
-  relatedAccountId?: string;
-};
 
 // ─── Style helpers (inline para garantir compilação no Tailwind v4) ─────────
 
@@ -703,7 +650,7 @@ function truncateText(text: string, maxLength: number) {
 
 function sortByPriorityAndSla(items: ActionItem[]) {
   const priorityOrder: Record<Priority, number> = { Crítica: 0, Alta: 1, Média: 2, Baixa: 3 };
-  const slaOrder: Record<SlaStatus, number> = { vencido: 0, alerta: 1, sem_sla: 2, ok: 3 };
+  const slaOrder: Record<SlaStatus, number> = { vencido: 0, alerta: 1, ok: 2, sem_sla: 3 };
   return [...items].sort((a, b) => {
     const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
     if (priorityDiff !== 0) return priorityDiff;
@@ -1651,7 +1598,16 @@ function adaptStoredAction(raw: Record<string, string>): ActionItem {
 }
 
 export const Actions: React.FC = () => {
+  const { openAccount, sessionActions } = useAccountDetail();
   const [items, setItems] = useState<ActionItem[]>(initialActions);
+  
+  // Consolidar mock + sessão (Recorte Operacional)
+  const allItems = useMemo(() => {
+    const sessionIds = new Set(sessionActions.map(a => a.id));
+    const uniqueInitial = initialActions.filter(a => !sessionIds.has(a.id));
+    return [...sessionActions, ...uniqueInitial];
+  }, [sessionActions, initialActions]);
+
   const [query, setQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("Todas");
   const [channelFilter, setChannelFilter] = useState("Todos");
@@ -1736,8 +1692,9 @@ export const Actions: React.FC = () => {
 
   const filteredItems = useMemo(() => {
     const lowerQuery = query.trim().toLowerCase();
+    // Usa allItems (consolidado) em vez de items (local)
     return sortByPriorityAndSla(
-      items.filter((item) => {
+      allItems.filter((item) => {
         const matchesQuery =
           lowerQuery.length === 0 ||
           [item.title, item.description, item.accountName, item.origin, item.relatedSignal, item.category, item.channel]
@@ -1751,7 +1708,7 @@ export const Actions: React.FC = () => {
         return matchesQuery && matchesPriority && matchesChannel && matchesStatus && matchesOwner;
       })
     );
-  }, [items, query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
+  }, [allItems, query, priorityFilter, channelFilter, statusFilter, ownerFilter]);
 
   // ─── Merge com localStorage (ações criadas em Signals) ──────────────────────
   useEffect(() => {
@@ -1783,13 +1740,13 @@ export const Actions: React.FC = () => {
   const selectedItem = items.find((item) => item.id === overlayItemId) ?? null;
 
   const metrics = useMemo(() => {
-    const total = items.length;
-    const critical = items.filter((item) => item.priority === "Crítica").length;
-    const inProgress = items.filter((item) => item.status === "Em andamento").length;
-    const delayed = items.filter((item) => item.slaStatus === "vencido" || item.slaStatus === "alerta").length;
-    const noOwner = items.filter((item) => item.ownerName === null).length;
+    const total = allItems.length;
+    const critical = allItems.filter((item) => item.priority === "Crítica").length;
+    const inProgress = allItems.filter((item) => item.status === "Em andamento").length;
+    const delayed = allItems.filter((item) => item.slaStatus === "vencido" || item.slaStatus === "alerta").length;
+    const noOwner = allItems.filter((item) => item.ownerName === null).length;
     return { total, critical, inProgress, delayed, noOwner };
-  }, [items]);
+  }, [allItems]);
 
   const itemsByStatus = useMemo(
     () => statusOptions.map((status) => ({ status, items: filteredItems.filter((item) => item.status === status) })),
