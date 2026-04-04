@@ -24,7 +24,7 @@ const fmt = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' }).format(v);
 
 const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
-  const color = val >= 75 ? '#22c55e' : val >= 50 ? '#3b82f6' : '#f59e0b';
+  const bgColor = val >= 75 ? 'bg-emerald-500' : val >= 50 ? 'bg-blue-500' : 'bg-amber-500';
   return (
     <div className="flex-1 min-w-0">
       <div className="flex justify-between items-center mb-1">
@@ -32,7 +32,7 @@ const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
         <span className="text-[10px] font-bold text-slate-300">{val}</span>
       </div>
       <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${val}%`, backgroundColor: color }} />
+        <div className={`h-full rounded-full transition-all duration-500 ${bgColor}`} style={{ width: `${val}%` }} />
       </div>
     </div>
   );
