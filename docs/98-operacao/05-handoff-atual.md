@@ -2,11 +2,11 @@
 
 ## Estado atual
 - **Fase:** Fase 8 — Operational Efficiency (Em Andamento)
-- **Último recorte concluído:** Recorte 17 — Auditoria de Conformidade: Footer.tsx (Inexistência técnica)
+- **Último recorte concluído:** Recorte 18 — Auditoria de Conformidade: Contacts.tsx (Conformidade prévia)
 - **Últimos commits relevantes:** 
+  - `84cf2f3` (docs: fechamento documental do Recorte 17 (Footer.tsx - Inexistência Técnica))
   - `ab7eb24` (docs: microreconciliação final de status (Recorte 16 sincronizado))
   - `2654ad0` (docs: microcorreção de coerência no handoff (Recorte 16 sincronizado))
-  - `8305042` (docs: fechamento documental do Recorte 16 (Sidebar.tsx) e retificação de nomenclatura)
 - **Data:** 2026-04-03
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK, Reconciliado com origin/main)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
@@ -29,15 +29,15 @@
 3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
 4.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
 5.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 única ocorrência legítima.
-6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 17).
+6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 18).
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 18:** Arquivo alvo `src/pages/Contacts.tsx` para saneamento técnico de estilos inline.
+1.  **Auditoria Recorte 19:** Arquivo alvo `src/pages/Settings.tsx` para saneamento técnico de estilos inline.
 2.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 18:** Iniciar auditoria e saneamento do arquivo `src/pages/Contacts.tsx`.
+- **Recorte 19:** Iniciar auditoria e saneamento do arquivo `src/pages/Settings.tsx`.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
