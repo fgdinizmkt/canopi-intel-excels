@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 13)
+ `main` — atualizada em 2026-04-03 (Fase 8 - Recorte 16)
 
 ## Fase atual do plano
 **Fase 8 — Operational Efficiency** (Em Andamento - Saneamento Técnico)
