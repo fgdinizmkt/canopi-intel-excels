@@ -11,6 +11,11 @@
 ## O que já foi concluído
 
 ### Saneamento de Performance (Fase 8 — 2026-04-03)
+**Recorte 16 — Auditoria de Conformidade: Sidebar.tsx**
+- **Resultado:** Aprovado por integridade biográfica (retificado de Navigation.tsx). O arquivo já opera 100% sob Tailwind v4 native e zero estilos inline.
+- **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+
 **Recorte 15 — Auditoria de Conformidade: Topbar.tsx**
 - **Resultado:** Aprovado por integridade biográfica. O arquivo já opera 100% sob Tailwind v4 native e zero estilos inline.
 - **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
@@ -137,7 +142,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Navigation.tsx` (Recorte 16), prosseguindo com o roteiro de eficiência operacional.
+- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Footer.tsx` (Recorte 17), prosseguindo com o roteiro de eficiência operacional.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

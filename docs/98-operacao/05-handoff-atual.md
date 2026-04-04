@@ -33,12 +33,12 @@
 6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 15).
 
 ## Pendências e Observações (Auditado)
-1.  **Auditoria Recorte 16:** Arquivo alvo `Navigation.tsx` para saneamento técnico de estilos inline.
+1.  **Auditoria Recorte 17:** Arquivo alvo `Footer.tsx` para saneamento técnico de estilos inline.
 2.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Direção Recomendada)
 - **Fase 8 — Operational Efficiency (Continuação):**
-- **Recorte 16:** Iniciar auditoria e saneamento do arquivo `Navigation.tsx`.
+- **Recorte 17:** Iniciar auditoria e saneamento do arquivo `Footer.tsx`.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
