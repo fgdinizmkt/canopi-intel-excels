@@ -11,6 +11,11 @@
 ## O que já foi concluído
 
 ### Saneamento de Performance (Fase 8 — 2026-04-03)
+**Recorte 17 — Auditoria de Conformidade: Footer.tsx**
+- **Resultado:** Concluído por Inexistência Técnica. O projeto não sustenta um componente de rodapé materializado no layout atual.
+- **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+
 **Recorte 16 — Auditoria de Conformidade: Sidebar.tsx**
 - **Resultado:** Aprovado por integridade biográfica (retificado de Navigation.tsx). O arquivo já opera 100% sob Tailwind v4 native e zero estilos inline.
 - **Alteração de Código:** Nenhuma (0 insertions, 0 deletions).
@@ -142,7 +147,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Footer.tsx` (Recorte 17), prosseguindo com o roteiro de eficiência operacional.
+- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Contacts.tsx` (Recorte 18), arquivo materializado em `src/pages/`.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

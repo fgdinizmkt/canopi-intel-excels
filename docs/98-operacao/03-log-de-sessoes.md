@@ -5,6 +5,24 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-03] — Sessão: Auditoria de Conformidade Técnica (Recorte 17)
+- **Fase:** Fase 8 — Operational Efficiency
+- **Alvo:** `Footer.tsx`
+- **Status:** Concluído por inexistência técnica.
+- **Resultado:** O projeto não sustenta um rodapé materializado no layout (dashboard app).
+- **Build:** `Exit 0` validado.
+
+---
+
+## [2026-04-03] — Sessão: Auditoria de Conformidade Técnica (Recorte 16)
+- **Fase:** Fase 8 — Operational Efficiency
+- **Alvo:** `src/components/layout/Sidebar.tsx` (Retificado de Navigation.tsx)
+- **Status:** Concluído por conformidade técnica.
+- **Resultado:** O arquivo já opera sob Tailwind v4 native e zero estilos inline.
+- **Build:** `Exit 0` validado.
+
+---
+
 ## [2026-04-03] — Auditoria de Conformidade: Topbar.tsx (Recorte 15 - Fase 8)
 **Agente:** Antigravity
 
