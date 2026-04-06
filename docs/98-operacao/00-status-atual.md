@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-06 (Documentação de Inteligência de Performance: a2ca782)
+ `main` — atualizada em 2026-04-06 (Copiloto Operacional Real: 6fff541, cfd30d1)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Próximo Marco - Definição Pendente)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Opção 3 — Copiloto Operacional Real)
 
 ---
 
@@ -190,24 +190,35 @@
 
 ---
 
-## Próximo passo aprovado
+## Último Recorte Concluído
 
-- **Fase 9 — Data Intelligence & Scale (Recorte Reconciliação):** Concluído — 2026-04-06
-  - ✅ Reconciliação de datasets publicada (commits 98952d9, 0c09526)
-  - ✅ Bloqueador semântico resolvido (signals/actions vinculadas a contas via accountId/relatedAccountId)
-  - ✅ Classificação operacional (9 contas órfãs, 4 vazias) para derivação de métricas downstream
-  - ✅ Build íntegro (Exit 0)
-  
-- **Fase 9 — Data Intelligence & Scale (Recorte Opção B — CONCLUÍDO):** Overview.tsx Consolidada (2026-04-06)
-  - ✅ Painel inteligente centralizado (Performance + Actions)
-  - ✅ KPIs consolidados (6): Pipeline, Conversão, Sinais Ativos, Ações Críticas, SLA em Risco, Melhor Origem
-  - ✅ Performance Insights: sinais resolvidos, taxa de conversão, origem destaque
-  - ✅ Anomalies Detection: ghosting, vazão baixa, cascata
-  - ✅ Origin Breakdown: análise dinâmica de volume por origem
-  - ✅ Respostas Claras: atenção, risco, melhoria, priorização, saúde
-  - ✅ Build íntegro (Exit 0, 6.57 kB)
-  - **Commit:** `05c36c8`
-  - **Próximo Recorte:** A ser aprovado pelo Orquestrador
+**Fase 9 — Data Intelligence & Scale**
+
+- **Recorte Reconciliação:** Concluído — 2026-04-06
+  - ✅ Reconciliação de datasets publicada (links accountId/relatedAccountId)
+  - ✅ 9 contas órfãs + 4 vazias classificadas para filtro downstream
+  - ✅ Build Exit 0
+
+- **Recorte Opção B — Overview.tsx Consolidada:** Concluído — 2026-04-06
+  - ✅ Painel unificado (Performance + Actions Intelligence)
+  - ✅ 6 KPIs dinâmicos (Pipeline, Conversão, Sinais, Ações, SLA, Origem)
+  - ✅ 4 anomalias detectadas (Ghosting, Vazão, Congestionamento, Cascata)
+  - ✅ Build Exit 0 (6.86 kB)
+  - **Commit:** `05c36c8` + `7fdce40` (cleanup)
+
+- **Recorte Opção 3 — Copiloto Operacional Real (ÚLTIMO):** Concluído — 2026-04-06
+  - ✅ Helper `operationalIntelligence.ts` consolidando 4 blocos de inteligência
+  - ✅ Integração em Assistant.tsx (card Prioridades Imediatas, context enriquecido)
+  - ✅ Enriquecimento em route.ts (5 blocos de inteligência injetados na system instruction)
+  - ✅ Assistant agora responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco
+  - ✅ Build Exit 0 (40.8 kB Assistant)
+  - **Commits:** `6fff541` (feat) + `cfd30d1` (docs)
+  - **Status:** Awaiting push approval
+
+## Próximo Passo
+
+- **Push final:** Publicar 2 commits no origin/main (aprovado tecnicamente, aguardando autorização)
+- **Novo Recorte:** A ser aprovado pelo Orquestrador após push bem-sucedido
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -232,6 +243,7 @@
 | Fila de Fogo (Fire Queue) | 28º Recorte Concluído | Cruzamento dinâmico sinais x radar x histórico para priorização de lote |
 | Lifecycle Operacional | Marco Concluído | Transições de status, histórico automático e persistência local (LocalStorage) |
 | Analytics de Conversão | Marco Concluído | Medição de taxa de conclusão, aging e backlog crítico via sessionActions |
-| Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão) em Actions |
-+| Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
+| Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão, Cascata) em Actions |
+| Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
 | Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
+| Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
