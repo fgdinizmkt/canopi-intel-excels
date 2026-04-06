@@ -5,6 +5,19 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Inteligência Operacional: Actions.tsx
+- **Fase:** Fase 9 — Data Intelligence & Scale
+- **Alvo:** `src/pages/Actions.tsx`
+- **Ação:** Implementação da camada de detecção proativa de anomalias.
+- **Decisões:**
+  - Expansão do `useMemo` de métricas para derivar diagnósticos operacionais (Congestionamento, Ghosting, Vazão, Cascata).
+  - Implementação de lógica defensiva para datas nulas (`createdAt` fallback).
+  - Interface baseada em insights silenciosos (só aparecem sob gatilho real).
+- **Commit:** `3fbf890` — feat(actions): adiciona deteccao operacional de anomalias na fila.
+- **Resultado:** Fila operacional agora atua como sensor ativo de riscos, auxiliando a equipe na priorização tática.
+
+---
+
 ## [2026-04-06] — Saneamento Técnico: Settings.tsx (Recorte 19)
 - **Fase:** Fase 8 — Operational Efficiency
 - **Alvo:** `src/pages/Settings.tsx`

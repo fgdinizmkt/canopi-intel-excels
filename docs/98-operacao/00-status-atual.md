@@ -159,6 +159,17 @@
 - **Build de Produção:** Validado com `npm run build` (sucesso completo).
 - **Commit de Código:** `2cad13f` — refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower.
 
+**Recorte — Inteligência Operacional: Actions.tsx**
+- **Resultado:** Implementação da camada de detecção proativa de anomalias na fila operacional.
+- **Inteligência Nexus:** Adição de gatilhos determinísticos para:
+  - **Congestionamento:** Concentração de ações críticas em um único canal.
+  - **Ghosting Crítico:** Ações de alta prioridade sem owner há +24h.
+  - **Baixa Vazão:** Origens de sinal com acúmulo de itens e zero conclusões.
+  - **Efeito Cascata:** Contas com múltiplos impeditivos (bloqueios/atrasos) simultâneos.
+- **UI/UX:** Adição do painel "Insights Operacionais" (Detecção Ativa) abaixo do hero.
+- **Build de Produção:** Validado com `npm run build` (sucesso completo).
+- **Commit de Código:** `3fbf890` — feat(actions): adiciona deteccao operacional de anomalias na fila.
+
 ---
 
 ## Bloqueios e Pontas Soltas (Auditado)
@@ -171,7 +182,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte 19.
+- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte de Inteligência Operacional.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -196,3 +207,4 @@
 | Fila de Fogo (Fire Queue) | 28º Recorte Concluído | Cruzamento dinâmico sinais x radar x histórico para priorização de lote |
 | Lifecycle Operacional | Marco Concluído | Transições de status, histórico automático e persistência local (LocalStorage) |
 | Analytics de Conversão | Marco Concluído | Medição de taxa de conclusão, aging e backlog crítico via sessionActions |
+| Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão) em Actions |

@@ -2,13 +2,13 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último recorte concluído:** Saneamento Técnico: Settings.tsx (Recorte 19)
+- **Último recorte concluído:** Inteligência Operacional: Actions.tsx
 - **Últimos commits relevantes:** 
+  - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
   - `2cad13f` (refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower)
   - `78d5e25` (docs(operacao): reconcilia hotfix 9e15033 na memoria operacional)
-  - `9e15033` (fix(actions): corrige métricas da fila operacional)
 - **Data:** 2026-04-06
-- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Ahead of origin/main by 1 commit)
+- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Ahead of origin/main by 2 commits)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 
 ## Status de Qualidade (Auditado)
