@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Fix: Chat Overflow — Correção de UX em Assistant
+
+- **Contexto:** Repostas longas no Assistant transbordavam do container e texto não fazia wrap adequado
+- **Problema:** Layout quebrando em respostas multi-linha, input desaparecendo, falta de scroll
+- **Solução Implementada:**
+  - **Container:** Altura aumentada de 500px → 600px para melhor espaço visual
+  - **Flex Overflow:** Adicionado `min-h-0` ao container de mensagens (essencial para flex funcionar)
+  - **Text Wrapping:** 
+    * `break-words` + `overflow-hidden` nos message divs
+    * ReactMarkdown com `whiteSpace: pre-wrap` e `wordBreak: break-word` para preservar linebreaks
+    * `max-w-[85%]` mantido para evitar overscan
+  - **Prose Styling:** Modifiers `prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:my-2` para espaçamento consistente
+  - **Flex Stability:** `flex-shrink-0` em input area e send button para evitar colapso
+  - **Validação:** `npm run build` Exit 0, sem breaking changes
+- **Commit:** `12f4d1f` — fix(chat): corrige overflow de mensagens longas no Assistant
+- **Status:** ✅ Build validado, pronto para review
+
+---
+
 ## [2026-04-06] — Recorte 15 (Plays Recomendados): Recomendações Explícitas — Implementação Concluída
 - **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de loop: Inteligência → Ação)
 - **Alvo:** Derivar recomendações explícitas de plays a partir de inteligência operacional consolidada

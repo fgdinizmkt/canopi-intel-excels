@@ -2,8 +2,9 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último recorte concluído:** Recorte 15 — Plays Recomendados (Recomendações Explícitas)
+- **Último trabalho concluído:** Fix de UI — Chat overflow corrigido
 - **Últimos commits relevantes:** 
+  - `12f4d1f` (fix(chat): corrige overflow de mensagens longas no Assistant)
   - `f9cf7a7` (feat(plays): adiciona bloco de plays recomendados com derivação inteligente)
   - `6fff541` (feat(copiloto): integra inteligência operacional enriquecida no Assistente)
   - `7fdce40` (fix(overview): cleanup técnico — memoização, anomalias e derivações)
@@ -12,7 +13,7 @@
   - `1e7bf81` (feat(performance): adiciona leitura dinamica por canal e origem)
   - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
 - **Data:** 2026-04-06
-- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 42.4 kB Assistant, 6.86 kB Overview)
+- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 42.5 kB Assistant, 6.86 kB Overview)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 
 ## Status de Qualidade (Auditado)
@@ -27,7 +28,7 @@
 3. Preservar o histórico completo nos documentos de operação.
 4. Não introduzir estilos inline em componentes já migrados para Tailwind.
 
-## O que foi entregue (Recortes 9 a 15 — Fase 9)
+## O que foi entregue (Recortes 9 a 15 — Fase 9 + Fixes)
 1.  **Saneamento PaidMedia.tsx:** Migração integral para Tailwind v4 utilitário e zeragem de 100% dos estilos estáticos (`Exit 0`).
 2.  **Saneamento SeoInbound.tsx:** Migração integral para Tailwind v4 utilitário e estabilização de build (`Exit 0`).
 3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
@@ -38,15 +39,16 @@
 8.  **Overview.tsx Consolidada (Opção B):** Painel de controle inteligente integrando Performance + Actions. 6 KPIs dinâmicos, 4 anomalias operacionais detectadas, hierarquia visual coerente, exclusão de contas 'vazia', memoização ativa.
 9.  **Copiloto Operacional Real (Opção 3):** Helper `operationalIntelligence.ts` consolidando toda inteligência. Integração no Assistant.tsx com card de Prioridades Imediatas. Enriquecimento de `src/app/api/chat/route.ts` com 5 blocos de contexto operacional injetados na system instruction. Assistant responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco.
 10. **Plays Recomendados (Recorte 15):** Função `deriveRecommendedPlays()` que gera até 4 recomendações explícitas baseadas em padrões detectados (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Conta em Risco→Intervenção, Sinal Crítico→Ativação). Bloco visual com cards responsivos, cores por urgência, botões "Chat" e "Copiar". Fecha loop: inteligência → ação.
+11. **Fix de Chat Overflow:** Correção de UX em Assistant.tsx para repostas longas. Aumenta container (500px→600px), adiciona `min-h-0` ao flex, implementa text wrapping com ReactMarkdown props (`whiteSpace: pre-wrap`), add prose styling modifiers, fixa input/button com `flex-shrink-0`. Resultado: mensagens longas renderizam com scroll correto, sem layout breaks.
 
 ## Pendências e Observações (Auditado)
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual (Recorte 15 Concluído):** Plays recomendados implementados com derivação automática de 6 padrões. Bloco visual com cards responsivos, cores por urgência. Botões "Chat" e "Copiar" habilitam exploração rápida. Max 4 plays visíveis. Working tree limpa.
-- **Validação Completada:** Build Exit 0, 16 rotas compilam (42.4 kB Assistant, 6.86 kB Overview). Apenas 174 linhas de código novo. Sem breaking changes. deriveRecommendedPlays() integrada com useMemo.
-- **Status de Recorte 15:** ✅ Publicado em origin/main.
-- **Pipeline Fechado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15). Loop completo: detecção → priorização → ação.
+- **Estado Atual:** Recorte 15 (Plays) publicado. Chat overflow fix implementado, testado e validado.
+- **Fix de Chat Status:** ✅ Build Exit 0 (42.5 kB Assistant). Código commitado localmente (`12f4d1f`). Awaiting push approval.
+- **Working Tree:** Limpa após commit. Pronto para push quando aprovado.
+- **Pipeline Fechado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15) → Chat UX Fix. Loop completo: detecção → priorização → ação → UX refinement.
 
 ## Recomendações para próximo recorte (Fase 10)
 1. **Validação UX de Cores:** Verificar se amber/orange (Prioridades) e red/orange/blue (Plays) oferecem contraste suficiente e clareza.
