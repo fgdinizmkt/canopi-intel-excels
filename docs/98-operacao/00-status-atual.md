@@ -192,7 +192,18 @@
 
 ## Próximo passo aprovado
 
-- **Fase 9 — Data Intelligence & Scale:** Reconciliação de datasets concluída (2026-04-06). 9 contas órfãs adicionadas ao contasMock com reconciliationStatus explícito. Sinais e ações vinculados via accountId. Pronto para implementar Opção B (Overview.tsx consolidada).
+- **Fase 9 — Data Intelligence & Scale (Recorte Reconciliação):** Concluído — 2026-04-06
+  - ✅ Reconciliação de datasets publicada (commits 98952d9, 0c09526)
+  - ✅ Bloqueador semântico resolvido (signals/actions vinculadas a contas via accountId/relatedAccountId)
+  - ✅ Classificação operacional (9 contas órfãs, 4 vazias) para derivação de métricas downstream
+  - ✅ Build íntegro (Exit 0)
+  
+- **Fase 9 — Data Intelligence & Scale (Próximo Recorte — APROVADO):** Overview.tsx Consolidada
+  - **Objetivo:** Painel inteligente centralizando inteligência de performance + fila operacional
+  - **Reutilização:** Lógica factual de Performance.tsx + detecção de anomalias de Actions.tsx
+  - **Escopo:** Respostas claras (atenção, risco, melhoria, priorização, saúde)
+  - **Timeline:** A iniciar
+  - **Restrição:** Sem abertura de frente Supabase (focus: funcional)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
