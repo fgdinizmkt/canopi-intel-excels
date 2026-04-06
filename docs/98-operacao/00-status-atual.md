@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-06 (Plays Recomendados: f9cf7a7, branch local)
+ `main` — sincronizada em 2026-04-06 (Plays Recomendados: f9cf7a7 + e884885, publicados em origin/main)
 
 ## Fase atual do plano
 **Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 15 — Plays Recomendados)
@@ -206,19 +206,28 @@
   - ✅ Build Exit 0 (6.86 kB)
   - **Commit:** `05c36c8` + `7fdce40` (cleanup)
 
-- **Recorte Opção 3 — Copiloto Operacional Real (ÚLTIMO):** Concluído — 2026-04-06
+- **Recorte Opção 3 — Copiloto Operacional Real:** Concluído — 2026-04-06
   - ✅ Helper `operationalIntelligence.ts` consolidando 4 blocos de inteligência
   - ✅ Integração em Assistant.tsx (card Prioridades Imediatas, context enriquecido)
   - ✅ Enriquecimento em route.ts (5 blocos de inteligência injetados na system instruction)
   - ✅ Assistant agora responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco
   - ✅ Build Exit 0 (40.8 kB Assistant)
   - **Commits:** `6fff541` (feat) + `cfd30d1` (docs)
-  - **Status:** Awaiting push approval
+  - **Status:** ✅ Publicado em origin/main
+
+- **Recorte 15 — Plays Recomendados (ÚLTIMO):** Concluído — 2026-04-06
+  - ✅ Função `deriveRecommendedPlays()` com 6 padrões automáticos
+  - ✅ Bloco visual com cards responsivos, cores por urgência
+  - ✅ Botões "Chat" (preenche input) + "Copiar" (clipboard)
+  - ✅ Fecha loop: Inteligência → Recomendação → Ação
+  - ✅ Build Exit 0 (42.4 kB Assistant)
+  - **Commits:** `f9cf7a7` (feat) + `e884885` (docs)
+  - **Status:** ✅ Publicado em origin/main
 
 ## Próximo Passo
 
-- **Push final:** Publicar 2 commits no origin/main (aprovado tecnicamente, aguardando autorização)
-- **Novo Recorte:** A ser aprovado pelo Orquestrador após push bem-sucedido
+- **Status Atual:** Recorte 15 publicado e sincronizado com origin/main
+- **Novo Recorte:** A ser aprovado pelo Orquestrador
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -247,4 +256,5 @@
 | Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
 | Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
 | Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
+| Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Risco→Intervenção, Sinal Crítico→Ativação) |
 | Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, etc) |

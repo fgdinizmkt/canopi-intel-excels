@@ -45,7 +45,7 @@
 ## Próximos passos (Fase 9 — Continuação)
 - **Estado Atual (Recorte 15 Concluído):** Plays recomendados implementados com derivação automática de 6 padrões. Bloco visual com cards responsivos, cores por urgência. Botões "Chat" e "Copiar" habilitam exploração rápida. Max 4 plays visíveis. Working tree limpa.
 - **Validação Completada:** Build Exit 0, 16 rotas compilam (42.4 kB Assistant, 6.86 kB Overview). Apenas 174 linhas de código novo. Sem breaking changes. deriveRecommendedPlays() integrada com useMemo.
-- **Status de Recorte 15:** ✅ Pronto para encerramento. Awaiting push approval para origin/main.
+- **Status de Recorte 15:** ✅ Publicado em origin/main.
 - **Pipeline Fechado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15). Loop completo: detecção → priorização → ação.
 
 ## Recomendações para próximo recorte (Fase 10)
@@ -65,4 +65,4 @@
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
 - **Consistency Check:** colorMap estendido para anomalia types (`Ghosting`, `Vazão`, `Congestionamento`, `Cascata`) + urgency levels (`crítica`, `alta`, `média`) em próximo recorte, se necessário.
-- **Push Approval Pendente:** Aguardando autorização explícita antes de `git push origin main` (1 novo commit: Recorte 15).
+- **Sincronização:** ✅ Main sincronizada com origin/main (Recorte 15 publicado).
