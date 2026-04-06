@@ -198,12 +198,16 @@
   - ✅ Classificação operacional (9 contas órfãs, 4 vazias) para derivação de métricas downstream
   - ✅ Build íntegro (Exit 0)
   
-- **Fase 9 — Data Intelligence & Scale (Próximo Recorte — APROVADO):** Overview.tsx Consolidada
-  - **Objetivo:** Painel inteligente centralizando inteligência de performance + fila operacional
-  - **Reutilização:** Lógica factual de Performance.tsx + detecção de anomalias de Actions.tsx
-  - **Escopo:** Respostas claras (atenção, risco, melhoria, priorização, saúde)
-  - **Timeline:** A iniciar
-  - **Restrição:** Sem abertura de frente Supabase (focus: funcional)
+- **Fase 9 — Data Intelligence & Scale (Recorte Opção B — CONCLUÍDO):** Overview.tsx Consolidada (2026-04-06)
+  - ✅ Painel inteligente centralizado (Performance + Actions)
+  - ✅ KPIs consolidados (6): Pipeline, Conversão, Sinais Ativos, Ações Críticas, SLA em Risco, Melhor Origem
+  - ✅ Performance Insights: sinais resolvidos, taxa de conversão, origem destaque
+  - ✅ Anomalies Detection: ghosting, vazão baixa, cascata
+  - ✅ Origin Breakdown: análise dinâmica de volume por origem
+  - ✅ Respostas Claras: atenção, risco, melhoria, priorização, saúde
+  - ✅ Build íntegro (Exit 0, 6.57 kB)
+  - **Commit:** `05c36c8`
+  - **Próximo Recorte:** A ser aprovado pelo Orquestrador
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -230,3 +234,4 @@
 | Analytics de Conversão | Marco Concluído | Medição de taxa de conclusão, aging e backlog crítico via sessionActions |
 | Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão) em Actions |
 +| Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
+| Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |

@@ -5,6 +5,26 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Opção B (Overview.tsx Consolidada): Implementação Concluída
+- **Fase:** Fase 9 — Data Intelligence & Scale
+- **Alvo:** `src/pages/Overview.tsx` — painel de controle inteligente centralizado
+- **Ação Executada:**
+  - **Reutilização de Performance:** derivação dinâmica de pipeline por contas ativas, taxa de conversão (sinais resolvidos), melhor origem por volume
+  - **Reutilização de Actions:** detecção de anomalias (ghosting, vazão baixa, cascata), métricas de SLA em risco, ranking de canais
+  - **KPIs Consolidados (6):** Pipeline Total, Taxa de Conversão, Sinais Ativos, Ações Críticas, SLA em Risco, Melhor Origem
+  - **Componentes Novo:** Performance Insights Card, Anomalies Detection Panel, Origin Breakdown dinâmica
+  - **Respostas Claras:**
+    - O que exige atenção: top 3 sinais críticos + anomalias operacionais
+    - O que está em risco: ações com SLA vencido + ghosting de atribuição
+    - O que melhorou: sinais resolvidos, taxa de conversão, origem destaque
+    - O que precisa priorizar: sinal executivo principal com confiança
+    - O que está performando: origem com maior volume de sinais
+- **Governança:** Tailwind v4 native, zero estilos inline, useMemo para derivação, exclusão de contas 'vazia'
+- **Build:** `npm run build` — Exit 0, todas 16 rotas compilam (6.57 kB Overview)
+- **Commit:** `05c36c8` — feat(overview): consolidação inteligente — Performance + Actions Intelligence
+
+---
+
 ## [2026-04-06] — Reconciliação de Datasets: Implementação Concluída
 - **Fase:** Fase 9 — Data Intelligence & Scale
 - **Alvo:** Eliminação de ruptura semântica entre `advancedSignals`, `initialActions` e `contasMock`
