@@ -66,6 +66,16 @@ export interface HealthSnapshot {
   nextImmediateAction: string;
 }
 
+export interface RecommendedPlay {
+  id: string;
+  title: string;
+  reason: string;
+  focus: string;
+  urgency: 'crítica' | 'alta' | 'média';
+  suggestedAction: string;
+  promptForChat: string;
+}
+
 // ─── EXTRATORES DE INTELIGÊNCIA ──────────────────────────────────────
 
 /**
@@ -293,6 +303,103 @@ export function extractHealthSnapshot(): HealthSnapshot {
     criticalIndicator,
     nextImmediateAction: nextAction,
   };
+}
+
+/**
+ * Deriva plays recomendados a partir de padrões detectados na inteligência operacional
+ */
+export function deriveRecommendedPlays(): RecommendedPlay[] {
+  const queue = extractQueueIntelligence();
+  const priorities = extractPrioritiesIntelligence();
+  const plays: RecommendedPlay[] = [];
+
+  // Play 1: Ghosting → Atribuição Imediata
+  const ghostingAnomaly = queue.anomalies.find(a => a.type === 'Ghosting');
+  if (ghostingAnomaly && ghostingAnomaly.accountName) {
+    plays.push({
+      id: 'play-ghosting',
+      title: 'Atribuição Crítica Urgente',
+      reason: ghostingAnomaly.description,
+      focus: ghostingAnomaly.accountName,
+      urgency: 'crítica',
+      suggestedAction: 'Atribuir ação crítica sem responsável para um owner',
+      promptForChat: `Preciso atribuir uma ação crítica na conta ${ghostingAnomaly.accountName} que está sem responsável há mais de 24 horas. Qual é o melhor owner para essa tarefa?`,
+    });
+  }
+
+  // Play 2: Cascata → Destravamento de Conta
+  const cascataAnomaly = queue.anomalies.find(a => a.type === 'Bloqueio');
+  if (cascataAnomaly && cascataAnomaly.accountName) {
+    plays.push({
+      id: 'play-cascata',
+      title: 'Destravamento de Conta',
+      reason: cascataAnomaly.description,
+      focus: cascataAnomaly.accountName,
+      urgency: 'crítica',
+      suggestedAction: 'Investigar bloqueios simultâneos e definir sequência de resolução',
+      promptForChat: `A conta ${cascataAnomaly.accountName} tem múltiplos bloqueios simultâneos. Qual é a ordem ideal para resolver esses impeditivos?`,
+    });
+  }
+
+  // Play 3: Congestionamento → Redistribuição
+  const congestionAnomaly = queue.anomalies.find(a => a.type === 'Congestionamento');
+  if (congestionAnomaly) {
+    plays.push({
+      id: 'play-congestion',
+      title: 'Redistribuição de Fila',
+      reason: congestionAnomaly.description,
+      focus: 'Canais operacionais',
+      urgency: 'alta',
+      suggestedAction: 'Rebalancear distribuição de ações críticas entre canais',
+      promptForChat: `Temos um gargalo em um canal com muitas ações críticas. Como devemos redistribuir o trabalho para descongestionar?`,
+    });
+  }
+
+  // Play 4: Vazão Baixa → Desbloqueio de Pipeline
+  const vazaoAnomaly = queue.anomalies.find(a => a.type === 'Vazão');
+  if (vazaoAnomaly) {
+    plays.push({
+      id: 'play-vazao',
+      title: 'Desbloqueio de Pipeline',
+      reason: vazaoAnomaly.description,
+      focus: 'Origem/Canal',
+      urgency: 'alta',
+      suggestedAction: 'Investigar bloqueios em origem com acúmulo de ações e zero conclusões',
+      promptForChat: `Uma origem ou canal tem muitas ações acumuladas sem conclusão. Quais podem ser os bloqueios e como desbloqueamos?`,
+    });
+  }
+
+  // Play 5: Conta em Risco → Intervenção Estratégica
+  if (priorities.riskAccounts.length > 0) {
+    const riskAccount = priorities.riskAccounts[0];
+    plays.push({
+      id: 'play-risk-account',
+      title: 'Intervenção Estratégica em Conta',
+      reason: riskAccount.reason,
+      focus: riskAccount.name,
+      urgency: riskAccount.riskLevel === 'high' ? 'crítica' : 'alta',
+      suggestedAction: 'Ativar plano de mitigação de risco para conta',
+      promptForChat: `A conta ${riskAccount.name} está em risco. Qual deve ser a estratégia de intervenção para recuperar o relacionamento?`,
+    });
+  }
+
+  // Play 6: Sinal Crítico de Alta Confiança → Abordagem Prioritária
+  if (priorities.topSignals.length > 0) {
+    const topSignal = priorities.topSignals[0];
+    if (topSignal.severity === 'crítico' && topSignal.confidence >= 80) {
+      plays.push({
+        id: 'play-critical-signal',
+        title: 'Ativação Prioritária',
+        reason: `Sinal crítico com ${topSignal.confidence}% de confiança: ${topSignal.title}`,
+        focus: topSignal.account,
+        urgency: 'crítica',
+        suggestedAction: 'Iniciar abordagem focada com comitê comprador',
+        promptForChat: `${topSignal.title} foi identificado em ${topSignal.account} com ${topSignal.confidence}% de confiança. Qual é o melhor play para aproveitar esse sinal?`,
+      });
+    }
+  }
+
+  return plays.slice(0, 4); // Max 4 plays visíveis
 }
 
 /**

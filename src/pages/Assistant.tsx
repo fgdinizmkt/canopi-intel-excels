@@ -3,11 +3,11 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Card, Button, Badge } from '../components/ui';
-import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target } from 'lucide-react';
+import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target, Lightbulb, Copy, MessageCircle } from 'lucide-react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
-import { buildOperationalIntelligence } from '../helpers/operationalIntelligence';
+import { buildOperationalIntelligence, deriveRecommendedPlays } from '../helpers/operationalIntelligence';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -185,6 +185,9 @@ export const Assistant: React.FC = () => {
       }));
   }, [storedActions]);
 
+  // Plays recomendados baseados em inteligência operacional
+  const recommendedPlays = useMemo(() => deriveRecommendedPlays(), []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -215,6 +218,26 @@ export const Assistant: React.FC = () => {
       })),
       operationalIntelligence: opIntel,
     };
+  };
+
+  const handleUsePlayInChat = (promptText: string) => {
+    setInput(promptText);
+  };
+
+  const handleCopyPlay = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const getUrgencyColor = (urgency: string): string => {
+    if (urgency === 'crítica') return 'bg-red-50 border-red-200 text-red-900';
+    if (urgency === 'alta') return 'bg-orange-50 border-orange-200 text-orange-900';
+    return 'bg-blue-50 border-blue-200 text-blue-900';
+  };
+
+  const getUrgencyBadgeColor = (urgency: string): string => {
+    if (urgency === 'crítica') return 'bg-red-100 text-red-700';
+    if (urgency === 'alta') return 'bg-orange-100 text-orange-700';
+    return 'bg-blue-100 text-blue-700';
   };
 
   const handleSend = async () => {
@@ -321,6 +344,48 @@ export const Assistant: React.FC = () => {
           })()}
         </div>
       </Card>
+
+      {/* Plays Recomendados */}
+      {recommendedPlays.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {recommendedPlays.map((play) => (
+            <Card key={play.id} className={`p-4 border ${getUrgencyColor(play.urgency)}`}>
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start gap-2 flex-1">
+                  <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                  <div>
+                    <h4 className="font-bold text-sm">{play.title}</h4>
+                    <p className="text-xs opacity-75 mt-0.5">{play.reason}</p>
+                  </div>
+                </div>
+                <Badge className={`flex-shrink-0 text-xs ${getUrgencyBadgeColor(play.urgency)}`}>
+                  {play.urgency}
+                </Badge>
+              </div>
+              <div className="text-xs space-y-2 mt-3 pt-2 border-t border-current border-opacity-10">
+                <p><span className="font-semibold">Foco:</span> {play.focus}</p>
+                <p><span className="font-semibold">Ação:</span> {play.suggestedAction}</p>
+              </div>
+              <div className="flex gap-2 mt-3 pt-2 border-t border-current border-opacity-10">
+                <Button
+                  onClick={() => handleUsePlayInChat(play.promptForChat)}
+                  className="flex-1 h-7 text-xs bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1"
+                >
+                  <MessageCircle className="w-3 h-3" />
+                  Chat
+                </Button>
+                <Button
+                  onClick={() => handleCopyPlay(play.promptForChat)}
+                  className="flex-1 h-7 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center gap-1"
+                >
+                  <Copy className="w-3 h-3" />
+                  Copiar
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-6">
         {/* Chat Interface */}
