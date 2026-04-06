@@ -123,6 +123,7 @@ export const initialActions: ActionItem[] = [
     description:
       "Leads de seguradoras com perfil enterprise estão caindo na fila geral, sem owner definido e fora do SLA do primeiro contato. A ação precisa corrigir a regra no HubSpot, redistribuir os 13 leads afetados e preservar a percepção comercial da vertical.",
     accountName: "Carteira Seguros Enterprise",
+    relatedAccountId: "9",
     accountContext: "Cluster estratégico · Aquisição",
     origin: "Falha operacional de roteamento",
     relatedSignal: "13 leads com score alto sem owner nas últimas 72h e 3 já abriram proposta concorrente.",
@@ -172,6 +173,7 @@ export const initialActions: ActionItem[] = [
     description:
       "A conta perdeu tração após duas semanas sem resposta do sponsor técnico. A ação combina reposicionamento da tese, reforço executivo e follow-up contextual para evitar esfriamento de oportunidade já madura.",
     accountName: "V.tal",
+    relatedAccountId: "12",
     accountContext: "Enterprise Telecom · Expansão",
     origin: "Queda abrupta de engajamento",
     relatedSignal: "Open rate caiu 48% e a reunião de revisão não foi reagendada.",
@@ -221,6 +223,7 @@ export const initialActions: ActionItem[] = [
     description:
       "A QBR será a primeira conversa com o novo diretor industrial. Precisamos aquecer esse stakeholder antes do rito, alinhar narrativa de valor e reduzir risco de rediscussão do roadmap de MLOps.",
     accountName: "Minerva Foods",
+    relatedAccountId: "8",
     accountContext: "Enterprise Industrial · Expansão",
     origin: "Mudança de stakeholder",
     relatedSignal: "Novo diretor industrial assumiu em 17/03 e ainda não participou de ritos da conta.",
@@ -266,6 +269,7 @@ export const initialActions: ActionItem[] = [
     description:
       "A campanha continua gerando volume, mas o CPL estourou o patamar saudável da vertical. A ação precisa cortar desperdício, redistribuir verba e proteger a qualidade do pipeline.",
     accountName: "Cluster Healthtech",
+    relatedAccountId: "16",
     accountContext: "Mid-market + Enterprise · Aquisição",
     origin: "Desvio de performance",
     relatedSignal: "CPL 37% acima da meta há 9 dias, com 61% do gasto concentrado em 3 conjuntos pouco aderentes.",
@@ -311,6 +315,7 @@ export const initialActions: ActionItem[] = [
     description:
       "As páginas técnicas de manufatura começaram a ranquear e atrair visitas qualificadas de contas-alvo. A ação precisa transformar esse sinal em lista acionável para SDR, com contexto de intenção real.",
     accountName: "Cluster Manufatura",
+    relatedAccountId: "15",
     accountContext: "Mid-market Industrial · Aquisição",
     origin: "Intent orgânico crescente",
     relatedSignal: "12 contas-alvo visitaram páginas sobre automação industrial e MLOps nos últimos 5 dias.",
@@ -735,6 +740,8 @@ export interface Conta {
   };
   tecnografia: string[];
   historico: { data: string; tipo: string; descricao: string; icone?: string }[];
+  /** Reconciliação explícita: status operacional da conta para métricas */
+  reconciliationStatus?: 'ativa' | 'seed' | 'prospecting' | 'orfã' | 'vazia';
 }
 
 export const contasMock: Conta[] = [
@@ -880,7 +887,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
     tecnografia: [],
-    historico: []
+    historico: [],
+    reconciliationStatus: 'vazia'
   },
   {
     id: '5', slug: 'novasaude-global', nome: 'NovaSaude', dominio: 'novasaude.com', vertical: 'Saúde', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
@@ -894,7 +902,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
     tecnografia: [],
-    historico: []
+    historico: [],
+    reconciliationStatus: 'vazia'
   },
   {
     id: '6', slug: 'mobilitypro-sa', nome: 'MobilityPro', dominio: 'mobilitypro.com.br', vertical: 'Mobilidade', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'Belo Horizonte, Brasil',
@@ -908,7 +917,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
     tecnografia: [],
-    historico: []
+    historico: [],
+    reconciliationStatus: 'vazia'
   },
   {
     id: '7', slug: 'agrocloud-sa', nome: 'AgroCloud', dominio: 'agrocloud.com', vertical: 'Agronegócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiânia, Brasil',
@@ -922,7 +932,152 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
     tecnografia: [],
-    historico: []
+    historico: [],
+    reconciliationStatus: 'vazia'
+  },
+  // --- CONTAS ÓRFÃS RECONCILIADAS (Shell Mínimas) --- (Shell Mínimas) ---
+  // Estas contas são mencionadas em advancedSignals e initialActions mas não existiam em contasMock
+  // Adicionadas como shell operacionais para eliminar quebra semântica
+  {
+    id: '8', slug: 'minerva-foods', nome: 'Minerva Foods', dominio: 'minervafoods.com.br', vertical: 'Alimentos e Bebidas', segmento: 'Enterprise',
+    porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Elber Costa', ownersSecundarios: [],
+    etapa: 'Expansão', tipoEstrategico: 'ABX', potencial: 76, risco: 18, prontidao: 70, coberturaRelacional: 55,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
+    icp: 82, crm: 65, vp: 78, ct: 45, ft: 72, budgetBrl: 2800000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Expansão de infraestrutura MLOps', proximaMelhorAcao: 'Executar QBR com novo diretor industrial.',
+    resumoExecutivo: 'Conta orfã reconciliada: casos operacionais referenciados em sinais e ações. Status seed — sem histórico estruturado.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '9', slug: 'carteira-seguros-enterprise', nome: 'Carteira Seguros Enterprise', dominio: 'carteiraseguros.com.br', vertical: 'Seguros',
+    segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil', ownerPrincipal: 'Ligia Martins', ownersSecundarios: [],
+    etapa: 'Prospecção', tipoEstrategico: 'Híbrida', potencial: 78, risco: 25, prontidao: 62, coberturaRelacional: 48,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Híbrido', statusGeral: 'Saudável',
+    icp: 80, crm: 55, vp: 72, ct: 48, ft: 68, budgetBrl: 1950000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Transformação digital do backend de sinistros', proximaMelhorAcao: 'Redirecionar leads enterprise de seguros.',
+    resumoExecutivo: 'Conta orfã reconciliada: casos de roteamento de leads. Status seed — sem histórico estruturado.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '10', slug: 'cluster-fintech-sudeste', nome: 'Cluster Fintech Sudeste', dominio: 'cluster-fintech.com.br', vertical: 'Fintech',
+    segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Julia Mendes', ownersSecundarios: [],
+    etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 72, risco: 22, prontidao: 65, coberturaRelacional: 40,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
+    icp: 85, crm: 52, vp: 80, ct: 50, ft: 70, budgetBrl: 3500000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Ativar campanha de retargeting para cluster.',
+    resumoExecutivo: 'Conta orfã reconciliada: cluster de 12 contas em avaliação simultânea. Status seed — sem mapeamento individual.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '11', slug: 'nexus-fintech', nome: 'Nexus Fintech', dominio: 'nexusfintech.com.br', vertical: 'Fintech',
+    segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Pablo Diniz', ownersSecundarios: [],
+    etapa: 'Decisão', tipoEstrategico: 'ABM', potencial: 88, risco: 45, prontidao: 72, coberturaRelacional: 60,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Atenção',
+    icp: 92, crm: 68, vp: 85, ct: 70, ft: 80, budgetBrl: 4500000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Proposta de R$ 280k em estágio de Decisão', proximaMelhorAcao: 'Mapear novo decisor após saída de sponsor.',
+    resumoExecutivo: 'Conta orfã reconciliada: caso crítico de mudança de stakeholder. Status seed — contexto operacional referenciado.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '12', slug: 'v-tal', nome: 'V.tal', dominio: 'vtal.com.br', vertical: 'Telecom',
+    segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Camila Ribeiro', ownersSecundarios: [],
+    etapa: 'Expansão', tipoEstrategico: 'ABM', potencial: 80, risco: 30, prontidao: 68, coberturaRelacional: 62,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Atenção',
+    icp: 82, crm: 70, vp: 75, ct: 68, ft: 78, budgetBrl: 2600000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Renovação multi-unidade com expansão', proximaMelhorAcao: 'Reaquecer sponsor técnico.',
+    resumoExecutivo: 'Conta orfã reconciliada: caso de reengajamento de comitê. Status seed — contexto operacional referenciado.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '13', slug: 'msd-saude', nome: 'MSD Saúde', dominio: 'msdsaude.com.br', vertical: 'Saúde',
+    segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Pablo Diniz', ownersSecundarios: [],
+    etapa: 'Expansão', tipoEstrategico: 'ABX', potencial: 81, risco: 15, prontidao: 75, coberturaRelacional: 70,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
+    icp: 88, crm: 75, vp: 82, ct: 65, ft: 80, budgetBrl: 3200000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Expansão de R$ 180k em nova unidade', proximaMelhorAcao: 'Agendar reunião executiva.',
+    resumoExecutivo: 'Conta orfã reconciliada: sinal de expansão detectado. Status seed — caso operacional referenciado.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '14', slug: 'operacao-interna', nome: 'Operação Interna', dominio: 'canopi.internal', vertical: 'Operação',
+    segmento: 'Interno', porte: 'N/A', localizacao: 'Remoto', ownerPrincipal: 'Revenue Ops', ownersSecundarios: [],
+    etapa: 'Operação', tipoEstrategico: 'Em andamento', potencial: 100, risco: 0, prontidao: 95, coberturaRelacional: 100,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Nenhum', statusGeral: 'Crítico',
+    icp: 100, crm: 95, vp: 100, ct: 100, ft: 100, budgetBrl: 0, possuiOportunidade: false,
+    proximaMelhorAcao: 'Monitorar integrações e resolver alertas.', resumoExecutivo: 'Conta orfã interna: alertas operacionais de sincronização. Status seed — caso sistêmico.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Integração', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '15', slug: 'cluster-manufatura', nome: 'Cluster Manufatura', dominio: 'cluster-manufatura.com.br', vertical: 'Manufatura',
+    segmento: 'Mid-Market + Enterprise', porte: 'Grande', localizacao: 'Região Sudeste, Brasil', ownerPrincipal: 'Daniel Rocha', ownersSecundarios: [],
+    etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 68, risco: 28, prontidao: 55, coberturaRelacional: 35,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'ABX', statusGeral: 'Saudável',
+    icp: 72, crm: 48, vp: 68, ct: 42, ft: 65, budgetBrl: 2200000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Conectar sinais SEO ao play outbound.', resumoExecutivo: 'Conta orfã reconciliada: cluster de 34 contas, taxa de resposta baixa. Status seed — caso de cadência.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+  },
+  {
+    id: '16', slug: 'cluster-healthtech', nome: 'Cluster Healthtech', dominio: 'cluster-healthtech.com.br', vertical: 'Saúde + Healthtech',
+    segmento: 'Mid-Market + Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Camila Ribeiro', ownersSecundarios: [],
+    etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 70, risco: 20, prontidao: 60, coberturaRelacional: 40,
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'Nenhum', statusGeral: 'Saudável',
+    icp: 75, crm: 50, vp: 70, ct: 45, ft: 68, budgetBrl: 2500000, possuiOportunidade: false,
+    proximaMelhorAcao: 'Recuperar campanha de mídia paga.', resumoExecutivo: 'Conta orfã reconciliada: cluster healthtech com CPL elevado. Status seed — caso de otimização.',
+    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
+    sinais: [], acoes: [], contatos: [], oportunidades: [],
+    canaisCampanhas: { origemPrincipal: 'Paid Media', influencias: [] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
   }
 ];
 

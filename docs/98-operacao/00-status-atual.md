@@ -192,7 +192,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte de Inteligência de Performance.
+- **Fase 9 — Data Intelligence & Scale:** Reconciliação de datasets concluída (2026-04-06). 9 contas órfãs adicionadas ao contasMock com reconciliationStatus explícito. Sinais e ações vinculados via accountId. Pronto para implementar Opção B (Overview.tsx consolidada).
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
