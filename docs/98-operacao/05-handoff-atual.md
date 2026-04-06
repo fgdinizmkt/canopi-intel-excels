@@ -2,8 +2,9 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último recorte concluído:** Inteligência Operacional: Actions.tsx
+- **Último recorte concluído:** Inteligência de Performance: Performance.tsx
 - **Últimos commits relevantes:** 
+  - `1e7bf81` (feat(performance): adiciona leitura dinamica por canal e origem)
   - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
   - `2cad13f` (refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower)
   - `78d5e25` (docs(operacao): reconcilia hotfix 9e15033 na memoria operacional)
@@ -29,7 +30,8 @@
 3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
 4.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
 5.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 única ocorrência legítima.
-6.  **Ambiente Reconciliado:** Local e remoto 100% sincronizados no GitHub (até o Recorte 18).
+6.  **Inteligência de Performance (Canais/Origens):** Substituição de mocks estáticos por derivação dinâmica em `Performance.tsx`. Pipeline e conversão (critério `resolved`) agora são factuais e auditáveis. Zeragem de `Math.random()`.
+7.  **Ambiente Reconciliado:** Local e remoto sincronizados. Build de produção íntegro.
 
 ## Pendências e Observações (Auditado)
 1.  **Auditoria Recorte 19:** Arquivo alvo `src/pages/Settings.tsx` para saneamento técnico de estilos inline.

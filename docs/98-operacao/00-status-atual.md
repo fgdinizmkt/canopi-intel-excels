@@ -170,6 +170,16 @@
 - **Build de Produção:** Validado com `npm run build` (sucesso completo).
 - **Commit de Código:** `3fbf890` — feat(actions): adiciona deteccao operacional de anomalias na fila.
 
+**Recorte — Inteligência de Performance: Performance.tsx**
+- **Resultado:** Substituição de mocks estáticos por derivação analítica real baseada em `contasMock` e `advancedSignals`.
+- **Inteligência Analítica:** Cálculo determinístico de:
+  - **Eficiência Operacional:** Pipeline associado e taxa de conversão factual por canal.
+  - **Vazão de Origem:** Identificação factual da origem com maior volume de sinais no período.
+  - **Taxa de Conversão:** Baseada estritamente em sinais resolvidos (`s.resolved`).
+- **Eliminação de Ruído:** Remoção integral de `Math.random()` e fallbacks manuais de pipeline.
+- **Build de Produção:** Validado com `npm run build` (sucesso completo).
+- **Commit de Código:** `1e7bf81` — feat(performance): adiciona leitura dinamica por canal e origem.
+
 ---
 
 ## Bloqueios e Pontas Soltas (Auditado)
@@ -182,7 +192,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte de Inteligência Operacional.
+- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte de Inteligência de Performance.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -208,3 +218,4 @@
 | Lifecycle Operacional | Marco Concluído | Transições de status, histórico automático e persistência local (LocalStorage) |
 | Analytics de Conversão | Marco Concluído | Medição de taxa de conclusão, aging e backlog crítico via sessionActions |
 | Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão) em Actions |
++| Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |

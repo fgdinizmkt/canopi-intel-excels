@@ -5,6 +5,21 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Inteligência de Performance: Performance.tsx
+- **Fase:** Fase 9 — Data Intelligence & Scale
+- **Alvo:** `src/pages/Performance.tsx`
+- **Ação:** Evolução da leitura analítica de mocks estáticos para derivação dinâmica factual.
+- **Decisões:**
+  - Substituição da dependência de `CHANNELS` por `DYNAMIC_CHANNELS` via `useMemo`.
+  - Derivação de pipeline associado a partir de `contasMock`.
+  - Cálculo de conversão baseado exclusivamente em `advancedSignals` com flag `resolved`.
+  - Implementação do indicador "Maior Volume por Origem" baseado em contagem real de sinais.
+  - Saneamento total de aleatoriedade (`Math.random()`) e remoção de fallbacks fixos de pipeline.
+- **Commit:** `1e7bf81` — feat(performance): adiciona leitura dinamica por canal e origem.
+- **Resultado:** Página de performance integrada ao fluxo real de dados, com leitura auditável de pipeline e vazão.
+
+---
+
 ## [2026-04-06] — Inteligência Operacional: Actions.tsx
 - **Fase:** Fase 9 — Data Intelligence & Scale
 - **Alvo:** `src/pages/Actions.tsx`
