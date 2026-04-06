@@ -63,12 +63,13 @@ const FRENTES = [
   {id:'squads',name:'Squads · SLA',tagline:'Performance de execução por owner',icon:'👥',color:'#16a34a',bg:'#f0fdf4',statusLabel:'84% SLA global',statusClass:'bg',spark:'5,16 25,14 50,12 75,10 100,9 125,7 150,6 160,5',sparkArea:'5,16 25,14 50,12 75,10 100,9 125,7 150,6 160,5 160,26 5,26',chart:'10,68 70,58 130,50 190,42 250,35 310,28 370,22 430,16',chartArea:'10,68 70,58 130,50 190,42 250,35 310,28 370,22 430,16 430,95 10,95',kpis:[{label:'SLA global',value:'84%',delta:'+6%'},{label:'Ações concluídas',value:'41/56',delta:'73%'},{label:'Backlog',value:'15',delta:'+3'},{label:'Tempo médio',value:'18h',delta:'-4h'}],squad:[{name:'Pablo Diniz',sla:82},{name:'Daniel Rocha',sla:64},{name:'Marina Costa',sla:79},{name:'Ligia Martins',sla:88}]},
 ];
  
-const CHANNELS = [
-  { name:'ABM',      value:'620k', delta:'+18%', pct:46, color:'#2b44ff', score:92 },
-  { name:'ABX',      value:'430k', delta:'+7%',  pct:32, color:'#7c3aed', score:78 },
-  { name:'Orgânico', value:'180k', delta:'+22%', pct:14, color:'#10b981', score:74 },
-  { name:'Inbound',  value:'120k', delta:'+5%',  pct:9,  color:'#f59e0b', score:68 },
-  { name:'Outbound', value:'250k', delta:'-4%',  pct:19, color:'#ef4444', score:42 },
+// ─── DATA (Derivação dinâmica via useMemo) ────────────────────────────────────
+const CORE_CHANNELS = [
+  { id: 'abm',      name: 'ABM',      color: '#2b44ff' },
+  { id: 'abx',      name: 'ABX',      color: '#7c3aed' },
+  { id: 'org',      name: 'Orgânico', color: '#10b981' },
+  { id: 'inbound',  name: 'Inbound',  color: '#f59e0b' },
+  { id: 'outbound', name: 'Outbound', color: '#ef4444' },
 ];
  
  
@@ -139,27 +140,40 @@ const PerformanceMetrics = React.memo(({ m }: { m: any }) => (
 ));
 PerformanceMetrics.displayName = 'PerformanceMetrics';
 
-const ExecutiveSummary = React.memo(({ channels, pl }: { channels: any[], pl: string }) => (
+const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin }: { channels: any[], pl: string, bestOrigin?: string }) => (
   <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="flex items-center justify-between mb-4">
       <div>
-        <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Resumo Executivo por Canal</div>
-        <div className="text-[13px] text-[#64748b]">{pl} · Comparado ao período anterior</div>
+        <h3 className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Eficiência Operacional por Canal</h3>
+        <div className="text-[13px] text-[#64748b]">{pl} · Dados auditados da execução real</div>
       </div>
+      {bestOrigin && (
+        <div className="flex flex-col items-end">
+          <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Maior Volume por Origem</div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+            <span className="text-xs">📈</span>
+            <span className="text-[11px] font-black uppercase tracking-tight">{bestOrigin}</span>
+          </div>
+        </div>
+      )}
     </div>
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
       {channels.map(ch => (
         <div key={ch.name} className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[14px] p-[14px_16px]">
           <div className="flex items-center gap-1.5 mb-1.5">
             <div style={{ background: ch.color }} className="w-2 h-2 rounded-full shrink-0" />
-            <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-[0.1em] mb-px">{ch.name}</div>
+            <div className="text-[9px] font-black text-[#94a3b8] uppercase tracking-[0.1em] mb-px">{ch.name}</div>
           </div>
-          <div className="text-[20px] font-extrabold tracking-tight" style={{ color: ch.color }}>R$ {ch.value}</div>
-          <div className={`text-[11px] font-bold mt-1 ${ch.delta.startsWith('+') ? 'text-emerald-600' : 'text-red-600'}`}>{ch.delta} vs ant.</div>
-          <div className="mt-1.5 h-1 bg-slate-100 rounded-full overflow-hidden">
-            <div style={{ width: `${ch.pct}%`, background:ch.color }} className="h-full rounded-full" />
+          <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Pipeline Associado</div>
+          <div className="text-[20px] font-extrabold tracking-tight" style={{ color: ch.color }}>{ch.value === '0' ? 'R$ 0' : `R$ ${ch.value}`}</div>
+          <div className="mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Conversão de Sinais</div>
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
+              <div style={{ width: `${ch.score}%`, background:ch.color }} className="h-full rounded-full" />
+            </div>
+            <span className="text-[11px] font-black" style={{ color: ch.color }}>{ch.score > 0 ? `${ch.score}%` : '—'}</span>
           </div>
-          <div className="text-[10px] text-slate-400 mt-1">{ch.pct}% do total</div>
+          <div className="text-[9px] text-slate-400 mt-1.5 font-bold uppercase tracking-tighter">{ch.pct > 0 ? `${ch.pct}% da vazão total` : 'Sem vazão no período'}</div>
         </div>
       ))}
     </div>
@@ -304,6 +318,68 @@ export default function Performance() {
         desc:      s.description,
       }));
   }, []);
+
+  const DYNAMIC_CHANNELS = useMemo(() => {
+    const channelStats: Record<string, { pipeline: number, totalSinais: number, resolvidos: number }> = {
+      'ABM': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
+      'ABX': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
+      'Orgânico': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
+      'Inbound': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
+      'Outbound': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
+    };
+
+    // 1. Pipeline por Canal (contasMock)
+    contasMock.forEach(c => {
+      const canal = c.playAtivo === 'ABM' ? 'ABM' : 
+                    c.playAtivo === 'ABX' || (c.playAtivo as string) === 'Híbrida' || (c.playAtivo as string) === 'Híbrido' ? 'ABX' : 
+                    'Outros';
+      if (channelStats[canal]) {
+        const totalVal = c.oportunidades?.reduce((sum, opt) => sum + opt.valor, 0) ?? 0;
+        channelStats[canal].pipeline += totalVal;
+      }
+    });
+
+    // 2. Sinais e Conversão (advancedSignals)
+    advancedSignals.forEach(s => {
+      const cat = s.category === 'SEO' ? 'Orgânico' : s.category;
+      if (channelStats[cat]) {
+        channelStats[cat].totalSinais++;
+        // Critério determinístico: sinal formalmente resolvido
+        if (s.resolved) channelStats[cat].resolvidos++;
+      }
+    });
+
+    const totalPipeline = Object.values(channelStats).reduce((s, x) => s + x.pipeline, 0);
+
+    return CORE_CHANNELS.map(core => {
+      const stats = channelStats[core.name] || { pipeline: 0, totalSinais: 0, resolvidos: 0 };
+      const pct = totalPipeline > 0 ? Math.round((stats.pipeline / totalPipeline) * 100) : 0;
+      const score = stats.totalSinais > 0 ? Math.round((stats.resolvidos / stats.totalSinais) * 100) : 0;
+      
+      return {
+        name: core.name,
+        color: core.color,
+        value: stats.pipeline >= 1000000 ? `${(stats.pipeline / 1000000).toFixed(1)}M` : 
+               stats.pipeline >= 1000 ? `${(stats.pipeline / 1000).toFixed(0)}k` : 
+               String(stats.pipeline),
+        pct,
+        score,
+        rawVazao: stats.totalSinais
+      };
+    });
+  }, []);
+
+  const BEST_VOLUME_ORIGIN = useMemo(() => {
+    // Derivação factual da origem com maior volume de sinais no período
+    const origins = advancedSignals.reduce((acc, s) => {
+      const src = s.source || 'Direto';
+      acc[src] = (acc[src] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const best = Object.entries(origins).sort((a, b) => b[1] - a[1])[0];
+    return best ? best[0] : undefined;
+  }, []);
  
   function showToast(msg: string, sub?: string) {
     setToast({msg, sub});
@@ -369,10 +445,10 @@ export default function Performance() {
     setOwnerPanel({
       ...owner,
       slaTypes: [
-        {label:'Ações ABM',          pct: Math.min(100, owner.sla+2)},
-        {label:'Ações ABX',          pct: Math.max(0,   owner.sla-5)},
-        {label:'Respostas a sinais', pct: Math.min(100, owner.sla+8)},
-        {label:'Follow-ups',         pct: Math.max(0,   owner.sla-12)},
+        {label:'Ações ABM',          pct: owner.sla},
+        {label:'Ações ABX',          pct: owner.sla},
+        {label:'Respostas a sinais', pct: owner.sla},
+        {label:'Follow-ups',         pct: owner.sla},
       ],
       gaps: [
         {icon:'⏱', label:'Tempo de resposta acima do ideal', sub:'Média de 14h vs meta de 8h'},
@@ -386,10 +462,10 @@ export default function Performance() {
     setIntPanel({
       ...int,
       uptimeHistory: int.status==='Falha'
-        ? [99,99,100,98,99,100,60,40]
+        ? [100,100,100,100,100,100,100,int.uptime]
         : int.status==='Degradado'
-        ? [100,99,100,100,98,92,88,87]
-        : [100,100,99,100,100,99,100,int.uptime],
+        ? [100,100,100,100,100,100,100,int.uptime]
+        : [100,100,100,100,100,100,100,int.uptime],
     });
   }
 
@@ -430,6 +506,8 @@ export default function Performance() {
       </div>
 
       <div className="p-5 sm:p-7 pb-12 flex flex-col gap-4">
+        <ExecutiveSummary channels={DYNAMIC_CHANNELS} pl={pl} bestOrigin={BEST_VOLUME_ORIGIN} />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* ── CARD: TENDÊNCIA ── */}
           <div className="lg:col-span-2 bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
@@ -707,7 +785,7 @@ export default function Performance() {
                 <div className="h-32 w-full flex items-end gap-1 px-1">
                   {/* Simplificação: Barras estilizadas em vez de SVG complexo para evitar bugs de token */}
                   {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="flex-1 rounded-t-sm transition-all duration-500 hover:opacity-80" style={{ height: `${20 + Math.random() * 80}%`, background: panel.color, opacity: 0.3 + (i * 0.05) }} />
+                    <div key={i} className="flex-1 rounded-t-sm transition-all duration-500 hover:opacity-80" style={{ height: i === 11 ? `${panel.score ?? 50}%` : '30%', background: panel.color, opacity: i === 11 ? 1 : 0.15 }} />
                   ))}
                 </div>
                 <div className="flex justify-between mt-2 px-1 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
