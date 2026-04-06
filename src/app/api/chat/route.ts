@@ -717,6 +717,55 @@ interface OperationalContext {
     accountName: string;
     status: string;
   }>;
+  operationalIntelligence?: {
+    performance: {
+      totalPipeline: string;
+      conversionRate: number;
+      bestOrigin: string;
+      activeAccounts: number;
+      totalSignals: number;
+      resolvedSignals: number;
+    };
+    queue: {
+      totalActions: number;
+      criticalActions: number;
+      delayedActions: number;
+      noOwnerActions: number;
+      anomalies: Array<{
+        type: string;
+        title: string;
+        description: string;
+        severity: string;
+        accountName?: string;
+      }>;
+    };
+    priorities: {
+      topSignals: Array<{
+        id: string;
+        title: string;
+        account: string;
+        severity: string;
+        confidence: number;
+      }>;
+      topAnomalies: Array<{
+        type: string;
+        title: string;
+        description: string;
+        severity: string;
+        accountName?: string;
+      }>;
+      riskAccounts: Array<{
+        name: string;
+        reason: string;
+        riskLevel: string;
+      }>;
+    };
+    health: {
+      operationalSummary: string;
+      criticalIndicator: string;
+      nextImmediateAction: string;
+    };
+  };
 }
 
 function buildContextualInstruction(context: OperationalContext): string {
@@ -761,10 +810,68 @@ function buildContextualInstruction(context: OperationalContext): string {
     });
   }
 
+  // Inteligência Operacional Enriquecida
+  if (context.operationalIntelligence) {
+    const oi = context.operationalIntelligence;
+
+    lines.push('\n==================================================');
+    lines.push('INTELIGÊNCIA OPERACIONAL CONSOLIDADA');
+    lines.push('==================================================');
+
+    // Performance
+    lines.push('\nDESEMPENHO (Métricas Reais):');
+    lines.push(`- Pipeline Total: ${oi.performance.totalPipeline}`);
+    lines.push(`- Taxa de Conversão: ${oi.performance.conversionRate}%`);
+    lines.push(`- Melhor Origem: ${oi.performance.bestOrigin}`);
+    lines.push(`- Contas Ativas: ${oi.performance.activeAccounts}`);
+    lines.push(`- Sinais Totais: ${oi.performance.totalSignals} | Resolvidos: ${oi.performance.resolvedSignals}`);
+
+    // Queue Intelligence
+    lines.push('\nFILA OPERACIONAL:');
+    lines.push(`- Ações Totais: ${oi.queue.totalActions}`);
+    lines.push(`- Ações Críticas: ${oi.queue.criticalActions}`);
+    lines.push(`- Ações Atrasadas (>24h): ${oi.queue.delayedActions}`);
+    lines.push(`- Sem Responsável: ${oi.queue.noOwnerActions}`);
+
+    if (oi.queue.anomalies.length > 0) {
+      lines.push('\nANOMALIAS DETECTADAS (prioridade alta):');
+      oi.queue.anomalies.forEach((a, i) => {
+        const accountNote = a.accountName ? ` — Conta: ${a.accountName}` : '';
+        lines.push(`${i + 1}. [${a.severity.toUpperCase()}] ${a.type}: ${a.title}`);
+        lines.push(`   Descrição: ${a.description}${accountNote}`);
+      });
+    }
+
+    // Priorities
+    if (oi.priorities.riskAccounts.length > 0) {
+      lines.push('\nCONTAS EM RISCO (intervir agora):');
+      oi.priorities.riskAccounts.forEach((r, i) => {
+        lines.push(`${i + 1}. ${r.name} (risco ${r.riskLevel})`);
+        lines.push(`   Razão: ${r.reason}`);
+      });
+    }
+
+    // Health Summary
+    lines.push('\nINDICADOR DE SAÚDE OPERACIONAL:');
+    lines.push(`- Resumo: ${oi.health.operationalSummary}`);
+    lines.push(`- Status Crítico: ${oi.health.criticalIndicator}`);
+    lines.push(`- Próxima Ação Imediata: ${oi.health.nextImmediateAction}`);
+  }
+
   lines.push(
-    '\nUse este contexto para personalizar suas respostas.',
-    'Quando o usuário perguntar sobre a conta aberta, sinais ou ações, use esses dados como base factual.',
-    'Diferencie sempre o que é dado real (acima) do que é inferência ou recomendação sua.',
+    '\n==================================================',
+    'INSTRUÇÕES DE RESPOSTA AO USUÁRIO',
+    '==================================================',
+    '',
+    'Quando responder, priorize os seguintes tópicos (se relevantes):',
+    '1. O que exige atenção AGORA (anomalias, criticals, SLAs vencidos)',
+    '2. O que está em RISCO (contas em risco, sinais críticos sem resolução)',
+    '3. O que MELHOROU (taxa de conversão, sinais resolvidos, ações concluídas)',
+    '4. Qual é o PRÓXIMO PLAY a priorizar (recomendação acionável)',
+    '5. Quais CONTAS/SINAIS/AÇÕES merecem FOCO IMEDIATO (top 3 por categoria)',
+    '',
+    'Sempre diferencie dado real (contexto acima) de inferência ou recomendação sua.',
+    'Use números factuais como âncora de confiança.',
   );
 
   return lines.join('\n');

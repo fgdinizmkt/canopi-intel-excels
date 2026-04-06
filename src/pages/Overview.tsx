@@ -84,7 +84,7 @@ export const Overview: React.FC = () => {
       totalSignals: advancedSignals.length,
       resolvedSignals: resolvedosSinais.length
     };
-  }, []);
+  }, [advancedSignals]);
 
   // ─── INTELIGÊNCIA DE FILA (Detecção de anomalias — 4 tipos) ──────────────
   const queueIntelligence = useMemo(() => {

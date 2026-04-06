@@ -3,10 +3,11 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Card, Button, Badge } from '../components/ui';
-import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2 } from 'lucide-react';
+import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target } from 'lucide-react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
+import { buildOperationalIntelligence } from '../helpers/operationalIntelligence';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -43,6 +44,53 @@ interface ContextBlock {
     accountName: string;
     status: string;
   }>;
+  operationalIntelligence: {
+    performance: {
+      totalPipeline: string;
+      conversionRate: number;
+      bestOrigin: string;
+      activeAccounts: number;
+      totalSignals: number;
+      resolvedSignals: number;
+    };
+    queue: {
+      totalActions: number;
+      criticalActions: number;
+      delayedActions: number;
+      noOwnerActions: number;
+      anomalies: Array<{
+        type: string;
+        title: string;
+        description: string;
+        severity: string;
+      }>;
+    };
+    priorities: {
+      topSignals: Array<{
+        id: string;
+        title: string;
+        account: string;
+        severity: string;
+        confidence: number;
+      }>;
+      topAnomalies: Array<{
+        type: string;
+        title: string;
+        description: string;
+        severity: string;
+      }>;
+      riskAccounts: Array<{
+        name: string;
+        reason: string;
+        riskLevel: string;
+      }>;
+    };
+    health: {
+      operationalSummary: string;
+      criticalIndicator: string;
+      nextImmediateAction: string;
+    };
+  };
 }
 
 export const Assistant: React.FC = () => {
@@ -145,25 +193,29 @@ export const Assistant: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const buildContextBlock = (): ContextBlock => ({
-    contaAberta: contaAberta
-      ? {
-          nome: contaAberta.nome,
-          vertical: contaAberta.vertical,
-          statusGeral: contaAberta.statusGeral,
-          resumoExecutivo: contaAberta.resumoExecutivo,
-          prontidao: contaAberta.prontidao,
-          potencial: contaAberta.potencial,
-          proximaMelhorAcao: contaAberta.proximaMelhorAcao,
-        }
-      : null,
-    sinaisCriticos: sinaisCriticosContexto,
-    acoesFila: storedActions.slice(0, 3).map(a => ({
-      title: a.title || 'Ação sem título',
-      accountName: a.account || '—',
-      status: a.status || 'Nova',
-    })),
-  });
+  const buildContextBlock = (): ContextBlock => {
+    const opIntel = buildOperationalIntelligence();
+    return {
+      contaAberta: contaAberta
+        ? {
+            nome: contaAberta.nome,
+            vertical: contaAberta.vertical,
+            statusGeral: contaAberta.statusGeral,
+            resumoExecutivo: contaAberta.resumoExecutivo,
+            prontidao: contaAberta.prontidao,
+            potencial: contaAberta.potencial,
+            proximaMelhorAcao: contaAberta.proximaMelhorAcao,
+          }
+        : null,
+      sinaisCriticos: sinaisCriticosContexto,
+      acoesFila: storedActions.slice(0, 3).map(a => ({
+        title: a.title || 'Ação sem título',
+        accountName: a.account || '—',
+        status: a.status || 'Nova',
+      })),
+      operationalIntelligence: opIntel,
+    };
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -241,6 +293,34 @@ export const Assistant: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Prioridades Imediatas */}
+      <Card className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
+        <div className="flex items-center gap-2 mb-3">
+          <Target className="w-5 h-5 text-amber-600" />
+          <h3 className="font-bold text-amber-900">Prioridades Imediatas</h3>
+        </div>
+        <div className="text-xs space-y-2">
+          {(() => {
+            const opIntel = buildOperationalIntelligence();
+            const insights: string[] = [];
+            if (opIntel.health.criticalIndicator && !opIntel.health.criticalIndicator.includes('Estável')) {
+              insights.push(opIntel.health.criticalIndicator);
+            }
+            if (opIntel.queue.anomalies.length > 0) {
+              insights.push(`⚠️ ${opIntel.queue.anomalies[0].description}`);
+            }
+            if (opIntel.priorities.riskAccounts.length > 0) {
+              insights.push(`🎯 Conta em risco: ${opIntel.priorities.riskAccounts[0].name}`);
+            }
+            return insights.length > 0 ? (
+              insights.map((insight, i) => <p key={i} className="text-amber-800">{insight}</p>)
+            ) : (
+              <p className="text-amber-700">✅ Operação estável — continue monitorando</p>
+            );
+          })()}
+        </div>
+      </Card>
 
       <div className="grid grid-cols-3 gap-6">
         {/* Chat Interface */}
