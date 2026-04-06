@@ -5,6 +5,39 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Reconciliação de Datasets: Implementação Concluída
+- **Fase:** Fase 9 — Data Intelligence & Scale
+- **Alvo:** Eliminação de ruptura semântica entre `advancedSignals`, `initialActions` e `contasMock`
+- **Ação Executada:**
+  - **Extensão de Interface:** Adição de `reconciliationStatus?: 'ativa' | 'seed' | 'prospecting' | 'orfã' | 'vazia'` à Conta
+  - **Contas Órfãs:** Criação de 9 shells de conta com ID 8-16 (Minerva Foods, Carteira Seguros, Cluster Fintech, Nexus Fintech, V.tal, MSD Saúde, Operação Interna, Cluster Manufatura, Cluster Healthtech)
+  - **Vinculação Explícita:** Adição de `accountId` a todos os 9 `advancedSignals` (SIG-4092 → ID 8, SIG-4088 → ID 9, etc.)
+  - **Vinculação de Ações:** Adição de `relatedAccountId` a todos os 5 `initialActions` (a1 → ID 9, a2 → ID 12, a3 → ID 8, a4 → ID 16, a5 → ID 15)
+  - **Classificação de Vazios:** Tagging de 4 contas existentes com `reconciliationStatus: 'vazia'` (AlphaBank, NovaSaude, MobilityPro, AgroCloud)
+- **Decisão Arquitetural Aplicada:** Manutenção de três layers canônicos independentes com linking explícito (sem destructive merge)
+- **Impacto Técnico:**
+  - Build: `npm run build` — Exit 0, zero type errors
+  - Sem alterações de comportamento visual/funcional (pure data layer)
+  - Pronto para derivação de métricas downstream com exclusão de contas 'vazia'
+- **Próximo Passo:** Implementação de Opção B (Overview.tsx consolidada) agora desbloqueada
+
+---
+
+## [2026-04-06] — Varredura de Consistência Operacional (Auditoria de Dados)
+- **Fase:** Fase 9 — Data Intelligence & Scale (Preparatória para Opção B)
+- **Alto:** Auditoria de índices obrigatórios (sinais, ações, contas, backlogs)
+- **Ação:** Validação de coerência entre `advancedSignals`, `initialActions` e `contasMock`
+- **Decisões:**
+  - Executada auditoria técnica rigorosa com contagem de índices
+  - Identificadas 2 inconsistências críticas (sinais referem contas inexistentes; 4 contas vazias)
+  - Recomendação: Não aplicar correção automática — decisão arquitetural necessária
+  - Resultado: Plataforma funciona (build 100% OK) mas dados descoerentes
+- **Relatório:** Documentado em análise técnica com 3 opções de remediação
+- **Impacto:** Implementação de Opção B (Overview consolidada) depende de decisão sobre qual dataset é canônico
+- **Próximo passo:** Encaminhar para ChatGPT (Orquestrador) para decisão estratégica
+
+---
+
 ## [2026-04-06] — Inteligência de Performance: Performance.tsx
 - **Fase:** Fase 9 — Data Intelligence & Scale
 - **Alvo:** `src/pages/Performance.tsx`

@@ -38,8 +38,9 @@
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual:** Inteligência de Performance (Recorte Fase 9) concluída e documentada. Working tree limpa e sincronizada.
-- **Próximo Recorte da Fase 9:** A ser definido formalmente conforme direção estratégica e roadmap.
+- **Estado Atual:** Reconciliação de datasets concluída (2026-04-06). Todos os 9 sinais vinculados a contas via `accountId`. Todas as 5 ações vinculadas via `relatedAccountId`. Contas órfãs e vazias classificadas com `reconciliationStatus`. Working tree limpa e sincronizada.
+- **Bloqueador Resolvido:** Dataset descoerência eliminada. Plataforma pronta para implementação de Opção B (Overview.tsx consolidada).
+- **Próximo Recorte da Fase 9:** **Opção B — Overview.tsx Consolidada** (Desbloqueada e aprovada para execução após esta reconciliação)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
