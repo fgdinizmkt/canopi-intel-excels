@@ -1161,6 +1161,10 @@ export const Actions: React.FC = () => {
   const metrics = useMemo(() => {
     const total = allItems.length;
     const critical = allItems.filter(item => item.priority === "Crítica" && item.status !== "Concluída").length;
+    const inProgress = allItems.filter(item => item.status === "Em andamento").length;
+    const concluida = allItems.filter(item => item.status === "Concluída").length;
+    const delayed = allItems.filter(item => item.slaStatus === "vencido" || item.slaStatus === "alerta").length;
+    const noOwner = allItems.filter(item => item.ownerName === null).length;
     const nova = allItems.filter(item => item.status === "Nova").length;
     const conversionRate = (total - nova) > 0 ? (concluida / (total - nova)) * 100 : 0;
     
