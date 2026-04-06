@@ -1184,7 +1184,86 @@ export const Actions: React.FC = () => {
       }, {} as Record<string, number>)
     ).sort((a, b) => b[1] - a[1]).slice(0, 3);
 
-    return { total, critical, inProgress, delayed, noOwner, conversionRate, aged, concluida, channelRanking };
+    // ─── Detecção de Anomalias (Fase 9) ──────────────────────────────
+    const foundAnomalies: Array<{ id: string; type: string; title: string; description: string; impact: "High" | "Medium" }> = [];
+
+    // 1. Congestionamento por canal (>= 3 ações Críticas/Altas ativas no mesmo canal)
+    const channelCrit = allItems.reduce((acc, item) => {
+      if (item.status !== "Concluída" && (item.priority === "Crítica" || item.priority === "Alta")) {
+        acc[item.channel] = (acc[item.channel] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    Object.entries(channelCrit).forEach(([channel, count]) => {
+      if (count >= 3) {
+        foundAnomalies.push({
+          id: `cong-${channel}`,
+          type: "Congestionamento",
+          title: `Fila Crítica: ${channel}`,
+          description: `Concentração de ${count} ações de alta prioridade. Risco de gargalo operacional.`,
+          impact: "High"
+        });
+      }
+    });
+
+    // 2. Ghosting de atribuição (Ação Crítica sem owner há mais de 24h)
+    const ghosted = allItems.find(i => 
+      i.priority === "Crítica" && 
+      !i.ownerName && 
+      i.status !== "Concluída" &&
+      (now.getTime() - new Date(i.createdAt || "2026-04-03T09:00:00Z").getTime()) > (24 * 60 * 60 * 1000)
+    );
+    if (ghosted) {
+      foundAnomalies.push({
+        id: "ghosting-critico",
+        type: "Ghosting",
+        title: "Atribuição Crítica Pendente",
+        description: `Ação na conta ${ghosted.accountName} sem owner há mais de 24h.`,
+        impact: "High"
+      });
+    }
+
+    // 3. Anomalia de Origem (Origem com >= 3 ações e 0 conclusões)
+    const originStats = allItems.reduce((acc, item) => {
+      if (!acc[item.origin]) acc[item.origin] = { total: 0, done: 0 };
+      acc[item.origin].total++;
+      if (item.status === "Concluída") acc[item.origin].done++;
+      return acc;
+    }, {} as Record<string, { total: number; done: number }>);
+
+    Object.entries(originStats).forEach(([origin, stats]) => {
+      if (stats.total >= 3 && stats.done === 0) {
+        foundAnomalies.push({
+          id: `orig-${origin}`,
+          type: "Vazão Baixa",
+          title: `Complexidade: ${origin}`,
+          description: `Detectado baixo índice de vazão (0% de conclusão) para esta origem de sinal.`,
+          impact: "Medium"
+        });
+      }
+    });
+
+    // 4. Efeito cascata por conta (>= 2 ações Bloqueadas ou Vencidas na mesma conta)
+    const accStats = allItems.reduce((acc, item) => {
+      if (!acc[item.accountName]) acc[item.accountName] = 0;
+      if (item.status === "Bloqueada" || item.slaStatus === "vencido") acc[item.accountName]++;
+      return acc;
+    }, {} as Record<string, number>);
+
+    Object.entries(accStats).forEach(([accName, count]) => {
+      if (count >= 2) {
+        foundAnomalies.push({
+          id: `cascade-${accName}`,
+          type: "Bloqueio",
+          title: `Cascata: ${accName}`,
+          description: `Conta com ${count} impeditivos simultâneos. Indica paralisia operacional na conta.`,
+          impact: "High"
+        });
+      }
+    });
+
+    return { total, critical, inProgress, delayed, noOwner, conversionRate, aged, concluida, channelRanking, anomalies: foundAnomalies.slice(0, 3) };
   }, [allItems]);
 
   const ownerOptions = useMemo(() => {
@@ -1356,6 +1435,37 @@ export const Actions: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* ─── Painel de Insights Nexus (Fase 9) ────────────────────── */}
+        {metrics.anomalies.length > 0 && (
+          <div className="mt-8 animate-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3 px-2 mb-4">
+               <Activity className="w-5 h-5 text-blue-500" />
+               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insights Operacionais</h3>
+               <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">DETECÇÃO ATIVA</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {metrics.anomalies.map((ano) => (
+                <div key={ano.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex gap-4 ring-1 ring-slate-100 hover:shadow-md transition-all">
+                  <div className={cx(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                    ano.impact === "High" ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-600"
+                  )}>
+                    {ano.type === "Congestionamento" ? <Target className="w-5 h-5" /> : 
+                     ano.type === "Ghosting" ? <AlertTriangle className="w-5 h-5" /> : 
+                     ano.type === "Bloqueio" ? <Activity className="w-5 h-5" /> : 
+                     <TrendingUp className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider transition-all">{ano.type}</p>
+                    <h4 className="mt-1 text-sm font-black text-slate-900">{ano.title}</h4>
+                    <p className="mt-1.5 text-xs text-slate-500 font-medium leading-relaxed">{ano.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Playbook Library Bar (Recorte 20) */}
         <div className="mt-8">
