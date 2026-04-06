@@ -5,6 +5,54 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Opção 3 (Contexto Avançado): Copiloto Operacional Real — Implementação Concluída
+- **Fase:** Fase 9 — Data Intelligence & Scale (Evolução do Assistant → Copiloto)
+- **Alvo:** Integração de inteligência operacional enriquecida no Assistente de IA
+- **Decisão Aprovada:** Opção 3 — Contexto avançado + UX mínima (Orquestrador, 2026-04-06)
+- **Ação Executada:**
+  - **Criação de `src/helpers/operationalIntelligence.ts` (~350 linhas):**
+    * Consolidação de lógica de inteligência (Performance, Queue, Priorities, Health)
+    * `extractPerformanceIntelligence()`: 6 KPIs (Pipeline, Conversão, Origem, Contas, Sinais, Resolvidos)
+    * `extractQueueIntelligence()`: 4 anomalias (Ghosting, Vazão, Congestionamento, Cascata)
+    * `extractPrioritiesIntelligence()`: Top 3 sinais, top 2 anomalias, top 3 contas em risco
+    * `extractHealthSnapshot()`: Resumo operacional, indicador crítico emoji+texto, próxima ação
+    * `buildOperationalIntelligence()`: Consolidação master de todas as inteligências
+  - **Integração em `src/pages/Assistant.tsx`:**
+    * Importação e uso de `buildOperationalIntelligence()`
+    * Enriquecimento de `ContextBlock` com `operationalIntelligence` completa
+    * Novo card "Prioridades Imediatas" mostrando insights críticos (amber/orange gradient)
+    * Contexto mais rico passado para API (4 anomalias, 6 KPIs, priorities)
+  - **Enriquecimento de `src/app/api/chat/route.ts`:**
+    * Extensão de `OperationalContext` com `operationalIntelligence` opcional
+    * Nova seção em `buildContextualInstruction()`: "INTELIGÊNCIA OPERACIONAL CONSOLIDADA"
+    * Injeção de 5 categorias de insights na system instruction:
+      - Desempenho (pipeline, conversão, origem, contas, sinais)
+      - Fila (ações, críticas, atrasos, anomalias com descrição)
+      - Contas em Risco (top 3 com motivo e nível)
+      - Indicador de Saúde (resumo, crítico, próxima ação)
+      - Instruções de Resposta (guia para 5 tópicos)
+    * Novo bloco: "INSTRUÇÕES DE RESPOSTA AO USUÁRIO"
+      - O que exige atenção AGORA
+      - O que está em RISCO
+      - O que MELHOROU
+      - Qual é o PRÓXIMO PLAY
+      - Quais CONTAS/SINAIS/AÇÕES focar imediato
+  - **Validação Técnica:**
+    * Correção de dependency array em Overview.tsx (advancedSignals adicionado)
+    * Build: `npm run build` — Exit 0, 16 rotas compilam, 40.8 kB Assistant bundle
+    * Sem Supabase, sem nova arquitetura, integração limpa
+- **Resultado de Comportamento:**
+  - Assistant agora responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco
+  - Contexto operacional factual injetado para recomendações acionáveis
+  - 4 tipos de anomalias detectadas automaticamente passadas como contexto
+  - 6 KPIs dinâmicos (não mocks) alimentam decisões da IA
+  - Prioridades imediatas visíveis na UI (card Prioridades Imediatas)
+  - Chat agora tem 5 coluna de KPIs + card de prioridades + chat 2/3 + fila 1/3
+- **Commit:** `6fff541` — feat(copiloto): integra inteligência operacional enriquecida no Assistente
+- **Status:** ✅ Recorte pronto para encerramento. Nenhuma pendência funcional.
+
+---
+
 ## [2026-04-06] — Opção B (Overview.tsx): Cleanup Técnico & Validação Concluída
 - **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de Opção B)
 - **Alvo:** `src/pages/Overview.tsx` — validação e cleanup técnico
