@@ -2,8 +2,9 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último recorte concluído:** Opção 3 — Contexto Avançado (Copiloto Operacional Real)
+- **Último recorte concluído:** Recorte 15 — Plays Recomendados (Recomendações Explícitas)
 - **Últimos commits relevantes:** 
+  - `f9cf7a7` (feat(plays): adiciona bloco de plays recomendados com derivação inteligente)
   - `6fff541` (feat(copiloto): integra inteligência operacional enriquecida no Assistente)
   - `7fdce40` (fix(overview): cleanup técnico — memoização, anomalias e derivações)
   - `05c36c8` (feat(overview): consolidação inteligente — Performance + Actions Intelligence)
@@ -11,7 +12,7 @@
   - `1e7bf81` (feat(performance): adiciona leitura dinamica por canal e origem)
   - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
 - **Data:** 2026-04-06
-- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 40.8 kB Assistant, 6.86 kB Overview)
+- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 42.4 kB Assistant, 6.86 kB Overview)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 
 ## Status de Qualidade (Auditado)
@@ -26,7 +27,7 @@
 3. Preservar o histórico completo nos documentos de operação.
 4. Não introduzir estilos inline em componentes já migrados para Tailwind.
 
-## O que foi entregue (Recortes 9 a 14 — Fase 9)
+## O que foi entregue (Recortes 9 a 15 — Fase 9)
 1.  **Saneamento PaidMedia.tsx:** Migração integral para Tailwind v4 utilitário e zeragem de 100% dos estilos estáticos (`Exit 0`).
 2.  **Saneamento SeoInbound.tsx:** Migração integral para Tailwind v4 utilitário e estabilização de build (`Exit 0`).
 3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
@@ -36,23 +37,32 @@
 7.  **Reconciliação de Datasets:** Linking explícito entre `advancedSignals` (accountId), `initialActions` (relatedAccountId), e `contasMock` (reconciliationStatus). Três camadas canônicas independentes com linking sem destructive merge.
 8.  **Overview.tsx Consolidada (Opção B):** Painel de controle inteligente integrando Performance + Actions. 6 KPIs dinâmicos, 4 anomalias operacionais detectadas, hierarquia visual coerente, exclusão de contas 'vazia', memoização ativa.
 9.  **Copiloto Operacional Real (Opção 3):** Helper `operationalIntelligence.ts` consolidando toda inteligência. Integração no Assistant.tsx com card de Prioridades Imediatas. Enriquecimento de `src/app/api/chat/route.ts` com 5 blocos de contexto operacional injetados na system instruction. Assistant responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco.
+10. **Plays Recomendados (Recorte 15):** Função `deriveRecommendedPlays()` que gera até 4 recomendações explícitas baseadas em padrões detectados (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Conta em Risco→Intervenção, Sinal Crítico→Ativação). Bloco visual com cards responsivos, cores por urgência, botões "Chat" e "Copiar". Fecha loop: inteligência → ação.
 
 ## Pendências e Observações (Auditado)
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual (Opção 3 Concluída):** Helper de inteligência operacional consolidado. Integração em Assistant.tsx e route.ts concluída. Card de Prioridades Imediatas adicionado à UI. 5 blocos de contexto operacional injetados no Gemini. Contexto factual (4 anomalias, 6 KPIs, priorities, health) agora enriquece todas as repostas do Assistant. Working tree limpa.
-- **Validação Completada:** Build Exit 0, 16 rotas compilam (40.8 kB Assistant, 6.86 kB Overview). Sem breaking changes. ContextBlock estendido com operationalIntelligence. System instruction ampliada com 5 tópicos de resposta guiados.
-- **Status de Opção 3:** ✅ Pronto para encerramento. Awaiting push approval para origin/main.
+- **Estado Atual (Recorte 15 Concluído):** Plays recomendados implementados com derivação automática de 6 padrões. Bloco visual com cards responsivos, cores por urgência. Botões "Chat" e "Copiar" habilitam exploração rápida. Max 4 plays visíveis. Working tree limpa.
+- **Validação Completada:** Build Exit 0, 16 rotas compilam (42.4 kB Assistant, 6.86 kB Overview). Apenas 174 linhas de código novo. Sem breaking changes. deriveRecommendedPlays() integrada com useMemo.
+- **Status de Recorte 15:** ✅ Pronto para encerramento. Awaiting push approval para origin/main.
+- **Pipeline Fechado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15). Loop completo: detecção → priorização → ação.
 
 ## Recomendações para próximo recorte (Fase 10)
-1. **Validação UX do Card de Prioridades Imediatas:** Verificar se a apresentação amber/orange é clara o suficiente. Considerar adicionar action buttons (e.g., "Resolver", "Investigar").
-2. **Teste de Comportamento do Chat:** Validar se as 5 categorias de contexto (atenção, risco, melhoria, play, foco) realmente melhoram qualidade das recomendações. A/B test ou survey de usuário.
-3. **Enriquecimento de Anomalias no Contexto:** Adicionar mais metadados às anomalias (e.g., impacto estimado, conta mais afetada, ação recomendada).
-4. **Sistema de Recomendações Explícitas:** Criar interface para "Plays Recomendados" baseado em padrões detectados pelas anomalias.
+1. **Validação UX de Cores:** Verificar se amber/orange (Prioridades) e red/orange/blue (Plays) oferecem contraste suficiente e clareza.
+2. **Teste de Fluxo Chat→Input:** Confirmar que "Chat" preenchendo input seja intuitivo. Considerar auto-focus após clique.
+3. **Limite de Plays:** Monitorar se 4 é o número ideal ou se deve variar com context (mobile: 1-2, desktop: 3-4).
+4. **Enriquecimento Futuro:** Adicionar botão "Investigar" que abre detalhes da anomalia. Considerar histórico de plays.
+5. **Métricas:** Rastrear taxa de clique em "Chat" vs "Copiar" para otimizar UX de engajamento.
+
+## Próximos Recortes Sugeridos (Ordem Canônica)
+1. **Validação A/B de UX:** Testar se cores de urgência realmente melhoram clareza.
+2. **Investigação Detalhada:** Botão "Investigar" que expande contexto da anomalia.
+3. **Histórico de Plays:** Rastrear quais plays foram usados, clicados, ignorados.
+4. **Automação de Play:** Considerar "Executar Automaticamente" para plays de baixa complexidade.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
-- **Consistency Check:** Validar se o `colorMap` precisa de extensões para anomalia types (`Ghosting`, `Vazão`, `Congestionamento`, `Cascata`).
-- **Push Approval Pendente:** Aguardando autorização explícita antes de `git push origin main`.
+- **Consistency Check:** colorMap estendido para anomalia types (`Ghosting`, `Vazão`, `Congestionamento`, `Cascata`) + urgency levels (`crítica`, `alta`, `média`) em próximo recorte, se necessário.
+- **Push Approval Pendente:** Aguardando autorização explícita antes de `git push origin main` (1 novo commit: Recorte 15).

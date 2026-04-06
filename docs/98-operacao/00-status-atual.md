@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-06 (Copiloto Operacional Real: 6fff541, cfd30d1)
+ `main` — atualizada em 2026-04-06 (Plays Recomendados: f9cf7a7, branch local)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Opção 3 — Copiloto Operacional Real)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 15 — Plays Recomendados)
 
 ---
 
@@ -247,3 +247,4 @@
 | Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
 | Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
 | Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
+| Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, etc) |

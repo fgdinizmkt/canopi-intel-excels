@@ -5,6 +5,55 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Recorte 15 (Plays Recomendados): Recomendações Explícitas — Implementação Concluída
+- **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de loop: Inteligência → Ação)
+- **Alvo:** Derivar recomendações explícitas de plays a partir de inteligência operacional consolidada
+- **Decisão:** Novo recorte aprovado após Opção 3. Fechar gap entre "saber o problema" e "saber a ação".
+- **Ação Executada:**
+  - **Criação de `deriveRecommendedPlays()` em operationalIntelligence.ts:**
+    * Função que detecta padrões em anomalias + prioridades
+    * 6 tipos de plays gerados automaticamente (não mocks):
+      1. Ghosting → Atribuição Crítica Urgente (sem owner 24h+)
+      2. Cascata → Destravamento de Conta (2+ bloqueios na conta)
+      3. Congestionamento → Redistribuição de Fila (3+ críticas/altas no canal)
+      4. Vazão Baixa → Desbloqueio de Pipeline (3+ acumuladas, 0 conclusões)
+      5. Conta em Risco → Intervenção Estratégica (sinais críticos com risco)
+      6. Sinal Crítico (80%+ confiança) → Ativação Prioritária
+    * Cada play carrega: id, title, reason, focus, urgency, suggestedAction, promptForChat
+    * Max 4 plays visíveis (slice(0,4))
+  - **Integração em Assistant.tsx:**
+    * useMemo para derivação de plays (lazy)
+    * Novo bloco visual "Plays Recomendados" (grid 1-2 colunas)
+    * Cards responsivos com cores por urgência: crítica (red-50), alta (orange-50), média (blue-50)
+    * 2 botões por play: "Chat" (preenche input) + "Copiar" (clipboard)
+    * Funções: handleUsePlayInChat(), handleCopyPlay(), getUrgencyColor(), getUrgencyBadgeColor()
+  - **Validação Técnica:**
+    * Build: Exit 0, 16 rotas compilam, +1.6 kB Assistant (42.4 kB total)
+    * Zero breaking changes
+    * 174 linhas de código novo (174 insertions, 2 deletions)
+  - **Comportamento:**
+    * Usuário vê até 4 plays recomendados carregados automaticamente
+    * Urgência visual (cor) destaca críticas
+    * Clique em "Chat" preenche input com prompt contextual
+    * Clique em "Copiar" copia prompt para clipboard
+    * Convite implícito para ação no prompt: "Qual é o melhor owner?" etc
+- **Padrões Implementados:**
+  - Ghosting (anomalia "Ghosting") → Play Atribuição
+  - Cascata (anomalia "Bloqueio" = Cascata) → Play Destravamento
+  - Congestionamento (anomalia "Congestionamento") → Play Redistribuição
+  - Vazão Baixa (anomalia "Vazão") → Play Desbloqueio
+  - Conta em Risco (priorities.riskAccounts) → Play Intervenção
+  - Sinal Crítico 80%+ (priorities.topSignals, severity=crítico, confidence≥80) → Play Ativação
+- **Resultado de Impacto:**
+  - Inteligência operacional agora dirige recomendações acionáveis
+  - Reduz gap: "saber o que está errado" → "saber o que fazer"
+  - Chat + Copiar habilitam fluxo rápido de exploração
+  - UX mínima, apenas o necessário (sem novo componente pesado)
+- **Commit:** `f9cf7a7` — feat(plays): adiciona bloco de plays recomendados com derivação inteligente
+- **Status:** ✅ Recorte pronto para encerramento. Awaiting push approval.
+
+---
+
 ## [2026-04-06] — Opção 3 (Contexto Avançado): Copiloto Operacional Real — Implementação Concluída
 - **Fase:** Fase 9 — Data Intelligence & Scale (Evolução do Assistant → Copiloto)
 - **Alvo:** Integração de inteligência operacional enriquecida no Assistente de IA
