@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Saneamento Técnico: Settings.tsx (Recorte 19)
+- **Fase:** Fase 8 — Operational Efficiency
+- **Alvo:** `src/pages/Settings.tsx`
+- **Ação:** Saneamento técnico cirúrgico e blindagem de acessibilidade.
+- **Decisões:**
+  - Substituição de interpolações de strings de classes por mapeamentos estáticos (`bgMap`, `textMap`) para garantir compatibilidade com Tailwind v4.
+  - Implementação de propriedades ARIA (`aria-label`, `aria-pressed`) e `type="button"` nos toggles de controle para conformidade técnica.
+- **Commit:** `2cad13f` — refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower.
+- **Resultado:** Cockpit de governança blindado tecnicamente, com build de produção íntegro.
+
+---
+
 ## [2026-04-06] — Hotfix de Integridade: Fila Operacional (Metrics)
 - **Fase:** Fase 9 — Data Intelligence & Scale (Alinhamento Documental)
 - **Alvo:** `src/pages/Actions.tsx` (Bloco de `metrics`)

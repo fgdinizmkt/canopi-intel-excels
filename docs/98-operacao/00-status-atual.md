@@ -153,6 +153,12 @@
 - **Lint Limpo:** Execução de `npm run lint` com 0 erros bloqueadores.
 - **Build de Produção:** Validado com `npm run build` (sucesso completo em todas as 16 rotas).
 
+**Recorte 19 — Saneamento Técnico: Settings.tsx**
+- **Saneamento Cirúrgico:** Substituição de interpolações frágeis de classes Tailwind por mapeamentos estáticos (`bgMap`, `textMap`).
+- **Blindagem ARIA:** Implementação de `aria-label`, `aria-pressed` e `type="button"` nos toggles de controle da engine Nexus.
+- **Build de Produção:** Validado com `npm run build` (sucesso completo).
+- **Commit de Código:** `2cad13f` — refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower.
+
 ---
 
 ## Bloqueios e Pontas Soltas (Auditado)
@@ -165,7 +171,7 @@
 
 ## Próximo passo aprovado
 
-- **Fase 8 — Operational Efficiency:** Iniciar auditoria e saneamento de `Settings.tsx` (Recorte 19).
+- **Fase 9 — Data Intelligence & Scale:** Definir próximo recorte da Fase 9 após fechamento do Recorte 19.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
