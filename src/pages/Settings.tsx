@@ -11,6 +11,25 @@ export const Settings: React.FC = () => {
   const [toggles, setToggles] = useState({ nexus_ai: true, auto_sync: true, risk_alert: true });
   const [enginePower, setEnginePower] = useState(85);
 
+  // Mapeamentos estáticos para blindagem de cores Tailwind (Evita interpolação frágil)
+  const bgMap: Record<string, string> = {
+    emerald: 'bg-emerald-500',
+    blue: 'bg-blue-500',
+    amber: 'bg-amber-500',
+    red: 'bg-red-500',
+    'emerald-pale': 'bg-emerald-50',
+    'blue-pale': 'bg-blue-50',
+    'amber-pale': 'bg-amber-50',
+    'red-pale': 'bg-red-50'
+  };
+
+  const textMap: Record<string, string> = {
+    emerald: 'text-emerald-600',
+    blue: 'text-blue-600',
+    amber: 'text-amber-600',
+    red: 'text-red-600'
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-20 max-w-[1400px] mx-auto">
       {/* 1. WORKSPACE HEALTH - HERO PROTAGONISTA */}
@@ -86,7 +105,13 @@ export const Settings: React.FC = () => {
                 <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest mt-1">Configuração de Inteligência & Processamento</p>
               </div>
             </div>
-            <button className={`w-14 h-8 rounded-full transition-all flex items-center px-1 ${toggles.nexus_ai ? 'bg-indigo-600' : 'bg-slate-200'}`} onClick={() => setToggles({...toggles, nexus_ai: !toggles.nexus_ai})}>
+            <button 
+              type="button"
+              className={`w-14 h-8 rounded-full transition-all flex items-center px-1 ${toggles.nexus_ai ? 'bg-indigo-600' : 'bg-slate-200'}`} 
+              onClick={() => setToggles({...toggles, nexus_ai: !toggles.nexus_ai})}
+              aria-label="Alternar Nexus Core Engine"
+              aria-pressed={toggles.nexus_ai}
+            >
               <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all ${toggles.nexus_ai ? 'translate-x-6' : ''}`} />
             </button>
           </div>
@@ -180,13 +205,16 @@ export const Settings: React.FC = () => {
               <div key={i} className="group cursor-pointer">
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full bg-${source.color || 'blue'}-500 animate-pulse`}></div>
+                    <div className={`w-2 h-2 rounded-full ${bgMap[source.color || 'blue']} animate-pulse`}></div>
                     <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{source.name}</span>
                   </div>
                   <span className="text-[10px] font-black text-slate-400">{source.health}%</span>
                 </div>
                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className={`h-full bg-${source.color || 'blue'}-500 transition-all duration-1000`} style={{ width: `${source.health}%` }}></div>
+                  <div 
+                    className={`h-full ${bgMap[source.color || 'blue']} transition-all duration-1000`} 
+                    style={{ width: `${source.health}%` }}
+                  ></div>
                 </div>
               </div>
             ))}
@@ -197,7 +225,7 @@ export const Settings: React.FC = () => {
              <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-4">Ação de Sustentação</p>
              <h4 className="text-white text-sm font-bold leading-snug">Auditoria de 145 contas sem Owner identificado no CRM.</h4>
              <Button variant="ghost" className="w-full mt-6 text-white bg-white/10 hover:bg-white/20 font-black text-[9px] uppercase tracking-widest py-3 rounded-xl border border-white/10">
-               Rodar Auto-Fix de Mapeamento
+                Rodar Auto-Fix de Mapeamento
              </Button>
           </div>
         </Card>
@@ -247,13 +275,13 @@ export const Settings: React.FC = () => {
           
           <div className="space-y-4 mt-10">
             {[
-              { label: 'CRÍTICO (P0): Churn ou Risco Político', color: 'red', desc: 'Push + Email + Slack Urgent', val: true },
-              { label: 'ALERTA (P1): Mudança de ICP ou Signal Gap', color: 'amber', desc: 'Push + Slack Digest', val: true },
-              { label: 'OPORTUNIDADE (P2): Sinal de Intenção Médio', color: 'blue', desc: 'In-app Notification Only', val: false },
+              { label: 'CRÍTICO (P0): Churn ou Risco Político', color: 'red', desc: 'Push + Email + Slack Urgent', val: true, id: 'toggle-critical' },
+              { label: 'ALERTA (P1): Mudança de ICP ou Signal Gap', color: 'amber', desc: 'Push + Slack Digest', val: true, id: 'toggle-alert' },
+              { label: 'OPORTUNIDADE (P2): Sinal de Intenção Médio', color: 'blue', desc: 'In-app Notification Only', val: false, id: 'toggle-opp' },
             ].map((n, i) => (
               <div key={i} className="flex justify-between items-center p-5 border border-slate-100 rounded-3xl hover:bg-slate-50 transition-all cursor-pointer group">
                 <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-xl bg-${n.color || 'blue'}-50 text-${n.color || 'blue'}-600 group-hover:scale-110 transition-transform`}>
+                  <div className={`p-2 rounded-xl ${bgMap[`${n.color}-pale`] || 'bg-blue-50'} ${textMap[n.color] || 'text-blue-600'} group-hover:scale-110 transition-transform`}>
                     <AlertCircle className="w-5 h-5" />
                   </div>
                   <div>
@@ -261,7 +289,12 @@ export const Settings: React.FC = () => {
                     <p className="text-[10px] font-medium text-slate-500 mt-1">{n.desc}</p>
                   </div>
                 </div>
-                <button className={`w-10 h-6 rounded-full transition-colors ${n.val ? (n.color === 'red' ? 'bg-red-600' : n.color === 'amber' ? 'bg-amber-600' : 'bg-blue-600') : 'bg-slate-200'}`}>
+                <button 
+                  type="button"
+                  className={`w-10 h-6 rounded-full transition-colors ${n.val ? (n.color === 'red' ? 'bg-red-600' : n.color === 'amber' ? 'bg-amber-600' : 'bg-blue-600') : 'bg-slate-200'}`}
+                  aria-label={n.label}
+                  aria-pressed={n.val}
+                >
                   <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-all ${n.val ? 'translate-x-4' : ''}`} />
                 </button>
               </div>
