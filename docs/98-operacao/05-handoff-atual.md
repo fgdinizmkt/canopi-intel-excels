@@ -2,15 +2,15 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último recorte concluído:** Inteligência de Performance: Performance.tsx
+- **Último recorte concluído:** Opção B — Overview.tsx Consolidada (com cleanup técnico)
 - **Últimos commits relevantes:** 
-  - `a2ca782` (docs(operacao): registra inteligencia de performance na memoria do projeto)
+  - `7fdce40` (fix(overview): cleanup técnico — memoização, anomalias e derivações)
+  - `05c36c8` (feat(overview): consolidação inteligente — Performance + Actions Intelligence)
+  - `27bdd69` (feat(data): reconciliação explícita de datasets — vinculação accountId/relatedAccountId)
   - `1e7bf81` (feat(performance): adiciona leitura dinamica por canal e origem)
   - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
-  - `2cad13f` (refactor(settings): saneamento tecnico e blindagem de acessibilidade no control tower)
-  - `78d5e25` (docs(operacao): reconcilia hotfix 9e15033 na memoria operacional)
 - **Data:** 2026-04-06
-- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Sincronizado com origin/main)
+- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 6.86 kB Overview)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 
 ## Status de Qualidade (Auditado)
@@ -38,9 +38,9 @@
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual:** Reconciliação de datasets concluída (2026-04-06). Todos os 9 sinais vinculados a contas via `accountId`. Todas as 5 ações vinculadas via `relatedAccountId`. Contas órfãs e vazias classificadas com `reconciliationStatus`. Working tree limpa e sincronizada.
-- **Bloqueador Resolvido:** Dataset descoerência eliminada. Plataforma pronta para implementação de Opção B (Overview.tsx consolidada).
-- **Próximo Recorte da Fase 9:** **Opção B — Overview.tsx Consolidada** (Desbloqueada e aprovada para execução após esta reconciliação)
+- **Estado Atual (Opção B Concluída):** Overview.tsx consolidada com lógica de Performance + Actions reutilizada. 6 KPIs derivados dinamicamente. 4 tipos de anomalias implementadas e validadas. Cleanup técnico concluído (memoização, refatoração Origin Breakdown, derivações otimizadas). Working tree limpa e pronta para sincronização.
+- **Validação Completada:** Hierarquia visual coerente, 6 KPIs claros, datasets reconciliados, contas 'vazia' filtradas corretamente. Build: Exit 0, todas 16 rotas compilam (6.86 kB).
+- **Status de Opção B:** ✅ Pronto para encerramento. Nenhum novo recorte funcional iniciado.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

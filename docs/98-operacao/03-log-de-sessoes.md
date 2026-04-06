@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Opção B (Overview.tsx): Cleanup Técnico & Validação Concluída
+- **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de Opção B)
+- **Alvo:** `src/pages/Overview.tsx` — validação e cleanup técnico
+- **Problemas Corrigidos:**
+  1. Origin Breakdown: extraído de useMemo inline, dependency list corrigida
+  2. Anomalias incompletas: adicionadas Congestionamento + Cascata (4/4 tipos agora)
+  3. Derivações sem memoização: consolidadas em useMemo (performance)
+- **Anomalias Implementadas (4 tipos):**
+  - Ghosting: ação crítica sem owner 24h+
+  - Vazão Baixa: origem >= 3 ações, 0 conclusões
+  - Congestionamento: >= 3 ações críticas/altas no canal
+  - Cascata: >= 2 ações bloqueadas/vencidas na conta
+- **Validação:** Hierarquia visual coerente, 6 KPIs claros, datasets reconciliados, contas 'vazia' filtradas
+- **Build:** `npm run build` — Exit 0, todas 16 rotas compilam (6.86 kB Overview)
+- **Commit:** `7fdce40` — fix(overview): cleanup técnico — memoização, anomalias e derivações
+- **Status:** ✅ Recorte pronto para encerramento
+
+---
+
 ## [2026-04-06] — Opção B (Overview.tsx Consolidada): Implementação Concluída
 - **Fase:** Fase 9 — Data Intelligence & Scale
 - **Alvo:** `src/pages/Overview.tsx` — painel de controle inteligente centralizado
