@@ -10,36 +10,48 @@ import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
 
 export const Overview: React.FC = () => {
-  // ─── DERIVAÇÃO DE SINAIS (Nível de Severidade) ─────────────────────────
-  const criticosSinais = advancedSignals.filter(s => s.severity === 'crítico');
-  const alertasSinais  = advancedSignals.filter(s => s.severity === 'alerta');
-  const oportunidadesSinais = advancedSignals.filter(s => s.severity === 'oportunidade');
-  const resolvedosSinais = advancedSignals.filter(s => s.resolved);
+  // ─── DERIVAÇÃO MEMOIZADA DE SINAIS (Nível de Severidade) ───────────────
+  const { criticosSinais, alertasSinais, oportunidadesSinais, resolvedosSinais, topSignal, saudeOperacional, topPrioridades } = useMemo(() => {
+    const crits = advancedSignals.filter(s => s.severity === 'crítico');
+    const alerts = advancedSignals.filter(s => s.severity === 'alerta');
+    const opps = advancedSignals.filter(s => s.severity === 'oportunidade');
+    const resolved = advancedSignals.filter(s => s.resolved);
 
-  // ─── EXECUTIVO (Sinal crítico de maior confiança) ──────────────────────
-  const topSignal = [...criticosSinais].sort((a, b) => b.confidence - a.confidence)[0];
+    // Executivo: sinal crítico de maior confiança
+    const top = [...crits].sort((a, b) => b.confidence - a.confidence)[0];
 
-  // ─── SAÚDE OPERACIONAL (1 por severity) ──────────────────────────────
-  const saudeOperacional = [
-    criticosSinais[0]
-      ? { title: criticosSinais[0].title, detail: criticosSinais[0].impact, border: 'border-red-500', titleCls: 'text-red-900', detailCls: 'text-red-600' }
-      : null,
-    alertasSinais[0]
-      ? { title: alertasSinais[0].title, detail: alertasSinais[0].impact, border: 'border-amber-500', titleCls: 'text-amber-900', detailCls: 'text-amber-600' }
-      : null,
-    oportunidadesSinais[0]
-      ? { title: oportunidadesSinais[0].title, detail: oportunidadesSinais[0].impact, border: 'border-brand', titleCls: 'text-brand', detailCls: 'text-brand' }
-      : null,
-  ].filter(Boolean) as { title: string; detail: string; border: string; titleCls: string; detailCls: string }[];
+    // Saúde operacional: 1 por severity
+    const saude = [
+      crits[0]
+        ? { title: crits[0].title, detail: crits[0].impact, border: 'border-red-500', titleCls: 'text-red-900', detailCls: 'text-red-600' }
+        : null,
+      alerts[0]
+        ? { title: alerts[0].title, detail: alerts[0].impact, border: 'border-amber-500', titleCls: 'text-amber-900', detailCls: 'text-amber-600' }
+        : null,
+      opps[0]
+        ? { title: opps[0].title, detail: opps[0].impact, border: 'border-brand', titleCls: 'text-brand', detailCls: 'text-brand' }
+        : null,
+    ].filter(Boolean) as { title: string; detail: string; border: string; titleCls: string; detailCls: string }[];
 
-  // ─── PRIORIDADES IMEDIATAS (Top 3 por severity + confidence) ───────────
-  const severityOrder: Record<string, number> = { crítico: 0, alerta: 1, oportunidade: 2 };
-  const topPrioridades = [...advancedSignals]
-    .sort((a, b) =>
-      (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9) ||
-      b.confidence - a.confidence
-    )
-    .slice(0, 3);
+    // Prioridades imediatas: top 3 por severity + confidence
+    const severityOrder: Record<string, number> = { crítico: 0, alerta: 1, oportunidade: 2 };
+    const priorities = [...advancedSignals]
+      .sort((a, b) =>
+        (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9) ||
+        b.confidence - a.confidence
+      )
+      .slice(0, 3);
+
+    return {
+      criticosSinais: crits,
+      alertasSinais: alerts,
+      oportunidadesSinais: opps,
+      resolvedosSinais: resolved,
+      topSignal: top,
+      saudeOperacional: saude,
+      topPrioridades: priorities
+    };
+  }, []);
 
   // ─── INTELIGÊNCIA DE PERFORMANCE (Dinamização por canal/origem) ────────
   const performanceMetrics = useMemo(() => {
@@ -74,7 +86,7 @@ export const Overview: React.FC = () => {
     };
   }, []);
 
-  // ─── INTELIGÊNCIA DE FILA (Detecção de anomalias) ──────────────────────
+  // ─── INTELIGÊNCIA DE FILA (Detecção de anomalias — 4 tipos) ──────────────
   const queueIntelligence = useMemo(() => {
     const allActions = initialActions;
     const now = new Date();
@@ -88,10 +100,10 @@ export const Overview: React.FC = () => {
     }).length;
     const noOwner = allActions.filter(a => !a.ownerName).length;
 
-    // Anomalias
+    // Anomalias (4 tipos)
     const foundAnomalies: Array<{ type: string; title: string; description: string; severity: 'high' | 'medium' }> = [];
 
-    // 1. Ações críticas sem owner há 24h+
+    // 1. GHOSTING: Ações críticas sem owner há 24h+
     const ghosted = allActions.find(a =>
       a.priority === 'Crítica' &&
       !a.ownerName &&
@@ -106,10 +118,11 @@ export const Overview: React.FC = () => {
       });
     }
 
-    // 2. Origem com concentração mas zero conclusões
+    // 2. VAZÃO BAIXA: Origem com >= 3 ações e 0 conclusões
     const originStats = allActions.reduce((acc, a) => {
       if (!acc[a.origin]) acc[a.origin] = { total: 0, done: 0 };
       acc[a.origin].total++;
+      if (a.status === 'Concluída') acc[a.origin].done++;
       return acc;
     }, {} as Record<string, { total: number; done: number }>);
 
@@ -124,12 +137,49 @@ export const Overview: React.FC = () => {
       }
     });
 
+    // 3. CONGESTIONAMENTO: >= 3 ações Críticas/Altas ativas no mesmo canal
+    const channelCrit = allActions.reduce((acc, a) => {
+      if (a.status !== 'Concluída' && (a.priority === 'Crítica' || a.priority === 'Alta')) {
+        acc[a.channel] = (acc[a.channel] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    Object.entries(channelCrit).forEach(([channel, count]) => {
+      if (count >= 3) {
+        foundAnomalies.push({
+          type: 'Congestionamento',
+          title: `Fila Crítica: ${channel}`,
+          description: `Concentração de ${count} ações de alta prioridade. Risco de gargalo.`,
+          severity: 'high'
+        });
+      }
+    });
+
+    // 4. CASCATA: >= 2 ações Bloqueadas ou Vencidas na mesma conta
+    const accStats = allActions.reduce((acc, a) => {
+      if (!acc[a.accountName]) acc[a.accountName] = 0;
+      if (a.status === 'Bloqueada' || a.slaStatus === 'vencido') acc[a.accountName]++;
+      return acc;
+    }, {} as Record<string, number>);
+
+    Object.entries(accStats).forEach(([accName, count]) => {
+      if (count >= 2) {
+        foundAnomalies.push({
+          type: 'Bloqueio',
+          title: `Cascata: ${accName}`,
+          description: `Conta com ${count} impeditivos simultâneos. Paralisia operacional.`,
+          severity: 'high'
+        });
+      }
+    });
+
     return {
       total,
       critical,
       delayed,
       noOwner,
-      anomalies: foundAnomalies.slice(0, 2)
+      anomalies: foundAnomalies.slice(0, 2) // Mostrar top 2
     };
   }, []);
 
@@ -148,6 +198,24 @@ export const Overview: React.FC = () => {
     { label: 'Outbound',       ...getChannelStatus('Outbound') },
     { label: 'Tráfego Pago',   ...getChannelStatus('Canal') },
   ];
+
+  // ─── ORIGIN BREAKDOWN (Análise dinâmica de volume e vazão por origem) ────
+  const originBreakdown = useMemo(() => {
+    const breakdown = advancedSignals.reduce((acc, s) => {
+      if (!acc[s.source]) acc[s.source] = { total: 0, resolved: 0 };
+      acc[s.source].total++;
+      if (s.resolved) acc[s.source].resolved++;
+      return acc;
+    }, {} as Record<string, { total: number; resolved: number }>);
+
+    return Object.entries(breakdown)
+      .sort((a, b) => b[1].total - a[1].total)
+      .map(([origin, stats]) => {
+        const pct = Math.round((stats.total / advancedSignals.length) * 100);
+        const resRate = stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0;
+        return { origin, pct, resRate, total: stats.total };
+      });
+  }, []);
 
   // ─── ABM READINESS (Contas com prontidão > 70) ──────────────────────────
   const abmReadyAccounts = contasMock
@@ -382,35 +450,20 @@ export const Overview: React.FC = () => {
           {/* Performance por Origem (Inteligência Dinâmica) */}
           <Card title="Volume e Vazão por Origem de Sinal">
             <div className="space-y-6 pt-4">
-              {useMemo(() => {
-                const originBreakdown = advancedSignals.reduce((acc, s) => {
-                  if (!acc[s.source]) acc[s.source] = { total: 0, resolved: 0 };
-                  acc[s.source].total++;
-                  if (s.resolved) acc[s.source].resolved++;
-                  return acc;
-                }, {} as Record<string, { total: number; resolved: number }>);
-
-                return Object.entries(originBreakdown)
-                  .sort((a, b) => b[1].total - a[1].total)
-                  .map(([origin, stats]) => {
-                    const pct = Math.round((stats.total / advancedSignals.length) * 100);
-                    const resRate = stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0;
-                    return (
-                      <div key={origin} className="space-y-2">
-                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-                          <div>
-                            <span className="text-slate-900">{origin}</span>
-                            <span className="text-slate-400 ml-2">({stats.total} sinais)</span>
-                          </div>
-                          <span className="text-slate-500">{pct}% · {resRate}% resolvido</span>
-                        </div>
-                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-brand" style={{ width: `${pct}%` }}></div>
-                        </div>
-                      </div>
-                    );
-                  });
-              }, [])}
+              {originBreakdown.map((item) => (
+                <div key={item.origin} className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                    <div>
+                      <span className="text-slate-900">{item.origin}</span>
+                      <span className="text-slate-400 ml-2">({item.total} sinais)</span>
+                    </div>
+                    <span className="text-slate-500">{item.pct}% · {item.resRate}% resolvido</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-brand" style={{ width: `${item.pct}%` }}></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
         </div>
