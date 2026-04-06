@@ -3,23 +3,23 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles } from 'lucide-react';
-import { kpis, accountsAtRisk, pipelineInfluence } from '../data/mockData';
+import React, { useMemo } from 'react';
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap } from 'lucide-react';
 import { advancedSignals } from '../data/signalsV6';
-import { contasMock } from '../data/accountsData';
+import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
 
 export const Overview: React.FC = () => {
-  // Derivações de sinais reais
+  // ─── DERIVAÇÃO DE SINAIS (Nível de Severidade) ─────────────────────────
   const criticosSinais = advancedSignals.filter(s => s.severity === 'crítico');
   const alertasSinais  = advancedSignals.filter(s => s.severity === 'alerta');
   const oportunidadesSinais = advancedSignals.filter(s => s.severity === 'oportunidade');
+  const resolvedosSinais = advancedSignals.filter(s => s.resolved);
 
-  // Executive Highlight: sinal crítico de maior confiança
+  // ─── EXECUTIVO (Sinal crítico de maior confiança) ──────────────────────
   const topSignal = [...criticosSinais].sort((a, b) => b.confidence - a.confidence)[0];
 
-  // Saúde Operacional: 1 representante de cada severity
+  // ─── SAÚDE OPERACIONAL (1 por severity) ──────────────────────────────
   const saudeOperacional = [
     criticosSinais[0]
       ? { title: criticosSinais[0].title, detail: criticosSinais[0].impact, border: 'border-red-500', titleCls: 'text-red-900', detailCls: 'text-red-600' }
@@ -32,7 +32,7 @@ export const Overview: React.FC = () => {
       : null,
   ].filter(Boolean) as { title: string; detail: string; border: string; titleCls: string; detailCls: string }[];
 
-  // Prioridades Imediatas: top 3 por severity desc → confidence desc
+  // ─── PRIORIDADES IMEDIATAS (Top 3 por severity + confidence) ───────────
   const severityOrder: Record<string, number> = { crítico: 0, alerta: 1, oportunidade: 2 };
   const topPrioridades = [...advancedSignals]
     .sort((a, b) =>
@@ -41,12 +41,99 @@ export const Overview: React.FC = () => {
     )
     .slice(0, 3);
 
-  // ABM Readiness: contas com prontidão > 70 e play ativo
-  const abmReadyAccounts = contasMock
-    .filter(c => c.prontidao > 70 && c.playAtivo !== 'Nenhum')
-    .slice(0, 2);
+  // ─── INTELIGÊNCIA DE PERFORMANCE (Dinamização por canal/origem) ────────
+  const performanceMetrics = useMemo(() => {
+    const allSignals = advancedSignals.filter(s => !s.archived && s.resolved === false);
 
-  // Channel Health: pior severity por categoria de sinal
+    // Pipeline associado: contagem de contas ativas com sinais ativos
+    const accountsWithSignals = new Set(allSignals.map(s => s.accountId || s.account));
+    const activeAccountsCount = accountsWithSignals.size;
+    const totalPipeline = activeAccountsCount > 0 ? `R$ ${(activeAccountsCount * 215)}k` : 'R$ 0';
+
+    // Taxa de conversão: baseada em sinais resolvidos
+    const conversionRate = advancedSignals.length > 0
+      ? Math.round((resolvedosSinais.length / advancedSignals.length) * 100)
+      : 0;
+
+    // Melhor origem por volume
+    const originVolume = advancedSignals.reduce((acc, s) => {
+      acc[s.source] = (acc[s.source] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const bestOrigin = Object.entries(originVolume)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+    return {
+      totalPipeline,
+      conversionRate,
+      bestOrigin,
+      activeAccounts: activeAccountsCount,
+      totalSignals: advancedSignals.length,
+      resolvedSignals: resolvedosSinais.length
+    };
+  }, []);
+
+  // ─── INTELIGÊNCIA DE FILA (Detecção de anomalias) ──────────────────────
+  const queueIntelligence = useMemo(() => {
+    const allActions = initialActions;
+    const now = new Date();
+
+    // Métricas básicas
+    const total = allActions.length;
+    const critical = allActions.filter(a => a.priority === 'Crítica').length;
+    const delayed = allActions.filter(a => {
+      const created = new Date(a.createdAt || '2026-04-03T09:00:00Z');
+      return (now.getTime() - created.getTime()) > (24 * 60 * 60 * 1000);
+    }).length;
+    const noOwner = allActions.filter(a => !a.ownerName).length;
+
+    // Anomalias
+    const foundAnomalies: Array<{ type: string; title: string; description: string; severity: 'high' | 'medium' }> = [];
+
+    // 1. Ações críticas sem owner há 24h+
+    const ghosted = allActions.find(a =>
+      a.priority === 'Crítica' &&
+      !a.ownerName &&
+      (now.getTime() - new Date(a.createdAt || '2026-04-03T09:00:00Z').getTime()) > (24 * 60 * 60 * 1000)
+    );
+    if (ghosted) {
+      foundAnomalies.push({
+        type: 'Ghosting',
+        title: 'Atribuição Crítica Pendente',
+        description: `Ação na ${ghosted.accountName} sem responsável há 24h+`,
+        severity: 'high'
+      });
+    }
+
+    // 2. Origem com concentração mas zero conclusões
+    const originStats = allActions.reduce((acc, a) => {
+      if (!acc[a.origin]) acc[a.origin] = { total: 0, done: 0 };
+      acc[a.origin].total++;
+      return acc;
+    }, {} as Record<string, { total: number; done: number }>);
+
+    Object.entries(originStats).forEach(([origin, stats]) => {
+      if (stats.total >= 3 && stats.done === 0) {
+        foundAnomalies.push({
+          type: 'Vazão',
+          title: `Baixa Vazão: ${origin}`,
+          description: `${stats.total} ações sem conclusão. Investigar bloqueios.`,
+          severity: 'medium'
+        });
+      }
+    });
+
+    return {
+      total,
+      critical,
+      delayed,
+      noOwner,
+      anomalies: foundAnomalies.slice(0, 2)
+    };
+  }, []);
+
+  // ─── SAÚDE DOS CANAIS ───────────────────────────────────────────────────
   const getChannelStatus = (category: string): { status: string; variant: string } => {
     const sinais = advancedSignals.filter(s => s.category === category);
     if (sinais.some(s => s.severity === 'crítico'))    return { status: 'Crítico', variant: 'red' };
@@ -61,6 +148,11 @@ export const Overview: React.FC = () => {
     { label: 'Outbound',       ...getChannelStatus('Outbound') },
     { label: 'Tráfego Pago',   ...getChannelStatus('Canal') },
   ];
+
+  // ─── ABM READINESS (Contas com prontidão > 70) ──────────────────────────
+  const abmReadyAccounts = contasMock
+    .filter(c => c.prontidao > 70 && c.playAtivo !== 'Nenhum' && c.reconciliationStatus !== 'vazia')
+    .slice(0, 2);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -85,33 +177,93 @@ export const Overview: React.FC = () => {
         </div>
       </header>
 
-      {/* KPIs Section */}
+      {/* KPIs Section — Consolidados (Performance + Actions) */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {kpis.map((kpi, index) => (
-          <div key={index} className={`p-5 rounded-2xl border border-slate-100 shadow-sm ${index === 0 ? 'bg-brand text-white' : 'bg-white text-slate-900'}`}>
-            <p className={`text-[10px] font-bold uppercase tracking-widest ${index === 0 ? 'text-brand-100' : 'text-slate-400'}`}>{kpi.label}</p>
-            <div className="mt-2 flex items-end justify-between">
-              <div>
-                <h3 className="text-2xl font-bold font-headline">
-                  {kpi.prefix}{kpi.value}{kpi.suffix}
-                </h3>
-                <div className={`flex items-center gap-1 text-[10px] font-bold mt-1 ${
-                  kpi.trend === 'up' ? (index === 0 ? 'text-white/80' : 'text-emerald-600') :
-                  kpi.trend === 'down' ? 'text-red-500' : 'text-slate-400'
-                }`}>
-                  {kpi.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : kpi.trend === 'down' ? <TrendingDown className="w-3 h-3" /> : null}
-                  {kpi.change > 0 ? `+${kpi.change}%` : kpi.change === 0 ? '0%' : `${kpi.change}%`}
-                  {index === 0 && <span className="ml-1 opacity-70">vs mês anterior</span>}
-                </div>
+        {/* KPI 1: Pipeline (Performance) */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-brand text-white">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-100">Pipeline Total</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-2xl font-bold font-headline">{performanceMetrics.totalPipeline}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-white/80">
+                <TrendingUp className="w-3 h-3" />
+                <span>{performanceMetrics.activeAccounts} contas ativas</span>
               </div>
-              {index === 0 && (
-                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-              )}
+            </div>
+            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* KPI 2: Conversão (Performance) */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Taxa de Conversão</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-2xl font-bold font-headline">{performanceMetrics.conversionRate}%</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-emerald-600">
+                <CheckCircle2 className="w-3 h-3" />
+                <span>{performanceMetrics.resolvedSignals}/{performanceMetrics.totalSignals} resolvidos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 3: Sinais Ativos */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sinais Ativos</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-2xl font-bold font-headline">{advancedSignals.length}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-red-600">
+                <AlertTriangle className="w-3 h-3" />
+                <span>{criticosSinais.length} críticos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 4: Ações Críticas (Queue Intelligence) */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ações Críticas</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-2xl font-bold font-headline">{queueIntelligence.critical}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-slate-400">
+                <span>fila operacional</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 5: Em Risco de SLA (Queue Intelligence) */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">SLA em Risco</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-2xl font-bold font-headline">{queueIntelligence.delayed}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-amber-600">
+                <Zap className="w-3 h-3" />
+                <span>atrasadas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 6: Melhor Origem (Performance) */}
+        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Maior Volume</p>
+          <div className="mt-2 flex items-end justify-between">
+            <div>
+              <h3 className="text-xl font-bold font-headline">{performanceMetrics.bestOrigin}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-emerald-600">
+                <TrendingUp className="w-3 h-3" />
+                <span>origem principal</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -142,39 +294,65 @@ export const Overview: React.FC = () => {
             </Card>
           )}
 
-          {/* Accounts at Risk */}
-          <Card title="Contas em Risco de Churn / Baixo Engajamento" headerAction={<Button variant="ghost" size="sm" className="text-brand font-bold">Ver todas</Button>}>
+          {/* Performance Insights — O que está melhorando */}
+          <Card className="border-l-4 border-l-emerald-500">
+            <div className="relative z-10">
+              <Badge variant="slate" className="mb-4 bg-emerald-50 text-emerald-700 border-emerald-100">PERFORMANCE & CONVERSÃO</Badge>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">O que está melhorando</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sinais Resolvidos</p>
+                  <div className="flex items-end gap-3">
+                    <h4 className="text-3xl font-bold text-emerald-600">{performanceMetrics.resolvedSignals}</h4>
+                    <p className="text-xs text-slate-500 mb-1">{Math.round((performanceMetrics.resolvedSignals / performanceMetrics.totalSignals) * 100)}% do total</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Taxa de Conversão</p>
+                  <div className="flex items-end gap-3">
+                    <h4 className="text-3xl font-bold text-emerald-600">{performanceMetrics.conversionRate}%</h4>
+                    <p className="text-xs text-slate-500 mb-1">acima da meta</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Origem Destaque</p>
+                  <div className="flex items-end gap-3">
+                    <h4 className="text-2xl font-bold text-emerald-600">{performanceMetrics.bestOrigin}</h4>
+                    <p className="text-xs text-slate-500 mb-1">melhor performance</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Contas com Sinais Críticos */}
+          <Card title="Contas com Alertas Críticos" headerAction={<Button variant="ghost" size="sm" className="text-brand font-bold">Ver todas</Button>}>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-50">
-                    <th className="pb-4">NOME DA CONTA</th>
-                    <th className="pb-4">SCORE DE SAÚDE</th>
-                    <th className="pb-4">PRINCIPAIS LACUNAS</th>
-                    <th className="pb-4 text-right">AÇÃO</th>
+                    <th className="pb-4">CONTA</th>
+                    <th className="pb-4">SINAL CRÍTICO</th>
+                    <th className="pb-4">OWNER</th>
+                    <th className="pb-4 text-right">CONFIANÇA</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {accountsAtRisk.map((account) => (
-                    <tr key={account.id} className="group hover:bg-slate-50/50 transition-colors">
+                  {criticosSinais.slice(0, 3).map((signal) => (
+                    <tr key={signal.id} className="group hover:bg-slate-50/50 transition-colors">
                       <td className="py-4">
-                        <p className="font-bold text-slate-900">{account.name}</p>
+                        <p className="font-bold text-slate-900">{signal.account}</p>
                       </td>
                       <td className="py-4">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${account.healthScore < 40 ? 'bg-red-500' : 'bg-amber-500'}`}></div>
-                          <span className={`font-bold ${account.healthScore < 40 ? 'text-red-600' : 'text-amber-600'}`}>
-                            {account.healthScore}/100
-                          </span>
-                        </div>
+                        <p className="text-xs text-slate-600 max-w-xs truncate">{signal.title}</p>
                       </td>
                       <td className="py-4">
-                        <p className="text-xs text-slate-500">{account.gaps[0]}</p>
+                        <p className="text-xs font-medium text-slate-500">{signal.owner}</p>
                       </td>
                       <td className="py-4 text-right">
-                        <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-                          <MoreHorizontal className="w-5 h-5" />
-                        </button>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-100">
+                          {signal.confidence}%
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -201,20 +379,38 @@ export const Overview: React.FC = () => {
             </section>
           </div>
 
-          {/* Pipeline Influence */}
-          <Card title="Influência de Pipeline por Origem">
+          {/* Performance por Origem (Inteligência Dinâmica) */}
+          <Card title="Volume e Vazão por Origem de Sinal">
             <div className="space-y-6 pt-4">
-              {pipelineInfluence.map((item, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-                    <span className="text-slate-500">{item.label}</span>
-                    <span className="text-slate-900">{item.value}%</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full ${item.color}`} style={{ width: `${item.value}%` }}></div>
-                  </div>
-                </div>
-              ))}
+              {useMemo(() => {
+                const originBreakdown = advancedSignals.reduce((acc, s) => {
+                  if (!acc[s.source]) acc[s.source] = { total: 0, resolved: 0 };
+                  acc[s.source].total++;
+                  if (s.resolved) acc[s.source].resolved++;
+                  return acc;
+                }, {} as Record<string, { total: number; resolved: number }>);
+
+                return Object.entries(originBreakdown)
+                  .sort((a, b) => b[1].total - a[1].total)
+                  .map(([origin, stats]) => {
+                    const pct = Math.round((stats.total / advancedSignals.length) * 100);
+                    const resRate = stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0;
+                    return (
+                      <div key={origin} className="space-y-2">
+                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                          <div>
+                            <span className="text-slate-900">{origin}</span>
+                            <span className="text-slate-400 ml-2">({stats.total} sinais)</span>
+                          </div>
+                          <span className="text-slate-500">{pct}% · {resRate}% resolvido</span>
+                        </div>
+                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-brand" style={{ width: `${pct}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  });
+              }, [])}
             </div>
           </Card>
         </div>
@@ -237,26 +433,45 @@ export const Overview: React.FC = () => {
             </div>
           </div>
 
-          {/* Immediate Priorities */}
-          <Card title="Prioridades Imediatas">
+          {/* Immediate Priorities + Anomalies */}
+          <Card title="Prioridades e Insights">
             <div className="space-y-5">
-              {topPrioridades.map((signal) => (
-                <div key={signal.id} className="flex items-center justify-between group cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 uppercase">
-                      {signal.account.substring(0, 2)}
+              {/* Seção 1: Top 3 Sinais */}
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Sinais Críticos</p>
+                {topPrioridades.map((signal) => (
+                  <div key={signal.id} className="flex items-center justify-between group cursor-pointer mb-3 pb-3 border-b border-slate-100 last:border-b-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 uppercase">
+                        {signal.account.substring(0, 2)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 group-hover:text-brand transition-colors">{signal.title}</p>
+                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{signal.account}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900 group-hover:text-brand transition-colors">{signal.title}</p>
-                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{signal.account} · {signal.owner}</p>
-                    </div>
+                    <Badge variant={signal.severity === 'crítico' ? 'red' : signal.severity === 'alerta' ? 'amber' : 'slate'}>
+                      {signal.severity}
+                    </Badge>
                   </div>
-                  <Badge variant={signal.severity === 'crítico' ? 'red' : signal.severity === 'alerta' ? 'amber' : 'slate'}>
-                    {signal.severity}
-                  </Badge>
+                ))}
+              </div>
+
+              {/* Seção 2: Anomalias da Fila (se houver) */}
+              {queueIntelligence.anomalies.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Insights Operacionais</p>
+                  {queueIntelligence.anomalies.map((ano, i) => (
+                    <div key={i} className={`p-3 rounded-lg mb-2 border-l-4 ${ano.severity === 'high' ? 'border-l-red-500 bg-red-50' : 'border-l-amber-500 bg-amber-50'}`}>
+                      <p className={`text-xs font-bold ${ano.severity === 'high' ? 'text-red-900' : 'text-amber-900'}`}>{ano.type}</p>
+                      <p className={`text-[10px] ${ano.severity === 'high' ? 'text-red-700' : 'text-amber-700'} mt-1`}>{ano.title}</p>
+                      <p className={`text-[10px] ${ano.severity === 'high' ? 'text-red-600' : 'text-amber-600'} mt-0.5`}>{ano.description}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              <Button variant="secondary" className="w-full mt-4 bg-slate-100 text-slate-900 hover:bg-slate-200 border-none">Ver Minha Agenda</Button>
+              )}
+
+              <Button variant="secondary" className="w-full mt-4 bg-slate-100 text-slate-900 hover:bg-slate-200 border-none">Ver Fila de Ações</Button>
             </div>
           </Card>
 
