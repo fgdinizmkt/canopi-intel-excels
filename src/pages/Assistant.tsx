@@ -389,25 +389,32 @@ export const Assistant: React.FC = () => {
 
       <div className="grid grid-cols-3 gap-6">
         {/* Chat Interface */}
-        <Card className="col-span-2 p-6 flex flex-col h-[500px]">
+        <Card className="col-span-2 p-6 flex flex-col h-[600px]">
           <h3 className="font-bold mb-4 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-blue-600"/> Chat com Assistente Estratégico
           </h3>
 
-          <div className="flex-1 overflow-y-auto space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          {/* Messages Area — min-h-0 crucial para flex overflow */}
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
                 className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`p-3 rounded-lg shadow-sm text-sm max-w-[85%] prose prose-sm ${
+                  className={`p-3 rounded-lg shadow-sm text-sm max-w-[85%] break-words overflow-hidden prose prose-sm prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:my-2 ${
                     msg.role === 'user'
                       ? 'bg-blue-600 text-white prose-invert'
                       : 'bg-white text-slate-800 border border-slate-100'
                   }`}
                 >
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <ReactMarkdown
+                    components={{
+                      p: ({node, ...props}) => <p style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}} {...props} />,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
                 </div>
               </div>
             ))}
@@ -421,7 +428,8 @@ export const Assistant: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="mt-4 flex gap-2">
+          {/* Input Area — flex-shrink-0 para garantir que não encolha */}
+          <div className="flex-shrink-0 mt-4 flex gap-2">
             <input
               type="text"
               value={input}
@@ -433,7 +441,7 @@ export const Assistant: React.FC = () => {
               className="flex-1 p-3 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             />
-            <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0">
+            <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0 flex-shrink-0">
               <Send className="w-5 h-5" />
             </Button>
           </div>

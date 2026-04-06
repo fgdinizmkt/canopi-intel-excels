@@ -1,5 +1,13 @@
 import { GoogleGenAI } from '@google/genai';
 
+// ─── Validação de Chave de API ───────────────────────────────────────
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error('[SECURITY] GEMINI_API_KEY não configurada em variáveis de ambiente');
+}
+if (!process.env.GEMINI_API_KEY.startsWith('AIza')) {
+  throw new Error('[SECURITY] GEMINI_API_KEY inválida ou corrompida (não começa com AIza)');
+}
+
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const SYSTEM_INSTRUCTION = `Você vai atuar como estrategista de produto, arquiteto funcional, analista de UX, analista de dados e copiloto de documentação para a plataforma Canopi | intel excels.
@@ -917,10 +925,24 @@ export async function POST(req: Request) {
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     );
   } catch (error: any) {
-    console.error('Erro no /api/chat:', error);
+    // ─── Sanitização de Logging ───────────────────────────────────────
+    // Log apenas informações não-sensíveis (name, truncated message, status)
+    console.error('[API Error]', {
+      name: error?.name || 'UnknownError',
+      message: error?.message?.slice(0, 100) || 'No message',
+      status: error?.status || 'N/A',
+    });
+
+    // ─── Resposta Genérica (sem expor error.message) ──────────────────
+    // Diferencia apenas entre 403 (credenciais) e erro genérico
+    const isAuthError = error?.status === 403;
+    const errorMessage = isAuthError
+      ? 'Credenciais inválidas. Verifique a configuração do API Key.'
+      : 'Erro ao processar sua solicitação. Tente novamente.';
+
     return new Response(
-      JSON.stringify({ error: error.message || 'Erro interno no assistente IA' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
+      JSON.stringify({ error: errorMessage }),
+      { status: error?.status || 500, headers: { 'Content-Type': 'application/json' } },
     );
   }
 }
