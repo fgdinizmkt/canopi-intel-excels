@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-06 (Hotfix de Integridade em Actions: 9e15033)
+ `main` — atualizada em 2026-04-06 (Documentação de Inteligência de Performance: a2ca782)
 
 ## Fase atual do plano
 **Fase 9 — Data Intelligence & Scale** (Próximo Marco - Definição Pendente)
