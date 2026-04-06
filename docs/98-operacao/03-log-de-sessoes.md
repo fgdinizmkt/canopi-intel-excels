@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Hotfix de Integridade: Fila Operacional (Metrics)
+- **Fase:** Fase 9 — Data Intelligence & Scale (Alinhamento Documental)
+- **Alvo:** `src/pages/Actions.tsx` (Bloco de `metrics`)
+- **Ação:** Restauração da integridade do bloco de métricas operacionais.
+- **Decisões:**
+  - Correção técnica das variáveis de estado no escopo do `useMemo` para garantir cálculos precisos e estabilidade de runtime.
+  - Preservação da fórmula de conversão refinada: `(concluídas / (total - novas))`.
+- **Commit:** `9e15033` — fix(actions): corrige métricas da fila operacional.
+- **Resultado:** Página de Ações restaurada e funcional, com build íntegro.
+
+---
+
 ## [2026-04-04] — Marco Operacional & Analítico (Fechamento)
 - **Fase:** Fase 8 — Operational Efficiency (Encerramento do Marco)
 - **Escopo:** Operacionalização do Canopi como motor de execução local-first.

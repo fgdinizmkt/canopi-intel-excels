@@ -1,12 +1,13 @@
 # 05 - Handoff atual
 
 ## Estado atual
-- **Fase:** Fase 8 — Operational Efficiency (Marco Concluído)
-- **Último recorte concluído:** Marco Operacional & Analítico (Commits f0afafd, 098f21d)
+- **Fase:** Fase 9 — Data Intelligence & Scale
+- **Último recorte concluído:** Hotfix de Integridade em Actions (Commit 9e15033)
 - **Últimos commits relevantes:** 
-  - `098f21d` (feat: adiciona camada analítica operacional à queue da Canopi)
-  - `f0afafd` (feat: implementa lifecycle operacional da fila com reflexo nas entidades)
-- **Data:** 2026-04-04
+  - `9e15033` (fix(actions): corrige métricas da fila operacional)
+  - `40bd2de` (refactor(actions): refina coerencia percentual e ranking analitico)
+  - `43593d6` (docs: encerramento formal do marco operacional e analítico)
+- **Data:** 2026-04-06
 - **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, Lint 100% OK, Reconciliado com origin/main)
 - **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
 

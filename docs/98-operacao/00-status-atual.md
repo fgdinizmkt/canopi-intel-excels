@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — atualizada em 2026-04-04 (Marco Operacional & Analítico Concluído)
+ `main` — atualizada em 2026-04-06 (Hotfix de Integridade em Actions: 9e15033)
 
 ## Fase atual do plano
 **Fase 9 — Data Intelligence & Scale** (Próximo Marco - Definição Pendente)
@@ -16,11 +16,12 @@
 - **Persistência:** Implementação de `localStorage` para `sessionActions` e `sessionLogs` no `AccountDetailContext`.
 - **UX Operativa:** CTAs do Command Center (Executar Playbook, Registrar Log) agora materializam ações reais na fila global.
 
-**Camada Analítica Operacional (Commit `098f21d`)**
+**Camada Analítica Operacional (Commit `098f21d` + Hotfix `9e15033`)**
 - **Métricas de Conversão:** Implementação de cálculo dinâmico de taxa de conclusão (Conversion Rate) na `Actions.tsx`.
+- **Restauração de Integridade:** Correção tática do bloco de métricas operacionais (Commit `9e15033`).
 - **Inteligência de Aging:** Rastreamento de ações estagnadas (+48h) via campo `createdAt` injetado no schema.
-- **Dashboard Hero:** Expansão da UI de `Actions` com 7 KPIs críticos (Total, Críticas, Em andamento, Risco SLA, Conversão, Aging, Sem Owner).
-- **Build de Produção:** Validado com `npm run build` (sucesso completo).
+- **Dashboard de Performance:** Painel de indicadores operacionais da fila global consolidado e funcional.
+- **Build de Produção:** Validado com `npm run build` após hotfix (sucesso completo).
 
 ---
 **Recorte 18 — Auditoria de Conformidade: Contacts.tsx**
