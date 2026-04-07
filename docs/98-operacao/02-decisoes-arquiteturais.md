@@ -80,6 +80,25 @@ Registrar decisões técnicas e de produto já tomadas e consolidadas, para evit
 
 ---
 
+### 8. Migração Supabase: estratégia defensiva e gradual
+**Decisão:** Migração para Supabase segue padrão read-only, defensivo e gradual sem quebra de funcionalidade.
+
+**Implicação estrutural:**
+- **Repository pattern:** cada entidade tem `src/lib/{entity}Repository.ts` com `get{Entity}()` retornando tipo canônico
+- **Fallback completo:** se Supabase não configurado ou erro → volta a mock imediatamente (sem falha)
+- **Merge com mock:** dados do Supabase são mergeados com mock para campos não migrados ainda (sinais, ações, contatos, ABM, ABX, etc)
+- **Shell seguro:** contas novas no Supabase sem mock correspondente recebem shell explícito com todos campos obrigatórios preenchidos (não cast frouxo)
+- **Read-only primeiro:** primeira migração (E2) é apenas leitura. Writes vêm em recortes futuros
+- **Logging de observabilidade:** pontos-chave de fallback e sucesso logam para visibilidade em prod
+
+**Decisão de produto:** mocks nunca são removidos. São stepping stones para real data. Sua vida útil é prolongada enquanto migração acontece.
+
+**Dado real:** `src/lib/accountsRepository.ts` (Recorte 22) implementa padrão para `Conta` — serve de template para futuras entidades.
+
+**Commits:** `fd5b46d` (E1 preparação), `15ce264` (E2 primeira migração)
+
+---
+
 ### 8. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

@@ -5,6 +5,38 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 22 (Supabase E2): Primeira Migração de Entidade (accounts) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Primeira migração real: accounts lidos do Supabase)
+- **Alto:** Implementar camada de repositório defensiva para leitura de contas do Supabase com fallback seguro.
+- **Contexto:** Recorte 21 preparou infraestrutura Supabase. Recorte 22 inicia migração real com primeira entidade (accounts). Estratégia: read-only, merge com mock para campos não migrados, shell seguro para contas novas.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/accountsRepository.ts`:**
+    * Type `AccountRow`: tipagem alinhada com `Conta` (risco: number, atividadeRecente: union, playAtivo: union, statusGeral: union, tipoEstrategico: TipoEstrategico)
+    * Função `getAccounts()`: 
+      - Query 24 campos mínimos do Supabase
+      - Merge com contasMock (busca por id OU slug)
+      - Shell seguro explícito para contas sem mock: todos campos obrigatórios preenchidos com valores defaults seguros (campos profundos vazios)
+      - Fallback completo: se Supabase não configurado, erro, ou sem dados → contasMock
+      - Logging em 5 pontos: config, error, warning (shell), success, exception
+    * `getAccountById()` removida (não usada no recorte)
+  - **Modificação `src/pages/Accounts.tsx`:**
+    * +import `getAccounts` do repositório
+    * +estado `[contas, setContas]` para armazenar dados carregados
+    * useEffect refatorado: async `carregarContas()` chamada fora do try/catch, cleanup de timeout no corpo do effect (não dentro do async)
+    * Fallback: setContas(contasMock) em erro
+    * Todas as métricas, filtros, opcoes, coberturaBase alimentadas por `contas` ao invés de `contasMock` direto
+    * Dependencies corretos nos useMemo: adicionado `contas` onde necessário
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 205 insertions(+), 18 deletions(-)
+    * Tipagem: AccountRow alinhada 100% com interface Conta
+    * Fallback: seguro em todos cenários (dev sem Supabase, error, shell)
+    * Dev environment: logs mostram "Supabase não configurado" e fallback para contasMock funciona
+- **Commit:** `15ce264` — feat(supabase): Recorte 22 — E2: Primeira Migração de Entidade (accounts)
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 17 (Assistant Orquestrador): Encaminhamento Profundo — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de circuito: Cards → Deep-links contextuais)
 - **Alvo:** Converter cards acionáveis em deep-links específicos para cada tipo de entidade

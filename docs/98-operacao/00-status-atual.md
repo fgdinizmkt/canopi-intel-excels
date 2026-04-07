@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 21 — Supabase E1: Preparação de Ambiente: fd5b46d, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 22 — Supabase E2: Primeira Migração de Entidade: 15ce264, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Iniciada - Último Recorte: Recorte 21 — Supabase E1: Preparação de Ambiente)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 22 — Supabase E2: Primeira Migração de Entidade)
 
 ---
 
@@ -236,10 +236,24 @@
   - **Commits:** `f9cf7a7` (feat) + `e884885` (docs)
   - **Status:** ✅ Publicado em origin/main
 
+## Último Recorte Concluído — Fase E
+
+**Recorte 22 — Supabase E2: Primeira Migração de Entidade (accounts)** — 2026-04-07
+- ✅ Repositório defensivo `src/lib/accountsRepository.ts`
+- ✅ `getAccounts()`: query Supabase + merge com contasMock + fallback seguro
+- ✅ Shell explícito para contas sem mock correspondente
+- ✅ Tipagem alinhada: AccountRow com union types corretos (risco: number, atividadeRecente: 'Alta'|'Média'|'Baixa', etc)
+- ✅ `src/pages/Accounts.tsx`: consome getAccounts() em useEffect com try/catch
+- ✅ Todos os useMemo, métricas e filtros alimentados por dados potencialmente do Supabase
+- ✅ Cleanup de timeout corrigido (fora do async)
+- ✅ Build Exit 0 (59.1 kB Accounts, +600 bytes com repositório)
+- **Commit:** `15ce264` — feat(supabase): Recorte 22 — E2: Primeira Migração de Entidade (accounts)
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 16 — Assistant Orquestrador concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 17
+- **Status Atual:** Recorte 22 — E2 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 23 (E3 — Segunda Migração: sinais ou contatos)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -270,3 +284,5 @@
 | Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
 | Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Risco→Intervenção, Sinal Crítico→Ativação) |
 | Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |
+| Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
+| Supabase E2: First Migration | Recorte 22 Concluído (Fase E) | Repository layer accounts: getAccounts(), merge com mock, shell seguro, Accounts.tsx consumindo dados |

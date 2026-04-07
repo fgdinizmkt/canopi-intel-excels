@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-07
 
-**Status:** Recorte 21 — Supabase E1: Preparação de Ambiente concluído.
+**Status:** Recorte 22 — Supabase E2: Primeira Migração de Entidade concluído.
 
 ## Objetivo Atual
-Iniciar a Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 22 (E2 — Primeira Migração de Entidade).
+Prosseguir Fase E — Supabase Migration & Scale.
+Próximo passo: definir e aprovar o Recorte 23 (E3 — Segunda Migração de Entidade).
 
 ## Último Estado Confiável
-**Recorte 21 — Supabase E1: Preparação de Ambiente** (commit `fd5b46d`, publicado em origin/main)
+**Recorte 22 — Supabase E2: Primeira Migração de Entidade** (commit `15ce264`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -36,12 +36,19 @@ Próximo passo: definir e aprovar o Recorte 22 (E2 — Primeira Migração de En
 - ✅ Recorte 21: `.env.example` expandido com convenção dev/staging/prod.
 - ✅ Recorte 21: `src/lib/supabaseClient.ts` criado com mapeamento explícito e degradação segura.
 - ✅ Recorte 21: Documentação mínima de ambiente `docs/98-operacao/08-preparacao-supabase-e1.md` criada.
-- ✅ Transição: Fase 9 (Data Intelligence & Scale) finalizada. Fase E (Supabase Migration & Scale) iniciada.
+- ✅ Recorte 22: Repository layer `src/lib/accountsRepository.ts` implementado.
+- ✅ Recorte 22: `getAccounts()`: query Supabase 24 campos + merge com contasMock + fallback seguro.
+- ✅ Recorte 22: Tipagem AccountRow alinhada com Conta (risco: number, atividadeRecente/playAtivo/statusGeral como unions, tipoEstrategico).
+- ✅ Recorte 22: Shell seguro para contas sem mock: todos campos obrigatórios preenchidos, campos profundos vazios.
+- ✅ Recorte 22: `src/pages/Accounts.tsx` consome `getAccounts()` em useEffect com try/catch e fallback.
+- ✅ Recorte 22: Cleanup de timeout corrigido (fora do async).
+- ✅ Recorte 22: Todas métricas, filtros, opcoes, coberturaBase alimentadas por dados potencialmente do Supabase.
+- ✅ Transição: Fase 9 (Data Intelligence & Scale) finalizada. Fase E (Supabase Migration & Scale) em execução.
 - ✅ Publicação: commits publicados em origin/main.
-- ✅ Documentação: checkpoint sincronizado.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 02-decisoes-arquiteturais.md, 06-checkpoint-atual.md sincronizados.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 22 (E2 — Primeira Migração de Entidade) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 23 (E3 — Segunda Migração de Entidade) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 22 (E2).
+Aguardar aprovação do Orquestrador para definir o Recorte 23 (E3). Candidatos: sinais ou contatos.
