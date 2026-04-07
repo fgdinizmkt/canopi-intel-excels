@@ -35,6 +35,38 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 21 (Supabase E1): Preparação de Ambiente — Concluído
+- **Fase:** Transição: Fase 9 → Fase E (Supabase Migration & Scale)
+- **Alvo:** Preparar fundação Supabase sem migração total ainda. Mocks e lógica permanecem intactos.
+- **Contexto:** Recortes 16-20 fecharam circuito operacional do Assistant. Próximo: infraestrutura Supabase. E1 = preparação; E2+ = migrações.
+- **Ações Executadas:**
+  - **`.env.example`:**
+    * Preservadas variáveis originais (GEMINI_API_KEY, APP_URL)
+    * Seção Supabase acrescentada com convenção clara
+    * Ambientes: dev, staging, prod com placeholders
+  - **`src/lib/supabaseClient.ts`:**
+    * Cliente Supabase com suporte a múltiplos ambientes
+    * Mapeamento explícito por ambiente (dev/staging/prod)
+    * Degradação graciosa: retorna null se env vars ausentes
+    * Helpers: `isSupabaseConfigured()`, `getEnvironment()`
+  - **`package.json`:**
+    * Instalado `@supabase/supabase-js@^2.102.1`
+  - **`package-lock.json`:**
+    * Dependências internas do SDK resolvidas (auth-js, postgrest-js, functions-js, phoenix)
+  - **`docs/98-operacao/08-preparacao-supabase-e1.md`:**
+    * Documentação mínima de ambiente E1
+    * Estrutura de convenção, setup local, uso do cliente
+    * Estado: preparação sem migração ainda
+- **Validação Técnica:**
+  * Build: Exit 0
+  * 5 files, 267 insertions(+)
+  * Cliente defensivo: sem quebras se env vars faltarem
+  * Mocks e lógica atual intactos (nenhuma migração feita)
+- **Commit:** `fd5b46d` — chore(supabase): prepara ambiente base e cliente defensivo para E1
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 20 (Assistant Orquestrador): Resolução Determinística de Duplicidade — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Determinismo: duplicidade com deep-link específico)
 - **Alvo:** Transformar detecção booleana de duplicidade em resolução que obtenha actionId da ação equivalente

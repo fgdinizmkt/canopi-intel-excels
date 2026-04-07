@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 20 — Resolução Determinística de Duplicidade: ccc2107, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 21 — Supabase E1: Preparação de Ambiente: fd5b46d, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 20 — Assistant Orquestrador: Resolução Determinística de Duplicidade)
+**Fase E — Supabase Migration & Scale** (Iniciada - Último Recorte: Recorte 21 — Supabase E1: Preparação de Ambiente)
 
 ---
 

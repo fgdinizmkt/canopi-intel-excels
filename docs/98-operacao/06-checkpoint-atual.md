@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-07
 
-**Status:** Recorte 20 — Resolução Determinística de Duplicidade no Assistant concluído.
+**Status:** Recorte 21 — Supabase E1: Preparação de Ambiente concluído.
 
 ## Objetivo Atual
-Finalizar a Fase 9 — Data Intelligence & Scale.
-Próximo passo: definir e aprovar o Recorte 21.
+Iniciar a Fase E — Supabase Migration & Scale.
+Próximo passo: definir e aprovar o Recorte 22 (E2 — Primeira Migração de Entidade).
 
 ## Último Estado Confiável
-**Recorte 20 — Resolução Determinística de Duplicidade no Assistant** (commit `ccc2107`, publicado em origin/main)
+**Recorte 21 — Supabase E1: Preparação de Ambiente** (commit `fd5b46d`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -32,11 +32,16 @@ Próximo passo: definir e aprovar o Recorte 21.
 - ✅ Recorte 20: `resolveDuplicateActionId()` resolve determinísticamente actionId de ação equivalente.
 - ✅ Recorte 20: Duplicidade deixa de ser booleana, permite deep-link `/acoes?actionId={id}` para ação existente.
 - ✅ Recorte 20: Fallback genérico `/acoes` mantido apenas como contingência sem match.
+- ✅ Recorte 21: SDK `@supabase/supabase-js@^2.102.1` instalado.
+- ✅ Recorte 21: `.env.example` expandido com convenção dev/staging/prod.
+- ✅ Recorte 21: `src/lib/supabaseClient.ts` criado com mapeamento explícito e degradação segura.
+- ✅ Recorte 21: Documentação mínima de ambiente `docs/98-operacao/08-preparacao-supabase-e1.md` criada.
+- ✅ Transição: Fase 9 (Data Intelligence & Scale) finalizada. Fase E (Supabase Migration & Scale) iniciada.
 - ✅ Publicação: commits publicados em origin/main.
 - ✅ Documentação: checkpoint sincronizado.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 21 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 22 (E2 — Primeira Migração de Entidade) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 21.
+Aguardar aprovação do Orquestrador para definir o Recorte 22 (E2).
