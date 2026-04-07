@@ -703,6 +703,28 @@ interface HistoryMessage {
   content: string;
 }
 
+// ─── Tipos de cards acionáveis (espelhados no frontend) ──────────────
+type ResponseCard =
+  | { type: 'existing_account'; accountId: string; slug: string; name: string; reason?: string }
+  | { type: 'existing_signal';  signalId: string;  name: string; severity: string; account: string; reason?: string }
+  | { type: 'existing_action';  actionId: string;  title: string; priority: string; accountName: string }
+  | { type: 'new_action'; title: string; reason: string; urgency: string; accountName: string; relatedAccountId?: string; focus?: string; suggestedAction: string; destination?: string };
+
+const CARDS_PATTERN = /<!--CANOPI_CARDS:([\s\S]*?)-->/;
+
+function extractCards(rawText: string): { cleanText: string; cards: ResponseCard[] } {
+  const match = rawText?.match(CARDS_PATTERN);
+  if (!match) return { cleanText: rawText ?? '', cards: [] };
+  let cards: ResponseCard[] = [];
+  try {
+    const parsed = JSON.parse(match[1].trim());
+    if (Array.isArray(parsed)) cards = parsed;
+  } catch {
+    // JSON malformado — mantém texto limpo, descarta cards
+  }
+  return { cleanText: rawText.replace(CARDS_PATTERN, '').trim(), cards };
+}
+
 interface OperationalContext {
   contaAberta: {
     nome: string;
@@ -725,6 +747,11 @@ interface OperationalContext {
     accountName: string;
     status: string;
   }>;
+  availableEntities?: {
+    accounts: Array<{ id: string; slug: string; name: string; status?: string }>;
+    signals: Array<{ id: string; title: string; severity: string; account: string }>;
+    actions: Array<{ id: string; title: string; priority: string; accountName: string }>;
+  };
   operationalIntelligence?: {
     performance: {
       totalPipeline: string;
@@ -882,6 +909,106 @@ function buildContextualInstruction(context: OperationalContext): string {
     'Use números factuais como âncora de confiança.',
   );
 
+  // ENTIDADES DISPONÍVEIS PARA REFERÊNCIA
+  if (context.availableEntities) {
+    const ae = context.availableEntities;
+    lines.push(
+      '\n==================================================',
+      'ENTIDADES DISPONÍVEIS PARA REFERÊNCIA',
+      '==================================================',
+    );
+
+    if (ae.accounts.length > 0) {
+      lines.push('\nCONTAS (com slugs para deep link):');
+      ae.accounts.forEach(a => {
+        lines.push(`  - id: "${a.id}" | slug: "${a.slug}" | name: "${a.name}" | status: ${a.status}`);
+      });
+    }
+
+    if (ae.signals.length > 0) {
+      lines.push('\nSINAIS (críticos e ativos):');
+      ae.signals.forEach(s => {
+        lines.push(`  - id: "${s.id}" | title: "${s.title}" | severity: ${s.severity} | account: ${s.account}`);
+      });
+    }
+
+    if (ae.actions.length > 0) {
+      lines.push('\nAÇÕES (prioritárias/críticas):');
+      ae.actions.forEach(a => {
+        lines.push(`  - id: "${a.id}" | title: "${a.title}" | priority: ${a.priority} | account: ${a.accountName}`);
+      });
+    }
+  }
+
+  // GERAÇÃO DE CARDS ACIONÁVEIS
+  lines.push(
+    '\n==================================================',
+    'GERAÇÃO DE CARDS ACIONÁVEIS (JSON)',
+    '==================================================',
+    '',
+    'QUANDO gerar cards:',
+    '- Sua resposta menciona uma conta que existe nas "ENTIDADES DISPONÍVEIS"?',
+    '- Sua resposta menciona um sinal que existe nas "ENTIDADES DISPONÍVEIS"?',
+    '- Sua resposta menciona uma ação que existe nas "ENTIDADES DISPONÍVEIS"?',
+    '- Sua resposta recomenda uma NOVA ação a ser criada na fila?',
+    '',
+    'COMO gerar:',
+    '1. No FINAL da sua resposta (após todo o markdown)',
+    '2. Adicione exatamente este bloco:',
+    '   <!--CANOPI_CARDS:[{...card1...},{...card2...}]-->',
+    '',
+    'TIPOS DE CARD (use EXATAMENTE como especificado):',
+    '',
+    '**existing_account**: referencia uma conta que JÁ EXISTE',
+    '{',
+    '  "type": "existing_account",',
+    '  "accountId": "ID exato da conta (ver lista acima)",',
+    '  "slug": "slug exato da conta (ver lista acima)",',
+    '  "name": "Nome da conta",',
+    '  "reason": "Breve contexto por que esta conta é mencionada"',
+    '}',
+    '',
+    '**existing_signal**: referencia um SINAL que JÁ EXISTE',
+    '{',
+    '  "type": "existing_signal",',
+    '  "signalId": "ID exato do sinal (ver lista acima)",',
+    '  "name": "Título do sinal",',
+    '  "severity": "crítico|alerta|oportunidade",',
+    '  "account": "Conta relacionada",',
+    '  "reason": "Contexto por que este sinal é relevante"',
+    '}',
+    '',
+    '**existing_action**: referencia uma AÇÃO que JÁ EXISTE na fila',
+    '{',
+    '  "type": "existing_action",',
+    '  "actionId": "ID exato da ação (ver lista acima)",',
+    '  "title": "Título da ação",',
+    '  "priority": "Crítica|Alta|Média|Baixa",',
+    '  "accountName": "Conta relacionada"',
+    '}',
+    '',
+    '**new_action**: recomenda uma NOVA ação para criar na fila',
+    '{',
+    '  "type": "new_action",',
+    '  "title": "Título claro e acionável da nova ação",',
+    '  "reason": "Por que essa ação é importante?",',
+    '  "urgency": "crítica|alta|média",',
+    '  "accountName": "Conta a que se aplica (DEVE EXISTIR nas ENTIDADES)",',
+    '  "relatedAccountId": "ID da conta (ver lista, opcional)",',
+    '  "focus": "Área de foco ou contexto (ex: Ghosting, Expansão, etc)",',
+    '  "suggestedAction": "O que exatamente deve ser feito?",',
+    '  "destination": "Onde essa ação será executada (ex: Fila, Chat, Investigação)"',
+    '}',
+    '',
+    'REGRAS OBRIGATÓRIAS:',
+    '- Use NO MÁXIMO 4 cards por resposta',
+    '- NUNCA invente IDs ou slugs — use EXATAMENTE os das "ENTIDADES DISPONÍVEIS"',
+    '- NUNCA misture tipos (ex: não colocar um novo_action como existing_account)',
+    '- Só gere cards para itens que você menciona explicitamente na sua resposta',
+    '- Se não houver entidades mencionadas, não gere nenhum card',
+    '- Cards inválidos (IDs inexistentes, mal formatados) serão descartados silenciosamente no front',
+  );
+
   return lines.join('\n');
 }
 
@@ -920,8 +1047,16 @@ export async function POST(req: Request) {
       config: { systemInstruction },
     });
 
+    const rawText = response.text ?? '';
+    const { cleanText, cards } = extractCards(rawText);
+
+    const responseBody: Record<string, any> = { text: cleanText };
+    if (cards.length > 0) {
+      responseBody.cards = cards;
+    }
+
     return new Response(
-      JSON.stringify({ text: response.text }),
+      JSON.stringify(responseBody),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     );
   } catch (error: any) {

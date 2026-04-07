@@ -1,17 +1,26 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { Card, Button, Badge } from '../components/ui';
-import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target, Lightbulb, Copy, MessageCircle } from 'lucide-react';
+import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target, Lightbulb, Copy, MessageCircle, ExternalLink, ChevronRight, Plus, ArrowRight } from 'lucide-react';
 import { useAccountDetail } from '../context/AccountDetailContext';
-import { contasMock } from '../data/accountsData';
+import { contasMock, initialActions, type Priority } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
 import { buildOperationalIntelligence, deriveRecommendedPlays } from '../helpers/operationalIntelligence';
+
+// ─── Tipos de cards acionáveis ─────────────────────────────────────
+type ResponseCard =
+  | { type: 'existing_account'; accountId: string; slug: string; name: string; reason?: string }
+  | { type: 'existing_signal';  signalId: string;  name: string; severity: string; account: string; reason?: string }
+  | { type: 'existing_action';  actionId: string;  title: string; priority: string; accountName: string }
+  | { type: 'new_action'; title: string; reason: string; urgency: string; accountName: string; relatedAccountId?: string; focus?: string; suggestedAction: string; destination?: string };
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  cards?: ResponseCard[];
 }
 
 interface StoredAction {
@@ -44,6 +53,11 @@ interface ContextBlock {
     accountName: string;
     status: string;
   }>;
+  availableEntities?: {
+    accounts: Array<{ id: string; slug: string; name: string; status?: string }>;
+    signals: Array<{ id: string; title: string; severity: string; account: string }>;
+    actions: Array<{ id: string; title: string; priority: string; accountName: string }>;
+  };
   operationalIntelligence: {
     performance: {
       totalPipeline: string;
@@ -100,9 +114,10 @@ export const Assistant: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [storedActions, setStoredActions] = useState<StoredAction[]>([]);
+  const [createdActionIds, setCreatedActionIds] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { selectedAccountId } = useAccountDetail();
+  const { selectedAccountId, createAction } = useAccountDetail();
 
   // Leitura defensiva do localStorage — apenas no cliente
   useEffect(() => {
@@ -198,6 +213,24 @@ export const Assistant: React.FC = () => {
 
   const buildContextBlock = (): ContextBlock => {
     const opIntel = buildOperationalIntelligence();
+
+    // Montar availableEntities com restrições
+    const availableAccounts = contasMock
+      .filter(c => c.reconciliationStatus !== 'vazia')
+      .filter(c => c.statusGeral === 'Atenção' || c.statusGeral === 'Crítico' || c.prontidao > 70)
+      .slice(0, 8)
+      .map(c => ({ id: c.id, slug: c.slug, name: c.nome, status: c.statusGeral }));
+
+    const availableSignals = sinaisAtivos
+      .filter(s => s.severity === 'crítico')
+      .slice(0, 5)
+      .map(s => ({ id: s.id, title: s.title, severity: s.severity, account: s.account }));
+
+    const availableActions = initialActions
+      .filter(a => a.priority === 'Crítica' || a.priority === 'Alta')
+      .slice(0, 5)
+      .map(a => ({ id: a.id, title: a.title, priority: a.priority, accountName: a.accountName || '—' }));
+
     return {
       contaAberta: contaAberta
         ? {
@@ -216,8 +249,75 @@ export const Assistant: React.FC = () => {
         accountName: a.account || '—',
         status: a.status || 'Nova',
       })),
+      availableEntities: {
+        accounts: availableAccounts,
+        signals: availableSignals,
+        actions: availableActions,
+      },
       operationalIntelligence: opIntel,
     };
+  };
+
+  // Validar cards contra entidades reais
+  const validateCards = (cards: ResponseCard[], ctx: ContextBlock): ResponseCard[] => {
+    if (!ctx.availableEntities) return [];
+    const validAccountSlugs = new Set(ctx.availableEntities.accounts.map(a => a.slug));
+    const validSignalIds = new Set(ctx.availableEntities.signals.map(s => s.id));
+    const validActionIds = new Set(ctx.availableEntities.actions.map(a => a.id));
+
+    return cards.filter(card => {
+      if (card.type === 'existing_account') return validAccountSlugs.has(card.slug);
+      if (card.type === 'existing_signal') return validSignalIds.has(card.signalId);
+      if (card.type === 'existing_action') return validActionIds.has(card.actionId);
+      if (card.type === 'new_action') return !!card.title && !!card.accountName;
+      return false;
+    });
+  };
+
+  // Verificar duplicação antes de criar ação
+  const checkActionDuplicate = (title: string, accountName: string): boolean => {
+    const titleLower = title.toLowerCase();
+
+    // Verificar em initialActions (tem accountName)
+    const isDuplicateInInitial = initialActions.some(a =>
+      a.accountName?.toLowerCase() === accountName.toLowerCase() &&
+      a.title?.toLowerCase().includes(titleLower.slice(0, 20))
+    );
+
+    // Verificar em storedActions (tem account)
+    const isDuplicateInStored = storedActions.some(a =>
+      a.account?.toLowerCase() === accountName.toLowerCase() &&
+      a.title?.toLowerCase().includes(titleLower.slice(0, 20))
+    );
+
+    return isDuplicateInInitial || isDuplicateInStored;
+  };
+
+  // Criar nova ação na fila
+  const handleCreateAction = (card: ResponseCard & { type: 'new_action' }) => {
+    if (checkActionDuplicate(card.title, card.accountName)) {
+      return; // Já existe, não criar
+    }
+
+    const priorityMap: Record<string, Priority> = { crítica: 'Crítica', alta: 'Alta', média: 'Média' };
+
+    createAction({
+      title: card.title,
+      priority: priorityMap[card.urgency] ?? 'Alta',
+      category: 'ABX',
+      channel: 'ABX',
+      accountName: card.accountName,
+      relatedAccountId: card.relatedAccountId,
+      accountContext: card.focus ?? '',
+      ownerName: null,
+      nextStep: card.suggestedAction,
+      sourceType: 'signal',
+      description: card.reason,
+    });
+
+    // Marcar como criada (usar title+accountName como chave)
+    const cardKey = `${card.title}|${card.accountName}`;
+    setCreatedActionIds(prev => new Set([...prev, cardKey]));
   };
 
   const handleUsePlayInChat = (promptText: string) => {
@@ -271,7 +371,14 @@ export const Assistant: React.FC = () => {
         throw new Error(data.error || 'Erro na comunicação com a API');
       }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.text }]);
+      const ctx = buildContextBlock();
+      const validatedCards = data.cards ? validateCards(data.cards, ctx) : [];
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.text,
+        ...(validatedCards.length > 0 && { cards: validatedCards })
+      }]);
     } catch (error: any) {
       setMessages(prev => [...prev, { role: 'assistant', content: `**Erro:** ${error.message}` }]);
     } finally {
@@ -284,6 +391,159 @@ export const Assistant: React.FC = () => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  // Renderizador de cards acionáveis
+  const renderResponseCards = (cards: ResponseCard[]) => {
+    if (!cards || cards.length === 0) return null;
+
+    return (
+      <div className="space-y-2 mt-3">
+        {cards.map((card, idx) => {
+          if (card.type === 'existing_account') {
+            return (
+              <Link key={idx} href={`/contas/${card.slug}`}>
+                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer flex items-start gap-3">
+                  <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-blue-900">{card.name}</p>
+                    {card.reason && <p className="text-xs text-blue-700 mt-0.5">{card.reason}</p>}
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                </div>
+              </Link>
+            );
+          }
+
+          if (card.type === 'existing_signal') {
+            return (
+              <Link key={idx} href="/sinais">
+                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer flex items-start gap-3">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-sm font-semibold text-amber-900">{card.name}</p>
+                      <Badge className={`text-xs ${
+                        card.severity === 'crítico' ? 'bg-red-100 text-red-700' :
+                        card.severity === 'alerta' ? 'bg-amber-100 text-amber-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {card.severity}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-amber-700">Conta: {card.account}</p>
+                    {card.reason && <p className="text-xs text-amber-700 mt-0.5">{card.reason}</p>}
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                </div>
+              </Link>
+            );
+          }
+
+          if (card.type === 'existing_action') {
+            return (
+              <Link key={idx} href="/acoes">
+                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer flex items-start gap-3">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-sm font-semibold text-emerald-900">{card.title}</p>
+                      <Badge className={`text-xs ${
+                        card.priority === 'Crítica' ? 'bg-red-100 text-red-700' :
+                        card.priority === 'Alta' ? 'bg-orange-100 text-orange-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {card.priority}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-emerald-700">Conta: {card.accountName}</p>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                </div>
+              </Link>
+            );
+          }
+
+          if (card.type === 'new_action') {
+            const isDuplicate = checkActionDuplicate(card.title, card.accountName);
+            const cardKey = `${card.title}|${card.accountName}`;
+            const isCreated = createdActionIds.has(cardKey);
+
+            const handleClick = () => {
+              if (!isDuplicate && !isCreated) {
+                handleCreateAction(card);
+              }
+            };
+
+            return (
+              <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <div className="flex items-start gap-3 mb-3">
+                  <Lightbulb className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h4 className="text-sm font-semibold text-slate-900">{card.title}</h4>
+                      <Badge className={`flex-shrink-0 text-xs ${
+                        card.urgency === 'crítica' ? 'bg-red-100 text-red-700' :
+                        card.urgency === 'alta' ? 'bg-orange-100 text-orange-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {card.urgency}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-700 mt-1">{card.reason}</p>
+                    {card.focus && <p className="text-xs text-slate-600 mt-0.5"><span className="font-semibold">Foco:</span> {card.focus}</p>}
+                  </div>
+                </div>
+
+                {/* FlowStrip leve — apenas chips inline */}
+                <div className="flex items-center gap-1 flex-wrap text-xs mb-3 pb-3 border-b border-slate-200">
+                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">{card.accountName}</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">IA Detectou</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">{card.urgency}</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200 truncate">{card.suggestedAction.slice(0, 15)}...</span>
+                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                  <span className="bg-blue-50 px-2 py-1 rounded text-blue-700 border border-blue-200">Fila</span>
+                </div>
+
+                <p className="text-xs text-slate-600 mb-3"><span className="font-semibold">Ação:</span> {card.suggestedAction}</p>
+
+                <div className="flex gap-2">
+                  {isDuplicate ? (
+                    <Link href="/acoes" className="flex-1">
+                      <div className="w-full h-8 text-xs bg-slate-400 text-white rounded px-3 flex items-center justify-center gap-1 cursor-pointer hover:bg-slate-500 transition-colors">
+                        Já existe → Ver Ações
+                      </div>
+                    </Link>
+                  ) : isCreated ? (
+                    <div className="flex-1 h-8 text-xs bg-emerald-500 text-white rounded px-3 flex items-center justify-center gap-1">
+                      <CheckCircle className="w-3 h-3" /> Criada
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={handleClick}
+                      className="flex-1 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" /> Criar na Fila
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => handleUsePlayInChat(card.suggestedAction)}
+                    className="flex-1 h-8 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center gap-1"
+                  >
+                    <MessageCircle className="w-3 h-3" /> Chat
+                  </Button>
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })}
+      </div>
+    );
   };
 
   return (
@@ -414,6 +674,12 @@ export const Assistant: React.FC = () => {
                     {msg.content}
                   </ReactMarkdown>
                 </div>
+                {/* Render cards abaixo de mensagens do assistant */}
+                {msg.role === 'assistant' && msg.cards && (
+                  <div className="w-full max-w-[90%] mt-2">
+                    {renderResponseCards(msg.cards)}
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && (
