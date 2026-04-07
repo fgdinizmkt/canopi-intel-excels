@@ -137,11 +137,12 @@ export const Topbar: React.FC = () => {
               <p className="text-[8px] text-slate-400 font-medium lowercase tracking-tighter">fabio.diniz@canopi.com</p>
             </div>
           </div>
-          <Image 
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fabio" 
-            alt="Avatar" 
+          <Image
+            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fabio"
+            alt="Avatar"
             width={32}
             height={32}
+            unoptimized
             className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50"
           />
         </div>
