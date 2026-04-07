@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
 import { contasMock, type Conta } from '../data/accountsData';
+import { getAccounts } from '../lib/accountsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
@@ -41,6 +42,7 @@ export const Accounts = () => {
   const { openAccount } = useAccountDetail();
 
   const [loading, setLoading] = useState(true);
+  const [contas, setContas] = useState<Conta[]>([]);
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
   const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
   const [filtros, setFiltros] = useState<Filtros>({
@@ -60,6 +62,18 @@ export const Accounts = () => {
   });
 
   useEffect(() => {
+    const carregarContas = async () => {
+      try {
+        const dados = await getAccounts();
+        setContas(dados);
+      } catch (err) {
+        console.error('[Accounts] Erro ao carregar contas:', err);
+        setContas(contasMock);
+      }
+    };
+
+    carregarContas();
+
     const t = setTimeout(() => setLoading(false), 550);
     return () => clearTimeout(t);
   }, []);
@@ -84,14 +98,14 @@ export const Accounts = () => {
   }, [filtros, visualizacao, ordenacao, pathname, router]);
 
   const opcoes = useMemo(() => ({
-    verticais: Array.from(new Set(contasMock.map((c) => c.vertical))),
-    segmentos: Array.from(new Set(contasMock.map((c) => c.segmento))),
-    owners: Array.from(new Set(contasMock.map((c) => c.ownerPrincipal))),
-    etapas: Array.from(new Set(contasMock.map((c) => c.etapa)))
-  }), []);
+    verticais: Array.from(new Set(contas.map((c) => c.vertical))),
+    segmentos: Array.from(new Set(contas.map((c) => c.segmento))),
+    owners: Array.from(new Set(contas.map((c) => c.ownerPrincipal))),
+    etapas: Array.from(new Set(contas.map((c) => c.etapa)))
+  }), [contas]);
 
   const filtradas = useMemo(() => {
-    let data = contasMock.filter((c) => {
+    let data = contas.filter((c) => {
       if (filtros.busca && !`${c.nome} ${c.dominio}`.toLowerCase().includes(filtros.busca.toLowerCase())) return false;
       if (filtros.vertical !== 'todos' && c.vertical !== filtros.vertical) return false;
       if (filtros.segmento !== 'todos' && c.segmento !== filtros.segmento) return false;
@@ -121,18 +135,18 @@ export const Accounts = () => {
     });
 
     return data;
-  }, [filtros, ordenacao]);
+  }, [filtros, ordenacao, contas]);
 
   const metricas = useMemo(() => ({
-    prioritarias: contasMock.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
-    risco: contasMock.filter((c) => c.risco >= 70).length,
-    andamento: contasMock.filter((c) => c.tipoEstrategico === 'Em andamento').length,
-    abm: contasMock.filter((c) => c.tipoEstrategico === 'ABM').length,
-    abx: contasMock.filter((c) => c.tipoEstrategico === 'ABX').length,
-    altoPotencial: contasMock.filter((c) => c.potencial >= 80).length,
-    baixaCobertura: contasMock.filter((c) => c.coberturaRelacional < 50).length,
-    oportunidades: contasMock.filter((c) => c.possuiOportunidade).length
-  }), []);
+    prioritarias: contas.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
+    risco: contas.filter((c) => c.risco >= 70).length,
+    andamento: contas.filter((c) => c.tipoEstrategico === 'Em andamento').length,
+    abm: contas.filter((c) => c.tipoEstrategico === 'ABM').length,
+    abx: contas.filter((c) => c.tipoEstrategico === 'ABX').length,
+    altoPotencial: contas.filter((c) => c.potencial >= 80).length,
+    baixaCobertura: contas.filter((c) => c.coberturaRelacional < 50).length,
+    oportunidades: contas.filter((c) => c.possuiOportunidade).length
+  }), [contas]);
 
   const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
 
@@ -147,13 +161,13 @@ export const Accounts = () => {
     { titulo: 'Oportunidades ativas', valor: metricas.oportunidades, acao: () => setFiltros((f) => ({ ...f, oportunidade: 'com' })) }
   ];
 
-  const coberturaBase = Math.round(contasMock.reduce((acc, c) => acc + c.coberturaRelacional, 0) / contasMock.length);
+  const coberturaBase = Math.round(contas.reduce((acc, c) => acc + c.coberturaRelacional, 0) / contas.length);
 
   if (loading) {
     return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-500">Carregando portfólio de contas...</div>;
   }
 
-  if (contasMock.length === 0) {
+  if (contas.length === 0) {
     return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-600">Nenhuma conta cadastrada no portfólio. Cadastre contas para iniciar a priorização operacional.</div>;
   }
 
