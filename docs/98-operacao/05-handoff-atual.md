@@ -2,9 +2,9 @@
 
 ## Estado atual
 - **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último trabalho concluído:** Fix de UI — Chat overflow corrigido
+- **Último trabalho concluído:** Hotfix de Chat — Scroll overflow resolvido e validado em navegador
 - **Últimos commits relevantes:** 
-  - `12f4d1f` (fix(chat): corrige overflow de mensagens longas no Assistant)
+  - `18b8d8b` (fix(chat): corrige overflow e scroll do Assistant no container do Card) — Validado em navegador
   - `f9cf7a7` (feat(plays): adiciona bloco de plays recomendados com derivação inteligente)
   - `6fff541` (feat(copiloto): integra inteligência operacional enriquecida no Assistente)
   - `7fdce40` (fix(overview): cleanup técnico — memoização, anomalias e derivações)
@@ -39,16 +39,16 @@
 8.  **Overview.tsx Consolidada (Opção B):** Painel de controle inteligente integrando Performance + Actions. 6 KPIs dinâmicos, 4 anomalias operacionais detectadas, hierarquia visual coerente, exclusão de contas 'vazia', memoização ativa.
 9.  **Copiloto Operacional Real (Opção 3):** Helper `operationalIntelligence.ts` consolidando toda inteligência. Integração no Assistant.tsx com card de Prioridades Imediatas. Enriquecimento de `src/app/api/chat/route.ts` com 5 blocos de contexto operacional injetados na system instruction. Assistant responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco.
 10. **Plays Recomendados (Recorte 15):** Função `deriveRecommendedPlays()` que gera até 4 recomendações explícitas baseadas em padrões detectados (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Conta em Risco→Intervenção, Sinal Crítico→Ativação). Bloco visual com cards responsivos, cores por urgência, botões "Chat" e "Copiar". Fecha loop: inteligência → ação.
-11. **Fix de Chat Overflow:** Correção de UX em Assistant.tsx para repostas longas. Aumenta container (500px→600px), adiciona `min-h-0` ao flex, implementa text wrapping com ReactMarkdown props (`whiteSpace: pre-wrap`), add prose styling modifiers, fixa input/button com `flex-shrink-0`. Resultado: mensagens longas renderizam com scroll correto, sem layout breaks.
+11. **Hotfix Chat Overflow & Scroll:** Correção estrutural em Assistant.tsx para respostas longas. Problema raiz: Card renderiza com `overflow-hidden`, bloqueava scroll interno. Solução: Adiciona `!overflow-y-auto !overflow-x-hidden` ao Card (sobrescreve base). Ajusta padding granular (Card `p-0`, seções com `px-6 pb-6`). Melhora prose spacing (`my-2`/`my-3`) e destaque visual. Validado em navegador: scrollbar funciona, texto completo visível, input acessível. Commit: `18b8d8b`.
 
 ## Pendências e Observações (Auditado)
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual:** Recorte 15 (Plays) publicado. Chat overflow fix implementado, testado e validado.
-- **Fix de Chat Status:** ✅ Build Exit 0 (42.5 kB Assistant). Código commitado localmente (`12f4d1f`). Awaiting push approval.
+- **Estado Atual (Hotfix Fechado):** Recorte 15 (Plays) publicado em origin/main. Hotfix de Chat (scroll overflow) commitado localmente (`18b8d8b`) e validado em navegador.
+- **Hotfix Status:** ✅ Build Exit 0 (42.5 kB Assistant). ✅ Validado em navegador (scrollbar funciona, texto visível). Commitado localmente. **Awaiting push approval.**
 - **Working Tree:** Limpa após commit. Pronto para push quando aprovado.
-- **Pipeline Fechado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15) → Chat UX Fix. Loop completo: detecção → priorização → ação → UX refinement.
+- **Pipeline Completado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15) → Chat Hotfix (overflow/scroll). Loop completo: detecção → priorização → ação → UX refinement.
 
 ## Recomendações para próximo recorte (Fase 10)
 1. **Validação UX de Cores:** Verificar se amber/orange (Prioridades) e red/orange/blue (Plays) oferecem contraste suficiente e clareza.

@@ -5,22 +5,19 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
-## [2026-04-06] — Fix: Chat Overflow — Correção de UX em Assistant
+## [2026-04-06] — Hotfix: Chat Overflow & Scroll — Fechado (Validado em Navegador)
 
-- **Contexto:** Repostas longas no Assistant transbordavam do container e texto não fazia wrap adequado
-- **Problema:** Layout quebrando em respostas multi-linha, input desaparecendo, falta de scroll
-- **Solução Implementada:**
-  - **Container:** Altura aumentada de 500px → 600px para melhor espaço visual
-  - **Flex Overflow:** Adicionado `min-h-0` ao container de mensagens (essencial para flex funcionar)
-  - **Text Wrapping:** 
-    * `break-words` + `overflow-hidden` nos message divs
-    * ReactMarkdown com `whiteSpace: pre-wrap` e `wordBreak: break-word` para preservar linebreaks
-    * `max-w-[85%]` mantido para evitar overscan
-  - **Prose Styling:** Modifiers `prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:my-2` para espaçamento consistente
-  - **Flex Stability:** `flex-shrink-0` em input area e send button para evitar colapso
-  - **Validação:** `npm run build` Exit 0, sem breaking changes
-- **Commit:** `12f4d1f` — fix(chat): corrige overflow de mensagens longas no Assistant
-- **Status:** ✅ Build validado, pronto para review
+- **Problema Raiz Identificado:** Card renderiza com `overflow-hidden`, bloqueando scroll interno
+- **Manifestação:** Respostas longas truncadas, sem scroll bar funcional
+- **Validação Navegador:** Scrollbar funciona ✅, texto completo visível ✅, input acessível ✅
+- **Solução Aplicada:**
+  - **Override overflow:** Adicionado `!overflow-y-auto !overflow-x-hidden` ao Card (sobrescreve `overflow-hidden` base)
+  - **Padding granular:** Card `p-6` → `p-0`, seções com `px-6 pb-6` individuais
+  - **Prose spacing:** `my-2`/`my-3` para melhor legibilidade
+  - **Max-width:** `85%` → `90%` para melhor uso do espaço
+  - **Markup:** Código com destaque, blockquotes com border, links sublinhados
+- **Commit:** `18b8d8b` — fix(chat): corrige overflow e scroll do Assistant no container do Card
+- **Status:** ✅ Commitado localmente, validado em navegador, awaiting push approval
 
 ---
 
