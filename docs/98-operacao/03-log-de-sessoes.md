@@ -35,6 +35,29 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 19 (Higiene de Deep-Link): Consumo e Limpeza de Query Params — Concluído
+- **Fase:** Fase 9 — Data Intelligence & Scale (Completude de higiene: deep-link sem URL suja)
+- **Alto:** Consumir query params após deep-link e limpá-los da URL para evitar reabertura involuntária
+- **Contexto:** Recortes 17-18 implementaram deep-linking para signals/actions. Query params ficavam na URL, causando reabertura em refresh/back. Recorte 19 fecha esse gap.
+- **Ações Executadas:**
+  - **Frontend (Signals.tsx):**
+    * Deep-link effect: detecta `?signalId=X` e abre drawer do sinal
+    * Após sucesso: `window.history.replaceState({}, '', '/sinais')` limpa query param
+    * Drawer permanece aberto, URL fica limpa
+  - **Frontend (Actions.tsx):**
+    * Deep-link effect: detecta `?actionId=X` e abre overlay da ação
+    * Após sucesso: `window.history.replaceState({}, '', '/acoes')` limpa query param
+    * Overlay permanece aberto, URL fica limpa
+- **Validação Técnica:**
+  * Build: Exit 0
+  * 2 files, 9 insertions(+), 3 deletions(-)
+  * Comportamento: deep-link funciona, URL fica limpa, sem reabertura fantasma
+  * Backwards-compatible: deep-link continua funcionando normalmente
+- **Commit:** `007f446` — fix(routing): consome e limpa query params de deep-link em sinais e ações
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 18 (Assistant Orquestrador): Retorno Direto da Nova Ação — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Completude do circuito: new_action com deep-link)
 - **Alvo:** Retornar direto para a ação recém-criada no lugar de rota genérica `/acoes`

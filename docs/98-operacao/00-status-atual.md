@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 18 — Retorno Direto da Nova Ação: 7b5dc23, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 19 — Higiene de Deep-Link: 007f446, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 18 — Assistant Orquestrador: Retorno Direto da Nova Ação)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 19 — Higiene de Deep-Link e Consumo de Query Params)
 
 ---
 
