@@ -35,6 +35,30 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 20 (Assistant Orquestrador): Resolução Determinística de Duplicidade — Concluído
+- **Fase:** Fase 9 — Data Intelligence & Scale (Determinismo: duplicidade com deep-link específico)
+- **Alvo:** Transformar detecção booleana de duplicidade em resolução que obtenha actionId da ação equivalente
+- **Contexto:** Recortes 17-19 implementaram deep-linking e consumo de query params. Duplicidade ainda caía em fallback genérico. Recorte 20 resolve ação duplicada deterministicamente.
+- **Ações Executadas:**
+  - **Frontend (Assistant.tsx):**
+    * Nova função `resolveDuplicateActionId(title, accountName)`: procura ação equivalente
+    * Busca em initialActions e storedActions usando mesmo critério de matching
+    * Retorna actionId quando encontra match confiável, null caso contrário
+    * renderResponseCards() (new_action branch):
+      - Calcula `duplicateActionId` se `isDuplicate` for true
+      - Resolve `resolvedActionId`: prioritariamente createdActionId OU duplicateActionId
+      - Deep-link usa `/acoes?actionId={resolvedActionId}` quando disponível
+      - Fallback `/acoes` apenas como contingência sem match
+- **Validação Técnica:**
+  * Build: Exit 0
+  * 1 file, 10 insertions(+), 1 deletion(-)
+  * Comportamento: ação duplicada agora resolve actionId determinístico
+  * Backwards-compatible: fallback continua funcionando normalmente
+- **Commit:** `ccc2107` — feat(assistant): resolve duplicidade com deep-link determinístico
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 19 (Higiene de Deep-Link): Consumo e Limpeza de Query Params — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Completude de higiene: deep-link sem URL suja)
 - **Alto:** Consumir query params após deep-link e limpá-los da URL para evitar reabertura involuntária

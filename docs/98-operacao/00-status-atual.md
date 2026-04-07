@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 19 — Higiene de Deep-Link: 007f446, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 20 — Resolução Determinística de Duplicidade: ccc2107, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 19 — Higiene de Deep-Link e Consumo de Query Params)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 20 — Assistant Orquestrador: Resolução Determinística de Duplicidade)
 
 ---
 
