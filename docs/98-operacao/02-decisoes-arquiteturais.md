@@ -99,7 +99,7 @@ Registrar decisões técnicas e de produto já tomadas e consolidadas, para evit
 
 ---
 
-### 8. CSS: cada página com namespace próprio
+### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 
 **Exemplos consolidados:**
@@ -110,7 +110,7 @@ Registrar decisões técnicas e de produto já tomadas e consolidadas, para evit
 
 ---
 
-### 9. Dados mock: caminho para dados reais
+### 10. Dados mock: caminho para dados reais
 **Decisão:** a plataforma usa dados mock estruturados como stepping stone para dados reais. Os mocks devem refletir a estrutura real das entidades, não ser gerados aleatoriamente.
 
 **Fontes de dados reais disponíveis:**
