@@ -216,6 +216,13 @@ export const Assistant: React.FC = () => {
            storedActions.some(a => a.account?.toLowerCase() === accountName.toLowerCase() && a.title?.toLowerCase().includes(titleLower));
   };
 
+  const resolveDuplicateActionId = (title: string, accountName: string): string | null => {
+    const titleLower = title.toLowerCase().slice(0, 20);
+    const match = initialActions.find(a => a.accountName?.toLowerCase() === accountName.toLowerCase() && a.title?.toLowerCase().includes(titleLower)) ||
+                  storedActions.find(a => a.account?.toLowerCase() === accountName.toLowerCase() && a.title?.toLowerCase().includes(titleLower));
+    return match ? match.id : null;
+  };
+
   const handleCreateAction = (card: ResponseCard & { type: 'new_action' }) => {
     if (checkActionDuplicate(card.title, card.accountName)) return;
     const priorityMap: Record<string, Priority> = { crítica: 'Crítica', alta: 'Alta', média: 'Média' };
@@ -261,7 +268,9 @@ export const Assistant: React.FC = () => {
             const isDuplicate = checkActionDuplicate(card.title, card.accountName);
             const isCreated = createdActionIds.has(`${card.title}|${card.accountName}`);
             const createdActionId = createdActionMap[`${card.title}|${card.accountName}`];
-            const targetLink = createdActionId ? `/acoes?actionId=${createdActionId}` : '/acoes';
+            const duplicateActionId = isDuplicate ? resolveDuplicateActionId(card.title, card.accountName) : null;
+            const resolvedActionId = createdActionId || duplicateActionId;
+            const targetLink = resolvedActionId ? `/acoes?actionId=${resolvedActionId}` : '/acoes';
             return (
               <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
                 <div className="flex items-start justify-between gap-2 mb-2">
