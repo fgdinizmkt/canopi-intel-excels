@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import '../pages/signals.css';
 import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
+import { getSignals } from '../lib/signalsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 
@@ -24,12 +25,27 @@ export const Signals: React.FC = () => {
   };
   const [subpage, setSubpage] = useState<string | null>(null);
   const [subpageData, setSubpageData] = useState<any>(null);
-  
+
   const [toast, setToast] = useState({ show: false, title: '', sub: '' });
   const [signals, setSignals] = useState(advancedSignals);
   const [selOwner, setSelOwner] = useState('');
   const [assignNote, setAssignNote] = useState('');
-  
+
+  // Carrega sinais do Supabase com fallback para advancedSignals
+  useEffect(() => {
+    const carregarSignals = async () => {
+      try {
+        const dados = await getSignals();
+        setSignals(dados);
+      } catch (err) {
+        console.error('[Signals] Erro ao carregar sinais:', err);
+        setSignals(advancedSignals);
+      }
+    };
+
+    carregarSignals();
+  }, []);
+
   // Specific Panel states
   const [intFixed, setIntFixed] = useState(false);
   
