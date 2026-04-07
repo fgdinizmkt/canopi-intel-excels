@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Assistant Orquestrador: a5b43d0, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 17 — Encaminhamento Profundo: 7de955d, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Estabilização Premium do Assistant)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 17 — Assistant Orquestrador: Encaminhamento Profundo)
 
 ---
 

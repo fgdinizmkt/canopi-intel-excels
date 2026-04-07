@@ -5,6 +5,36 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 17 (Assistant Orquestrador): Encaminhamento Profundo — Concluído
+- **Fase:** Fase 9 — Data Intelligence & Scale (Fechamento de circuito: Cards → Deep-links contextuais)
+- **Alvo:** Converter cards acionáveis em deep-links específicos para cada tipo de entidade
+- **Contexto:** Recorte 16 implementou cards acionáveis genéricos. Recorte 17 fecha o circuito: cada card abre o contexto certo da entidade específica.
+- **Ações Executadas:**
+  - **Frontend (Assistant.tsx):**
+    * Refatoração de `renderResponseCards()`: de ternários dinâmicos para 4 branches explícitos
+    * Branch `new_action`: link "Ver Fila" para `/acoes` após criação
+    * Branch `existing_account`: `/contas/{slug}` (continuação)
+    * Branch `existing_signal`: `/sinais?signalId=X` (novo com filtro via query param)
+    * Branch `existing_action`: `/acoes?actionId=X` (novo, implementado)
+    * Visual differentiation mantida: cores e ícones distintos por tipo (azul/Building2, âmbar/Zap, esmeralda/Target)
+  - **Frontend (Signals.tsx):**
+    * +import `useSearchParams` from next/navigation
+    * +useEffect: monitora query param `?signalId=` e abre drawer do sinal automaticamente
+    * Deep-linking: usuário clicado em card no Assistant → chega em `/sinais?signalId=X` → drawer abre
+  - **Frontend (Actions.tsx):**
+    * +import `useSearchParams` from next/navigation
+    * +useEffect: monitora query param `?actionId=` e abre overlay da ação com tab 'resumo'
+    * Deep-linking: usuário clicado em card no Assistant → chega em `/acoes?actionId=X` → overlay abre
+- **Validação Técnica:**
+  * Build: Exit 0 (sucesso em todas as 16 rotas)
+  * 3 files, 71 insertions(+), 10 deletions(-)
+  * Zero breaking changes, sintaxe TypeScript válida
+  * Checkout: Recorte 16 ainda funciona (suporte backwards-compatible ao novo pattern)
+- **Commit:** `7de955d` — feat(assistant): adiciona encaminhamento profundo dos cards acionáveis
+- **Status:** ✅ Publicado em origin/main, checkpoint sincronizado.
+
+---
+
 ## [2026-04-07] — Estabilização Premium do Assistant: Refino Visual e Restauração Agêntica — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Estabilização de interface e lógica de cards)
 - **Alvo:** Consolidar a interface do Assistant como "Enterprise Edition" e restaurar a funcionalidade de cards acionáveis.
