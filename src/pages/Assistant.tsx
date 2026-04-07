@@ -267,7 +267,10 @@ export const Assistant: React.FC = () => {
                 <p className="text-xs text-slate-600 mb-3">{card.reason}</p>
                 <div className="flex gap-2">
                   {isDuplicate || isCreated ? (
-                    <div className="flex-1 h-8 text-[11px] font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
+                    <div className="flex-1 flex items-center gap-2">
+                      <div className="flex-1 h-8 text-[11px] font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
+                      <Link href="/acoes" className="h-8 px-3 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200 rounded flex items-center gap-1 hover:bg-slate-200 transition-all">Ver Fila <ChevronRight className="w-3 h-3" /></Link>
+                    </div>
                   ) : (
                     <Button onClick={() => handleCreateAction(card)} className="flex-1 h-8 text-[11px] font-bold bg-blue-600 text-white hover:bg-blue-700"><Plus className="w-3 h-3 mr-1" /> Criar na Fila</Button>
                   )}
@@ -276,16 +279,51 @@ export const Assistant: React.FC = () => {
               </div>
             );
           }
-          const isAccount = card.type === 'existing_account';
+
+          // Branch: existing_account
+          if (card.type === 'existing_account') {
+            return (
+              <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-200 transition-all flex items-start gap-4">
+                <div className="p-2.5 rounded-lg bg-slate-50 text-slate-500"><Building2 className="w-4 h-4" /></div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{card.name}</h4>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Contexto da conta.'}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <Badge className="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold">Conta</Badge>
+                    <Link href={`/contas/${card.slug}`} className="text-[11px] font-black text-blue-600 hover:underline flex items-center gap-1">Ver Contexto <ChevronRight className="w-3 h-3" /></Link>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // Branch: existing_signal
+          if (card.type === 'existing_signal') {
+            return (
+              <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-amber-200 transition-all flex items-start gap-4">
+                <div className="p-2.5 rounded-lg bg-amber-50 text-amber-500"><Zap className="w-4 h-4" /></div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{card.name}</h4>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Sinal tático para investigação.'}</p>
+                  <div className="mt-3 flex items-center justify-between">
+                    <Badge className="bg-amber-50 text-amber-700 text-[10px] uppercase font-bold">{card.severity}</Badge>
+                    <Link href={`/sinais?signalId=${card.signalId}`} className="text-[11px] font-black text-amber-600 hover:underline flex items-center gap-1">Ver Sinal <ChevronRight className="w-3 h-3" /></Link>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // Branch: existing_action
           return (
-            <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-200 transition-all flex items-start gap-4">
-              <div className="p-2.5 rounded-lg bg-slate-50 text-slate-500">{isAccount ? <Building2 className="w-4 h-4" /> : <Zap className="w-4 h-4" />}</div>
+            <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-emerald-200 transition-all flex items-start gap-4">
+              <div className="p-2.5 rounded-lg bg-emerald-50 text-emerald-500"><Target className="w-4 h-4" /></div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{isAccount ? card.name : (card as any).title || (card as any).name}</h4>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Sinal tático para investigação.'}</p>
+                <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{(card as any).title}</h4>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Ação operacional em andamento.'}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <Badge className="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold">Relatório</Badge>
-                  <Link href={isAccount ? `/contas/${card.slug}` : '/sinais'} className="text-[11px] font-black text-blue-600 hover:underline flex items-center gap-1">Ver Contexto <ChevronRight className="w-3 h-3" /></Link>
+                  <Badge className="bg-emerald-50 text-emerald-700 text-[10px] uppercase font-bold">{(card as any).priority}</Badge>
+                  <Link href={`/acoes?actionId=${(card as any).actionId}`} className="text-[11px] font-black text-emerald-600 hover:underline flex items-center gap-1">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
                 </div>
               </div>
             </div>

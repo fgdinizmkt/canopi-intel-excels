@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
   ChevronDown,
@@ -1113,8 +1114,9 @@ const KpiCard = ({ label, value, color = "text-slate-900", trend, variant }: { l
 );
 
 export const Actions: React.FC = () => {
+  const searchParams = useSearchParams();
   const { openAccount, sessionActions, updateAction, createAction } = useAccountDetail();
-  
+
   // O sessionActions agora contém tanto as iniciais (hidratadas) quanto as da sessão
   const allItems = sessionActions;
 
@@ -1137,6 +1139,17 @@ export const Actions: React.FC = () => {
   // Estados Recorte 20
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [activatingTemplate, setActivatingTemplate] = useState<PlaybookTemplate | null>(null);
+
+  // Deep-linking: open action from URL param
+  useEffect(() => {
+    const actionId = searchParams?.get('actionId');
+    if (!actionId) return;
+    const action = allItems.find(a => a.id === actionId);
+    if (action) {
+      setOverlayItemId(action.id);
+      setOverlayTab('resumo');
+    }
+  }, [searchParams, allItems]);
 
   const handleActivatePlaybook = (templateId: string, accountIds: string[]) => {
     const template = playbookTemplates.find(t => t.id === templateId);

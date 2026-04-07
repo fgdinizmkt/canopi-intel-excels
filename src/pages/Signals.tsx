@@ -1,17 +1,19 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import '../pages/signals.css';
 import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 
 export const Signals: React.FC = () => {
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState('');
   const [filterSev, setFilterSev] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterCat, setFilterCat] = useState('');
   const [showArc, setShowArc] = useState(false);
   const [drawer, setDrawer] = useState<any>(null);
-  
+
   const [midPanel, setMidPanel] = useState<string | null>(null);
   const [midData, setMidData] = useState<any>(null);
   const { openAccount } = useAccountDetail();
@@ -39,6 +41,14 @@ export const Signals: React.FC = () => {
   const [selSt, setSelSt] = useState('');
   const [outSubject, setOutSubject] = useState('[Manufatura] Como reduzimos custo operacional em 23% em 90 dias');
   const [outBody, setOutBody] = useState('Olá [Nome],\n\nVi que vocês estão expandindo a operação de manufatura...');
+
+  // Deep-linking: open signal from URL param
+  useEffect(() => {
+    const signalId = searchParams?.get('signalId');
+    if (!signalId) return;
+    const signal = signals.find(s => s.id === signalId);
+    if (signal) setDrawer(signal);
+  }, [searchParams, signals]);
 
   const active = signals.filter(s => !s.archived);
   const archived = signals.filter(s => s.archived);
