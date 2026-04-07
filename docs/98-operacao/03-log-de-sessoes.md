@@ -5,6 +5,39 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-06] — Recorte 16 (Assistant Orquestrador): Cards de Ação e Encaminhamento — Em Desenvolvimento
+
+- **Fase:** Fase 9 — Data Intelligence & Scale (Evolução: Assistant textual → Assistente orquestrador)
+- **Alvo:** Transformar Assistant de chat puro em orquestrador operacional com cards acionáveis
+- **Escopo:** Cards para itens existentes (contas/sinais/ações) + criação de novas ações na fila
+- **Restrições Aplicadas:**
+  - Validação rigorosa de cards contra entidades reais (descartar inválidos silenciosamente)
+  - Context comprimido: máx 8 contas, máx 5 sinais críticos, máx 5 ações prioritárias
+  - Proteção contra duplicação de novas ações
+  - FlowStrip visual leve (5 chips + setas, sem fluxograma)
+- **Arquitetura:**
+  - **Backend (route.ts):**
+    * Nova interface `OperationalContext.availableEntities` com entidades de referência
+    * Tipos `ResponseCard` inline com 4 variantes (existing_account/signal/action, new_action)
+    * Parser `extractCards()` para bloco HTML `<!--CANOPI_CARDS:[...]-->`
+    * `buildContextualInstruction()` com 2 seções: ENTIDADES + GERAÇÃO DE CARDS
+    * Response expandido: `{ text, cards? }`
+  - **Frontend (Assistant.tsx):**
+    * `validateCards()` filtra contra entidades reais (slug, signalId, actionId, accountName)
+    * `checkActionDuplicate()` detecta similaridade por conta + primeiros 20 chars do título
+    * `handleCreateAction()` cria via `createAction()` do contexto (sourceType: 'signal')
+    * `renderResponseCards()` renderiza 4 tipos com UI leve + deep links
+    * Cards integrados abaixo de mensagens do assistant
+- **Validação Técnica:**
+  * Build: Exit 0 (7.1s)
+  * Zero inline styles (Tailwind puro)
+  * Parser defensivo contra JSON malformado
+  * Cards inválidos descartados silenciosamente
+- **Commit:** `fe9d5f9` — feat(assistant): adiciona cards acionaveis para orquestracao operacional
+- **Status:** ✅ Build validado, commitado localmente, **Awaiting approval before push**
+
+---
+
 ## [2026-04-06] — Hotfix: Chat Overflow & Scroll — Fechado (Validado em Navegador)
 
 - **Problema Raiz Identificado:** Card renderiza com `overflow-hidden`, bloqueando scroll interno

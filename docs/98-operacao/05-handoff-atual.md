@@ -40,15 +40,17 @@
 9.  **Copiloto Operacional Real (Opção 3):** Helper `operationalIntelligence.ts` consolidando toda inteligência. Integração no Assistant.tsx com card de Prioridades Imediatas. Enriquecimento de `src/app/api/chat/route.ts` com 5 blocos de contexto operacional injetados na system instruction. Assistant responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco.
 10. **Plays Recomendados (Recorte 15):** Função `deriveRecommendedPlays()` que gera até 4 recomendações explícitas baseadas em padrões detectados (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Conta em Risco→Intervenção, Sinal Crítico→Ativação). Bloco visual com cards responsivos, cores por urgência, botões "Chat" e "Copiar". Fecha loop: inteligência → ação.
 11. **Hotfix Chat Overflow & Scroll:** Correção estrutural em Assistant.tsx para respostas longas. Problema raiz: Card renderiza com `overflow-hidden`, bloqueava scroll interno. Solução: Adiciona `!overflow-y-auto !overflow-x-hidden` ao Card (sobrescreve base). Ajusta padding granular (Card `p-0`, seções com `px-6 pb-6`). Melhora prose spacing (`my-2`/`my-3`) e destaque visual. Validado em navegador: scrollbar funciona, texto completo visível, input acessível. Commit: `18b8d8b`.
+12. **Assistant Orquestrador (Recorte 16):** Evolução do Assistant de chat puro para orquestrador operacional com cards acionáveis. Backend: expansão OperationalContext com availableEntities, tipos ResponseCard (4 variantes), parser extractCards(), instrução expandida (ENTIDADES + GERAÇÃO DE CARDS), retorno { text, cards? }. Frontend: validação rigorosa de cards contra entidades reais, checkActionDuplicate() para prevenção de duplicação, handleCreateAction() para criar novas ações, renderResponseCards() com 4 tipos (existing_account/signal/action → deep links; new_action → FlowStrip + criação). Cards renderizados abaixo de mensagens do assistant. Build: Exit 0, zero inline styles, parser defensivo. Commit: `fe9d5f9`. Status: commitado localmente, aguardando aprovação.
 
 ## Pendências e Observações (Auditado)
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual (Hotfix Fechado):** Recorte 15 (Plays) publicado em origin/main. Hotfix de Chat (scroll overflow) publicado em origin/main (`18b8d8b`) e validado em navegador.
-- **Hotfix Status:** ✅ Build Exit 0 (42.5 kB Assistant). ✅ Validado em navegador (scrollbar funciona, texto visível). ✅ Publicado em origin/main.
-- **Working Tree:** Limpa e sincronizada com origin/main.
-- **Pipeline Completado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15) → Chat Hotfix (overflow/scroll). Loop completo: detecção → priorização → ação → UX refinement.
+- **Estado Anterior:** Recorte 15 (Plays) publicado em origin/main. Hotfix Chat (scroll overflow) publicado (`18b8d8b`).
+- **Estado Atual (Recorte 16 em Desenvolvimento):** Assistant Orquestrador — Cards de Ação e Encaminhamento (commitado localmente, build validado, awaiting approval).
+- **Recorte 16 Status:** ✅ Build Exit 0 (44.8 kB Assistant, +2.3 kB por nova lógica de cards). ✅ Cards validados contra entidades reais. ✅ Duplicação de ações prevenida. ✅ FlowStrip visual enxuto. ✅ Zero inline styles.
+- **Working Tree:** Limpa com 1 commit novo (`fe9d5f9`), 1 commit ahead of origin/main.
+- **Pipeline Evoluído:** Inteligência Operacional → Plays Recomendados → Chat Hotfix → **Cards Acionáveis (orquestração operacional)**. Assistant passa de chat puro a orquestrador com encaminhamento claro para itens existentes + criação de novas ações.
 
 ## Recomendações para próximo recorte (Fase 10)
 1. **Validação UX de Cores:** Verificar se amber/orange (Prioridades) e red/orange/blue (Plays) oferecem contraste suficiente e clareza.
