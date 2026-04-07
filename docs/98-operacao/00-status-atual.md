@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 22 — Supabase E2: Primeira Migração de Entidade: 15ce264, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 23 — Supabase E3: Segunda Migração de Entidade: 1d7ab3d, publicado em origin/main)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 22 — Supabase E2: Primeira Migração de Entidade)
@@ -250,10 +250,23 @@
 - **Commit:** `15ce264` — feat(supabase): Recorte 22 — E2: Primeira Migração de Entidade (accounts)
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 23 — Supabase E3: Segunda Migração de Entidade (signals)** — 2026-04-07
+- ✅ Repositório defensivo `src/lib/signalsRepository.ts`
+- ✅ `getSignals()`: query Supabase 17 campos (id, severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
+- ✅ Merge defensivo com advancedSignals: nullish coalescing (??) para todos 19 campos críticos
+- ✅ Shell seguro para sinais sem mock correspondente
+- ✅ Tipagem SignalRow com 17 campos opcionais
+- ✅ `src/pages/Signals.tsx`: consome getSignals() em useEffect com try/catch
+- ✅ Fallback completo: não configurado → advancedSignals; erro → advancedSignals; sem dados → advancedSignals
+- ✅ Logging observabilidade em 5 pontos (config, error, shell, success, exception)
+- ✅ Build Exit 0 (validado)
+- **Commit:** `1d7ab3d` — feat(signals): implementa Recorte 23 — Supabase E3 Segunda Migração de Entidade
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 22 — E2 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 23 (E3 — Segunda Migração: sinais ou contatos)
+- **Status Atual:** Recorte 23 — E3 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 24 (E4 — Terceira Migração: contatos)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -286,3 +299,4 @@
 | Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |
 | Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
 | Supabase E2: First Migration | Recorte 22 Concluído (Fase E) | Repository layer accounts: getAccounts(), merge com mock, shell seguro, Accounts.tsx consumindo dados |
+| Supabase E3: Second Migration | Recorte 23 Concluído (Fase E) | Repository layer signals: getSignals(), query 17 campos, merge defensivo (nullish coalescing), Signals.tsx consumindo dados |

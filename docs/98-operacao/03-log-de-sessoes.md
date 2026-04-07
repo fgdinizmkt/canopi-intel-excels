@@ -5,6 +5,35 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 23 (Supabase E3): Segunda Migração de Entidade (signals) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Segunda migração: signals lidos do Supabase)
+- **Alto:** Implementar camada de repositório defensiva para leitura de sinais do Supabase com fallback seguro.
+- **Contexto:** Recorte 22 implementou primeira migração (accounts). Recorte 23 aplica padrão a segunda entidade (signals). Estratégia: read-only, merge defensivo com nullish coalescing, shell seguro.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/signalsRepository.ts`:**
+    * Type `SignalRow`: tipagem com 17 campos opcionais (id, severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
+    * Função `getSignals()`: 
+      - Query 17 campos mínimos do Supabase
+      - Merge defensivo com advancedSignals: nullish coalescing (??) para todos 19 campos críticos (17 campos + archived + resolved)
+      - Shell seguro explícito para sinais sem mock: todos campos obrigatórios preenchidos com valores defaults seguros, campos profundos vazios
+      - Fallback completo: se Supabase não configurado, erro, ou sem dados → advancedSignals
+      - Logging em 5 pontos: config, error, warning (shell), success, exception
+  - **Modificação `src/pages/Signals.tsx`:**
+    * +import `getSignals` do repositório
+    * +estado `[signals, setSignals]` já existente, reinicializado em useEffect
+    * useEffect: async `carregarSignals()` chamada em mount, fallback para advancedSignals em erro
+    * Todos os filtros, métricas, opções alimentadas por dados potencialmente do Supabase
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 173 insertions(+), 2 deletions(-)
+    * Merge defensivo: nullish coalescing garante que null/undefined do Supabase nunca sobrescreve valores válidos de mock
+    * Tipagem: SignalRow alinhada com campos de advancedSignals
+    * Fallback: seguro em todos cenários (dev sem Supabase, error, sem dados)
+- **Commit:** `1d7ab3d` — feat(signals): implementa Recorte 23 — Supabase E3 Segunda Migração de Entidade
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 22 (Supabase E2): Primeira Migração de Entidade (accounts) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Primeira migração real: accounts lidos do Supabase)
 - **Alto:** Implementar camada de repositório defensiva para leitura de contas do Supabase com fallback seguro.
