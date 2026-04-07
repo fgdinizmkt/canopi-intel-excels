@@ -115,6 +115,7 @@ export const Assistant: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [storedActions, setStoredActions] = useState<StoredAction[]>([]);
   const [createdActionIds, setCreatedActionIds] = useState<Set<string>>(new Set());
+  const [createdActionMap, setCreatedActionMap] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { selectedAccountId, createAction } = useAccountDetail();
@@ -218,8 +219,9 @@ export const Assistant: React.FC = () => {
   const handleCreateAction = (card: ResponseCard & { type: 'new_action' }) => {
     if (checkActionDuplicate(card.title, card.accountName)) return;
     const priorityMap: Record<string, Priority> = { crítica: 'Crítica', alta: 'Alta', média: 'Média' };
-    createAction({ title: card.title, priority: priorityMap[card.urgency] ?? 'Alta', category: 'ABX', channel: 'ABX', accountName: card.accountName, relatedAccountId: card.relatedAccountId, accountContext: card.focus ?? '', ownerName: null, nextStep: card.suggestedAction, sourceType: 'signal', description: card.reason });
+    const actionId = createAction({ title: card.title, priority: priorityMap[card.urgency] ?? 'Alta', category: 'ABX', channel: 'ABX', accountName: card.accountName, relatedAccountId: card.relatedAccountId, accountContext: card.focus ?? '', ownerName: null, nextStep: card.suggestedAction, sourceType: 'signal', description: card.reason });
     setCreatedActionIds(prev => new Set([...prev, `${card.title}|${card.accountName}`]));
+    setCreatedActionMap(prev => ({ ...prev, [`${card.title}|${card.accountName}`]: actionId as string }));
   };
 
   const handleSend = async () => {
@@ -258,6 +260,8 @@ export const Assistant: React.FC = () => {
           if (card.type === 'new_action') {
             const isDuplicate = checkActionDuplicate(card.title, card.accountName);
             const isCreated = createdActionIds.has(`${card.title}|${card.accountName}`);
+            const createdActionId = createdActionMap[`${card.title}|${card.accountName}`];
+            const targetLink = createdActionId ? `/acoes?actionId=${createdActionId}` : '/acoes';
             return (
               <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -269,7 +273,7 @@ export const Assistant: React.FC = () => {
                   {isDuplicate || isCreated ? (
                     <div className="flex-1 flex items-center gap-2">
                       <div className="flex-1 h-8 text-[11px] font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
-                      <Link href="/acoes" className="h-8 px-3 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200 rounded flex items-center gap-1 hover:bg-slate-200 transition-all">Ver Fila <ChevronRight className="w-3 h-3" /></Link>
+                      <Link href={targetLink} className="h-8 px-3 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200 rounded flex items-center gap-1 hover:bg-slate-200 transition-all">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
                     </div>
                   ) : (
                     <Button onClick={() => handleCreateAction(card)} className="flex-1 h-8 text-[11px] font-bold bg-blue-600 text-white hover:bg-blue-700"><Plus className="w-3 h-3 mr-1" /> Criar na Fila</Button>

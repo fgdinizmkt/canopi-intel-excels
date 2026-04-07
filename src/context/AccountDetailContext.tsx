@@ -25,8 +25,8 @@ interface AccountDetailContextType {
   sessionActions: ActionItem[];
   /** Operação: Logs adicionados nesta sessão (por Account ID) */
   sessionLogs: Record<string, string[]>;
-  /** Cria uma nova ação operacional */
-  createAction: (action: Partial<ActionItem>) => void;
+  /** Cria uma nova ação operacional e retorna seu ID */
+  createAction: (action: Partial<ActionItem>) => string;
   /** Atualiza uma ação existente com registro de histórico automático */
   updateAction: (actionId: string, patch: Partial<ActionItem> & { comment?: string }, actor?: string) => void;
   /** Adiciona um registro ao histórico da conta */
@@ -139,7 +139,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
   /**
    * Operacional: Criação de Ação Real
    */
-  const createAction = useCallback((partialAction: Partial<ActionItem>) => {
+  const createAction = useCallback((partialAction: Partial<ActionItem>): string => {
     const newAction: ActionItem = {
       id: `session-${Date.now()}`,
       priority: partialAction.priority || "Média",
@@ -182,6 +182,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     setSessionActions(prev => [newAction, ...prev]);
+    return newAction.id;
   }, []);
 
   /**
