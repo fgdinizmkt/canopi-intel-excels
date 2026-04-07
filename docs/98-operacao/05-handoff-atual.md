@@ -45,9 +45,9 @@
 1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
 
 ## Próximos passos (Fase 9 — Continuação)
-- **Estado Atual (Hotfix Fechado):** Recorte 15 (Plays) publicado em origin/main. Hotfix de Chat (scroll overflow) commitado localmente (`18b8d8b`) e validado em navegador.
-- **Hotfix Status:** ✅ Build Exit 0 (42.5 kB Assistant). ✅ Validado em navegador (scrollbar funciona, texto visível). Commitado localmente. **Awaiting push approval.**
-- **Working Tree:** Limpa após commit. Pronto para push quando aprovado.
+- **Estado Atual (Hotfix Fechado):** Recorte 15 (Plays) publicado em origin/main. Hotfix de Chat (scroll overflow) publicado em origin/main (`18b8d8b`) e validado em navegador.
+- **Hotfix Status:** ✅ Build Exit 0 (42.5 kB Assistant). ✅ Validado em navegador (scrollbar funciona, texto visível). ✅ Publicado em origin/main.
+- **Working Tree:** Limpa e sincronizada com origin/main.
 - **Pipeline Completado:** Inteligência Operacional (Opção 3) → Plays Recomendados (Recorte 15) → Chat Hotfix (overflow/scroll). Loop completo: detecção → priorização → ação → UX refinement.
 
 ## Recomendações para próximo recorte (Fase 10)
@@ -67,4 +67,4 @@
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
 - **Consistency Check:** colorMap estendido para anomalia types (`Ghosting`, `Vazão`, `Congestionamento`, `Cascata`) + urgency levels (`crítica`, `alta`, `média`) em próximo recorte, se necessário.
-- **Sincronização:** ✅ Main sincronizada com origin/main (Recorte 15 publicado).
+- **Sincronização:** ✅ Main sincronizada com origin/main (Recorte 15 + Hotfix Chat publicados).

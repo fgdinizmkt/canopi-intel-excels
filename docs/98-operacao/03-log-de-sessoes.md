@@ -17,7 +17,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Max-width:** `85%` → `90%` para melhor uso do espaço
   - **Markup:** Código com destaque, blockquotes com border, links sublinhados
 - **Commit:** `18b8d8b` — fix(chat): corrige overflow e scroll do Assistant no container do Card
-- **Status:** ✅ Commitado localmente, validado em navegador, awaiting push approval
+- **Status:** ✅ Publicado em origin/main (18b8d8b), validado em navegador
 
 ---
 
