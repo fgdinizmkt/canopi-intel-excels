@@ -194,14 +194,16 @@
 
 **Fase 9 — Data Intelligence & Scale**
 
-- **Recorte: Estabilização Premium do Assistant:** Concluído — 2026-04-07
-  - ✅ Hierarquia visual 12 colunas e Header "Enterprise Edition" estabilizados
-  - ✅ Chat com design assimétrico (usuário: rounded-tr-none / IA: rounded-tl-none)
-  - ✅ Restauração integral do backend agêntico (`route.ts`): types, parser e entrega de cards
-  - ✅ Funcionalidades recuperadas: criação de ações na fila e validação contra entidades reais
-  - ✅ Botão "Copiar" nos Plays táticos reativado via `navigator.clipboard`
+- **Recorte 16 — Assistant Orquestrador:** Concluído — 2026-04-07
+  - ✅ Cards acionáveis para contas existentes, sinais e ações (existing_account, signal, action)
+  - ✅ Criação de nova ação diretamente na fila via `handleCreateAction()` (tipo new_action)
+  - ✅ Validação de cards contra entidades reais via `validateCards()` (slug, signalId, actionId)
+  - ✅ Proteção contra duplicação de ações via `checkActionDuplicate()`
+  - ✅ Parser `extractCards()` em route.ts via regex CANOPI_CARDS
+  - ✅ Estabilização premium: grade 12 colunas, tipografia, design assimétrico de bolhas
+  - ✅ Restore do backend agêntico: tipos ResponseCard + instrução Gemini + payload { text, cards }
   - ✅ Build Exit 0 (45.5 kB Assistant)
-  - **Commit:** `a5b43d0` (amend do `2888411`)
+  - **Commits:** `fe9d5f9` (feat) + `a5b43d0` (estabilização)
   - **Status:** ✅ Publicado em origin/main
 
 - **Recorte Reconciliação:** Concluído — 2026-04-06
@@ -225,7 +227,7 @@
   - **Commits:** `6fff541` (feat) + `cfd30d1` (docs)
   - **Status:** ✅ Publicado em origin/main
 
-- **Recorte 15 — Plays Recomendados (ÚLTIMO):** Concluído — 2026-04-06
+- **Recorte 15 — Plays Recomendados:** Concluído — 2026-04-06
   - ✅ Função `deriveRecommendedPlays()` com 6 padrões automáticos
   - ✅ Bloco visual com cards responsivos, cores por urgência
   - ✅ Botões "Chat" (preenche input) + "Copiar" (clipboard)
@@ -236,8 +238,8 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Estabilização Premium do Assistant publicada e sincronizada com origin/main
-- **Novo Recorte:** A ser aprovado pelo Orquestrador
+- **Status Atual:** Recorte 16 — Assistant Orquestrador concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 17
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -267,4 +269,4 @@
 | Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
 | Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
 | Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Risco→Intervenção, Sinal Crítico→Ativação) |
-| Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, etc) |
+| Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |
