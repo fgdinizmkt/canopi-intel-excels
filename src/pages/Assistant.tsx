@@ -389,30 +389,28 @@ export const Assistant: React.FC = () => {
 
       <div className="grid grid-cols-3 gap-6">
         {/* Chat Interface */}
-        <Card className="col-span-2 p-6 flex flex-col h-[600px]">
-          <h3 className="font-bold mb-4 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-blue-600"/> Chat com Assistente Estratégico
-          </h3>
+        <Card className="col-span-2 p-0 flex flex-col h-[600px] !overflow-y-auto !overflow-x-hidden">
+          <div className="px-6 pt-6 pb-0 flex-shrink-0">
+            <h3 className="font-bold mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-blue-600"/> Chat com Assistente Estratégico
+            </h3>
+          </div>
 
-          {/* Messages Area — min-h-0 crucial para flex overflow */}
-          <div className="flex-1 min-h-0 overflow-y-auto space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          {/* Messages Area — flex-1 min-h-0 overflow-y-auto crucial para scroll */}
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-4 bg-slate-50 p-4 mx-6 rounded-xl border border-slate-100">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
                 className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`p-3 rounded-lg shadow-sm text-sm max-w-[85%] break-words overflow-hidden prose prose-sm prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:my-2 ${
+                  className={`p-3 rounded-lg shadow-sm text-sm max-w-[90%] break-words prose prose-sm prose-p:my-2 prose-li:my-1 prose-ul:my-2 prose-ol:my-2 prose-headings:my-3 prose-code:bg-slate-100 prose-code:px-1.5 prose-code:rounded prose-code:text-sm prose-blockquote:border-l-4 prose-blockquote:italic prose-blockquote:my-2 prose-a:text-blue-500 prose-a:underline ${
                     msg.role === 'user'
                       ? 'bg-blue-600 text-white prose-invert'
                       : 'bg-white text-slate-800 border border-slate-100'
                   }`}
                 >
-                  <ReactMarkdown
-                    components={{
-                      p: ({node, ...props}) => <p style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}} {...props} />,
-                    }}
-                  >
+                  <ReactMarkdown>
                     {msg.content}
                   </ReactMarkdown>
                 </div>
@@ -429,7 +427,7 @@ export const Assistant: React.FC = () => {
           </div>
 
           {/* Input Area — flex-shrink-0 para garantir que não encolha */}
-          <div className="flex-shrink-0 mt-4 flex gap-2">
+          <div className="flex-shrink-0 mt-4 px-6 pb-6 flex gap-2">
             <input
               type="text"
               value={input}
