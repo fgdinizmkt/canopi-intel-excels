@@ -35,6 +35,33 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 18 (Assistant Orquestrador): Retorno Direto da Nova Ação — Concluído
+- **Fase:** Fase 9 — Data Intelligence & Scale (Completude do circuito: new_action com deep-link)
+- **Alvo:** Retornar direto para a ação recém-criada no lugar de rota genérica `/acoes`
+- **Contexto:** Recorte 17 implementou deep-linking para existing_signal e existing_action. new_action ainda levava genericamente. Recorte 18 fecha esse gap.
+- **Ações Executadas:**
+  - **Backend (AccountDetailContext.tsx):**
+    * `createAction()` mudança de assinatura: `(action) => void` → `(action) => string`
+    * Função agora retorna o ID da ação criada (`newAction.id`)
+    * Interface `AccountDetailContextType` atualizada
+  - **Frontend (Assistant.tsx):**
+    * Novo estado `createdActionMap`: `Record<string, string>` mapeia `${title}|${accountName}` → actionId
+    * `handleCreateAction()`: captura ID retornado e armazena em mapa
+    * renderResponseCards() (new_action branch):
+      * Extrai actionId do mapa via chave única
+      * Link "Ver Ação" usa `/acoes?actionId={id}` quando actionId existe
+      * Fallback seguro para `/acoes` quando não há ID determinístico
+      * UX consistente com existing_signal e existing_action (Recorte 17)
+- **Validação Técnica:**
+  * Build: Exit 0 (sucesso completo)
+  * 2 files, 10 insertions(+), 5 deletions(-)
+  * TypeScript: type safety com cast de actionId
+  * Backwards-compatible: fallback garante funcionamento mesmo sem mapa
+- **Commit:** `7b5dc23` — feat(assistant): adiciona retorno direto para ação criada no assistant
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Estabilização Premium do Assistant: Refino Visual e Restauração Agêntica — Concluído
 - **Fase:** Fase 9 — Data Intelligence & Scale (Estabilização de interface e lógica de cards)
 - **Alvo:** Consolidar a interface do Assistant como "Enterprise Edition" e restaurar a funcionalidade de cards acionáveis.

@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-07
 
-**Status:** Recorte 17 — Assistant Orquestrador: Encaminhamento Profundo concluído.
+**Status:** Recorte 18 — Assistant Orquestrador: Retorno Direto da Nova Ação concluído.
 
 ## Objetivo Atual
 Finalizar a Fase 9 — Data Intelligence & Scale.
-Próximo passo: definir e aprovar o Recorte 18.
+Próximo passo: definir e aprovar o Recorte 19.
 
 ## Último Estado Confiável
-**Recorte 17 — Assistant Orquestrador: Encaminhamento Profundo** (commit `7de955d`, publicado em origin/main)
+**Recorte 18 — Assistant Orquestrador: Retorno Direto da Nova Ação** (commit `7b5dc23`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -23,11 +23,14 @@ Próximo passo: definir e aprovar o Recorte 18.
   - new_action → `/acoes` com link "Ver Fila"
 - ✅ Recorte 17: useSearchParams hooks adicionados a Signals.tsx e Actions.tsx.
 - ✅ Recorte 17: Visual differentiation mantida (cores e ícones distintos por tipo).
+- ✅ Recorte 18: `createAction()` retorna ID da ação criada (antes: void).
+- ✅ Recorte 18: `new_action` passa a usar deep-link `/acoes?actionId={id}` direto para a ação criada.
+- ✅ Recorte 18: Fallback seguro para `/acoes` quando não houver ID determinístico.
 - ✅ Publicação: commits publicados em origin/main.
 - ✅ Documentação: checkpoint sincronizado.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 18 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 19 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 18.
+Aguardar aprovação do Orquestrador para definir o Recorte 19.
