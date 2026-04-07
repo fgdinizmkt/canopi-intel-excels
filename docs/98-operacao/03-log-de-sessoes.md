@@ -5,6 +5,34 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Estabilização Premium do Assistant: Refino Visual e Restauração Agêntica — Concluído
+- **Fase:** Fase 9 — Data Intelligence & Scale (Estabilização de interface e lógica de cards)
+- **Alvo:** Consolidar a interface do Assistant como "Enterprise Edition" e restaurar a funcionalidade de cards acionáveis.
+- **Contexto:** Auditoria pós-refino visual identificou que o backend (`route.ts`) havia perdido a infraestrutura de parsing e geração de cards, neutralizando a inteligência agêntica.
+- **Ações Executadas:**
+  - **Frontend (Assistant.tsx):**
+    * Refino estético premium: grade de 12 colunas, tipografia `tracking-tight` e sombras profundas.
+    * Design de bolhas assimétrico: Usuário (`rounded-tr-none`) vs Assistant (`rounded-tl-none`).
+    * Reativação da funcionalidade de cópia nos Plays Sugeridos via `navigator.clipboard`.
+    * Header rotulado como "Assistant Enterprise Edition" para reforço de autoridade.
+  - **Backend (route.ts):**
+    * Restauração integral dos tipos `ResponseCard` (existing_account, signal, action e new_action).
+    * Reimplementação do parser `extractCards()` via Regex `CARDS_PATTERN`.
+    * Injeção do bloco de "Entidades Disponíveis" no contexto operacional enviado ao Gemini.
+    * Atualização da `SYSTEM_INSTRUCTION` com regras rigorosas de geração de JSON em blocos HTML.
+    * Sincronização do payload de resposta: `{ text: string, cards?: ResponseCard[] }`.
+- **Validação Técnica:**
+  * Build: Exit 0 (sucesso absoluto em todas as 16 rotas).
+  * Correção por **amend** do commit `2888411` para manter a integridade do histórico histórico.
+  * Publicação: Push concluído para `origin/main` (hash final `a5b43d0`).
+- **Resultado:**
+  * O Assistant voltou a operar como orquestrador, permitindo identificar contas e criar ações reais na fila.
+  * A interface atingiu o padrão visual "enterprise-ready", com hierarquia clara entre KPIs, Plays e Chat.
+- **Commit:** `a5b43d0` — refactor(assistant): estabiliza apresentacao premium sem regressao logica
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-06] — Recorte 16 (Assistant Orquestrador): Cards de Ação e Encaminhamento — Em Desenvolvimento
 
 - **Fase:** Fase 9 — Data Intelligence & Scale (Evolução: Assistant textual → Assistente orquestrador)

@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-06 (Plays Recomendados: f9cf7a7 + e884885, publicados em origin/main)
+ `main` — sincronizada em 2026-04-07 (Assistant Orquestrador: a5b43d0, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Recorte 15 — Plays Recomendados)
+**Fase 9 — Data Intelligence & Scale** (Em Execução - Último Recorte: Estabilização Premium do Assistant)
 
 ---
 
@@ -194,6 +194,16 @@
 
 **Fase 9 — Data Intelligence & Scale**
 
+- **Recorte: Estabilização Premium do Assistant:** Concluído — 2026-04-07
+  - ✅ Hierarquia visual 12 colunas e Header "Enterprise Edition" estabilizados
+  - ✅ Chat com design assimétrico (usuário: rounded-tr-none / IA: rounded-tl-none)
+  - ✅ Restauração integral do backend agêntico (`route.ts`): types, parser e entrega de cards
+  - ✅ Funcionalidades recuperadas: criação de ações na fila e validação contra entidades reais
+  - ✅ Botão "Copiar" nos Plays táticos reativado via `navigator.clipboard`
+  - ✅ Build Exit 0 (45.5 kB Assistant)
+  - **Commit:** `a5b43d0` (amend do `2888411`)
+  - **Status:** ✅ Publicado em origin/main
+
 - **Recorte Reconciliação:** Concluído — 2026-04-06
   - ✅ Reconciliação de datasets publicada (links accountId/relatedAccountId)
   - ✅ 9 contas órfãs + 4 vazias classificadas para filtro downstream
@@ -226,7 +236,7 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 15 publicado e sincronizado com origin/main
+- **Status Atual:** Estabilização Premium do Assistant publicada e sincronizada com origin/main
 - **Novo Recorte:** A ser aprovado pelo Orquestrador
 
 > [!IMPORTANT]
