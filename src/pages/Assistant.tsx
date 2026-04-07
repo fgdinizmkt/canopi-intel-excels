@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { Card, Button, Badge } from '../components/ui';
-import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target, Lightbulb, Copy, MessageCircle, ExternalLink, ChevronRight, Plus, ArrowRight } from 'lucide-react';
+import { Bot, Zap, Clock, CheckCircle, MessageSquare, Play, RefreshCw, Send, Loader2, AlertTriangle, Building2, TrendingUp, Target, Copy, MessageCircle, ChevronRight, Plus } from 'lucide-react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock, initialActions, type Priority } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
@@ -14,7 +14,7 @@ import { buildOperationalIntelligence, deriveRecommendedPlays } from '../helpers
 type ResponseCard =
   | { type: 'existing_account'; accountId: string; slug: string; name: string; reason?: string }
   | { type: 'existing_signal';  signalId: string;  name: string; severity: string; account: string; reason?: string }
-  | { type: 'existing_action';  actionId: string;  title: string; priority: string; accountName: string }
+  | { type: 'existing_action';  actionId: string;  title: string; priority: string; accountName: string; reason?: string }
   | { type: 'new_action'; title: string; reason: string; urgency: string; accountName: string; relatedAccountId?: string; focus?: string; suggestedAction: string; destination?: string };
 
 interface ChatMessage {
@@ -119,49 +119,31 @@ export const Assistant: React.FC = () => {
 
   const { selectedAccountId, createAction } = useAccountDetail();
 
-  // Leitura defensiva do localStorage — apenas no cliente
   useEffect(() => {
     try {
       const raw = localStorage.getItem('canopi_actions');
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setStoredActions(parsed as StoredAction[]);
-        }
+        if (Array.isArray(parsed)) setStoredActions(parsed as StoredAction[]);
       }
-    } catch {
-      // localStorage malformado — ignora
-    }
+    } catch {}
   }, []);
 
-  // Conta aberta (pode ser null)
   const contaAberta = useMemo(() => {
     if (!selectedAccountId) return null;
     return contasMock.find(c => c.id === selectedAccountId) ?? null;
   }, [selectedAccountId]);
 
-  // Sinais ativos (não arquivados, não resolvidos)
-  const sinaisAtivos = useMemo(
-    () => advancedSignals.filter(s => !s.archived && !s.resolved),
-    [],
-  );
+  const sinaisAtivos = useMemo(() => advancedSignals.filter(s => !s.archived && !s.resolved), []);
 
-  // Top 3 sinais críticos para o contexto
   const sinaisCriticosContexto = useMemo(() => {
     const severityOrder: Record<string, number> = { crítico: 0, alerta: 1, oportunidade: 2 };
     return [...sinaisAtivos]
       .sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9))
       .slice(0, 3)
-      .map(s => ({
-        title: s.title,
-        severity: s.severity,
-        account: s.account,
-        recommendation: s.recommendation,
-        confidence: s.confidence,
-      }));
+      .map(s => ({ title: s.title, severity: s.severity, account: s.account, recommendation: s.recommendation, confidence: s.confidence }));
   }, [sinaisAtivos]);
 
-  // KPIs derivados de dados reais
   const kpis = useMemo(() => {
     const criticos = advancedSignals.filter(s => s.severity === 'crítico' && !s.archived).length;
     const prioritarias = contasMock.filter(c => c.prontidao > 70).length;
@@ -170,15 +152,14 @@ export const Assistant: React.FC = () => {
       : 0;
 
     return [
-      { label: 'AÇÕES NA FILA',       val: String(storedActions.length),  icon: Play,          color: 'text-blue-500' },
-      { label: 'SINAIS ATIVOS',       val: String(sinaisAtivos.length),   icon: Bot,           color: 'text-emerald-500' },
-      { label: 'SINAIS CRÍTICOS',     val: String(criticos),              icon: AlertTriangle, color: 'text-red-500' },
-      { label: 'CONTAS PRIORITÁRIAS', val: String(prioritarias),          icon: Building2,     color: 'text-purple-500' },
-      { label: 'CONFIANÇA MÉDIA',     val: `${confidenceMedia}%`,         icon: CheckCircle,   color: 'text-emerald-500' },
+      { label: 'Fila de Ações', val: String(storedActions.length), icon: Play, color: 'text-blue-600', bg: 'bg-blue-50' },
+      { label: 'Sinais Ativos', val: String(sinaisAtivos.length), icon: Bot, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+      { label: 'Críticos', val: String(criticos), icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
+      { label: 'Prioritárias', val: String(prioritarias), icon: Building2, color: 'text-purple-600', bg: 'bg-purple-50' },
+      { label: 'Confiança', val: `${confidenceMedia}%`, icon: CheckCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
     ];
   }, [storedActions, sinaisAtivos]);
 
-  // Fila de tarefas operacionais — ações reais ou fallback em sinais críticos
   const filaOperacional = useMemo(() => {
     if (storedActions.length > 0) {
       return storedActions.slice(0, 3).map(a => ({
@@ -188,77 +169,31 @@ export const Assistant: React.FC = () => {
         icon: a.status === 'Em andamento' ? RefreshCw : a.status === 'Concluída' ? CheckCircle : Clock,
       }));
     }
-    // Fallback: sinais críticos como tarefas pendentes
-    return advancedSignals
-      .filter(s => s.severity === 'crítico' && !s.archived)
-      .slice(0, 3)
-      .map(s => ({
-        task: s.title,
-        sub: s.account,
-        status: 'Pendente',
-        icon: AlertTriangle,
-      }));
+    return advancedSignals.filter(s => s.severity === 'crítico' && !s.archived).slice(0, 3).map(s => ({
+      task: s.title, sub: s.account, status: 'Pendente', icon: AlertTriangle,
+    }));
   }, [storedActions]);
 
-  // Plays recomendados baseados em inteligência operacional
   const recommendedPlays = useMemo(() => deriveRecommendedPlays(), []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => { scrollToBottom(); }, [messages, isLoading]);
 
   const buildContextBlock = (): ContextBlock => {
     const opIntel = buildOperationalIntelligence();
-
-    // Montar availableEntities com restrições
-    const availableAccounts = contasMock
-      .filter(c => c.reconciliationStatus !== 'vazia')
-      .filter(c => c.statusGeral === 'Atenção' || c.statusGeral === 'Crítico' || c.prontidao > 70)
-      .slice(0, 8)
-      .map(c => ({ id: c.id, slug: c.slug, name: c.nome, status: c.statusGeral }));
-
-    const availableSignals = sinaisAtivos
-      .filter(s => s.severity === 'crítico')
-      .slice(0, 5)
-      .map(s => ({ id: s.id, title: s.title, severity: s.severity, account: s.account }));
-
-    const availableActions = initialActions
-      .filter(a => a.priority === 'Crítica' || a.priority === 'Alta')
-      .slice(0, 5)
-      .map(a => ({ id: a.id, title: a.title, priority: a.priority, accountName: a.accountName || '—' }));
+    const availableAccounts = contasMock.filter(c => c.reconciliationStatus !== 'vazia' && (c.statusGeral !== 'Saudável' || c.prontidao > 70)).slice(0, 8).map(c => ({ id: c.id, slug: c.slug, name: c.nome, status: c.statusGeral }));
+    const availableSignals = sinaisAtivos.filter(s => s.severity === 'crítico').slice(0, 5).map(s => ({ id: s.id, title: s.title, severity: s.severity, account: s.account }));
+    const availableActions = initialActions.filter(a => a.priority === 'Crítica' || a.priority === 'Alta').slice(0, 5).map(a => ({ id: a.id, title: a.title, priority: a.priority, accountName: a.accountName || '—' }));
 
     return {
-      contaAberta: contaAberta
-        ? {
-            nome: contaAberta.nome,
-            vertical: contaAberta.vertical,
-            statusGeral: contaAberta.statusGeral,
-            resumoExecutivo: contaAberta.resumoExecutivo,
-            prontidao: contaAberta.prontidao,
-            potencial: contaAberta.potencial,
-            proximaMelhorAcao: contaAberta.proximaMelhorAcao,
-          }
-        : null,
+      contaAberta: contaAberta ? { nome: contaAberta.nome, vertical: contaAberta.vertical, statusGeral: contaAberta.statusGeral, resumoExecutivo: contaAberta.resumoExecutivo, prontidao: contaAberta.prontidao, potencial: contaAberta.potencial, proximaMelhorAcao: contaAberta.proximaMelhorAcao } : null,
       sinaisCriticos: sinaisCriticosContexto,
-      acoesFila: storedActions.slice(0, 3).map(a => ({
-        title: a.title || 'Ação sem título',
-        accountName: a.account || '—',
-        status: a.status || 'Nova',
-      })),
-      availableEntities: {
-        accounts: availableAccounts,
-        signals: availableSignals,
-        actions: availableActions,
-      },
+      acoesFila: storedActions.slice(0, 3).map(a => ({ title: a.title || 'Ação sem título', accountName: a.account || '—', status: a.status || 'Nova' })),
+      availableEntities: { accounts: availableAccounts, signals: availableSignals, actions: availableActions },
       operationalIntelligence: opIntel,
     };
   };
 
-  // Validar cards contra entidades reais
   const validateCards = (cards: ResponseCard[], ctx: ContextBlock): ResponseCard[] => {
     if (!ctx.availableEntities) return [];
     const validAccountSlugs = new Set(ctx.availableEntities.accounts.map(a => a.slug));
@@ -274,80 +209,23 @@ export const Assistant: React.FC = () => {
     });
   };
 
-  // Verificar duplicação antes de criar ação
   const checkActionDuplicate = (title: string, accountName: string): boolean => {
-    const titleLower = title.toLowerCase();
-
-    // Verificar em initialActions (tem accountName)
-    const isDuplicateInInitial = initialActions.some(a =>
-      a.accountName?.toLowerCase() === accountName.toLowerCase() &&
-      a.title?.toLowerCase().includes(titleLower.slice(0, 20))
-    );
-
-    // Verificar em storedActions (tem account)
-    const isDuplicateInStored = storedActions.some(a =>
-      a.account?.toLowerCase() === accountName.toLowerCase() &&
-      a.title?.toLowerCase().includes(titleLower.slice(0, 20))
-    );
-
-    return isDuplicateInInitial || isDuplicateInStored;
+    const titleLower = title.toLowerCase().slice(0, 20);
+    return initialActions.some(a => a.accountName?.toLowerCase() === accountName.toLowerCase() && a.title?.toLowerCase().includes(titleLower)) ||
+           storedActions.some(a => a.account?.toLowerCase() === accountName.toLowerCase() && a.title?.toLowerCase().includes(titleLower));
   };
 
-  // Criar nova ação na fila
   const handleCreateAction = (card: ResponseCard & { type: 'new_action' }) => {
-    if (checkActionDuplicate(card.title, card.accountName)) {
-      return; // Já existe, não criar
-    }
-
+    if (checkActionDuplicate(card.title, card.accountName)) return;
     const priorityMap: Record<string, Priority> = { crítica: 'Crítica', alta: 'Alta', média: 'Média' };
-
-    createAction({
-      title: card.title,
-      priority: priorityMap[card.urgency] ?? 'Alta',
-      category: 'ABX',
-      channel: 'ABX',
-      accountName: card.accountName,
-      relatedAccountId: card.relatedAccountId,
-      accountContext: card.focus ?? '',
-      ownerName: null,
-      nextStep: card.suggestedAction,
-      sourceType: 'signal',
-      description: card.reason,
-    });
-
-    // Marcar como criada (usar title+accountName como chave)
-    const cardKey = `${card.title}|${card.accountName}`;
-    setCreatedActionIds(prev => new Set([...prev, cardKey]));
-  };
-
-  const handleUsePlayInChat = (promptText: string) => {
-    setInput(promptText);
-  };
-
-  const handleCopyPlay = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  const getUrgencyColor = (urgency: string): string => {
-    if (urgency === 'crítica') return 'bg-red-50 border-red-200 text-red-900';
-    if (urgency === 'alta') return 'bg-orange-50 border-orange-200 text-orange-900';
-    return 'bg-blue-50 border-blue-200 text-blue-900';
-  };
-
-  const getUrgencyBadgeColor = (urgency: string): string => {
-    if (urgency === 'crítica') return 'bg-red-100 text-red-700';
-    if (urgency === 'alta') return 'bg-orange-100 text-orange-700';
-    return 'bg-blue-100 text-blue-700';
+    createAction({ title: card.title, priority: priorityMap[card.urgency] ?? 'Alta', category: 'ABX', channel: 'ABX', accountName: card.accountName, relatedAccountId: card.relatedAccountId, accountContext: card.focus ?? '', ownerName: null, nextStep: card.suggestedAction, sourceType: 'signal', description: card.reason });
+    setCreatedActionIds(prev => new Set([...prev, `${card.title}|${card.accountName}`]));
   };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
-
     const userMessage = input.trim();
     setInput('');
-
-    // Build history from current messages, excluding any leading assistant messages
-    // (Gemini requires first content to be from 'user')
     const firstUserIdx = messages.findIndex(m => m.role === 'user');
     const historyToSend = firstUserIdx === -1 ? [] : messages.slice(firstUserIdx);
 
@@ -355,392 +233,168 @@ export const Assistant: React.FC = () => {
     setIsLoading(true);
 
     try {
+      const ctx = buildContextBlock();
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMessage,
-          history: historyToSend,
-          context: buildContextBlock(),
-        }),
+        body: JSON.stringify({ message: userMessage, history: historyToSend, context: ctx }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro na comunicação com a API');
-      }
-
-      const ctx = buildContextBlock();
+      if (!response.ok) throw new Error(data.error || 'Erro na API');
       const validatedCards = data.cards ? validateCards(data.cards, ctx) : [];
-
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.text,
-        ...(validatedCards.length > 0 && { cards: validatedCards })
-      }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.text, cards: validatedCards }]);
     } catch (error: any) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `**Erro:** ${error.message}` }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `**Falha técnica:** ${error.message}` }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  // Renderizador de cards acionáveis
   const renderResponseCards = (cards: ResponseCard[]) => {
     if (!cards || cards.length === 0) return null;
-
     return (
-      <div className="space-y-2 mt-3">
+      <div className="space-y-2.5 mt-4">
         {cards.map((card, idx) => {
-          if (card.type === 'existing_account') {
-            return (
-              <Link key={idx} href={`/contas/${card.slug}`}>
-                <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer flex items-start gap-3">
-                  <Building2 className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-blue-900">{card.name}</p>
-                    {card.reason && <p className="text-xs text-blue-700 mt-0.5">{card.reason}</p>}
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                </div>
-              </Link>
-            );
-          }
-
-          if (card.type === 'existing_signal') {
-            return (
-              <Link key={idx} href="/sinais">
-                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer flex items-start gap-3">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-amber-900">{card.name}</p>
-                      <Badge className={`text-xs ${
-                        card.severity === 'crítico' ? 'bg-red-100 text-red-700' :
-                        card.severity === 'alerta' ? 'bg-amber-100 text-amber-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {card.severity}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-amber-700">Conta: {card.account}</p>
-                    {card.reason && <p className="text-xs text-amber-700 mt-0.5">{card.reason}</p>}
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                </div>
-              </Link>
-            );
-          }
-
-          if (card.type === 'existing_action') {
-            return (
-              <Link key={idx} href="/acoes">
-                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer flex items-start gap-3">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-emerald-900">{card.title}</p>
-                      <Badge className={`text-xs ${
-                        card.priority === 'Crítica' ? 'bg-red-100 text-red-700' :
-                        card.priority === 'Alta' ? 'bg-orange-100 text-orange-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {card.priority}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-emerald-700">Conta: {card.accountName}</p>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                </div>
-              </Link>
-            );
-          }
-
           if (card.type === 'new_action') {
             const isDuplicate = checkActionDuplicate(card.title, card.accountName);
-            const cardKey = `${card.title}|${card.accountName}`;
-            const isCreated = createdActionIds.has(cardKey);
-
-            const handleClick = () => {
-              if (!isDuplicate && !isCreated) {
-                handleCreateAction(card);
-              }
-            };
-
+            const isCreated = createdActionIds.has(`${card.title}|${card.accountName}`);
             return (
-              <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-                <div className="flex items-start gap-3 mb-3">
-                  <Lightbulb className="w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="text-sm font-semibold text-slate-900">{card.title}</h4>
-                      <Badge className={`flex-shrink-0 text-xs ${
-                        card.urgency === 'crítica' ? 'bg-red-100 text-red-700' :
-                        card.urgency === 'alta' ? 'bg-orange-100 text-orange-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {card.urgency}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-slate-700 mt-1">{card.reason}</p>
-                    {card.focus && <p className="text-xs text-slate-600 mt-0.5"><span className="font-semibold">Foco:</span> {card.focus}</p>}
-                  </div>
+              <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h4 className="text-sm font-bold text-slate-900">{card.title}</h4>
+                  <Badge className={`text-[10px] uppercase font-bold ${card.urgency === 'crítica' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{card.urgency}</Badge>
                 </div>
-
-                {/* FlowStrip leve — apenas chips inline */}
-                <div className="flex items-center gap-1 flex-wrap text-xs mb-3 pb-3 border-b border-slate-200">
-                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">{card.accountName}</span>
-                  <ChevronRight className="w-3 h-3 text-slate-400" />
-                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">IA Detectou</span>
-                  <ChevronRight className="w-3 h-3 text-slate-400" />
-                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200">{card.urgency}</span>
-                  <ChevronRight className="w-3 h-3 text-slate-400" />
-                  <span className="bg-white px-2 py-1 rounded text-slate-700 border border-slate-200 truncate">{card.suggestedAction.slice(0, 15)}...</span>
-                  <ChevronRight className="w-3 h-3 text-slate-400" />
-                  <span className="bg-blue-50 px-2 py-1 rounded text-blue-700 border border-blue-200">Fila</span>
-                </div>
-
-                <p className="text-xs text-slate-600 mb-3"><span className="font-semibold">Ação:</span> {card.suggestedAction}</p>
-
+                <p className="text-xs text-slate-600 mb-3">{card.reason}</p>
                 <div className="flex gap-2">
-                  {isDuplicate ? (
-                    <Link href="/acoes" className="flex-1">
-                      <div className="w-full h-8 text-xs bg-slate-400 text-white rounded px-3 flex items-center justify-center gap-1 cursor-pointer hover:bg-slate-500 transition-colors">
-                        Já existe → Ver Ações
-                      </div>
-                    </Link>
-                  ) : isCreated ? (
-                    <div className="flex-1 h-8 text-xs bg-emerald-500 text-white rounded px-3 flex items-center justify-center gap-1">
-                      <CheckCircle className="w-3 h-3" /> Criada
-                    </div>
+                  {isDuplicate || isCreated ? (
+                    <div className="flex-1 h-8 text-[11px] font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
                   ) : (
-                    <Button
-                      onClick={handleClick}
-                      className="flex-1 h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1"
-                    >
-                      <Plus className="w-3 h-3" /> Criar na Fila
-                    </Button>
+                    <Button onClick={() => handleCreateAction(card)} className="flex-1 h-8 text-[11px] font-bold bg-blue-600 text-white hover:bg-blue-700"><Plus className="w-3 h-3 mr-1" /> Criar na Fila</Button>
                   )}
-                  <Button
-                    onClick={() => handleUsePlayInChat(card.suggestedAction)}
-                    className="flex-1 h-8 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center gap-1"
-                  >
-                    <MessageCircle className="w-3 h-3" /> Chat
-                  </Button>
+                  <Button onClick={() => setInput(card.suggestedAction)} className="flex-1 h-8 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200"><MessageCircle className="w-3 h-3 mr-1" /> Investigar</Button>
                 </div>
               </div>
             );
           }
-
-          return null;
+          const isAccount = card.type === 'existing_account';
+          return (
+            <div key={idx} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-200 transition-all flex items-start gap-4">
+              <div className="p-2.5 rounded-lg bg-slate-50 text-slate-500">{isAccount ? <Building2 className="w-4 h-4" /> : <Zap className="w-4 h-4" />}</div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{isAccount ? card.name : (card as any).title || (card as any).name}</h4>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Sinal tático para investigação.'}</p>
+                <div className="mt-3 flex items-center justify-between">
+                  <Badge className="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold">Relatório</Badge>
+                  <Link href={isAccount ? `/contas/${card.slug}` : '/sinais'} className="text-[11px] font-black text-blue-600 hover:underline flex items-center gap-1">Ver Contexto <ChevronRight className="w-3 h-3" /></Link>
+                </div>
+              </div>
+            </div>
+          );
         })}
       </div>
     );
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex justify-between items-start">
+    <div className="max-w-7xl mx-auto space-y-8 py-4 animate-in fade-in duration-700">
+      {/* Header Premium (Layout Step 12) */}
+      <div className="flex justify-between items-end pb-2 border-b border-slate-100">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Assistente IA</h1>
-          <p className="text-slate-500 mt-1">
-            {contaAberta
-              ? `Contexto ativo: ${contaAberta.nome} · ${contaAberta.vertical}`
-              : 'Gerencie suas automações, interaja com a IA e monitore a execução de tarefas estratégicas.'}
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Assistente Estratégico</h1>
+          <p className="text-slate-500 text-sm font-medium mt-1">
+            {contaAberta ? `Foco em Inteligência: ${contaAberta.nome}` : 'Orquestração Account-Centric & Decisão Agêntica'}
           </p>
         </div>
-        <Button className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800">
-          <Bot className="w-4 h-4" />
-          Nova Automação
-        </Button>
+        <div className="flex items-center gap-3">
+          <Badge className="bg-blue-50 text-blue-700 border-blue-200 py-1.5 px-4 uppercase text-[10px] tracking-widest font-black ring-1 ring-blue-100 italic">Enterprise Edition</Badge>
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-5 gap-4">
-        {kpis.map((kpi, i) => (
-          <Card key={i} className="p-4">
-            <div className="flex justify-between items-start">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{kpi.label}</p>
-              <kpi.icon className={`w-4 h-4 ${kpi.color}`} />
-            </div>
-            <p className="text-2xl font-bold mt-2 text-slate-900">{kpi.val}</p>
-          </Card>
-        ))}
-      </div>
-
-      {/* Prioridades Imediatas */}
-      <Card className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
-        <div className="flex items-center gap-2 mb-3">
-          <Target className="w-5 h-5 text-amber-600" />
-          <h3 className="font-bold text-amber-900">Prioridades Imediatas</h3>
-        </div>
-        <div className="text-xs space-y-2">
-          {(() => {
-            const opIntel = buildOperationalIntelligence();
-            const insights: string[] = [];
-            if (opIntel.health.criticalIndicator && !opIntel.health.criticalIndicator.includes('Estável')) {
-              insights.push(opIntel.health.criticalIndicator);
-            }
-            if (opIntel.queue.anomalies.length > 0) {
-              insights.push(`⚠️ ${opIntel.queue.anomalies[0].description}`);
-            }
-            if (opIntel.priorities.riskAccounts.length > 0) {
-              insights.push(`🎯 Conta em risco: ${opIntel.priorities.riskAccounts[0].name}`);
-            }
-            return insights.length > 0 ? (
-              insights.map((insight, i) => <p key={i} className="text-amber-800">{insight}</p>)
-            ) : (
-              <p className="text-amber-700">✅ Operação estável — continue monitorando</p>
-            );
-          })()}
-        </div>
-      </Card>
-
-      {/* Plays Recomendados */}
-      {recommendedPlays.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {recommendedPlays.map((play) => (
-            <Card key={play.id} className={`p-4 border ${getUrgencyColor(play.urgency)}`}>
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-start gap-2 flex-1">
-                  <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
-                  <div>
-                    <h4 className="font-bold text-sm">{play.title}</h4>
-                    <p className="text-xs opacity-75 mt-0.5">{play.reason}</p>
-                  </div>
-                </div>
-                <Badge className={`flex-shrink-0 text-xs ${getUrgencyBadgeColor(play.urgency)}`}>
-                  {play.urgency}
-                </Badge>
-              </div>
-              <div className="text-xs space-y-2 mt-3 pt-2 border-t border-current border-opacity-10">
-                <p><span className="font-semibold">Foco:</span> {play.focus}</p>
-                <p><span className="font-semibold">Ação:</span> {play.suggestedAction}</p>
-              </div>
-              <div className="flex gap-2 mt-3 pt-2 border-t border-current border-opacity-10">
-                <Button
-                  onClick={() => handleUsePlayInChat(play.promptForChat)}
-                  className="flex-1 h-7 text-xs bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1"
-                >
-                  <MessageCircle className="w-3 h-3" />
-                  Chat
-                </Button>
-                <Button
-                  onClick={() => handleCopyPlay(play.promptForChat)}
-                  className="flex-1 h-7 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center gap-1"
-                >
-                  <Copy className="w-3 h-3" />
-                  Copiar
-                </Button>
+      {/* KPIs & Prioridades (Layout Step 12) */}
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-8 grid grid-cols-5 gap-4">
+          {kpis.map((kpi, i) => (
+            <Card key={i} className="p-4 bg-white border-slate-100 shadow-sm hover:shadow-md transition-all group">
+              <div className="flex flex-col items-center text-center">
+                <div className={`p-2 rounded-xl ${kpi.bg} ${kpi.color} mb-3 group-hover:scale-110 transition-transform`}><kpi.icon className="w-5 h-5" /></div>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{kpi.label}</p>
+                <p className="text-xl font-black text-slate-900 tracking-tighter">{kpi.val}</p>
               </div>
             </Card>
           ))}
         </div>
-      )}
-
-      <div className="grid grid-cols-3 gap-6">
-        {/* Chat Interface */}
-        <Card className="col-span-2 p-0 flex flex-col h-[600px] !overflow-y-auto !overflow-x-hidden">
-          <div className="px-6 pt-6 pb-0 flex-shrink-0">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-600"/> Chat com Assistente Estratégico
-            </h3>
+        <Card className="col-span-4 p-5 bg-amber-50 border-amber-200 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center border border-amber-200 text-amber-600 animate-pulse"><Target className="w-6 h-6" /></div>
+          <div className="flex-1">
+            <h3 className="text-xs font-black text-amber-900 uppercase tracking-widest mb-1">Status Operacional</h3>
+            <p className="text-sm text-amber-800 font-bold leading-tight">{buildOperationalIntelligence().health.criticalIndicator || 'Operação estabilizada.'}</p>
           </div>
+        </Card>
+      </div>
 
-          {/* Messages Area — flex-1 min-h-0 overflow-y-auto crucial para scroll */}
-          <div className="flex-1 min-h-0 overflow-y-auto space-y-4 bg-slate-50 p-4 mx-6 rounded-xl border border-slate-100">
+      <div className="grid grid-cols-12 gap-8 h-[740px]">
+        {/* Chat Interface (Premium Design) */}
+        <div className="col-span-8 flex flex-col h-full bg-white border border-slate-200 shadow-2xl rounded-[32px] overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-8 py-10 space-y-8 bg-slate-50/40">
             {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-              >
-                <div
-                  className={`p-3 rounded-lg shadow-sm text-sm max-w-[90%] break-words prose prose-sm prose-p:my-2 prose-li:my-1 prose-ul:my-2 prose-ol:my-2 prose-headings:my-3 prose-code:bg-slate-100 prose-code:px-1.5 prose-code:rounded prose-code:text-sm prose-blockquote:border-l-4 prose-blockquote:italic prose-blockquote:my-2 prose-a:text-blue-500 prose-a:underline ${
-                    msg.role === 'user'
-                      ? 'bg-blue-600 text-white prose-invert'
-                      : 'bg-white text-slate-800 border border-slate-100'
-                  }`}
-                >
-                  <ReactMarkdown>
-                    {msg.content}
-                  </ReactMarkdown>
+              <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} max-w-[90%] ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'}`}>
+                <div className={`p-6 rounded-[24px] text-sm leading-relaxed shadow-sm min-w-[120px] ${
+                  msg.role === 'user' ? 'bg-blue-600 text-white font-medium rounded-tr-none' : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none ring-1 ring-slate-900/5'
+                }`}>
+                  <div className={`prose prose-sm max-w-none prose-p:my-1 prose-strong:text-inherit ${msg.role === 'user' ? 'prose-invert' : ''}`}><ReactMarkdown>{msg.content}</ReactMarkdown></div>
+                  {msg.cards && renderResponseCards(msg.cards)}
                 </div>
-                {/* Render cards abaixo de mensagens do assistant */}
-                {msg.role === 'assistant' && msg.cards && (
-                  <div className="w-full max-w-[90%] mt-2">
-                    {renderResponseCards(msg.cards)}
-                  </div>
-                )}
               </div>
             ))}
             {isLoading && (
-              <div className="flex items-start">
-                <div className="bg-white p-3 rounded-lg shadow-sm text-sm max-w-[85%] border border-slate-100 flex items-center gap-2 text-slate-500">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Processando estratégia...
-                </div>
+              <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-full border border-slate-200 shadow-sm w-fit animate-pulse">
+                <Loader2 className="w-4 h-4 animate-spin text-blue-600" /><span className="text-xs font-bold text-slate-500 uppercase tracking-wider italic">IA Processando...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
-
-          {/* Input Area — flex-shrink-0 para garantir que não encolha */}
-          <div className="flex-shrink-0 mt-4 px-6 pb-6 flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={contaAberta
-                ? `Pergunte sobre ${contaAberta.nome}, plays, sinais ou estratégias...`
-                : 'Pergunte sobre plays, contas, ou estratégias ABM/ABX...'}
-              className="flex-1 p-3 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isLoading}
-            />
-            <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="bg-blue-600 hover:bg-blue-700 w-12 h-12 flex items-center justify-center p-0 flex-shrink-0">
-              <Send className="w-5 h-5" />
-            </Button>
+          <div className="p-6 bg-white border-t border-slate-100">
+            <div className="relative flex items-center">
+              <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Analise conta, sinal ou peça recomendações..." className="w-full pl-6 pr-20 py-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium" disabled={isLoading} />
+              <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="absolute right-2.5 h-12 w-12 rounded-xl bg-blue-600 text-white shadow-xl hover:bg-blue-700 hover:scale-105 transition-all flex items-center justify-center"><Send className="w-5 h-5 ml-0.5" /></Button>
+            </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Fila Operacional */}
-        <Card className="p-6">
-          <h3 className="font-bold mb-4">Fila de Tarefas Operacionais</h3>
-          {filaOperacional.length === 0 ? (
-            <p className="text-sm text-slate-400">Nenhuma tarefa na fila.</p>
-          ) : (
-            <div className="space-y-4">
+        {/* Sidebar Operacional (Premium Design) */}
+        <div className="col-span-4 flex flex-col gap-6 overflow-y-auto">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1"><h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] italic">Plays Sugeridos</h3><Zap className="w-4 h-4 text-amber-500" /></div>
+            {recommendedPlays.slice(0, 3).map((play) => (
+              <Card key={play.id} className="p-5 border-slate-200 hover:border-blue-200 transition-all bg-white group cursor-help">
+                <div className="flex items-start justify-between mb-3"><h4 className="font-black text-sm text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{play.title}</h4><Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[9px] uppercase tracking-tighter">{play.urgency}</Badge></div>
+                <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4">{play.reason}</p>
+                <div className="flex gap-2">
+                  <Button onClick={() => setInput(play.promptForChat)} className="flex-1 h-8 text-[11px] font-black bg-blue-700 text-white uppercase hover:bg-blue-800 transition-all">Ativar Chat</Button>
+                  <Button onClick={() => navigator.clipboard.writeText(play.promptForChat)} className="h-8 w-8 p-0 bg-slate-50 text-slate-500 border border-slate-200 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-all"><Copy className="w-4 h-4" /></Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+          <div className="space-y-4 mt-2">
+            <h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] italic px-1">Fila Operacional</h3>
+            <div className="space-y-3">
               {filaOperacional.map((t, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                  <t.icon
-                    className={`w-5 h-5 flex-shrink-0 ${
-                      t.status === 'Em andamento' ? 'text-blue-500 animate-spin'
-                      : t.status === 'Concluída'  ? 'text-emerald-500'
-                      : t.status === 'Pendente'   ? 'text-red-400'
-                      : 'text-slate-400'
-                    }`}
-                  />
+                <div key={i} className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-slate-300 transition-all">
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100"><t.icon className={`w-5 h-5 ${t.status === 'Em andamento' ? 'text-blue-500 animate-spin' : t.status === 'Concluída' ? 'text-emerald-500' : 'text-slate-400'}`} /></div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-900 truncate" title={t.task}>{t.task}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{t.sub} · {t.status}</p>
+                    <p className="text-xs font-black text-slate-900 truncate uppercase mt-0.5" title={t.task}>{t.task}</p>
+                    <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">{t.sub} <span className="opacity-40 mx-1">·</span> {t.status}</p>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </Card>
+            <Link href="/acoes" className="block w-full py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all border-2 border-dashed border-slate-100 rounded-2xl">Ver Fila Completa</Link>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
-
 
 export default Assistant;
