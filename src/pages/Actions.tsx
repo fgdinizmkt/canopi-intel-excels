@@ -1140,7 +1140,7 @@ export const Actions: React.FC = () => {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [activatingTemplate, setActivatingTemplate] = useState<PlaybookTemplate | null>(null);
 
-  // Deep-linking: open action from URL param
+  // Deep-linking: open action from URL param and consume query param
   useEffect(() => {
     const actionId = searchParams?.get('actionId');
     if (!actionId) return;
@@ -1148,6 +1148,8 @@ export const Actions: React.FC = () => {
     if (action) {
       setOverlayItemId(action.id);
       setOverlayTab('resumo');
+      // Clean query param after successful deep-link
+      window.history.replaceState({}, '', '/acoes');
     }
   }, [searchParams, allItems]);
 

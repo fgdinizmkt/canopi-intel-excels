@@ -42,12 +42,16 @@ export const Signals: React.FC = () => {
   const [outSubject, setOutSubject] = useState('[Manufatura] Como reduzimos custo operacional em 23% em 90 dias');
   const [outBody, setOutBody] = useState('Olá [Nome],\n\nVi que vocês estão expandindo a operação de manufatura...');
 
-  // Deep-linking: open signal from URL param
+  // Deep-linking: open signal from URL param and consume query param
   useEffect(() => {
     const signalId = searchParams?.get('signalId');
     if (!signalId) return;
     const signal = signals.find(s => s.id === signalId);
-    if (signal) setDrawer(signal);
+    if (signal) {
+      setDrawer(signal);
+      // Clean query param after successful deep-link
+      window.history.replaceState({}, '', '/sinais');
+    }
   }, [searchParams, signals]);
 
   const active = signals.filter(s => !s.archived);
