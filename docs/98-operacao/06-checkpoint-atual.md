@@ -1,13 +1,13 @@
-# Checkpoint Atual — 2026-04-07
+# Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 25 — Supabase E5: Quarta Migração de Entidade concluído.
+**Status:** Recorte 26 — Supabase E6: Primeira Escrita Defensiva concluído.
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 26 (E6 — Quinta Migração ou escrita defensiva).
+Próximo passo: definir e aprovar o Recorte 27 (E7 — Segunda Migração de Escrita ou Escrita Defensiva em Outras Entidades).
 
 ## Último Estado Confiável
-**Recorte 25 — Supabase E5: Quarta Migração de Entidade** (commit `77eb41f`, publicado em origin/main)
+**Recorte 26 — Supabase E6: Primeira Escrita Defensiva** (commit `bf676c60fd7484ed42f41dab757e81300abdeda4`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -73,12 +73,25 @@ Próximo passo: definir e aprovar o Recorte 26 (E6 — Quinta Migração ou escr
 - ✅ Recorte 25: Decisão arquitetural: AccountDetailContext/sessionActions = source of truth; actionsRepository.ts = complementary; Actions.tsx = responsável pelo merge.
 - ✅ Recorte 25: createAction, updateAction, deep-linking, playbooks, localStorage/sessionActions preservados intactos.
 - ✅ Recorte 25: Logging em 4 pontos (config, error, success, exception).
-- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5 ativadas.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6 ativadas.
 - ✅ Publicação: commits publicados em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 26: Repository layer `src/lib/actionsRepository.ts` expandido com `persistAction()` para escrita defensiva.
+- ✅ Recorte 26: `persistAction()`: upsert por id via Supabase, mapeamento explícito ActionItem → ActionRow, falha silenciosa.
+- ✅ Recorte 26: Helper puro `buildNewAction()`: montagem protegida, sem sobrescrita de id/status/createdAt, preservação campo a campo.
+- ✅ Recorte 26: Helper puro `applyActionPatch()`: cálculo determinístico com checks de presença ('in'), histórico automático sem side effects.
+- ✅ Recorte 26: `createAction()` refatorado: local-first + persistência remota fire-and-forget, sem bloqueio de UX.
+- ✅ Recorte 26: `updateAction()` refatorado: snapshot ANTES de setState, cálculo final ANTES de setState, persistência remota depois.
+- ✅ Recorte 26: Fire-and-forget pattern: persistAction().catch(() => {}) nunca bloqueia, nunca relança, nunca causa rollback.
+- ✅ Recorte 26: SessionActions/localStorage continuam source of truth absoluta, remote persistence é complementar best-effort.
+- ✅ Recorte 26: Type safety: sem `as any`, mapeamento ActionRow completo, type guard isValidSourceType.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6 concluídas.
+- ✅ Publicação: commit bf676c60fd7484ed42f41dab757e81300abdeda4 publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 26 (E6 — Quinta Migração ou Escrita) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 27 (E7 — Segunda Escrita ou Migração Complementar) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 26 (E6). Candidatos: escrita defensiva em repositórios existentes ou ABM/ABX/oportunidades migrations.
+Aguardar aprovação do Orquestrador para definir o Recorte 27 (E7). Candidatos: escrita defensiva em signals/contacts, ABM/ABX/oportunidades migrations, ou continuação da escrita em actions.

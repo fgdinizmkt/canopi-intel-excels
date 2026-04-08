@@ -148,6 +148,54 @@ const allItems = useMemo(() => {
 
 ---
 
+### 8.2 Escrita Defensiva em Actions (Recorte 26)
+**Decisão refinada:** Primeira escrita remota em `actions` segue padrão defensivo: best-effort, nunca bloqueia UX, sem rollback de UI.
+
+**Implicação estrutural (Recorte 26 em diante):**
+- **AccountDetailContext (source of truth intacto):** createAction() e updateAction() continuam local-first
+  - `sessionActions` e `localStorage` são operacionais soberanos
+  - Persistência remota é disparada DEPOIS da UI estar atualizada
+  - Sem await bloqueando a ação local
+- **persistAction() em Repository:** camada complementar de persistência
+  - Upsert por id no Supabase
+  - Mapeamento explícito ActionItem → ActionRow (sem spreads frouxos)
+  - Falha silenciosa: loga erros, nunca relança, nunca impacta UX
+  - Se Supabase não está configurado: skips automaticamente
+- **Padrão fire-and-forget:** createAction/updateAction disparam persistAction().catch(() => {})
+  - Não bloqueia retorno de id
+  - Não bloqueia revalidação de estado local
+  - Não requer retry sofisticado
+
+**Helpers puros extraídos:**
+- `buildNewAction(partialAction)`: montagem protegida sem spread aberto, id/status/createdAt imutáveis
+- `applyActionPatch(action, patch, actor)`: cálculo de ação final com histórico automático antes de setState
+
+**Exemplo concreto (Recorte 26):**
+```typescript
+// createAction: local-first + remote best-effort
+const createAction = useCallback((partialAction) => {
+  const newAction = buildNewAction(partialAction);  // puro
+  setSessionActions(prev => [newAction, ...prev]);   // local, imediato
+  persistAction(newAction).catch(() => {});          // remoto, fire-and-forget
+  return newAction.id;
+}, []);
+
+// updateAction: snapshot + calcular + setState + persist
+const updateAction = useCallback((actionId, patch, actor) => {
+  const currentAction = sessionActions.find(a => a.id === actionId);
+  if (!currentAction) return;
+  const updatedAction = applyActionPatch(currentAction, patch, actor);  // puro
+  setSessionActions(prev => prev.map(a => a.id === actionId ? updatedAction : a));
+  persistAction(updatedAction).catch(() => {});  // remoto, fire-and-forget
+}, [sessionActions]);
+```
+
+**Benefício:** separação nítida entre operação local (confiável, rápida, reativa) e persistência remota (complementar, assíncrona, opcional).
+
+**Commits:** `bf676c60fd7484ed42f41dab757e81300abdeda4` (E6 implementação defensiva)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

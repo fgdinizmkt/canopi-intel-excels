@@ -5,6 +5,56 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-08] — Recorte 26 (Supabase E6): Primeira Escrita Defensiva em actions — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Primeira escrita remota: actions upserted no Supabase)
+- **Alto:** Introduzir persistência remota defensiva em `actions` mantendo sessionActions/localStorage como source of truth absoluto. UX nunca bloqueia, nunca rollback, falhas remotas não impactam operação local.
+- **Contexto:** Recortes 22-25 implementaram migrações de leitura (accounts, signals, contacts, actions). Recorte 26 fecha o ciclo com primeira escrita remota, seguindo padrão defensivo: local-first, best-effort remoto, fire-and-forget.
+- **Ações Executadas:**
+  - **Novo método `persistAction()` em `src/lib/actionsRepository.ts`:**
+    * Upsert por id no Supabase (insere novo ou atualiza existente)
+    * Mapeamento explícito ActionItem → ActionRow (sem spreads frouxos, sem defaults remotos que inventem semântica)
+    * Reflete a ação final local com máxima fidelidade (ownerName: null persiste como null)
+    * Falha silenciosa: loga warn/info, nunca relança, nunca impacta UX
+    * Se Supabase não configurado: skips com console.debug
+    * Type guard explícito para sourceType (isValidSourceType)
+  - **Refatoração `src/context/AccountDetailContext.tsx`:**
+    * **Helper `buildNewAction(partialAction)`:**
+      - Montagem protegida sem spread aberto (`...partialAction`)
+      - id, status, createdAt imutáveis (não permitir sobrescrita)
+      - Preservação explícita campo a campo: slaText, expectedImpact, dependencies, evidence, projectObjective, projectSuccess, projectSteps, buttons, sourceType, playbookName, playbookRunId, playbookStepId, relatedAccountId
+      - Preservação de partialAction.history válido: `[entradaAutomatica, ...(Array.isArray(partialAction.history) ? partialAction.history : [])]`
+    * **Helper `applyActionPatch(action, patch, actor)`:**
+      - Cálculo de ação final com histórico automático (sem efeitos colaterais, sem state)
+      - Checks de presença (`'status' in patch`) em vez de truthy → permite updates com valores falsy (null, 0, "", false)
+      - ownerName, nextStep, status agora detectados deterministicamente
+      - comment extraído antes de spread (nunca entra no objeto final)
+    * **`createAction()` refatorado:**
+      - Local-first: `const newAction = buildNewAction(partialAction); setSessionActions(prev => [newAction, ...prev]);`
+      - Persistência remota: `persistAction(newAction).catch(() => {})` fire-and-forget
+      - Sem await bloqueando retorno de id
+    * **`updateAction()` refatorado:**
+      - Snapshot-first: `const currentAction = sessionActions.find(a => a.id === actionId);` (ANTES de setState)
+      - Calcular final: `const updatedAction = applyActionPatch(currentAction, patch, actor);` (puro, ANTES de setState)
+      - Atualizar local: `setSessionActions(prev => prev.map(a => a.id === actionId ? updatedAction : a));`
+      - Persistência remota: `persistAction(updatedAction).catch(() => {})` fire-and-forget
+      - Dependência adicionada: `[sessionActions]` (snapshot em cada ciclo)
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 217 insertions(+), 94 deletions(-)
+    * Type safety: sem `as any`, type guards explícitos (isValidSourceType), mapeamento ActionRow completo
+    * Fire-and-forget: persistAction() não bloqueia UI, não causa refetch local, não relança em erro
+    * Fidelidade remota: ActionRow reflete ActionItem final sem alterações de semântica
+    * Helpers puros: buildNewAction() e applyActionPatch() sem side effects
+    * Snapshot-safety: updateAction() não depende de variável capturada dentro de updater
+  - **Arquitetura confirmada:**
+    * AccountDetailContext/sessionActions = source of truth, keeper da fila viva, responsável por create/update locais
+    * persistAction() = camada remota complementar, best-effort, responsável apenas por upsert
+    * createAction()/updateAction() = operações locais soberanas com persistência remota assíncrona acoplada
+- **Commit:** `bf676c60fd7484ed42f41dab757e81300abdeda4` — feat(actions): add defensive best-effort Supabase persistence
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 25 (Supabase E5): Quarta Migração de Entidade (actions) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Quarta migração: actions lidos do Supabase como camada complementar)
 - **Alto:** Introduzir leitura defensiva de ações do Supabase sem quebrar fila operacional local baseada em sessionActions.

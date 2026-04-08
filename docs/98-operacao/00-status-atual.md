@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 25 — Supabase E5: Quarta Migração de Entidade: 77eb41f, publicado em origin/main)
+ `main` — sincronizada em 2026-04-08 (Recorte 26 — Supabase E6: Primeira Escrita Defensiva: bf676c60fd7484ed42f41dab757e81300abdeda4, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 25 — Supabase E5: Quarta Migração de Entidade)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 26 — Supabase E6: Primeira Escrita Defensiva)
 
 ---
 
