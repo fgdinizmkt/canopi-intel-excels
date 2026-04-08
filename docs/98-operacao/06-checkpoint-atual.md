@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts concluído via micro-recorte (owner assignment mínimo).
+**Status:** Recorte 29 — Supabase E8.2: Classificação Editável em Contacts concluído (extensão do padrão defensivo de E8).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 29 (próxima escrita defensiva ou migração complementar).
+Próximo passo: definir e aprovar o Recorte 30 (próxima escrita defensiva ou migração complementar).
 
 ## Último Estado Confiável
-**Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts** (commit `027191c`, publicado em origin/main)
+**Recorte 29 — Supabase E8.2: Classificação Editável em Contacts** (commit `2e46a47`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -117,8 +117,23 @@ Próximo passo: definir e aprovar o Recorte 29 (próxima escrita defensiva ou mi
 - ✅ Publicação: commit 027191c publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 29: Extensão do padrão defensivo de E8 para campo multi-seleção `classificacao` em contacts.
+- ✅ Recorte 29: Estado `[selectedClassifications, setSelectedClassifications]` com tipagem explícita de 7 tipos.
+- ✅ Recorte 29: Estado `[classificationStatus, setClassificationStatus]` para feedback "Classificação atualizada".
+- ✅ Recorte 29: Função `handleToggleClassification()` reusa padrão local-first idêntico ao owner assignment.
+- ✅ Recorte 29: UI inline: 7 botões toggle com cores semânticas (amber=Decisor, blue=Influenciador, emerald=Champion, purple=Sponsor, red=Blocker, slate=Técnico, indigo=Negócio).
+- ✅ Recorte 29: Selecionado mostra ring effect + cores cheias; deseleccionado mostra opacity-60.
+- ✅ Recorte 29: useEffect ressincroniza selectedClassifications ao alternar contatos.
+- ✅ Recorte 29: Padrão: snapshot → build togglado → `setSelectedClassifications() + onUpdateContact()` local-first → `persistContact().catch()` fire-and-forget.
+- ✅ Recorte 29: Classificação muda na UI imediatamente, persistência é background best-effort.
+- ✅ Recorte 29: Sem novo componente, sem novo hook, sem spread em ContactItem — apenas inline em ContactDetailProfile.
+- ✅ Recorte 29: Type safety: tipagem union literal explícita, sem `as any`, mapeamento ContactRow completo (já reusado de E8).
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6, E7, E8, E8.2 concluídas.
+- ✅ Publicação: commit 2e46a47 publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 29 (próxima escrita defensiva ou migração complementar) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 30 (próxima escrita defensiva ou migração complementar) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 29. Candidatos: escrita defensiva em signals/actions complementares, ABM/ABX/oportunidades migrations, ou expansão de campos em entities existentes.
+Aguardar aprovação do Orquestrador para definir o Recorte 30. Candidatos: escrita defensiva em signals/actions complementares, ABM/ABX/oportunidades migrations, ou expansão de campos em entities existentes.

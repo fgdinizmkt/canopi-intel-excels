@@ -291,10 +291,28 @@
 - **Status:** ✅ Publicado em origin/main
 - **Nota:** E8 foi destravado e concluído via micro-recorte 28.1 (owner assignment mínimo). Ponte real e operacional para future expansões.
 
+**Recorte 29 — Supabase E8.2: Classificação Editável em Contacts** — 2026-04-08
+- ✅ Extensão do Recorte 28.1: classificação multi-toggle em ContactDetailProfile
+- ✅ Tipo `ContactItem` já suporta campo `classificacao` (sem alterações necessárias)
+- ✅ Estado `[selectedClassifications, setSelectedClassifications]` com tipagem explícita de 7 tipos (Decisor, Influenciador, Champion, Sponsor, Blocker, Técnico, Negócio)
+- ✅ Estado `[classificationStatus, setClassificationStatus]` para feedback "Classificação atualizada" (1.5s)
+- ✅ Função `handleToggleClassification()` implementa padrão local-first idêntico ao owner assignment
+  - 1. Snapshot contato-alvo
+  - 2. Build array togglado + nova ContatoConta
+  - 3. `setSelectedClassifications() + onUpdateContact()` local-first
+  - 4. `persistContact({...updatedContact, accountId, accountName}).catch()` fire-and-forget
+- ✅ UI: 7 botões toggle com cores semânticas (amber=Decisor, blue=Influenciador, emerald=Champion, purple=Sponsor, red=Blocker, slate=Técnico, indigo=Negócio)
+- ✅ Visual: botão selecionado mostra ring effect + cores cheias; deseleccionado mostra opacity-60
+- ✅ useEffect ressincroniza selectedClassifications ao alternar contatos
+- ✅ Sem novo componente, sem novo hook, sem spread em ContactItem — apenas inline no ContactDetailProfile
+- ✅ Build Exit 0 (validado)
+- **Commit:** `2e46a47` — feat(contacts): add local-first classification toggles with defensive persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 28.1 — E8 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 29 (próxima escrita defensiva ou migração complementar)
+- **Status Atual:** Recorte 29 — E8.2 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 30 (próxima escrita defensiva ou migração complementar)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

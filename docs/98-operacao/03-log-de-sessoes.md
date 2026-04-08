@@ -5,6 +5,49 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-08] — Recorte 29 (Supabase E8.2): Classificação Editável em Contacts — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E8.2: extensão de E8 com campo multi-seleção editável)
+- **Alto:** Expandir padrão defensivo de E8 (owner assignment) para campo `classificacao` (array multi-seleção) em contacts, reutilizando padrão local-first consolidado.
+- **Contexto:** Recorte 28.1 destravou E8 com owner assignment mínimo. Recorte 29 expande isso para classificação, testando reutilização do padrão defensivo em field multi-seleção sem novo componente/hook/abstração.
+- **Ações Executadas:**
+  - **Refatoração `src/components/account/ContactDetailProfile.tsx`:**
+    * +estado `[selectedClassifications, setSelectedClassifications]` com tipagem explícita: `('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[]`
+    * +estado `[classificationStatus, setClassificationStatus]` para feedback visual
+    * +constante `classificationOptions` com 7 tipos tipados explicitamente
+    * +useEffect ressincroniza selectedClassifications ao alternar contatos (dependência: `[contact.id, contact.owner, contact.classificacao]`)
+    * +função `handleToggleClassification(classification: union type)`:
+      - 1. Snapshot contato-alvo
+      - 2. Build array togglado (`includes ? filter : [...push]`)
+      - 3. Build ContatoConta com classificacao: newClassifications
+      - 4. `setSelectedClassifications(newClassifications) + onUpdateContact(updatedContact)` — LOCAL: setState imediatamente
+      - 5. `persistContact({...updatedContact, accountId, accountName}).catch()` — REMOTO: fire-and-forget
+      - 6. Feedback: setClassificationStatus('Classificação atualizada') por 1.5s
+    * +UI seção "Classificação" com 7 botões toggle
+      - Cores semânticas: amber (Decisor), blue (Influenciador), emerald (Champion), purple (Sponsor), red (Blocker), slate (Técnico), indigo (Negócio)
+      - Selecionado: ring-1 ring-offset-1 + cores cheias + opacity-100
+      - Deseleccionado: opacity-60 + cores reduzidas + hover efeito
+      - Feedback texto emerald "Classificação atualizada" mostra por 1.5s
+  - **Sem alterações necessárias em Repository:** persistContact() já suporta `classificacao` via ContactItem (campo já existe)
+  - **Padrão reusado:** handleToggleClassification() segue exatamente mesmo padrão que handleAssignOwner()
+    - Snapshot → build → setState local + onUpdateContact → persistContact fire-and-forget
+    - Sem spread aberto, sem lógica remota, sem refetch desnecessário
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 1 file, 89 insertions(+), 1 deletion(-)
+    * Type safety: sem `as any`, tipagem union literal explícita em handleToggleClassification
+    * Fire-and-forget: persistContact() não bloqueia UI, não causa refetch, não relança em erro
+    * Fidelidade: classificação muda na UI imediatamente, persistência é background best-effort
+    * Ressincronização: useEffect limpa selectedClassifications e classificationStatus ao alternar contatos
+    - Sem divergência entre snapshot, estado local, persistência remota
+  - **Arquitetura confirmada:**
+    * Padrão local-first é genérico o bastante para field simples (string, owner) e multi-seleção (array, classificacao)
+    * Sem novo componente, sem novo hook, sem spread novo — apenas inline em ContactDetailProfile
+    * persistContact() já reusa o mesmo mapeamento ContactItem → ContactRow
+- **Commit:** `2e46a47` — feat(contacts): add local-first classification toggles with defensive persistence
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-08] — Recorte 28.1 (Supabase E8): Primeira Escrita Defensiva em Contacts (Micro-recorte) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Terceira escrita remota: contacts upserted no Supabase via micro-recorte 28.1)
 - **Alto:** Destravamento e conclusão de E8 via owner assignment mínimo. Owner é caminho de escrita real, local-first, best-effort remoto.

@@ -242,7 +242,7 @@ const confirmAssign = () => {
 
 ---
 
-### 8.4 Escrita Defensiva em Contacts (Recorte 28.1)
+### 8.4 Escrita Defensiva em Contacts: Owner Assignment (Recorte 28.1)
 **Decisão refinada:** Terceira escrita remota em `contacts` via micro-recorte 28.1. Owner assignment mínimo destrava E8 com padrão consolidado.
 
 **Implicação estrutural (Recorte 28.1 em diante):**
@@ -303,6 +303,66 @@ const handleAssignOwner = () => {
 **Benefício:** Owner assignment mínimo destrava E8 com padrão consolidado (local-first + fire-and-forget). Sem divergência entre snapshot, estado local e persistência remota.
 
 **Commits:** `027191c` (E8 implementação defensiva em contacts via micro-recorte 28.1)
+
+---
+
+### 8.5 Escrita Defensiva em Contacts: Classificação Multi-toggle (Recorte 29)
+**Decisão refinada:** Extensão do padrão defensivo de E8 para campo multi-seleção `classificacao` em contacts via inline toggles.
+
+**Implicação estrutural (Recorte 29 em diante):**
+- **ContactDetailProfile (local-first):** classificação toggle com padrão rígido idêntico ao owner assignment
+  - Estado `[selectedClassifications, setSelectedClassifications]` com tipagem explícita de 7 tipos: 'Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio'
+  - Estado `[classificationStatus, setClassificationStatus]` para feedback visual (1.5s)
+  - Constante `classificationOptions` com 7 tipos tipados explicitamente
+  - useEffect ressincroniza `selectedClassifications` e `classificationStatus` ao alternar contatos (dependência: `contact.id`, `contact.classificacao`)
+  - `handleToggleClassification(classification: union type)`:
+    1. Snapshot contato-alvo
+    2. Build array togglado + nova ContatoConta
+    3. `setSelectedClassifications() + onUpdateContact()` — LOCAL: setState imediatamente
+    4. `persistContact({...updatedContact, accountId, accountName}).catch()` — REMOTO: fire-and-forget
+  - UI: 7 botões toggle com cores semânticas (amber=Decisor, blue=Influenciador, emerald=Champion, purple=Sponsor, red=Blocker, slate=Técnico, indigo=Negócio)
+    - Selecionado: ring effect + cores cheias + opacity-100
+    - Deseleccionado: opacity-60 + cores reduzidas
+    - Feedback texto aparece por 1.5s após toggle
+- **Sem alterações no Repository:** persistContact() já suporta campo `classificacao` via ContactItem
+- **Sem novo componente, hook ou spread:** padrão inline em ContactDetailProfile apenas, reusa `onUpdateContact` + `persistContact` existentes
+- **Tipagem:** Union literal para `handleToggleClassification` parameter garante type safety sem `as any`
+
+**Exemplo concreto (Recorte 29):**
+```typescript
+// ContactDetailProfile: classificacao toggle
+const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio') => {
+  // 1. Snapshot
+  const targetContact = contact;
+
+  // 2. Build toggled array + final state
+  const newClassifications = selectedClassifications.includes(classification)
+    ? selectedClassifications.filter(c => c !== classification)
+    : [...selectedClassifications, classification];
+
+  const updatedContact: ContatoConta = { ...targetContact, classificacao: newClassifications };
+
+  // 3. Update local (local-first)
+  setSelectedClassifications(newClassifications);
+  if (onUpdateContact) {
+    onUpdateContact(updatedContact);
+  }
+
+  // 4. Persist remoto (fire-and-forget)
+  persistContact({
+    ...updatedContact,
+    accountId: accountId,
+    accountName: accountName,
+  }).catch(() => {});
+
+  setClassificationStatus('Classificação atualizada');
+  setTimeout(() => setClassificationStatus(null), 1500);
+};
+```
+
+**Benefício:** Extensão natural de E8 para field multi-seleção. Reutiliza padrão defensivo consolidado (snapshot → build → local-first → fire-and-forget) sem novas abstrações. Classificação fica editável inline com feedback imediato.
+
+**Commits:** `2e46a47` (E8.2 implementação defensiva em contacts via Recorte 29)
 
 ---
 
