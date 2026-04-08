@@ -196,6 +196,52 @@ const updateAction = useCallback((actionId, patch, actor) => {
 
 ---
 
+### 8.3 Escrita Defensiva em Signals (Recorte 27)
+**Decisão refinada:** Segunda escrita remota em `signals` segue padrão defensivo idêntico a E6, sem desvios.
+
+**Implicação estrutural (Recorte 27 em diante):**
+- **persistSignal() em Repository:** função complementar de persistência
+  - Upsert por id no Supabase
+  - Mapeamento explícito SignalItem → SignalRow (sem spreads frouxos)
+  - Falha silenciosa: loga erros, nunca relança, nunca impacta UX
+  - Se Supabase não está configurado: skips automaticamente
+- **Integração em Signals.tsx (local-first):** confirmAssign() e archive() seguem padrão rígido
+  - 1. Identificar alvo explicitamente (snapshot do sinal)
+  - 2. Construir estado final ANTES de setState
+  - 3. Atualizar estado local por id (não por condição ampla)
+  - 4. Disparar persistSignal().catch(() => {}) (fire-and-forget, assíncrono)
+  - Ordem garante: alvo snapshot = alvo update local = alvo persist remoto (sem divergência)
+- **Tipagem:** Tipo `SignalItem` nomeado e explícito em signalsRepository.ts
+  - Exportado para uso em Signals.tsx
+  - Contém 20 campos: 6 obrigatórios (id, severity, category, archived, resolved, owner) + 14 opcionais
+  - Compatível com advancedSignals estrutura
+  - Mapeamento claro: SignalItem → SignalRow (subset para banco de dados)
+
+**Exemplo concreto (Recorte 27):**
+```typescript
+// confirmAssign: exemplo de padrão defensivo em signals
+const confirmAssign = () => {
+  // 1. Identificar alvo
+  const targetSignal = signals.find(x => x.flow === 'assign' && !x.archived);
+  if (!targetSignal) { closeMid(); return; }
+
+  // 2. Construir estado final ANTES de setState
+  const updatedSignal = { ...targetSignal, resolved: true, owner: selOwner };
+
+  // 3. Atualizar estado local por id
+  setSignals(signals.map(x => x.id === targetSignal.id ? updatedSignal : x));
+
+  // 4. Persistir remotamente (fire-and-forget)
+  persistSignal(updatedSignal).catch(() => {});
+};
+```
+
+**Benefício:** Total de 2 mutações de signals acopladas com persistência defensiva (confirmAssign, archive). Sem divergência entre snapshot, estado local e persistência remota.
+
+**Commits:** `054254a0c96f07cb72f7433c069d2b08a40a8350` (E7 implementação defensiva em signals)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

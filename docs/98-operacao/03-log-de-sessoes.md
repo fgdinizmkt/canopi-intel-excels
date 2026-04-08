@@ -1810,3 +1810,37 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 5.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
 
 **Status:** Recorte 10 (Fase 8 — Saneamento) concluído. Commit: `aea96de7d3e2c68d6eb9426aa648541bb6319eed`.
+
+---
+
+### Sessão: 2026-04-08 — Recorte 27 (Fase E7)
+**Agente:** Antigravity
+
+**Objetivo:** Implementar escrita defensiva em signals com persistência Supabase best-effort.
+
+**Ações:**
+1.  **Tipagem Explícita:** Criado tipo `SignalItem` nomeado em `src/lib/signalsRepository.ts` (20 campos: 6 obrigatórios, 14 opcionais).
+2.  **Persistência Remota:** Implementada função `persistSignal(signal: SignalItem)` com:
+     - Upsert por id no Supabase
+     - Mapeamento explícito SignalItem → SignalRow (sem spreads frouxos)
+     - Falha silenciosa com logging detalhado (config, error, exception)
+     - Fire-and-forget (não bloqueia UX, não relança erro)
+3.  **Integração em confirmAssign():** Padrão defensivo de 4 passos
+     - Snapshot: identificar alvo explicitamente
+     - Construção: estado final ANTES de setState
+     - Update: por id (não por condição ampla)
+     - Persistência: fire-and-forget remotamente
+4.  **Integração em archive():** Padrão defensivo idêntico
+     - Mesmo procedimento: snapshot → construção → update por id → persist
+5.  **Tipagem em Signals.tsx:** Exportado `SignalItem` e tipado `useState<SignalItem[]>`
+6.  **Build de Produção:** Validado com `npm run build` (Exit code: 0).
+7.  **Patch Corretivo:** Alinhadas assinaturas, removidos improviso de cast em persistSignal.
+
+**Decisões:**
+- Manter `sessionState` (localStorage + signals array) como source of truth absoluta
+- Supabase persistência apenas complementar, sem impacto em falha
+- Snapshot + construção + update por id = alinhamento perfeito entre snapshot, estado local e persistência remota (sem divergência)
+
+**Status:** Recorte 27 (Fase E7 — Escrita Defensiva em Signals) concluído. Commit: `054254a0c96f07cb72f7433c069d2b08a40a8350`.
+- ✅ Publicado em origin/main
+- ✅ Cobertura: 2 mutações reais (confirmAssign, archive) acopladas com persistência defensiva

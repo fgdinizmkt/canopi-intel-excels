@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-08 (Recorte 26 — Supabase E6: Primeira Escrita Defensiva: bf676c60fd7484ed42f41dab757e81300abdeda4, publicado em origin/main)
+ `main` — sincronizada em 2026-04-08 (Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals: 054254a0c96f07cb72f7433c069d2b08a40a8350, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 26 — Supabase E6: Primeira Escrita Defensiva)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals)
 
 ---
 
@@ -263,10 +263,23 @@
 - **Commit:** `1d7ab3d` — feat(signals): implementa Recorte 23 — Supabase E3 Segunda Migração de Entidade
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals** — 2026-04-08
+- ✅ Tipo `SignalItem` nomeado e explícito em signalsRepository.ts
+- ✅ Função `persistSignal(signal: SignalItem)` com upsert por id e mapeamento explícito (SignalItem → SignalRow)
+- ✅ Fire-and-forget pattern: best-effort, nunca bloqueia UX, falha silenciosa com logging
+- ✅ Integração defensiva em `confirmAssign()`: snapshot → construção estado → update por id → persist remoto
+- ✅ Integração defensiva em `archive()`: snapshot → construção estado → update por id → persist remoto
+- ✅ Alinhamento garantido entre snapshot, estado local e persistência remota (sem divergência)
+- ✅ `sessionState` (localStorage + signals) permanece source of truth absoluta
+- ✅ Supabase persistência complementar sem impacto em falha
+- ✅ Build Exit 0 (validado)
+- **Commit:** `054254a0c96f07cb72f7433c069d2b08a40a8350` — feat(signals): add defensive best-effort Supabase persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 23 — E3 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 24 (E4 — Terceira Migração: contatos)
+- **Status Atual:** Recorte 27 — E7 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

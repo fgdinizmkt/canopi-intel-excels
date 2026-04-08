@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 26 — Supabase E6: Primeira Escrita Defensiva concluído.
+**Status:** Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals concluído.
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 27 (E7 — Segunda Migração de Escrita ou Escrita Defensiva em Outras Entidades).
+Próximo passo: definir e aprovar o Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar).
 
 ## Último Estado Confiável
-**Recorte 26 — Supabase E6: Primeira Escrita Defensiva** (commit `bf676c60fd7484ed42f41dab757e81300abdeda4`, publicado em origin/main)
+**Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals** (commit `054254a0c96f07cb72f7433c069d2b08a40a8350`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -90,8 +90,20 @@ Próximo passo: definir e aprovar o Recorte 27 (E7 — Segunda Migração de Esc
 - ✅ Publicação: commit bf676c60fd7484ed42f41dab757e81300abdeda4 publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 27: Tipo `SignalItem` nomeado e explícito em signalsRepository.ts (20 campos: 6 obrigatórios + 14 opcionais).
+- ✅ Recorte 27: Repository layer `src/lib/signalsRepository.ts` expandido com `persistSignal()` para escrita defensiva.
+- ✅ Recorte 27: `persistSignal()`: upsert por id via Supabase, mapeamento explícito SignalItem → SignalRow, falha silenciosa.
+- ✅ Recorte 27: Integração defensiva em `confirmAssign()`: snapshot → construção → update por id → persist fire-and-forget.
+- ✅ Recorte 27: Integração defensiva em `archive()`: snapshot → construção → update por id → persist fire-and-forget.
+- ✅ Recorte 27: Alinhamento garantido entre snapshot, estado local e persistência remota (sem divergência).
+- ✅ Recorte 27: Sessions/localStorage continuam source of truth absoluta, remote persistence é complementar best-effort.
+- ✅ Recorte 27: Type safety: tipagem `SignalItem[]` em useState, sem `as any`, mapeamento SignalRow completo.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6, E7 concluídas.
+- ✅ Publicação: commit 054254a0c96f07cb72f7433c069d2b08a40a8350 publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 27 (E7 — Segunda Escrita ou Migração Complementar) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 27 (E7). Candidatos: escrita defensiva em signals/contacts, ABM/ABX/oportunidades migrations, ou continuação da escrita em actions.
+Aguardar aprovação do Orquestrador para definir o Recorte 28 (E8). Candidatos: escrita defensiva em contacts, ABM/ABX/oportunidades migrations, ou complementação de campos em actions/signals.
