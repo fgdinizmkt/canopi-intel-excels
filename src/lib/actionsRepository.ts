@@ -182,3 +182,76 @@ export async function getActions(): Promise<RepositoryAction[]> {
     return [];
   }
 }
+
+/**
+ * Persiste ação (upsert por id) para Supabase como best-effort
+ * Não bloqueia, não retorna resultado, não lança erro
+ * Logging silencioso apenas (sem UI impact)
+ *
+ * E6: Primeira Escrita Defensiva
+ * Mapeamento explícito: reflete a ação final local com máxima fidelidade
+ * Sem defaults remotos que inventem semântica diferente
+ * ownerName: null persiste como null
+ */
+export async function persistAction(action: ActionItem): Promise<void> {
+  // Se Supabase não está configurado, silencia (operação local é source of truth)
+  if (!isSupabaseConfigured()) {
+    console.debug('[Actions Repository] persistAction: Supabase não configurado. Skipping.');
+    return;
+  }
+
+  try {
+    // Mapeamento explícito: ActionItem → ActionRow
+    // Reflete a ação final local de forma previsível
+    const rowData: ActionRow = {
+      id: action.id,
+      priority: action.priority,
+      category: action.category,
+      channel: action.channel,
+      status: action.status,
+      title: action.title,
+      description: action.description,
+      accountName: action.accountName,
+      origin: action.origin,
+      slaStatus: action.slaStatus,
+      suggestedOwner: action.suggestedOwner,
+      ownerTeam: action.ownerTeam,
+      createdAt: action.createdAt,
+      accountContext: action.accountContext,
+      relatedSignal: action.relatedSignal,
+      ownerName: action.ownerName,
+      slaText: action.slaText,
+      expectedImpact: action.expectedImpact,
+      nextStep: action.nextStep,
+      dependencies: action.dependencies,
+      evidence: action.evidence,
+      history: action.history,
+      projectObjective: action.projectObjective,
+      projectSuccess: action.projectSuccess,
+      projectSteps: action.projectSteps,
+      buttons: action.buttons,
+      sourceType: isValidSourceType(action.sourceType) ? action.sourceType : undefined,
+      playbookName: action.playbookName,
+      playbookRunId: action.playbookRunId,
+      playbookStepId: action.playbookStepId,
+      relatedAccountId: action.relatedAccountId,
+    };
+
+    // Upsert por id: insere novo ou atualiza existente
+    const { error } = await supabase!
+      .from('actions')
+      .upsert(rowData, { onConflict: 'id' });
+
+    if (error) {
+      console.warn(`[Actions Repository] Erro ao persistir ação id=${action.id}:`, error.message);
+      // Não relança — operação local já foi bem-sucedida
+      return;
+    }
+
+    console.info(`[Actions Repository] Ação id=${action.id} persistida com sucesso`);
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.warn(`[Actions Repository] Exceção ao persistir ação id=${action.id}:`, errorMsg);
+    // Não relança — operação local já foi bem-sucedida
+  }
+}
