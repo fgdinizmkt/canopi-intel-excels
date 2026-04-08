@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Search, Filter, ShieldCheck, Zap, AlertCircle, Users } from 'lucide-react';
+import { getContacts, RepositoryContact } from '../lib/contactsRepository';
 import { contasMock } from '../data/accountsData';
 import { StakeholderPulse } from '../components/contacts/StakeholderPulse';
 import { StakeholderRadar, EnrichedContact } from '../components/contacts/StakeholderRadar';
@@ -9,17 +10,46 @@ import { StakeholderRadar, EnrichedContact } from '../components/contacts/Stakeh
 export const Contacts: React.FC = () => {
   const [filter, setFilter] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // 1. Flattening e Enriquecimento de Dados
-  const allStakeholders = useMemo(() => {
-    return contasMock.flatMap(account => 
+  const [allStakeholders, setAllStakeholders] = useState<(RepositoryContact & { vertical: string })[]>(() => {
+    // Inicializa com mock para SSR
+    return contasMock.flatMap(account =>
       account.contatos.map(contact => ({
         ...contact,
         accountId: account.id,
         accountName: account.nome,
         vertical: account.vertical,
       }))
-    );
+    ) as (RepositoryContact & { vertical: string })[];
+  });
+
+  // Carrega contatos do Supabase com fallback para contasMock
+  useEffect(() => {
+    const carregarContatos = async () => {
+      try {
+        const contatos = await getContacts();
+        // Enriquece contatos com dados de vertical do contasMock
+        const enriquecidos = contatos.map(contact => ({
+          ...contact,
+          vertical: contasMock.find(a => a.id === contact.accountId)?.vertical || 'Desconhecida',
+        }));
+        setAllStakeholders(enriquecidos);
+      } catch (err) {
+        console.error('[Contacts] Erro ao carregar contatos:', err);
+        // Mantém mock como fallback
+        setAllStakeholders(
+          contasMock.flatMap(account =>
+            account.contatos.map(contact => ({
+              ...contact,
+              accountId: account.id,
+              accountName: account.nome,
+              vertical: account.vertical,
+            }))
+          ) as (RepositoryContact & { vertical: string })[]
+        );
+      }
+    };
+
+    carregarContatos();
   }, []);
 
   // 2. Cálculos de Estatísticas (Heurísticas Reais)
@@ -37,11 +67,27 @@ export const Contacts: React.FC = () => {
   const filteredStakeholders = useMemo(() => {
     return allStakeholders.filter(s => {
       const matchesFilter = filter === 'todos' || s.classificacao.some(c => c.toLowerCase() === filter.toLowerCase());
-      const matchesSearch = s.nome.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchesSearch = s.nome.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             s.accountName.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
   }, [allStakeholders, filter, searchQuery]);
+
+  // 4. Adapter para StakeholderRadar: converte RepositoryContact para EnrichedContact com defaults seguros
+  const radarContacts = useMemo<EnrichedContact[]>(() => {
+    return filteredStakeholders.map(s => ({
+      id: s.id,
+      nome: s.nome,
+      cargo: s.cargo || 'Cargo desconhecido',
+      area: s.area || 'Área desconhecida',
+      classificacao: s.classificacao,
+      influencia: s.influencia,
+      forcaRelacional: s.forcaRelacional,
+      accountId: s.accountId,
+      accountName: s.accountName,
+      vertical: s.vertical,
+    }));
+  }, [filteredStakeholders]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -98,7 +144,7 @@ export const Contacts: React.FC = () => {
            </h2>
         </div>
 
-        <StakeholderRadar contacts={filteredStakeholders} />
+        <StakeholderRadar contacts={radarContacts} />
       </div>
 
     </div>
