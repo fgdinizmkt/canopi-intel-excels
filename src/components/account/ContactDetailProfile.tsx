@@ -51,11 +51,17 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
   const [prepStatus, setPrepStatus] = React.useState<string | null>(null);
   const [ownerInput, setOwnerInput] = React.useState<string>(contact.owner || '');
   const [ownerStatus, setOwnerStatus] = React.useState<string | null>(null);
+  const [selectedClassifications, setSelectedClassifications] = React.useState<('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[]>(contact.classificacao || []);
+  const [classificationStatus, setClassificationStatus] = React.useState<string | null>(null);
+
+  const classificationOptions: ('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[] = ['Decisor', 'Influenciador', 'Champion', 'Sponsor', 'Blocker', 'Técnico', 'Negócio'];
 
   React.useEffect(() => {
     setOwnerInput(contact.owner || '');
     setOwnerStatus(null);
-  }, [contact.id, contact.owner]);
+    setSelectedClassifications(contact.classificacao || []);
+    setClassificationStatus(null);
+  }, [contact.id, contact.owner, contact.classificacao]);
 
   const handleAssignOwner = () => {
     if (!ownerInput.trim()) return;
@@ -98,6 +104,52 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
 
     setOwnerStatus('Owner atribuído');
     setTimeout(() => setOwnerStatus(null), 2000);
+  };
+
+  const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio') => {
+    // 1. Snapshot contato-alvo
+    const targetContact = contact;
+
+    // 2. Build estado final com classificacao togglada
+    const newClassifications = selectedClassifications.includes(classification)
+      ? selectedClassifications.filter(c => c !== classification)
+      : [...selectedClassifications, classification];
+
+    const updatedContact: ContatoConta = {
+      id: targetContact.id,
+      nome: targetContact.nome,
+      cargo: targetContact.cargo,
+      area: targetContact.area,
+      senioridade: targetContact.senioridade,
+      papelComite: targetContact.papelComite,
+      forcaRelacional: targetContact.forcaRelacional,
+      receptividade: targetContact.receptividade,
+      acessibilidade: targetContact.acessibilidade,
+      status: targetContact.status,
+      classificacao: newClassifications,
+      influencia: targetContact.influencia,
+      potencialSucesso: targetContact.potencialSucesso,
+      scoreSucesso: targetContact.scoreSucesso,
+      ganchoReuniao: targetContact.ganchoReuniao,
+      liderId: targetContact.liderId,
+      owner: targetContact.owner,
+    };
+
+    // 3. Update local ANTES da persistência (local-first)
+    setSelectedClassifications(newClassifications);
+    if (onUpdateContact) {
+      onUpdateContact(updatedContact);
+    }
+
+    // 4. Persistir remotamente (fire-and-forget)
+    persistContact({
+      ...updatedContact,
+      accountId: accountId,
+      accountName: accountName,
+    }).catch(() => {});
+
+    setClassificationStatus('Classificação atualizada');
+    setTimeout(() => setClassificationStatus(null), 1500);
   };
   // Cores semânticas Baseadas na Classificação
   const getClassColor = (classes: string[]) => {
@@ -221,6 +273,42 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           </div>
           {contact.owner && (
             <p className="text-[9px] text-blue-400 mt-2">Atual: <span className="font-bold">{contact.owner}</span></p>
+          )}
+        </section>
+
+        {/* --- CLASSIFICAÇÃO DE CONTATO --- */}
+        <section className="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50">
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5" /> Classificação
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {classificationOptions.map(option => {
+              const isSelected = selectedClassifications.includes(option);
+              const bgColor = option === 'Decisor' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                            option === 'Influenciador' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                            option === 'Champion' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                            option === 'Sponsor' ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' :
+                            option === 'Blocker' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                            option === 'Técnico' ? 'bg-slate-500/20 text-slate-300 border-slate-500/30' :
+                            'bg-indigo-500/20 text-indigo-400 border-indigo-500/30';
+
+              return (
+                <button
+                  key={option}
+                  onClick={() => handleToggleClassification(option)}
+                  className={`text-[9px] font-black uppercase px-2 py-1 rounded border transition-all ${
+                    isSelected
+                      ? `${bgColor} opacity-100 ring-1 ring-offset-1 ring-offset-slate-900`
+                      : 'bg-slate-700/30 text-slate-500 border-slate-700 opacity-60 hover:opacity-80'
+                  }`}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+          {classificationStatus && (
+            <p className="text-[9px] text-emerald-400 mt-2">{classificationStatus}</p>
           )}
         </section>
 
