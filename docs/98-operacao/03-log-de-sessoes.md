@@ -11,7 +11,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Contexto:** Recortes 22-24 implementaram E2-E4 com merge interno. Recorte 25 estabelece padrão correto: repository = camada complementar/remota apenas, merge = responsabilidade da página, source of truth = AccountDetailContext/sessionActions.
 - **Ações Executadas:**
   - **Novo arquivo `src/lib/actionsRepository.ts`:**
-    * Type `ActionRow`: tipagem com suporte a 30 campos (12 obrigatórios + 18 opcionais)
+    * Type `ActionRow`: tipagem com suporte a 31 campos (13 obrigatórios: id, priority, category, channel, status, title, description, accountName, origin, slaStatus, suggestedOwner, ownerTeam, createdAt; 18 opcionais: accountContext, relatedSignal, ownerName, slaText, expectedImpact, nextStep, dependencies, evidence, history, projectObjective, projectSuccess, projectSteps, buttons, sourceType, playbookName, playbookRunId, playbookStepId, relatedAccountId)
     * Função `getActions()`: 
       - Query campos de ActionRow do Supabase (sem `select('*')`)
       - Retorna apenas ações complementares (camada remota)

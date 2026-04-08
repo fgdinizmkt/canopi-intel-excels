@@ -63,9 +63,9 @@ Próximo passo: definir e aprovar o Recorte 26 (E6 — Quinta Migração ou escr
 - ✅ Recorte 24: Sem `as any` — type safety completa via adapter explícito.
 - ✅ Recorte 24: Logging observabilidade em 5 pontos (config, error, shell warn, success, exception).
 - ✅ Recorte 25: Repository layer `src/lib/actionsRepository.ts` implementado como camada complementar/remota.
-- ✅ Recorte 25: `getActions()`: query Supabase campos de ActionRow + retorna [] em erro (não fallback para sessionActions).
+- ✅ Recorte 25: `getActions()`: query Supabase 31 campos de ActionRow (13 obrigatórios + 18 opcionais) + retorna [] em erro.
 - ✅ Recorte 25: Type guards explícitos (isValidPriority, isValidStatus, isValidSlaStatus, isValidSourceType) — sem `as any`.
-- ✅ Recorte 25: Shell seguro para ações remotas: todos campos obrigatórios preenchidos (id, priority, category, channel, status, title, description, accountName, origin, slaStatus, suggestedOwner, ownerTeam, createdAt).
+- ✅ Recorte 25: Shell seguro para ações remotas: todos 13 campos obrigatórios preenchidos (id, priority, category, channel, status, title, description, accountName, origin, slaStatus, suggestedOwner, ownerTeam, createdAt).
 - ✅ Recorte 25: `src/pages/Actions.tsx` consome `getActions()` em useEffect com dependências `[]` (uma vez no mount).
 - ✅ Recorte 25: supabaseActions = estado complementar; sessionActions = source of truth (primária).
 - ✅ Recorte 25: allItems via useMemo com merge explícito donde sessionActions siempre vence por id.
