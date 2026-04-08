@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 29 — Supabase E8.2: Classificação Editável em Contacts concluído (extensão do padrão defensivo de E8).
+**Status:** Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only) concluído (primeira migração de leitura em ABM).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 30 (próxima escrita defensiva ou migração complementar).
+Próximo passo: definir e aprovar o Recorte 31 (próxima migração complementar, ex: ABX repository layer).
 
 ## Último Estado Confiável
-**Recorte 29 — Supabase E8.2: Classificação Editável em Contacts** (commit `2e46a47`, publicado em origin/main)
+**Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only)** (commit `4aa13f3`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -132,8 +132,22 @@ Próximo passo: definir e aprovar o Recorte 30 (próxima escrita defensiva ou mi
 - ✅ Publicação: commit 2e46a47 publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 30: Repository layer `src/lib/abmRepository.ts` implementado (first read-only ABM).
+- ✅ Recorte 30: `getAbm()` query Supabase 8 campos (id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico).
+- ✅ Recorte 30: Fallback seguro: Supabase não configurado ou erro → retorna `[]` (complemento vazio).
+- ✅ Recorte 30: Merge explícito em AbmStrategy.tsx com useMemo (contasMock base + supabaseAbm complemento).
+- ✅ Recorte 30: Merge defensivo com nullish coalescing (`??`) em campos: icp, crm, vp, ct, ft, tipoEstrategico, abm.
+- ✅ Recorte 30: Shell seguro: ignora contas remotas sem correspondente no mock.
+- ✅ Recorte 30: `activeAccountId` sincroniza com `accounts` via useEffect.
+- ✅ Recorte 30: `accounts` como fonte derivada final em toda UI ABM (heatmaps, TAL, métricas, posição).
+- ✅ Recorte 30: Sem escrita, sem ABX, sem novos campos (read-only).
+- ✅ Recorte 30: Type safety: tipagem `AbmRow` explícita, sem `as any`, mapeamento completo.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6, E7, E8, E8.2, E10A concluídas.
+- ✅ Publicação: commit 4aa13f3 publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 30 (próxima escrita defensiva ou migração complementar) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 31 (próxima migração complementar: ABX repository layer read-only, ou equivalente) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 30. Candidatos: escrita defensiva em signals/actions complementares, ABM/ABX/oportunidades migrations, ou expansão de campos em entities existentes.
+Aguardar aprovação do Orquestrador para definir o Recorte 31. Candidatos: ABX repository layer read-only (E10B para balancear com ABM E10A), escrita defensiva complementar em signals/actions, ou outras migrações Supabase.

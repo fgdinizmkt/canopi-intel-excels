@@ -5,6 +5,50 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-08] — Recorte 30 (Supabase E10A): ABM Repository Layer (Read-Only) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E10A: primeira leitura defensiva em ABM, read-only, sem ABX)
+- **Alto:** Implementar repository layer defensivo para ABM com Supabase, reutilizando padrão consolidado de E2 (Accounts), com fallback seguro e merge explícito.
+- **Contexto:** Recortes 22-25 implementaram E2-E5 (leituras) com merge interno. Recorte 26-28.1 implementaram E6-E8 (escritas). Recorte 30 estende leituras para ABM, testando escala de padrão defensivo em nova entidade estratégica. ABX fica para Recorte 31.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/abmRepository.ts`:**
+    * +Interface `AbmRow`: tipagem subset de Conta (id obrigatório + 8 campos ABM opcionais: slug, icp, crm, vp, ct, ft, abm, tipoEstrategico)
+    * +Função `getAbm()` defensiva:
+      - 1. Check `isSupabaseConfigured()`
+      - 2. Query Supabase explicit fields (não select('*'))
+      - 3. Error handling: log + return `[]` (fallback seguro)
+      - 4. Success logging
+      - 5. Exception catching
+    * Fallback strategy: Supabase não configurado → `[]`; erro → `[]`; sucesso → AbmRow[]
+  - **Refatoração `src/pages/AbmStrategy.tsx`:**
+    * +import `useEffect` para orchestration
+    * +import `getAbm, type AbmRow` do repositório
+    * +state `[supabaseAbm, setSupabaseAbm]` para dados remotos
+    * +useEffect carrega `getAbm()` uma única vez (deps: `[]`)
+    * +useMemo `accounts`: merge explícito contasMock (base) + supabaseAbm (complemento) por id
+      - Merge defensivo com `??` em: icp, crm, vp, ct, ft, tipoEstrategico, abm
+      - Ignora contas remotas sem mock
+    * +useEffect sincroniza `activeAccountId` com `accounts` (deps: `[accounts]`)
+    * -estado `activeAccountId` com contasMock[0] → agora null + sincroniza em useEffect
+    * -`activeAccount` derivação de contasMock → agora derivada de `accounts`
+    * -todos useMemo dependencies adicionam `accounts` ou removem `[]`
+    * -todos usos de contasMock.map/reduce/indexOf → `accounts.map/reduce/indexOf`
+    * UI transformations: abmHeatmapAccounts, abmAccounts (TAL), hero metrics, ranking position — todas usam `accounts`
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 137 insertions(+), 13 deletions(-)
+    * Type safety: sem `as any`, tipagem AbmRow explícita, TipoEstrategico importado corretamente
+    * Fallback: em erro Supabase, contasMock é única fonte (merge vazio)
+    * Padrão replicado: local-first + remote complementary + fallback seguro (idêntico a E2, E3, etc)
+  - **Arquitetura confirmada:**
+    * abmRepository.ts = camada remota complementar (read-only)
+    * AbmStrategy.tsx = responsável pelo merge + UI final
+    * `accounts` = fonte derivada final em TODA UI ABM
+
+- **Commit:** `4aa13f3` — feat(abm): add defensive read-only Supabase repository layer
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-08] — Recorte 29 (Supabase E8.2): Classificação Editável em Contacts — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E8.2: extensão de E8 com campo multi-seleção editável)
 - **Alto:** Expandir padrão defensivo de E8 (owner assignment) para campo `classificacao` (array multi-seleção) em contacts, reutilizando padrão local-first consolidado.

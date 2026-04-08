@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-08 (Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts: 027191c, publicado em origin/main)
+ `main` — sincronizada em 2026-04-08 (Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only): 4aa13f3, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only))
 
 ---
 
@@ -309,10 +309,24 @@
 - **Commit:** `2e46a47` — feat(contacts): add local-first classification toggles with defensive persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only)** — 2026-04-08
+- ✅ Repository layer `src/lib/abmRepository.ts` implementado
+- ✅ `getAbm()`: query Supabase campos de AbmRow (id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico)
+- ✅ Fallback seguro: Supabase não configurado ou erro → retorna `[]` (complemento vazio)
+- ✅ Merge explícito em AbmStrategy.tsx: `accounts = useMemo(contasMock + supabaseAbm por id)`
+- ✅ Merge defensivo com nullish coalescing (`??`) para campos: icp, crm, vp, ct, ft, tipoEstrategico, abm
+- ✅ Shell seguro: ignora contas remotas sem correspondente no mock (não cria shells novos)
+- ✅ `activeAccountId` sincroniza com `accounts` via useEffect
+- ✅ `accounts` como fonte derivada final em toda UI: heatmaps, TAL table, métricas, posição
+- ✅ Sem escrita, sem ABX, sem novos campos (read-only)
+- ✅ Build Exit 0 (validado)
+- **Commit:** `4aa13f3` — feat(abm): add defensive read-only Supabase repository layer
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 29 — E8.2 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 30 (próxima escrita defensiva ou migração complementar)
+- **Status Atual:** Recorte 30 — E10A concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 31 (ABX repository layer read-only, ou próxima migração complementar)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

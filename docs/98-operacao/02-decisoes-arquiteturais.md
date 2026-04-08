@@ -366,6 +366,31 @@ const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' 
 
 ---
 
+### 8.6 Leitura Defensiva em ABM (Recorte 30)
+**Decisão refinada:** Primeira migração de leitura em ABM segue padrão defensivo idêntico a E2 (Accounts), sem escrita, sem ABX.
+
+**Implicação estrutural (Recorte 30 em diante):**
+- **abmRepository.ts (layer complementar/remota):** função `getAbm()` 
+  - Query Supabase com explicit fields: id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico (não select('*'))
+  - Fallback completo: Supabase não configurado ou erro → retorna `[]` (complemento vazio)
+  - Logging de observabilidade: config check, query success, query error, exception handling
+  - Type `AbmRow`: subset de Conta focusing on ABM scoring fields (id obrigatório + 8 campos opcionais)
+- **AbmStrategy.tsx (responsável pelo merge e UI):** padrão rígido local-first
+  - State `[supabaseAbm, setSupabaseAbm]` para dados remotos
+  - useEffect carrega `getAbm()` uma única vez no mount (deps: `[]`)
+  - useMemo `accounts`: merge explícito de contasMock (base) + supabaseAbm (complemento) por id
+    - Merge defensivo com nullish coalescing (`??`): icp, crm, vp, ct, ft, tipoEstrategico, abm
+    - Ignora contas remotas sem correspondente no mock (sem criar shells novos)
+  - useEffect sincroniza `activeAccountId` com `accounts` (deps: `[accounts]`)
+  - `activeAccount` derivado de `accounts` com dependências corretas
+  - Todas UI derivações (heatmaps, TAL, métricas, posição) usam `accounts` em vez de contasMock
+
+**Benefício:** ABM completa o trio de leituras (Accounts E2, Signals E3, ABM E10A). Padrão maduro validado 3x. ABX fica para Recorte 31 (E10B), mantendo escopo controlado.
+
+**Commits:** `4aa13f3` (E10A implementação defensiva de leitura em ABM via Recorte 30)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 
