@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-07
 
-**Status:** Recorte 23 — Supabase E3: Segunda Migração de Entidade concluído.
+**Status:** Recorte 24 — Supabase E4: Terceira Migração de Entidade concluído.
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 24 (E4 — Terceira Migração de Entidade).
+Próximo passo: definir e aprovar o Recorte 25 (E5 — Quarta Migração de Entidade ou escrita defensiva).
 
 ## Último Estado Confiável
-**Recorte 23 — Supabase E3: Segunda Migração de Entidade** (commit `1d7ab3d`, publicado em origin/main)
+**Recorte 24 — Supabase E4: Terceira Migração de Entidade** (commit `fdc38f8`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -53,12 +53,21 @@ Próximo passo: definir e aprovar o Recorte 24 (E4 — Terceira Migração de En
 - ✅ Recorte 23: Shell seguro para sinais sem mock: todos campos obrigatórios preenchidos, campos profundos vazios.
 - ✅ Recorte 23: `src/pages/Signals.tsx` consome `getSignals()` em useEffect com try/catch e fallback.
 - ✅ Recorte 23: Logging observabilidade em 5 pontos (config, error, shell warn, success, exception).
-- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3 ativadas.
+- ✅ Recorte 24: Repository layer `src/lib/contactsRepository.ts` implementado.
+- ✅ Recorte 24: `getContactsFromMock()` extrai contatos flat com accountId/accountName.
+- ✅ Recorte 24: `getContacts()`: query Supabase campos de ContactRow + merge com contasMock + fallback seguro.
+- ✅ Recorte 24: Merge defensivo com nullish coalescing (??) para todos 18 campos críticos.
+- ✅ Recorte 24: Shell seguro para contatos sem mock: todos campos obrigatórios preenchidos (nome, classificacao, forcaRelacional, influencia, accountId, accountName).
+- ✅ Recorte 24: `src/pages/Contacts.tsx` consome `getContacts()` em useEffect com try/catch e fallback.
+- ✅ Recorte 24: Adapter tipado `radarContacts` em useMemo<EnrichedContact[]> resolve mismatch RepositoryContact → component props.
+- ✅ Recorte 24: Sem `as any` — type safety completa via adapter explícito.
+- ✅ Recorte 24: Logging observabilidade em 5 pontos (config, error, shell warn, success, exception).
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4 ativadas.
 - ✅ Publicação: commits publicados em origin/main.
-- ✅ Documentação: 00-status-atual.md, 06-checkpoint-atual.md sincronizados.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md sincronizados.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 24 (E4 — Terceira Migração de Entidade) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 25 (E5 — Quarta Migração ou Escrita) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 24 (E4). Candidato: contatos (Contacts).
+Aguardar aprovação do Orquestrador para definir o Recorte 25 (E5). Candidatos: actions (para migração completa) ou escrita defensiva em repositórios existentes.

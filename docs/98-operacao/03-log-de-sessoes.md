@@ -5,6 +5,45 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 24 (Supabase E4): Terceira Migração de Entidade (contacts) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Terceira migração: contacts lidos do Supabase)
+- **Alto:** Implementar camada de repositório defensiva para leitura de contatos do Supabase com fallback seguro.
+- **Contexto:** Recorte 22 implementou primeira migração (accounts), Recorte 23 implementou segunda (signals). Recorte 24 aplica padrão a terceira entidade (contacts). Estratégia: read-only, merge defensivo com nullish coalescing, shell seguro.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/contactsRepository.ts`:**
+    * Type `ContactRow`: tipagem com suporte a 18 campos (id obrigatório + 17 opcionais: nome, cargo, area, senioridade, papelComite, forcaRelacional, receptividade, acessibilidade, status, classificacao, influencia, potencialSucesso, scoreSucesso, ganchoReuniao, liderId, accountId, accountName)
+    * Função `getContactsFromMock()`: extrai contatos flat do contasMock com enriquecimento de accountId/accountName
+    * Função `getContacts()`: 
+      - Query campos de ContactRow do Supabase
+      - Merge defensivo com contasMock: nullish coalescing (??) para todos os campos (id + 17 opcionais)
+      - Shell seguro explícito para contatos sem mock: todos campos obrigatórios preenchidos com valores defaults seguros
+        * nome: row.nome || 'Contato sem nome'
+        * classificacao: row.classificacao && row.classificacao.length > 0 ? row.classificacao : ['Stakeholder']
+        * forcaRelacional: row.forcaRelacional ?? 0
+        * influencia: row.influencia ?? 0
+        * accountId: row.accountId || 'unknown'
+        * accountName: row.accountName || 'Conta desconhecida'
+      - Fallback completo: se Supabase não configurado, erro, ou sem dados → contasMock
+      - Logging em 5 pontos: config, error, warning (shell), success, exception
+  - **Modificação `src/pages/Contacts.tsx`:**
+    * +import `useEffect, getContacts, RepositoryContact` do repositório e StakeholderRadar
+    * Estado `[allStakeholders, setAllStakeholders]` migrado de useMemo para useState com mock initialization para SSR
+    * useEffect: async `carregarContatos()` chamada em mount, enriquece contatos com `vertical` do contasMock, fallback para mock em erro
+    * Adapter tipado `radarContacts` com useMemo<EnrichedContact[]>: mapeia RepositoryContact para EnrichedContact com safe defaults para campos opcionais (cargo, area)
+    * Passa adapter sem `as any` para <StakeholderRadar contacts={radarContacts} />
+    * Todos filtros, estatísticas, opções alimentados por dados potencialmente do Supabase
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 228 insertions(+), 6 deletions(-)
+    * Merge defensivo: nullish coalescing garante que null/undefined do Supabase nunca sobrescreve valores válidos de mock
+    * Tipagem: RepositoryContact alinhada com campos de ContactRow; adapter resolve mismatch entre repository e component
+    * Fallback: seguro em todos cenários (dev sem Supabase, error, sem dados)
+    * Type safety: sem `as any`, sem cast frouxo — adapter tipado explicitamente
+- **Commit:** `fdc38f8` — feat(contacts): implementa Recorte 24 — Supabase E4 Terceira Migração de Entidade
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 23 (Supabase E3): Segunda Migração de Entidade (signals) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Segunda migração: signals lidos do Supabase)
 - **Alto:** Implementar camada de repositório defensiva para leitura de sinais do Supabase com fallback seguro.

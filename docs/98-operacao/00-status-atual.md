@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-07 (Recorte 23 — Supabase E3: Segunda Migração de Entidade: 1d7ab3d, publicado em origin/main)
+ `main` — sincronizada em 2026-04-07 (Recorte 24 — Supabase E4: Terceira Migração de Entidade: fdc38f8, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 23 — Supabase E3: Segunda Migração de Entidade)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 24 — Supabase E4: Terceira Migração de Entidade)
 
 ---
 
