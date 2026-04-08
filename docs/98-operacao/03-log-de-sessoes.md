@@ -5,6 +5,45 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-07] — Recorte 25 (Supabase E5): Quarta Migração de Entidade (actions) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Quarta migração: actions lidos do Supabase como camada complementar)
+- **Alto:** Introduzir leitura defensiva de ações do Supabase sem quebrar fila operacional local baseada em sessionActions.
+- **Contexto:** Recortes 22-24 implementaram E2-E4 com merge interno. Recorte 25 estabelece padrão correto: repository = camada complementar/remota apenas, merge = responsabilidade da página, source of truth = AccountDetailContext/sessionActions.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/actionsRepository.ts`:**
+    * Type `ActionRow`: tipagem com suporte a 30 campos (12 obrigatórios + 18 opcionais)
+    * Função `getActions()`: 
+      - Query campos de ActionRow do Supabase (sem `select('*')`)
+      - Retorna apenas ações complementares (camada remota)
+      - Em erro ou ausência de configuração: retorna `[]` (complemento vazio)
+      - Shell seguro com type guards explícitos (isValidPriority, isValidStatus, isValidSlaStatus, isValidSourceType)
+      - NÃO responsável pela fila viva — essa é AccountDetailContext
+      - Logging em 4 pontos: config, error, success, exception
+  - **Modificação `src/pages/Actions.tsx`:**
+    * +import `getActions` do repositório
+    * +estado `[supabaseActions, setSupabaseActions]` para complementares (read-only)
+    * useEffect: carrega remoto **uma vez no mount** (dependências: `[]`)
+    * sessionActions continua source of truth (primária)
+    * Merge explícito via useMemo: sessionActions base + supabaseActions complementa por id
+    * sessionActions sempre vence em conflito (por id)
+    * Sem refetch desnecessário: merge é local e reativo
+    * Deep-linking, playbooks, createAction, updateAction preservados intactos
+  - **Decisão Arquitetural:**
+    * AccountDetailContext/sessionActions = source of truth (fila viva)
+    * actionsRepository.ts = complementary/remote layer (read-only)
+    * Actions.tsx = responsável pelo merge com precedência explícita
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 219 insertions(+), 2 deletions(-)
+    * Type safety: sem `as any` — type guards explícitos para todos enums
+    * Fallback: em erro Supabase, sessionActions é única fonte
+    * Sem refetch desnecessário: useEffect rodar apenas uma vez
+    * Merge determinístico: sessionActions vence sempre por id
+- **Commit:** `77eb41f` — feat(actions): implementa Recorte 25 — Supabase E5 Quarta Migração de Entidade
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-07] — Recorte 24 (Supabase E4): Terceira Migração de Entidade (contacts) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Terceira migração: contacts lidos do Supabase)
 - **Alto:** Implementar camada de repositório defensiva para leitura de contatos do Supabase com fallback seguro.

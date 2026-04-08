@@ -99,6 +99,55 @@ Registrar decisões técnicas e de produto já tomadas e consolidadas, para evit
 
 ---
 
+### 8.1 Responsabilidade Explícita em Camadas de Migração (Recorte 25)
+**Decisão refinada:** Migração Supabase estabelece separação clara de responsabilidades entre contexto, repositório e página.
+
+**Implicação estrutural (Recorte 25 em diante):**
+- **AccountDetailContext (source of truth):** gerencia fila viva (sessionActions), localStorage, create/update direto
+  - Nunca depende de Supabase — é a fonte primária operacional
+  - Hidratação e sincronização locais são exclusivamente desta camada
+  - Todas as operações de escrita passam aqui
+- **Repository (`src/lib/{entity}Repository.ts`):** camada complementar/remota apenas
+  - Retorna dados para complementar lacunas, não substitui source of truth
+  - Em erro ou ausência de config → retorna [] (complemento vazio, não fallback para context)
+  - Nunca reimplementa merge interno — merge é job da página
+  - Read-only absoluto
+- **Página (`src/pages/{Entity}.tsx`):** responsável pelo merge e UI
+  - Merge explícito: camada local (context) sempre vence por id
+  - useEffect do repositório roda uma vez (mount) — sem refetch desnecessário
+  - `sessionActions` continua source of truth para toda lógica de UI
+
+**Exemplo concreto (Recorte 25):**
+```typescript
+// Context = source of truth
+const { sessionActions, createAction, updateAction } = useAccountDetail();
+
+// Repository = complementar
+const [supabaseActions, setSupabaseActions] = useState([]);
+useEffect(() => {
+  const remote = await getActions();  // retorna [] se erro
+  setSupabaseActions(remote);
+}, []);  // roda uma vez
+
+// Merge = página
+const allItems = useMemo(() => {
+  const merged = [...sessionActions];  // base primária
+  // adiciona do Supabase apenas se não existe por id
+  for (const action of supabaseActions) {
+    if (!mergedIds.has(action.id)) {
+      merged.push(action);
+    }
+  }
+  return merged;
+}, [sessionActions, supabaseActions]);
+```
+
+**Benefício:** evita duas responsabilidades sobre mesma fonte, reduz refetch desnecessário, clareza de precedência.
+
+**Commits:** `77eb41f` (E5 implementação com padrão claro)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

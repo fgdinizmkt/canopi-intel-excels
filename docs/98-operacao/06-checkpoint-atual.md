@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-07
 
-**Status:** Recorte 24 — Supabase E4: Terceira Migração de Entidade concluído.
+**Status:** Recorte 25 — Supabase E5: Quarta Migração de Entidade concluído.
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 25 (E5 — Quarta Migração de Entidade ou escrita defensiva).
+Próximo passo: definir e aprovar o Recorte 26 (E6 — Quinta Migração ou escrita defensiva).
 
 ## Último Estado Confiável
-**Recorte 24 — Supabase E4: Terceira Migração de Entidade** (commit `fdc38f8`, publicado em origin/main)
+**Recorte 25 — Supabase E5: Quarta Migração de Entidade** (commit `77eb41f`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -62,12 +62,23 @@ Próximo passo: definir e aprovar o Recorte 25 (E5 — Quarta Migração de Enti
 - ✅ Recorte 24: Adapter tipado `radarContacts` em useMemo<EnrichedContact[]> resolve mismatch RepositoryContact → component props.
 - ✅ Recorte 24: Sem `as any` — type safety completa via adapter explícito.
 - ✅ Recorte 24: Logging observabilidade em 5 pontos (config, error, shell warn, success, exception).
-- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4 ativadas.
+- ✅ Recorte 25: Repository layer `src/lib/actionsRepository.ts` implementado como camada complementar/remota.
+- ✅ Recorte 25: `getActions()`: query Supabase campos de ActionRow + retorna [] em erro (não fallback para sessionActions).
+- ✅ Recorte 25: Type guards explícitos (isValidPriority, isValidStatus, isValidSlaStatus, isValidSourceType) — sem `as any`.
+- ✅ Recorte 25: Shell seguro para ações remotas: todos campos obrigatórios preenchidos (id, priority, category, channel, status, title, description, accountName, origin, slaStatus, suggestedOwner, ownerTeam, createdAt).
+- ✅ Recorte 25: `src/pages/Actions.tsx` consome `getActions()` em useEffect com dependências `[]` (uma vez no mount).
+- ✅ Recorte 25: supabaseActions = estado complementar; sessionActions = source of truth (primária).
+- ✅ Recorte 25: allItems via useMemo com merge explícito donde sessionActions siempre vence por id.
+- ✅ Recorte 25: Sem refetch desnecessário (merge é local e reativo, useEffect não depende de sessionActions).
+- ✅ Recorte 25: Decisão arquitetural: AccountDetailContext/sessionActions = source of truth; actionsRepository.ts = complementary; Actions.tsx = responsável pelo merge.
+- ✅ Recorte 25: createAction, updateAction, deep-linking, playbooks, localStorage/sessionActions preservados intactos.
+- ✅ Recorte 25: Logging em 4 pontos (config, error, success, exception).
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5 ativadas.
 - ✅ Publicação: commits publicados em origin/main.
-- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md sincronizados.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 25 (E5 — Quarta Migração ou Escrita) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 26 (E6 — Quinta Migração ou Escrita) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 25 (E5). Candidatos: actions (para migração completa) ou escrita defensiva em repositórios existentes.
+Aguardar aprovação do Orquestrador para definir o Recorte 26 (E6). Candidatos: escrita defensiva em repositórios existentes ou ABM/ABX/oportunidades migrations.
