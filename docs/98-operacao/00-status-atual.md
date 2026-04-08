@@ -4,7 +4,7 @@
  `main` — sincronizada em 2026-04-07 (Recorte 23 — Supabase E3: Segunda Migração de Entidade: 1d7ab3d, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 22 — Supabase E2: Primeira Migração de Entidade)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 23 — Supabase E3: Segunda Migração de Entidade)
 
 ---
 
@@ -252,10 +252,10 @@
 
 **Recorte 23 — Supabase E3: Segunda Migração de Entidade (signals)** — 2026-04-07
 - ✅ Repositório defensivo `src/lib/signalsRepository.ts`
-- ✅ `getSignals()`: query Supabase 17 campos (id, severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
+- ✅ `getSignals()`: query Supabase campos de SignalRow (id, severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
 - ✅ Merge defensivo com advancedSignals: nullish coalescing (??) para todos 19 campos críticos
 - ✅ Shell seguro para sinais sem mock correspondente
-- ✅ Tipagem SignalRow com 17 campos opcionais
+- ✅ Tipagem SignalRow com 1 campo obrigatório (id) + 18 campos opcionais
 - ✅ `src/pages/Signals.tsx`: consome getSignals() em useEffect com try/catch
 - ✅ Fallback completo: não configurado → advancedSignals; erro → advancedSignals; sem dados → advancedSignals
 - ✅ Logging observabilidade em 5 pontos (config, error, shell, success, exception)
@@ -299,4 +299,4 @@
 | Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |
 | Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
 | Supabase E2: First Migration | Recorte 22 Concluído (Fase E) | Repository layer accounts: getAccounts(), merge com mock, shell seguro, Accounts.tsx consumindo dados |
-| Supabase E3: Second Migration | Recorte 23 Concluído (Fase E) | Repository layer signals: getSignals(), query 17 campos, merge defensivo (nullish coalescing), Signals.tsx consumindo dados |
+| Supabase E3: Second Migration | Recorte 23 Concluído (Fase E) | Repository layer signals: getSignals(), query campos de SignalRow, merge defensivo (nullish coalescing), Signals.tsx consumindo dados |

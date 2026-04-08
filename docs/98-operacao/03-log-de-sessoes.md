@@ -11,10 +11,10 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Contexto:** Recorte 22 implementou primeira migração (accounts). Recorte 23 aplica padrão a segunda entidade (signals). Estratégia: read-only, merge defensivo com nullish coalescing, shell seguro.
 - **Ações Executadas:**
   - **Novo arquivo `src/lib/signalsRepository.ts`:**
-    * Type `SignalRow`: tipagem com 17 campos opcionais (id, severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
+    * Type `SignalRow`: tipagem com suporte a 19 campos (id obrigatório + 18 opcionais: severity, type, category, archived, resolved, title, description, timestamp, account, accountId, owner, confidence, channel, source, context, probableCause, impact, recommendation)
     * Função `getSignals()`: 
-      - Query 17 campos mínimos do Supabase
-      - Merge defensivo com advancedSignals: nullish coalescing (??) para todos 19 campos críticos (17 campos + archived + resolved)
+      - Query campos de SignalRow do Supabase
+      - Merge defensivo com advancedSignals: nullish coalescing (??) para todos os campos de SignalRow (id + 18 campos opcionais)
       - Shell seguro explícito para sinais sem mock: todos campos obrigatórios preenchidos com valores defaults seguros, campos profundos vazios
       - Fallback completo: se Supabase não configurado, erro, ou sem dados → advancedSignals
       - Logging em 5 pontos: config, error, warning (shell), success, exception

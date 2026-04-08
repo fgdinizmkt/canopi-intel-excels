@@ -48,7 +48,7 @@ Próximo passo: definir e aprovar o Recorte 24 (E4 — Terceira Migração de En
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 02-decisoes-arquiteturais.md, 06-checkpoint-atual.md sincronizados.
 
 - ✅ Recorte 23: Repository layer `src/lib/signalsRepository.ts` implementado.
-- ✅ Recorte 23: `getSignals()`: query Supabase 17 campos + merge com advancedSignals + fallback seguro.
+- ✅ Recorte 23: `getSignals()`: query Supabase campos de SignalRow + merge com advancedSignals + fallback seguro.
 - ✅ Recorte 23: Merge defensivo com nullish coalescing (??) para todos 19 campos críticos.
 - ✅ Recorte 23: Shell seguro para sinais sem mock: todos campos obrigatórios preenchidos, campos profundos vazios.
 - ✅ Recorte 23: `src/pages/Signals.tsx` consome `getSignals()` em useEffect com try/catch e fallback.
