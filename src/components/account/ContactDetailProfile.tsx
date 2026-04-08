@@ -1,30 +1,34 @@
 'use client';
 
 import React from 'react';
-import { 
-  X, 
-  User, 
-  Linkedin, 
-  ShieldCheck, 
-  Zap, 
-  AlertCircle, 
-  Activity, 
-  Target, 
-  MessageSquare, 
+import {
+  X,
+  User,
+  Linkedin,
+  ShieldCheck,
+  Zap,
+  AlertCircle,
+  Activity,
+  Target,
+  MessageSquare,
   ArrowUpRight,
   TrendingUp,
   BrainCircuit,
   Clock,
   ChevronRight,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  Users
 } from 'lucide-react';
 import { ContatoConta, SinalConta, ActionItem } from '../../data/accountsData';
 import { useAccountDetail } from '../../context/AccountDetailContext';
+import { persistContact, ContactItem } from '../../lib/contactsRepository';
 
 interface ContactDetailProfileProps {
   contact: ContatoConta;
   onClose: () => void;
+  onUpdateContact?: (contact: ContatoConta) => void;
+  accountId?: string;
   sinais?: SinalConta[];
   acoes?: ActionItem[];
   accountName?: string;
@@ -34,15 +38,67 @@ interface ContactDetailProfileProps {
  * ContactDetailProfile - Operational Intelligence Layer
  * Camada de profundidade para diagnóstico e estratégia de abordagem de stakeholders.
  */
-export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({ 
-  contact, 
+export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
+  contact,
   onClose,
+  onUpdateContact,
+  accountId = "unknown",
   sinais = [],
   acoes = [],
   accountName = "Conta não identificada"
 }) => {
   const { createAction } = useAccountDetail();
   const [prepStatus, setPrepStatus] = React.useState<string | null>(null);
+  const [ownerInput, setOwnerInput] = React.useState<string>(contact.owner || '');
+  const [ownerStatus, setOwnerStatus] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setOwnerInput(contact.owner || '');
+    setOwnerStatus(null);
+  }, [contact.id, contact.owner]);
+
+  const handleAssignOwner = () => {
+    if (!ownerInput.trim()) return;
+
+    // 1. Snapshot contato-alvo
+    const targetContact = contact;
+
+    // 2. Construir estado final ANTES de setState
+    const updatedContact: ContatoConta = {
+      id: targetContact.id,
+      nome: targetContact.nome,
+      cargo: targetContact.cargo,
+      area: targetContact.area,
+      senioridade: targetContact.senioridade,
+      papelComite: targetContact.papelComite,
+      forcaRelacional: targetContact.forcaRelacional,
+      receptividade: targetContact.receptividade,
+      acessibilidade: targetContact.acessibilidade,
+      status: targetContact.status,
+      classificacao: targetContact.classificacao,
+      influencia: targetContact.influencia,
+      potencialSucesso: targetContact.potencialSucesso,
+      scoreSucesso: targetContact.scoreSucesso,
+      ganchoReuniao: targetContact.ganchoReuniao,
+      liderId: targetContact.liderId,
+      owner: ownerInput.trim(),
+    };
+
+    // 3. Update local ANTES da persistência (local-first)
+    if (onUpdateContact) {
+      onUpdateContact(updatedContact);
+    }
+
+    // 4. Persistir remotamente (fire-and-forget)
+    persistContact({
+      ...updatedContact,
+      accountId: accountId,
+      accountName: accountName,
+    }).catch(() => {});
+
+    setOwnerStatus('Owner atribuído');
+    setTimeout(() => setOwnerStatus(null), 2000);
+  };
   // Cores semânticas Baseadas na Classificação
   const getClassColor = (classes: string[]) => {
     if (classes.includes('Blocker')) return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -140,6 +196,32 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                </div>
             </div>
           </div>
+        </section>
+
+        {/* --- ATRIBUIÇÃO DE OWNER --- */}
+        <section className="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/20">
+          <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <Users className="w-3.5 h-3.5" /> Atribuição de Owner
+          </h3>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={ownerInput}
+              onChange={(e) => setOwnerInput(e.target.value)}
+              placeholder="Nome do owner"
+              className="flex-1 h-8 px-3 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-all"
+            />
+            <button
+              onClick={handleAssignOwner}
+              disabled={!ownerInput.trim() || !!ownerStatus}
+              className={`h-8 px-3 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 ${ownerStatus ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50'}`}
+            >
+              {ownerStatus ? 'OK' : 'Atribuir'}
+            </button>
+          </div>
+          {contact.owner && (
+            <p className="text-[9px] text-blue-400 mt-2">Atual: <span className="font-bold">{contact.owner}</span></p>
+          )}
         </section>
 
         {/* --- CONTEXTO OPERACIONAL (SINAIS/AÇÕES) --- */}

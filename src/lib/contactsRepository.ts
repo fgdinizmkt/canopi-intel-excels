@@ -2,14 +2,41 @@ import supabase, { isSupabaseConfigured } from './supabaseClient';
 import { contasMock } from '../data/accountsData';
 
 /**
- * Repositório de Contatos — Camada de Leitura Supabase com Fallback
- * E4: Terceira migração de entidade
+ * Repositório de Contatos — Camada de Leitura/Escrita Defensiva Supabase
+ * E4: Terceira migração de entidade (leitura)
+ * E8: Primeira escrita defensiva em Contacts (persistência)
  *
  * Estratégia:
  * 1. Se Supabase está configurado, tenta ler contacts
  * 2. Se falha ou não configurado, retorna contatos extraídos do contasMock
- * 3. Nunca escreve — apenas leitura
+ * 3. Persistência defensiva: best-effort, nunca bloqueia UX, falha silenciosa
  */
+
+/**
+ * Tipo explícito para item de contato na aplicação
+ * Compatível com contatos do mock e estrutura esperada em operações locais
+ */
+export type ContactItem = {
+  id: string;
+  nome: string;
+  cargo?: string;
+  area?: string;
+  senioridade?: string;
+  papelComite?: string;
+  forcaRelacional: number;
+  receptividade?: 'Alta' | 'Média' | 'Baixa';
+  acessibilidade?: 'Alta' | 'Média' | 'Baixa';
+  status?: string;
+  classificacao: string[];
+  influencia: number;
+  potencialSucesso?: number;
+  scoreSucesso?: number;
+  ganchoReuniao?: string;
+  liderId?: string;
+  owner?: string;
+  accountId: string;
+  accountName: string;
+};
 
 export type ContactRow = {
   id: string;
@@ -28,6 +55,7 @@ export type ContactRow = {
   scoreSucesso?: number;
   ganchoReuniao?: string;
   liderId?: string;
+  owner?: string;
   accountId: string;
   accountName: string;
 };
@@ -49,6 +77,7 @@ export type RepositoryContact = {
   scoreSucesso?: number;
   ganchoReuniao?: string;
   liderId?: string;
+  owner?: string;
   accountId: string;
   accountName: string;
 };
@@ -145,6 +174,7 @@ export async function getContacts(): Promise<RepositoryContact[]> {
           scoreSucesso: row.scoreSucesso,
           ganchoReuniao: row.ganchoReuniao,
           liderId: row.liderId ?? undefined,
+          owner: row.owner ?? undefined,
           accountId: row.accountId || 'unknown',
           accountName: row.accountName || 'Conta desconhecida',
         };
@@ -169,6 +199,7 @@ export async function getContacts(): Promise<RepositoryContact[]> {
         scoreSucesso: row.scoreSucesso ?? mockContact.scoreSucesso,
         ganchoReuniao: row.ganchoReuniao ?? mockContact.ganchoReuniao,
         liderId: row.liderId ?? mockContact.liderId,
+        owner: row.owner ?? mockContact.owner,
         accountId: row.accountId ?? mockContact.accountId,
         accountName: row.accountName ?? mockContact.accountName,
       };
@@ -181,5 +212,61 @@ export async function getContacts(): Promise<RepositoryContact[]> {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error('[Contacts] Exceção ao buscar contatos:', errorMsg);
     return getContactsFromMock();
+  }
+}
+
+/**
+ * E8: Persistência defensiva de contato no Supabase.
+ * Upsert por id, mapeamento explícito ContactItem → ContactRow.
+ * Best-effort: nunca relança erro, falha silenciosa com logging.
+ * Fire-and-forget: não bloqueia fluxo local.
+ */
+export async function persistContact(contact: ContactItem): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    console.log('[contactsRepository] Supabase não configurado — skip persistência remota');
+    return;
+  }
+
+  try {
+    console.log(`[contactsRepository] Persistindo contato ${contact.id} no Supabase...`);
+
+    // Mapeamento explícito ContactItem → ContactRow
+    // Persiste apenas campos que fazem sentido no banco de dados
+    const contactRow: ContactRow = {
+      id: contact.id,
+      nome: contact.nome,
+      cargo: contact.cargo,
+      area: contact.area,
+      senioridade: contact.senioridade,
+      papelComite: contact.papelComite,
+      forcaRelacional: contact.forcaRelacional,
+      receptividade: contact.receptividade,
+      acessibilidade: contact.acessibilidade,
+      status: contact.status,
+      classificacao: contact.classificacao,
+      influencia: contact.influencia,
+      potencialSucesso: contact.potencialSucesso,
+      scoreSucesso: contact.scoreSucesso,
+      ganchoReuniao: contact.ganchoReuniao,
+      liderId: contact.liderId,
+      owner: contact.owner,
+      accountId: contact.accountId,
+      accountName: contact.accountName
+    };
+
+    // Upsert por id
+    const { error } = await supabase!
+      .from('contacts')
+      .upsert(contactRow, { onConflict: 'id' });
+
+    if (error) {
+      console.error(`[contactsRepository] Erro ao persistir contato ${contact.id}:`, error);
+      return;
+    }
+
+    console.log(`[contactsRepository] Contato ${contact.id} persistido com sucesso`);
+  } catch (e) {
+    console.error(`[contactsRepository] Exceção ao persistir contato ${contact.id}:`, e);
+    // Silencioso — nunca relança
   }
 }

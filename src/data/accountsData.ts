@@ -33,6 +33,7 @@ export interface ContatoConta {
   status: string;
   classificacao: ('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[];
   liderId?: string;
+  owner?: string;
   influencia: number;
   potencialSucesso: number;
   /** Score consolidado de probabilidade de conversão (0-100) */

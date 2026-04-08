@@ -54,30 +54,35 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [isLogging, setIsLogging] = useState(false);
   const [logDraft, setLogDraft] = useState('');
   const [showFeedback, setShowFeedback] = useState<string | null>(null);
+  const [localContatos, setLocalContatos] = useState<ContatoConta[]>(account?.contatos ?? []);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
   }, [initialContactId]);
+
+  React.useEffect(() => {
+    if (account) setLocalContatos(account.contatos);
+  }, [account?.id]);
 
   const isFullscreen = shellViewMode === 'fullscreen';
 
   // Radar Relacional Logic (RECORTE 26)
   const radar = React.useMemo(() => {
     if (!account) return { tension: [], support: [], gaps: [] };
-    const tension = account.contatos.filter(c => 
-      (c.classificacao.includes('Blocker') || c.influencia > 7) && 
+    const tension = localContatos.filter(c =>
+      (c.classificacao.includes('Blocker') || c.influencia > 7) &&
       account.sinais.some(s => s.contexto === c.area && s.impacto === 'Alto')
     );
-    const support = account.contatos.filter(c => 
-      (c.classificacao.includes('Champion') || c.classificacao.includes('Sponsor')) && 
+    const support = localContatos.filter(c =>
+      (c.classificacao.includes('Champion') || c.classificacao.includes('Sponsor')) &&
       account.sinais.some(s => s.contexto === c.area && (s.tipo === 'Tendência' || s.tipo === 'Mudança'))
     );
     const areasComSinais = Array.from(new Set(account.sinais.filter(s => s.impacto === 'Alto').map(s => s.contexto)));
-    const areasComContatos = Array.from(new Set(account.contatos.map(c => c.area)));
+    const areasComContatos = Array.from(new Set(localContatos.map(c => c.area)));
     const gaps = areasComSinais.filter(a => !areasComContatos.includes(a));
 
     return { tension, support, gaps };
-  }, [account]);
+  }, [account, localContatos]);
 
   const renderTree = React.useCallback((contatos: ContatoConta[], parentId?: string, level = 0) => {
     const children = contatos.filter(c => c.liderId === parentId);
@@ -159,6 +164,10 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     });
     setShowFeedback('Playbook ativado. Nova ação enviada para a fila global.');
     setTimeout(() => setShowFeedback(null), 4000);
+  };
+
+  const handleUpdateContact = (updatedContact: ContatoConta) => {
+    setLocalContatos(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
   };
 
   return (
@@ -680,15 +689,15 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
             </div>
 
-            {account.contatos.length > 0 ? (
+            {localContatos.length > 0 ? (
               <div className={`bg-slate-900 rounded-[28px] border border-slate-800/60 shadow-2xl overflow-hidden transition-all duration-300 ${orgView === 'tree' ? 'p-6 md:p-8' : 'p-0'} ${selectedContactId && isFullscreen ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                 {orgView === 'tree' ? (
                   <div className="space-y-2">
                     {(() => {
-                      const topLevel = account.contatos.filter(c => !c.liderId || !account.contatos.find(p => p.id === c.liderId));
+                      const topLevel = localContatos.filter(c => !c.liderId || !localContatos.find(p => p.id === c.liderId));
                       return topLevel.map(contact => (
                         <div key={contact.id}>
-                          {renderTree(account.contatos, contact.liderId ? undefined : contact.id, 0)}
+                          {renderTree(localContatos, contact.liderId ? undefined : contact.id, 0)}
                         </div>
                       ));
                     })()}
@@ -703,7 +712,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800">
-                      {account.contatos.map(contact => {
+                      {localContatos.map(contact => {
                         const sinaisNaArea = account.sinais.filter(s => s.contexto === contact.area);
                         const hasCriticalSignal = sinaisNaArea.some(s => s.impacto === 'Alto');
                         return (
@@ -869,7 +878,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setSelectedContactId(null)} />
           <div className={`relative h-full shadow-2xl transition-all duration-300 ${isFullscreen ? 'w-full md:w-[45%]' : 'w-full'}`}>
             {(() => {
-              const contact = account.contatos.find(c => c.id === selectedContactId);
+              const contact = localContatos.find(c => c.id === selectedContactId);
               if (!contact) return null;
               // FILTRO RIGOROSO POR ÁREA DO CONTATO
               const sinaisAssociados = account.sinais.filter(s => s.contexto === contact.area);
@@ -878,6 +887,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <ContactDetailProfile
                   contact={contact}
                   onClose={() => setSelectedContactId(null)}
+                  onUpdateContact={handleUpdateContact}
+                  accountId={account.id}
                   sinais={sinaisAssociados}
                   acoes={realActions.filter(a => a.ownerName === contact.nome || a.description.includes(contact.nome))}
                   accountName={account.nome}
