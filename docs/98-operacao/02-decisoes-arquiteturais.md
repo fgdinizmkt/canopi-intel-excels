@@ -391,6 +391,31 @@ const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' 
 
 ---
 
+### 8.7 Leitura Defensiva em ABX (Recorte 31)
+**Decisão refinada:** Segunda migração de leitura em ABM (complementar) segue padrão defensivo idêntico a E10A (ABM), sem escrita.
+
+**Implicação estrutural (Recorte 31 em diante):**
+- **abxRepository.ts (layer complementar/remota):** função `getAbx()`
+  - Query Supabase com explicit fields: id, abx (não select('*'))
+  - Fallback completo: Supabase não configurado ou erro → retorna `[]` (complemento vazio)
+  - Logging de observabilidade: config check, query success, query error, exception handling
+  - Type `AbxRow`: subset de Conta focusing on ABX expansion fields (id obrigatório + abx opcional)
+  - ABX é objeto aninhado com 9 campos opcionais: motivo, evolucaoJornada, maturidadeRelacional, sponsorAtivo, profundidadeComite, continuidade, expansao, retencao, riscoEstagnacao
+- **AbmStrategy.tsx (responsável pelo merge e UI):** padrão rígido local-first expandido
+  - State `[supabaseAbx, setSupabaseAbx]` para dados remotos
+  - useEffect carrega ABX em paralelo com ABM via `Promise.all([getAbm(), getAbx()])` (uma vez no mount)
+  - useMemo `accounts`: merge explícito de contasMock (base) + supabaseAbm (complemento) + supabaseAbx (complemento) por id
+    - Merge defensivo com nullish coalescing (`??`): campo abx (objeto aninhado)
+    - Ignora contas remotas sem correspondente no mock (sem criar shells novos)
+  - Dependências corretas: `[supabaseAbm, supabaseAbx]`
+  - Todas UI derivações (heatmaps, TAL, métricas, posição) usam `accounts` merged com ABM + ABX
+
+**Benefício:** ABX complementa E10A (pair E10A/E10B = ABM + ABX em harmonia). Padrão consolidado: E2 (Accounts) + E3 (Signals) + E10A (ABM) + E10B (ABX) = 4 leituras defensivas validadas. ABX read-only, sem impacto em existente.
+
+**Commits:** `04f634f` (E10B implementação defensiva de leitura em ABX via Recorte 31)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

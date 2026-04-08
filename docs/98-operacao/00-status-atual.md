@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-08 (Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only): 4aa13f3, publicado em origin/main)
+ `main` — sincronizada em 2026-04-08 (Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only): 04f634f, publicado em origin/main)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only))
@@ -323,10 +323,24 @@
 - **Commit:** `4aa13f3` — feat(abm): add defensive read-only Supabase repository layer
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only)** — 2026-04-08
+- ✅ Repository layer `src/lib/abxRepository.ts` implementado (novo arquivo)
+- ✅ `getAbx()`: query Supabase campo `abx` (objeto aninhado com 9 campos opcionais)
+- ✅ Fallback seguro: Supabase não configurado ou erro → retorna `[]` (complemento vazio)
+- ✅ Merge explícito em AbmStrategy.tsx: `accounts = useMemo(contasMock + supabaseAbm + supabaseAbx por id)`
+- ✅ Merge defensivo com nullish coalescing (`??`) para campo: abx
+- ✅ Carga paralela ABM + ABX via `Promise.all([getAbm(), getAbx()])`
+- ✅ Shell seguro: ignora contas remotas sem correspondente no mock
+- ✅ ABX complementar ao E10A (pair E10A/E10B = ABM + ABX em harmonia)
+- ✅ Sem escrita, read-only
+- ✅ Build Exit 0 (validado)
+- **Commit:** `04f634f` — feat(abx): add defensive read-only Supabase repository layer
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 30 — E10A concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 31 (ABX repository layer read-only, ou próxima migração complementar)
+- **Status Atual:** Recorte 31 — E10B concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 32 (próxima migração complementar)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only) concluído (primeira migração de leitura em ABM).
+**Status:** Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only) concluído (segunda migração de leitura em ABM, complementar a E10A).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
 Próximo passo: definir e aprovar o Recorte 31 (próxima migração complementar, ex: ABX repository layer).
 
 ## Último Estado Confiável
-**Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only)** (commit `4aa13f3`, publicado em origin/main)
+**Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only)** (commit `04f634f49c90eabea027d2f59e56549745f95b5a`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -146,8 +146,24 @@ Próximo passo: definir e aprovar o Recorte 31 (próxima migração complementar
 - ✅ Publicação: commit 4aa13f3 publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 31: Repository layer `src/lib/abxRepository.ts` implementado (second read-only ABM complementar).
+- ✅ Recorte 31: `getAbx()` query Supabase 2 campos (id, abx).
+- ✅ Recorte 31: Campo `abx` é objeto aninhado com 9 campos opcionais: motivo, evolucaoJornada, maturidadeRelacional, sponsorAtivo, profundidadeComite, continuidade, expansao, retencao, riscoEstagnacao.
+- ✅ Recorte 31: Fallback seguro: Supabase não configurado ou erro → retorna `[]` (complemento vazio).
+- ✅ Recorte 31: Merge explícito em AbmStrategy.tsx com useMemo (contasMock base + supabaseAbm complemento + supabaseAbx complemento).
+- ✅ Recorte 31: Merge defensivo com nullish coalescing (`??`) em campo: abx (objeto aninhado).
+- ✅ Recorte 31: Carga paralela ABM + ABX via `Promise.all([getAbm(), getAbx()])`.
+- ✅ Recorte 31: Shell seguro: ignora contas remotas sem correspondente no mock.
+- ✅ Recorte 31: `accounts` como fonte derivada final em toda UI ABM (ABM + ABX merged).
+- ✅ Recorte 31: Pair E10A/E10B completo: ABM + ABX em harmonia.
+- ✅ Recorte 31: Sem escrita, sem novos campos (read-only).
+- ✅ Recorte 31: Type safety: tipagem `AbxRow` explícita, sem `as any`, mapeamento completo.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6, E7, E8, E8.2, E10A, E10B concluídas.
+- ✅ Publicação: commit 04f634f49c90eabea027d2f59e56549745f95b5a publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 31 (próxima migração complementar: ABX repository layer read-only, ou equivalente) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 32 (próxima migração complementar) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 31. Candidatos: ABX repository layer read-only (E10B para balancear com ABM E10A), escrita defensiva complementar em signals/actions, ou outras migrações Supabase.
+Aguardar aprovação do Orquestrador para definir o Recorte 32. Pair E10A/E10B (ABM + ABX) completo. Próximas oportunidades: escrita defensiva complementar em entities existentes, ou novas migrações Supabase para outras camadas.

@@ -5,6 +5,47 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-08] — Recorte 31 (Supabase E10B): ABX Repository Layer (Read-Only) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E10B: segunda leitura defensiva em ABM, focada em ABX expansion context, read-only)
+- **Alto:** Implementar repository layer defensivo para ABX (complementar a E10A), reutilizando padrão consolidado com fallback seguro e merge explícito, fechando pair E10A/E10B.
+- **Contexto:** Recorte 30 implementou E10A (ABM repository). Recorte 31 implementa E10B (ABX repository), completando pair natural em AbmStrategy.tsx. Ambos read-only, complementares, mergidos explicitamente por id no useMemo accounts. Sem escrita, sem mudança em contasMock.
+- **Ações Executadas:**
+  - **Novo arquivo `src/lib/abxRepository.ts`:**
+    * +Interface `AbxRow`: tipagem subset de Conta (id obrigatório + abx opcional)
+    * +Campo `abx` é objeto aninhado com 9 campos opcionais: motivo, evolucaoJornada, maturidadeRelacional, sponsorAtivo, profundidadeComite, continuidade, expansao, retencao, riscoEstagnacao
+    * +Função `getAbx()` defensiva:
+      - 1. Check `isSupabaseConfigured()`
+      - 2. Query Supabase explicit fields: id, abx (não select('*'))
+      - 3. Error handling: log + return `[]` (fallback seguro)
+      - 4. Success logging
+      - 5. Exception catching
+    * Fallback strategy: Supabase não configurado → `[]`; erro → `[]`; sucesso → AbxRow[]
+  - **Refatoração `src/pages/AbmStrategy.tsx`:**
+    * +import `getAbx, type AbxRow` do repositório
+    * +state `[supabaseAbx, setSupabaseAbx]` para dados remotos ABX
+    * +useEffect refatorado para carregar ABM + ABX em paralelo via `Promise.all([getAbm(), getAbx()])`
+    * +useMemo `accounts`: merge explícito contasMock (base) + supabaseAbm (complemento) + supabaseAbx (complemento) por id
+      - Merge defensivo com `??` em: campo abx (objeto aninhado)
+      - Ignora contas remotas sem mock
+    * +dependências useMemo: `[supabaseAbm, supabaseAbx]`
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 94 insertions(+), 6 deletions(-)
+    * Type safety: sem `as any`, tipagem AbxRow explícita
+    * Fallback: em erro Supabase, contasMock é única fonte (merge vazio)
+    * Parallelism: Promise.all garante carga otimizada de ABM + ABX
+    * Padrão replicado: local-first + remote complementary + fallback seguro (idêntico a E10A, E3, E2)
+  - **Arquitetura confirmada:**
+    * abxRepository.ts = camada remota complementar (read-only)
+    * AbmStrategy.tsx = responsável pelo merge + UI final
+    * `accounts` = fonte derivada final em TODA UI ABM (ABM + ABX merged)
+    * Pair E10A/E10B = ABM + ABX em harmonia, sem divergência, sem escrita
+
+- **Commit:** `04f634f` — feat(abx): add defensive read-only Supabase repository layer
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-08] — Recorte 30 (Supabase E10A): ABM Repository Layer (Read-Only) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E10A: primeira leitura defensiva em ABM, read-only, sem ABX)
 - **Alto:** Implementar repository layer defensivo para ABM com Supabase, reutilizando padrão consolidado de E2 (Accounts), com fallback seguro e merge explícito.
