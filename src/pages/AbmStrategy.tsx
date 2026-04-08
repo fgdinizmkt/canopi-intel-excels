@@ -60,6 +60,7 @@ import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 import { getAbm, type AbmRow } from '../lib/abmRepository';
+import { getAbx, type AbxRow } from '../lib/abxRepository';
 
 // --- MOCK DATA ---
 
@@ -416,22 +417,24 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
 
   const { openAccount } = useAccountDetail();
   const [supabaseAbm, setSupabaseAbm] = useState<AbmRow[]>([]);
+  const [supabaseAbx, setSupabaseAbx] = useState<AbxRow[]>([]);
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
 
-  // Load ABM data from Supabase once on mount
+  // Load ABM and ABX data from Supabase once on mount
   useEffect(() => {
     (async () => {
-      const remote = await getAbm();
-      setSupabaseAbm(remote);
+      const [remoteAbm, remoteAbx] = await Promise.all([getAbm(), getAbx()]);
+      setSupabaseAbm(remoteAbm);
+      setSupabaseAbx(remoteAbx);
     })();
   }, []);
 
-  // Merge: contasMock (base) + supabaseAbm (complementary)
+  // Merge: contasMock (base) + supabaseAbm + supabaseAbx (complementary)
   // Local-first pattern: contasMock is source of truth
   const accounts = useMemo(() => {
     const merged = [...contasMock];
 
-    // Merge fields from Supabase by id (only: icp, crm, vp, ct, ft, abm, tipoEstrategico)
+    // Merge ABM fields from Supabase by id (only: icp, crm, vp, ct, ft, abm, tipoEstrategico)
     for (const remote of supabaseAbm) {
       const idx = merged.findIndex(c => c.id === remote.id);
       if (idx >= 0) {
@@ -452,8 +455,23 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
       // Ignore remote accounts not in contasMock
     }
 
+    // Merge ABX fields from Supabase by id
+    for (const remote of supabaseAbx) {
+      const idx = merged.findIndex(c => c.id === remote.id);
+      if (idx >= 0) {
+        merged[idx] = {
+          ...merged[idx],
+          abx: {
+            ...merged[idx].abx,
+            ...(remote.abx || {})
+          }
+        };
+      }
+      // Ignore remote accounts not in contasMock
+    }
+
     return merged;
-  }, [supabaseAbm]);
+  }, [supabaseAbm, supabaseAbx]);
 
   // Initialize activeAccountId once accounts is available
   useEffect(() => {
