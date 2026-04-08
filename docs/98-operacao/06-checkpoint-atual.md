@@ -56,8 +56,8 @@ Próximo passo: definir e aprovar o Recorte 25 (E5 — Quarta Migração de Enti
 - ✅ Recorte 24: Repository layer `src/lib/contactsRepository.ts` implementado.
 - ✅ Recorte 24: `getContactsFromMock()` extrai contatos flat com accountId/accountName.
 - ✅ Recorte 24: `getContacts()`: query Supabase campos de ContactRow + merge com contasMock + fallback seguro.
-- ✅ Recorte 24: Merge defensivo com nullish coalescing (??) para todos 18 campos críticos.
-- ✅ Recorte 24: Shell seguro para contatos sem mock: todos campos obrigatórios preenchidos (nome, classificacao, forcaRelacional, influencia, accountId, accountName).
+- ✅ Recorte 24: Merge defensivo com nullish coalescing (??) para todos 18 campos (7 obrigatórios + 11 opcionais).
+- ✅ Recorte 24: Shell seguro para contatos sem mock: todos campos obrigatórios preenchidos (id, nome, forcaRelacional, classificacao, influencia, accountId, accountName).
 - ✅ Recorte 24: `src/pages/Contacts.tsx` consome `getContacts()` em useEffect com try/catch e fallback.
 - ✅ Recorte 24: Adapter tipado `radarContacts` em useMemo<EnrichedContact[]> resolve mismatch RepositoryContact → component props.
 - ✅ Recorte 24: Sem `as any` — type safety completa via adapter explícito.

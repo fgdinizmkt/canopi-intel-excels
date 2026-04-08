@@ -11,11 +11,11 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Contexto:** Recorte 22 implementou primeira migração (accounts), Recorte 23 implementou segunda (signals). Recorte 24 aplica padrão a terceira entidade (contacts). Estratégia: read-only, merge defensivo com nullish coalescing, shell seguro.
 - **Ações Executadas:**
   - **Novo arquivo `src/lib/contactsRepository.ts`:**
-    * Type `ContactRow`: tipagem com suporte a 18 campos (id obrigatório + 17 opcionais: nome, cargo, area, senioridade, papelComite, forcaRelacional, receptividade, acessibilidade, status, classificacao, influencia, potencialSucesso, scoreSucesso, ganchoReuniao, liderId, accountId, accountName)
+    * Type `ContactRow`: tipagem com suporte a 18 campos (7 obrigatórios: id, nome, forcaRelacional, classificacao, influencia, accountId, accountName; 11 opcionais: cargo, area, senioridade, papelComite, receptividade, acessibilidade, status, potencialSucesso, scoreSucesso, ganchoReuniao, liderId)
     * Função `getContactsFromMock()`: extrai contatos flat do contasMock com enriquecimento de accountId/accountName
     * Função `getContacts()`: 
       - Query campos de ContactRow do Supabase
-      - Merge defensivo com contasMock: nullish coalescing (??) para todos os campos (id + 17 opcionais)
+      - Merge defensivo com contasMock: nullish coalescing (??) para todos 18 campos (7 obrigatórios + 11 opcionais)
       - Shell seguro explícito para contatos sem mock: todos campos obrigatórios preenchidos com valores defaults seguros
         * nome: row.nome || 'Contato sem nome'
         * classificacao: row.classificacao && row.classificacao.length > 0 ? row.classificacao : ['Stakeholder']
@@ -35,7 +35,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Validação Técnica:**
     * Build: Exit 0 (sem regressões)
     * 2 files, 228 insertions(+), 6 deletions(-)
-    * Merge defensivo: nullish coalescing garante que null/undefined do Supabase nunca sobrescreve valores válidos de mock
+    * Merge defensivo: nullish coalescing (??) garante que null/undefined do Supabase nunca sobrescreve valores válidos de mock (7 obrigatórios + 11 opcionais)
     * Tipagem: RepositoryContact alinhada com campos de ContactRow; adapter resolve mismatch entre repository e component
     * Fallback: seguro em todos cenários (dev sem Supabase, error, sem dados)
     * Type safety: sem `as any`, sem cast frouxo — adapter tipado explicitamente
