@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import '../pages/signals.css';
 import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
-import { getSignals } from '../lib/signalsRepository';
+import { getSignals, persistSignal, SignalItem } from '../lib/signalsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 
@@ -27,7 +27,7 @@ export const Signals: React.FC = () => {
   const [subpageData, setSubpageData] = useState<any>(null);
 
   const [toast, setToast] = useState({ show: false, title: '', sub: '' });
-  const [signals, setSignals] = useState(advancedSignals);
+  const [signals, setSignals] = useState<SignalItem[]>(advancedSignals);
   const [selOwner, setSelOwner] = useState('');
   const [assignNote, setAssignNote] = useState('');
 
@@ -121,10 +121,26 @@ export const Signals: React.FC = () => {
   };
 
   const confirmAssign = () => {
-    const s = signals.find(x => x.flow === 'assign' && !x.archived);
-    setSignals(signals.map(x => x.flow === 'assign' && !x.archived ? { ...x, resolved: true, owner: selOwner } : x));
+    // 1. Identificar alvo explicitamente
+    const targetSignal = signals.find(x => x.flow === 'assign' && !x.archived);
+    if (!targetSignal) {
+      closeMid();
+      return;
+    }
+
+    // 2. Construir estado final ANTES de setState
+    const updatedSignal = { ...targetSignal, resolved: true, owner: selOwner };
+
+    // 3. Atualizar estado local por id (não por condição ampla)
+    setSignals(signals.map(x => x.id === targetSignal.id ? updatedSignal : x));
+
+    // 4. Persistir remotamente exatamente esse mesmo sinal final (fire-and-forget)
+    persistSignal(updatedSignal).catch(() => {
+      // Silencioso — persistSignal já logou o erro
+    });
+
     closeMid();
-    addAction({ title: 'Acompanhar lead atribuído — ' + (s?.account || 'Carteira Seguros Enterprise'), description: 'Lead atribuído para ' + selOwner + '. Acompanhar contato em até 2h.', account: s?.account || 'Carteira Seguros Enterprise', owner: selOwner, priority: 'Crítica', category: 'Inbound', origin: s?.id || 'SIG-4088', sla: '2h', slaStatus: 'ok' });
+    addAction({ title: 'Acompanhar lead atribuído — ' + (targetSignal.account || 'Carteira Seguros Enterprise'), description: 'Lead atribuído para ' + selOwner + '. Acompanhar contato em até 2h.', account: targetSignal.account || 'Carteira Seguros Enterprise', owner: selOwner, priority: 'Crítica', category: 'Inbound', origin: targetSignal.id || 'SIG-4088', sla: '2h', slaStatus: 'ok' });
     t2('✓ Lead atribuído para ' + selOwner, 'Ação criada na fila · Sinal resolvido');
   };
 
@@ -210,7 +226,24 @@ export const Signals: React.FC = () => {
     setSelSt(''); 
   };
 
-  const archive = (id: string, state: boolean) => { setSignals(signals.map(s => s.id === id ? { ...s, archived: state } : s)); t2(state ? 'Sinal arquivado' : 'Sinal restaurado', id); };
+  const archive = (id: string, state: boolean) => {
+    // 1. Identificar alvo explicitamente
+    const targetSignal = signals.find(s => s.id === id);
+    if (!targetSignal) return;
+
+    // 2. Construir estado final ANTES de setState
+    const updatedSignal = { ...targetSignal, archived: state };
+
+    // 3. Atualizar estado local por id
+    setSignals(signals.map(s => s.id === id ? updatedSignal : s));
+
+    // 4. Persistir remotamente exatamente esse mesmo sinal final (fire-and-forget)
+    persistSignal(updatedSignal).catch(() => {
+      // Silencioso — persistSignal já logou o erro
+    });
+
+    t2(state ? 'Sinal arquivado' : 'Sinal restaurado', id);
+  };
 
   if (subpage === 'account' && subpageData) {
     return (
