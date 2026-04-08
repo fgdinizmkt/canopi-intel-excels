@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Badge, Button, Card } from '../components/ui';
 import { useAccountDetail } from "../context/AccountDetailContext";
+import { getActions } from "../lib/actionsRepository";
 import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
 
 type ViewMode = "Lista" | "Kanban";
@@ -1117,8 +1118,40 @@ export const Actions: React.FC = () => {
   const searchParams = useSearchParams();
   const { openAccount, sessionActions, updateAction, createAction } = useAccountDetail();
 
-  // O sessionActions agora contém tanto as iniciais (hidratadas) quanto as da sessão
-  const allItems = sessionActions;
+  // Estado para ações complementares do Supabase (camada de leitura apenas)
+  // sessionActions é a fonte primária e sempre vence em merge
+  const [supabaseActions, setSupabaseActions] = useState<ActionItem[]>([]);
+
+  // useEffect para carregar ações complementares do Supabase (apenas uma vez no mount)
+  // Merge com sessionActions é local e reativo, sem refetch desnecessário
+  useEffect(() => {
+    const carregarAcoes = async () => {
+      try {
+        const remoteActions = await getActions();
+        setSupabaseActions(remoteActions);
+      } catch (err) {
+        console.error('[Actions] Erro ao carregar ações complementares:', err);
+        setSupabaseActions([]);
+      }
+    };
+
+    carregarAcoes();
+  }, []);
+
+  // Merge explícito e determinístico: sessionActions vence sempre por id
+  const allItems = useMemo(() => {
+    const merged = [...sessionActions];
+    const mergedIds = new Set(merged.map(a => a.id));
+
+    // Adiciona apenas ações do Supabase que não existem em sessionActions
+    for (const action of supabaseActions) {
+      if (!mergedIds.has(action.id)) {
+        merged.push(action);
+      }
+    }
+
+    return merged;
+  }, [sessionActions, supabaseActions]);
 
   const [query, setQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("Todas");
