@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Target,
   Filter,
@@ -59,6 +59,7 @@ import { Card, Badge, Button } from '../components/ui';
 import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
+import { getAbm, type AbmRow } from '../lib/abmRepository';
 
 // --- MOCK DATA ---
 
@@ -414,15 +415,60 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [icpWeights, setIcpWeights] = useState({ receita: 30, stack: 25, equipe: 20, setor: 25 });
 
   const { openAccount } = useAccountDetail();
-  const [activeAccountId, setActiveAccountId] = useState<string | null>(contasMock[0]?.id || null);
+  const [supabaseAbm, setSupabaseAbm] = useState<AbmRow[]>([]);
+  const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
+
+  // Load ABM data from Supabase once on mount
+  useEffect(() => {
+    (async () => {
+      const remote = await getAbm();
+      setSupabaseAbm(remote);
+    })();
+  }, []);
+
+  // Merge: contasMock (base) + supabaseAbm (complementary)
+  // Local-first pattern: contasMock is source of truth
+  const accounts = useMemo(() => {
+    const merged = [...contasMock];
+
+    // Merge fields from Supabase by id (only: icp, crm, vp, ct, ft, abm, tipoEstrategico)
+    for (const remote of supabaseAbm) {
+      const idx = merged.findIndex(c => c.id === remote.id);
+      if (idx >= 0) {
+        merged[idx] = {
+          ...merged[idx],
+          icp: remote.icp ?? merged[idx].icp,
+          crm: remote.crm ?? merged[idx].crm,
+          vp: remote.vp ?? merged[idx].vp,
+          ct: remote.ct ?? merged[idx].ct,
+          ft: remote.ft ?? merged[idx].ft,
+          tipoEstrategico: remote.tipoEstrategico ?? merged[idx].tipoEstrategico,
+          abm: {
+            ...merged[idx].abm,
+            ...(remote.abm || {})
+          }
+        };
+      }
+      // Ignore remote accounts not in contasMock
+    }
+
+    return merged;
+  }, [supabaseAbm]);
+
+  // Initialize activeAccountId once accounts is available
+  useEffect(() => {
+    if (activeAccountId === null && accounts.length > 0) {
+      setActiveAccountId(accounts[0]!.id);
+    }
+  }, [accounts, activeAccountId]);
 
   const activeAccount = useMemo(() => {
-    return contasMock.find(a => a.id === activeAccountId) || contasMock[0];
-  }, [activeAccountId]);
+    return accounts.find(a => a.id === activeAccountId) || accounts[0];
+  }, [activeAccountId, accounts]);
 
-  // Camada Derivada: Transforma contasMock para o formato do Heatmap
+  // Camada Derivada: Transforma accounts (merged) para o formato do Heatmap
   const abmHeatmapAccounts = useMemo(() => {
-    return contasMock.map(c => ({
+    return accounts.map(c => ({
       id:       c.id,
       name:     c.nome,
       vertical: c.vertical,
@@ -434,12 +480,12 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
       ft:       c.ft,
       budget:   Math.round(c.budgetBrl / 1000) // Converte BRL absoluto para k para UI
     }));
-  }, []);
+  }, [accounts]);
 
-  // TAL Table derivada de contasMock
+  // TAL Table derivada de accounts (merged)
   const abmAccounts = useMemo(() => {
     const statusMap: Record<string, string> = { 'Crítico': 'HOT', 'Atenção': 'PLAYBOOK', 'Saudável': 'MAPEANDO' };
-    return contasMock.map(c => ({
+    return accounts.map(c => ({
       id:         c.id,
       initials:   c.nome.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
       name:       c.nome,
@@ -449,7 +495,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
       engagement: c.prontidao,
       mqa:        c.prontidao > 70,
     }));
-  }, []);
+  }, [accounts]);
 
   // Score ICP ponderado pelos pesos configurados (normalizado 0-100)
   const getWeightedIcp = (acc: any) => {
@@ -490,11 +536,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
         <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100 z-10">
            <div className="px-6 py-2 text-center border-r border-slate-200">
               <p className="text-[9px] font-bold text-slate-400 uppercase">Target Accounts</p>
-              <p className="text-lg font-bold text-slate-900">{contasMock.length}</p>
+              <p className="text-lg font-bold text-slate-900">{accounts.length}</p>
            </div>
            <div className="px-6 py-2 text-center">
               <p className="text-[9px] font-bold text-slate-400 uppercase">Health Score</p>
-              <p className="text-lg font-bold text-emerald-600">{(contasMock.reduce((acc, c) => acc + c.prontidao, 0) / (contasMock.length * 10)).toFixed(1)}/10</p>
+              <p className="text-lg font-bold text-emerald-600">{(accounts.reduce((acc, c) => acc + c.prontidao, 0) / (accounts.length * 10)).toFixed(1)}/10</p>
            </div>
            <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none" title="Refinar lista de contas-alvo" aria-label="Refinar lista de contas-alvo">Refinar TAL</Button>
         </div>
@@ -598,7 +644,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   <div key="avg-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-blue-500"/>Ranking ABM</p>
-                      <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {contasMock.indexOf(activeAccount) + 1}º</Badge>
+                      <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {accounts.indexOf(activeAccount) + 1}º</Badge>
                     </div>
                     <div className="space-y-1.5">
                       {ranked.slice(0,5).map((acc, i) => {
