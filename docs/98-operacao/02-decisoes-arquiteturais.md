@@ -242,6 +242,70 @@ const confirmAssign = () => {
 
 ---
 
+### 8.4 Escrita Defensiva em Contacts (Recorte 28.1)
+**Decisão refinada:** Terceira escrita remota em `contacts` via micro-recorte 28.1. Owner assignment mínimo destrava E8 com padrão consolidado.
+
+**Implicação estrutural (Recorte 28.1 em diante):**
+- **AccountDetailView (estado local):** mantém cópia local dos contatos via `[localContatos, setLocalContatos]`
+  - useEffect sincroniza com `account.contatos` quando account muda
+  - Handler `handleUpdateContact(updatedContact)` atualiza a cópia local por id
+  - Passa `onUpdateContact` callback e `accountId` real para ContactDetailProfile
+- **persistContact() em Repository:** função complementar de persistência
+  - Upsert por id no Supabase
+  - Mapeamento explícito ContactItem → ContactRow (sem spreads frouxos)
+  - Falha silenciosa: loga erros, nunca relança, nunca impacta UX
+  - Se Supabase não está configurado: skips automaticamente
+- **ContactDetailProfile (local-first):** owner assignment com padrão rígido
+  - useEffect ressincroniza `ownerInput` e `ownerStatus` ao alternar contatos (dependência: contact.id, contact.owner)
+  - handleAssignOwner():
+    1. Snapshot contato-alvo
+    2. Build estado final (ContatoConta puro)
+    3. `onUpdateContact(updatedContact)` — LOCAL: setState imediatamente
+    4. `persistContact({...updatedContact, accountId, accountName}).catch()` — REMOTO: fire-and-forget
+  - Ordem garante: owner muda na UI na hora, persistência é background best-effort
+- **Tipagem:** Tipo `ContactItem` nomeado e explícito em contactsRepository.ts
+  - Exportado para uso em ContactDetailProfile
+  - Contém 20 campos: id, nome, cargo, area, senioridade, papelComite, forcaRelacional, receptividade, acessibilidade, status, classificacao, influencia, potencialSucesso, scoreSucesso, ganchoReuniao, liderId, owner, accountId, accountName
+  - Mapeamento claro: ContactItem → ContactRow (subset para banco de dados)
+
+**Exemplo concreto (Recorte 28.1):**
+```typescript
+// AccountDetailView: local state + callback
+const [localContatos, setLocalContatos] = useState<ContatoConta[]>(account?.contatos ?? []);
+const handleUpdateContact = (updatedContact: ContatoConta) => {
+  setLocalContatos(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+};
+
+// ContactDetailProfile: local-first owner assignment
+const handleAssignOwner = () => {
+  if (!ownerInput.trim()) return;
+  
+  // 1. Snapshot
+  const targetContact = contact;
+  
+  // 2. Build final state
+  const updatedContact: ContatoConta = { ...targetContact, owner: ownerInput.trim() };
+  
+  // 3. Update local (local-first, imediato)
+  if (onUpdateContact) {
+    onUpdateContact(updatedContact);
+  }
+  
+  // 4. Persist remoto (fire-and-forget)
+  persistContact({
+    ...updatedContact,
+    accountId: accountId,
+    accountName: accountName,
+  }).catch(() => {});
+};
+```
+
+**Benefício:** Owner assignment mínimo destrava E8 com padrão consolidado (local-first + fire-and-forget). Sem divergência entre snapshot, estado local e persistência remota.
+
+**Commits:** `027191c` (E8 implementação defensiva em contacts via micro-recorte 28.1)
+
+---
+
 ### 9. CSS: cada página com namespace próprio
 **Decisão:** páginas que usam CSS inline (não Tailwind puro) devem prefixar suas classes para evitar colisões.
 

@@ -5,6 +5,58 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-08] — Recorte 28.1 (Supabase E8): Primeira Escrita Defensiva em Contacts (Micro-recorte) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Terceira escrita remota: contacts upserted no Supabase via micro-recorte 28.1)
+- **Alto:** Destravamento e conclusão de E8 via owner assignment mínimo. Owner é caminho de escrita real, local-first, best-effort remoto.
+- **Contexto:** Recortes 22-27 implementaram E1-E7 (3 leituras + 2 escritas). Recorte 28.1 é micro-recorte que implementa terceira escrita defensiva em contacts. Estratégia: owner assignment mínimo, AccountDetailView com estado local (`localContatos`), callback `onUpdateContact`, persistContact() fire-and-forget.
+- **Ações Executadas:**
+  - **Novo método `persistContact()` em `src/lib/contactsRepository.ts`:**
+    * Type `ContactItem` explícito: 20 campos (id, nome, cargo, area, senioridade, papelComite, forcaRelacional, receptividade, acessibilidade, status, classificacao, influencia, potencialSucesso, scoreSucesso, ganchoReuniao, liderId, owner, accountId, accountName)
+    * Upsert por id no Supabase (insere novo ou atualiza existente)
+    * Mapeamento explícito ContactItem → ContactRow (sem spreads frouxos)
+    * Falha silenciosa: loga info/erro, nunca relança, nunca impacta UX
+    * Se Supabase não configurado: skips automaticamente
+    * accountId real (não accountName) vindo de AccountDetailView
+  - **Refatoração `src/components/account/AccountDetailView.tsx`:**
+    * +estado `[localContatos, setLocalContatos]` para manter cópia local dos contatos
+    * +useEffect sincroniza com `account.contatos` quando account muda (dependência: `[account?.id]`)
+    * +handler `handleUpdateContact(updatedContact)` atualiza a cópia local por id
+    * Radar, renderTree, maps agora usam `localContatos` em vez de `account.contatos`
+    * Passa `onUpdateContact={handleUpdateContact}` + `accountId={account.id}` para ContactDetailProfile
+  - **Refatoração `src/components/account/ContactDetailProfile.tsx`:**
+    * +prop `onUpdateContact?: (contact: ContatoConta) => void` — callback local-first
+    * +prop `accountId?: string` — ID real da conta (default: "unknown")
+    * +estado `[ownerInput, setOwnerInput]` para input do owner
+    * +estado `[ownerStatus, setOwnerStatus]` para feedback visual
+    * +useEffect ressincroniza `ownerInput` e `ownerStatus` ao alternar contatos (dependência: `[contact.id, contact.owner]`)
+    * handleAssignOwner(): 
+      - 1. Snapshot contato-alvo
+      - 2. Build estado final (ContatoConta puro)
+      - 3. `onUpdateContact(updatedContact)` — LOCAL: setState imediatamente
+      - 4. `persistContact({...updatedContact, accountId, accountName}).catch()` — REMOTO: fire-and-forget
+    * UI: input + botão "Atribuir" com feedback visual (botão vira green "OK" por 2s)
+    * Texto "Atual: X" mostra owner existente
+  - **Tipagem em `src/data/accountsData.ts`:**
+    * +campo `owner?: string` em `ContatoConta` interface
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 4 files, 208 insertions(+), 27 deletions(-)
+    * Type safety: sem `as any`, mapeamento ContactItem/ContactRow completo, tipos explícitos
+    * Fire-and-forget: persistContact() não bloqueia UI, não causa refetch local, não relança em erro
+    * Local-first: onUpdateContact() executa ANTES de persistContact()
+    * Ressincronização: useEffect limpa ownerStatus ao alternar contatos
+    * accountId real: vem de account.id, não de accountName
+    * Fidelidade: owner muda na UI imediatamente, persistência é background
+  - **Arquitetura confirmada:**
+    * AccountDetailView/localContatos = estado local dos contatos (operacional)
+    * ContactDetailProfile = UI mínima com owner assignment + onUpdateContact callback
+    * persistContact() = camada remota complementar, best-effort, responsável apenas por upsert
+    * Padrão local-first: setState local > persistência remota fire-and-forget
+- **Commit:** `027191c` — feat(contacts): add local-first owner assignment with defensive persistence
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-08] — Recorte 26 (Supabase E6): Primeira Escrita Defensiva em actions — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Primeira escrita remota: actions upserted no Supabase)
 - **Alto:** Introduzir persistência remota defensiva em `actions` mantendo sessionActions/localStorage como source of truth absoluto. UX nunca bloqueia, nunca rollback, falhas remotas não impactam operação local.

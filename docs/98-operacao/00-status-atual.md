@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-08 (Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals: 054254a0c96f07cb72f7433c069d2b08a40a8350, publicado em origin/main)
+ `main` — sincronizada em 2026-04-08 (Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts: 027191c, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts)
 
 ---
 
@@ -276,10 +276,25 @@
 - **Commit:** `054254a0c96f07cb72f7433c069d2b08a40a8350` — feat(signals): add defensive best-effort Supabase persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts (Micro-recorte)** — 2026-04-08
+- ✅ Owner assignment mínimo em contatos (caminho de escrita real)
+- ✅ Tipo `ContactItem` com `owner?: string` (20 campos: 4 obrigatórios + 16 opcionais)
+- ✅ Função `persistContact(contact: ContactItem)` com upsert por id, mapeamento explícito (ContactItem → ContactRow)
+- ✅ UI mínima: input + botão "Atribuir" em ContactDetailProfile com feedback visual
+- ✅ Local-first via AccountDetailView com `[localContatos, setLocalContatos]` e `onUpdateContact` callback
+- ✅ Padrão: snapshot → build estado (ContatoConta) → `onUpdateContact()` local-first → `persistContact()` fire-and-forget
+- ✅ Ressincronização automática de `ownerInput` ao alternar contatos via useEffect
+- ✅ accountId correto vindo de `account.id` (não accountName)
+- ✅ Fire-and-forget: persistência remota nunca bloqueia UX, falha silenciosa com logging
+- ✅ Build Exit 0 (validado)
+- **Commit:** `027191c` — feat(contacts): add local-first owner assignment with defensive persistence
+- **Status:** ✅ Publicado em origin/main
+- **Nota:** E8 foi destravado e concluído via micro-recorte 28.1 (owner assignment mínimo). Ponte real e operacional para future expansões.
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 27 — E7 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar)
+- **Status Atual:** Recorte 28.1 — E8 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 29 (próxima escrita defensiva ou migração complementar)
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

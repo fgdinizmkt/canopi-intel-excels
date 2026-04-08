@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-08
 
-**Status:** Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals concluído.
+**Status:** Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts concluído via micro-recorte (owner assignment mínimo).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar).
+Próximo passo: definir e aprovar o Recorte 29 (próxima escrita defensiva ou migração complementar).
 
 ## Último Estado Confiável
-**Recorte 27 — Supabase E7: Primeira Escrita Defensiva em Signals** (commit `054254a0c96f07cb72f7433c069d2b08a40a8350`, publicado em origin/main)
+**Recorte 28.1 — Supabase E8: Primeira Escrita Defensiva em Contacts** (commit `027191c`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -102,8 +102,23 @@ Próximo passo: definir e aprovar o Recorte 28 (E8 — Segunda Escrita Defensiva
 - ✅ Publicação: commit 054254a0c96f07cb72f7433c069d2b08a40a8350 publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 28.1: Tipo `ContactItem` nomeado e explícito em contactsRepository.ts (20 campos: 4 obrigatórios + 16 opcionais, incluindo owner).
+- ✅ Recorte 28.1: Repository layer `src/lib/contactsRepository.ts` expandido com `persistContact()` para escrita defensiva.
+- ✅ Recorte 28.1: `persistContact()`: upsert por id via Supabase, mapeamento explícito ContactItem → ContactRow, falha silenciosa.
+- ✅ Recorte 28.1: AccountDetailView com `[localContatos, setLocalContatos]` estado local dos contatos.
+- ✅ Recorte 28.1: `handleUpdateContact()` callback atualiza localContatos por id (local-first).
+- ✅ Recorte 28.1: ContactDetailProfile com owner assignment UI mínima (input + botão "Atribuir").
+- ✅ Recorte 28.1: Ressincronização automática de ownerInput ao alternar contatos via useEffect.
+- ✅ Recorte 28.1: accountId real vindo de account.id (não accountName).
+- ✅ Recorte 28.1: Padrão local-first: snapshot → build → `onUpdateContact()` → `persistContact().catch()` fire-and-forget.
+- ✅ Recorte 28.1: Owner muda na UI imediatamente, persistência é background best-effort.
+- ✅ Recorte 28.1: Type safety: tipagem `ContactItem` explícita, sem `as any`, mapeamento ContactRow completo.
+- ✅ Transição: Fase E (Supabase Migration & Scale) em execução — E1, E2, E3, E4, E5, E6, E7, E8 concluídas via micro-recorte 28.1.
+- ✅ Publicação: commit 027191c publicado em origin/main.
+- ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 28 (E8 — Segunda Escrita Defensiva ou Migração Complementar) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 29 (próxima escrita defensiva ou migração complementar) pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 28 (E8). Candidatos: escrita defensiva em contacts, ABM/ABX/oportunidades migrations, ou complementação de campos em actions/signals.
+Aguardar aprovação do Orquestrador para definir o Recorte 29. Candidatos: escrita defensiva em signals/actions complementares, ABM/ABX/oportunidades migrations, ou expansão de campos em entities existentes.
