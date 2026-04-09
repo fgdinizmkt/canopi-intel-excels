@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import '../../../pages/signals.css';
 import Signals from '../../../pages/Signals';
 
 export default function SinaisPage() {

@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import '../pages/signals.css';
 import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV6';
 import { getSignals, persistSignal, SignalItem } from '../lib/signalsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
