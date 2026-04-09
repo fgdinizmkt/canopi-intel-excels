@@ -75,4 +75,34 @@ export async function getAbm(): Promise<AbmRow[]> {
   }
 }
 
+/**
+ * persistAbm: Update ABM account data in Supabase (defensive, best-effort)
+ * Currently restricted to 'tipoEstrategico' for Recorte 32.
+ */
+export async function persistAbm(abm: { id: string; tipoEstrategico: TipoEstrategico }): Promise<void> {
+  if (!isSupabaseConfigured() || !abm.id) return;
+
+  try {
+    // 1. Upsert by id - mapping only allowed fields
+    const { error } = await supabase!
+      .from('contas')
+      .upsert(
+        {
+          id: abm.id,
+          tipoEstrategico: abm.tipoEstrategico
+        },
+        { onConflict: 'id' }
+      );
+
+    // 2. Defensive log - never block or throw UI
+    if (error) {
+      console.warn('[ABM Repository] Persist failed:', error.message);
+    } else {
+      console.info(`[ABM Repository] Persisted tipoEstrategico for ${abm.id}`);
+    }
+  } catch (exception) {
+    console.error('[ABM Repository] Exception during persist:', exception);
+  }
+}
+
 export default getAbm;

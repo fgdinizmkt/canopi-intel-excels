@@ -59,8 +59,9 @@ import { Card, Badge, Button } from '../components/ui';
 import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
-import { getAbm, type AbmRow } from '../lib/abmRepository';
+import { getAbm, persistAbm, type AbmRow } from '../lib/abmRepository';
 import { getAbx, type AbxRow } from '../lib/abxRepository';
+import type { TipoEstrategico } from '../data/accountsData';
 
 // --- MOCK DATA ---
 
@@ -526,6 +527,32 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     return Math.round((acc as any)[key] || 0);
   };
 
+  /**
+   * handleUpdateTipoEstrategico: local-first mutation with defensive persist
+   * Recorte 32 - scope: only tipoEstrategico
+   */
+  const handleUpdateTipoEstrategico = (newTipo: TipoEstrategico) => {
+    if (!activeAccount) return;
+
+    // 1. Snapshot target
+    const targetId = activeAccount.id;
+
+    // 2. Build final state for repository mapping
+    const updatedAbm: AbmRow = { id: targetId, tipoEstrategico: newTipo };
+
+    // 3. Update local-first: updating supabaseAbm state which drives useMemo(accounts)
+    setSupabaseAbm(prev => {
+      const exists = prev.find(a => a.id === targetId);
+      if (exists) {
+        return prev.map(a => a.id === targetId ? { ...a, tipoEstrategico: newTipo } : a);
+      }
+      return [...prev, updatedAbm];
+    });
+
+    // 4. Remote persistence (fire-and-forget)
+    persistAbm({ id: targetId, tipoEstrategico: newTipo }).catch(() => {});
+  };
+
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-32 max-w-[1700px] mx-auto font-sans text-slate-900">
@@ -663,6 +690,25 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-blue-500"/>Ranking ABM</p>
                       <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {accounts.indexOf(activeAccount) + 1}º</Badge>
+                    </div>
+                    {/* Strategia Switcher - Recorte 32 Mutation Point */}
+                    <div className="flex flex-col gap-2">
+                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Configuração de Estratégia</p>
+                       <div className="flex gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
+                          {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as TipoEstrategico[]).map((t) => (
+                             <button
+                                key={t}
+                                onClick={() => handleUpdateTipoEstrategico(t)}
+                                className={`flex-1 py-1.5 text-[8px] font-bold uppercase rounded-lg transition-all ${
+                                   activeAccount.tipoEstrategico === t
+                                      ? 'bg-white text-blue-600 shadow-sm border border-slate-200 ring-1 ring-slate-100'
+                                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
+                                }`}
+                             >
+                                {t}
+                             </button>
+                          ))}
+                       </div>
                     </div>
                     <div className="space-y-1.5">
                       {ranked.slice(0,5).map((acc, i) => {
