@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-08 (Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only): 04f634f, publicado em origin/main)
+ `main` — sincronizada em 2026-04-09 (Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo): b944813, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 30 — Supabase E10A: ABM Repository Layer (Read-Only))
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo))
 
 ---
 
