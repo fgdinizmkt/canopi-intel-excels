@@ -59,7 +59,7 @@ import { Card, Badge, Button } from '../components/ui';
 import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
-import { getAbm, persistAbm, type AbmRow } from '../lib/abmRepository';
+import { getAbm, persistAbm, type AbmRow, type PlayAtivo } from '../lib/abmRepository';
 import { getAbx, type AbxRow } from '../lib/abxRepository';
 import type { TipoEstrategico } from '../data/accountsData';
 
@@ -450,7 +450,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
           abm: {
             ...merged[idx].abm,
             ...(remote.abm || {})
-          }
+          },
+          playAtivo: remote.playAtivo ?? merged[idx].playAtivo
         };
       }
       // Ignore remote accounts not in contasMock
@@ -551,6 +552,32 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
 
     // 4. Remote persistence (fire-and-forget)
     persistAbm({ id: targetId, tipoEstrategico: newTipo }).catch(() => {});
+  };
+
+  /**
+   * handleUpdatePlayAtivo: local-first mutation with defensive persist
+   * Recorte 33 - scope: expanding to include playAtivo alongside tipoEstrategico
+   */
+  const handleUpdatePlayAtivo = (newPlay: PlayAtivo) => {
+    if (!activeAccount) return;
+
+    // 1. Snapshot target
+    const targetId = activeAccount.id;
+
+    // 2. Build final state for repository mapping
+    const updatedAbm: AbmRow = { id: targetId, playAtivo: newPlay };
+
+    // 3. Update local-first: updating supabaseAbm state which drives useMemo(accounts)
+    setSupabaseAbm(prev => {
+      const exists = prev.find(a => a.id === targetId);
+      if (exists) {
+        return prev.map(a => a.id === targetId ? { ...a, playAtivo: newPlay } : a);
+      }
+      return [...prev, updatedAbm];
+    });
+
+    // 4. Remote persistence (fire-and-forget)
+    persistAbm({ id: targetId, playAtivo: newPlay }).catch(() => {});
   };
 
 
@@ -706,6 +733,25 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                                 }`}
                              >
                                 {t}
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                    {/* Play Ativo Switcher - Recorte 33 Expansion */}
+                    <div className="flex flex-col gap-2">
+                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Play Ativo</p>
+                       <div className="flex gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
+                          {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as PlayAtivo[]).map((p) => (
+                             <button
+                                key={p}
+                                onClick={() => handleUpdatePlayAtivo(p)}
+                                className={`flex-1 py-1.5 text-[8px] font-bold uppercase rounded-lg transition-all ${
+                                   activeAccount.playAtivo === p
+                                      ? 'bg-white text-emerald-600 shadow-sm border border-slate-200 ring-1 ring-slate-100'
+                                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
+                                }`}
+                             >
+                                {p}
                              </button>
                           ))}
                        </div>

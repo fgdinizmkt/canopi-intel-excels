@@ -1,6 +1,8 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import type { TipoEstrategico } from '../data/accountsData';
 
+export type PlayAtivo = 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
+
 /**
  * ABM Row: Supabase schema for ABM account data
  * Subset of Conta interface focused on ABM scoring and context
@@ -25,6 +27,7 @@ export interface AbmRow {
     contasSimilares?: string[];
   };
   tipoEstrategico?: TipoEstrategico;
+  playAtivo?: PlayAtivo;
 }
 
 /**
@@ -52,7 +55,7 @@ export async function getAbm(): Promise<AbmRow[]> {
     // 2. Query explicit fields only (not select('*'))
     const { data, error } = await supabase!
       .from('contas')
-      .select('id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico');
+      .select('id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico, playAtivo');
 
     // 3. Error handling: log and return empty (fallback)
     if (error) {
@@ -77,9 +80,9 @@ export async function getAbm(): Promise<AbmRow[]> {
 
 /**
  * persistAbm: Update ABM account data in Supabase (defensive, best-effort)
- * Currently restricted to 'tipoEstrategico' for Recorte 32.
+ * Expanded for Recorte 33: now includes 'tipoEstrategico' and 'playAtivo'.
  */
-export async function persistAbm(abm: { id: string; tipoEstrategico: TipoEstrategico }): Promise<void> {
+export async function persistAbm(abm: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: PlayAtivo }): Promise<void> {
   if (!isSupabaseConfigured() || !abm.id) return;
 
   try {
@@ -89,7 +92,8 @@ export async function persistAbm(abm: { id: string; tipoEstrategico: TipoEstrate
       .upsert(
         {
           id: abm.id,
-          tipoEstrategico: abm.tipoEstrategico
+          tipoEstrategico: abm.tipoEstrategico,
+          playAtivo: abm.playAtivo
         },
         { onConflict: 'id' }
       );
@@ -98,7 +102,7 @@ export async function persistAbm(abm: { id: string; tipoEstrategico: TipoEstrate
     if (error) {
       console.warn('[ABM Repository] Persist failed:', error.message);
     } else {
-      console.info(`[ABM Repository] Persisted tipoEstrategico for ${abm.id}`);
+      console.info(`[ABM Repository] Persisted ABM fields for ${abm.id}`);
     }
   } catch (exception) {
     console.error('[ABM Repository] Exception during persist:', exception);
