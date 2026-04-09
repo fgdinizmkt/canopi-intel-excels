@@ -337,10 +337,20 @@
 - **Commit:** `04f634f` — feat(abx): add defensive read-only Supabase repository layer
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo)** — 2026-04-09
+- ✅ Definição de primeiro write path defensivo e best-effort restrito ao campo `tipoEstrategico` em ABM.
+- ✅ Implementação de `persistAbm()` em `src/lib/abmRepository.ts`.
+- ✅ Persistência limitada com `.upsert({ id, tipoEstrategico }, { onConflict: 'id' })` explícito e fire-and-forget.
+- ✅ Implementação de seletor local-first em `src/pages/AbmStrategy.tsx` na seção de "Configuração de Estratégia".
+- ✅ 4 estados estratégicos configurados na UI (`ABM`, `ABX`, `Híbrida`, `Em andamento`).
+- ✅ Build Exit 0 (validado).
+- **Commit:** `b944813` — feat(abm): add local-first strategic type persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 31 — E10B concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 32 (próxima migração complementar)
+- **Status Atual:** Recorte 32 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 33
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

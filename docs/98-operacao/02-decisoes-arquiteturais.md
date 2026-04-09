@@ -446,3 +446,14 @@ const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' 
 | Contatos: página independente vs extensão de Contas | Em aberto | Existe `Contacts.tsx` mas sem auditoria feita |
 | Conexão de Performance com dados reais | Pendente | `Performance.tsx` usa mock hardcoded desconectado dos dados reais |
 | Side panels vs accordion expand | Em decisão | Main usa side panel; refactor usa accordion. Não decidido qual adotar |
+
+
+---
+
+### Decisão 11: Escrita Defensiva em ABM (Escopo Mínimo - Recorte 32)
+
+No Recorte 32, abrimos o primeiro write path defensivo para a entidade ABM (E11A). A decisão arquitetural fundamental aqui foi a **restrição voluntária de escopo**:
+- Apenas um único campo foi exposto à mutação remota (`tipoEstrategico`), garantindo uma superfície de risco minúscula.
+- O repository `src/lib/abmRepository.ts` recebeu a função `persistAbm()`, usando unicamente `upsert` explícito referenciado na chave `id` (`{ onConflict: 'id' }`).
+- A implementação segue o padrão *fire-and-forget* consolidado: a interface em `AbmStrategy.tsx` atualiza imediatamente (local-first) nos botões de estado estratégico, enfileirando o salvamento em background.
+- Em caso de falha no servidor, o Supabase é silenciado e não propaga exceptions para a UI. Não há rollback para não frustrar a ação local de planejamento. O objetivo foi testar o "write shell" antes de expandir.

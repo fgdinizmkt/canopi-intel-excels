@@ -1,13 +1,13 @@
-# Checkpoint Atual — 2026-04-08
+# Checkpoint Atual — 2026-04-09
 
-**Status:** Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only) concluído (segunda migração de leitura em ABM, complementar a E10A).
+**Status:** Recorte 32 — Supabase E11A: Escrita Defensiva em ABM concluído (escopo mínimo alocado no `tipoEstrategico` com update reativo da estratégia local-first).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definir e aprovar o Recorte 31 (próxima migração complementar, ex: ABX repository layer).
+Próximo passo: aguardar definição e aprovação do Orquestrador para o Recorte 33.
 
 ## Último Estado Confiável
-**Recorte 31 — Supabase E10B: ABX Repository Layer (Read-Only)** (commit `04f634f49c90eabea027d2f59e56549745f95b5a`, publicado em origin/main)
+**Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo)** (commit `b944813bc99bc03e91ccafbd0de5e3a86540fa14`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -162,8 +162,14 @@ Próximo passo: definir e aprovar o Recorte 31 (próxima migração complementar
 - ✅ Publicação: commit 04f634f49c90eabea027d2f59e56549745f95b5a publicado em origin/main.
 - ✅ Documentação: 00-status-atual.md, 03-log-de-sessoes.md, 06-checkpoint-atual.md, 02-decisoes-arquiteturais.md sincronizados.
 
+- ✅ Recorte 32: Primeira escrita defensiva em ABM implementada com escopo mínimo restrito ao campo `tipoEstrategico`.
+- ✅ Recorte 32: Construída função `persistAbm()` com `upsert` explícito condicional por `id` (`onConflict: 'id'`).
+- ✅ Recorte 32: Interface `AbmStrategy.tsx` com seletor local-first garantindo UX estrita, persistindo em best-effort.
+- ✅ Recorte 32: Transição: Primeira escrita local-first sucedendo perfeitamente o par de leitura ABM/ABX (E10A/E10B).
+- ✅ Recorte 32: Publicação: commit `b944813` sincronizado e homologado (Exit 0), publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 32 (próxima migração complementar) pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 33 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 32. Pair E10A/E10B (ABM + ABX) completo. Próximas oportunidades: escrita defensiva complementar em entities existentes, ou novas migrações Supabase para outras camadas.
+Aguardar aprovação do Orquestrador para definir o Recorte 33 (Ex: ampliação da cobertura de writing).

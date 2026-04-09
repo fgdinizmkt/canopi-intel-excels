@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-09] — Recorte 32 (Supabase E11A): Escrita Defensiva em ABM (escopo mínimo) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (Primeira escrita best-effort remota na camada ABM).
+- **Alto:** Implementar primeiro write path defensivo em ABM, reduzindo escopo para mitigar riscos, focado somente em `tipoEstrategico`.
+- **Contexto:** Após consolidação de read defensivos E10A e E10B (ABM/ABX), foi decidido abrir path write local-first.
+- **Ações Executadas:**
+  - **Repositório (`src/lib/abmRepository.ts`):**
+    * Adicionada função `persistAbm()`.
+    * Incluído `.upsert({ id, tipoEstrategico }, { onConflict: 'id' })` explicitando a regra de persistência condicional da pk.
+    * Padrão fire-and-forget: falha silenciosa sem derrubar UX.
+  - **Interface Local-first (`src/pages/AbmStrategy.tsx`):**
+    * Adicionado seletor visual na aba "Configuração de Estratégia" com 4 estados: `ABM`, `ABX`, `Híbrida`, `Em andamento`.
+    * Comportamento local-first: update de estado `supabaseAbm` atualiza UI imediatamente.
+  - **Validação:**
+    * Build: Exit 0.
+    * Commit local: `b944813`.
+- **Status:** ✅ Publicado em origin/main, memória operacional sincronizada.
+
+---
+
 ## [2026-04-08] — Recorte 31 (Supabase E10B): ABX Repository Layer (Read-Only) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E10B: segunda leitura defensiva em ABM, focada em ABX expansion context, read-only)
 - **Alto:** Implementar repository layer defensivo para ABX (complementar a E10A), reutilizando padrão consolidado com fallback seguro e merge explícito, fechando pair E10A/E10B.
