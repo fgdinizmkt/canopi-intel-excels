@@ -1,6 +1,11 @@
 # Checkpoint Atual — 2026-04-09
 
-**Status:** Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo concluído (ciclo local-first completo: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE fechado).
+**Status:** Recorte 33 concluído + Hotfix P0 `/sinais` publicado. Main estável em origin/main.
+
+**Hotfix Operacional Publicado (pós-Recorte 33):**
+- Commit: `90401f2` — `fix(signals): restore page styling via route-level CSS import`
+- Causa: Stylesheet de sinais movido para ponto correto da rota App Router
+- Impacto: Página `/sinais` recupera estilos visuais; funcionalidade preservada
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
@@ -8,6 +13,7 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 34.
 
 ## Último Estado Confiável
 **Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo** (commit `1c91d31`, publicado em origin/main)
+**Hotfix Operacional P0 `/sinais`** (commit `90401f2`, publicado em origin/main — pós-Recorte 33)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).

@@ -5,6 +5,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-09] — Hotfix P0: Recuperação Visual da Página /sinais — Concluído
+- **Tipo:** Hotfix operacional pós-Recorte 33 (não previsto em recorte, regressão descoberta durante validação).
+- **Causa Raiz:** Stylesheet `signals.css` estava sendo importado do componente reutilizável (`src/pages/Signals.tsx`), causando falha de carregamento em Next.js App Router.
+- **Solução:** Mover import de CSS para ponto de entrada correto da rota (`src/app/(shell)/sinais/page.tsx`).
+- **Ações Executadas:**
+  - **Rota App Router (`src/app/(shell)/sinais/page.tsx`):** +Import `'../../../pages/signals.css'` no nível da rota
+  - **Componente (`src/pages/Signals.tsx`):** -Remove import de CSS do componente
+  - **Validação:** Build Exit 0, sem regressões em outras páginas
+- **Impacto:**
+  - ✅ Página `/sinais` recupera estilos visuais (hero-sinais, filter-bar, signal-list, drawer, etc.)
+  - ✅ Funcionalidade de dados preservada (Supabase flow, filtros, drawer, deep-linking intactos)
+  - ✅ Zero impacto em outras páginas ou recortes
+- **Commit:** `90401f2` — fix(signals): restore page styling via route-level CSS import
+- **Status:** ✅ Publicado em origin/main, página restaurada.
+
+---
+
 ## [2026-04-09] — Recorte 33 (Supabase E11B): Expandir Escrita Defensiva em ABM — Play Ativo — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E11B: expansão de E11A, fechando ciclo local-first de playAtivo).
 - **Alto:** Fechar ciclo local-first completo de `playAtivo`: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE, validando que padrão defensivo é extensível.
