@@ -5,6 +5,40 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-09] — Recorte 33 (Supabase E11B): Expandir Escrita Defensiva em ABM — Play Ativo — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E11B: expansão de E11A, fechando ciclo local-first de playAtivo).
+- **Alto:** Fechar ciclo local-first completo de `playAtivo`: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE, validando que padrão defensivo é extensível.
+- **Contexto:** Recorte 32 implementou E11A (primeiro write path defensivo em ABM com tipoEstrategico). Recorte 33 expande para playAtivo, demonstrando que arquitetura local-first + fire-and-forget é escalável a múltiplos campos sem quebra.
+- **Ações Executadas:**
+  - **Repositório (`src/lib/abmRepository.ts`):**
+    * +Type `PlayAtivo = 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum'` (exportado)
+    * +Campo `playAtivo?: PlayAtivo` adicionado à interface AbmRow
+    * +`getAbm()` expandido: `.select(..., playAtivo)` incluso na query (READ fase fechada)
+    * +`persistAbm()` expandido: assinatura agora aceita `{ id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: PlayAtivo }`
+    * +Upsert payload expandido: `.upsert({ id, tipoEstrategico, playAtivo }, { onConflict: 'id' })`
+  - **Interface Local-first (`src/pages/AbmStrategy.tsx`):**
+    * +Merge defensivo em `useMemo(accounts)`: `playAtivo: remote.playAtivo ?? merged[idx].playAtivo` (MERGE fase fechada)
+    * +`handleUpdatePlayAtivo(newPlay: PlayAtivo)` implementado com padrão idêntico a `handleUpdateTipoEstrategico()` (LOCAL-FIRST UPDATE fase fechada)
+      - 1. Snapshot conta-alvo
+      - 2. Build estado final (AbmRow puro)
+      - 3. `setSupabaseAbm()` — LOCAL-FIRST: setState imediatamente
+      - 4. `persistAbm()` — REMOTO: fire-and-forget
+    * +Seletor visual: 4 botões toggle (ABM, ABX, Híbrido, Nenhum) na seção "Play Ativo" com feedback de seleção (PERSIST WRITE fase fechada)
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 57 insertions(+), 7 deletions(-)
+    * Type safety: sem `as any`, PlayAtivo union literal explícita, AbmRow estendida
+    * Fallback: em erro Supabase, merge usa local; nenhum divergência snapshot/local/remoto
+    * Fire-and-forget: padrão validado 3x+ (Actions E6, Signals E7, Contacts E8, ABM E11A, playAtivo E11B)
+  - **Arquitetura confirmada:**
+    * Padrão local-first + fire-and-forget é extensível a novos campos sem reabrir discussão
+    * E11A/E11B (tipoEstrategico/playAtivo) serve de template para expansões futuras em ABM e outras entidades
+    * Ciclo READ/MERGE/LOCAL-FIRST/PERSIST WRITE é robusto e testado em múltiplos contextos
+- **Commit:** `1c91d31` — feat(abm): expand defensive persistence to playAtivo
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada, memória operacional pronta para Recorte 34.
+
+---
+
 ## [2026-04-09] — Recorte 32 (Supabase E11A): Escrita Defensiva em ABM (escopo mínimo) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (Primeira escrita best-effort remota na camada ABM).
 - **Alto:** Implementar primeiro write path defensivo em ABM, reduzindo escopo para mitigar riscos, focado somente em `tipoEstrategico`.

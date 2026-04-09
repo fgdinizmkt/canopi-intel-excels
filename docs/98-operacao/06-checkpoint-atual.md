@@ -1,13 +1,13 @@
 # Checkpoint Atual — 2026-04-09
 
-**Status:** Recorte 32 — Supabase E11A: Escrita Defensiva em ABM concluído (escopo mínimo alocado no `tipoEstrategico` com update reativo da estratégia local-first).
+**Status:** Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo concluído (ciclo local-first completo: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE fechado).
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: aguardar definição e aprovação do Orquestrador para o Recorte 33.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 34.
 
 ## Último Estado Confiável
-**Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo)** (commit `b944813bc99bc03e91ccafbd0de5e3a86540fa14`, publicado em origin/main)
+**Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo** (commit `1c91d31`, publicado em origin/main)
 
 ## O que está concluído
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
@@ -168,8 +168,20 @@ Próximo passo: aguardar definição e aprovação do Orquestrador para o Recort
 - ✅ Recorte 32: Transição: Primeira escrita local-first sucedendo perfeitamente o par de leitura ABM/ABX (E10A/E10B).
 - ✅ Recorte 32: Publicação: commit `b944813` sincronizado e homologado (Exit 0), publicado em origin/main.
 
+- ✅ Recorte 33: Expandir escrita defensiva em ABM para campo novo `playAtivo` com 4 valores: 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum'.
+- ✅ Recorte 33: **READ:** `getAbm()` expandido para trazer `.select(..., playAtivo)` do Supabase em AbmRow.
+- ✅ Recorte 33: **MERGE:** `useMemo(accounts)` aplica merge defensivo com nullish coalescing: `playAtivo: remote.playAtivo ?? merged[idx].playAtivo`.
+- ✅ Recorte 33: **LOCAL-FIRST UPDATE:** `handleUpdatePlayAtivo()` implementado com padrão idêntico a `handleUpdateTipoEstrategico()` (E11A).
+- ✅ Recorte 33: **PERSIST WRITE:** `persistAbm()` expandido para aceitar `playAtivo` junto com `tipoEstrategico`, upsert payload completo.
+- ✅ Recorte 33: UI: 4 botões toggle (ABM, ABX, Híbrido, Nenhum) na seção "Play Ativo" com feedback visual de seleção.
+- ✅ Recorte 33: Fire-and-forget defensivo mantido: falha remota nunca bloqueia UX, logging silencioso em fallback.
+- ✅ Recorte 33: Ciclo local-first completo validado: READ/MERGE/LOCAL-FIRST UPDATE/PERSIST WRITE em harmonia.
+- ✅ Recorte 33: Padrão escalável: expansões futuras em ABM (ou outras entidades) podem replicar este template.
+- ✅ Recorte 33: Build: Exit 0 (validado, 2 files changed, 57 insertions, 7 deletions).
+- ✅ Recorte 33: Publicação: commit `1c91d31` — feat(abm): expand defensive persistence to playAtivo publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 33 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 34 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 33 (Ex: ampliação da cobertura de writing).
+Aguardar aprovação do Orquestrador para definir o Recorte 34 (continuação da Fase E — Supabase Migration & Scale).

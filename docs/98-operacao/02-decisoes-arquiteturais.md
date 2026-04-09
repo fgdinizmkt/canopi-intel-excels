@@ -457,3 +457,33 @@ No Recorte 32, abrimos o primeiro write path defensivo para a entidade ABM (E11A
 - O repository `src/lib/abmRepository.ts` recebeu a função `persistAbm()`, usando unicamente `upsert` explícito referenciado na chave `id` (`{ onConflict: 'id' }`).
 - A implementação segue o padrão *fire-and-forget* consolidado: a interface em `AbmStrategy.tsx` atualiza imediatamente (local-first) nos botões de estado estratégico, enfileirando o salvamento em background.
 - Em caso de falha no servidor, o Supabase é silenciado e não propaga exceptions para a UI. Não há rollback para não frustrar a ação local de planejamento. O objetivo foi testar o "write shell" antes de expandir.
+
+### Decisão 12: Escrita Defensiva em ABM — Expansão de Escopo (Recorte 33 — E11B)
+
+No Recorte 33, expandimos o padrão E11A para incluir novo campo `playAtivo`, demonstrando que o padrão defensivo é extensível a múltiplos campos sem quebra de arquitetura. A decisão foi fechar o **ciclo local-first completo** de playAtivo: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE.
+
+**Implicação estrutural (Recorte 33 em diante):**
+- **Type `PlayAtivo`:** Union literal `'ABM' | 'ABX' | 'Híbrido' | 'Nenhum'` exportado de `abmRepository.ts`
+- **READ:** `getAbm()` expandido para trazer `.select(..., playAtivo)` do Supabase em AbmRow
+  - Campo `playAtivo?: PlayAtivo` adicionado à interface AbmRow
+  - Query explícita inclui `playAtivo` na lista de campos (não select('*'))
+  - Fallback: Supabase não configurado ou erro → retorna `[]` (complemento vazio)
+- **MERGE:** `useMemo(accounts)` em `AbmStrategy.tsx` aplica merge defensivo com nullish coalescing
+  - Padrão: `playAtivo: remote.playAtivo ?? merged[idx].playAtivo`
+  - Garante: se remoto traz valor, usa; se undefined, preserva local
+  - Sem divergência entre snapshot, estado local e persistência remota
+- **LOCAL-FIRST UPDATE:** `handleUpdatePlayAtivo()` implementado com padrão idêntico a `handleUpdateTipoEstrategico()` (E11A)
+  - 1. Snapshot conta-alvo
+  - 2. Build estado final (AbmRow puro)
+  - 3. `setSupabaseAbm()` — LOCAL-FIRST: setState imediatamente
+  - 4. `persistAbm({ id, playAtivo }).catch()` — REMOTO: fire-and-forget
+  - UI: 4 botões toggle (ABM, ABX, Híbrido, Nenhum) com feedback visual de seleção
+- **PERSIST WRITE:** `persistAbm()` expandido para aceitar `playAtivo` junto com `tipoEstrategico`
+  - Assinatura: `persistAbm(abm: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: PlayAtivo })`
+  - Upsert payload: `.upsert({ id, tipoEstrategico, playAtivo }, { onConflict: 'id' })`
+  - Mapeamento explícito: apenas campos autorizado enviados (sem spreads frouxos)
+  - Fire-and-forget: falha silenciosa, loga error, nunca impacta UX
+
+**Benefício:** E11B valida que o padrão defensivo (local-first + fire-and-forget) é escalável. Próximas expansões de campos em ABM (ou outras entidades) podem seguir exatamente este template sem reabrir discussão arquitetural.
+
+**Commits:** `1c91d31` (E11B implementação defensiva de playAtivo em ABM via Recorte 33)

@@ -347,10 +347,23 @@
 - **Commit:** `b944813` — feat(abm): add local-first strategic type persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo** — 2026-04-09
+- ✅ Ciclo completo local-first de `playAtivo`: READ / MERGE / LOCAL-FIRST UPDATE / PERSIST WRITE
+- ✅ Type `PlayAtivo` com 4 valores: `'ABM' | 'ABX' | 'Híbrido' | 'Nenhum'` exportado de `abmRepository.ts`
+- ✅ **READ:** `getAbm()` expandido para trazer `.select(..., playAtivo)` do Supabase
+- ✅ **MERGE:** `useMemo(accounts)` em `AbmStrategy.tsx` aplica `playAtivo: remote.playAtivo ?? merged[idx].playAtivo` com fallback local
+- ✅ **LOCAL-FIRST UPDATE:** `handleUpdatePlayAtivo()` implementado com padrão idêntico a `handleUpdateTipoEstrategico()` (E11A)
+- ✅ **PERSIST WRITE:** `persistAbm()` expandido para aceitar `playAtivo` junto com `tipoEstrategico`, enfileira `.upsert({ id, tipoEstrategico, playAtivo }, { onConflict: 'id' })`
+- ✅ UI: 4 botões toggle (ABM, ABX, Híbrido, Nenhum) em seção "Play Ativo" com feedback visual de seleção
+- ✅ Fire-and-forget defensivo mantido: falha remota nunca bloqueia UX, logging silencioso em fallback
+- ✅ Build Exit 0 (validado, 2 files changed, 57 insertions, 7 deletions)
+- **Commit:** `1c91d31` — feat(abm): expand defensive persistence to playAtivo
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 32 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 33
+- **Status Atual:** Recorte 33 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 34
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
