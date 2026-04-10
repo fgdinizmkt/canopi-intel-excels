@@ -47,6 +47,8 @@ type AccountPersistPayload = {
   id: string;
   tipoEstrategico?: TipoEstrategico;
   playAtivo?: AccountRow['playAtivo'];
+  resumoExecutivo?: string;
+  proximaMelhorAcao?: string;
 };
 
 /**
@@ -54,13 +56,13 @@ type AccountPersistPayload = {
  * Padrão fire-and-forget: não bloqueia, não retorna feedback, registra erro silenciosamente
  *
  * Caso de uso: mutação local-first no state, depois persist async sem UI feedback
- * Campos suportados: tipoEstrategico, playAtivo
+ * Campos suportados: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao
  *
- * IMPORTANTE: Sempre enviar AMBOS os campos (não deixar undefined) para evitar
+ * IMPORTANTE: Sempre enviar TODOS os campos (não deixar undefined) para evitar
  * sobrescrita mútua no banco. Caller (handlers em Accounts.tsx) deve passar
- * o estado atual de cada campo.
+ * o estado atual de cada campo em snapshot completo.
  */
-export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo'] }): Promise<void> {
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string }): Promise<void> {
   if (!isSupabaseConfigured()) {
     console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
     return;
@@ -76,6 +78,12 @@ export async function persistAccount(account: { id: string; tipoEstrategico?: Ti
     if (account.playAtivo !== undefined) {
       payload.playAtivo = account.playAtivo;
     }
+    if (account.resumoExecutivo !== undefined) {
+      payload.resumoExecutivo = account.resumoExecutivo;
+    }
+    if (account.proximaMelhorAcao !== undefined) {
+      payload.proximaMelhorAcao = account.proximaMelhorAcao;
+    }
 
     const { error } = await supabase!
       .from('accounts')
@@ -86,7 +94,7 @@ export async function persistAccount(account: { id: string; tipoEstrategico?: Ti
       return;
     }
 
-    console.debug(`[Accounts] Conta ${account.id} persistida com tipoEstrategico=${account.tipoEstrategico}, playAtivo=${account.playAtivo}`);
+    console.debug(`[Accounts] Conta ${account.id} persistida com tipoEstrategico=${account.tipoEstrategico}, playAtivo=${account.playAtivo}, resumoExecutivo=${account.resumoExecutivo?.substring(0, 50)}, proximaMelhorAcao=${account.proximaMelhorAcao?.substring(0, 50)}`);
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.warn('[Accounts] Exceção ao persistir conta:', errorMsg);

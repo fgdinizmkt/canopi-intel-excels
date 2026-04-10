@@ -164,12 +164,13 @@ export const Accounts = () => {
       c.id === contaId ? { ...c, tipoEstrategico: newTipo } : c
     ));
 
-    // Fire-and-forget: persiste AMBOS os campos sem deixar undefined
-    // Garante que playAtivo não é apagado pela persistência de tipoEstrategico
+    // Fire-and-forget: persiste TODOS os 4 campos no snapshot
     persistAccount({
       id: contaId,
       tipoEstrategico: newTipo,
-      playAtivo: contaAtual.playAtivo
+      playAtivo: contaAtual.playAtivo,
+      resumoExecutivo: contaAtual.resumoExecutivo,
+      proximaMelhorAcao: contaAtual.proximaMelhorAcao
     });
   };
 
@@ -187,13 +188,60 @@ export const Accounts = () => {
       c.id === contaId ? { ...c, playAtivo: newPlay } : c
     ));
 
-    // Fire-and-forget: persiste AMBOS os campos sem deixar undefined
-    // Garante que tipoEstrategico não é apagado pela persistência de playAtivo
+    // Fire-and-forget: persiste TODOS os 4 campos no snapshot
     persistAccount({
       id: contaId,
       tipoEstrategico: contaAtual.tipoEstrategico,
-      playAtivo: newPlay
+      playAtivo: newPlay,
+      resumoExecutivo: contaAtual.resumoExecutivo,
+      proximaMelhorAcao: contaAtual.proximaMelhorAcao
     });
+  };
+
+  // Handler ATÔMICO local-first + fire-and-forget para atualizar AMBAS narrativas
+  // Garante: 1 snapshot + 1 setState + 1 persist = zero sobrescrita de race condition
+  const handleUpdateNarrativas = (contaId: string, newResumo: string, newAcao: string) => {
+    const contaAtual = contas.find(c => c.id === contaId);
+    if (!contaAtual) return;
+
+    // Local-first: atualiza AMBOS os campos em um único setState
+    setContas(prev => prev.map(c =>
+      c.id === contaId ? { ...c, resumoExecutivo: newResumo, proximaMelhorAcao: newAcao } : c
+    ));
+
+    // Fire-and-forget: persiste TODOS os 4 campos com snapshot único
+    // Atomicidade garantida: não há condição de corrida entre dois persists
+    persistAccount({
+      id: contaId,
+      tipoEstrategico: contaAtual.tipoEstrategico,
+      playAtivo: contaAtual.playAtivo,
+      resumoExecutivo: newResumo,
+      proximaMelhorAcao: newAcao
+    });
+  };
+
+  // Estado para controlar modal de edição de campos narrativos
+  const [editingContaId, setEditingContaId] = useState<string | null>(null);
+  const [editResumo, setEditResumo] = useState('');
+  const [editAcao, setEditAcao] = useState('');
+
+  const abrirEditorNarrativo = (conta: Conta) => {
+    setEditingContaId(conta.id);
+    setEditResumo(conta.resumoExecutivo || '');
+    setEditAcao(conta.proximaMelhorAcao || '');
+  };
+
+  const fecharEditorNarrativo = () => {
+    setEditingContaId(null);
+    setEditResumo('');
+    setEditAcao('');
+  };
+
+  const salvarNarrativas = () => {
+    if (!editingContaId) return;
+    // Chamada ÚNICA e ATÔMICA para ambas narrativas
+    handleUpdateNarrativas(editingContaId, editResumo, editAcao);
+    fecharEditorNarrativo();
   };
 
   const macroCards = [
@@ -388,12 +436,81 @@ export const Accounts = () => {
                   <td className="p-3">{conta.coberturaRelacional}%</td>
                   <td className="p-3">{new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR')}</td>
                   <td className="p-3">{conta.oportunidadePrincipal ? <button onClick={() => openAccount(conta.id)} className="underline text-left">{conta.oportunidadePrincipal}</button> : '-'}</td>
-                  <td className="p-3 max-w-[200px]"><span className="block truncate" title={conta.proximaMelhorAcao}>{conta.proximaMelhorAcao}</span></td>
+                  <td className="p-3 max-w-[240px]">
+                    <button
+                      onClick={() => abrirEditorNarrativo(conta)}
+                      className="text-xs text-slate-600 hover:text-brand hover:underline text-left group flex items-start gap-1.5"
+                      title={conta.proximaMelhorAcao}
+                    >
+                      <span className="block truncate flex-1">{conta.proximaMelhorAcao}</span>
+                      <span className="shrink-0 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">✎</span>
+                    </button>
+                  </td>
                   <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span></td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Modal para editar campos narrativos */}
+      {editingContaId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full">
+            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">Editar narrativas</h3>
+              <button
+                onClick={fecharEditorNarrativo}
+                className="text-slate-500 hover:text-slate-700 font-bold text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Resumo Executivo
+                </label>
+                <textarea
+                  value={editResumo}
+                  onChange={(e) => setEditResumo(e.target.value)}
+                  className="w-full border border-slate-300 rounded-lg p-3 text-sm font-sans resize-none focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
+                  rows={3}
+                  placeholder="Síntese factual da situação e contexto da conta..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Próxima Melhor Ação
+                </label>
+                <textarea
+                  value={editAcao}
+                  onChange={(e) => setEditAcao(e.target.value)}
+                  className="w-full border border-slate-300 rounded-lg p-3 text-sm font-sans resize-none focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/20"
+                  rows={3}
+                  placeholder="Próximo passo operacional recomendado para avanço..."
+                />
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-200 flex items-center justify-end gap-3">
+              <button
+                onClick={fecharEditorNarrativo}
+                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={salvarNarrativas}
+                className="px-4 py-2 rounded-lg bg-brand text-white font-semibold text-sm hover:bg-brand/90 transition-all"
+              >
+                Salvar narrativas
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
