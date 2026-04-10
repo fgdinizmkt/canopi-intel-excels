@@ -5,6 +5,53 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 38 (Supabase E8.1): Campos Narrativos Editáveis em Contacts — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E8.1: expansão de E8 em contacts, replicando padrão atômico de Signals/Accounts).
+- **Alto:** Expandir escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`), replicando padrão atômico validado em Recortes 37 e 36.
+- **Contexto:** Recorte 37 consolidou drawer synchronization pattern (quando estado está duplicado em array + drawer, mutações no array sincronizam drawer explicitamente). Recorte 38 valida padrão em novo contexto (contacts em drawer dentro de AccountDetailView).
+- **Ações Executadas:**
+  - **Modelagem (`src/data/accountsData.ts`):**
+    * +Interface `ContatoConta` expandida com 3 campos opcionais: `observacoes`, `historicoInteracoes`, `proximaAcao`
+  - **Repository (`src/lib/contactsRepository.ts`):**
+    * +Type `ContactItem` expandido com 3 campos narrativos
+    * +Type `ContactRow` expandido com 3 campos narrativos
+    * +Type `RepositoryContact` expandido com 3 campos narrativos
+    * +`getContacts()`: query SELECT estendida para incluir 3 campos, merge defensivo com nullish coalescing para cada
+    * +Shell seguro: 3 campos incluídos quando não há mock correspondente
+    * +`persistContact()` estendida: mapeamento explícito com 3 campos no upsert atomicamente garantido
+  - **UI (`src/components/account/ContactDetailProfile.tsx`):**
+    * +Estado modal: `editingNarrative`, `observacoes`, `historicoInteracoes`, `proximaAcao`, `narrativeStatus` (5 hooks)
+    * +Funções ciclo de vida: `useEffect` sincroniza todos os 5 estados quando contato muda
+    * +Handler ATÔMICO `handleUpdateNarrativas()`:
+      - 1 snapshot: contato-alvo capturado
+      - 1 construção: estado final com trim dos 3 campos
+      - 1 setState: `onUpdateContact(updatedContact)` local-first
+      - 1 persist: `persistContact().catch(() => {})` fire-and-forget
+    * +Seção "Narrativas Operacionais": edit toggle (✎) com 3 textareas (3 linhas cada), save button com feedback
+    * +Read mode: snippets das 3 narrativas, placeholder se vazio
+  - **State Consistency:**
+    * Padrão: onUpdateContact() sincroniza contato aberto com source of truth (array em AccountDetailView)
+    * Este padrão é idêntico ao drawer synchronization de Signals (E7.1)
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões, 3x validado)
+    * 3 files, 148 insertions(+), 2 deletions(-)
+    * Type safety: 3 campos narrativos tipados, nenhum `any`, guards contra undefined
+    * Atomicidade: 1 snapshot = estado consistente; 1 setState com callback = estado garantido current
+    * Sincronização: drawer pattern validado em segundo contexto (first time em contacts, segunda em signals)
+    * Fire-and-forget: persistContact() dispara sem await, falhas logadas silenciosamente
+- **Impacto:**
+  - ✅ Narrativas em contacts agora editáveis (observações + histórico + próxima ação)
+  - ✅ Persistência atômica: zero race condition entre 3 campos
+  - ✅ Drawer synchronization pattern replicado e validado em novo contexto
+  - ✅ Modelagem extensível: padrão "expandir interface antes de UI" consolidado
+  - ✅ Padrão defensivo reaplicável: snapshot + atomic setState + fire-and-forget validado 3x (E9/E7.1/E8.1)
+  - ✅ Escrita defensiva cobrindo tríade core: Accounts (4 campos) → Signals (3 campos) → Contacts (3 campos)
+- **Commit Código:** `8abd084` — feat(contacts): add defensive narrative editing
+- **Commit Documentação:** (em progresso)
+- **Status:** ✅ Publicado em origin/main, documentação em sincronização.
+
+---
+
 ## [2026-04-10] — Recorte 37 (Supabase E7.1): Campos Narrativos Editáveis em Signals — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E7.1: expansão de E7 em signals, fechando ciclo narrativo com atomicidade).
 - **Alto:** Expandir escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), replicando padrão atômico validado em Recorte 36 (accounts).

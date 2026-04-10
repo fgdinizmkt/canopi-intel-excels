@@ -404,6 +404,92 @@ const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' 
 
 ---
 
+### Decisão 15: Escrita Defensiva em Contacts — Campos Narrativos com Atomicidade (Recorte 38 — E8.1)
+
+No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`) com ênfase especial em **atomicidade contra race conditions** e **sincronização de drawer**. A decisão arquitetural fundamental aqui foi a aplicação consolidada do padrão atômico (validado em E9C para Accounts) MAIS o padrão drawer sync (validado em E7.1 para Signals) em uma única entidade.
+
+**Implicação estrutural (Recorte 38 em diante):**
+
+- **Type extensões em src/data/accountsData.ts:** Interface `ContatoConta` expandida com 3 campos narrativos opcionais
+  ```typescript
+  export interface ContatoConta {
+    // ... campos existentes ...
+    observacoes?: string;           // Observações tácticas sobre o stakeholder
+    historicoInteracoes?: string;   // Histórico de interações e pontos-chave
+    proximaAcao?: string;           // Próxima ação recomendada com este stakeholder
+  }
+  ```
+
+- **Type extensões em src/lib/contactsRepository.ts:**
+  - `ContactItem` expandido com 3 campos narrativos
+  - `ContactRow` expandido com 3 campos narrativos (interface de persistência)
+  - `RepositoryContact` expandido com 3 campos narrativos (return type)
+  - `getContacts()` SELECT query expandida para incluir `observacoes, historicoInteracoes, proximaAcao`
+  - Merge defensivo com nullish coalescing (`??`): preserva valores mock quando Supabase retorna null/undefined
+  - Shell seguro (fallback quando sem mock) popula todos 3 campos
+
+- **PERSIST WRITE:** `persistContact()` em `src/lib/contactsRepository.ts` expandida
+  - Mapeamento explícito: todos 3 campos narrativos incluídos no ContactRow
+  - Upsert explícito: `.upsert(contactRow, { onConflict: 'id' })`
+  - Falha silenciosa: erros logados com `console.error()`, nunca relançados
+  - Se Supabase não configurado: skips automaticamente
+
+- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO + DRAWER SYNC:** Novo `handleUpdateNarrativas()` em `src/components/account/ContactDetailProfile.tsx`
+  - Padrão rígido com 4 passos:
+    1. **SNAPSHOT:** Captura snapshot completo do contato (todos 3 campos narrativos)
+    2. **SETSTATE LOCAL:** Uma única chamada `onUpdateContact()` que atualiza todos 3 campos simultaneamente no array-source (drawer pai)
+    3. **SETSTATE DRAWER:** Sincronização explícita de drawer (replicando E7.1 pattern): se contact.id aberto = target, reimpõe estado narrative local
+    4. **PERSIST:** Uma única chamada `persistContact()` com snapshot completo (não valores parciais/atuais)
+  - Pseudocódigo:
+    ```typescript
+    const handleUpdateNarrativas = () => {
+      // 1. Snapshot
+      const targetContact = contact;
+      
+      // 2. Build estado final (todos 3 campos)
+      const updatedContact: ContatoConta = {
+        ...targetContact,
+        observacoes: observacoes.trim(),
+        historicoInteracoes: historicoInteracoes.trim(),
+        proximaAcao: proximaAcao.trim(),
+      };
+      
+      // 3. Local-first setState
+      if (onUpdateContact) {
+        onUpdateContact(updatedContact);  // atualiza array-source
+      }
+      
+      // 4. Persistir (fire-and-forget)
+      persistContact({
+        ...updatedContact,
+        accountId: accountId,
+        accountName: accountName,
+      }).catch(() => {});
+    };
+    ```
+  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (1 snapshot + 1 setState + 1 persist)
+
+- **UI — Seção Narrativas Operacionais:** Nova seção em `src/components/account/ContactDetailProfile.tsx`
+  - Estado local: 5 hooks (`editingNarrative: boolean`, `observacoes`, `historicoInteracoes`, `proximaAcao`, `narrativeStatus: string | null`)
+  - useEffect sincroniza todos 5 ao mudar contact.id
+  - Modo read: exibe 3 campos com labels "Obs:", "Hist:", "Próx:" e snippet truncado
+  - Modo edit: toggle button (✎) abre 3 textareas com conteúdo completo
+  - Botão save dispara `handleUpdateNarrativas()`, mostra feedback "✓ Salvo" por 1.5s
+  - Placeholder quando todos campos vazios
+  - Sem alteração em Contacts.tsx, grade ou board (escopo isolado em ContactDetailProfile)
+
+- **Tipagem:** Sem novo tipo — reutiliza `ContatoConta` estendida
+  - Imports atualizados em ContactDetailProfile.tsx para incluir tipos e `persistContact`
+  - Sem `as any`, mapeamento explícito de 3 campos
+
+**Benefício arquitetural:** E8.1 demonstra que o padrão atomicamente garantido (E9C) é escalável a QUALQUER entidade com drawer, combinado com drawer sync pattern (E7.1). A consolidação de 1 snapshot + 1 setState (no array-source) + 1 persist é a chave para evitar divergência remota. Futuras expansões em contacts com múltiplos campos correlatos podem seguir este template exatamente.
+
+**Validação de padrão:** E8.1 é a terceira aplicação do padrão atomicamente garantido (E9: Accounts tipoEstrategico → E9C: Accounts narrativos → E8.1: Contacts narrativos). Padrão consolidado e repetível em qualquer escrita defensiva multi-field.
+
+**Commits:** `8abd084` (E8.1 implementação defensiva de campos narrativos em Contacts via Recorte 38 com atomicidade garantida e drawer sync)
+
+---
+
 ### 8.6 Leitura Defensiva em ABM (Recorte 30)
 **Decisão refinada:** Primeira migração de leitura em ABM segue padrão defensivo idêntico a E2 (Accounts), sem escrita, sem ABX.
 

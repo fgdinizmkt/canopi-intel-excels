@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals: 16e673e, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts: 8abd084, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts)
 
 ---
 
@@ -414,10 +414,25 @@
 - **Commit:** `16e673e` — feat(signals): add defensive narrative editing with modal
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
+- ✅ Expansão de escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`)
+- ✅ Replicação de padrão atômico de Recorte 37/36: 1 snapshot + 1 setState + 1 persist
+- ✅ Modelagem estendida: ContatoConta interface expandida com 3 campos opcionais
+- ✅ Repository estendido: ContactItem, ContactRow, RepositoryContact com 3 campos narrativos
+- ✅ `getContacts()` estendida: query SELECT inclui 3 campos, merge defensivo com nullish coalescing
+- ✅ `persistContact()` estendida: mapeamento explícito com 3 campos no upsert atomicamente garantido
+- ✅ UI em ContactDetailProfile: seção "Narrativas Operacionais" com edit mode (✎) e 3 textareas
+- ✅ Atomicidade: handleUpdateNarrativas() segue padrão 1 snapshot + 1 setState + 1 persist
+- ✅ Drawer synchronization: onUpdateContact() sincroniza contato aberto
+- ✅ Type safety: sem `any`, mapeamento explícito, guards defensivos contra undefined
+- ✅ Build: Exit 0 (validado, 3 files changed, 148 insertions, 2 deletions)
+- **Commit:** `8abd084` — feat(contacts): add defensive narrative editing
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 37 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 38
+- **Status Atual:** Recorte 38 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 39
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

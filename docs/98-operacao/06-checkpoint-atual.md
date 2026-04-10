@@ -1,24 +1,24 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 37 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 38 concluído e publicado. Main estável em origin/main.
 
-**Recorte 37 Publicado:**
+**Recorte 38 Publicado:**
+- Commit: `8abd084` — `feat(contacts): add defensive narrative editing`
+- Descrição: Expansão de escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`), replicando padrão atômico de Signals
+- Impacto: Seção "Narrativas Operacionais" em ContactDetailProfile com edit mode (✎) para 3 textareas, atomicidade garantida contra race conditions, drawer sincronizado com array de source
+
+**Recorte 37 Publicado (Anterior):**
 - Commit: `16e673e` — `feat(signals): add defensive narrative editing with modal`
-- Descrição: Expansão de escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), com novo padrão de drawer synchronization
-- Impacto: UI discreta (modal de edição com 3 textareas no drawer), grade intacta, atomicidade garantida contra race conditions, drawer sempre sincronizado com array de source
-
-**Recorte 36 Publicado (Anterior):**
-- Commit: `a6604c2` — `feat(accounts): add defensive narrative persistence`
-- Descrição: Expansão de escrita defensiva em accounts para 2 campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`), consolidando padrão defensivo multi-field com snapshot atomicamente garantido
+- Descrição: Expansão de escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), introduzindo drawer synchronization pattern
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 38.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 39.
 
 ## Último Estado Confiável
-**Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals (context + probableCause + recommendation)** (commit `16e673e`, publicado em origin/main)
+**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts (observacoes + historicoInteracoes + proximaAcao)** (commit `8abd084`, publicado em origin/main)
+**Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals (context + probableCause + recommendation)** (commit `16e673e`, publicado em origin/main — pré-Recorte 38)
 **Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (resumoExecutivo + proximaMelhorAcao)** (commit `a6604c2`, publicado em origin/main — pré-Recorte 37)
-**Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** (commit `cdbc4f3`, publicado em origin/main — pré-Recorte 36)
 
 ## O que está concluído
 - ✅ Recorte 35: Expansão de escrita defensiva em accounts para `playAtivo` com padrão dual-field (snapshot garantido, sem sobrescrita mútua).
