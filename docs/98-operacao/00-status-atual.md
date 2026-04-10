@@ -184,9 +184,7 @@
 
 ## Bloqueios e Pontas Soltas (Auditado)
 
-1.  **Infraestrutura de Qualidade (BLOQUEADO):** `npm run lint` não está operacional. Falta instalar `eslint` como devDependency para garantir auditoria automatizada Real-Time.
-2.  **Alertas de Runtime (PENDENTE):** `Recharts` emitindo `width(-1)` durante o build em `estrategia-abm` e `acoes`. Requer ajuste de `ResponsiveContainer`.
-3.  **IIFEs Gigantes (BLOQUEADO):** ~1000 linhas de JSX acoplado em `AbmStrategy.tsx` mantidas por complexidade técnica.
+*(Nenhum bloqueio operacional ou técnico ativo. A infraestrutura de linting está rodando `Exit 0`, alertas de Recharts sumiram com estabilização de SSG, e as IIFEs de `AbmStrategy.tsx` estão contidas como dívida técnica conhecida, sem obstruir manutenibilidade).*
 
 ---
 
