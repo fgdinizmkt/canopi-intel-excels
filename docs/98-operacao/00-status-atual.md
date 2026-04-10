@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM: 88bceb3, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX: 616a8ca, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX)
 
 ---
 
@@ -414,25 +414,46 @@
 - **Commit:** `16e673e` — feat(signals): add defensive narrative editing with modal
 - **Status:** ✅ Publicado em origin/main
 
-**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
-- ✅ Expansão de escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`)
-- ✅ Replicação de padrão atômico de Recorte 37/36: 1 snapshot + 1 setState + 1 persist
-- ✅ Modelagem estendida: ContatoConta interface expandida com 3 campos opcionais
-- ✅ Repository estendido: ContactItem, ContactRow, RepositoryContact com 3 campos narrativos
-- ✅ `getContacts()` estendida: query SELECT inclui 3 campos, merge defensivo com nullish coalescing
-- ✅ `persistContact()` estendida: mapeamento explícito com 3 campos no upsert atomicamente garantido
-- ✅ UI em ContactDetailProfile: seção "Narrativas Operacionais" com edit mode (✎) e 3 textareas
-- ✅ Atomicidade: handleUpdateNarrativas() segue padrão 1 snapshot + 1 setState + 1 persist
-- ✅ Drawer synchronization: onUpdateContact() sincroniza contato aberto
-- ✅ Type safety: sem `any`, mapeamento explícito, guards defensivos contra undefined
-- ✅ Build: Exit 0 (validado, 3 files changed, 148 insertions, 2 deletions)
-- **Commit:** `8abd084` — feat(contacts): add defensive narrative editing
+**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026**Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
+- ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
+- ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
+- ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
+- ✅ ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
+- ✅ Fire-and-forget: persistAction() sem await, falhas logadas silenciosamente.
+- ✅ Type safety consolidado: 3 campos narrativos tipados via ActionItem.
+- ✅ Build Exit 0 (validado, 3 files changed, 155 insertions, 2 deletions).
+- **Commit:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
 - **Status:** ✅ Publicado em origin/main
+
+**Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM** — 2026-04-10
+- ✅ Expansão de escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`).
+- ✅ Modelagem estendida: `Conta.abm` com 3 campos aninhados.
+- ✅ Repository estendido: `AbmRow.abm` contém 3 campos narrativos.
+- ✅ `persistAbm()` refatorada com tipagem explícita `AbmRow['abm']`.
+- ✅ Handler `handleUpdateAbmNarrativas()` em `src/pages/AbmStrategy.tsx`.
+- ✅ UI dupla (read/edit) em seção "Narrativa Estratégica" no card de Ranking ABM.
+- ✅ Fire-and-forget: persistAbm() sem await, falhas logadas silenciosamente.
+- ✅ Build Exit 0 (validado).
+- **Commit:** `88bceb3` — feat(abm): add defensive strategic narrative persistence
+- **Status:** ✅ Publicado em origin/main
+
+**Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX** — 2026-04-10
+- ✅ Expansão estratégica em ABX: narrativas `strategyNarrative` + `riskAssessment` + `successCriteria` dentro do objeto `abx`.
+- ✅ Simetria estratégica: ABX agora espelha as capacidades narrativas de ABM.
+- ✅ Implementação de `persistAbx()` em `src/lib/abxRepository.ts` com tipagem explícita.
+- ✅ Handler ATÔMICO `handleUpdateAbxNarratives()` em `src/pages/AbmStrategy.tsx`.
+- ✅ UI simétrica: Seção "Narrativa Expansionista" no card de Ranking ABM.
+- ✅ Padrão atômico consolidado em todas as 6 dimensões (Accounts, Signals, Actions, Contacts, ABM, ABX).
+- ✅ Build Exit 0 (validado, 1 file changed, 115 insertions, 1 deletion).
+- **Commit:** `616a8ca` — feat(abx): add defensive strategic narrative persistence
+- **Status:** ✅ Publicado em origin/main
+
+---
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 38 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 39
+- **Status Atual:** Recorte 41 concluído e publicado em origin/main.
+- **Novo Recorte:** Aguardar definição do Recorte 42 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -460,6 +481,14 @@
 | Inteligência de Fila | Recorte Concluído (Fase 9) | Camada proativa de detecção de anomalias (Congestionamento, Ghosting, Vazão, Cascata) em Actions |
 | Inteligência de Canais | Recorte Concluído (Fase 9) | Leitura comparativa e dinâmica de performance e pipeline por canal/origem em Performance |
 | Consolidação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
+| Assistant Orquestrador | Recorte 16 Concluído | Cards acionáveis, handleCreateAction, extractCards() |
+| Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
+| Supabase E2-E5: Leitura | Recortes 22-25 Concluídos (Fase E) | Migração de leitura defensiva: Accounts, Signals, Contacts, Actions |
+| Supabase E6-E9: Escrita 1 | Recortes 26-36 Concluídos (Fase E) | Escrita defensiva: Actions, Signals, Contacts, Accounts (Campos core/operacionais) |
+| Supabase E10-E11: ABM Core | Recortes 30-33 Concluídos (Fase E) | ABM Repository (Read/Write) + ABX Repository (Read) + playAtivo |
+| Supabase E12: ABM Narrativa | Recorte 40 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABM com atomicidade |
+| Supabase E13: ABX Narrativa | Recorte 41 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABX (estratégia, risco, sucesso) |
+dação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
 | Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
 | Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Risco→Intervenção, Sinal Crítico→Ativação) |
 | Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |

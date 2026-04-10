@@ -5,6 +5,42 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 41 (Supabase E13): Campos Narrativos Estratégicos em ABX — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E13: expansão de escrita defensiva para camada estratégica em ABX).
+- **Alto:** Expandir escrita defensiva em ABX para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) dentro do objeto `abx`, fechando simetria estratégica com o Recorte 40 (ABM).
+- **Contexto:** Recorte 40 consolidou narrativas em ABM. Recorte 41 replica o padrão para ABX, garantindo que a tese de expansão e retenção tenha o mesmo nível de persistência e atomicidade.
+- **Ações Executadas:**
+  - **Modelagem (`src/data/accountsData.ts`):**
+    * +Interface `Conta.abx` expandida com 3 campos opcionais narrativos: `strategyNarrative`, `riskAssessment`, `successCriteria`
+  - **Repository (`src/lib/abxRepository.ts`):**
+    * +Type `AbxRow.abx` expandido com 3 campos narrativos
+    * +Function `persistAbx()` implementada: aceita `abx?: {...}` com 3 campos narrativos + preservação de campos operacionais (motivo, evolucaoJornada, etc.)
+    * Tipagem explícita usando `AbxRow['abx']` para payload unificado
+  - **UI (`src/pages/AbmStrategy.tsx`):**
+    * +5 hooks de estado para narrativa ABX (`editingAbxNarrative`, 3 campos, `abxNarrativeStatus`)
+    * +useEffect sincroniza narrativas ao trocar de conta ativa
+    * +Handler ATÔMICO `handleUpdateAbxNarratives()`:
+      - 1 snapshot: conta-alvo capturada
+      - 1 build: `updatedAbxObject` com merge de `activeAccount.abx` + 3 novos campos
+      - 1 setState: atualiza `supabaseAbx` local-first
+      - 1 persistAbx: fire-and-forget (upsert por id)
+    * +Seção "Narrativa Expansionista": UI dupla (read/edit) em card de ranking, mantendo simetria com ABM
+    * Merge em `useMemo(accounts)`: narrativas preservadas dentro do spread `{...remote.abx}`
+  - **Validação Técnica:**
+    * Build: Exit 0
+    * Type safety: Payload tipado explicitamente, mapeamento campo a campo
+    * Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist
+    * Simetria: ABM e ABX agora possuem as mesmas capacidades narrativas
+- **Impacto:**
+  - ✅ Narrativas estratégicas em ABX editáveis para planejamento de expansão
+  - ✅ Simetria estratégica completa entre entrada (ABM) e expansão (ABX)
+  - ✅ Padrão defensivo validado em 6ª dimensão Core/Estratégica: Accounts → Signals → Actions → Contacts → ABM → ABX
+- **Commit Código:** `616a8ca` — feat(abx): add defensive strategic narrative persistence
+- **Commit Documentação:** `[pendente]`
+- **Status:** ✅ Código publicado em origin/main, documentação em sincronia.
+
+---
+
 ## [2026-04-10] — Recorte 40 (Supabase E12): Campos Narrativos Estratégicos em ABM — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E12: expansão de escrita defensiva para camada estratégica em ABM).
 - **Alto:** Expandir escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) dentro do objeto `abm`, replicando padrão atômico validado em Accounts/Signals/Actions/Contacts.

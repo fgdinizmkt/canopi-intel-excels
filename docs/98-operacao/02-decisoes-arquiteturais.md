@@ -920,3 +920,34 @@ No Recorte 40, aplicamos o padrão defensivo consolidado ao domínio estratégic
 **Benefício operacional:** Narrativas estratégicas de ABM agora são editáveis com persistência defensiva, sem requerer navegação externa. Escopo mantido mínimo: apenas seção discreta em ABM, sem tocar estrutura existente de 9 campos operacionais.
 
 **Commits:** `88bceb3` (E12 implementação defensiva de narrativas estratégicas em ABM via Recorte 40 com atomicidade e tipagem explícita)
+
+---
+
+### Decisão 18: Escrita Defensiva em ABX — Campos Narrativos Estratégicos com Atomicidade e Simetria (Recorte 41 — E13)
+
+No Recorte 41, expandimos o padrão defensivo e atômico para o domínio **ABX**, introduzindo três campos narrativos (`strategyNarrative`, `riskAssessment`, `successCriteria`) **dentro do objeto abx aninhado**. Esta decisão fecha a simetria estratégica com o domínio ABM (Recorte 40), consolidando o padrão de escrita defensiva para objetos compostos e reforçando a arquitetura local-first.
+
+**Contexto do problema:**
+- ABX possuía 9 campos operacionais (`motivo`, `evolucaoJornada`, etc.) agrupados dentro de `Conta.abx`.
+- Era necessário adicionar narrativas estratégicas específicas para o contexto de expansão e retenção (ABX), mantendo a mesma experiência de usuário e integridade de dados de ABM.
+
+**Implicação estrutural (Recorte 41 em diante):**
+
+- **Modelagem (`src/data/accountsData.ts`):** 
+  - Interface `Conta.abx` expandida com 3 campos narrativos opcionais (E13): `strategyNarrative`, `riskAssessment`, `successCriteria`.
+- **Repository (`src/lib/abxRepository.ts`):**
+  - Interface `AbxRow` expandida para incluir os 3 campos dentro do objeto `abx`.
+  - Implementada função `persistAbx()` com **tipagem explícita** e payload mapeado campo a campo.
+  - Upsert explícito por ID (`{ onConflict: 'id' }`) e comportamento fire-and-forget.
+- **UI & Estado (`src/pages/AbmStrategy.tsx`):**
+  - Implementado handler atômico `handleUpdateAbxNarratives()` seguindo o protocolo de 5 etapas: 
+    1. **Snapshot** da conta ativa.
+    2. **Build** do objeto final (`updatedAbxObject`) fundindo dados operacionais existentes com novas narrativas.
+    3. **SetState** local-first no estado `supabaseAbx` para reflexão imediata na UI.
+    4. **Persist** remoto assíncrono (fire-and-forget).
+    5. **Feedback** visual ("✓ Salvo").
+  - Adicionada seção "Narrativa Expansionista" no card de Ranking ABM, mantendo simetria visual com a seção de ABM.
+
+**Benefício arquitetural:** Sexta aplicação consolidada do padrão atômico, agora abrangendo todos os principais domínios operacionais (Accounts, Signals, Actions, Contacts) e estratégicos (ABM, ABX). A simetria entre ABM e ABX simplifica a manutenção e garante que a tese estratégica da conta (entrada vs. expansão) seja capturada de forma consistente e segura, encerrando o ciclo de implementação da camada estratégica narrativamente editável.
+
+**Commits:** `616a8ca` (E13 implementação defensiva de narrativas estratégicas em ABX via Recorte 41 com atomicidade)
