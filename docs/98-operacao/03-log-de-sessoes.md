@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 42 (Especificação Visual): QG de Narrativas Estratégicas ABM/ABX — Documental Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (especificação visual, sem implementação).
+- **Natureza:** Recorte documental. Nenhum arquivo de `src/` alterado. Nenhum commit de código publicado em origin/main.
+- **Objetivo:** Identificar, especificar e bloquear formalmente a intenção de redesenho da camada de narrativas em `AbmStrategy.tsx`, preservando o Recorte 41 como último marco funcional confiável.
+- **Contexto:** A implementação foi reprovada por não atingir critério de risco zero operacional definido pelo Orquestrador. Um commit local de inspeção (`e374cca`) foi gerado, auditado e descartado via `git reset`. O branch local está sincronizado com origin/main.
+- **Ações Executadas:**
+  - Criado: `docs/98-operacao/07-especificacoes-visuais.md` com especificação completa do Recorte 42.
+  - Atualizado: `docs/98-operacao/00-status-atual.md` — seção "Próximo Passo" registra Recorte 42 como especificação documental concluída.
+  - Atualizado: `docs/98-operacao/06-checkpoint-atual.md` — Recorte 42 incluído como especificação, Recorte 41 preservado como último estado funcional.
+  - Nenhum arquivo de `src/` foi tocado.
+- **Bloqueio Documentado:**
+  - Implementação bloqueada enquanto régua de risco zero estiver ativa.
+  - Critérios de aceitação para futura implementação registrados em `07-especificacoes-visuais.md`.
+  - Diff de referência: commit local `e374cca` (não publicado, descartado via `git reset`).
+- **Commit Documentação:** `docs(ops): add Recorte 42 visual specification with zero-risk guardrails`
+- **Status:** ✅ Especificação publicada em origin/main. Nenhum código alterado. Último marco funcional permanece: Recorte 41 (`616a8ca`).
+
+---
+
 ## [2026-04-10] — Recorte 41 (Supabase E13): Campos Narrativos Estratégicos em ABX — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E13: expansão de escrita defensiva para camada estratégica em ABX).
 - **Alto:** Expandir escrita defensiva em ABX para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) dentro do objeto `abx`, fechando simetria estratégica com o Recorte 40 (ABM).

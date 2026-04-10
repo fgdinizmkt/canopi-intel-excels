@@ -461,12 +461,16 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 41 concluído e publicado em origin/main.
-- **Novo Recorte:** Aguardar definição do Recorte 42 pelo Orquestrador.
+- **Status Atual:** Recorte 41 concluído e publicado em origin/main. Último marco funcional: commit `616a8ca`.
+- **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
+  - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
+  - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
+- **Próximo passo funcional:** Aguardar definição do Recorte 43 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
+
 
 ---
 

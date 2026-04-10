@@ -1,4 +1,4 @@
-# Checkpoint Atual — Recorte 41 (Concluído)
+# Checkpoint Atual — Recorte 42 Documental (Especificação Concluída)
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
@@ -57,11 +57,16 @@
 - ✅ Recorte 30: Publicação: commit `4aa13f3` — feat(abm): add defensive read-only Supabase repository layer publicado em origin/main.
 
 
+- 📋 Recorte 42: Especificação visual concluída. Implementação bloqueada (régua de risco zero ativa).
+  - Documento: `docs/98-operacao/07-especificacoes-visuais.md`
+  - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 42 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 43 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição e aprovação do Recorte 42.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição e aprovação do Recorte 43.
 
 ---
-*Último estado confiável: Recorte 41*
+*Último estado funcional confiável: Recorte 41 (`616a8ca`)*
+*Recorte 42: documental/especificação — sem alteração de código*
