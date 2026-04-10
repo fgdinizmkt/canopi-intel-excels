@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico): 650a4c4, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts — Play Ativo: cdbc4f3, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico))
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts — Play Ativo)
 
 ---
 
@@ -372,10 +372,25 @@
 - **Commit:** `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** — 2026-04-10
+- ✅ Expansão da escrita defensiva em accounts para campo `playAtivo`
+- ✅ Extensão de `persistAccount()` em `src/lib/accountsRepository.ts` com tipo `AccountPersistPayload`
+- ✅ Persistência defensiva dual-field: `.upsert({ id, tipoEstrategico, playAtivo }, { onConflict: 'id' })` explícito
+- ✅ Payload explícito com guards defensivos: apenas campos definidos incluídos (previne sobrescrita mútua com undefined)
+- ✅ Implementação de `handleUpdatePlayAtivo()` em `src/pages/Accounts.tsx` com padrão local-first + fire-and-forget
+- ✅ Padrão robusto: snapshot dual-field ANTES de setState, persistência com AMBOS campos (tipoEstrategico + playAtivo)
+- ✅ UI mínima: 4 botões toggle (`ABM`, `ABX`, `Híbrido`, `Nenhum`) apenas na view `lista`, coluna "Play ativo"
+- ✅ Grade e board permanecem somente leitura (mantêm comportamento intacto)
+- ✅ Type safety reforçado: `AccountPersistPayload` explícito, sem `any`, proteção contra sobrescrita
+- ✅ Validação: Bug de persistência crítico corrigido (campos não sobrescrevem-se mutuamente)
+- ✅ Build Exit 0 (validado, 2 files changed, 84 insertions, 9 deletions)
+- **Commit:** `cdbc4f3` — feat(accounts): add defensive playAtivo persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 34 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 35
+- **Status Atual:** Recorte 35 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 36
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

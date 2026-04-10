@@ -5,6 +5,52 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 35 (Supabase E9B): Escrita Defensiva em Accounts (playAtivo) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E9B: expansão de E9 em accounts, fechando ciclo dual-field defensivo).
+- **Alto:** Expandir escrita defensiva em accounts para `playAtivo`, validando que padrão defensivo escala a múltiplos campos com segurança contra sobrescrita mútua.
+- **Contexto:** Recorte 34 implementou E9 (primeiro write path defensivo em accounts com tipoEstrategico). Recorte 35 expande para playAtivo, com ênfase em corrigir bug crítico: campos não devem sobrescrever-se com undefined. Padrão: snapshot dual-field ANTES de setState, persistência com AMBOS campos explícitos.
+- **Ações Executadas:**
+  - **Repositório (`src/lib/accountsRepository.ts`):**
+    * +Type `AccountPersistPayload = { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo'] }` (explícito, sem `any`)
+    * +`persistAccount()` expandido: assinatura agora aceita `{ id, tipoEstrategico?, playAtivo? }`
+    * +Payload construtivo defensivo: apenas campos definidos incluídos (guards contra undefined)
+    * +Upsert payload dual-field: `.upsert({ id, tipoEstrategico, playAtivo }, { onConflict: 'id' })`
+    * +Falha silenciosa mantida: erros capturados em try/catch e logados com `console.warn()`, nunca relançados
+  - **Página Local-first (`src/pages/Accounts.tsx`):**
+    * +`handleUpdatePlayAtivo(contaId: string, newPlay: PlayAtivo)` implementado com padrão defensivo crítico:
+      - 1. Snapshot conta-alvo ANTES de setState (captura tipoEstrategico atual)
+      - 2. Persistência com AMBOS campos: { id, tipoEstrategico: snapshot.tipoEstrategico, playAtivo: newPlay } (previne sobrescrita mútua)
+      - 3. `setContas()` — LOCAL-FIRST: atualiza estado imediatamente
+      - 4. `persistAccount()` — REMOTO: fire-and-forget (SEM await)
+    * +`handleUpdateTipoEstrategico()` refatorado com mesmo padrão dual-field (snapshot ANTES, persist COM ambos campos)
+    * +UI Mínima: 4 botões toggle (`ABM`, `ABX`, `Híbrido`, `Nenhum`) APENAS em view `lista`, coluna "Play ativo"
+      - Grade e board permanecem somente leitura (comportamento original preservado)
+      - Feedback visual: botão ativo colorido (emerald-500 para plays, slate-500 para nenhum); inativos transparentes
+      - Cada clique dispara `handleUpdatePlayAtivo(conta.id, play)` imediatamente
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 84 insertions(+), 9 deletions(-)
+    * Type safety: `AccountPersistPayload` union literal explícita, sem `as any`, guards contra undefined
+    * Padrão defensivo crítico: snapshot dual-field garante alvo snapshot = alvo update local = alvo persist remoto (SEM divergência)
+    * Fallback: em erro Supabase, UI local permanece atualizada; nenhuma rollback, logging defensivo
+    * Fire-and-forget: padrão validado 6+ vezes (Actions E6, Signals E7, Contacts E8, ABM E11A/E11B, Accounts E9/E9B)
+  - **Arquitetura confirmada:**
+    * Padrão defensivo dual-field é robusto: snapshot + persist COM ambos campos previne sobrescrita
+    * Payload construtivo explícito protege contra undefined overwrites
+    * E9/E9B serve template para expansões futuras em accounts (e validação cross-entidade)
+- **Impacto:**
+  - ✅ Expansão segura de accounts com padrão defensivo dual-field consolidado
+  - ✅ Bug crítico corrigido: campos não sobrescrevem-se mutuamente com undefined
+  - ✅ Type safety reforçada: sem `any`, `AccountPersistPayload` explícito
+  - ✅ Padrão escalável validado em 6 contextos diferentes (Actions, Signals, Contacts, ABM 2x, Accounts 2x)
+  - ✅ Grade e board não afetados — permanecem leitura pura
+  - ✅ Local-first + fire-and-forget consolidado como arquitetura defensiva agnóstica
+- **Commit Código:** `cdbc4f3` — feat(accounts): add defensive playAtivo persistence
+- **Commit Documentação:** docs(ops): sync Recorte 35 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada, pronto para Recorte 36.
+
+---
+
 ## [2026-04-10] — Recorte 34 (Supabase E9): Escrita Defensiva em Accounts (campo inicial: tipoEstrategico) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E9: primeiro write path defensivo em accounts, complementando E11A/E11B em ABM e E6-E8 em Actions/Signals/Contacts).
 - **Alto:** Abrir escrita defensiva em accounts com `tipoEstrategico`, validando que padrão local-first + fire-and-forget é agnóstico à entidade e escalável.

@@ -1,21 +1,27 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 34 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 35 concluído e publicado. Main estável em origin/main.
 
-**Recorte 34 Publicado:**
+**Recorte 35 Publicado:**
+- Commit: `cdbc4f3` — `feat(accounts): add defensive playAtivo persistence`
+- Descrição: Expansão de escrita defensiva em accounts com campo `playAtivo`, dual-field defensivo com snapshot garantido
+- Impacto: UI mínima (4 botões toggle play ativo em lista), grade/board intactos, bug crítico corrigido (sem sobrescrita mútua)
+
+**Recorte 34 Publicado (Anterior):**
 - Commit: `650a4c4` — `feat(accounts): add defensive tipoEstrategico persistence`
 - Descrição: Primeira escrita defensiva em accounts com campo `tipoEstrategico`, local-first + fire-and-forget
-- Impacto: UI mínima (4 botões toggle em lista), grade/board intactos
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 35.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 36.
 
 ## Último Estado Confiável
 **Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main)
 **Hotfix Operacional P0 `/sinais`** (commit `90401f2`, publicado em origin/main — pós-Recorte 33)
 
 ## O que está concluído
+- ✅ Recorte 35: Expansão de escrita defensiva em accounts para `playAtivo` com padrão dual-field (snapshot garantido, sem sobrescrita mútua).
+- ✅ Recorte 34: Primeira escrita defensiva em accounts com `tipoEstrategico`, validando agnose do padrão local-first.
 - ✅ Recorte 16: Cards acionáveis implementados (4 tipos: existing_account, signal, action, new_action).
 - ✅ Recorte 16: validateCards() filtra contra entidades reais (slug, signalId, actionId).
 - ✅ Recorte 16: handleCreateAction() cria ação na fila via createAction() do contexto.
@@ -197,7 +203,7 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 35.
 - ✅ Recorte 34: Publicação: commit `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence publicado em origin/main.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 35 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 36 pelo Orquestrador.
 
 ## Próximo Passo Exato
 Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 35.
