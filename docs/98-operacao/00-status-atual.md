@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts: 8abd084, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions: a60f2f9, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions)
 
 ---
 

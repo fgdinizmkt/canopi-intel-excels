@@ -1,8 +1,13 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 38 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 39 concluído e publicado. Main estável em origin/main.
 
-**Recorte 38 Publicado:**
+**Recorte 39 Publicado:**
+- Commit: `a60f2f9` — `feat(actions): add defensive narrative editing with atomicity`
+- Descrição: Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`), replicando padrão atômico de Signals e Contacts
+- Impacto: Aba "Narrativa Operacional" no ActionOverlay com UI dupla (read/edit), 3 textareas, atomicidade garantida contra race conditions, persistência fire-and-forget
+
+**Recorte 38 Publicado (Anterior):**
 - Commit: `8abd084` — `feat(contacts): add defensive narrative editing`
 - Descrição: Expansão de escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`), replicando padrão atômico de Signals
 - Impacto: Seção "Narrativas Operacionais" em ContactDetailProfile com edit mode (✎) para 3 textareas, atomicidade garantida contra race conditions, drawer sincronizado com array de source
@@ -227,8 +232,19 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 39.
 - ✅ Recorte 37: Build: Exit 0 (validado 2x, sem regressões).
 - ✅ Recorte 37: Publicação: commit `16e673e` — feat(signals): add defensive narrative editing with modal publicado em origin/main.
 
+- ✅ Recorte 39: Repository layer expandido com `resolutionPath`, `executionNotes`, `learnings` em ActionRow.
+- ✅ Recorte 39: `getActions()` expandida para trazer 3 campos narrativos, shell seguro com type guards.
+- ✅ Recorte 39: `persistAction()` expandida para mapear 3 campos narrativos com upsert atomicamente garantido.
+- ✅ Recorte 39: ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
+- ✅ Recorte 39: Handler `handleUpdateNarrativas()` com padrão atomicamente garantido: snapshot → build → updateAction → persistAction.
+- ✅ Recorte 39: UI dupla (read/edit) com toggle ✎, 3 textareas (3 linhas), feedback "✓ Salvo" por 1.5s.
+- ✅ Recorte 39: Fire-and-forget: persistAction() dispara SEM await, nunca bloqueia UX, falhas logadas silenciosamente.
+- ✅ Recorte 39: Type safety: 3 campos narrativos tipados via ActionItem, nenhum `as any`, guards contra undefined.
+- ✅ Recorte 39: Build: Exit 0 (validado).
+- ✅ Recorte 39: Publicação: commit `a60f2f9` — feat(actions): add defensive narrative editing with atomicity publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 38 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 40 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 38.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 40.

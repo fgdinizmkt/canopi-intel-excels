@@ -5,6 +5,47 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 39 (Supabase E6.1): Campos Narrativos Editáveis em Actions — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E6.1: expansão de E6 em actions, fechando ciclo narrativo com E7.1/E8.1).
+- **Alto:** Expandir escrita defensiva em Actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`), replicando padrão atômico validado em Recortes 37 e 38.
+- **Contexto:** Recortes 37 (Signals) e 38 (Contacts) implementaram narrativas com atomicidade garantida. Recorte 39 fecha o ciclo em Actions, consolidando padrão defensivo em todas 3 entidades core.
+- **Ações Executadas:**
+  - **Modelagem (`src/data/accountsData.ts`):**
+    * +Interface `ActionItem` expandida com 3 campos opcionais: `resolutionPath`, `executionNotes`, `learnings`
+  - **Repository (`src/lib/actionsRepository.ts`):**
+    * +Type `ActionRow` expandido com 3 campos narrativos
+    * +`getActions()`: query SELECT estendida para incluir 3 campos, shell seguro com type guards
+    * +`persistAction()` estendida: mapeamento explícito com 3 campos no upsert atomicamente garantido
+  - **UI (`src/pages/Actions.tsx`):**
+    * +ModalTab expandido: "narrativa" adiciona 4ª aba ao ActionOverlay
+    * +Estado modal: `editingNarrative`, `resolutionPath`, `executionNotes`, `learnings`, `narrativeStatus` (5 hooks)
+    * +useEffect sincroniza todos os 5 estados quando ação muda (item?.id)
+    * +Handler ATÔMICO `handleUpdateNarrativas()`:
+      - 1 snapshot: ação-alvo capturada
+      - 1 construção: estado final com trim dos 3 campos
+      - 1 updateAction: local-first sem await
+      - 1 persistAction: fire-and-forget (nenhuma espera, falha silenciosa)
+    * +Seção "Narrativa Operacional": aba discreta com UI dupla (read/edit), toggle ✎, 3 textareas, feedback visual "✓ Salvo"
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 3 files, 155 insertions(+), 2 deletions(-)
+    * Type safety: 3 campos narrativos tipados, nenhum `as any`, guards contra undefined
+    * Atomicidade: 1 snapshot = estado consistente; 1 updateAction = local-first garantido
+    * Padrão: idêntico a E7.1 (Signals) e E8.1 (Contacts)
+    * Fire-and-forget: persistAction() dispara sem await, falhas logadas silenciosamente
+- **Impacto:**
+  - ✅ Narrativas em actions agora editáveis (trilha + notas + aprendizados)
+  - ✅ Persistência atômica: zero race condition entre 3 campos
+  - ✅ Aba discreta "Narrativa Operacional" sem alterar abas existentes
+  - ✅ Padrão defensivo validado em 3ª entidade core: Accounts → Signals → Actions
+  - ✅ Ciclo narrativo fechado: tríade core (Accounts, Signals, Actions) tem narrativas com atomicidade
+  - ✅ Extensibilidade consolidada: padrão é agnóstico a entidade (Actions prova escalabilidade E6→E7.1→E8.1→E6.1)
+- **Commit Código:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
+- **Commit Documentação:** (aguardando commit)
+- **Status:** ✅ Código publicado em origin/main, documentação pronta para commit.
+
+---
+
 ## [2026-04-10] — Recorte 38 (Supabase E8.1): Campos Narrativos Editáveis em Contacts — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E8.1: expansão de E8 em contacts, replicando padrão atômico de Signals/Accounts).
 - **Alto:** Expandir escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`), replicando padrão atômico validado em Recortes 37 e 36.

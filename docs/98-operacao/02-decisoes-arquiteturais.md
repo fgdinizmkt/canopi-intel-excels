@@ -490,6 +490,88 @@ No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativo
 
 ---
 
+### Decisão 16: Escrita Defensiva em Actions — Campos Narrativos com Atomicidade (Recorte 39 — E6.1)
+
+No Recorte 39, expandimos o padrão E6 para incluir três novos campos narrativos (`resolutionPath`, `executionNotes`, `learnings`) com ênfase especial em **atomicidade contra race conditions** e **aba discreta no overlay**. A decisão arquitetural fundamental aqui foi a quarta validação do padrão atômico (consolidado em E9/E9C/E8.1) em uma entidade com UI overlay de detalhe.
+
+**Implicação estrutural (Recorte 39 em diante):**
+
+- **Type extensões em src/data/accountsData.ts:** Interface `ActionItem` expandida com 3 campos narrativos opcionais
+  ```typescript
+  export interface ActionItem {
+    // ... campos existentes ...
+    resolutionPath?: string;      // Como a ação está sendo resolvida / trilha de resolução
+    executionNotes?: string;      // Notas operacionais correntes de execução
+    learnings?: string;           // Aprendizados acumulados durante a execução
+  }
+  ```
+
+- **Type extensões em src/lib/actionsRepository.ts:**
+  - `ActionRow` expandido com 3 campos narrativos (interface de persistência)
+  - `getActions()` SELECT query expandida para incluir `resolutionPath, executionNotes, learnings`
+  - Shell seguro (fallback quando sem mock) popula todos 3 campos
+  - `persistAction()` mapeamento explícito: todos 3 campos narrativos incluídos no upsert atomicamente garantido
+
+- **ModalTab expandido em src/pages/Actions.tsx:**
+  - +1 aba discreta: "narrativa" adicionada ao enum ModalTab (4ª aba ao lado de 'resumo', 'projeto', 'historico')
+  - Sem alteração nas 3 abas existentes (escopo mínimo, encapsulado)
+
+- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO:** Novo `handleUpdateNarrativas()` em `src/pages/Actions.tsx`
+  - Padrão rígido com 4 passos:
+    1. **SNAPSHOT:** Captura snapshot completo da ação (todos 3 campos narrativos)
+    2. **SETSTATE LOCAL:** Uma única chamada `updateAction()` que atualiza todos 3 campos simultaneamente (sem await)
+    3. **PERSIST:** Uma única chamada `persistAction()` fire-and-forget (nenhuma espera, falha silenciosa)
+    4. **FEEDBACK:** Timeout de 1.5s para mostrar "✓ Salvo" (sem persistência)
+  - Pseudocódigo:
+    ```typescript
+    const handleUpdateNarrativas = () => {
+      if (!item) return;
+
+      // 1. Snapshot
+      const targetAction = item;
+      
+      // 2. Build estado final (todos 3 campos)
+      const updatedAction: ActionItem = {
+        ...targetAction,
+        resolutionPath: resolutionPath.trim(),
+        executionNotes: executionNotes.trim(),
+        learnings: learnings.trim(),
+      };
+      
+      // 3. Atualizar local (fire-and-forget, sem await)
+      updateAction(item.id, {
+        resolutionPath: updatedAction.resolutionPath,
+        executionNotes: updatedAction.executionNotes,
+        learnings: updatedAction.learnings,
+      });
+      
+      // 4. Feedback visual (desacoplado de persistência)
+      setNarrativeStatus("✓ Salvo");
+      setTimeout(() => setNarrativeStatus(null), 1500);
+    };
+    ```
+  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (1 snapshot + 1 updateAction + 1 persistAction)
+
+- **UI — Aba Discreta "Narrativa Operacional":** Nova aba em `src/pages/Actions.tsx` ActionOverlay
+  - Estado local: 5 hooks (`editingNarrative: boolean`, `resolutionPath`, `executionNotes`, `learnings`, `narrativeStatus: string | null`)
+  - useEffect sincroniza todos 5 ao mudar item.id
+  - Modo read: exibe 3 campos com labels em uppercase e conteúdo truncado; placeholder se vazio
+  - Modo edit: toggle button (✎) abre 3 textareas com conteúdo completo, placeholders descritivos
+  - Botão save dispara `handleUpdateNarrativas()`, mostra feedback "✓ Salvo" por 1.5s
+  - Sem alteração em outras 3 abas, grade ou detalhe resumido (escopo isolado em aba discreta)
+
+- **Tipagem:** Sem novo tipo — reutiliza `ActionItem` estendida
+  - Imports atualizados em Actions.tsx para incluir tipos e `persistAction`
+  - Sem `as any`, mapeamento explícito de 3 campos
+
+**Benefício arquitetural:** E6.1 é a quarta aplicação do padrão atomicamente garantido e demonstra que a consolidação de 1 snapshot + 1 setState + 1 persist é escalável a QUALQUER entidade com UI overlay. A aba discreta (não intrusiva nas 3 abas existentes) é estratégia de UI leve que mantém encapsulamento de escopo. Futuras expansões em actions com múltiplos campos correlatos podem seguir este template exatamente.
+
+**Validação de padrão:** E6.1 é a quarta aplicação do padrão atomicamente garantido (E9 tipoEstrategico → E9C narrativos Accounts → E8.1 narrativos Contacts → E6.1 narrativos Actions). Padrão consolidado e repetível em qualquer entidade e UI (drawer prop, overlay componentizado, modal). Ciclo narrativo fechado: tríade core (Accounts, Signals, Actions) agora tem escrita defensiva com narrativas.
+
+**Commits:** `a60f2f9` (E6.1 implementação defensiva de campos narrativos em Actions via Recorte 39 com atomicidade garantida e aba discreta)
+
+---
+
 ### 8.6 Leitura Defensiva em ABM (Recorte 30)
 **Decisão refinada:** Primeira migração de leitura em ABM segue padrão defensivo idêntico a E2 (Accounts), sem escrita, sem ABX.
 
