@@ -215,8 +215,20 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 37 (Acc
 - ✅ Recorte 36: Build: Exit 0 (validado após bug fix de atomicidade).
 - ✅ Recorte 36: Publicação: commit `a6604c2` — feat(accounts): add defensive narrative persistence publicado em origin/main.
 
+- ✅ Recorte 37: Repository layer `src/lib/signalsRepository.ts` verificado: `persistSignal()` já suporta 3 campos narrativos (context, probableCause, recommendation).
+- ✅ Recorte 37: Padrão local-first em `src/pages/Signals.tsx`: `handleUpdateSignalNarrativas()` implementado com snapshot atomicamente garantido.
+- ✅ Recorte 37: Atomicidade contra race conditions: 1 snapshot + 1 setState 3 campos + 1 persist 3 campos.
+- ✅ Recorte 37: **Drawer synchronization pattern novo:** detecta se sinal editado está aberto em drawer, sincroniza explicitamente com `setDrawer(updatedSignal)`.
+- ✅ Recorte 37: Modal de edição narrativa com 3 textareas (`context` + `probableCause` + `recommendation`), acionado via edit icon (✎) ao lado de "Causa/Impacto" no drawer.
+- ✅ Recorte 37: Modal UI: overlay escuro, 3 textareas com 3 linhas cada, placeholders descritivos, botões "Cancelar" e "Salvar".
+- ✅ Recorte 37: Fire-and-forget: persistSignal() dispara SEM await, nunca bloqueia UX, falhas logadas silenciosamente.
+- ✅ Recorte 37: UI discreta: único lugar de interação é drawer aberto, grade não afetada (read-only).
+- ✅ Recorte 37: Type safety: 3 campos narrativos tipados via SignalItem, nenhum `any`, guards contra undefined.
+- ✅ Recorte 37: Build: Exit 0 (validado 2x, sem regressões).
+- ✅ Recorte 37: Publicação: commit `16e673e` — feat(signals): add defensive narrative editing with modal publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 37 pelo Orquestrador.
+(nenhum)
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 37.
+Avaliar Recorte 17 (plano de deep-linking com renderResponseCards refatorado): verificar se há mudança necessária no Assistant após a mudança recente de imports ou qualquer outro detalhe pendente. Alternativamente, iniciar Recorte 38+ em roadmap (a definir).

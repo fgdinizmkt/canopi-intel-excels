@@ -242,6 +242,44 @@ const confirmAssign = () => {
 
 ---
 
+### 8.3.1 Drawer Synchronization Pattern (Recorte 37)
+**Decisão nova:** Quando uma entidade é exibida em dois lugares de estado (array de fonte e drawer de detalhe), mutações no array devem sincronizar explicitamente o drawer.
+
+**Contexto do problema:**
+- `signals` array é a fonte de verdade
+- `drawer` é estado separado que exibe detalhe de 1 sinal
+- Quando handler atualiza signal no array via setSignals(), drawer permanecia stale (exibia valores antigos)
+- Exemplo: usuário edita `context` de um sinal aberto no drawer → `setSignals()` atualiza array → drawer exibe valor antigo
+
+**Solução implementada (Recorte 37):**
+```typescript
+// Em handleUpdateSignalNarrativas():
+setSignals(prev => 
+  prev.map(s => s.id === signalId ? updatedSignal : s)
+);
+
+// Sincronização explícita: se sinal editado está aberto no drawer
+if (drawer?.id === signalId) {
+  setDrawer(updatedSignal);  // imediatamente reflect
+}
+
+persistSignal(updatedSignal).catch(() => {});
+```
+
+**Padrão genérico (aplicável a outras entidades):**
+- Identifique pares estado: (array-source, detail-view)
+- Após setState no array-source, detecte se detalhe aberto = alvo mutação
+- Se sim: setDetailView(mutatedEntity) para sincronizar imediatamente
+- Implementação é mínima (1 linha if), benefício é imenso (zero staleness)
+
+**Benefício:** Drawer nunca exibe valores antigos. Sincronização é imediata, sem lag entre array update e detail view.
+
+**Aplicabilidade futura:** Padrão escalável para Accounts.drawer, Actions.overlay, Contacts.detail — qualquer entidade com view "list + detail" separada.
+
+**Commits:** `16e673e` (E7.1 implementação de drawer synchronization em signals)
+
+---
+
 ### 8.4 Escrita Defensiva em Contacts: Owner Assignment (Recorte 28.1)
 **Decisão refinada:** Terceira escrita remota em `contacts` via micro-recorte 28.1. Owner assignment mínimo destrava E8 com padrão consolidado.
 

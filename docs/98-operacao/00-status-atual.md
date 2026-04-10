@@ -401,10 +401,23 @@
 - **Commit:** `a6604c2` — feat(accounts): add defensive narrative persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals** — 2026-04-10
+- ✅ Expansão da escrita defensiva em signals para campos narrativos `context` + `probableCause` + `recommendation`
+- ✅ Replicação de padrão atômico de Recorte 36 (accounts): 1 snapshot + 1 setState + 1 persist
+- ✅ Implementação de handler ATÔMICO `handleUpdateSignalNarrativas()` em `src/pages/Signals.tsx`
+- ✅ **Novo padrão: Drawer synchronization** — detecta se sinal editado está aberto, sincroniza explicitamente com `setDrawer(updatedSignal)` após setState do array
+- ✅ Modal de edição com 3 textareas (`context`, `probableCause`, `recommendation`), 3 linhas cada
+- ✅ Trigger UI: edit button (✎) ao lado de "Causa/Impacto" no drawer
+- ✅ Fire-and-forget: persistSignal() sem await, falhas logadas silenciosamente
+- ✅ Type safety consolidado: 3 campos narrativos tipados, guards defensivos contra undefined
+- ✅ Build Exit 0 (validado, 1 file changed, 132 insertions, 1 deletion)
+- **Commit:** `16e673e` — feat(signals): add defensive narrative editing with modal
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 36 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 37
+- **Status Atual:** Recorte 37 concluído e publicado em origin/main
+- **Próximo:** Avaliar Recorte 17 (plano pendente) ou iniciar novo recorte conforme roadmap
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

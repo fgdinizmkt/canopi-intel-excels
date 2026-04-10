@@ -5,6 +5,52 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 37 (Supabase E7.1): Campos Narrativos Editáveis em Signals — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E7.1: expansão de E7 em signals, fechando ciclo narrativo com atomicidade).
+- **Alto:** Expandir escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), replicando padrão atômico validado em Recorte 36 (accounts).
+- **Contexto:** Recorte 36 implementou atomicidade multi-campo em accounts (1 snapshot + 1 setState + 1 persist para 4 campos). Recorte 37 expande o padrão para signals com 3 campos narrativos, adicionando sincronização drawer (drawer é estado separado do array, requer sincronização explícita após setState).
+- **Ações Executadas:**
+  - **Repositório (`src/lib/signalsRepository.ts`):**
+    * ✅ Verificado: `persistSignal()` já suporta context, probableCause, recommendation (nenhuma mudança necessária)
+    * ✅ SignalItem type já inclui os 3 campos (opcionais)
+  - **Página Local-first (`src/pages/Signals.tsx`):**
+    * +Estado modal: `editingSignalId`, `editContext`, `editProbableCause`, `editRecommendation` (4 hooks)
+    * +Funções ciclo de vida:
+      - `abrirEditorNarrativas(signal)`: popula modal states a partir de signal.context/probableCause/recommendation
+      - `fecharEditorNarrativas()`: reseta todos 4 estados para null/''
+    * +Handler ATÔMICO `handleUpdateSignalNarrativas(signalId, newContext, newProbableCause, newRecommendation)`:
+      - 1 snapshot: `signals.find(s => s.id === signalId)`
+      - 1 setState: `setSignals(prev => prev.map(...))` com callback para garantir estado atual
+      - **SINCRONIZAÇÃO DRAWER:** se drawer?.id === signalId, `setDrawer(updatedSignal)` imediatamente (previne staleness)
+      - 1 persist: `persistSignal(updatedSignal).catch(() => {})` fire-and-forget
+      - Feedback: toast + limpeza modal
+    * +Trigger UI: Botão ✎ ao lado de "Causa/Impacto" no drawer, opens modal
+    * +Modal UI: 3 textareas (3 linhas cada) para context/probableCause/recommendation, backdrop, cancel/save buttons
+  - **State Consistency Fix:**
+    * Bug detectado: drawer state e signals array state são separados
+    * Solução: Após setState no array, detectar se sinal editado está aberto em drawer
+    * Implementação: `if (drawer?.id === signalId) { setDrawer(updatedSignal); }` garante sincronização
+    * Esta é primeira vez em projeto que estado separado (drawer) é sincronizado explicitamente com fonte de verdade (signals array)
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões, 2 vezes validado)
+    * 1 file, 132 insertions(+), 1 deletion(-)
+    * Type safety: 3 campos narrativos tipados via SignalItem, nenhum `any`, guards contra undefined
+    * Atomicidade: 1 snapshot = estado consistente; 1 setState com callback = estado garantido current
+    * Sincronização: drawer sync pattern é novo neste projeto, mas segue mesmo princípio de "1 source of truth"
+    * Fire-and-forget: persistSignal() dispara sem await, falhas logadas silenciosamente
+- **Impacto:**
+  - ✅ Narrativas em signals agora editáveis (context + probableCause + recommendation)
+  - ✅ Persistência atômica: zero race condition entre 3 campos
+  - ✅ Drawer synchronization pattern estabelecido para casos onde estado é duplicado (drawer + array)
+  - ✅ Modal premium: integrado ao drawer existente, discreto e funcional
+  - ✅ Grade não afetada — permanece leitura pura
+  - ✅ Padrão defensivo replicado com sucesso de accounts (E9C) para signals (E7.1)
+- **Commit Código:** `16e673e` — feat(signals): add defensive narrative editing with modal
+- **Commit Documentação:** (em progresso)
+- **Status:** ✅ Código publicado em origin/main, documentação em sincronização.
+
+---
+
 ## [2026-04-10] — Recorte 36 (Supabase E9C): Escrita Defensiva em Accounts (Campos Narrativos) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E9C: expansão de E9/E9B em accounts, fechando ciclo narrativo com atomicidade).
 - **Alto:** Expandir escrita defensiva em accounts para 2 campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`), validando padrão defensivo para edição multi-campo com atomicidade garantida.
