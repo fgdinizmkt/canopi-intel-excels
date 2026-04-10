@@ -13,12 +13,14 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Rota App Router (`src/app/(shell)/sinais/page.tsx`):** +Import `'../../../pages/signals.css'` no nível da rota
   - **Componente (`src/pages/Signals.tsx`):** -Remove import de CSS do componente
   - **Validação:** Build Exit 0, sem regressões em outras páginas
+  - **Causa Operacional Local (pós-publicação):** Erro de módulo `.next/server/pages/_document.js` relatado durante teste local. Raiz: cache de build corrompido. Resolução: remover `.next` + rebuild fresco (npm run dev). Resultado: ambiente restaurado, `/sinais` renderiza normalmente.
 - **Impacto:**
   - ✅ Página `/sinais` recupera estilos visuais (hero-sinais, filter-bar, signal-list, drawer, etc.)
   - ✅ Funcionalidade de dados preservada (Supabase flow, filtros, drawer, deep-linking intactos)
   - ✅ Zero impacto em outras páginas ou recortes
-- **Commit:** `90401f2` — fix(signals): restore page styling via route-level CSS import
-- **Status:** ✅ Publicado em origin/main, página restaurada.
+  - ✅ Ambiente local estável após limpeza de artefatos
+- **Commit Código:** `90401f2` — fix(signals): restore page styling via route-level CSS import
+- **Status:** ✅ Publicado em origin/main, página restaurada e ambientes validados (prod + local).
 
 ---
 
