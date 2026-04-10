@@ -465,11 +465,15 @@
 - **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
   - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
-- **Próximo passo funcional:** Aguardar definição do Recorte 43 pelo Orquestrador.
+- **Recorte 43:** Concluído como **mapa de cobertura de persistência documental**. Nenhum código alterado.
+  - Documento: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md`
+  - **Decisão pendente de Orquestrador:** ownership de `tipoEstrategico` e `playAtivo` — dois repositories capazes de escrever os mesmos campos top-level. Nenhum recorte funcional pode avançar sobre esses campos sem resolução.
+- **Próximo passo funcional:** Aguardar decisão do Orquestrador sobre o ownership de `tipoEstrategico`/`playAtivo` antes de definir Recorte 44.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
+
 
 
 ---

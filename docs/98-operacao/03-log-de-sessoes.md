@@ -5,7 +5,29 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 43 (Documental): Mapa de Cobertura de Persistência — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale (mapa documental, sem implementação).
+- **Natureza:** Recorte documental. Nenhum arquivo de `src/` alterado. Nenhum commit de código produzido.
+- **Objetivo:** Inventariar factualmente todos os campos do modelo `Conta` e entidades relacionadas, documentando cobertura real de leitura e escrita por repository Supabase, lacunas sem cobertura e decisões de ownership pendentes.
+- **Base:** Leitura direta de `src/lib/*.ts` e `src/data/accountsData.ts` em commit `5672e97`.
+- **Ações Executadas:**
+  - Criado: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md` com inventário completo de 6 entidades.
+  - Atualizado: `docs/98-operacao/00-status-atual.md` — seção "Próximo Passo" registra Recorte 43 e decisão pendente de ownership.
+  - Atualizado: `docs/98-operacao/03-log-de-sessoes.md` — este registro.
+  - Atualizado: `docs/98-operacao/06-checkpoint-atual.md` — Recorte 43 incluído.
+  - Nenhum arquivo de `src/` foi tocado.
+- **Decisão Pendente Documentada:**
+  - `tipoEstrategico` e `playAtivo` são campos top-level de `Conta`, não existem dentro de `Conta.abx`.
+  - Dois repositories (`accountsRepository` e `abmRepository`) estão atualmente autorizados a escrever as mesmas colunas Supabase, sem definição de ownership canônico.
+  - Nenhum recorte funcional pode avançar sobre esses campos enquanto o Orquestrador não decidir qual repository é a fonte de verdade.
+- **Commit Documentação:** `docs(ops): add Recorte 43 persistence coverage map and ownership gaps`
+- **Status:** ✅ Mapa publicado em origin/main. Nenhum código alterado. Último marco funcional permanece: Recorte 41 (`616a8ca`).
+
+---
+
 ## [2026-04-10] — Recorte 42 (Especificação Visual): QG de Narrativas Estratégicas ABM/ABX — Documental Concluído
+
 - **Fase:** Fase E — Supabase Migration & Scale (especificação visual, sem implementação).
 - **Natureza:** Recorte documental. Nenhum arquivo de `src/` alterado. Nenhum commit de código publicado em origin/main.
 - **Objetivo:** Identificar, especificar e bloquear formalmente a intenção de redesenho da camada de narrativas em `AbmStrategy.tsx`, preservando o Recorte 41 como último marco funcional confiável.

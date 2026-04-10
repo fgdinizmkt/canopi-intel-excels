@@ -1,4 +1,4 @@
-# Checkpoint Atual — Recorte 42 Documental (Especificação Concluída)
+# Checkpoint Atual — Recorte 43 Documental (Mapa de Cobertura Concluído)
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
@@ -61,12 +61,17 @@
   - Documento: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
 
+- 📋 Recorte 43: Mapa de cobertura de persistência documental concluído. Nenhum código alterado.
+  - Documento: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md`
+  - **Decisão pendente de Orquestrador:** ownership de `tipoEstrategico` e `playAtivo` (dois repositories escrevem os mesmos campos top-level sem definição canônica).
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 43 pelo Orquestrador.
+- ⌛ Decisão do Orquestrador sobre ownership de `tipoEstrategico`/`playAtivo` antes de definir Recorte 44.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição e aprovação do Recorte 43.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: decisão de ownership e definição do Recorte 44.
 
 ---
 *Último estado funcional confiável: Recorte 41 (`616a8ca`)*
 *Recorte 42: documental/especificação — sem alteração de código*
+*Recorte 43: documental/mapa de cobertura — sem alteração de código*
