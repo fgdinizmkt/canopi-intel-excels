@@ -25,6 +25,10 @@ export interface AbmRow {
     potencialAbertura?: string;
     hipoteses?: string[];
     contasSimilares?: string[];
+    // Narrativas estratégicas (E12)
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
   };
   tipoEstrategico?: TipoEstrategico;
   playAtivo?: PlayAtivo;
@@ -81,24 +85,49 @@ export async function getAbm(): Promise<AbmRow[]> {
 /**
  * persistAbm: Update ABM account data in Supabase (defensive, best-effort)
  * Expanded for Recorte 33: now includes 'tipoEstrategico' and 'playAtivo'.
+ * Expanded for Recorte 40 (E12): now includes narrative fields inside abm object.
  */
-export async function persistAbm(abm: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: PlayAtivo }): Promise<void> {
+export async function persistAbm(abm: {
+  id: string;
+  tipoEstrategico?: TipoEstrategico;
+  playAtivo?: PlayAtivo;
+  abm?: {
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
+    // preserve other abm fields
+    motivo?: string;
+    fit?: string;
+    cluster?: string;
+    similaridade?: string;
+    coberturaInicialComite?: string;
+    playsEntrada?: string[];
+    potencialAbertura?: string;
+    hipoteses?: string[];
+    contasSimilares?: string[];
+  };
+}): Promise<void> {
   if (!isSupabaseConfigured() || !abm.id) return;
 
   try {
-    // 1. Upsert by id - mapping only allowed fields
+    // 1. Build payload: explicit fields only
+    const payload: {
+      id: string;
+      tipoEstrategico?: TipoEstrategico;
+      playAtivo?: PlayAtivo;
+      abm?: AbmRow['abm'];
+    } = { id: abm.id };
+
+    if (abm.tipoEstrategico !== undefined) payload.tipoEstrategico = abm.tipoEstrategico;
+    if (abm.playAtivo !== undefined) payload.playAtivo = abm.playAtivo;
+    if (abm.abm !== undefined) payload.abm = abm.abm;
+
+    // 2. Upsert by id - mapping only allowed fields
     const { error } = await supabase!
       .from('contas')
-      .upsert(
-        {
-          id: abm.id,
-          tipoEstrategico: abm.tipoEstrategico,
-          playAtivo: abm.playAtivo
-        },
-        { onConflict: 'id' }
-      );
+      .upsert(payload, { onConflict: 'id' });
 
-    // 2. Defensive log - never block or throw UI
+    // 3. Defensive log - never block or throw UI
     if (error) {
       console.warn('[ABM Repository] Persist failed:', error.message);
     } else {

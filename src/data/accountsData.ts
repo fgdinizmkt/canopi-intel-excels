@@ -728,6 +728,10 @@ export interface Conta {
     potencialAbertura: string;
     hipoteses: string[];
     contasSimilares: string[];
+    // Narrativas estratégicas (E12)
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
   };
   abx: {
     motivo: string;

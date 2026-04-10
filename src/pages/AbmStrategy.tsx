@@ -421,6 +421,13 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [supabaseAbx, setSupabaseAbx] = useState<AbxRow[]>([]);
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
 
+  // Narrative fields (E12)
+  const [editingNarrative, setEditingNarrative] = useState(false);
+  const [strategyNarrative, setStrategyNarrative] = useState('');
+  const [riskAssessment, setRiskAssessment] = useState('');
+  const [successCriteria, setSuccessCriteria] = useState('');
+  const [narrativeStatus, setNarrativeStatus] = useState<string | null>(null);
+
   // Load ABM and ABX data from Supabase once on mount
   useEffect(() => {
     (async () => {
@@ -435,7 +442,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const accounts = useMemo(() => {
     const merged = [...contasMock];
 
-    // Merge ABM fields from Supabase by id (only: icp, crm, vp, ct, ft, abm, tipoEstrategico)
+    // Merge ABM fields from Supabase by id (narrative fields live inside abm, not top-level)
     for (const remote of supabaseAbm) {
       const idx = merged.findIndex(c => c.id === remote.id);
       if (idx >= 0) {
@@ -451,7 +458,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
             ...merged[idx].abm,
             ...(remote.abm || {})
           },
-          playAtivo: remote.playAtivo ?? merged[idx].playAtivo
+          playAtivo: remote.playAtivo ?? merged[idx].playAtivo,
         };
       }
       // Ignore remote accounts not in contasMock
@@ -485,6 +492,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const activeAccount = useMemo(() => {
     return accounts.find(a => a.id === activeAccountId) || accounts[0];
   }, [activeAccountId, accounts]);
+
+  // Sync narrative fields when active account changes (E12)
+  useEffect(() => {
+    if (activeAccount) {
+      setStrategyNarrative(activeAccount.abm?.strategyNarrative ?? '');
+      setRiskAssessment(activeAccount.abm?.riskAssessment ?? '');
+      setSuccessCriteria(activeAccount.abm?.successCriteria ?? '');
+      setNarrativeStatus(null);
+      setEditingNarrative(false);
+    }
+  }, [activeAccount?.id]);
 
   // Camada Derivada: Transforma accounts (merged) para o formato do Heatmap
   const abmHeatmapAccounts = useMemo(() => {
@@ -578,6 +596,52 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
 
     // 4. Remote persistence (fire-and-forget)
     persistAbm({ id: targetId, playAtivo: newPlay }).catch(() => {});
+  };
+
+  /**
+   * handleUpdateAbmNarratives: local-first mutation with defensive persist
+   * Recorte 40 (E12) - scope: expand to include narrative fields inside abm object
+   * Atomicity guaranteed: 1 snapshot + 1 build + 1 setState + 1 persist
+   */
+  const handleUpdateAbmNarratives = () => {
+    if (!activeAccount) return;
+
+    // 1. Snapshot target
+    const targetId = activeAccount.id;
+
+    // 2. Build final state: merge abm with new narrative fields (trim, omit empty)
+    const finalNarrative = strategyNarrative.trim();
+    const finalRisk = riskAssessment.trim();
+    const finalSuccess = successCriteria.trim();
+
+    const updatedAbmObject = {
+      ...activeAccount.abm,
+      strategyNarrative: finalNarrative || undefined,
+      riskAssessment: finalRisk || undefined,
+      successCriteria: finalSuccess || undefined,
+    };
+
+    const updatedAbm: Parameters<typeof persistAbm>[0] = {
+      id: targetId,
+      abm: updatedAbmObject,
+    };
+
+    // 3. Update local-first: updating supabaseAbm state which drives useMemo(accounts)
+    setSupabaseAbm(prev => {
+      const exists = prev.find(a => a.id === targetId);
+      if (exists) {
+        return prev.map(a => a.id === targetId ? { ...a, ...updatedAbm } : a);
+      }
+      return [...prev, updatedAbm];
+    });
+
+    // 4. Feedback + close edit mode
+    setEditingNarrative(false);
+    setNarrativeStatus('✓ Salvo');
+    setTimeout(() => setNarrativeStatus(null), 1500);
+
+    // 5. Remote persistence (fire-and-forget)
+    persistAbm(updatedAbm).catch(() => {});
   };
 
 
@@ -755,6 +819,75 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                              </button>
                           ))}
                        </div>
+                    </div>
+                    {/* Narrativa Estratégica - Recorte 40 (E12) */}
+                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-3">
+                       <div className="flex items-center justify-between">
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Narrativa Estratégica</p>
+                          <button
+                             onClick={() => setEditingNarrative(!editingNarrative)}
+                             className="text-slate-400 hover:text-slate-600 transition-colors text-xs"
+                             title={editingNarrative ? "Fechar edição" : "Editar narrativas"}
+                          >
+                             {editingNarrative ? '✕' : '✎'}
+                          </button>
+                       </div>
+                       {!editingNarrative ? (
+                          // Read mode
+                          <div className="space-y-2 text-[8px] text-slate-600 leading-relaxed">
+                             {(strategyNarrative || riskAssessment || successCriteria) ? (
+                                <>
+                                   {strategyNarrative && <p><span className="font-bold text-slate-700">Estratégia:</span> {strategyNarrative}</p>}
+                                   {riskAssessment && <p><span className="font-bold text-slate-700">Risco:</span> {riskAssessment}</p>}
+                                   {successCriteria && <p><span className="font-bold text-slate-700">Sucesso:</span> {successCriteria}</p>}
+                                </>
+                             ) : (
+                                <p className="text-slate-400 italic">Nenhuma narrativa registrada. Clique ✎ para adicionar.</p>
+                             )}
+                          </div>
+                       ) : (
+                          // Edit mode
+                          <div className="space-y-2 flex flex-col">
+                             <textarea
+                                placeholder="Racional estratégico da conta / tese de abordagem"
+                                value={strategyNarrative}
+                                onChange={(e) => setStrategyNarrative(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                rows={3}
+                             />
+                             <textarea
+                                placeholder="Avaliação de riscos da estratégia atual"
+                                value={riskAssessment}
+                                onChange={(e) => setRiskAssessment(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                rows={3}
+                             />
+                             <textarea
+                                placeholder="Critérios objetivos de sucesso da conta / play"
+                                value={successCriteria}
+                                onChange={(e) => setSuccessCriteria(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                rows={3}
+                             />
+                             <div className="flex gap-2 items-center">
+                                <button
+                                   onClick={handleUpdateAbmNarratives}
+                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                                >
+                                   Salvar
+                                </button>
+                                <button
+                                   onClick={() => setEditingNarrative(false)}
+                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-all"
+                                >
+                                   Cancelar
+                                </button>
+                                {narrativeStatus && (
+                                   <span className="text-[8px] font-bold text-emerald-600 ml-1">{narrativeStatus}</span>
+                                )}
+                             </div>
+                          </div>
+                       )}
                     </div>
                     <div className="space-y-1.5">
                       {ranked.slice(0,5).map((acc, i) => {
