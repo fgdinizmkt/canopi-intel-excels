@@ -415,7 +415,7 @@
 - **Status:** ✅ Publicado em origin/main
 
 **Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
-- ✅ Expansão de escrita defensiva em contacts para campos narrativos (`resumoProspect`, `notasInteracao`).
+- ✅ Expansão de escrita defensiva em contacts para campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`).
 - ✅ Replicação de padrão atômico: snapshot + persistência fire-and-forget.
 - ✅ UI discreta: modal de edição via ícone ✎ na ficha do contato.
 - ✅ Build validado.
