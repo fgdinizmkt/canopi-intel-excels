@@ -418,38 +418,39 @@
   - Commit código: `8abd084` | Commit docs: `1161d1a`
 - **Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
   - Commit código: `a60f2f9` | Commit docs: `c747f0c`
-- ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
-- ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
-- ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
-- ✅ ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
-- ✅ Fire-and-forget: persistAction() sem await, falhas logadas silenciosamente.
-- ✅ Type safety consolidado: 3 campos narrativos tipados via ActionItem.
-- ✅ Build Exit 0 (validado, 3 files changed, 155 insertions, 2 deletions).
-- **Commit:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
-- **Status:** ✅ Publicado em origin/main
+  - ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
+  - ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
+  - ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
+  - ✅ ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
+  - ✅ Fire-and-forget: persistAction() sem await, falhas logadas silenciosamente.
+  - ✅ Type safety consolidado: 3 campos narrativos tipados via ActionItem.
+  - ✅ Build Exit 0 (validado, 3 files changed, 155 insertions, 2 deletions).
+  - **Commit:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
+  - **Status:** ✅ Publicado em origin/main
 
-**Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM** — 2026-04-10
-- ✅ Expansão de escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`).
-- ✅ Modelagem estendida: `Conta.abm` com 3 campos aninhados.
-- ✅ Repository estendido: `AbmRow.abm` contém 3 campos narrativos.
-- ✅ `persistAbm()` refatorada com tipagem explícita `AbmRow['abm']`.
-- ✅ Handler `handleUpdateAbmNarrativas()` em `src/pages/AbmStrategy.tsx`.
-- ✅ UI dupla (read/edit) em seção "Narrativa Estratégica" no card de Ranking ABM.
-- ✅ Fire-and-forget: persistAbm() sem await, falhas logadas silenciosamente.
-- ✅ Build Exit 0 (validado).
-- **Commit:** `88bceb3` — feat(abm): add defensive strategic narrative persistence
-- **Status:** ✅ Publicado em origin/main
+- **Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM** — 2026-04-10
+  - ✅ Expansão de escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`).
+  - ✅ Modelagem estendida: `Conta.abm` com 3 campos aninhados.
+  - ✅ Repository estendido: `AbmRow.abm` contém 3 campos narrativos.
+  - ✅ `persistAbm()` refatorada com tipagem explícita `AbmRow['abm']`.
+  - ✅ Handler `handleUpdateAbmNarrativas()` em `src/pages/AbmStrategy.tsx`.
+  - ✅ UI dupla (read/edit) em seção "Narrativa Estratégica" no card de Ranking ABM.
+  - ✅ Fire-and-forget: persistAbm() sem await, falhas logadas silenciosamente.
+  - ✅ Build Exit 0 (validado).
+  - **Commit:** `88bceb3` — feat(abm): add defensive strategic narrative persistence
+  - **Status:** ✅ Publicado em origin/main
 
-**Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX** — 2026-04-10
-- ✅ Expansão estratégica em ABX: narrativas `strategyNarrative` + `riskAssessment` + `successCriteria` dentro do objeto `abx`.
-- ✅ Simetria estratégica: ABX agora espelha as capacidades narrativas de ABM.
-- ✅ Implementação de `persistAbx()` em `src/lib/abxRepository.ts` com tipagem explícita.
-- ✅ Handler ATÔMICO `handleUpdateAbxNarratives()` em `src/pages/AbmStrategy.tsx`.
-- ✅ UI simétrica: Seção "Narrativa Expansionista" no card de Ranking ABM.
-- ✅ Padrão atômico consolidado em todas as 6 dimensões (Accounts, Signals, Actions, Contacts, ABM, ABX).
-- ✅ Build Exit 0 (validado, 1 file changed, 115 insertions, 1 deletion).
-- **Commit:** `616a8ca` — feat(abx): add defensive strategic narrative persistence
-- **Status:** ✅ Publicado em origin/main
+- **Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX** — 2026-04-10
+  - ✅ Expansão estratégica em ABX: narrativas `strategyNarrative` + `riskAssessment` + `successCriteria` dentro do objeto `abx`.
+  - ✅ Simetria estratégica: ABX agora espelha as capacidades narrativas de ABM.
+  - ✅ Implementação de `persistAbx()` em `src/lib/abxRepository.ts` com tipagem explícita.
+  - ✅ Handler ATÔMICO `handleUpdateAbxNarratives()` em `src/pages/AbmStrategy.tsx`.
+  - ✅ UI simétrica: Seção "Narrativa Expansionista" no card de Ranking ABM.
+  - ✅ Padrão atômico consolidado em todas as 6 dimensões (Accounts, Signals, Actions, Contacts, ABM, ABX).
+  - ✅ Build Exit 0 (validado, 1 file changed, 115 insertions, 1 deletion).
+  - **Commit:** `616a8ca` — feat(abx): add defensive strategic narrative persistence
+  - **Status:** ✅ Publicado em origin/main
+
 
 ---
 
@@ -463,6 +464,7 @@
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
 
 ---
+
 
 | Centro de Comando | Fase 1, 2, 3 Concluída | Perfil, Organograma e Contato vinculados globalmente |
 | Assistant Contextual | 6º Recorte Concluído | KPIs e fila operacional derivados de dados reais e injetados via Assistant Context |

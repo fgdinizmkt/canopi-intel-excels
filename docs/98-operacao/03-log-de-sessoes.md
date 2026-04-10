@@ -36,8 +36,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - ✅ Simetria estratégica completa entre entrada (ABM) e expansão (ABX)
   - ✅ Padrão defensivo validado em 6ª dimensão Core/Estratégica: Accounts → Signals → Actions → Contacts → ABM → ABX
 - **Commit Código:** `616a8ca` — feat(abx): add defensive strategic narrative persistence
-- **Commit Documentação:** `[pendente]`
-- **Status:** ✅ Código publicado em origin/main, documentação em sincronia.
+- **Commit Documentação:** 3d2e2d6 — docs(ops): sync Recorte 41 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
 
 ---
 
