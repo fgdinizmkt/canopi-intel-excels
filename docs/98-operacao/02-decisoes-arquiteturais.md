@@ -798,3 +798,125 @@ No Recorte 36, expandimos o padrão E9 para incluir dois novos campos narrativos
 **Bug corrigido:** Implementação anterior com dois handlers separados (`handleUpdateResumoExecutivo` + `handleUpdateProximaMelhorAcao`) criava race condition onde segundo persist poderia sobrescrever primeiro se resolvidos out-of-order. Consolidação em `handleUpdateNarrativas()` elimina divergência.
 
 **Commits:** `a6604c2` (E9C implementação defensiva de campos narrativos em Accounts via Recorte 36 com atomicidade garantida)
+
+---
+
+### Decisão 17: Escrita Defensiva em ABM — Campos Narrativos Estratégicos com Atomicidade e Tipagem Explícita (Recorte 40 — E12)
+
+No Recorte 40, aplicamos o padrão defensivo consolidado ao domínio estratégico de ABM, expandindo a estrutura de ABM para incluir três campos narrativos (`strategyNarrative`, `riskAssessment`, `successCriteria`) **dentro do objeto abm aninhado**, com ênfase em **tipagem explícita** (nenhum `Record<string, any>`), **merge defensivo** (nullish coalescing para preservar mock), e **atomicidade contra race conditions**. A decisão arquitetural fundamental aqui foi a quinta validação consolidada do padrão atômico, aplicada a um objeto aninhado em vez de top-level.
+
+**Contexto do problema:**
+- ABM contém 9 campos operacionais existentes (`motivo`, `fit`, `cluster`, etc.) agrupados dentro de `Conta.abm`
+- Os 3 novos campos narrativos devem viver **dentro desse mesmo objeto aninhado** (não top-level)
+- Persistência remota de objetos aninhados requer cuidado extra com merge e tipagem para evitar perda de dados
+
+**Implicação estrutural (Recorte 40 em diante):**
+
+- **Type extensões em src/data/accountsData.ts:**
+  - Interface `Conta.abm` expandida com 3 campos narrativos opcionais **dentro do objeto**:
+    ```typescript
+    abm: {
+      motivo: string;
+      fit: string;
+      // ... 7 mais existentes ...
+      // Narrativas estratégicas (E12)
+      strategyNarrative?: string;  // Narrativa estratégica da abordagem
+      riskAssessment?: string;     // Avaliação de riscos táticos
+      successCriteria?: string;    // Critérios de sucesso mensuráveis
+    };
+    ```
+  - Nenhuma mudança top-level de `Conta` — narrativas vivem exclusivamente dentro `abm`
+
+- **Type extensões em src/lib/abmRepository.ts:**
+  - Interface `AbmRow` expandida: campo `abm?` (objeto aninhado) inclui 3 novos campos narrativos
+    ```typescript
+    abm?: {
+      // ... 9 operacionais existentes ...
+      strategyNarrative?: string;
+      riskAssessment?: string;
+      successCriteria?: string;
+    };
+    ```
+  - `getAbm()` SELECT query permanece **original** (sem adicionar colunas top-level para narrativas): `'id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico, playAtivo'`
+    - Narrativas são lidas como parte do objeto JSON `abm`, não como colunas separadas
+  - Merge defensivo com nullish coalescing: `{ ...remote.abm || {} }` preserva valores mock quando Supabase retorna undefined
+  - Shell seguro (fallback quando sem mock) popula todos 3 campos narrativos dentro do objeto abm
+
+- **PERSIST WRITE:** `persistAbm()` em `src/lib/abmRepository.ts` expandida com **tipagem explícita**
+  - Assinatura: 
+    ```typescript
+    async function persistAbm(abm: {
+      id: string;
+      tipoEstrategico?: TipoEstrategico;
+      playAtivo?: PlayAtivo;
+      abm?: {  // Objeto aninhado com tipagem explícita
+        strategyNarrative?: string;
+        riskAssessment?: string;
+        successCriteria?: string;
+        // + 9 existentes
+      };
+    }): Promise<void>
+    ```
+  - **Nenhum `Record<string, any>`** — tipagem totalmente explícita via `abm?: AbmRow['abm']`
+  - Payload defensivo: construído com type guards, apenas campos definidos enviados ao Supabase
+  - Upsert explícito: `.upsert({ id, tipoEstrategico, playAtivo, abm }, { onConflict: 'id' })`
+  - Falha silenciosa: erros logados com `console.error()`, nunca relançados
+  - Se Supabase não configurado: skips automaticamente
+
+- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO:** Novo `handleUpdateAbmNarratives()` em `src/pages/AbmStrategy.tsx`
+  - Padrão rígido com 3 passos ANTES de qualquer async (consolidado de E9/E9C/E8.1):
+    1. **SNAPSHOT:** Captura snapshot completo da conta e seu objeto abm aninhado
+    2. **BUILD:** Constrói `updatedAbmObject` com spread: `{ ...activeAccount.abm, strategyNarrative: ..., riskAssessment: ..., successCriteria: ... }`
+       - Spread preserva todos 9 campos operacionais existentes + adiciona 3 narrativos
+    3. **SETSTATE:** Uma única chamada `setSupabaseAbm()` que atualiza o item por id
+    4. **PERSIST:** Uma única chamada `persistAbm({ id: targetId, abm: updatedAbmObject })` com snapshot completo (não valores parciais)
+  - Pseudocódigo:
+    ```typescript
+    const handleUpdateAbmNarratives = (narrative, risk, success) => {
+      // 1. Snapshot target
+      const targetId = activeAccount.id;
+      
+      // 2. Build: merge abm com novos campos narrativos
+      const updatedAbmObject = {
+        ...activeAccount.abm,
+        strategyNarrative: narrative || undefined,
+        riskAssessment: risk || undefined,
+        successCriteria: success || undefined,
+      };
+      
+      // 3. Create payload com tipagem explícita
+      const updatedAbm: Parameters<typeof persistAbm>[0] = {
+        id: targetId,
+        abm: updatedAbmObject,  // Tipo é AbmRow['abm'], não any
+      };
+      
+      // 4. Update local-first (imediato)
+      setSupabaseAbm(prev => prev.map(item => 
+        item.id === targetId ? { ...item, abm: updatedAbmObject } : item
+      ));
+      
+      // 5. Fire-and-forget persist (background, sem bloquear)
+      persistAbm(updatedAbm).catch(() => {});
+    };
+    ```
+  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (1 snapshot + 1 setState + 1 persist unificado)
+
+- **UI — Seção Discreta "Narrativa Estratégica":** Em `src/pages/AbmStrategy.tsx`
+  - Trigger: toggle ✎ em header da seção (visible on hover)
+  - Modo LEITURA: 3 textareas readonly com conteúdo (sem edit)
+  - Modo EDIÇÃO: 3 textareas editáveis (strategyNarrative: 3 linhas, riskAssessment: 3 linhas, successCriteria: 3 linhas)
+  - Placeholders: "Narrativa estratégica da abordagem...", "Avaliação de riscos...", "Critérios de sucesso..."
+  - Botões: toggle ✎ abre edição, "Salvar" dispara `handleUpdateAbmNarratives()`, "Cancelar" fecha sem salvar
+  - Feedback visual: badge "✓ Salvo" aparece por 1.5s após persist bem-sucedido
+  - Grade e board permanecem somente leitura (nenhuma mudança de escopo)
+
+- **Tipagem:** Não há novo tipo — reutiliza tipos existentes
+  - `TipoEstrategico` e `PlayAtivo` já existem
+  - Imports atualizados em AbmStrategy.tsx para incluir `persistAbm` (novo)
+  - Sem `as any`, mapeamento explícito via `AbmRow['abm']`
+
+**Benefício arquitetural:** E12 consolida que o padrão defensivo é totalmente agnóstico a estrutura de dados — aplicável tanto a campos top-level quanto a objetos aninhados. A ênfase em **tipagem explícita** (recusando `Record<string, any>`) e **merge com spread preservando estrutura aninhada** são lições críticas para futuras persistências complexas. Quinta aplicação consolidada do padrão atômico (E9 Accounts → E7.1 Signals → E8.1 Contacts → E6.1 Actions → E12 ABM).
+
+**Benefício operacional:** Narrativas estratégicas de ABM agora são editáveis com persistência defensiva, sem requerer navegação externa. Escopo mantido mínimo: apenas seção discreta em ABM, sem tocar estrutura existente de 9 campos operacionais.
+
+**Commits:** `88bceb3` (E12 implementação defensiva de narrativas estratégicas em ABM via Recorte 40 com atomicidade e tipagem explícita)
