@@ -28,7 +28,7 @@ import { getActions } from "../lib/actionsRepository";
 import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
 
 type ViewMode = "Lista" | "Kanban";
-type ModalTab = "resumo" | "projeto" | "historico";
+type ModalTab = "resumo" | "projeto" | "historico" | "narrativa";
 type CardDensity = "super-compacta" | "compacta" | "media" | "expandida";
 
 // ─── Style helpers (inline para garantir compilação no Tailwind v4) ─────────
@@ -786,6 +786,11 @@ function ActionOverlay({
   onEscalate: (id: string) => void;
 }) {
   const [commentDraft, setCommentDraft] = useState("");
+  const [editingNarrative, setEditingNarrative] = useState(false);
+  const [resolutionPath, setResolutionPath] = useState("");
+  const [executionNotes, setExecutionNotes] = useState("");
+  const [learnings, setLearnings] = useState("");
+  const [narrativeStatus, setNarrativeStatus] = useState<string | null>(null);
   const { updateAction, openAccount } = useAccountDetail();
   const config = scaleConfig(projectScale);
 
@@ -802,6 +807,15 @@ function ActionOverlay({
       document.body.style.overflow = previousOverflow;
     };
   }, [item]);
+
+  useEffect(() => {
+    if (!item) return;
+    setResolutionPath(item.resolutionPath || "");
+    setExecutionNotes(item.executionNotes || "");
+    setLearnings(item.learnings || "");
+    setEditingNarrative(false);
+    setNarrativeStatus(null);
+  }, [item?.id]);
 
   if (!item) return null;
 
@@ -821,6 +835,32 @@ function ActionOverlay({
     if (!commentDraft.trim()) return;
     updateAction(item.id, { comment: commentDraft });
     setCommentDraft("");
+  };
+
+  const handleUpdateNarrativas = () => {
+    if (!item) return;
+
+    // 1. Snapshot atual
+    const targetAction = item;
+
+    // 2. Build estado final
+    const updatedAction: ActionItem = {
+      ...targetAction,
+      resolutionPath: resolutionPath.trim(),
+      executionNotes: executionNotes.trim(),
+      learnings: learnings.trim(),
+    };
+
+    // 3. Atualizar local (fire-and-forget, sem await)
+    updateAction(item.id, {
+      resolutionPath: updatedAction.resolutionPath,
+      executionNotes: updatedAction.executionNotes,
+      learnings: updatedAction.learnings,
+    });
+
+    // 4. Feedback visual
+    setNarrativeStatus("✓ Salvo");
+    setTimeout(() => setNarrativeStatus(null), 1500);
   };
 
   return (
@@ -862,6 +902,7 @@ function ActionOverlay({
                 { id: 'resumo', label: 'Resumo' },
                 { id: 'projeto', label: 'Projeto' },
                 { id: 'historico', label: 'Histórico' },
+                { id: 'narrativa', label: 'Narrativa Operacional' },
               ].map((entry) => (
                 <button
                   key={entry.id}
@@ -1090,6 +1131,102 @@ function ActionOverlay({
               <div className="flex flex-col gap-6">
                 <DetailList title="Dependências em aberto" items={item.dependencies} emptyLabel="Nenhuma dependência em aberto." />
                 <DetailList title="Evidências-chave" items={item.evidence} emptyLabel="Sem evidências-chave." />
+              </div>
+            </div>
+          )}
+
+          {tab === 'narrativa' && (
+            <div className="flex flex-col gap-8">
+              <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Narrativa operacional</p>
+                    <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900">Trilha de resolução e aprendizados</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditingNarrative(!editingNarrative)}
+                    className="w-10 h-10 rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all flex items-center justify-center"
+                    title="Editar narrativa"
+                  >
+                    {editingNarrative ? <X className="w-4 h-4" /> : <span className="text-base font-bold">✎</span>}
+                  </button>
+                </div>
+
+                {editingNarrative ? (
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Trilha de resolução</label>
+                      <textarea
+                        value={resolutionPath}
+                        onChange={(e) => setResolutionPath(e.target.value)}
+                        placeholder="Como a ação está sendo resolvida / próximos passos"
+                        className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Notas de execução</label>
+                      <textarea
+                        value={executionNotes}
+                        onChange={(e) => setExecutionNotes(e.target.value)}
+                        placeholder="Notas operacionais correntes durante a execução"
+                        className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Aprendizados</label>
+                      <textarea
+                        value={learnings}
+                        onChange={(e) => setLearnings(e.target.value)}
+                        placeholder="Aprendizados acumulados durante a execução"
+                        className="w-full rounded-2xl border border-slate-200 p-4 text-sm font-medium text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                      <div className="text-[11px] font-bold text-emerald-600">{narrativeStatus}</div>
+                      <button
+                        type="button"
+                        onClick={handleUpdateNarrativas}
+                        className="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all shadow-sm"
+                      >
+                        Salvar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {!resolutionPath && !executionNotes && !learnings ? (
+                      <p className="text-slate-500 text-sm font-medium italic">Nenhuma narrativa registrada. Clique no ícone ✎ para adicionar.</p>
+                    ) : (
+                      <>
+                        {resolutionPath && (
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Trilha</p>
+                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{resolutionPath}</p>
+                          </div>
+                        )}
+                        {executionNotes && (
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Notas</p>
+                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{executionNotes}</p>
+                          </div>
+                        )}
+                        {learnings && (
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Aprendizados</p>
+                            <p className="text-sm text-slate-700 leading-relaxed font-medium">{learnings}</p>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

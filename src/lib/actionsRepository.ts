@@ -48,6 +48,10 @@ export type ActionRow = {
   playbookRunId?: string;
   playbookStepId?: string;
   relatedAccountId?: string;
+  // Narrativas operacionais (E6.1)
+  resolutionPath?: string;
+  executionNotes?: string;
+  learnings?: string;
 };
 
 export type RepositoryAction = ActionItem;
@@ -115,7 +119,10 @@ export async function getActions(): Promise<RepositoryAction[]> {
         playbookName,
         playbookRunId,
         playbookStepId,
-        relatedAccountId
+        relatedAccountId,
+        resolutionPath,
+        executionNotes,
+        learnings
       `);
 
     if (error) {
@@ -169,6 +176,9 @@ export async function getActions(): Promise<RepositoryAction[]> {
         ...(row.playbookRunId && typeof row.playbookRunId === 'string' && { playbookRunId: row.playbookRunId }),
         ...(row.playbookStepId && typeof row.playbookStepId === 'string' && { playbookStepId: row.playbookStepId }),
         ...(row.relatedAccountId && typeof row.relatedAccountId === 'string' && { relatedAccountId: row.relatedAccountId }),
+        ...(row.resolutionPath && typeof row.resolutionPath === 'string' && { resolutionPath: row.resolutionPath }),
+        ...(row.executionNotes && typeof row.executionNotes === 'string' && { executionNotes: row.executionNotes }),
+        ...(row.learnings && typeof row.learnings === 'string' && { learnings: row.learnings }),
       };
 
       return shellAction;
@@ -235,6 +245,9 @@ export async function persistAction(action: ActionItem): Promise<void> {
       playbookRunId: action.playbookRunId,
       playbookStepId: action.playbookStepId,
       relatedAccountId: action.relatedAccountId,
+      resolutionPath: action.resolutionPath,
+      executionNotes: action.executionNotes,
+      learnings: action.learnings,
     };
 
     // Upsert por id: insere novo ou atualiza existente

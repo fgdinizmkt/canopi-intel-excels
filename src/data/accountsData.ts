@@ -115,6 +115,9 @@ export interface ActionItem {
   playbookRunId?: string;
   playbookStepId?: string;
   relatedAccountId?: string;
+  resolutionPath?: string;
+  executionNotes?: string;
+  learnings?: string;
   createdAt: string;
 }
 
