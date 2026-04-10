@@ -1,63 +1,30 @@
-# Checkpoint Atual — Recorte 41 (Supabase E13): Campos Narrativos Estratégicos em ABX
+# Checkpoint de Continuidade — Recorte 41 (Concluído)
 
-Este documento registra o estado exato do sistema após o fechamento do Recorte 41, focado na expansão estratégica defensiva para o domínio ABX.
+## Objetivo do Checklist
+Garantir a integridade da memória operacional e a prontidão para a definição do Recorte 42 após a publicação do Supabase E13.
 
----
+## 1. Estado da Branch
+- **Principal:** `main`
+- **Sincronismo:** ✅ Sincronizada com `origin/main` em 2026-04-10.
+- **Commit Código:** `616a8ca`
+- **Commit Docs:** `3d2e2d6`
 
-## 1. Escopo Concluído (Recorte 41)
-- **Domínio:** ABX (Entidade estrategica para Expansão/Retenção).
-- **Objetivo:** Adicionar 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) com persistência defensiva e atômica.
-- **Implementação:**
-  - **Repositório:** `persistAbx()` em `abxRepository.ts` com tipagem explícita e upsert por ID.
-  - **UI:** Seção "Narrativa Expansionista" em `AbmStrategy.tsx` (Card de Ranking).
-  - **Simetria:** ABX agora espelha exatamente a estrutura estratégica de ABM (Recorte 40).
-- **Padrão Atômico:** 1 snapshot → 1 build → 1 setState → 1 persist (sexta aplicação bem-sucedida).
+## 2. Último Marco Publicado
+**Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX**
+- ✅ Expansão de narrativas estratégicas em ABX (`strategyNarrative`, `riskAssessment`, `successCriteria`).
+- ✅ Implementação de `persistAbx()` com tipagem explícita.
+- ✅ UI de edição simétrica em `AbmStrategy.tsx`.
+- ✅ Build validado (Exit 0).
 
-## 2. Visão Geral do Sistema (Estado do Repositório)
-- **Branch:** `main` (sincronizada).
-- **Build:** Exit 0 (validado).
-- **Persistência:** 
-  - **Read:** Supabase (Best-effort com fallback para cache/memory).
-  - **Write:** Supabase (Defensivo, fire-and-forget, atomicidade garantida por handlers).
-- **Entidades Migradas (Sync):** 
-  - Accounts (Narrativas + TipoEstrategico)
-  - Signals (Narrativas)
-  - Actions (Narrativas)
-  - Contacts (Narrativas)
-  - ABM (Narrativas + tipoEstrategico + playAtivo)
-  - ABX (Narrativas Estratégicas)
+## 3. Contexto Técnico & Decisões
+- **Padrão Atômico:** Protocolo de 5 etapas (Snapshot → Build → setState → Persist) mantido para evitar race conditions.
+- **Simetria:** ABX agora espelha ABM, consolidando a captura de tese estratégica.
+- **Persistência:** Modelo defensivo e *fire-and-forget* estabelecido em todas as dimensões core (Accounts, Signals, Actions, Contacts, ABM, ABX).
 
-## 3. Estrutura de Dados (Camada Estratégica)
-```typescript
-interface Conta {
-  // ... core fields
-  abm?: {
-    tipoEstrategico?: TipoEstrategico;
-    playAtivo?: PlayAtivo;
-    strategyNarrative?: string;
-    riskAssessment?: string;
-    successCriteria?: string;
-  };
-  abx?: {
-    // 9 campos operacionais existentes...
-    strategyNarrative?: string;
-    riskAssessment?: string;
-    successCriteria?: string;
-  }
-}
-```
-
-## 4. Próximos Passos Imediatos
-- **Fase E (Supabase & Scale):** Continuar a expansão da escrita defensiva.
-- **Próximo Recorte:** Definir o Recorte 42. Possíveis caminhos:
-  - Expansão da People Layer (Contacts vinculados a accounts/signals).
-  - Expansão de metadados em Actions (prazo, prioridade).
-  - Refinamento de performance de merge (caching de queries).
-
-## 5. Governança e Regras
-- **NÃO reverter o padrão fire-and-forget.**
-- **NÃO usar `any` em novos repositórios.**
-- **MANTER simetria entre ABM e ABX em `AbmStrategy.tsx`.**
+## 4. Próximos Passos (Recorte 42)
+- [ ] Definir escopo do Recorte 42 (Orquestrador).
+- [ ] Avaliar expansão de campos operacionais em ABM/ABX (Readiness, Sentiment).
+- [ ] Auditar performance de queries em lote na camada de merge.
 
 ---
-*Gerado em: 2026-04-10*
+*Status: Pronto para definição do Recorte 42.*

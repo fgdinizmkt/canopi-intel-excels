@@ -414,7 +414,10 @@
 - **Commit:** `16e673e` — feat(signals): add defensive narrative editing with modal
 - **Status:** ✅ Publicado em origin/main
 
-**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026**Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
+- **Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
+  - Commit código: `8abd084` | Commit docs: `1161d1a`
+- **Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
+  - Commit código: `a60f2f9` | Commit docs: `c747f0c`
 - ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
 - ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
 - ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
@@ -488,10 +491,3 @@
 | Supabase E10-E11: ABM Core | Recortes 30-33 Concluídos (Fase E) | ABM Repository (Read/Write) + ABX Repository (Read) + playAtivo |
 | Supabase E12: ABM Narrativa | Recorte 40 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABM com atomicidade |
 | Supabase E13: ABX Narrativa | Recorte 41 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABX (estratégia, risco, sucesso) |
-dação de Overview | Recorte Concluído (Fase 9) | Opção B: Painel unificado com inteligência de Performance + Actions (KPIs, Insights, Anomalias) |
-| Copiloto Operacional Real | Recorte Concluído (Fase 9) | Opção 3: Helper consolidado + integração em Assistant.tsx + enriquecimento em route.ts (5 blocos de contexto) |
-| Plays Recomendados | Recorte Concluído (Fase 9) | Recorte 15: deriveRecommendedPlays() + bloco visual com 6 padrões (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Risco→Intervenção, Sinal Crítico→Ativação) |
-| Assistant Orquestrador | Recorte 16 Concluído (Fase 9) | Cards acionáveis (existing_account/signal/action + new_action), validateCards(), handleCreateAction(), extractCards() |
-| Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
-| Supabase E2: First Migration | Recorte 22 Concluído (Fase E) | Repository layer accounts: getAccounts(), merge com mock, shell seguro, Accounts.tsx consumindo dados |
-| Supabase E3: Second Migration | Recorte 23 Concluído (Fase E) | Repository layer signals: getSignals(), query campos de SignalRow, merge defensivo (nullish coalescing), Signals.tsx consumindo dados |
