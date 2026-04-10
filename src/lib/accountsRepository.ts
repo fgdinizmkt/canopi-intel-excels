@@ -39,28 +39,54 @@ export type AccountRow = {
 };
 
 /**
+ * Payload defensivo para persistência de conta
+ * Apenas campos escritáveis são incluídos
+ * Campos undefined são omitidos para evitar sobrescrita no banco
+ */
+type AccountPersistPayload = {
+  id: string;
+  tipoEstrategico?: TipoEstrategico;
+  playAtivo?: AccountRow['playAtivo'];
+};
+
+/**
  * Escreve defensivamente uma conta no Supabase (upsert)
  * Padrão fire-and-forget: não bloqueia, não retorna feedback, registra erro silenciosamente
  *
  * Caso de uso: mutação local-first no state, depois persist async sem UI feedback
+ * Campos suportados: tipoEstrategico, playAtivo
+ *
+ * IMPORTANTE: Sempre enviar AMBOS os campos (não deixar undefined) para evitar
+ * sobrescrita mútua no banco. Caller (handlers em Accounts.tsx) deve passar
+ * o estado atual de cada campo.
  */
-export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico }): Promise<void> {
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo'] }): Promise<void> {
   if (!isSupabaseConfigured()) {
     console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
     return;
   }
 
   try {
+    // Constrói payload explicitamente: inclui apenas campos definidos
+    // Evita enviar undefined, que poderia sobrescrever campos no banco
+    const payload: AccountPersistPayload = { id: account.id };
+    if (account.tipoEstrategico !== undefined) {
+      payload.tipoEstrategico = account.tipoEstrategico;
+    }
+    if (account.playAtivo !== undefined) {
+      payload.playAtivo = account.playAtivo;
+    }
+
     const { error } = await supabase!
       .from('accounts')
-      .upsert({ id: account.id, tipoEstrategico: account.tipoEstrategico }, { onConflict: 'id' });
+      .upsert(payload, { onConflict: 'id' });
 
     if (error) {
-      console.warn('[Accounts] Erro ao persistir tipoEstrategico:', error.message);
+      console.warn('[Accounts] Erro ao persistir conta:', error.message);
       return;
     }
 
-    console.debug(`[Accounts] Conta ${account.id} persistida com tipoEstrategico=${account.tipoEstrategico}`);
+    console.debug(`[Accounts] Conta ${account.id} persistida com tipoEstrategico=${account.tipoEstrategico}, playAtivo=${account.playAtivo}`);
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.warn('[Accounts] Exceção ao persistir conta:', errorMsg);

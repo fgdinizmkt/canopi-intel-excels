@@ -151,8 +151,9 @@ export const Accounts = () => {
   const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
 
   // Handler local-first + fire-and-forget para atualizar tipoEstrategico
-  // 1. Atualiza estado local imediatamente via setContas()
-  // 2. Dispara persist async sem await, capturando erros silenciosamente
+  // 1. Snapshot: captura estado atual completo (tipoEstrategico + playAtivo)
+  // 2. Atualiza estado local imediatamente via setContas()
+  // 3. Persiste AMBOS os campos juntos (impede sobrescrita mútua com undefined)
   const handleUpdateTipoEstrategico = (contaId: string, newTipo: TipoEstrategico) => {
     // Snapshot: encontra a conta atual
     const contaAtual = contas.find(c => c.id === contaId);
@@ -163,8 +164,36 @@ export const Accounts = () => {
       c.id === contaId ? { ...c, tipoEstrategico: newTipo } : c
     ));
 
-    // Fire-and-forget: persiste async sem await, erros silenciosos
-    persistAccount({ id: contaId, tipoEstrategico: newTipo });
+    // Fire-and-forget: persiste AMBOS os campos sem deixar undefined
+    // Garante que playAtivo não é apagado pela persistência de tipoEstrategico
+    persistAccount({
+      id: contaId,
+      tipoEstrategico: newTipo,
+      playAtivo: contaAtual.playAtivo
+    });
+  };
+
+  // Handler local-first + fire-and-forget para atualizar playAtivo
+  // 1. Snapshot: captura estado atual completo (tipoEstrategico + playAtivo)
+  // 2. Atualiza estado local imediatamente via setContas()
+  // 3. Persiste AMBOS os campos juntos (impede sobrescrita mútua com undefined)
+  const handleUpdatePlayAtivo = (contaId: string, newPlay: 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum') => {
+    // Snapshot: encontra a conta atual
+    const contaAtual = contas.find(c => c.id === contaId);
+    if (!contaAtual) return;
+
+    // Local-first: atualiza estado local imediatamente
+    setContas(prev => prev.map(c =>
+      c.id === contaId ? { ...c, playAtivo: newPlay } : c
+    ));
+
+    // Fire-and-forget: persiste AMBOS os campos sem deixar undefined
+    // Garante que tipoEstrategico não é apagado pela persistência de playAtivo
+    persistAccount({
+      id: contaId,
+      tipoEstrategico: contaAtual.tipoEstrategico,
+      playAtivo: newPlay
+    });
   };
 
   const macroCards = [
@@ -296,7 +325,7 @@ export const Accounts = () => {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
               <tr>
-                <th className="p-3 text-left">Conta</th><th className="p-3 text-left">Vertical / Segmento</th><th className="p-3 text-left">Owner</th><th className="p-3 text-left">Etapa</th><th className="p-3 text-left">Tipo estratégico</th><th className="p-3 text-left">Potencial</th><th className="p-3 text-left">Risco</th><th className="p-3 text-left">Cobertura relacional</th><th className="p-3 text-left">Última movimentação</th><th className="p-3 text-left">Oportunidade</th><th className="p-3 text-left">Próxima melhor ação</th><th className="p-3 text-left">Status geral</th>
+                <th className="p-3 text-left">Conta</th><th className="p-3 text-left">Vertical / Segmento</th><th className="p-3 text-left">Owner</th><th className="p-3 text-left">Etapa</th><th className="p-3 text-left">Tipo estratégico</th><th className="p-3 text-left">Play ativo</th><th className="p-3 text-left">Potencial</th><th className="p-3 text-left">Risco</th><th className="p-3 text-left">Cobertura relacional</th><th className="p-3 text-left">Última movimentação</th><th className="p-3 text-left">Oportunidade</th><th className="p-3 text-left">Próxima melhor ação</th><th className="p-3 text-left">Status geral</th>
               </tr>
             </thead>
             <tbody>
@@ -330,6 +359,26 @@ export const Accounts = () => {
                           }`}
                         >
                           {tipo}
+                        </button>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <div className="inline-flex gap-1 bg-slate-100 rounded-lg p-1">
+                      {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as const).map(play => (
+                        <button
+                          key={play}
+                          onClick={() => handleUpdatePlayAtivo(conta.id, play)}
+                          className={`px-2 py-1 rounded text-xs font-semibold transition-all ${
+                            conta.playAtivo === play
+                              ? play === 'ABM' ? 'bg-blue-500 text-white'
+                              : play === 'ABX' ? 'bg-purple-500 text-white'
+                              : play === 'Híbrido' ? 'bg-amber-500 text-white'
+                              : 'bg-slate-500 text-white'
+                              : 'bg-transparent text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          {play === 'Nenhum' ? 'Nenhum' : play}
                         </button>
                       ))}
                     </div>
