@@ -216,12 +216,7 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 37 (Acc
 - ✅ Recorte 36: Publicação: commit `a6604c2` — feat(accounts): add defensive narrative persistence publicado em origin/main.
 
 ## O que está pendente
-- ⌛ Avaliação de necessidade de atualização em docs/98-operacao/02-decisoes-arquiteturais.md.
-- ⌛ Commit de documentação: git add docs/98-operacao/ && git commit -m 'docs(ops): sync Recorte 36 publication state'.
-- ⌛ Push: git push origin main.
+- ⌛ Definição e aprovação do Recorte 37 pelo Orquestrador.
 
 ## Próximo Passo Exato
-1. Avaliar 02-decisoes-arquiteturais.md para documentar padrão de atomicidade multi-field.
-2. Commit documentação.
-3. Push.
-4. Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 37.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 37.
