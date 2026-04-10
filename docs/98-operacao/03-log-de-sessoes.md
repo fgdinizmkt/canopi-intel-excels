@@ -41,8 +41,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - ✅ Ciclo narrativo fechado: tríade core (Accounts, Signals, Actions) tem narrativas com atomicidade
   - ✅ Extensibilidade consolidada: padrão é agnóstico a entidade (Actions prova escalabilidade E6→E7.1→E8.1→E6.1)
 - **Commit Código:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
-- **Commit Documentação:** (aguardando commit)
-- **Status:** ✅ Código publicado em origin/main, documentação pronta para commit.
+- **Commit Documentação:** `c747f0c` — docs(operacao): Recorte 39 — E6.1 Actions campos narrativos com atomicidade
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
 
 ---
 
