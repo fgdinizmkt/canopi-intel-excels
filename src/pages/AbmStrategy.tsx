@@ -59,7 +59,8 @@ import { Card, Badge, Button } from '../components/ui';
 import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
-import { getAbm, persistAbm, type AbmRow, type PlayAtivo } from '../lib/abmRepository';
+import { getAbm, persistAbm, type AbmRow } from '../lib/abmRepository';
+import { getAccounts, persistAccount, type PlayAtivo } from '../lib/accountsRepository';
 import { getAbx, persistAbx, type AbxRow } from '../lib/abxRepository';
 import type { TipoEstrategico } from '../data/accountsData';
 
@@ -436,10 +437,13 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [abxSuccessCriteria, setAbxSuccessCriteria] = useState('');
   const [abxNarrativeStatus, setAbxNarrativeStatus] = useState<string | null>(null);
 
-  // Load ABM and ABX data from Supabase once on mount
+  const [supabaseAccounts, setSupabaseAccounts] = useState<any[]>([]);
+
+  // Load Accounts, ABM and ABX data from Supabase once on mount
   useEffect(() => {
     (async () => {
-      const [remoteAbm, remoteAbx] = await Promise.all([getAbm(), getAbx()]);
+      const [remoteAccounts, remoteAbm, remoteAbx] = await Promise.all([getAccounts(), getAbm(), getAbx()]);
+      setSupabaseAccounts(remoteAccounts);
       setSupabaseAbm(remoteAbm);
       setSupabaseAbx(remoteAbx);
     })();
@@ -448,9 +452,20 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   // Merge: contasMock (base) + supabaseAbm + supabaseAbx (complementary)
   // Local-first pattern: contasMock is source of truth
   const accounts = useMemo(() => {
-    const merged = [...contasMock];
+    // 1. Merge core account fields from Supabase Accounts layer
+    const merged = contasMock.map(mockAcc => {
+      const remoteAcc = supabaseAccounts.find(r => r.id === mockAcc.id);
+      if (remoteAcc) {
+        return {
+          ...mockAcc,
+          tipoEstrategico: remoteAcc.tipoEstrategico ?? mockAcc.tipoEstrategico,
+          playAtivo: remoteAcc.playAtivo ?? mockAcc.playAtivo,
+        };
+      }
+      return mockAcc;
+    });
 
-    // Merge ABM fields from Supabase by id (narrative fields live inside abm, not top-level)
+    // 2. Merge ABM fields from Supabase by id (narrative fields live inside abm, not top-level)
     for (const remote of supabaseAbm) {
       const idx = merged.findIndex(c => c.id === remote.id);
       if (idx >= 0) {
@@ -461,12 +476,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
           vp: remote.vp ?? merged[idx].vp,
           ct: remote.ct ?? merged[idx].ct,
           ft: remote.ft ?? merged[idx].ft,
-          tipoEstrategico: remote.tipoEstrategico ?? merged[idx].tipoEstrategico,
           abm: {
             ...merged[idx].abm,
             ...(remote.abm || {})
           },
-          playAtivo: remote.playAtivo ?? merged[idx].playAtivo,
         };
       }
       // Ignore remote accounts not in contasMock
@@ -573,19 +586,19 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     const targetId = activeAccount.id;
 
     // 2. Build final state for repository mapping
-    const updatedAbm: AbmRow = { id: targetId, tipoEstrategico: newTipo };
+    const payload = { id: targetId, tipoEstrategico: newTipo };
 
-    // 3. Update local-first: updating supabaseAbm state which drives useMemo(accounts)
-    setSupabaseAbm(prev => {
+    // 3. Update local-first: updating supabaseAccounts state which drives useMemo(accounts)
+    setSupabaseAccounts(prev => {
       const exists = prev.find(a => a.id === targetId);
       if (exists) {
         return prev.map(a => a.id === targetId ? { ...a, tipoEstrategico: newTipo } : a);
       }
-      return [...prev, updatedAbm];
+      return [...prev, payload as any];
     });
 
     // 4. Remote persistence (fire-and-forget)
-    persistAbm({ id: targetId, tipoEstrategico: newTipo }).catch(() => {});
+    persistAccount(payload).catch(() => {});
   };
 
   /**
@@ -599,19 +612,19 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     const targetId = activeAccount.id;
 
     // 2. Build final state for repository mapping
-    const updatedAbm: AbmRow = { id: targetId, playAtivo: newPlay };
+    const payload = { id: targetId, playAtivo: newPlay };
 
-    // 3. Update local-first: updating supabaseAbm state which drives useMemo(accounts)
-    setSupabaseAbm(prev => {
+    // 3. Update local-first: updating supabaseAccounts state which drives useMemo(accounts)
+    setSupabaseAccounts(prev => {
       const exists = prev.find(a => a.id === targetId);
       if (exists) {
         return prev.map(a => a.id === targetId ? { ...a, playAtivo: newPlay } : a);
       }
-      return [...prev, updatedAbm];
+      return [...prev, payload as any];
     });
 
     // 4. Remote persistence (fire-and-forget)
-    persistAbm({ id: targetId, playAtivo: newPlay }).catch(() => {});
+    persistAccount(payload).catch(() => {});
   };
 
   /**

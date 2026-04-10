@@ -147,47 +147,20 @@ Nenhum campo será alterado como resultado deste documento.
 
 ---
 
-## 5. Decisão Pendente de Ownership: `tipoEstrategico` e `playAtivo`
+## 5. Decisão de Ownership Resolvida (Recorte 44): `tipoEstrategico` e `playAtivo`
 
-Esta é a lacuna arquitetural documentada neste recorte. Não há recomendação de resolução aqui.
+Esta lacuna arquitetural documentada no Recorte 43 foi formalmente resolvida no Recorte 44 por decisão do Orquestrador.
 
-### Situação Atual (factual)
+### Resolução Final (Factual)
 
-`tipoEstrategico` e `playAtivo` são campos **top-level de `Conta`**, na interface:
+1. `accountsRepository` foi definido como o **owner definitivo e prioritário** de `tipoEstrategico` e `playAtivo`.
+2. A entidade `Conta` (top-level) rege esses campos de forma central.
+3. `abmRepository` foi destituído da autoridade de escrita desses campos. Suas obrigações voltaram a ficar circunscritas puramente ao domínio aninhado `abm`.
+4. Os handlers de atualização na interface (`AbmStrategy.tsx`) agora despacham mutações exclusivamente via `persistAccount()`.
 
-```typescript
-// src/data/accountsData.ts — linha 690 e 704
-tipoEstrategico: TipoEstrategico;  // top-level de Conta
-playAtivo: 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';  // top-level de Conta
-```
+Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 
-Eles **não existem** dentro de `Conta.abx`. Não há campo equivalente em `Conta.abx`.
-
-### Quem escreve esses campos hoje
-
-`persistAccount()` em `accountsRepository.ts` — escreve `tipoEstrategico` e `playAtivo` como colunas top-level na tabela `contas` do Supabase.
-
-`persistAbm()` em `abmRepository.ts` — também aceita `tipoEstrategico` e `playAtivo` no payload e os escreve como colunas top-level. Isso representa escrita redundante potencial do mesmo campo por dois repositories diferentes.
-
-### Quem lê esses campos hoje
-
-`getAccounts()` — lê `tipoEstrategico` e `playAtivo` como colunas top-level.
-`getAbm()` — também lê `tipoEstrategico` e `playAtivo` como colunas top-level, via `select('id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico, playAtivo')`.
-
-### O problema de ownership
-
-Dois repositories (`accountsRepository` e `abmRepository`) estão autorizados a escrever as mesmas colunas Supabase (`tipoEstrategico`, `playAtivo`) sobre a mesma tabela (`contas`), por caminhos diferentes na UI.
-
-Não há colisão garantida (ambos fazem upsert por `id`), mas não há definição explícita de qual repository é a fonte de verdade para esses campos.
-
-### Perguntas abertas (não respondidas neste documento)
-
-1. `tipoEstrategico` deve continuar sendo escrito por dois repositories, ou deve ter um único responsável?
-2. `playAtivo` no contexto ABX tem o mesmo significado semântico que `playAtivo` no contexto ABM? Ou são dimensões diferentes que hoje compartilham o mesmo campo?
-3. Se `playAtivo` for semanticamente diferente em ABX, deve existir `abx.playAtivo` dentro do objeto `Conta.abx`? Isso exigiria mudança de modelo.
-4. Quem chama `persistAccount()` vs `persistAbm()` para esses campos na UI: é sempre o mesmo evento de interação, ou podem ser chamados independentemente?
-
-Essas perguntas precisam de decisão do Orquestrador antes de qualquer recorte funcional que toque nesses campos.
+---
 
 ---
 

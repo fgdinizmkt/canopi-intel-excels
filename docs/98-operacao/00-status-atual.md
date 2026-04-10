@@ -467,8 +467,9 @@
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
 - **Recorte 43:** Concluído como **mapa de cobertura de persistência documental**. Nenhum código alterado.
   - Documento: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md`
-  - **Decisão pendente de Orquestrador:** ownership de `tipoEstrategico` e `playAtivo` — dois repositories capazes de escrever os mesmos campos top-level. Nenhum recorte funcional pode avançar sobre esses campos sem resolução.
-- **Próximo passo funcional:** Aguardar decisão do Orquestrador sobre o ownership de `tipoEstrategico`/`playAtivo` antes de definir Recorte 44.
+  - **Decisão de Orquestrador resolvida no Recorte 44:** ownership de `tipoEstrategico` e `playAtivo` centralizado em `accountsRepository`.
+- **Recorte 44:** Concluído doc+funcional. Ownership de `tipoEstrategico` e `playAtivo` realinhado centralmente sob `accountsRepository`. Manipulação dupla em `abmRepository` removida.
+- **Próximo passo funcional:** Definição do Recorte 45 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

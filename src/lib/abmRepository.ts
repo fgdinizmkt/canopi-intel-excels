@@ -1,8 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import type { TipoEstrategico } from '../data/accountsData';
 
-export type PlayAtivo = 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
-
 /**
  * ABM Row: Supabase schema for ABM account data
  * Subset of Conta interface focused on ABM scoring and context
@@ -30,8 +28,6 @@ export interface AbmRow {
     riskAssessment?: string;
     successCriteria?: string;
   };
-  tipoEstrategico?: TipoEstrategico;
-  playAtivo?: PlayAtivo;
 }
 
 /**
@@ -59,7 +55,7 @@ export async function getAbm(): Promise<AbmRow[]> {
     // 2. Query explicit fields only (not select('*'))
     const { data, error } = await supabase!
       .from('contas')
-      .select('id, slug, icp, crm, vp, ct, ft, abm, tipoEstrategico, playAtivo');
+      .select('id, slug, icp, crm, vp, ct, ft, abm');
 
     // 3. Error handling: log and return empty (fallback)
     if (error) {
@@ -84,13 +80,10 @@ export async function getAbm(): Promise<AbmRow[]> {
 
 /**
  * persistAbm: Update ABM account data in Supabase (defensive, best-effort)
- * Expanded for Recorte 33: now includes 'tipoEstrategico' and 'playAtivo'.
  * Expanded for Recorte 40 (E12): now includes narrative fields inside abm object.
  */
 export async function persistAbm(abm: {
   id: string;
-  tipoEstrategico?: TipoEstrategico;
-  playAtivo?: PlayAtivo;
   abm?: {
     strategyNarrative?: string;
     riskAssessment?: string;
@@ -113,13 +106,9 @@ export async function persistAbm(abm: {
     // 1. Build payload: explicit fields only
     const payload: {
       id: string;
-      tipoEstrategico?: TipoEstrategico;
-      playAtivo?: PlayAtivo;
       abm?: AbmRow['abm'];
     } = { id: abm.id };
 
-    if (abm.tipoEstrategico !== undefined) payload.tipoEstrategico = abm.tipoEstrategico;
-    if (abm.playAtivo !== undefined) payload.playAtivo = abm.playAtivo;
     if (abm.abm !== undefined) payload.abm = abm.abm;
 
     // 2. Upsert by id - mapping only allowed fields

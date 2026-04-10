@@ -12,6 +12,8 @@ import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsDa
  * 4. Se conta não encontrada em mock, cria shell seguro com campos obrigatórios
  */
 
+export type PlayAtivo = 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
+
 export type AccountRow = {
   id: string;
   slug: string;
@@ -30,7 +32,7 @@ export type AccountRow = {
   coberturaRelacional?: number;
   ultimaMovimentacao?: string;
   atividadeRecente?: 'Alta' | 'Média' | 'Baixa';
-  playAtivo?: 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
+  playAtivo?: PlayAtivo;
   statusGeral?: 'Saudável' | 'Atenção' | 'Crítico';
   oportunidadePrincipal?: string;
   possuiOportunidade?: boolean;
