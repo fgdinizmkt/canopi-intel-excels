@@ -16,7 +16,7 @@
 - ✅ Recorte 40: Repository layer expandido: `AbmRow.abm` contém 3 campos narrativos.
 - ✅ Recorte 40: Publicação: commit `88bceb3` — feat(abm): add defensive strategic narrative persistence publicado em origin/main.
 
-- ✅ Recorte 39: Repository layer expandido com resolutionPath, executionNotes, learnings em ActionRow.
+- ✅ Recorte 39: Repository layer expandido com `resolutionPath`, `executionNotes`, `learnings` em ActionRow.
 - ✅ Recorte 39: ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
 - ✅ Recorte 39: Publicação: commit `a60f2f9` — feat(actions): add defensive narrative editing with atomicity publicado em origin/main.
 
@@ -30,7 +30,7 @@
 
 - ✅ Recorte 36: AccountPersistPayload expandido para 4 campos narrativos em Accounts.
 - ✅ Recorte 36: Modal de edição narrativa dual em Accounts view lista.
-- ✅ Recorte 36: Publicação: commit `a60f2ce` — feat(accounts): add defensive narrative persistence publicado em origin/main.
+- ✅ Recorte 36: Publicação: commit `a6604c2` — feat(accounts): add defensive narrative persistence publicado em origin/main.
 
 - ✅ Recorte 34: Repository layer expandido com persistAccount() para escrita defensiva (tipoEstrategico).
 - ✅ Recorte 34: UI mínima de toggle estrategico em Accounts view lista.
