@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts — Play Ativo: cdbc4f3, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals: 16e673e, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts — Play Ativo)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals)
 
 ---
 
@@ -417,7 +417,7 @@
 ## Próximo Passo
 
 - **Status Atual:** Recorte 37 concluído e publicado em origin/main
-- **Próximo:** Avaliar Recorte 17 (plano pendente) ou iniciar novo recorte conforme roadmap
+- **Novo Recorte:** Definir e aprovar o Recorte 38
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

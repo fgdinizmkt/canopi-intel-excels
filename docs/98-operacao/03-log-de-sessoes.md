@@ -46,8 +46,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - ✅ Grade não afetada — permanece leitura pura
   - ✅ Padrão defensivo replicado com sucesso de accounts (E9C) para signals (E7.1)
 - **Commit Código:** `16e673e` — feat(signals): add defensive narrative editing with modal
-- **Commit Documentação:** (em progresso)
-- **Status:** ✅ Código publicado em origin/main, documentação em sincronização.
+- **Commit Documentação:** `0dab6f9` — docs(ops): sync Recorte 37 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
 
 ---
 

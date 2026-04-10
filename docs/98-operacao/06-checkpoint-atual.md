@@ -1,24 +1,24 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 36 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 37 concluído e publicado. Main estável em origin/main.
 
-**Recorte 36 Publicado:**
+**Recorte 37 Publicado:**
+- Commit: `16e673e` — `feat(signals): add defensive narrative editing with modal`
+- Descrição: Expansão de escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), com novo padrão de drawer synchronization
+- Impacto: UI discreta (modal de edição com 3 textareas no drawer), grade intacta, atomicidade garantida contra race conditions, drawer sempre sincronizado com array de source
+
+**Recorte 36 Publicado (Anterior):**
 - Commit: `a6604c2` — `feat(accounts): add defensive narrative persistence`
 - Descrição: Expansão de escrita defensiva em accounts para 2 campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`), consolidando padrão defensivo multi-field com snapshot atomicamente garantido
-- Impacto: UI discreta (modal de edição com 2 textareas na coluna "Próxima melhor ação"), grade/board intactos, atomicidade garantida contra race conditions
-
-**Recorte 35 Publicado (Anterior):**
-- Commit: `cdbc4f3` — `feat(accounts): add defensive playAtivo persistence`
-- Descrição: Expansão de escrita defensiva em accounts com campo `playAtivo`, dual-field defensivo com snapshot garantido
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 37 (Accounts E9D ou similar).
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 38.
 
 ## Último Estado Confiável
-**Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (resumoExecutivo + proximaMelhorAcao)** (commit `a6604c2`, publicado em origin/main)
+**Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals (context + probableCause + recommendation)** (commit `16e673e`, publicado em origin/main)
+**Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (resumoExecutivo + proximaMelhorAcao)** (commit `a6604c2`, publicado em origin/main — pré-Recorte 37)
 **Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** (commit `cdbc4f3`, publicado em origin/main — pré-Recorte 36)
-**Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main — pré-Recorte 35)
 
 ## O que está concluído
 - ✅ Recorte 35: Expansão de escrita defensiva em accounts para `playAtivo` com padrão dual-field (snapshot garantido, sem sobrescrita mútua).
@@ -228,7 +228,7 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 37 (Acc
 - ✅ Recorte 37: Publicação: commit `16e673e` — feat(signals): add defensive narrative editing with modal publicado em origin/main.
 
 ## O que está pendente
-(nenhum)
+- ⌛ Definição e aprovação do Recorte 38 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Avaliar Recorte 17 (plano de deep-linking com renderResponseCards refatorado): verificar se há mudança necessária no Assistant após a mudança recente de imports ou qualquer outro detalhe pendente. Alternativamente, iniciar Recorte 38+ em roadmap (a definir).
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 38.
