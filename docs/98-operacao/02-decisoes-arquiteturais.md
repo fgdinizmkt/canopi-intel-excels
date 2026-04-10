@@ -519,3 +519,76 @@ No Recorte 34, abrimos o primeiro write path defensivo para a entidade de **acco
 **Benefício:** Abre escrita defensiva em accounts com padrão estabelecido, validando que o modelo local-first + fire-and-forget é agnóstico à entidade. Futuras expansões de campos em accounts (ou outras entidades) podem seguir exatamente este template. Grade e board permanecem intactos neste recorte, mantendo encapsulamento mínimo.
 
 **Commits:** `650a4c4` (E9 implementação defensiva de tipoEstrategico em Accounts via Recorte 34)
+
+---
+
+### Decisão 14: Escrita Defensiva em Accounts — Campos Narrativos com Atomicidade (Recorte 36 — E9C)
+
+No Recorte 36, expandimos o padrão E9 para incluir dois novos campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`) com ênfase especial em **atomicidade contra race conditions**. A decisão arquitetural fundamental aqui foi a consolidação de um padrão multi-field defensivo que garante snapshot único e persist unificado.
+
+**Implicação estrutural (Recorte 36 em diante):**
+- **Type `AccountPersistPayload`:** Expandido para aceitar 4 campos
+  ```typescript
+  type AccountPersistPayload = {
+    id: string;
+    tipoEstrategico?: TipoEstrategico;
+    playAtivo?: AccountRow['playAtivo'];
+    resumoExecutivo?: string;
+    proximaMelhorAcao?: string;
+  };
+  ```
+  - Mapeia exatamente os 4 campos controláveis via UI
+  - Todos opcionais (defensivo: undefined não sobrescreve banco)
+- **PERSIST WRITE:** `persistAccount()` em `src/lib/accountsRepository.ts` expandida
+  - Assinatura: `async function persistAccount(account: { id: string; tipoEstrategico?; playAtivo?; resumoExecutivo?; proximaMelhorAcao? }): Promise<void>`
+  - Payload defensivo: constrói objeto incluindo APENAS campos definidos (guards `if (account.XXX !== undefined)`)
+  - Upsert explícito: `.upsert(payload, { onConflict: 'id' })`
+  - Falha silenciosa idêntica a E9: erros logados com `console.warn()`, nunca relançados
+  - Se Supabase não configurado: skips automaticamente
+- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO:** Novo `handleUpdateNarrativas()` em `src/pages/Accounts.tsx`
+  - Padrão rígido com 3 passos ANTES de qualquer async:
+    1. **SNAPSHOT:** Captura snapshot completo da conta (todos 4 campos): `const contaAtual = contas.find(c => c.id === contaId);`
+    2. **SETSTATE:** Uma única chamada `setContas()` que atualiza AMBOS campos narrativos simultaneamente
+    3. **PERSIST:** Uma única chamada `persistAccount()` com snapshot completo de todos 4 campos (não valores parciais/atuais)
+  - Pseudocódigo:
+    ```typescript
+    const handleUpdateNarrativas = (contaId: string, newResumo: string, newAcao: string) => {
+      // 1. Snapshot
+      const contaAtual = contas.find(c => c.id === contaId);
+      if (!contaAtual) return;
+      
+      // 2. SetState (ONE call, both fields)
+      setContas(prev => prev.map(c =>
+        c.id === contaId 
+          ? { ...c, resumoExecutivo: newResumo, proximaMelhorAcao: newAcao } 
+          : c
+      ));
+      
+      // 3. Persist (ONE call, full snapshot)
+      persistAccount({
+        id: contaId,
+        tipoEstrategico: contaAtual.tipoEstrategico,
+        playAtivo: contaAtual.playAtivo,
+        resumoExecutivo: newResumo,
+        proximaMelhorAcao: newAcao
+      });
+    };
+    ```
+  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (snapshot + 1 setState + 1 persist)
+- **UI — Modal Discreta:** Modal de edição narrativa em `src/pages/Accounts.tsx`
+  - Trigger: ícone de edição (✎) na coluna "Próxima melhor ação" (hover visible)
+  - Modal: overlay escuro, 2 textareas (resumoExecutivo: 3 linhas, proximaMelhorAcao: 3 linhas)
+  - Placeholders descritivos: "Resumo executivo da conta..." / "Próxima melhor ação..."
+  - Botões: "Cancelar" (fecha sem salvar) / "Salvar" (dispara `handleUpdateNarrativas()`, fecha modal)
+  - Grade e board permanecem somente leitura (nenhuma mudança de escopo)
+- **Tipagem:** Sem novo tipo — reutiliza `TipoEstrategico` e `AccountRow['playAtivo']`
+  - Imports atualizados em Accounts.tsx para incluir `persistAccount` (já existente, apenas expandido)
+  - Sem `as any`, mapeamento explícito de 4 campos
+
+**Benefício arquitetural:** E9C demonstra que o padrão defensivo é escalável a múltiplos campos **com garantia de atomicidade contra race conditions**. A consolidação de 1 snapshot + 1 setState + 1 persist é a chave para evitar divergência remota. Futuras expansões em accounts (ou outras entidades com múltiplos campos correlatos) podem seguir este template exatamente.
+
+**Benefício operacional:** Narrativas agora são editáveis com persistência defensiva, sem requerer navegação em ABM ou ABX. Escopo mantido mínimo: apenas lista de contas, modal discreta, sem tocar grade/board.
+
+**Bug corrigido:** Implementação anterior com dois handlers separados (`handleUpdateResumoExecutivo` + `handleUpdateProximaMelhorAcao`) criava race condition onde segundo persist poderia sobrescrever primeiro se resolvidos out-of-order. Consolidação em `handleUpdateNarrativas()` elimina divergência.
+
+**Commits:** `a6604c2` (E9C implementação defensiva de campos narrativos em Accounts via Recorte 36 com atomicidade garantida)

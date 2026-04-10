@@ -1,22 +1,23 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 35 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 36 concluído e publicado. Main estável em origin/main.
 
-**Recorte 35 Publicado:**
+**Recorte 36 Publicado:**
+- Commit: `a6604c2` — `feat(accounts): add defensive narrative persistence`
+- Descrição: Expansão de escrita defensiva em accounts para 2 campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`), consolidando padrão defensivo multi-field com snapshot atomicamente garantido
+- Impacto: UI discreta (modal de edição com 2 textareas na coluna "Próxima melhor ação"), grade/board intactos, atomicidade garantida contra race conditions
+
+**Recorte 35 Publicado (Anterior):**
 - Commit: `cdbc4f3` — `feat(accounts): add defensive playAtivo persistence`
 - Descrição: Expansão de escrita defensiva em accounts com campo `playAtivo`, dual-field defensivo com snapshot garantido
-- Impacto: UI mínima (4 botões toggle play ativo em lista), grade/board intactos, bug crítico corrigido (sem sobrescrita mútua)
-
-**Recorte 34 Publicado (Anterior):**
-- Commit: `650a4c4` — `feat(accounts): add defensive tipoEstrategico persistence`
-- Descrição: Primeira escrita defensiva em accounts com campo `tipoEstrategico`, local-first + fire-and-forget
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 36.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 37 (Accounts E9D ou similar).
 
 ## Último Estado Confiável
-**Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** (commit `cdbc4f3`, publicado em origin/main)
+**Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (resumoExecutivo + proximaMelhorAcao)** (commit `a6604c2`, publicado em origin/main)
+**Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** (commit `cdbc4f3`, publicado em origin/main — pré-Recorte 36)
 **Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main — pré-Recorte 35)
 
 ## O que está concluído
@@ -202,8 +203,25 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 36.
 - ✅ Recorte 34: Build: Exit 0 (validado, 2 files changed, 66 insertions, 3 deletions).
 - ✅ Recorte 34: Publicação: commit `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence publicado em origin/main.
 
+- ✅ Recorte 36: Repository layer `src/lib/accountsRepository.ts` expandido: `AccountPersistPayload` agora suporta 4 campos (`tipoEstrategico`, `playAtivo`, `resumoExecutivo`, `proximaMelhorAcao`).
+- ✅ Recorte 36: `persistAccount()` aceita todos 4 campos e constrói payload defensivamente (omitindo undefined).
+- ✅ Recorte 36: Padrão local-first em `src/pages/Accounts.tsx`: `handleUpdateNarrativas()` implementado com snapshot atomicamente garantido.
+- ✅ Recorte 36: Atomicidade contra race conditions: 1 snapshot + 1 setState ambos campos + 1 persist 4 campos (solução de bug crítico identificado em testes).
+- ✅ Recorte 36: Modal de edição narrativa com 2 textareas (`resumoExecutivo` + `proximaMelhorAcao`), acionado via edit icon (✎) na coluna.
+- ✅ Recorte 36: Modal UI: overlay escuro, 2 textareas com 3 linhas, placeholders descritivos, botões "Cancelar" e "Salvar".
+- ✅ Recorte 36: Fire-and-forget: persistAccount() dispara SEM await, nunca bloqueia UX, falhas logadas silenciosamente.
+- ✅ Recorte 36: UI discreta: único lugar de interação é coluna "Próxima melhor ação", grade/board intactos (read-only).
+- ✅ Recorte 36: Type safety: sem `as any`, AccountPersistPayload completa, mapeamento defensivo de undefined.
+- ✅ Recorte 36: Build: Exit 0 (validado após bug fix de atomicidade).
+- ✅ Recorte 36: Publicação: commit `a6604c2` — feat(accounts): add defensive narrative persistence publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 36 pelo Orquestrador.
+- ⌛ Avaliação de necessidade de atualização em docs/98-operacao/02-decisoes-arquiteturais.md.
+- ⌛ Commit de documentação: git add docs/98-operacao/ && git commit -m 'docs(ops): sync Recorte 36 publication state'.
+- ⌛ Push: git push origin main.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 36.
+1. Avaliar 02-decisoes-arquiteturais.md para documentar padrão de atomicidade multi-field.
+2. Commit documentação.
+3. Push.
+4. Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 37.

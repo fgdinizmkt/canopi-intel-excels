@@ -5,6 +5,50 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 36 (Supabase E9C): Escrita Defensiva em Accounts (Campos Narrativos) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E9C: expansão de E9/E9B em accounts, fechando ciclo narrativo com atomicidade).
+- **Alto:** Expandir escrita defensiva em accounts para 2 campos narrativos (`resumoExecutivo`, `proximaMelhorAcao`), validando padrão defensivo para edição multi-campo com atomicidade garantida.
+- **Contexto:** Recortes 34/35 implementaram E9/E9B (tipo + play ativo). Recorte 36 expande para narrativas, com ênfase em atomicidade: quando 1 UI salva múltiplos campos de mesma entidade, padrão obrigatório é 1 snapshot + 1 setState + 1 persist (nunca múltiplos persists).
+- **Ações Executadas:**
+  - **Repositório (`src/lib/accountsRepository.ts`):**
+    * +Type `AccountPersistPayload` expandido para 4 campos: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao (union de tipos, sem `any`)
+    * +`persistAccount()` assinatura estendida: `.upsert({ id, tipoEstrategico?, playAtivo?, resumoExecutivo?, proximaMelhorAcao? }, { onConflict: 'id' })`
+    * +Payload construtivo: guards defensivos para cada campo (apenas definidos incluídos)
+    * +Logging aprimorado: mostra primeiros 50 chars de campos narrativos
+  - **Página Local-first (`src/pages/Accounts.tsx`):**
+    * +Handler ATÔMICO `handleUpdateNarrativas(contaId, newResumo, newAcao)`:
+      - 1 snapshot único captura estado completo
+      - 1 setState atualiza AMBOS campos narrativos (e detecta mudança de tipo/play se houver)
+      - 1 persistAccount com 4 campos garante zero race condition
+    * +Handlers anteriores (tipoEstrategico, playAtivo) revisados: agora persistem com snapshot completo de 4 campos
+    * +Estado modal: `editingContaId`, `editResumo`, `editAcao`
+    * +Funções: `abrirEditorNarrativo()`, `fecharEditorNarrativo()`, `salvarNarrativas()` (chamada ÚNICA ao handler atômico)
+    * +UI: Célula "Próxima melhor ação" em tabela lista é clicável com ícone ✎ ao hover
+    * +Modal: Overlay premium com 2 textareas (resumo + ação), 3 linhas cada, placeholders descritivos, botões Cancelar/Salvar
+  - **Atomicidade Garantida:**
+    * Bug crítico evitado: múltiplos persists independentes causam race condition → consolidado em 1 persist
+    * Padrão escalável: quando UI edita N campos, padrão é 1 snapshot de todos + 1 setState com todos + 1 persist com todos
+    * Testado: 4 campos persistidos atomicamente (tipo + play + resumo + ação)
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 137 insertions(+), 12 deletions(-)
+    * Type safety: 4 campos tipados, nenhum `any`, guards contra undefined
+    * Atomicidade: 1 snapshot = estado consistente capturado uma vez
+    * Fire-and-forget: 1 persist fire-and-forget (sem await, falha silenciosa)
+    * Padrão escalável validado em novo contexto (multi-campo)
+- **Impacto:**
+  - ✅ Narrativas agora editáveis na UI (resumo executivo + próxima melhor ação)
+  - ✅ Persistência atômica: zero race condition entre campos
+  - ✅ Padrão defensivo escala para N campos com garantia de atomicidade
+  - ✅ Modal premium: discreto na tabela, funcional e limpo
+  - ✅ Grade e board não afetados — permanecem leitura pura
+  - ✅ Áre de Accounts escrita "fechada" (4 campos: tipo, play, resumo, ação)
+- **Commit Código:** `a6604c2` — feat(accounts): add defensive narrative persistence
+- **Commit Documentação:** docs(ops): sync Recorte 36 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada, pronto para Recorte 37.
+
+---
+
 ## [2026-04-10] — Recorte 35 (Supabase E9B): Escrita Defensiva em Accounts (playAtivo) — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E9B: expansão de E9 em accounts, fechando ciclo dual-field defensivo).
 - **Alto:** Expandir escrita defensiva em accounts para `playAtivo`, validando que padrão defensivo escala a múltiplos campos com segurança contra sobrescrita mútua.

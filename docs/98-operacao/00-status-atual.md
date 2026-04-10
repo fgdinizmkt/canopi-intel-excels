@@ -387,10 +387,24 @@
 - **Commit:** `cdbc4f3` — feat(accounts): add defensive playAtivo persistence
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (Campos Narrativos)** — 2026-04-10
+- ✅ Expansão da escrita defensiva em accounts para campos narrativos `resumoExecutivo` + `proximaMelhorAcao`
+- ✅ Extensão de `persistAccount()` em `src/lib/accountsRepository.ts` para 4 campos (tipo + play + resumo + ação)
+- ✅ Persistência defensiva quadruplo-field: `.upsert({ id, tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao }, { onConflict: 'id' })` explícito
+- ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Accounts.tsx`
+- ✅ Padrão robusto: 1 snapshot + 1 setState + 1 persist = zero race condition entre múltiplos campos
+- ✅ UI mínima: coluna "Próxima melhor ação" clicável com ícone ✎; modal compacto para edição dual
+- ✅ Modal: 2 textareas (resumo + ação), salva atomicamente ambas narrativas juntas
+- ✅ Grade e board permanecem somente leitura (mantêm comportamento intacto)
+- ✅ Type safety consolidado: `AccountPersistPayload` com 4 campos, guards defensivos contra undefined
+- ✅ Build Exit 0 (validado, 2 files changed, 137 insertions, 12 deletions)
+- **Commit:** `a6604c2` — feat(accounts): add defensive narrative persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 35 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 36
+- **Status Atual:** Recorte 36 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 37
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
