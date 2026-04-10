@@ -743,6 +743,10 @@ export interface Conta {
     expansao: string;
     retencao: string;
     riscoEstagnacao: string;
+    // Narrativas estratégicas (E13)
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
   };
   inteligencia: {
     sucessos: string[];

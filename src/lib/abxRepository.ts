@@ -16,6 +16,10 @@ export interface AbxRow {
     expansao?: string;
     retencao?: string;
     riscoEstagnacao?: string;
+    // Narrativas estratégicas (E13)
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
   };
 }
 
@@ -64,6 +68,55 @@ export async function getAbx(): Promise<AbxRow[]> {
   } catch (exception) {
     console.error('[ABX Repository] Exception during query:', exception);
     return [];
+  }
+}
+
+/**
+ * persistAbx: Update ABX account data in Supabase (defensive, best-effort)
+ * Expanded for Recorte 41 (E13): now includes narrative fields inside abx object.
+ */
+export async function persistAbx(abx: {
+  id: string;
+  abx?: {
+    strategyNarrative?: string;
+    riskAssessment?: string;
+    successCriteria?: string;
+    // preserve other abx fields
+    motivo?: string;
+    evolucaoJornada?: string;
+    maturidadeRelacional?: string;
+    sponsorAtivo?: string;
+    profundidadeComite?: string;
+    continuidade?: string;
+    expansao?: string;
+    retencao?: string;
+    riscoEstagnacao?: string;
+  };
+}): Promise<void> {
+  if (!isSupabaseConfigured() || !abx.id) return;
+
+  try {
+    // 1. Build payload: explicit fields only
+    const payload: {
+      id: string;
+      abx?: AbxRow['abx'];
+    } = { id: abx.id };
+
+    if (abx.abx !== undefined) payload.abx = abx.abx;
+
+    // 2. Upsert by id - mapping only allowed fields
+    const { error } = await supabase!
+      .from('contas')
+      .upsert(payload, { onConflict: 'id' });
+
+    // 3. Defensive log - never block or throw UI
+    if (error) {
+      console.warn('[ABX Repository] Persist failed:', error.message);
+    } else {
+      console.info(`[ABX Repository] Persisted ABX fields for ${abx.id}`);
+    }
+  } catch (exception) {
+    console.error('[ABX Repository] Exception during persist:', exception);
   }
 }
 

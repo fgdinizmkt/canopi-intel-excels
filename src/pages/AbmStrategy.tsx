@@ -60,7 +60,7 @@ import { motion } from 'motion/react';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
 import { getAbm, persistAbm, type AbmRow, type PlayAtivo } from '../lib/abmRepository';
-import { getAbx, type AbxRow } from '../lib/abxRepository';
+import { getAbx, persistAbx, type AbxRow } from '../lib/abxRepository';
 import type { TipoEstrategico } from '../data/accountsData';
 
 // --- MOCK DATA ---
@@ -422,11 +422,19 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
 
   // Narrative fields (E12)
+  // ABM Narratives (E12)
   const [editingNarrative, setEditingNarrative] = useState(false);
   const [strategyNarrative, setStrategyNarrative] = useState('');
   const [riskAssessment, setRiskAssessment] = useState('');
   const [successCriteria, setSuccessCriteria] = useState('');
   const [narrativeStatus, setNarrativeStatus] = useState<string | null>(null);
+
+  // ABX Narratives (E13)
+  const [editingAbxNarrative, setEditingAbxNarrative] = useState(false);
+  const [abxStrategyNarrative, setAbxStrategyNarrative] = useState('');
+  const [abxRiskAssessment, setAbxRiskAssessment] = useState('');
+  const [abxSuccessCriteria, setAbxSuccessCriteria] = useState('');
+  const [abxNarrativeStatus, setAbxNarrativeStatus] = useState<string | null>(null);
 
   // Load ABM and ABX data from Supabase once on mount
   useEffect(() => {
@@ -493,14 +501,22 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     return accounts.find(a => a.id === activeAccountId) || accounts[0];
   }, [activeAccountId, accounts]);
 
-  // Sync narrative fields when active account changes (E12)
+  // Sync narrative fields when active account changes (E12 + E13)
   useEffect(() => {
     if (activeAccount) {
+      // ABM Narratives (E12)
       setStrategyNarrative(activeAccount.abm?.strategyNarrative ?? '');
       setRiskAssessment(activeAccount.abm?.riskAssessment ?? '');
       setSuccessCriteria(activeAccount.abm?.successCriteria ?? '');
       setNarrativeStatus(null);
       setEditingNarrative(false);
+
+      // ABX Narratives (E13)
+      setAbxStrategyNarrative(activeAccount.abx?.strategyNarrative ?? '');
+      setAbxRiskAssessment(activeAccount.abx?.riskAssessment ?? '');
+      setAbxSuccessCriteria(activeAccount.abx?.successCriteria ?? '');
+      setAbxNarrativeStatus(null);
+      setEditingAbxNarrative(false);
     }
   }, [activeAccount?.id]);
 
@@ -642,6 +658,52 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
 
     // 5. Remote persistence (fire-and-forget)
     persistAbm(updatedAbm).catch(() => {});
+  };
+
+  /**
+   * handleUpdateAbxNarratives: local-first mutation with defensive persist
+   * Recorte 41 (E13) - scope: expand to include narrative fields inside abx object
+   * Atomicity guaranteed: 1 snapshot + 1 build + 1 setState + 1 persist
+   */
+  const handleUpdateAbxNarratives = () => {
+    if (!activeAccount) return;
+
+    // 1. Snapshot target
+    const targetId = activeAccount.id;
+
+    // 2. Build final state: merge abx with new narrative fields (trim, omit empty)
+    const finalNarrative = abxStrategyNarrative.trim();
+    const finalRisk = abxRiskAssessment.trim();
+    const finalSuccess = abxSuccessCriteria.trim();
+
+    const updatedAbxObject = {
+      ...activeAccount.abx,
+      strategyNarrative: finalNarrative || undefined,
+      riskAssessment: finalRisk || undefined,
+      successCriteria: finalSuccess || undefined,
+    };
+
+    const updatedAbx: Parameters<typeof persistAbx>[0] = {
+      id: targetId,
+      abx: updatedAbxObject,
+    };
+
+    // 3. Update local-first: updating supabaseAbx state which drives useMemo(accounts)
+    setSupabaseAbx(prev => {
+      const exists = prev.find(a => a.id === targetId);
+      if (exists) {
+        return prev.map(a => a.id === targetId ? { ...a, ...updatedAbx } : a);
+      }
+      return [...prev, updatedAbx];
+    });
+
+    // 4. Feedback + close edit mode
+    setEditingAbxNarrative(false);
+    setAbxNarrativeStatus('✓ Salvo');
+    setTimeout(() => setAbxNarrativeStatus(null), 1500);
+
+    // 5. Remote persistence (fire-and-forget)
+    persistAbx(updatedAbx).catch(() => {});
   };
 
 
@@ -884,6 +946,75 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                                 </button>
                                 {narrativeStatus && (
                                    <span className="text-[8px] font-bold text-emerald-600 ml-1">{narrativeStatus}</span>
+                                )}
+                             </div>
+                          </div>
+                       )}
+                    </div>
+                    {/* Narrativa Expansionista - Recorte 41 (E13) */}
+                    <div className="flex flex-col gap-2 border-t border-slate-100 pt-3">
+                       <div className="flex items-center justify-between">
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Narrativa Expansionista</p>
+                          <button
+                             onClick={() => setEditingAbxNarrative(!editingAbxNarrative)}
+                             className="text-slate-400 hover:text-slate-600 transition-colors text-xs"
+                             title={editingAbxNarrative ? "Fechar edição" : "Editar narrativas"}
+                          >
+                             {editingAbxNarrative ? '✕' : '✎'}
+                          </button>
+                       </div>
+                       {!editingAbxNarrative ? (
+                          // Read mode
+                          <div className="space-y-2 text-[8px] text-slate-600 leading-relaxed">
+                             {(abxStrategyNarrative || abxRiskAssessment || abxSuccessCriteria) ? (
+                                <>
+                                   {abxStrategyNarrative && <p><span className="font-bold text-slate-700">Estratégia:</span> {abxStrategyNarrative}</p>}
+                                   {abxRiskAssessment && <p><span className="font-bold text-slate-700">Risco:</span> {abxRiskAssessment}</p>}
+                                   {abxSuccessCriteria && <p><span className="font-bold text-slate-700">Sucesso:</span> {abxSuccessCriteria}</p>}
+                                </>
+                             ) : (
+                                <p className="text-slate-400 italic">Nenhuma narrativa registrada. Clique ✎ para adicionar.</p>
+                             )}
+                          </div>
+                       ) : (
+                          // Edit mode
+                          <div className="space-y-2 flex flex-col">
+                             <textarea
+                                placeholder="Racional estratégico de expansão / estratégia de retenção"
+                                value={abxStrategyNarrative}
+                                onChange={(e) => setAbxStrategyNarrative(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                rows={3}
+                             />
+                             <textarea
+                                placeholder="Avaliação de riscos da estratégia expansionista"
+                                value={abxRiskAssessment}
+                                onChange={(e) => setAbxRiskAssessment(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                rows={3}
+                             />
+                             <textarea
+                                placeholder="Critérios de sucesso para expansão / retenção"
+                                value={abxSuccessCriteria}
+                                onChange={(e) => setAbxSuccessCriteria(e.target.value)}
+                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                rows={3}
+                             />
+                             <div className="flex gap-2 items-center">
+                                <button
+                                   onClick={handleUpdateAbxNarratives}
+                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all"
+                                >
+                                   Salvar
+                                </button>
+                                <button
+                                   onClick={() => setEditingAbxNarrative(false)}
+                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-all"
+                                >
+                                   Cancelar
+                                </button>
+                                {abxNarrativeStatus && (
+                                   <span className="text-[8px] font-bold text-emerald-600 ml-1">{abxNarrativeStatus}</span>
                                 )}
                              </div>
                           </div>
