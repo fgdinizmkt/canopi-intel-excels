@@ -16,8 +16,8 @@ Prosseguir Fase E — Supabase Migration & Scale.
 Próximo passo: definição e aprovação do Orquestrador para o Recorte 36.
 
 ## Último Estado Confiável
-**Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main)
-**Hotfix Operacional P0 `/sinais`** (commit `90401f2`, publicado em origin/main — pós-Recorte 33)
+**Recorte 35 — Supabase E9B: Escrita Defensiva em Accounts (playAtivo)** (commit `cdbc4f3`, publicado em origin/main)
+**Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main — pré-Recorte 35)
 
 ## O que está concluído
 - ✅ Recorte 35: Expansão de escrita defensiva em accounts para `playAtivo` com padrão dual-field (snapshot garantido, sem sobrescrita mútua).
@@ -206,4 +206,4 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 36.
 - ⌛ Definição e aprovação do Recorte 36 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 35.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 36.
