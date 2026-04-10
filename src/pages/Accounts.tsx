@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
-import { contasMock, type Conta } from '../data/accountsData';
-import { getAccounts } from '../lib/accountsRepository';
+import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
+import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
@@ -149,6 +149,23 @@ export const Accounts = () => {
   }), [contas]);
 
   const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
+
+  // Handler local-first + fire-and-forget para atualizar tipoEstrategico
+  // 1. Atualiza estado local imediatamente via setContas()
+  // 2. Dispara persist async sem await, capturando erros silenciosamente
+  const handleUpdateTipoEstrategico = (contaId: string, newTipo: TipoEstrategico) => {
+    // Snapshot: encontra a conta atual
+    const contaAtual = contas.find(c => c.id === contaId);
+    if (!contaAtual) return;
+
+    // Local-first: atualiza estado local imediatamente
+    setContas(prev => prev.map(c =>
+      c.id === contaId ? { ...c, tipoEstrategico: newTipo } : c
+    ));
+
+    // Fire-and-forget: persiste async sem await, erros silenciosos
+    persistAccount({ id: contaId, tipoEstrategico: newTipo });
+  };
 
   const macroCards = [
     { titulo: 'Contas prioritárias', valor: metricas.prioritarias, acao: () => setFiltros((f) => ({ ...f, potencial: 'alto' })) },
@@ -298,7 +315,24 @@ export const Accounts = () => {
                   <td className="p-3"><button onClick={() => atualizarFiltro('owner', conta.ownerPrincipal)} className="underline decoration-dotted">{conta.ownerPrincipal}</button></td>
                   <td className="p-3">{conta.etapa}</td>
                   <td className="p-3">
-                    {conta.tipoEstrategico === 'ABM' ? <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-blue-100 text-blue-700 font-semibold">ABM</button> : conta.tipoEstrategico === 'ABX' ? <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-purple-100 text-purple-700 font-semibold">ABX</button> : <button onClick={() => openAccount(conta.id)} className="px-2 py-1 rounded bg-slate-100 text-slate-700 font-semibold">{conta.tipoEstrategico}</button>}
+                    <div className="inline-flex gap-1 bg-slate-100 rounded-lg p-1">
+                      {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as TipoEstrategico[]).map(tipo => (
+                        <button
+                          key={tipo}
+                          onClick={() => handleUpdateTipoEstrategico(conta.id, tipo)}
+                          className={`px-2 py-1 rounded text-xs font-semibold transition-all ${
+                            conta.tipoEstrategico === tipo
+                              ? tipo === 'ABM' ? 'bg-blue-500 text-white'
+                              : tipo === 'ABX' ? 'bg-purple-500 text-white'
+                              : tipo === 'Híbrida' ? 'bg-amber-500 text-white'
+                              : 'bg-slate-500 text-white'
+                              : 'bg-transparent text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          {tipo}
+                        </button>
+                      ))}
+                    </div>
                   </td>
                   <td className="p-3">{conta.potencial}</td>
                   <td className={`p-3 font-semibold ${riscoClasse(conta.risco)}`}>{conta.risco}</td>

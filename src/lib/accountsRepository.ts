@@ -39,6 +39,35 @@ export type AccountRow = {
 };
 
 /**
+ * Escreve defensivamente uma conta no Supabase (upsert)
+ * Padrão fire-and-forget: não bloqueia, não retorna feedback, registra erro silenciosamente
+ *
+ * Caso de uso: mutação local-first no state, depois persist async sem UI feedback
+ */
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico }): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
+    return;
+  }
+
+  try {
+    const { error } = await supabase!
+      .from('accounts')
+      .upsert({ id: account.id, tipoEstrategico: account.tipoEstrategico }, { onConflict: 'id' });
+
+    if (error) {
+      console.warn('[Accounts] Erro ao persistir tipoEstrategico:', error.message);
+      return;
+    }
+
+    console.debug(`[Accounts] Conta ${account.id} persistida com tipoEstrategico=${account.tipoEstrategico}`);
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.warn('[Accounts] Exceção ao persistir conta:', errorMsg);
+  }
+}
+
+/**
  * Busca contas do Supabase com fallback para mock
  * Faz merge com contasMock para campos profundos não migrados ainda (sinais, ações, contatos)
  */
