@@ -406,7 +406,7 @@ const handleToggleClassification = (classification: 'Decisor' | 'Influenciador' 
 
 ### Decisão 15: Escrita Defensiva em Contacts — Campos Narrativos com Atomicidade (Recorte 38 — E8.1)
 
-No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`) com ênfase especial em **atomicidade contra race conditions** e **sincronização de drawer**. A decisão arquitetural fundamental aqui foi a aplicação consolidada do padrão atômico (validado em E9C para Accounts) MAIS o padrão drawer sync (validado em E7.1 para Signals) em uma única entidade.
+No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`) com ênfase especial em **atomicidade contra race conditions** e **sincronização implícita via props**. A decisão arquitetural fundamental aqui foi a aplicação consolidada do padrão atômico (validado em E9C para Accounts) em um componente de detalhe cujo estado de contato é derivado de array-source via prop, garantindo sincronização automática sem setters explícitos.
 
 **Implicação estrutural (Recorte 38 em diante):**
 
@@ -434,16 +434,16 @@ No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativo
   - Falha silenciosa: erros logados com `console.error()`, nunca relançados
   - Se Supabase não configurado: skips automaticamente
 
-- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO + DRAWER SYNC:** Novo `handleUpdateNarrativas()` em `src/components/account/ContactDetailProfile.tsx`
-  - Padrão rígido com 4 passos:
+- **LOCAL-FIRST UPDATE — PADRÃO ATOMICAMENTE GARANTIDO + CALLBACK SYNC:** Novo `handleUpdateNarrativas()` em `src/components/account/ContactDetailProfile.tsx`
+  - Padrão rígido com 3 passos (sincronização implícita via prop derivada):
     1. **SNAPSHOT:** Captura snapshot completo do contato (todos 3 campos narrativos)
-    2. **SETSTATE LOCAL:** Uma única chamada `onUpdateContact()` que atualiza todos 3 campos simultaneamente no array-source (drawer pai)
-    3. **SETSTATE DRAWER:** Sincronização explícita de drawer (replicando E7.1 pattern): se contact.id aberto = target, reimpõe estado narrative local
-    4. **PERSIST:** Uma única chamada `persistContact()` com snapshot completo (não valores parciais/atuais)
+    2. **SETSTATE CALLBACK:** Uma única chamada `onUpdateContact(updatedContact)` que atualiza todos 3 campos simultaneamente no array-source (`localContatos`) em `AccountDetailView` (componente pai)
+    3. **PERSIST:** Uma única chamada `persistContact()` com snapshot completo (não valores parciais/atuais)
+  - **Sincronização implícita via prop:** Contato em `ContactDetailProfile` é prop derivada via `localContatos.find(c => c.id === contact.id)`. Quando `onUpdateContact()` atualiza array-source, re-render automático propagadiza novo valor via prop, sincronizando estados locais (`observacoes`, `historicoInteracoes`, `proximaAcao`) via useEffect existente.
   - Pseudocódigo:
     ```typescript
     const handleUpdateNarrativas = () => {
-      // 1. Snapshot
+      // 1. Snapshot (para validação, embora não usado aqui)
       const targetContact = contact;
       
       // 2. Build estado final (todos 3 campos)
@@ -454,12 +454,12 @@ No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativo
         proximaAcao: proximaAcao.trim(),
       };
       
-      // 3. Local-first setState
+      // 3. Dispara callback (o qual atualiza localContatos em AccountDetailView)
       if (onUpdateContact) {
-        onUpdateContact(updatedContact);  // atualiza array-source
+        onUpdateContact(updatedContact);  // atualiza array-source em AccountDetailView
       }
       
-      // 4. Persistir (fire-and-forget)
+      // 4. Persistir (fire-and-forget, desacoplado do estado local)
       persistContact({
         ...updatedContact,
         accountId: accountId,
@@ -467,7 +467,7 @@ No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativo
       }).catch(() => {});
     };
     ```
-  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (1 snapshot + 1 setState + 1 persist)
+  - Garantia: nenhuma chance de dois persists concorrentes sobrescreverem um ao outro (1 snapshot + 1 setState via callback + 1 persist). Sincronização implícita de drawer: prop `contact` recebe novo valor automaticamente quando pai re-renderiza.
 
 - **UI — Seção Narrativas Operacionais:** Nova seção em `src/components/account/ContactDetailProfile.tsx`
   - Estado local: 5 hooks (`editingNarrative: boolean`, `observacoes`, `historicoInteracoes`, `proximaAcao`, `narrativeStatus: string | null`)
@@ -482,9 +482,9 @@ No Recorte 38, expandimos o padrão E8 para incluir três novos campos narrativo
   - Imports atualizados em ContactDetailProfile.tsx para incluir tipos e `persistContact`
   - Sem `as any`, mapeamento explícito de 3 campos
 
-**Benefício arquitetural:** E8.1 demonstra que o padrão atomicamente garantido (E9C) é escalável a QUALQUER entidade com drawer, combinado com drawer sync pattern (E7.1). A consolidação de 1 snapshot + 1 setState (no array-source) + 1 persist é a chave para evitar divergência remota. Futuras expansões em contacts com múltiplos campos correlatos podem seguir este template exatamente.
+**Benefício arquitetural:** E8.1 demonstra que o padrão atomicamente garantido (E9C) é escalável a entidades com componentes de detalhe cuja state é prop derivada de array-source. A sincronização implícita (via re-render com prop atualizada) é mais simples que sincronização explícita (setDrawer() condicional em E7.1), eliminando lógica condicional. A consolidação de 1 snapshot + 1 setState (callback no pai) + 1 persist é a chave para evitar divergência remota. Futuras expansões em contacts com múltiplos campos correlatos podem seguir este template exatamente.
 
-**Validação de padrão:** E8.1 é a terceira aplicação do padrão atomicamente garantido (E9: Accounts tipoEstrategico → E9C: Accounts narrativos → E8.1: Contacts narrativos). Padrão consolidado e repetível em qualquer escrita defensiva multi-field.
+**Validação de padrão:** E8.1 é a terceira aplicação do padrão atomicamente garantido (E9: Accounts tipoEstrategico → E9C: Accounts narrativos → E8.1: Contacts narrativos). Padrão consolidado e repetível em qualquer escrita defensiva multi-field. Nota arquitetural: E7.1 (Signals) usa sincronização explícita (setDrawer condicional), enquanto E8.1 (Contacts) usa sincronização implícita (prop derivada) — ambas válidas, escolha depende de arquitetura de state parent/child.
 
 **Commits:** `8abd084` (E8.1 implementação defensiva de campos narrativos em Contacts via Recorte 38 com atomicidade garantida e drawer sync)
 

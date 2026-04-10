@@ -47,8 +47,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - ✅ Padrão defensivo reaplicável: snapshot + atomic setState + fire-and-forget validado 3x (E9/E7.1/E8.1)
   - ✅ Escrita defensiva cobrindo tríade core: Accounts (4 campos) → Signals (3 campos) → Contacts (3 campos)
 - **Commit Código:** `8abd084` — feat(contacts): add defensive narrative editing
-- **Commit Documentação:** (em progresso)
-- **Status:** ✅ Publicado em origin/main, documentação em sincronização.
+- **Commit Documentação:** `1161d1a` — docs(operacao): Recorte 38 — E8.1 Contacts campos narrativos com atomicidade
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
 
 ---
 
