@@ -13,7 +13,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - Removidos `tipoEstrategico` e `playAtivo` de `abmRepository`.
   - Importados e utilizados `getAccounts` e `persistAccount` em `src/pages/AbmStrategy.tsx` para gerenciar estritamente a mutação e leitura inicial desses campos top-level.
 - **Impacto na Persistência:** A dupla atualização simultânea ou ambígua para essas duas colunas de contas Supabase não é mais possível; as mutações passam exclusiva e canonicamente por `accountsRepository`.
-- **Commits:** `696bc59` — refactor(accounts): centralize tipoEstrategico and playAtivo ownership to accountsRepository.
+- **Commits:** `8ab95ed` — refactor(accounts): centralize tipoEstrategico and playAtivo ownership to accountsRepository.
 
 ---
 

@@ -80,4 +80,4 @@ Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do
 *Último estado funcional confiável: Recorte 41 (`616a8ca`)*
 *Recorte 42: documental/especificação — sem alteração de código*
 *Recorte 43: documental/mapa de cobertura — sem alteração de código*
-*Último estado funcional confiável pós-Recorte 44: (`696bc59`)*
+*Último estado funcional confiável pós-Recorte 44: (`8ab95ed`)*
