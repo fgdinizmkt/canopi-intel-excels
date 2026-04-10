@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 41 — último marco funcional: 616a8ca; commits posteriores de consistência documental: f4917a4 e ed67559)
+ `main` — sincronizada em 2026-04-10 (Recorte 41 — último marco funcional: 616a8ca; commits documentais posteriores de consistência: f4917a4 e ed67559)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX)
