@@ -53,6 +53,11 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
   const [ownerStatus, setOwnerStatus] = React.useState<string | null>(null);
   const [selectedClassifications, setSelectedClassifications] = React.useState<('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[]>(contact.classificacao || []);
   const [classificationStatus, setClassificationStatus] = React.useState<string | null>(null);
+  const [editingNarrative, setEditingNarrative] = React.useState<boolean>(false);
+  const [observacoes, setObservacoes] = React.useState<string>(contact.observacoes || '');
+  const [historicoInteracoes, setHistoricoInteracoes] = React.useState<string>(contact.historicoInteracoes || '');
+  const [proximaAcao, setProximaAcao] = React.useState<string>(contact.proximaAcao || '');
+  const [narrativeStatus, setNarrativeStatus] = React.useState<string | null>(null);
 
   const classificationOptions: ('Decisor' | 'Influenciador' | 'Champion' | 'Sponsor' | 'Blocker' | 'Técnico' | 'Negócio')[] = ['Decisor', 'Influenciador', 'Champion', 'Sponsor', 'Blocker', 'Técnico', 'Negócio'];
 
@@ -61,7 +66,11 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
     setOwnerStatus(null);
     setSelectedClassifications(contact.classificacao || []);
     setClassificationStatus(null);
-  }, [contact.id, contact.owner, contact.classificacao]);
+    setObservacoes(contact.observacoes || '');
+    setHistoricoInteracoes(contact.historicoInteracoes || '');
+    setProximaAcao(contact.proximaAcao || '');
+    setEditingNarrative(false);
+  }, [contact.id, contact.owner, contact.classificacao, contact.observacoes, contact.historicoInteracoes, contact.proximaAcao]);
 
   const handleAssignOwner = () => {
     if (!ownerInput.trim()) return;
@@ -151,6 +160,52 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
     setClassificationStatus('Classificação atualizada');
     setTimeout(() => setClassificationStatus(null), 1500);
   };
+
+  const handleUpdateNarrativas = () => {
+    // 1. Snapshot contato-alvo
+    const targetContact = contact;
+
+    // 2. Build estado final
+    const updatedContact: ContatoConta = {
+      id: targetContact.id,
+      nome: targetContact.nome,
+      cargo: targetContact.cargo,
+      area: targetContact.area,
+      senioridade: targetContact.senioridade,
+      papelComite: targetContact.papelComite,
+      forcaRelacional: targetContact.forcaRelacional,
+      receptividade: targetContact.receptividade,
+      acessibilidade: targetContact.acessibilidade,
+      status: targetContact.status,
+      classificacao: targetContact.classificacao,
+      influencia: targetContact.influencia,
+      potencialSucesso: targetContact.potencialSucesso,
+      scoreSucesso: targetContact.scoreSucesso,
+      ganchoReuniao: targetContact.ganchoReuniao,
+      liderId: targetContact.liderId,
+      owner: targetContact.owner,
+      observacoes: observacoes.trim(),
+      historicoInteracoes: historicoInteracoes.trim(),
+      proximaAcao: proximaAcao.trim(),
+    };
+
+    // 3. Update local ANTES da persistência (local-first)
+    if (onUpdateContact) {
+      onUpdateContact(updatedContact);
+    }
+
+    // 4. Persistir remotamente (fire-and-forget)
+    persistContact({
+      ...updatedContact,
+      accountId: accountId,
+      accountName: accountName,
+    }).catch(() => {});
+
+    setNarrativeStatus('Narrativas salvas');
+    setEditingNarrative(false);
+    setTimeout(() => setNarrativeStatus(null), 1500);
+  };
+
   // Cores semânticas Baseadas na Classificação
   const getClassColor = (classes: string[]) => {
     if (classes.includes('Blocker')) return 'bg-red-500/10 text-red-500 border-red-500/20';
@@ -309,6 +364,69 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           </div>
           {classificationStatus && (
             <p className="text-[9px] text-emerald-400 mt-2">{classificationStatus}</p>
+          )}
+        </section>
+
+        {/* --- EDITOR NARRATIVO (OBSERVAÇÕES, HISTÓRICO, PRÓXIMA AÇÃO) --- */}
+        <section className="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+              <MessageSquare className="w-3.5 h-3.5" /> Narrativas Operacionais
+            </h3>
+            <button
+              onClick={() => setEditingNarrative(!editingNarrative)}
+              className="text-[11px] font-black uppercase px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500 transition-all"
+            >
+              {editingNarrative ? '✕' : '✎'}
+            </button>
+          </div>
+
+          {editingNarrative ? (
+            <div className="space-y-3">
+              <div>
+                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Observações</label>
+                <textarea
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  placeholder="Notas tácticas sobre o stakeholder..."
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Histórico de Interações</label>
+                <textarea
+                  value={historicoInteracoes}
+                  onChange={(e) => setHistoricoInteracoes(e.target.value)}
+                  placeholder="Pontos-chave de conversas anteriores..."
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Próxima Ação</label>
+                <textarea
+                  value={proximaAcao}
+                  onChange={(e) => setProximaAcao(e.target.value)}
+                  placeholder="Recomendação para próximo passo..."
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                />
+              </div>
+              <button
+                onClick={handleUpdateNarrativas}
+                disabled={!!narrativeStatus}
+                className={`w-full h-8 text-[10px] font-black uppercase rounded-lg transition-all active:scale-95 ${narrativeStatus ? 'bg-emerald-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
+              >
+                {narrativeStatus ? '✓ Salvo' : 'Salvar Narrativas'}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2 text-xs text-slate-300">
+              {observacoes && <p className="text-[9px]"><span className="font-bold text-emerald-400">Obs:</span> {observacoes}</p>}
+              {historicoInteracoes && <p className="text-[9px]"><span className="font-bold text-emerald-400">Hist:</span> {historicoInteracoes}</p>}
+              {proximaAcao && <p className="text-[9px]"><span className="font-bold text-emerald-400">Próx:</span> {proximaAcao}</p>}
+              {!observacoes && !historicoInteracoes && !proximaAcao && (
+                <p className="text-[9px] text-slate-500 italic">Clique em ✎ para adicionar narrativas operacionais.</p>
+              )}
+            </div>
           )}
         </section>
 

@@ -34,6 +34,9 @@ export type ContactItem = {
   ganchoReuniao?: string;
   liderId?: string;
   owner?: string;
+  observacoes?: string;
+  historicoInteracoes?: string;
+  proximaAcao?: string;
   accountId: string;
   accountName: string;
 };
@@ -56,6 +59,9 @@ export type ContactRow = {
   ganchoReuniao?: string;
   liderId?: string;
   owner?: string;
+  observacoes?: string;
+  historicoInteracoes?: string;
+  proximaAcao?: string;
   accountId: string;
   accountName: string;
 };
@@ -78,6 +84,9 @@ export type RepositoryContact = {
   ganchoReuniao?: string;
   liderId?: string;
   owner?: string;
+  observacoes?: string;
+  historicoInteracoes?: string;
+  proximaAcao?: string;
   accountId: string;
   accountName: string;
 };
@@ -131,8 +140,12 @@ export async function getContacts(): Promise<RepositoryContact[]> {
         scoreSucesso,
         ganchoReuniao,
         liderId,
+        owner,
         accountId,
-        accountName
+        accountName,
+        observacoes,
+        historicoInteracoes,
+        proximaAcao
       `);
 
     if (error) {
@@ -175,6 +188,9 @@ export async function getContacts(): Promise<RepositoryContact[]> {
           ganchoReuniao: row.ganchoReuniao,
           liderId: row.liderId ?? undefined,
           owner: row.owner ?? undefined,
+          observacoes: row.observacoes,
+          historicoInteracoes: row.historicoInteracoes,
+          proximaAcao: row.proximaAcao,
           accountId: row.accountId || 'unknown',
           accountName: row.accountName || 'Conta desconhecida',
         };
@@ -200,6 +216,9 @@ export async function getContacts(): Promise<RepositoryContact[]> {
         ganchoReuniao: row.ganchoReuniao ?? mockContact.ganchoReuniao,
         liderId: row.liderId ?? mockContact.liderId,
         owner: row.owner ?? mockContact.owner,
+        observacoes: row.observacoes ?? mockContact.observacoes,
+        historicoInteracoes: row.historicoInteracoes ?? mockContact.historicoInteracoes,
+        proximaAcao: row.proximaAcao ?? mockContact.proximaAcao,
         accountId: row.accountId ?? mockContact.accountId,
         accountName: row.accountName ?? mockContact.accountName,
       };
@@ -250,6 +269,9 @@ export async function persistContact(contact: ContactItem): Promise<void> {
       ganchoReuniao: contact.ganchoReuniao,
       liderId: contact.liderId,
       owner: contact.owner,
+      observacoes: contact.observacoes,
+      historicoInteracoes: contact.historicoInteracoes,
+      proximaAcao: contact.proximaAcao,
       accountId: contact.accountId,
       accountName: contact.accountName
     };

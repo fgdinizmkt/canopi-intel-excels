@@ -40,6 +40,12 @@ export interface ContatoConta {
   scoreSucesso: number;
   /** Sugestão de abertura de conversa Canopi AI */
   ganchoReuniao?: string;
+  /** Observações tácticas sobre o stakeholder */
+  observacoes?: string;
+  /** Histórico de interações e pontos-chave */
+  historicoInteracoes?: string;
+  /** Próxima ação recomendada com este stakeholder */
+  proximaAcao?: string;
 }
 
 export interface OportunidadeConta {
