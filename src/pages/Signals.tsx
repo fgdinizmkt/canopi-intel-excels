@@ -30,6 +30,12 @@ export const Signals: React.FC = () => {
   const [selOwner, setSelOwner] = useState('');
   const [assignNote, setAssignNote] = useState('');
 
+  // Estados para edição de narrativas de sinais (E7.1)
+  const [editingSignalId, setEditingSignalId] = useState<string | null>(null);
+  const [editContext, setEditContext] = useState('');
+  const [editProbableCause, setEditProbableCause] = useState('');
+  const [editRecommendation, setEditRecommendation] = useState('');
+
   // Carrega sinais do Supabase com fallback para advancedSignals
   useEffect(() => {
     const carregarSignals = async () => {
@@ -87,6 +93,54 @@ export const Signals: React.FC = () => {
     setTimeout(() => setToast(prev => ({ ...prev, show: false })), 4000);
   };
   const closeMid = () => { setMidPanel(null); setMidData(null); };
+
+  // E7.1: Funções para edição de narrativas em sinais
+  const abrirEditorNarrativas = (signal: SignalItem) => {
+    setEditingSignalId(signal.id);
+    setEditContext(signal.context || '');
+    setEditProbableCause(signal.probableCause || '');
+    setEditRecommendation(signal.recommendation || '');
+  };
+
+  const fecharEditorNarrativas = () => {
+    setEditingSignalId(null);
+    setEditContext('');
+    setEditProbableCause('');
+    setEditRecommendation('');
+  };
+
+  // E7.1: Handler ATÔMICO para atualizar narrativas de sinal
+  // Padrão: 1 snapshot + 1 setState + 1 persist
+  const handleUpdateSignalNarrativas = (signalId: string, newContext: string, newProbableCause: string, newRecommendation: string) => {
+    // 1. Snapshot: captura estado completo do sinal
+    const targetSignal = signals.find(s => s.id === signalId);
+    if (!targetSignal) return;
+
+    // 2. Build: construir objeto atualizado preservando tudo
+    const updatedSignal: SignalItem = {
+      ...targetSignal,
+      context: newContext,
+      probableCause: newProbableCause,
+      recommendation: newRecommendation
+    };
+
+    // 3. SetState: UMA única chamada, usa prev para garantir estado atual
+    setSignals(prev => prev.map(s => s.id === signalId ? updatedSignal : s));
+
+    // 3.1: Sincronizar drawer se o sinal editado for o mesmo que está aberto
+    if (drawer?.id === signalId) {
+      setDrawer(updatedSignal);
+    }
+
+    // 4. Persist: UMA única chamada com snapshot completo (fire-and-forget)
+    persistSignal(updatedSignal).catch(() => {
+      // Silencioso — persistSignal já logou o erro
+    });
+
+    // Fechar modal e mostrar feedback
+    fecharEditorNarrativas();
+    t2('✓ Narrativas atualizadas', 'Contexto, causa e recomendação sincronizados');
+  };
 
   const ini = (n: string) => n ? n.split(' ').map(x => x[0]).join('').substring(0, 2).toUpperCase() : '??';
   const bc = (s: string) => s === 'crítico' ? 'badge-red' : s === 'alerta' ? 'badge-amber' : s === 'oportunidade' ? 'badge-blue' : 'badge-green';
@@ -419,7 +473,13 @@ export const Signals: React.FC = () => {
             <div className="drawer-body">
               <div><div style={{ fontSize: '19px', fontWeight: 800 }}>{drawer.title}</div><p style={{ fontSize: '13px', color: 'var(--slate-500)' }}>{drawer.context}</p></div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}><div className="info-block"><div className="info-block-label">Conta</div><div className="info-block-value">{drawer.account}</div></div></div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}><div className="info-block"><div className="info-block-label">Causa</div><div style={{ fontSize: '13px', fontWeight: 600 }}>{drawer.probableCause}</div></div><div style={{ borderRadius: '16px', padding: '16px 18px', background: ib(drawer.severity), border: '1px solid ' + ibr(drawer.severity) }}><div className="info-block-label">Impacto</div><div style={{ fontSize: '13px', fontWeight: 700, color: ic(drawer.severity) }}>{drawer.impact}</div></div></div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="info-block"><div className="info-block-label">Causa</div><div style={{ fontSize: '13px', fontWeight: 600 }}>{drawer.probableCause}</div></div>
+                  <div style={{ borderRadius: '16px', padding: '16px 18px', background: ib(drawer.severity), border: '1px solid ' + ibr(drawer.severity) }}><div className="info-block-label">Impacto</div><div style={{ fontSize: '13px', fontWeight: 700, color: ic(drawer.severity) }}>{drawer.impact}</div></div>
+                </div>
+                <button className="btn btn-sm btn-outline" style={{ marginTop: '2px', fontSize: '16px', padding: '6px 8px', minWidth: 'unset' }} onClick={() => abrirEditorNarrativas(drawer)} title="Editar narrativas">✎</button>
+              </div>
               <div className="ai-block">
                 <div className="ai-block-header"><div className="ai-icon">⚡</div><span className="ai-label">Recomendação IA</span></div>
                 <p className="ai-text">{drawer.recommendation}</p>
@@ -647,6 +707,77 @@ export const Signals: React.FC = () => {
             <button className="btn btn-primary btn-md" style={{ flex: 1 }} onClick={() => sendEmail('send')}>✉ Enviar agora</button>
           </div>
         </div>
+      )}
+
+      {/* ── E7.1: EDIÇÃO DE NARRATIVAS SINAL ── */}
+      {editingSignalId && (
+        <>
+          <div className="drawer-backdrop" onClick={fecharEditorNarrativas} style={{ display: 'block', zIndex: 50 }}></div>
+          <div className="mid" style={{ zIndex: 51 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
+              <div className="mid-title">Editar narrativas do sinal</div>
+              <button className="drawer-close" onClick={fecharEditorNarrativas}>✕</button>
+            </div>
+
+            <div style={{ marginBottom: '18px' }}>
+              <label className="form-label">Contexto</label>
+              <textarea
+                className="inp"
+                rows={3}
+                value={editContext}
+                onChange={e => setEditContext(e.target.value)}
+                placeholder="Descreva o contexto operacional do sinal..."
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '18px' }}>
+              <label className="form-label">Causa provável</label>
+              <textarea
+                className="inp"
+                rows={3}
+                value={editProbableCause}
+                onChange={e => setEditProbableCause(e.target.value)}
+                placeholder="Identifique a causa raiz ou origem do sinal..."
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '18px' }}>
+              <label className="form-label">Recomendação</label>
+              <textarea
+                className="inp"
+                rows={3}
+                value={editRecommendation}
+                onChange={e => setEditRecommendation(e.target.value)}
+                placeholder="Recomendação de ação ou investigação..."
+                style={{ resize: 'none' }}
+              />
+            </div>
+
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px 16px', marginBottom: '18px', fontSize: '12px', color: '#374151' }}>
+              <strong style={{ color: '#16a34a' }}>Ao salvar:</strong> narrativas serão atualizadas e sincronizadas com o banco de dados.
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="btn btn-outline btn-md" style={{ flex: 1 }} onClick={fecharEditorNarrativas}>Cancelar</button>
+              <button
+                className="btn btn-primary btn-md"
+                style={{ flex: 1 }}
+                onClick={() =>
+                  handleUpdateSignalNarrativas(
+                    editingSignalId,
+                    editContext,
+                    editProbableCause,
+                    editRecommendation
+                  )
+                }
+              >
+                ✓ Salvar narrativas
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* ── STAKEHOLDER ── */}
