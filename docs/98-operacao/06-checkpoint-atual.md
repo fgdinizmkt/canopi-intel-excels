@@ -32,9 +32,30 @@
 - ✅ Recorte 36: Modal de edição narrativa dual em Accounts view lista.
 - ✅ Recorte 36: Publicação: commit `a6604c2` — feat(accounts): add defensive narrative persistence publicado em origin/main.
 
+- ✅ Recorte 35: Escrita defensiva em Accounts expandida para `playAtivo`.
+- ✅ Recorte 35: Padrão dual-field snapshot garantindo integridade contra sobrescrita.
+- ✅ Recorte 35: Publicação: commit `cdbc4f3` — feat(accounts): add defensive playAtivo persistence publicado em origin/main.
+
 - ✅ Recorte 34: Repository layer expandido com persistAccount() para escrita defensiva (tipoEstrategico).
 - ✅ Recorte 34: UI mínima de toggle estrategico em Accounts view lista.
 - ✅ Recorte 34: Publicação: commit `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence publicado em origin/main.
+
+- ✅ Recorte 33: Escrita defensiva em ABM expandida para `playAtivo`.
+- ✅ Recorte 33: Repository layer expandido com `.upsert()` para múltiplos campos estratégicos.
+- ✅ Recorte 33: Publicação: commit `1c91d31` — feat(abm): expand defensive persistence to playAtivo publicado em origin/main.
+
+- ✅ Recorte 32: Primeira escrita defensiva em ABM (campo `tipoEstrategico`).
+- ✅ Recorte 32: Repository layer `persistAbm()` com padrão fire-and-forget.
+- ✅ Recorte 32: Publicação: commit `b944813` — feat(abm): add local-first strategic type persistence publicado em origin/main.
+
+- ✅ Recorte 31: Repository layer de ABX (Read-Only) implementado.
+- ✅ Recorte 31: Merge defensivo de objetos aninhados em `AbmStrategy.tsx`.
+- ✅ Recorte 31: Publicação: commit `04f634f` — feat(abx): add defensive read-only Supabase repository layer publicado em origin/main.
+
+- ✅ Recorte 30: Repository layer de ABM (Read-Only) implementado.
+- ✅ Recorte 30: Sincronização de `activeAccountId` com `accounts` derivada.
+- ✅ Recorte 30: Publicação: commit `4aa13f3` — feat(abm): add defensive read-only Supabase repository layer publicado em origin/main.
+
 
 ## O que está pendente
 - ⌛ Definição e aprovação do Recorte 42 pelo Orquestrador.

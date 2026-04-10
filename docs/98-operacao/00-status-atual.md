@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX: 616a8ca, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 41 — último marco funcional: 616a8ca; commits posteriores de consistência documental: f4917a4 e ed67559)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX)
@@ -494,7 +494,7 @@
 | Assistant Orquestrador | Recorte 16 Concluído | Cards acionáveis, handleCreateAction, extractCards() |
 | Supabase E1: Preparação | Recorte 21 Concluído (Fase E) | SDK instalado, cliente defensivo, .env com convenção dev/staging/prod |
 | Supabase E2-E5: Leitura | Recortes 22-25 Concluídos (Fase E) | Migração de leitura defensiva: Accounts, Signals, Contacts, Actions |
-| Supabase E6-E9: Escrita 1 | Recortes 26-36 Concluídos (Fase E) | Escrita defensiva: Actions, Signals, Contacts, Accounts (Campos core/operacionais) |
+| Supabase E6-E9: Escrita 1 | Recortes 26-39 Concluídos (Fase E) | Escrita defensiva: Actions, Signals, Contacts, Accounts (Campos core/operacionais + narrativas) |
 | Supabase E10-E11: ABM Core | Recortes 30-33 Concluídos (Fase E) | ABM Repository (Read/Write) + ABX Repository (Read) + playAtivo |
 | Supabase E12: ABM Narrativa | Recorte 40 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABM com atomicidade |
 | Supabase E13: ABX Narrativa | Recorte 41 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABX (estratégia, risco, sucesso) |
