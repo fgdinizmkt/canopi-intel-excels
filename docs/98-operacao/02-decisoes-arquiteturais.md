@@ -487,3 +487,35 @@ No Recorte 33, expandimos o padrão E11A para incluir novo campo `playAtivo`, de
 **Benefício:** E11B valida que o padrão defensivo (local-first + fire-and-forget) é escalável. Próximas expansões de campos em ABM (ou outras entidades) podem seguir exatamente este template sem reabrir discussão arquitetural.
 
 **Commits:** `1c91d31` (E11B implementação defensiva de playAtivo em ABM via Recorte 33)
+
+---
+
+### Decisão 13: Escrita Defensiva em Accounts (Recorte 34 — E9)
+
+No Recorte 34, abrimos o primeiro write path defensivo para a entidade de **accounts** (E9), complementando os padrões estabelecidos em E11A/E11B (ABM) e E6-E8 (Actions, Signals, Contacts). O escopo é mínimo e focado: primeiro campo `tipoEstrategico` com UI apenas na view `lista`.
+
+**Implicação estrutural (Recorte 34 em diante):**
+- **Type `TipoEstrategico`:** Union literal `'ABM' | 'ABX' | 'Híbrida' | 'Em andamento'` já existe em `src/data/accountsData.ts` e é importado em `accountsRepository.ts`
+- **PERSIST WRITE:** Novo `persistAccount()` implementado em `src/lib/accountsRepository.ts`
+  - Assinatura: `async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico }): Promise<void>`
+  - Persistência defensiva best-effort com upsert explícito por `id`
+  - Upsert payload: `.upsert({ id, tipoEstrategico }, { onConflict: 'id' })`
+  - Mapeamento explícito: apenas campos `{ id, tipoEstrategico }` enviados ao Supabase (payload mínimo)
+  - Falha silenciosa: erros são capturados e logados com `console.warn()`, nunca relançados, nunca impedem retorno
+  - Se Supabase não está configurado: skips automaticamente com `console.debug()`, retorna vazio
+- **LOCAL-FIRST UPDATE:** `handleUpdateTipoEstrategico()` implementado em `src/pages/Accounts.tsx`
+  - 1. Snapshot conta-alvo (validação)
+  - 2. `setContas()` — LOCAL-FIRST: atualiza estado imediatamente (SEM await)
+  - 3. `persistAccount({ id, tipoEstrategico })` — REMOTO: fire-and-forget (SEM await, SEM .catch())
+  - Garantia: alvo snapshot = alvo update local = alvo persist remoto
+- **UI — Escopo Mínimo:** 4 botões toggle (`ABM`, `ABX`, `Híbrida`, `Em andamento`) APENAS na view `lista`, coluna "Tipo estratégico"
+  - Grade e board permanecem somente leitura neste recorte (mantêm comportamento de `openAccount(conta.id)` sem edição)
+  - Cada botão dispara `handleUpdateTipoEstrategico(contaId, tipo)` ao clique
+  - Feedback visual: botão ativo fica colorido (blue, purple, amber, slate); inativos ficam transparentes com hover
+- **Tipagem:** Não há novo tipo — `TipoEstrategico` já existe
+  - AccountRow já inclui `tipoEstrategico?: TipoEstrategico` (linha 26)
+  - Imports atualizados em Accounts.tsx para incluir `persistAccount` e `TipoEstrategico`
+
+**Benefício:** Abre escrita defensiva em accounts com padrão estabelecido, validando que o modelo local-first + fire-and-forget é agnóstico à entidade. Futuras expansões de campos em accounts (ou outras entidades) podem seguir exatamente este template. Grade e board permanecem intactos neste recorte, mantendo encapsulamento mínimo.
+
+**Commits:** `650a4c4` (E9 implementação defensiva de tipoEstrategico em Accounts via Recorte 34)

@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-09 (Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo): b944813, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico): 650a4c4, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 32 — Supabase E11A: Escrita Defensiva em ABM (escopo mínimo))
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico))
 
 ---
 
@@ -360,10 +360,22 @@
 - **Commit:** `1c91d31` — feat(abm): expand defensive persistence to playAtivo
 - **Status:** ✅ Publicado em origin/main
 
+**Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (campo inicial: tipoEstrategico)** — 2026-04-10
+- ✅ Primeira escrita defensiva na entidade de accounts (complementar a E11A/E11B em ABM)
+- ✅ Implementação de `persistAccount()` em `src/lib/accountsRepository.ts`
+- ✅ Persistência defensiva best-effort: `.upsert({ id, tipoEstrategico }, { onConflict: 'id' })` explícito
+- ✅ Payload mínimo `{ id, tipoEstrategico }` — únicos campos escritos, falha silenciosa/logging defensivo
+- ✅ Implementação de `handleUpdateTipoEstrategico()` em `src/pages/Accounts.tsx` com padrão local-first + fire-and-forget
+- ✅ UI mínima: 4 botões toggle (`ABM`, `ABX`, `Híbrida`, `Em andamento`) apenas na view `lista`, coluna "Tipo estratégico"
+- ✅ Grade e board permanecem somente leitura neste recorte (abrem account detail sem edição)
+- ✅ Build Exit 0 (validado, 2 files changed, 66 insertions, 3 deletions)
+- **Commit:** `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence
+- **Status:** ✅ Publicado em origin/main
+
 ## Próximo Passo
 
-- **Status Atual:** Recorte 33 concluído e publicado em origin/main
-- **Novo Recorte:** Definir e aprovar o Recorte 34
+- **Status Atual:** Recorte 34 concluído e publicado em origin/main
+- **Novo Recorte:** Definir e aprovar o Recorte 35
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

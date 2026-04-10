@@ -5,6 +5,46 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 34 (Supabase E9): Escrita Defensiva em Accounts (campo inicial: tipoEstrategico) — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E9: primeiro write path defensivo em accounts, complementando E11A/E11B em ABM e E6-E8 em Actions/Signals/Contacts).
+- **Alto:** Abrir escrita defensiva em accounts com `tipoEstrategico`, validando que padrão local-first + fire-and-forget é agnóstico à entidade e escalável.
+- **Contexto:** Recortes 32/33 demonstraram padrão defensivo em ABM (tipoEstrategico e playAtivo). Recorte 34 transpõe padrão para accounts com escopo mínimo: UI apenas em view `lista` (4 botões), grade e board intactos (somente leitura).
+- **Ações Executadas:**
+  - **Repositório (`src/lib/accountsRepository.ts`):**
+    * +`persistAccount()` implementado: assinatura `async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico }): Promise<void>`
+    * +Persistência defensiva best-effort: upsert explícito por `id`, payload mínimo `{ id, tipoEstrategico }`
+    * +Upsert: `.upsert({ id: account.id, tipoEstrategico: account.tipoEstrategico }, { onConflict: 'id' })`
+    * +Falha silenciosa: erros capturados em try/catch e logados com `console.warn()`, nunca relançados
+    * +Supabase não configurado: skips automaticamente com `console.debug()`, retorna vazio
+  - **Página Local-first (`src/pages/Accounts.tsx`):**
+    * +Imports: `persistAccount` de repository, `TipoEstrategico` de data
+    * +`handleUpdateTipoEstrategico(contaId: string, newTipo: TipoEstrategico)` implementado com padrão rígido:
+      - 1. Snapshot conta-alvo (validação)
+      - 2. `setContas()` — LOCAL-FIRST: atualiza estado imediatamente (SEM await)
+      - 3. `persistAccount({ id: contaId, tipoEstrategico: newTipo })` — REMOTO: fire-and-forget (SEM await)
+    * +UI Mínima: 4 botões toggle (`ABM`, `ABX`, `Híbrida`, `Em andamento`) APENAS em view `lista`, coluna "Tipo estratégico"
+      - Grade e board permanecem somente leitura (mantêm comportamento original de `openAccount(conta.id)`)
+      - Feedback visual: botão ativo colorido (blue-500, purple-500, amber-500, slate-500); inativos transparentes com hover
+      - Cada clique dispara `handleUpdateTipoEstrategico(conta.id, tipo)` imediatamente
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 2 files, 66 insertions(+), 3 deletions(-)
+    * Type safety: TipoEstrategico union literal explícita, imports corretos, sem `as any`
+    * Fallback: em erro Supabase, UI local permanece atualizada; nenhuma rollback, logging defensivo
+    * Escopo: lista apenas (66 linhas), grade/board intactos (encapsulamento mínimo mantido)
+- **Impacto:**
+  - ✅ Primeira escrita em accounts seguindo padrão E11A/E11B (consolidado 5+ vezes em Actions, Signals, Contacts, ABM)
+  - ✅ UI mínima e segura: 4 botões inline apenas em lista view
+  - ✅ Local-first + fire-and-forget validado em nova entidade
+  - ✅ Grade e board não afetados — permanecem leitura pura
+  - ✅ Template estabelecido para expansão futura (playAtivo, etc) seguindo mesmo padrão defensivo
+  - ✅ Arquitetura escala de novo: local-first não é "apenas em Context", aplica-se em repositories de escrita defensiva
+- **Commit Código:** `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence
+- **Commit Documentação:** docs(ops): sync Recorte 34 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada, pronto para Recorte 35.
+
+---
+
 ## [2026-04-09] — Hotfix P0: Recuperação Visual da Página /sinais — Concluído
 - **Tipo:** Hotfix operacional pós-Recorte 33 (não previsto em recorte, regressão descoberta durante validação).
 - **Causa Raiz:** Stylesheet `signals.css` estava sendo importado do componente reutilizável (`src/pages/Signals.tsx`), causando falha de carregamento em Next.js App Router.

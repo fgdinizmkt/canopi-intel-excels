@@ -1,18 +1,18 @@
-# Checkpoint Atual — 2026-04-09
+# Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 33 concluído + Hotfix P0 `/sinais` publicado. Main estável em origin/main.
+**Status:** Recorte 34 concluído e publicado. Main estável em origin/main.
 
-**Hotfix Operacional Publicado (pós-Recorte 33):**
-- Commit: `90401f2` — `fix(signals): restore page styling via route-level CSS import`
-- Causa: Stylesheet de sinais movido para ponto correto da rota App Router
-- Impacto: Página `/sinais` recupera estilos visuais; funcionalidade preservada
+**Recorte 34 Publicado:**
+- Commit: `650a4c4` — `feat(accounts): add defensive tipoEstrategico persistence`
+- Descrição: Primeira escrita defensiva em accounts com campo `tipoEstrategico`, local-first + fire-and-forget
+- Impacto: UI mínima (4 botões toggle em lista), grade/board intactos
 
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 34.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 35.
 
 ## Último Estado Confiável
-**Recorte 33 — Supabase E11B: Expandir Escrita Defensiva em ABM — Play Ativo** (commit `1c91d31`, publicado em origin/main)
+**Recorte 34 — Supabase E9: Escrita Defensiva em Accounts (tipoEstrategico)** (commit `650a4c4`, publicado em origin/main)
 **Hotfix Operacional P0 `/sinais`** (commit `90401f2`, publicado em origin/main — pós-Recorte 33)
 
 ## O que está concluído
@@ -186,8 +186,18 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 34.
 - ✅ Recorte 33: Build: Exit 0 (validado, 2 files changed, 57 insertions, 7 deletions).
 - ✅ Recorte 33: Publicação: commit `1c91d31` — feat(abm): expand defensive persistence to playAtivo publicado em origin/main.
 
+- ✅ Recorte 34: Repository layer `src/lib/accountsRepository.ts` expandido com `persistAccount()` para escrita defensiva.
+- ✅ Recorte 34: `persistAccount()`: upsert por id via Supabase, payload mínimo `{ id, tipoEstrategico }`, falha silenciosa.
+- ✅ Recorte 34: Padrão local-first em `src/pages/Accounts.tsx`: `handleUpdateTipoEstrategico()` com snapshot/setState/persist.
+- ✅ Recorte 34: Fire-and-forget: persistAccount() dispara SEM await, nunca bloqueia UX, falhas logadas silenciosamente.
+- ✅ Recorte 34: UI mínima: 4 botões toggle (`ABM`, `ABX`, `Híbrida`, `Em andamento`) APENAS em view `lista`.
+- ✅ Recorte 34: Grade e board intactos — permanecem somente leitura, sem mudança de comportamento.
+- ✅ Recorte 34: Validação: padrão defensivo é agnóstico à entidade (comprovado em Actions E6, Signals E7, Contacts E8, ABM E11A/E11B, Accounts E9).
+- ✅ Recorte 34: Build: Exit 0 (validado, 2 files changed, 66 insertions, 3 deletions).
+- ✅ Recorte 34: Publicação: commit `650a4c4` — feat(accounts): add defensive tipoEstrategico persistence publicado em origin/main.
+
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 34 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 35 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Aguardar aprovação do Orquestrador para definir o Recorte 34 (continuação da Fase E — Supabase Migration & Scale).
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 35.
