@@ -414,19 +414,24 @@
 - **Commit:** `16e673e` — feat(signals): add defensive narrative editing with modal
 - **Status:** ✅ Publicado em origin/main
 
-- **Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
-  - Commit código: `8abd084` | Commit docs: `1161d1a`
-- **Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
-  - Commit código: `a60f2f9` | Commit docs: `c747f0c`
-  - ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
-  - ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
-  - ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
-  - ✅ ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
-  - ✅ Fire-and-forget: persistAction() sem await, falhas logadas silenciosamente.
-  - ✅ Type safety consolidado: 3 campos narrativos tipados via ActionItem.
-  - ✅ Build Exit 0 (validado, 3 files changed, 155 insertions, 2 deletions).
-  - **Commit:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
-  - **Status:** ✅ Publicado em origin/main
+**Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts** — 2026-04-10
+- ✅ Expansão de escrita defensiva em contacts para campos narrativos (`resumoProspect`, `notasInteracao`).
+- ✅ Replicação de padrão atômico: snapshot + persistência fire-and-forget.
+- ✅ UI discreta: modal de edição via ícone ✎ na ficha do contato.
+- ✅ Build validado.
+- **Commit:** `8abd084` — feat(contacts): add defensive narrative persistence
+- **Status:** ✅ Publicado em origin/main
+
+**Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions** — 2026-04-10
+- ✅ Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`).
+- ✅ Replicação de padrão atômico: 1 snapshot + 1 setState + 1 persist.
+- ✅ Implementação de handler ATÔMICO `handleUpdateNarrativas()` em `src/pages/Actions.tsx`.
+- ✅ ModalTab expandido com "narrativa", ActionOverlay + 4ª aba discreta.
+- ✅ Fire-and-forget: persistAction() sem await, falhas logadas silenciosamente.
+- ✅ Type safety consolidado: 3 campos narrativos tipados via ActionItem.
+- ✅ Build Exit 0 (validado).
+- **Commit:** `a60f2f9` — feat(actions): add defensive narrative editing with atomicity
+- **Status:** ✅ Publicado em origin/main
 
 - **Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM** — 2026-04-10
   - ✅ Expansão de escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`).
