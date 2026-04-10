@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions: a60f2f9, publicado em origin/main)
+ `main` — sincronizada em 2026-04-10 (Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM: 88bceb3, publicado em origin/main)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM)
 
 ---
 

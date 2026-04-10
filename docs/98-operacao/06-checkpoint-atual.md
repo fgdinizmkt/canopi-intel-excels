@@ -1,8 +1,13 @@
 # Checkpoint Atual — 2026-04-10
 
-**Status:** Recorte 39 concluído e publicado. Main estável em origin/main.
+**Status:** Recorte 40 concluído e publicado. Main estável em origin/main.
 
-**Recorte 39 Publicado:**
+**Recorte 40 Publicado:**
+- Commit: `88bceb3` — `feat(abm): add defensive strategic narrative persistence`
+- Descrição: Expansão de escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) dentro do objeto `abm`, replicando padrão atômico de Accounts/Signals/Actions/Contacts
+- Impacto: Seção "Narrativa Estratégica" no card de ranking ABM com UI dupla (read/edit), 3 textareas (dentro do objeto abm), atomicidade garantida contra race conditions, persistência fire-and-forget, merge defensivo em useMemo
+
+**Recorte 39 Publicado (Anterior):**
 - Commit: `a60f2f9` — `feat(actions): add defensive narrative editing with atomicity`
 - Descrição: Expansão de escrita defensiva em actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`), replicando padrão atômico de Signals e Contacts
 - Impacto: Aba "Narrativa Operacional" no ActionOverlay com UI dupla (read/edit), 3 textareas, atomicidade garantida contra race conditions, persistência fire-and-forget
@@ -12,15 +17,13 @@
 - Descrição: Expansão de escrita defensiva em contacts para 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`), replicando padrão atômico de Signals
 - Impacto: Seção "Narrativas Operacionais" em ContactDetailProfile com edit mode (✎) para 3 textareas, atomicidade garantida contra race conditions, drawer sincronizado com array de source
 
-**Recorte 37 Publicado (Anterior):**
-- Commit: `16e673e` — `feat(signals): add defensive narrative editing with modal`
-- Descrição: Expansão de escrita defensiva em signals para 3 campos narrativos (`context`, `probableCause`, `recommendation`), introduzindo drawer synchronization pattern
-
 ## Objetivo Atual
 Prosseguir Fase E — Supabase Migration & Scale.
-Próximo passo: definição e aprovação do Orquestrador para o Recorte 39.
+Próximo passo: definição e aprovação do Orquestrador para o Recorte 41.
 
 ## Último Estado Confiável
+**Recorte 40 — Supabase E12: Campos Narrativos Estratégicos em ABM (strategyNarrative + riskAssessment + successCriteria)** (commit `88bceb3`, publicado em origin/main)
+**Recorte 39 — Supabase E6.1: Campos Narrativos Editáveis em Actions (resolutionPath + executionNotes + learnings)** (commit `a60f2f9`, publicado em origin/main — pré-Recorte 40)
 **Recorte 38 — Supabase E8.1: Campos Narrativos Editáveis em Contacts (observacoes + historicoInteracoes + proximaAcao)** (commit `8abd084`, publicado em origin/main)
 **Recorte 37 — Supabase E7.1: Campos Narrativos Editáveis em Signals (context + probableCause + recommendation)** (commit `16e673e`, publicado em origin/main — pré-Recorte 38)
 **Recorte 36 — Supabase E9C: Escrita Defensiva em Accounts (resumoExecutivo + proximaMelhorAcao)** (commit `a6604c2`, publicado em origin/main — pré-Recorte 37)
@@ -232,6 +235,31 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 39.
 - ✅ Recorte 37: Build: Exit 0 (validado 2x, sem regressões).
 - ✅ Recorte 37: Publicação: commit `16e673e` — feat(signals): add defensive narrative editing with modal publicado em origin/main.
 
+- ✅ Recorte 38: Repository layer `src/lib/contactsRepository.ts` expandido: 3 campos narrativos (`observacoes`, `historicoInteracoes`, `proximaAcao`) em ContactItem/ContactRow.
+- ✅ Recorte 38: `getContacts()` expandida para trazer 3 campos, merge defensivo com nullish coalescing, shell seguro com type guards.
+- ✅ Recorte 38: `persistContact()` expandida para mapear 3 campos narrativos com upsert atomicamente garantido.
+- ✅ Recorte 38: Padrão local-first em `src/components/account/ContactDetailProfile.tsx`: `handleUpdateNarrativas()` com snapshot atomicamente garantido.
+- ✅ Recorte 38: Atomicidade contra race conditions: 1 snapshot + 1 setState 3 campos + 1 persist 3 campos, com sincronização via callback `onUpdateContact()`.
+- ✅ Recorte 38: Seção "Narrativas Operacionais" com UI dupla (read/edit), toggle ✎, 3 textareas (3 linhas), feedback "✓ Salvo".
+- ✅ Recorte 38: **Drawer synchronization pattern replicado:** onUpdateContact() sincroniza contato aberto com source of truth (array em AccountDetailView).
+- ✅ Recorte 38: Fire-and-forget: persistContact() dispara SEM await, nunca bloqueia UX, falhas logadas silenciosamente.
+- ✅ Recorte 38: Type safety: 3 campos narrativos tipados via ContactItem, nenhum `as any`, guards contra undefined.
+- ✅ Recorte 38: Build: Exit 0 (validado 3x, sem regressões).
+- ✅ Recorte 38: Publicação: commit `8abd084` — feat(contacts): add defensive narrative editing publicado em origin/main.
+
+- ✅ Recorte 40: Modelagem `Conta.abm` expandida com 3 campos narrativos opcionais: `strategyNarrative`, `riskAssessment`, `successCriteria`.
+- ✅ Recorte 40: Repository layer `src/lib/abmRepository.ts` expandido: `AbmRow.abm` contém 3 campos narrativos.
+- ✅ Recorte 40: `getAbm()` mantém leitura de `abm` como objeto completo (narrativas dentro, não top-level).
+- ✅ Recorte 40: `persistAbm()` refatorada: tipagem explícita `AbmRow['abm']`, sem `Record<string, any>`.
+- ✅ Recorte 40: `AbmStrategy.tsx`: 5 hooks de estado para narrativa, useEffect sincroniza com `activeAccount.abm?.fieldName`.
+- ✅ Recorte 40: Handler `handleUpdateAbmNarrativas()`: snapshot → build(updatedAbmObject) → setState → persistAbm.
+- ✅ Recorte 40: UI dupla (read/edit) em seção "Narrativa Estratégica", 3 textareas (dentro de abm), feedback "✓ Salvo".
+- ✅ Recorte 40: Merge em useMemo: narrativas preservadas dentro do spread `{...remote.abm}`.
+- ✅ Recorte 40: Fire-and-forget: persistAbm() dispara SEM await, nunca bloqueia UX.
+- ✅ Recorte 40: Type safety: AbmRow tipado explicitamente, nenhum `any`, modelagem corrigida para narrativas dentro de abm.
+- ✅ Recorte 40: Build: Exit 0 (validado).
+- ✅ Recorte 40: Publicação: commit `88bceb3` — feat(abm): add defensive strategic narrative persistence publicado em origin/main.
+
 - ✅ Recorte 39: Repository layer expandido com `resolutionPath`, `executionNotes`, `learnings` em ActionRow.
 - ✅ Recorte 39: `getActions()` expandida para trazer 3 campos narrativos, shell seguro com type guards.
 - ✅ Recorte 39: `persistAction()` expandida para mapear 3 campos narrativos com upsert atomicamente garantido.
@@ -244,7 +272,7 @@ Próximo passo: definição e aprovação do Orquestrador para o Recorte 39.
 - ✅ Recorte 39: Publicação: commit `a60f2f9` — feat(actions): add defensive narrative editing with atomicity publicado em origin/main.
 
 ## O que está pendente
-- ⌛ Definição e aprovação do Recorte 40 pelo Orquestrador.
+- ⌛ Definição e aprovação do Recorte 41 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 40.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo recorte: definição e aprovação do Recorte 41.

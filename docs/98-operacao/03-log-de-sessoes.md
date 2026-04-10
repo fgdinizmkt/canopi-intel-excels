@@ -5,6 +5,48 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 40 (Supabase E12): Campos Narrativos Estratégicos em ABM — Concluído
+- **Fase:** Fase E — Supabase Migration & Scale (E12: expansão de escrita defensiva para camada estratégica em ABM).
+- **Alto:** Expandir escrita defensiva em ABM para 3 campos narrativos estratégicos (`strategyNarrative`, `riskAssessment`, `successCriteria`) dentro do objeto `abm`, replicando padrão atômico validado em Accounts/Signals/Actions/Contacts.
+- **Contexto:** Recortes 34/36 (Accounts), 37 (Signals), 38 (Contacts), 39 (Actions) consolidaram escrita defensiva em entidades core. Recorte 40 expande padrão para camada estratégica (ABM), fechando ciclo narrativo e expandindo para dimensão estratégica.
+- **Ações Executadas:**
+  - **Modelagem (`src/data/accountsData.ts`):**
+    * +Interface `Conta.abm` expandida com 3 campos opcionais narrativos: `strategyNarrative`, `riskAssessment`, `successCriteria`
+  - **Repository (`src/lib/abmRepository.ts`):**
+    * +Type `AbmRow.abm` expandido com 3 campos narrativos
+    * `getAbm()`: query SELECT mantém leitura apenas de `abm` (narrativas vivem dentro do objeto, não top-level)
+    * +`persistAbm()` refatorada: aceita `abm?: {...}` com 3 campos narrativos + preservação de campos existentes
+    * Tipagem explícita sem `Record<string, any>` — payload tipado como `AbmRow['abm']`
+  - **UI (`src/pages/AbmStrategy.tsx`):**
+    * +5 hooks de estado para narrativa (`editingNarrative`, 3 campos, `narrativeStatus`)
+    * +useEffect sincroniza narrativas ao trocar de conta ativa (lê de `activeAccount.abm?.strategyNarrative`, etc)
+    * +Handler ATÔMICO `handleUpdateAbmNarratives()`:
+      - 1 snapshot: conta-alvo capturada
+      - 1 build: `updatedAbmObject` com merge de `activeAccount.abm` + 3 novos campos (trim, undefined se vazio)
+      - 1 setState: atualiza `supabaseAbm` local-first
+      - 1 persistAbm: fire-and-forget
+    * +Seção discreta "Narrativa Estratégica": UI dupla (read/edit), toggle ✎, 3 textareas (3 linhas), "Salvar/Cancelar", feedback "✓ Salvo"
+    * Merge em `useMemo(accounts)`: narrativas dentro do spread `{...remote.abm}`
+  - **Validação Técnica:**
+    * Build: Exit 0 (sem regressões)
+    * 3 files, 179 insertions(+), 13 deletions(-)
+    * Type safety: `AbmRow['abm']` usado explicitamente, nenhum `as any`, fields tipadas
+    * Atomicidade: 1 snapshot → 1 build(abm) → 1 setState → 1 persistAbm
+    * Modelagem: narrativas vivem DENTRO de `abm`, não top-level (validação de estrutura correta)
+    * Fire-and-forget: persistAbm() nunca bloqueia, falhas logadas silenciosamente
+- **Impacto:**
+  - ✅ Narrativas estratégicas em ABM editáveis (racional + risco + sucesso)
+  - ✅ Persistência atômica: zero race condition entre 3 campos dentro de abm
+  - ✅ Seção discreta em card de ranking ABM sem refactor da página
+  - ✅ Padrão defensivo validado em 5ª dimensão: Accounts → Signals → Actions → Contacts → ABM
+  - ✅ Ciclo narrativo expandido: tríade core + camada estratégica têm narrativas com atomicidade
+  - ✅ Escalabilidade consolidada: padrão é agnóstico a entidade E a estrutura (narrativas podem viver em objects aninhados ou top-level, padrão atomicamente garantido)
+- **Commit Código:** `88bceb3` — feat(abm): add defensive strategic narrative persistence
+- **Commit Documentação:** `0103ab8` — docs(ops): sync Recorte 40 publication state
+- **Status:** ✅ Publicado em origin/main, documentação sincronizada.
+
+---
+
 ## [2026-04-10] — Recorte 39 (Supabase E6.1): Campos Narrativos Editáveis em Actions — Concluído
 - **Fase:** Fase E — Supabase Migration & Scale (E6.1: expansão de E6 em actions, fechando ciclo narrativo com E7.1/E8.1).
 - **Alto:** Expandir escrita defensiva em Actions para 3 campos narrativos (`resolutionPath`, `executionNotes`, `learnings`), replicando padrão atômico validado em Recortes 37 e 38.
