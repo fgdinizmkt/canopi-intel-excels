@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 46 (Supabase E15) Concluído
+# Checkpoint Atual — Recorte 47 (Supabase E16) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 46 Concluído
-- **Status da Infra:** Build íntegro, persistência defensiva lendo propriedades agregadas como Oportunidades sem comprometer UI ou lints.
+- **Marco:** Recorte 47 Concluído
+- **Status da Infra:** Build íntegro, read path fechado em AccountDetailView, escrita atômica de Inteligência Cumulativa validada.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -79,11 +79,16 @@
   - UI com overlay de edição e botão explícito "Salvar".
   - Publicação: commit `2f91d47` em `origin/main`.
 
+- ✅ Recorte 47 (Funcional): Escrita Defensiva Atômica de Inteligência (E16)
+  - Ciclo completo de leitura, merge e escrita de `inteligencia`.
+  - Read path assíncrono fechado em `AccountDetailView.tsx`.
+  - Publicação: commit `9ec0667` em `origin/main`.
+
 ## O que está pendente
-- Definição do Recorte 47 pelo Orquestrador.
+- Definição do Recorte 48 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 47.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 48.
 
 ---
-*Último estado funcional confiável: Recorte 46 (`2f91d47`)*
+*Último estado funcional confiável: Recorte 47 (`9ec0667`)*

@@ -186,6 +186,7 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Accounts — scores (`icp`, `crm`, `vp`, `ct`, `ft`) | ✅ | ⬜ | R30 (read), sem write |
 | Accounts — campos editoriais (`resumoExecutivo`, `proximaMelhorAcao`) | ✅ | ✅ | R34/R35 |
 | Accounts — `tipoEstrategico`, `playAtivo` | ✅ | ✅ | R32/R33/R34/R35 |
+| Accounts — `inteligencia` (Cumulativa) | ✅ | ✅ | R47 |
 | Signals — operacionais + narrativos | ✅ | ✅ | R37 |
 | Contacts — todos os campos cobertos | ✅ | ✅ | R38 |
 | Actions — todos os campos cobertos | ✅ | ✅ | R39 |
@@ -205,7 +206,6 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `acoes[]` — array de `AcaoConta` (lidas via `actionsRepository`)
 - `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
 - `canaisCampanhas` — objeto — **sem repository Supabase**
-- `inteligencia` — objeto com 6 arrays — **sem repository Supabase**
 - `tecnografia` — array de strings — **sem repository Supabase**
 - `historico[]` — array — **sem repository Supabase**
 - `leituraFactual[]`, `leituraInferida[]`, `leituraSugerida[]` — arrays — **sem repository Supabase**

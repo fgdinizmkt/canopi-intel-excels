@@ -5,6 +5,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-11] — Recorte 47 (Supabase E16): Escrita Defensiva Atômica de Inteligência Acumulada — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar o ciclo completo de leitura, merge e escrita defensiva atômica para o objeto `inteligencia` da entidade Conta, garantindo que o read path da UI seja alimentado pelo repositório.
+- **Ações Executadas:**
+  - **Refatoração Repository:** `persistAccount` agora aceita o payload de `inteligencia` (6 arrays de strings) e `getAccounts` realiza o merge defensivo desse objeto vindo do Supabase.
+  - **Refatoração UI:** `AccountDetailView.tsx` migrada para read path assíncrono via `getAccounts()`, eliminando lookup direto em `contasMock`.
+  - **Atomicidade:** Implementado padrão de salvamento atômico para os blocos de inteligência via `handleSaveInteligencia`, preservando a integridade local-first.
+  - **Estabilização:** Resolução de erro de build atrelado a prerender e dependências residuais.
+- **Commits:** `9ec0667` — feat(supabase): E16 atomic write & sync read path for inteligencia
+- **Status:** ✅ Publicado localmente e remoto (origin/main). Próximo passo: definição do Recorte 48.
+
 ## [2026-04-10] — Recorte 46 (Supabase E15): Escrita Defensiva Atômica de Oportunidades — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.
