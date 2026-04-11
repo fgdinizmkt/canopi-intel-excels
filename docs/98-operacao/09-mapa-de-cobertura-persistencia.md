@@ -142,6 +142,7 @@ Nenhum campo será alterado como resultado deste documento.
 | `title`, `status`, `priority` | ✅ | ✅ | Supabase | — |
 | `ownerName`, `accountName` | ✅ | ✅ | Supabase | — |
 | `resolutionPath` | ✅ | ✅ | Supabase | — (Recorte 39) |
+| `executionNotes` | ✅ | ✅ | Supabase | — (Recorte 39) |
 | `learnings` | ✅ | ✅ | Supabase | — (Recorte 39) |
 
 ---
