@@ -20,6 +20,7 @@ Este projeto é a plataforma Canopi | intel excels.
 - **Aprovação:** Seguir o fluxo: *Executar → Build → Diff Stat → Diff Real → Aprovação Usuário → Commit*.
 - **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
 - **Retomada:** Em caso de quebra, usar estritamente a documentação como fonte da verdade.
+- **Continuidade Operacional:** Após cada validação, aprovação ou fechamento de estado, se houver continuidade operacional clara, entregar exatamente **1 próximo prompt operacional**. Só parar sem novo prompt quando o usuário mandar aguardar retorno de outro agente ou bloquear novas ações. Encerrar em "estado validado" sem converter isso no próximo comando é erro de processo recorrente e não deve se repetir.
 
 ---
 

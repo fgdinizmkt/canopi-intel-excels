@@ -32,8 +32,8 @@ Ao final da implementação, confirmar explicitamente:
 
 - Não pedir autorização para commit antes de mostrar build, diff stat, diff real e checklist.
 - Não sugerir `git add`, `git commit` ou `git push` antes da aprovação explícita.
-- Não encerrar entrega com próximo passo operacional.
-- Encerrar sempre com: `Parado antes de commit. Aguardando aprovação.`
+- Após cada validação, aprovação ou fechamento de estado, se houver continuidade operacional clara, entregar exatamente **1 próximo prompt operacional**. Só parar sem novo prompt quando o usuário mandar aguardar retorno de outro agente ou bloquear novas ações. Encerrar em "estado validado" sem converter isso no próximo comando é erro de processo recorrente e não deve se repetir.
+- Encerrar pedidos de aprovação sempre com: `Parado antes de commit. Aguardando aprovação.`
 - Não substituir diff real por resumo narrativo.
 - Não usar expressões como:
   - `omitido para brevidade`
