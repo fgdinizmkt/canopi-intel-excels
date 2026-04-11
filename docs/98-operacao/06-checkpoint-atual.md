@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 43 Documental (Mapa de Cobertura Concluído)
+# Checkpoint Atual — Recorte 45 (Supabase E14) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 41 Concluído
-- **Status da Infra:** Build íntegro, persistência defensiva via Supabase validada em 6 dimensões.
+- **Marco:** Recorte 45 Concluído
+- **Status da Infra:** Build íntegro, persistência defensiva lendo propriedades agregadas como Oportunidades sem comprometer UI ou lints.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -70,14 +70,15 @@
   - Escrita via `abmRepository` desativada para esses campos.
   - Atualização do Mapa de Cobertura Documental.
 
+- ✅ Recorte 45 (Funcional): Leitura Defensiva de Oportunidades (E14)
+  - `oportunidadesRepository.ts` validado e estruturado.
+  - Orquestração de mock persistida em `accountsRepository.ts`.
+
 ## O que está pendente
-- Definição do Recorte 45 pelo Orquestrador.
+- Definição do Recorte 46 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 45.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 46.
 
 ---
-*Último estado funcional confiável: Recorte 41 (`616a8ca`)*
-*Recorte 42: documental/especificação — sem alteração de código*
-*Recorte 43: documental/mapa de cobertura — sem alteração de código*
-*Último estado funcional confiável pós-Recorte 44: (`8ab95ed`)*
+*Último estado funcional confiável: Recorte 45 (`81a1c6b`)*

@@ -142,8 +142,21 @@ Nenhum campo será alterado como resultado deste documento.
 | `title`, `status`, `priority` | ✅ | ✅ | Supabase | — |
 | `ownerName`, `accountName` | ✅ | ✅ | Supabase | — |
 | `resolutionPath` | ✅ | ✅ | Supabase | — (Recorte 39) |
-| `executionNotes` | ✅ | ✅ | Supabase | — (Recorte 39) |
 | `learnings` | ✅ | ✅ | Supabase | — (Recorte 39) |
+
+---
+
+## 4.5. Entidade: Opportunity (OportunidadeConta / OpportunityRow)
+
+**Arquivo de modelo:** implícita estruturada via accountsData
+**Repository:** `src/lib/oportunidadesRepository.ts`
+
+| Campo | Leitura Supabase | Escrita Supabase | Fonte de Verdade | Lacuna |
+|---|---|---|---|---|
+| `id` | ✅ | ⬜ read-only fixo | Supabase | N/D |
+| `account_slug` | ✅ | ⬜ | Supabase | N/D |
+| `nome`, `etapa`, `valor`, `owner`, `risco`, `probabilidade` | ✅ | ⬜ | Supabase | — (E14) |
+| `historico` | ✅ | ⬜ | Supabase | — (E14) |
 
 ---
 
@@ -174,6 +187,7 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Signals — operacionais + narrativos | ✅ | ✅ | R37 |
 | Contacts — todos os campos cobertos | ✅ | ✅ | R38 |
 | Actions — todos os campos cobertos | ✅ | ✅ | R39 |
+| Oportunidades — read defensivo `OpportunityRow` | ✅ | ⬜ | R45 |
 | ABM — objeto `abm` completo + narrativos | ✅ | ✅ | R30/R32/R33/R40 |
 | ABX — objeto `abx` completo + narrativos | ✅ | ✅ | R31/R41 |
 | ABX — `tipoEstrategico`, `playAtivo` | ⬜ | ⬜ | ❓ Decisão pendente (seção 5) |
@@ -188,7 +202,6 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `sinais[]` — array de `SinalConta` (lidos via `signalsRepository`, não via `accountsRepository`)
 - `acoes[]` — array de `AcaoConta` (lidas via `actionsRepository`)
 - `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
-- `oportunidades[]` — array de `OportunidadeConta` — **sem repository Supabase**
 - `canaisCampanhas` — objeto — **sem repository Supabase**
 - `inteligencia` — objeto com 6 arrays — **sem repository Supabase**
 - `tecnografia` — array de strings — **sem repository Supabase**

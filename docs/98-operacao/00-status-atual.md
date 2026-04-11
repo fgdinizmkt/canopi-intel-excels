@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 41 — último marco funcional: 616a8ca; commits documentais posteriores de consistência: f4917a4 e ed67559)
+ `main` — sincronizada em 2026-04-10 (Recorte 45 — último marco funcional: 81a1c6b)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 41 — Supabase E13: Campos Narrativos Estratégicos em ABX)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 45 — Supabase E14: Leitura Defensiva de Oportunidades)
 
 ---
 
@@ -459,15 +459,16 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 41 concluído e publicado em origin/main. Último marco funcional: commit `616a8ca`.
+- **Status Atual:** Recorte 45 concluído e publicado em origin/main. Último marco funcional: commit `81a1c6b`.
 - **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
   - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
 - **Recorte 43:** Concluído como **mapa de cobertura de persistência documental**. Nenhum código alterado.
   - Documento: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md`
   - **Decisão de Orquestrador resolvida no Recorte 44:** ownership de `tipoEstrategico` e `playAtivo` centralizado em `accountsRepository`.
-- **Recorte 44:** Concluído doc+funcional. Ownership de `tipoEstrategico` e `playAtivo` realinhado centralmente sob `accountsRepository`. Manipulação dupla em `abmRepository` removida.
-- **Próximo passo funcional:** Definição do Recorte 45 pelo Orquestrador.
+- **Recorte 44:** Concluído doc+funcional. Ownership de `tipoEstrategico` e `playAtivo` realinhado centralmente sob `accountsRepository`.
+- **Recorte 45:** Concluído. Implementação de persistência de leitura (read layer defensivo) para Oportunidades via `oportunidadesRepository.ts`, orquestrado ativamente em `accountsRepository.ts`.
+- **Próximo passo funcional:** Definição do Recorte 46 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -505,3 +506,4 @@
 | Supabase E10-E11: ABM Core | Recortes 30-33 Concluídos (Fase E) | ABM Repository (Read/Write) + ABX Repository (Read) + playAtivo |
 | Supabase E12: ABM Narrativa | Recorte 40 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABM com atomicidade |
 | Supabase E13: ABX Narrativa | Recorte 41 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABX (estratégia, risco, sucesso) |
+| Supabase E14: Oportunidades | Recorte 45 Concluído (Fase E) | Leitura defensiva read-only de Oportunidades orquestrada através de accountsRepository |

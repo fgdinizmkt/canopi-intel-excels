@@ -5,6 +5,17 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 45 (Supabase E14): Leitura Defensiva de Oportunidades — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Consolidar a arquitetura lendo ativamente `OportunidadeConta` através da criação read-only de `oportunidadesRepository.ts`.
+- **Restrições Aplicadas:** Tipagem estrita de `OpportunityRow`, abstenção completa de `select('*')`, agrupamento determinístico via `account_slug` e read-only explícito sem permitir escrita.
+- **Ações Executadas:**
+  - Construção do módulo modular `getOportunidadesMap()` encarregado do fetching e caching local do mapa Oportunidades.
+  - Modificação do hub principal `accountsRepository.ts` realizando carregamento paralelo com injunções para repopular array de oportunidades dentro do Mock `contasMock` validado ou shell mock derivativo (null object).
+- **Commits:** `81a1c6b` — feat(supabase): E14 defensible read layer for oportunidades
+- **Status:** ✅ Publicado localmente e remoto (origin/main). Fila sincronizada indicando próximo recorte: Recorte 46.
+
 ## [2026-04-10] — Recorte 44 (Documental + Funcional): Resolução de Ownership — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.
