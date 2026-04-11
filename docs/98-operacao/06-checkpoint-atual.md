@@ -1,8 +1,8 @@
-# Checkpoint Atual — Recorte 45 (Supabase E14) Concluído
+# Checkpoint Atual — Recorte 46 (Supabase E15) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 45 Concluído
+- **Marco:** Recorte 46 Concluído
 - **Status da Infra:** Build íntegro, persistência defensiva lendo propriedades agregadas como Oportunidades sem comprometer UI ou lints.
 
 ## 1. Recortes Concluídos (Fase E)
@@ -74,11 +74,16 @@
   - `oportunidadesRepository.ts` validado e estruturado.
   - Orquestração de mock persistida em `accountsRepository.ts`.
 
+- ✅ Recorte 46 (Funcional): Escrita Defensiva Atômica de Oportunidades (E15)
+  - Persistência atômica de `etapa` e `risco`.
+  - UI com overlay de edição e botão explícito "Salvar".
+  - Publicação: commit `2f91d47` em `origin/main`.
+
 ## O que está pendente
-- Definição do Recorte 46 pelo Orquestrador.
+- Definição do Recorte 47 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 46.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 47.
 
 ---
-*Último estado funcional confiável: Recorte 45 (`81a1c6b`)*
+*Último estado funcional confiável: Recorte 46 (`2f91d47`)*

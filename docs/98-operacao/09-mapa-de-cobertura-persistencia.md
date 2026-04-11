@@ -156,7 +156,8 @@ Nenhum campo será alterado como resultado deste documento.
 |---|---|---|---|---|
 | `id` | ✅ | ⬜ read-only fixo | Supabase | N/D |
 | `account_slug` | ✅ | ⬜ | Supabase | N/D |
-| `nome`, `etapa`, `valor`, `owner`, `risco`, `probabilidade` | ✅ | ⬜ | Supabase | — (E14) |
+| `nome`, `valor`, `owner`, `probabilidade` | ✅ | ⬜ | Supabase | — (E14) |
+| `etapa`, `risco` | ✅ | ✅ | Supabase | — (E15) |
 | `historico` | ✅ | ⬜ | Supabase | — (E14) |
 
 ---
@@ -188,7 +189,7 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Signals — operacionais + narrativos | ✅ | ✅ | R37 |
 | Contacts — todos os campos cobertos | ✅ | ✅ | R38 |
 | Actions — todos os campos cobertos | ✅ | ✅ | R39 |
-| Oportunidades — read defensivo `OpportunityRow` | ✅ | ⬜ | R45 |
+| Oportunidades — read/write defensivo | ✅ | ✅ | R46 |
 | ABM — objeto `abm` completo + narrativos | ✅ | ✅ | R30/R32/R33/R40 |
 | ABX — objeto `abx` completo + narrativos | ✅ | ✅ | R31/R41 |
 | ABX — `tipoEstrategico`, `playAtivo` | ⬜ | ⬜ | ❓ Decisão pendente (seção 5) |

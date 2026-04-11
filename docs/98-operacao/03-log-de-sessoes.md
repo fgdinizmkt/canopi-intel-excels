@@ -5,6 +5,17 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-10] — Recorte 46 (Supabase E15): Escrita Defensiva Atômica de Oportunidades — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar a escrita defensiva de Oportunidades (`etapa` e `risco`) abandonando mutações parciais por campo em favor de um salvamento atômico e explícito.
+- **Ações Executadas:**
+  - **Refatoração Repository:** `persistOportunidade(id, etapa, risco)` em `oportunidadesRepository.ts` tornou-se tipada e restrita aos campos permitidos.
+  - **Refatoração UI:** Em `AccountDetailView.tsx`, introduzido o estado local `editingOp` como rascunho.
+  - **Atomicidade:** Removida a persistência do `onChange`. O salvamento agora ocorre exclusivamente no botão "Salvar", disparando 1 snapshot local e 1 call de persistência fire-and-forget.
+- **Commits:** `2f91d47` — feat(supabase): E15 atomic write for oportunidades
+- **Status:** ✅ Publicado localmente e remoto (origin/main). Próximo passo: definição do Recorte 47.
+
 ## [2026-04-10] — Recorte 45 (Supabase E14): Leitura Defensiva de Oportunidades — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.

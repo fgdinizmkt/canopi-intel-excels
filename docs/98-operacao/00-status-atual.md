@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-10 (Recorte 45 — último marco funcional: 81a1c6b)
+ `main` — sincronizada em 2026-04-10 (Recorte 46 — último marco funcional: 2f91d47)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 45 — Supabase E14: Leitura Defensiva de Oportunidades)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 46 — Supabase E15: Escrita Defensiva Atômica de Oportunidades)
 
 ---
 
@@ -468,7 +468,8 @@
   - **Decisão de Orquestrador resolvida no Recorte 44:** ownership de `tipoEstrategico` e `playAtivo` centralizado em `accountsRepository`.
 - **Recorte 44:** Concluído doc+funcional. Ownership de `tipoEstrategico` e `playAtivo` realinhado centralmente sob `accountsRepository`.
 - **Recorte 45:** Concluído. Implementação de persistência de leitura (read layer defensivo) para Oportunidades via `oportunidadesRepository.ts`, orquestrado ativamente em `accountsRepository.ts`.
-- **Próximo passo funcional:** Definição do Recorte 46 pelo Orquestrador.
+- **Recorte 46:** Concluído. Escrita defensiva atômica de Oportunidades (`etapa` e `risco`) com padrão 1 snapshot → 1 build → 1 setState → 1 persist. Botão "Salvar" explícito no overlay de edição em `AccountDetailView.tsx`.
+- **Próximo passo funcional:** Definição do Recorte 47 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -507,3 +508,4 @@
 | Supabase E12: ABM Narrativa | Recorte 40 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABM com atomicidade |
 | Supabase E13: ABX Narrativa | Recorte 41 Concluído (Fase E) | Escrita defensiva de narrativas estratégicas em ABX (estratégia, risco, sucesso) |
 | Supabase E14: Oportunidades | Recorte 45 Concluído (Fase E) | Leitura defensiva read-only de Oportunidades orquestrada através de accountsRepository |
+| Supabase E15: Escrita Oport. | Recorte 46 Concluído (Fase E) | Escrita defensiva atômica de `etapa` e `risco` em Oportunidades via save explícito |
