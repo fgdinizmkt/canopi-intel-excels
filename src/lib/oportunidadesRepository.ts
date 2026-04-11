@@ -73,3 +73,27 @@ export async function getOportunidadesMap(): Promise<Record<string, Oportunidade
     return {};
   }
 }
+
+/**
+ * Escrita defensiva atômica de Oportunidades.
+ * Somente fire-and-forget. Parcialmente atualiza a base.
+ */
+export async function persistOportunidade(id: string, etapa: string, risco: 'Alto' | 'Médio' | 'Baixo'): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    console.debug('[Oportunidades] Supabase não configurado. Fallback local acionado para update:', id);
+    return;
+  }
+
+  try {
+    const { error } = await supabase!
+      .from('oportunidades')
+      .update({ etapa, risco })
+      .eq('id', id);
+
+    if (error) {
+      console.warn('[Oportunidades] Erro silenciado ao persistir:', error.message);
+    }
+  } catch (err) {
+    console.warn('[Oportunidades] Exceção estrutural na persistência:', err instanceof Error ? err.message : String(err));
+  }
+}

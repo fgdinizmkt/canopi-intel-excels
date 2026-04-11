@@ -7,9 +7,10 @@ import {
   ChevronRight, Lightbulb, LogsIcon, List as ListIcon, Network,
   Sparkles as SparkleIcon, CheckCircle2, Brain, MapPin, Users,
   AlertTriangle, ShieldCheck, Flame, Users2, History as HistoryIcon,
-  Globe, Share2
+  Globe, Share2, Pencil
 } from 'lucide-react';
-import { contasMock, ContatoConta, SinalConta } from '../../data/accountsData';
+import { contasMock, ContatoConta, SinalConta, OportunidadeConta } from '../../data/accountsData';
+import { persistOportunidade } from '../../lib/oportunidadesRepository';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
@@ -55,13 +56,18 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [logDraft, setLogDraft] = useState('');
   const [showFeedback, setShowFeedback] = useState<string | null>(null);
   const [localContatos, setLocalContatos] = useState<ContatoConta[]>(account?.contatos ?? []);
+  const [localOportunidades, setLocalOportunidades] = useState<OportunidadeConta[]>(account?.oportunidades ?? []);
+  const [editingOp, setEditingOp] = useState<OportunidadeConta | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
   }, [initialContactId]);
 
   React.useEffect(() => {
-    if (account) setLocalContatos(account.contatos);
+    if (account) {
+      setLocalContatos(account.contatos);
+      setLocalOportunidades(account.oportunidades);
+    }
   }, [account?.id]);
 
   const isFullscreen = shellViewMode === 'fullscreen';
@@ -168,6 +174,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
   const handleUpdateContact = (updatedContact: ContatoConta) => {
     setLocalContatos(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+  };
+
+  const handleUpdateOportunidade = () => {
+    if (!editingOp) return;
+    setLocalOportunidades(prev => prev.map(o => o.id === editingOp.id ? editingOp : o));
+    persistOportunidade(editingOp.id, editingOp.etapa, editingOp.risco);
+    setEditingOp(null);
   };
 
   return (
@@ -281,9 +294,9 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             {[
               { label: 'Prontidão AI', val: `${account.prontidao}%`, color: 'text-blue-400' },
               { label: 'Score Potencial', val: `${account.potencial}`, color: 'text-emerald-400' },
-              { label: 'Pipeline', val: fmt(account.oportunidades.reduce((a, o) => a + o.valor, 0)), color: 'text-slate-100' },
+              { label: 'Pipeline', val: fmt(localOportunidades.reduce((a, o) => a + o.valor, 0)), color: 'text-slate-100' },
               { label: 'Risco Churn', val: account.risco > 70 ? 'ALTO' : 'BAIXO', color: account.risco > 70 ? 'text-red-400' : 'text-emerald-400' },
-              { label: 'Oportunidades', val: `${account.oportunidades.length}`, color: account.oportunidades.length > 0 ? 'text-blue-400' : 'text-slate-500' },
+              { label: 'Oportunidades', val: `${localOportunidades.length}`, color: localOportunidades.length > 0 ? 'text-blue-400' : 'text-slate-500' },
             ].map(k => (
               <div key={k.label} className="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 flex flex-col items-center text-center">
                 <span className="text-slate-500 text-[9px] uppercase font-black tracking-widest mb-1">{k.label}</span>
@@ -510,9 +523,16 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <TrendingUp className="w-4 h-4" /> Pipeline
               </h3>
               <div className="space-y-3">
-                {account.oportunidades.map(op => (
-                  <div key={op.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
-                    <div className="flex justify-between items-start mb-1">
+                {localOportunidades.map(op => (
+                  <div key={op.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800 relative group">
+                    <button 
+                      onClick={() => setEditingOp(op)}
+                      className="absolute top-3 right-3 p-1 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-all border border-transparent hover:border-slate-700"
+                      title="Editar risco e etapa"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="flex justify-between items-start mb-1 pr-8">
                       <p className="text-sm font-bold text-slate-100">{op.nome}</p>
                       <span className="text-emerald-400 font-black">{fmt(op.valor)}</span>
                     </div>
@@ -895,6 +915,55 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 />
               );
             })()}
+          </div>
+        </div>
+      )}
+
+      {/* ── OVERLAY: EDIÇÃO DE OPORTUNIDADE (RECORTE 46) ── */}
+      {editingOp && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setEditingOp(null)} />
+          <div className="relative bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+            <h3 className="text-sm font-bold text-slate-100 mb-1">{editingOp.nome}</h3>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-4">Ajuste Pipeline Rápido</p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Etapa</label>
+                <select
+                  aria-label="Etapa da Oportunidade"
+                  value={editingOp.etapa}
+                  onChange={e => setEditingOp({ ...editingOp, etapa: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-lg text-xs text-slate-200 outline-none focus:border-blue-500"
+                >
+                  <option value="Prospecção">Prospecção</option>
+                  <option value="Qualificação">Qualificação</option>
+                  <option value="Proposta">Proposta</option>
+                  <option value="Negociação">Negociação</option>
+                  <option value="Fechamento">Fechamento</option>
+                  <option value="Perdida">Perdida</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Risco</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['Baixo', 'Médio', 'Alto'].map(r => (
+                    <button
+                      key={r}
+                      onClick={() => setEditingOp({ ...editingOp, risco: r as 'Alto'|'Médio'|'Baixo' })}
+                      className={`py-2 rounded-lg text-[10px] uppercase font-black transition-all ${editingOp.risco === r ? riscoOpStyle[r] : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => setEditingOp(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition-colors">Cancelar</button>
+              <button onClick={handleUpdateOportunidade} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-lg transition-all shadow-lg active:scale-95">Salvar</button>
+            </div>
           </div>
         </div>
       )}
