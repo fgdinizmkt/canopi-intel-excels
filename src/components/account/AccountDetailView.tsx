@@ -9,8 +9,9 @@ import {
   AlertTriangle, ShieldCheck, Flame, Users2, History as HistoryIcon,
   Globe, Share2, Pencil
 } from 'lucide-react';
-import { contasMock, ContatoConta, SinalConta, OportunidadeConta } from '../../data/accountsData';
+import { contasMock, ContatoConta, SinalConta, OportunidadeConta, Conta } from '../../data/accountsData';
 import { persistOportunidade } from '../../lib/oportunidadesRepository';
+import { persistAccount, getAccounts } from '../../lib/accountsRepository';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
@@ -44,10 +45,36 @@ const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
 export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   accountId, initialContactId, viewMode: shellViewMode, onClose, onToggleViewMode
 }) => {
-  const account = React.useMemo(() => {
-    const found = contasMock.find(c => c.id === accountId);
-    return found;
+  // ── ESTADO DE DADOS CONSOLIDADO (RECORTE 47: Read Path Fechado) ──
+  const [liveAccount, setLiveAccount] = useState<Conta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    let active = true;
+    async function load() {
+      setIsLoading(true);
+      try {
+        const all = await getAccounts();
+        const found = all.find(c => c.id === accountId);
+        if (found && active) {
+          setLiveAccount(found);
+        }
+      } catch (e) {
+        console.error('[AccountDetailView] Falha crítica no read path:', e);
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    }
+    load();
+    return () => { active = false; };
   }, [accountId]);
+
+  // Conta canônica: prefere live data do repositório, fallback ao mock para segurança estrutural
+  const account = React.useMemo(() => {
+    const mock = contasMock.find(c => c.id === accountId);
+    if (!liveAccount) return mock;
+    return liveAccount;
+  }, [accountId, liveAccount]);
   
   const { createAction, updateAction, addLog, sessionLogs, sessionActions } = useAccountDetail();
   const [orgView, setOrgView] = useState<'tree' | 'list'>('tree');
@@ -58,6 +85,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [localContatos, setLocalContatos] = useState<ContatoConta[]>(account?.contatos ?? []);
   const [localOportunidades, setLocalOportunidades] = useState<OportunidadeConta[]>(account?.oportunidades ?? []);
   const [editingOp, setEditingOp] = useState<OportunidadeConta | null>(null);
+  const [localInteligencia, setLocalInteligencia] = useState<Conta['inteligencia']>(account?.inteligencia ?? { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
+  const [editingIntel, setEditingIntel] = useState<Conta['inteligencia'] | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -65,10 +94,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
   React.useEffect(() => {
     if (account) {
-      setLocalContatos(account.contatos);
-      setLocalOportunidades(account.oportunidades);
+      setLocalContatos(account.contatos || []);
+      setLocalOportunidades(account.oportunidades || []);
+      setLocalInteligencia(account.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
     }
-  }, [account?.id]);
+  }, [account]); // Dependência direta do objeto consolidado
 
   const isFullscreen = shellViewMode === 'fullscreen';
 
@@ -140,6 +170,19 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     'Baixo': 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
   };
 
+  // Early return de segurança para ID inexistente ou loading inicial
+  if (!account && !isLoading) return null;
+
+  if (isLoading) {
+    return (
+      <div className={`relative h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 ${isFullscreen ? 'rounded-none' : 'rounded-l-2xl border-l border-slate-700/50'}`}>
+        <div className="w-8 h-8 border-2 border-blue-600/30 border-t-blue-500 rounded-full animate-spin mb-4" />
+        <p className="text-[10px] font-black uppercase tracking-widest animate-pulse">Sincronizando Profundidade da Conta...</p>
+      </div>
+    );
+  }
+
+  // Garantia de tipagem pós-loading
   if (!account) return null;
 
   const handleSaveLog = () => {
@@ -181,6 +224,29 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     setLocalOportunidades(prev => prev.map(o => o.id === editingOp.id ? editingOp : o));
     persistOportunidade(editingOp.id, editingOp.etapa, editingOp.risco);
     setEditingOp(null);
+  };
+
+  const handleSaveInteligencia = () => {
+    if (!editingIntel) return;
+    
+    // 1. Snapshot do estado atual (o que foi editado no modal)
+    const snapshot = { ...editingIntel };
+    
+    // 2. Build: o objeto final já está pronto em snapshot
+    
+    // 3. setState: atualiza o estado local síncrono
+    setLocalInteligencia(snapshot);
+    
+    // 4. Persist: chama o repositório Supabase (fire-and-forget)
+    persistAccount({
+      id: account.id,
+      inteligencia: snapshot
+    });
+    
+    // 5. Cleanup UI
+    setEditingIntel(null);
+    setShowFeedback('Inteligência atualizada e persistida.');
+    setTimeout(() => setShowFeedback(null), 3000);
   };
 
   return (
@@ -548,9 +614,18 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
           {/* ────── INSIGHTS HISTÓRICOS & LIÇÕES APRENDIDAS (RECORTE 27) ────── */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Inteligência Cumulativa e Memória Operacional</h2>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-500" />
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Inteligência Cumulativa e Memória Operacional</h2>
+              </div>
+              <button 
+                onClick={() => setEditingIntel(localInteligencia)}
+                className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all border border-transparent hover:border-slate-700"
+                title="Editar Inteligência"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -559,13 +634,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div>
                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Memória de Prospecção</span>
                    <div className="space-y-3">
-                     {account.inteligencia.sucessos.map((s, i) => (
+                     {localInteligencia.sucessos.map((s, i) => (
                        <div key={i} className="flex gap-2 text-xs">
                          <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                          <p className="text-slate-300 leading-relaxed">{s}</p>
                        </div>
                      ))}
-                     {account.inteligencia.insucessos.map((s, i) => (
+                     {localInteligencia.insucessos.map((s, i) => (
                        <div key={i} className="flex gap-2 text-xs opacity-60">
                          <div className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-red-400" />
                          <p className="text-slate-400 leading-relaxed line-through decoration-red-900/50 italic">{s}</p>
@@ -582,7 +657,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   <div>
                     <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Padrões Observados</p>
                     <div className="space-y-2 text-xs text-slate-200 font-medium">
-                      {account.inteligencia.padroes.map((p, i) => (
+                      {localInteligencia.padroes.map((p, i) => (
                         <div key={i} className="bg-blue-500/5 p-2 rounded-lg border border-blue-500/10 italic">
                           &quot;{p}&quot;
                         </div>
@@ -593,7 +668,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Lição Principal</p>
                     <div className="flex items-center gap-3 bg-amber-500/5 p-2.5 rounded-xl border border-amber-500/10">
                       <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                      <p className="text-xs text-amber-200/80 font-bold leading-tight">{account.inteligencia.learnings[0] || 'Sem learnings registrados.'}</p>
+                      <p className="text-xs text-amber-200/80 font-bold leading-tight">{localInteligencia.learnings[0] || 'Sem learnings registrados.'}</p>
                     </div>
                   </div>
                 </div>
@@ -603,7 +678,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50 flex flex-col gap-4">
                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Hipóteses de Destrave</span>
                 <div className="space-y-3">
-                  {account.inteligencia.hipoteses.map((h, i) => (
+                  {localInteligencia.hipoteses.map((h, i) => (
                     <div key={i} className="p-3 rounded-xl bg-slate-900/30 border border-slate-800 flex flex-col gap-1.5">
                       <div className="flex items-center gap-2">
                         <SparkleIcon className="w-3 h-3 text-blue-400" />
@@ -612,11 +687,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       <p className="text-[11px] text-slate-400 leading-normal">{h}</p>
                     </div>
                   ))}
-                  {account.inteligencia.fatoresRecomendacao.length > 0 && (
+                  {localInteligencia.fatoresRecomendacao.length > 0 && (
                      <div className="mt-2 pt-3 border-t border-slate-700/50">
                         <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5">Fatores AI</p>
                         <div className="flex flex-wrap gap-1.5">
-                           {account.inteligencia.fatoresRecomendacao.map((f, i) => (
+                           {localInteligencia.fatoresRecomendacao.map((f, i) => (
                              <span key={i} className="text-[8px] px-1.5 py-0.5 bg-slate-800 text-slate-500 rounded border border-slate-700">{f}</span>
                            ))}
                         </div>
@@ -919,50 +994,53 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         </div>
       )}
 
-      {/* ── OVERLAY: EDIÇÃO DE OPORTUNIDADE (RECORTE 46) ── */}
-      {editingOp && (
+      {/* ── OVERLAY: EDIÇÃO DE INTELIGÊNCIA (RECORTE 47) ── */}
+      {editingIntel && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setEditingOp(null)} />
-          <div className="relative bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
-            <h3 className="text-sm font-bold text-slate-100 mb-1">{editingOp.nome}</h3>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-4">Ajuste Pipeline Rápido</p>
-            
-            <div className="space-y-4">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setEditingIntel(null)} />
+          <div className="relative bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
+            <div className="flex justify-between items-start mb-6">
               <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Etapa</label>
-                <select
-                  aria-label="Etapa da Oportunidade"
-                  value={editingOp.etapa}
-                  onChange={e => setEditingOp({ ...editingOp, etapa: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-lg text-xs text-slate-200 outline-none focus:border-blue-500"
-                >
-                  <option value="Prospecção">Prospecção</option>
-                  <option value="Qualificação">Qualificação</option>
-                  <option value="Proposta">Proposta</option>
-                  <option value="Negociação">Negociação</option>
-                  <option value="Fechamento">Fechamento</option>
-                  <option value="Perdida">Perdida</option>
-                </select>
+                <h3 className="text-lg font-bold text-slate-100 italic">Memória e Inteligência da Conta</h3>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest">Escrita Defensiva Atômica</p>
               </div>
-              <div>
-                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Risco</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['Baixo', 'Médio', 'Alto'].map(r => (
-                    <button
-                      key={r}
-                      onClick={() => setEditingOp({ ...editingOp, risco: r as 'Alto'|'Médio'|'Baixo' })}
-                      className={`py-2 rounded-lg text-[10px] uppercase font-black transition-all ${editingOp.risco === r ? riscoOpStyle[r] : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <button onClick={() => setEditingIntel(null)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" title="Fechar">
+                <X className="w-5 h-5" />
+              </button>
             </div>
             
-            <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => setEditingOp(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg transition-colors">Cancelar</button>
-              <button onClick={handleUpdateOportunidade} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-lg transition-all shadow-lg active:scale-95">Salvar</button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { key: 'sucessos', label: 'Sucessos Sociais/Táticos', color: 'text-emerald-400' },
+                { key: 'insucessos', label: 'Insucessos/Bloqueios', color: 'text-red-400' },
+                { key: 'padroes', label: 'Padrões Observados', color: 'text-blue-400' },
+                { key: 'learnings', label: 'Lições Aprendidas', color: 'text-amber-400' },
+                { key: 'hipoteses', label: 'Hipóteses de Destrave', color: 'text-violet-400' },
+                { key: 'fatoresRecomendacao', label: 'Fatores de Recomendação', color: 'text-slate-400' },
+              ].map(block => (
+                <div key={block.key} className="space-y-2">
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">{block.label}</label>
+                  <textarea
+                    className={`w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-blue-500/50 transition-all resize-none ${block.color}`}
+                    placeholder="Um item por linha..."
+                    value={editingIntel[block.key as keyof Conta['inteligencia']].join('\n')}
+                    onChange={e => {
+                      const lines = e.target.value.split('\n').filter(l => l.trim() !== '');
+                      setEditingIntel({ ...editingIntel, [block.key]: lines });
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-800">
+              <button onClick={() => setEditingIntel(null)} className="px-6 py-2.5 text-slate-400 hover:text-slate-200 text-xs font-bold rounded-xl transition-colors uppercase tracking-widest">Descartar</button>
+              <button 
+                onClick={handleSaveInteligencia} 
+                className="px-8 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg shadow-blue-900/40 active:scale-95 flex items-center gap-2"
+              >
+                <SparkleIcon className="w-4 h-4" /> Salvar Inteligência
+              </button>
             </div>
           </div>
         </div>

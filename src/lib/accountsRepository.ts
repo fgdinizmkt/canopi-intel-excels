@@ -39,6 +39,7 @@ export type AccountRow = {
   possuiOportunidade?: boolean;
   proximaMelhorAcao?: string;
   resumoExecutivo?: string;
+  inteligencia?: Conta['inteligencia'];
 };
 
 /**
@@ -52,6 +53,7 @@ type AccountPersistPayload = {
   playAtivo?: AccountRow['playAtivo'];
   resumoExecutivo?: string;
   proximaMelhorAcao?: string;
+  inteligencia?: Conta['inteligencia'];
 };
 
 /**
@@ -65,7 +67,7 @@ type AccountPersistPayload = {
  * sobrescrita mútua no banco. Caller (handlers em Accounts.tsx) deve passar
  * o estado atual de cada campo em snapshot completo.
  */
-export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string }): Promise<void> {
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string; inteligencia?: Conta['inteligencia'] }): Promise<void> {
   if (!isSupabaseConfigured()) {
     console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
     return;
@@ -86,6 +88,9 @@ export async function persistAccount(account: { id: string; tipoEstrategico?: Ti
     }
     if (account.proximaMelhorAcao !== undefined) {
       payload.proximaMelhorAcao = account.proximaMelhorAcao;
+    }
+    if (account.inteligencia !== undefined) {
+      payload.inteligencia = account.inteligencia;
     }
 
     const { error } = await supabase!
@@ -145,7 +150,8 @@ export async function getAccounts(): Promise<Conta[]> {
         oportunidadePrincipal,
         possuiOportunidade,
         proximaMelhorAcao,
-        resumoExecutivo
+        resumoExecutivo,
+        inteligencia
       `);
 
     if (error) {
@@ -217,7 +223,7 @@ export async function getAccounts(): Promise<Conta[]> {
             motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '',
             profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: ''
           },
-          inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+          inteligencia: row.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
           tecnografia: [],
           historico: [],
         } as Conta;
@@ -232,6 +238,7 @@ export async function getAccounts(): Promise<Conta[]> {
         acoes: mockAccount.acoes || [],
         contatos: mockAccount.contatos || [],
         oportunidades: mappedOpps && mappedOpps.length > 0 ? mappedOpps : (mockAccount.oportunidades || []),
+        inteligencia: row.inteligencia || mockAccount.inteligencia,
       } as Conta;
     });
 
