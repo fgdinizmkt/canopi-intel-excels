@@ -1,5 +1,6 @@
 import supabase, { isSupabaseConfigured } from './supabaseClient';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
+import { getOportunidadesMap } from './oportunidadesRepository';
 
 /**
  * Repositório de Contas — Camada de Leitura Supabase com Fallback
@@ -115,6 +116,9 @@ export async function getAccounts(): Promise<Conta[]> {
   }
 
   try {
+    // Busca oportunidades em paralelo
+    const oportunidadesMap = await getOportunidadesMap();
+
     // Query defensiva: lê apenas campos mínimos necessários para listagem
     const { data, error } = await supabase!
       .from('accounts')
@@ -159,6 +163,8 @@ export async function getAccounts(): Promise<Conta[]> {
     const supabaseAccounts = (data as AccountRow[]).map(row => {
       // Procura mock por id ou slug
       const mockAccount = contasMock.find(m => m.id === row.id || m.slug === row.slug);
+      
+      const mappedOpps = oportunidadesMap ? oportunidadesMap[row.slug] : undefined;
 
       // Se não houver mock correspondente, cria shell seguro com campos obrigatórios
       if (!mockAccount) {
@@ -200,7 +206,7 @@ export async function getAccounts(): Promise<Conta[]> {
           sinais: [],
           acoes: [],
           contatos: [],
-          oportunidades: [],
+          oportunidades: mappedOpps && mappedOpps.length > 0 ? mappedOpps : [],
           canaisCampanhas: { origemPrincipal: '', influencias: [] },
           abm: {
             motivo: '', fit: '', cluster: '', similaridade: '',
@@ -225,6 +231,7 @@ export async function getAccounts(): Promise<Conta[]> {
         sinais: mockAccount.sinais || [],
         acoes: mockAccount.acoes || [],
         contatos: mockAccount.contatos || [],
+        oportunidades: mappedOpps && mappedOpps.length > 0 ? mappedOpps : (mockAccount.oportunidades || []),
       } as Conta;
     });
 
