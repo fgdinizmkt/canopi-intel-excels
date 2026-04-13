@@ -93,6 +93,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [editingHistorico, setEditingHistorico] = useState<{ data: string; tipo: string; descricao: string; icone?: string } | null>(null);
   const [localTecnografia, setLocalTecnografia] = useState<string[]>(account?.tecnografia ?? []);
   const [editingTecnografia, setEditingTecnografia] = useState<string | null>(null);
+  const [localCanaisCampanhas, setLocalCanaisCampanhas] = useState<Conta['canaisCampanhas']>(account?.canaisCampanhas ?? { origemPrincipal: '', influencias: [] });
+  const [editingCanaisCampanhas, setEditingCanaisCampanhas] = useState<{ origemPrincipal: string; influenciasJson: string } | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -106,6 +108,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       setLocalLeitura({ factual: account.leituraFactual || [], inferida: account.leituraInferida || [], sugerida: account.leituraSugerida || [] });
       setLocalHistorico(account.historico || []);
       setLocalTecnografia(account.tecnografia || []);
+      setLocalCanaisCampanhas(account.canaisCampanhas || { origemPrincipal: '', influencias: [] });
     }
   }, [account]); // Dependência direta do objeto consolidado
 
@@ -362,6 +365,74 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       tecnografia: snapshot,
     });
     setShowFeedback('Tecnologia removida da stack.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleSaveCanaisCampanhas = () => {
+    if (!editingCanaisCampanhas) return;
+
+    // Guard 1: validação de origemPrincipal
+    if (!editingCanaisCampanhas.origemPrincipal.trim()) {
+      setShowFeedback('Origem principal é obrigatória.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // Guard 2: parse JSON com try/catch
+    let parsedInfluencias: any;
+    try {
+      parsedInfluencias = JSON.parse(editingCanaisCampanhas.influenciasJson);
+    } catch (err) {
+      setShowFeedback('JSON de influências inválido.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // Guard 3: validar que é array
+    if (!Array.isArray(parsedInfluencias)) {
+      setShowFeedback('Influências devem ser um array JSON.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // Guard 4: validar shape factual de cada item
+    const isValidShape = parsedInfluencias.every(item => {
+      return (
+        typeof item === 'object' &&
+        item !== null &&
+        typeof item.canal === 'string' &&
+        typeof item.campanha === 'string' &&
+        typeof item.tipo === 'string' &&
+        typeof item.impacto === 'string' &&
+        typeof item.data === 'string'
+      );
+    });
+
+    if (!isValidShape) {
+      setShowFeedback('Cada influência deve ter: canal, campanha, tipo, impacto, data (todos strings).');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // 1. Snapshot do estado atual com influencias parseadas e validadas
+    const snapshot = {
+      origemPrincipal: editingCanaisCampanhas.origemPrincipal,
+      influencias: parsedInfluencias
+    };
+
+    // 2. Build: conversão para os nomes canônicos
+    // 3. setState: atualiza o estado local
+    setLocalCanaisCampanhas(snapshot);
+
+    // 4. Persist: chama o repositório Supabase (fire-and-forget)
+    persistAccount({
+      id: account.id,
+      canaisCampanhas: snapshot,
+    });
+
+    // 5. Cleanup UI
+    setEditingCanaisCampanhas(null);
+    setShowFeedback('Canais e campanhas atualizados.');
     setTimeout(() => setShowFeedback(null), 3000);
   };
 
@@ -875,11 +946,21 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
           </div>
 
-          {/* Canais e Campanhas (Evolução Canônica) */}
+          {/* Canais e Campanhas (Evolução Canônica — Recorte 51: E20) */}
           <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Globe className="w-4 h-4 text-emerald-500" /> Origem e Influência de Canais
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <Globe className="w-4 h-4 text-emerald-500" /> Origem e Influência de Canais
+              </h3>
+              <button
+                onClick={() => setEditingCanaisCampanhas(editingCanaisCampanhas !== null ? null : { origemPrincipal: localCanaisCampanhas.origemPrincipal, influenciasJson: JSON.stringify(localCanaisCampanhas.influencias, null, 2) })}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                title={editingCanaisCampanhas !== null ? 'Cancelar edição' : 'Editar canais'}
+              >
+                <Pencil className="w-3 h-3" />
+                {editingCanaisCampanhas !== null ? 'Cancelar' : 'Editar'}
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Origem Principal</span>
@@ -888,26 +969,70 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <Target className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-100">{account.canaisCampanhas.origemPrincipal}</p>
+                    <p className="text-sm font-bold text-slate-100">{localCanaisCampanhas.origemPrincipal || 'Não definido'}</p>
                     <p className="text-[10px] text-slate-500">Atribuição por Primeiro Toque</p>
                   </div>
                 </div>
               </div>
               <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Influência Recente</span>
+                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Influência Recente ({localCanaisCampanhas.influencias.length})</span>
                 <div className="space-y-3">
-                  {account.canaisCampanhas.influencias.map((inf, i) => (
-                    <div key={i} className="flex justify-between items-center text-xs">
-                      <div className="flex items-center gap-2">
-                        <Share2 className="w-3 h-3 text-blue-400" />
-                        <span className="text-slate-300">{inf.canal} — {inf.campanha}</span>
+                  {localCanaisCampanhas.influencias.length > 0 ? (
+                    localCanaisCampanhas.influencias.map((inf, i) => (
+                      <div key={i} className="flex justify-between items-center text-xs">
+                        <div className="flex items-center gap-2">
+                          <Share2 className="w-3 h-3 text-blue-400" />
+                          <span className="text-slate-300">{inf.canal} — {inf.campanha}</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 italic">{inf.data}</span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-500 italic">{inf.data}</span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-[10px] text-slate-500 italic">Sem influências registradas.</p>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Editor Mínimo: Canais e Campanhas (Recorte E20) */}
+            {editingCanaisCampanhas !== null && (
+              <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-emerald-500/20 space-y-3">
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Origem Principal</label>
+                  <input
+                    type="text"
+                    value={editingCanaisCampanhas.origemPrincipal}
+                    onChange={(e) => setEditingCanaisCampanhas({ ...editingCanaisCampanhas, origemPrincipal: e.target.value })}
+                    placeholder="Ex: Outbound, Inbound, Evento, Paid Media"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-slate-600/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Influências (JSON)</label>
+                  <textarea
+                    value={editingCanaisCampanhas.influenciasJson}
+                    onChange={(e) => setEditingCanaisCampanhas({ ...editingCanaisCampanhas, influenciasJson: e.target.value })}
+                    placeholder='[{"canal":"Inbound","campanha":"SEO","tipo":"Inbound","impacto":"Descoberta","data":"2026-04-12"}]'
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-xs text-slate-300 placeholder-slate-600 focus:outline-none focus:border-slate-600/50 font-mono"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <button
+                    onClick={() => setEditingCanaisCampanhas(null)}
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveCanaisCampanhas}
+                    className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg text-[9px] font-bold text-emerald-400 hover:text-emerald-300 transition-all"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Operacional: Ações e Oportunidades */}
