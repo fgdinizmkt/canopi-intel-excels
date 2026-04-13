@@ -44,6 +44,7 @@ export type AccountRow = {
   leituraInferida?: string[];
   leituraSugerida?: string[];
   historico?: Conta['historico'];
+  tecnografia?: string[];
 };
 
 /**
@@ -62,6 +63,7 @@ type AccountPersistPayload = {
   leituraInferida?: string[];
   leituraSugerida?: string[];
   historico?: Conta['historico'];
+  tecnografia?: string[];
 };
 
 /**
@@ -69,13 +71,13 @@ type AccountPersistPayload = {
  * Padrão fire-and-forget: não bloqueia, não retorna feedback, registra erro silenciosamente
  *
  * Caso de uso: mutação local-first no state, depois persist async sem UI feedback
- * Campos suportados: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao, inteligencia, leituraFactual, leituraInferida, leituraSugerida, historico
+ * Campos suportados: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao, inteligencia, leituraFactual, leituraInferida, leituraSugerida, historico, tecnografia
  *
  * IMPORTANTE: Sempre enviar TODOS os campos (não deixar undefined) para evitar
  * sobrescrita mútua no banco. Caller (handlers em AccountDetailView.tsx) deve passar
  * o estado atual de cada campo em snapshot completo.
  */
-export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string; inteligencia?: Conta['inteligencia']; leituraFactual?: string[]; leituraInferida?: string[]; leituraSugerida?: string[]; historico?: Conta['historico'] }): Promise<void> {
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string; inteligencia?: Conta['inteligencia']; leituraFactual?: string[]; leituraInferida?: string[]; leituraSugerida?: string[]; historico?: Conta['historico']; tecnografia?: string[] }): Promise<void> {
   if (!isSupabaseConfigured()) {
     console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
     return;
@@ -111,6 +113,9 @@ export async function persistAccount(account: { id: string; tipoEstrategico?: Ti
     }
     if (account.historico !== undefined) {
       payload.historico = account.historico;
+    }
+    if (account.tecnografia !== undefined) {
+      payload.tecnografia = account.tecnografia;
     }
 
     const { error } = await supabase!
@@ -175,7 +180,8 @@ export async function getAccounts(): Promise<Conta[]> {
         leituraFactual,
         leituraInferida,
         leituraSugerida,
-        historico
+        historico,
+        tecnografia
       `);
 
     if (error) {
@@ -248,7 +254,7 @@ export async function getAccounts(): Promise<Conta[]> {
             profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: ''
           },
           inteligencia: row.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-          tecnografia: [],
+          tecnografia: row.tecnografia || [],
           historico: row.historico || [],
         } as Conta;
       }
@@ -266,6 +272,7 @@ export async function getAccounts(): Promise<Conta[]> {
         leituraFactual: row.leituraFactual || mockAccount.leituraFactual || [],
         leituraInferida: row.leituraInferida || mockAccount.leituraInferida || [],
         leituraSugerida: row.leituraSugerida || mockAccount.leituraSugerida || [],
+        tecnografia: row.tecnografia || mockAccount.tecnografia || [],
       } as Conta;
     });
 

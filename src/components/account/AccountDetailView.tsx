@@ -91,6 +91,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [editingLeitura, setEditingLeitura] = useState<typeof localLeitura | null>(null);
   const [localHistorico, setLocalHistorico] = useState<Conta['historico']>(account?.historico ?? []);
   const [editingHistorico, setEditingHistorico] = useState<{ data: string; tipo: string; descricao: string; icone?: string } | null>(null);
+  const [localTecnografia, setLocalTecnografia] = useState<string[]>(account?.tecnografia ?? []);
+  const [editingTecnografia, setEditingTecnografia] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -103,6 +105,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       setLocalInteligencia(account.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
       setLocalLeitura({ factual: account.leituraFactual || [], inferida: account.leituraInferida || [], sugerida: account.leituraSugerida || [] });
       setLocalHistorico(account.historico || []);
+      setLocalTecnografia(account.tecnografia || []);
     }
   }, [account]); // Dependência direta do objeto consolidado
 
@@ -315,6 +318,53 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     setTimeout(() => setShowFeedback(null), 3000);
   };
 
+  const handleSaveTecnografia = () => {
+    // Guard: validação obrigatória
+    if (!editingTecnografia || !editingTecnografia.trim()) {
+      setShowFeedback('Nome da tecnologia é obrigatório.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // 1. Snapshot do estado atual: adiciona nova tecnologia
+    const trimmed = editingTecnografia.trim();
+
+    // Verifica duplicação
+    if (localTecnografia.includes(trimmed)) {
+      setShowFeedback('Tecnologia já existe na stack.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    const snapshot = [...localTecnografia, trimmed];
+
+    // 2. Build: conversão para os nomes canônicos
+    // 3. setState: atualiza o estado local
+    setLocalTecnografia(snapshot);
+
+    // 4. Persist: chama o repositório Supabase (fire-and-forget)
+    persistAccount({
+      id: account.id,
+      tecnografia: snapshot,
+    });
+
+    // 5. Cleanup UI
+    setEditingTecnografia(null);
+    setShowFeedback('Tecnologia adicionada à stack.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleRemoveTecnografia = (index: number) => {
+    const snapshot = localTecnografia.filter((_, i) => i !== index);
+    setLocalTecnografia(snapshot);
+    persistAccount({
+      id: account.id,
+      tecnografia: snapshot,
+    });
+    setShowFeedback('Tecnologia removida da stack.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
   return (
     <div className={`relative h-full flex flex-col bg-slate-900 text-slate-100 overflow-hidden ${isFullscreen ? 'rounded-none' : 'rounded-l-2xl border-l border-slate-700/50'}`}>
 
@@ -393,11 +443,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <span className="flex items-center gap-1 border-l border-slate-700 pl-4"><Users className="w-3 h-3 text-blue-500" />Time: {account.ownersSecundarios.join(', ')}</span>
           )}
 
-          {account.tecnografia.length > 0 && (
+          {localTecnografia.length > 0 && (
             <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
               <span className="text-[9px] font-black uppercase text-slate-600 tracking-tighter">Stack:</span>
               <div className="flex gap-1.5">
-                {account.tecnografia.map(t => (
+                {localTecnografia.map(t => (
                   <span key={t} className="px-1.5 py-0.5 bg-blue-500/5 border border-blue-500/20 text-blue-400 rounded-md font-bold tracking-tight">{t}</span>
                 ))}
               </div>
@@ -646,6 +696,73 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     className="px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 rounded-lg text-[9px] font-bold text-amber-400 hover:text-amber-300 transition-all"
                   >
                     Salvar Entrada
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Stack Tecnológico (Recorte 50: E19) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-slate-500" />
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Stack Tecnológico</h2>
+              </div>
+              <button
+                onClick={() => setEditingTecnografia(editingTecnografia !== null ? null : '')}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                title={editingTecnografia !== null ? 'Cancelar adição' : 'Adicionar tecnologia'}
+              >
+                <Pencil className="w-3 h-3" />
+                {editingTecnografia !== null ? 'Cancelar' : 'Adicionar'}
+              </button>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/30">
+              {localTecnografia.length > 0 ? (
+                <ul className="space-y-2">
+                  {localTecnografia.map((tech, i) => (
+                    <li key={i} className="text-xs text-slate-300 flex items-center justify-between p-2 bg-slate-900/30 rounded-lg border border-slate-700/20">
+                      <span className="font-bold text-slate-200">{tech}</span>
+                      <button
+                        onClick={() => handleRemoveTecnografia(i)}
+                        className="text-[10px] text-slate-500 hover:text-red-400 transition-colors"
+                        title="Remover tecnologia"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="text-xs text-slate-600 italic">Sem tecnologias registradas.</p>}
+            </div>
+
+            {/* Editor Mínimo: Adicionar Tecnologia (Recorte E19) */}
+            {editingTecnografia !== null && (
+              <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-blue-500/20 space-y-3">
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Nome da Tecnologia</label>
+                  <input
+                    type="text"
+                    value={editingTecnografia ?? ''}
+                    onChange={(e) => setEditingTecnografia(e.target.value)}
+                    placeholder="Ex: Salesforce, AWS, SAP S/4HANA"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-slate-600/50"
+                    autoFocus
+                  />
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <button
+                    onClick={() => setEditingTecnografia(null)}
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveTecnografia}
+                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all"
+                  >
+                    Adicionar
                   </button>
                 </div>
               </div>
