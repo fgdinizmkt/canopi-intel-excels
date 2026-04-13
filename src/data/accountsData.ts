@@ -896,62 +896,112 @@ export const contasMock: Conta[] = [
   {
     id: '4', slug: 'alphabank-sa', nome: 'AlphaBank S.A.', dominio: 'alphabank.com.br', vertical: 'Financeiro', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
     ownerPrincipal: 'Beatriz Lima', ownersSecundarios: ['Rafael Prado'], etapa: 'Prospecção', tipoEstrategico: 'ABM', potencial: 88, risco: 15, prontidao: 82, coberturaRelacional: 74,
-    ultimaMovimentacao: '2026-04-01', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 87, crm: 45, vp: 82, ct: 78, ft: 84, budgetBrl: 4200000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Apresentar diagnóstico de AI Readiness para diretoria executiva.', resumoExecutivo: 'Conta estratégica com alto fit e budget mapeado, aguardando validação de roadmap.',
-    leituraFactual: ['Budget de R$ 4.2M identificado.', 'Alta atividade em materiais de IA.'], leituraInferida: ['Momento ideal para entrada com oferta de governança.'], leituraSugerida: ['Ativar play ABM de entrada consultiva.'],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'MQL Consultivo', influencias: [] },
-    abm: { motivo: 'Fit ICP excelente.', fit: 'Alto', cluster: 'Financeiro Top', similaridade: '92%', coberturaInicialComite: '74%', playsEntrada: [], potencialAbertura: 'Altíssimo', hipoteses: [], contasSimilares: [] },
+    ultimaMovimentacao: '2026-04-01', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 87, crm: 45, vp: 82, ct: 78, ft: 84, budgetBrl: 4200000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Implementação de governança de IA e LLMs', proximaMelhorAcao: 'Apresentar diagnóstico de AI Readiness para diretoria executiva.',
+    resumoExecutivo: 'Instituição financeira estratégica com budget de R$ 4.2M identificado para governança de IA. Diretoria executiva com alta atividade em materiais de inteligência artificial. Momento crítico para posicionamento consultivo.',
+    leituraFactual: ['Budget de R$ 4.2M identificado em FY2026.', 'Alta atividade (3+ acessos em 5 dias) em materiais de IA e governança.', 'Comitê de tecnologia em fase de definição de roadmap.'],
+    leituraInferida: ['Momento ideal para entrada com oferta de governança de IA antes de decisão de vendor.', 'Concentração de leitura em risco e compliance indica prioridade em segurança.'],
+    leituraSugerida: ['Ativar play ABM de entrada consultiva com foco em governança.', 'Preparar diagnóstico customizado de AI Readiness para apresentação executiva.'],
+    sinais: [
+      { id: 's17', titulo: 'Alta atividade em materiais de governança de IA', tipo: 'Tendência', impacto: 'Alto', owner: 'Beatriz Lima', recomendacao: 'Preparar diagnóstico de AI Readiness até quinta.', contexto: '3+ acessos em materiais de IA e 2 downloads de case studies sobre governança.', data: '2026-04-01' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c19', nome: 'Gustavo Ferreira', cargo: 'VP de Tecnologia e Segurança', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Patrocinador de governança', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 82, scoreSucesso: 79, ganchoReuniao: 'Detalhar como IA governance reduz risco operacional e compliance.' },
+      { id: 'c20', nome: 'Natalia Rocha', cargo: 'Gerente de Risco e Compliance', area: 'Risco', senioridade: 'Gerência', papelComite: 'Validação de conformidade', forcaRelacional: 65, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Blocker'], liderId: 'c19', influencia: 80, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar framework de compliance para LLMs e IA generativa.' }
+    ],
+    oportunidades: [
+      { id: 'o17', nome: 'Implementação de governança de IA e LLMs', etapa: 'Diagnóstico', valor: 4200000, owner: 'Beatriz Lima', risco: 'Baixo', probabilidade: 68, historico: ['Atividade de pesquisa detectada', 'Diagnóstico em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'MQL Consultivo', influencias: [{ canal: 'Inbound', campanha: 'AI Governance Financeiro', tipo: 'Inbound', impacto: 'Ativação de interesse de decisor', data: '2026-03-28' }] },
+    abm: { motivo: 'Fit ICP excelente para verticais financeiras de risco elevado.', fit: 'Alto (87/100)', cluster: 'Financeiro Top', similaridade: '92%', coberturaInicialComite: '74%', playsEntrada: ['Play consultivo de governança', 'Play de compliance por vertical'], potencialAbertura: 'Altíssimo', hipoteses: ['Diretoria executiva aprova se governance resolve compliance'], contasSimilares: ['Banco Central', 'Caixa Econômica'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [],
-    historico: [],
-    reconciliationStatus: 'vazia'
+    inteligencia: { sucessos: [], insucessos: [], padroes: ['Instituições financeiras priorizam governança antes de adoção de IA.'], learnings: ['Compliance e risco são gatilhos de entrada em banking.'], hipoteses: ['Diagnóstico customizado acelera para 2º conversation em 7 dias.'], fatoresRecomendacao: ['Fit ICP altíssimo', 'Janela de decisão aberta', 'Budget confirmado'] },
+    tecnografia: ['Salesforce FSC', 'SailPoint IAM', 'Splunk', 'AWS GovCloud'],
+    historico: [{ data: '2026-04-01', tipo: 'Sinal', descricao: 'Atividade de pesquisa em IA governance detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Ação de diagnóstico criada para prospecção consultiva.', icone: 'Zap' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '5', slug: 'novasaude-global', nome: 'NovaSaude', dominio: 'novasaude.com', vertical: 'Saúde', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
     ownerPrincipal: 'Lia Azevedo', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 74, risco: 28, prontidao: 70, coberturaRelacional: 55,
     ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 72, crm: 80, vp: 68, ct: 55, ft: 70, budgetBrl: 1850000, possuiOportunidade: true,
-    proximaMelhorAcao: 'Mapear decisores técnicos na filial sul.', resumoExecutivo: 'Conta com bom engajamento em marketing, mas com DMU ainda fragmentado.',
-    leituraFactual: ['Engajamento CRM de 80%.', '1 oportunidade em qualificação.'], leituraInferida: ['Possibilidade de expansão via cross-sell precoce.'], leituraSugerida: ['Reforçar cobertura de contatos via LinkedIn.'],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [] },
-    abm: { motivo: 'Vertical prioritária.', fit: 'Médio-alto', cluster: 'Healthcare Enterprise', similaridade: '78%', coberturaInicialComite: '55%', playsEntrada: [], potencialAbertura: 'Médio', hipoteses: [], contasSimilares: [] },
+    oportunidadePrincipal: 'Transformação digital de sistemas de gestão hospitalar', proximaMelhorAcao: 'Mapear decisores técnicos na filial sul e estruturar roadmap de ERP.',
+    resumoExecutivo: 'Operadora de saúde com alto engajamento CRM (80%) mas com DMU altamente fragmentado entre corporativo e unidades regionais. Oportunidade de expansão via ERP cloud, mas requer mapeamento de stakeholders por filial.',
+    leituraFactual: ['Engajamento CRM consolidado em 80%.', '5 downloads de case de ERP em saúde.', 'Corporativo + 3 unidades regionais (Sul, Nordeste, Centro-Oeste).', '1 oportunidade em qualificação: transformação de gestão hospitalar.'],
+    leituraInferida: ['Fragmentação de DMU é risco e oportunidade: cada filial pode ter budget próprio.', 'Falta de standardização de sistemas entre unidades indica maturidade baixa em governança de TI.'],
+    leituraSugerida: ['Priorizar mapeamento de decisores por filial (não apenas corporativo).', 'Estruturar play de value com foco em unificação de operações.'],
+    sinais: [
+      { id: 's18', titulo: 'Alta atividade de pesquisa em ERP cloud para saúde', tipo: 'Tendência', impacto: 'Médio', owner: 'Lia Azevedo', recomendacao: 'Agendar workshop de visão de futuro de sistemas até 15/04.', contexto: '5 downloads de case de transformação digital em saúde e 2 acessos a roadmap de implementação.', data: '2026-04-02' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c21', nome: 'Dr. Marcelo Santos', cargo: 'Diretor de Operações Corporativas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 71, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 86, potencialSucesso: 74, scoreSucesso: 70, ganchoReuniao: 'Detalhar ROI de unificação de sistemas entre unidades.' },
+      { id: 'c22', nome: 'Fernanda Lima', cargo: 'Gerente de TI Corporativa', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica e vendor', forcaRelacional: 64, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c21', influencia: 75, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Demonstrar facilidade de implementação com manutenção em paralelo.' }
+    ],
+    oportunidades: [
+      { id: 'o18', nome: 'Transformação digital de sistemas de gestão hospitalar', etapa: 'Qualificação', valor: 1850000, owner: 'Lia Azevedo', risco: 'Médio', probabilidade: 52, historico: ['Pesquisa de mercado em andamento', 'Roadmap corporativo em discussão', 'Validação de budget por filial necessária'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [{ canal: 'Trade shows', campanha: 'Healthcare Tech Summit', tipo: 'Events', impacto: 'Geração de interesse em ERP cloud', data: '2026-02-15' }] },
+    abm: { motivo: 'Vertical prioritária com alta maturidade de negócio.', fit: 'Médio-alto (72/100)', cluster: 'Healthcare Enterprise', similaridade: '78%', coberturaInicialComite: '55% (apenas corporativo)', playsEntrada: ['Play de unificação de operações', 'Play de modernização de legacy'], potencialAbertura: 'Médio (depende de mapeamento regional)', hipoteses: ['Aceleração com aprovação regional de orçamento'], contasSimilares: ['Rede Ímpar', 'Amil'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [],
-    historico: [],
-    reconciliationStatus: 'vazia'
+    inteligencia: { sucessos: ['Alto engajamento CRM indica receptividade de marketing.'], insucessos: ['Fragmentação de DMU bloqueou avanço anterior.'], padroes: ['Healthcare Brasil prioriza unificação de operações quando há múltiplas unidades.'], learnings: ['Decisão em saúde requer validação regional, não apenas corporativa.'], hipoteses: ['Workshop multi-regional eleva probabilidade em 15 p.p.'], fatoresRecomendacao: ['Oportunidade regional não explorada', 'Engajamento CRM elevado', 'Fragmentação de DMU é constraint'] },
+    tecnografia: ['SAP S/4HANA Cloud', 'Salesforce Health Cloud', 'AWS', 'Tableau'],
+    historico: [{ data: '2026-04-02', tipo: 'Sinal', descricao: 'Alta atividade em pesquisa de ERP para saúde detectada.', icone: 'TrendingUp' }, { data: '2026-04-02', tipo: 'Ação', descricao: 'Ação de mapeamento regional criada.', icone: 'Activity' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '6', slug: 'mobilitypro-sa', nome: 'MobilityPro', dominio: 'mobilitypro.com.br', vertical: 'Mobilidade', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'Belo Horizonte, Brasil',
     ownerPrincipal: 'Marcos Oliveira', ownersSecundarios: [], etapa: 'Descoberta', tipoEstrategico: 'ABM', potencial: 50, risco: 40, prontidao: 48, coberturaRelacional: 40,
-    ultimaMovimentacao: '2026-03-25', atividadeRecente: 'Baixa', playAtivo: 'Nenhum', statusGeral: 'Atenção', icp: 45, crm: 35, vp: 60, ct: 40, ft: 48, budgetBrl: 600000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Iniciar sequência de reativação.', resumoExecutivo: 'Conta fria com histórico de interesse em 2025, precisando de nova abordagem.',
-    leituraFactual: ['Atividade recente baixa.', 'Sem oportunidade aberta.'], leituraInferida: ['Risco de perda de timing comercial.'], leituraSugerida: ['Lançar play de reengajamento.'],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Inbound Antigo', influencias: [] },
-    abm: { motivo: 'Potencial de vertical alto.', fit: 'Baixo-médio', cluster: 'Mobilidade Mid', similaridade: '45%', coberturaInicialComite: '40%', playsEntrada: [], potencialAbertura: 'Baixo', hipoteses: [], contasSimilares: [] },
+    ultimaMovimentacao: '2026-03-25', atividadeRecente: 'Baixa', playAtivo: 'Nenhum', statusGeral: 'Atenção', icp: 45, crm: 35, vp: 60, ct: 40, ft: 48, budgetBrl: 600000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Modernização de frota com telemática e IA de rotas', proximaMelhorAcao: 'Iniciar sequência de reativação com ângulo de eficiência operacional.',
+    resumoExecutivo: 'Conta fria com histórico de interesse em 2025 em soluções de mobilidade. Provedora de serviços de transporte com oportunidade de modernização de frota. Reativação necessária, mas vertical com potencial de crescimento.',
+    leituraFactual: ['Atividade recente baixa (1 acesso em 30 dias).', 'Histórico: 2 demos em 2025 sem conversão.', 'Empresa com 180+ veículos em frota regional.'],
+    leituraInferida: ['Falta de alinhamento em 2025 pode ter sido por preço ou timing de budget.', 'Renovação de frota pode estar planejada para 2026 (Q2-Q3 típico).'],
+    leituraSugerida: ['Reativar com ângulo de eficiência operacional (rotas + manutenção).', 'Validar timing de budget de capex para 2026.'],
+    sinais: [
+      { id: 's19', titulo: 'Histórico de interesse em soluções de mobilidade moderna', tipo: 'Oportunidade', impacto: 'Baixo', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência de rota baseado em IA.', contexto: '2 demos em 2025. Sem objeção explícita, apenas perda de contato. Atividade recente retomada na última semana.', data: '2026-03-25' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c23', nome: 'Roberto Teixeira', cargo: 'Diretor de Operações de Frota', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 38, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'Frio', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 42, scoreSucesso: 35, ganchoReuniao: 'Demonstrar economia de combustível e extensão de vida útil da frota.' }
+    ],
+    oportunidades: [
+      { id: 'o19', nome: 'Modernização de frota com telemática e IA de rotas', etapa: 'Prospecção', valor: 600000, owner: 'Marcos Oliveira', risco: 'Alto', probabilidade: 28, historico: ['2 demos em 2025 sem conversão', 'Reativação iniciada em 2026'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Inbound Antigo', influencias: [{ canal: 'Inbound', campanha: 'Webinar Mobilidade Eficiente', tipo: 'Inbound', impacto: 'Entrada em 2025', data: '2025-06-15' }] },
+    abm: { motivo: 'Potencial de vertical alto, mas conta fria.', fit: 'Baixo-médio (45/100)', cluster: 'Mobilidade Mid', similaridade: '45%', coberturaInicialComite: '40% (apenas director)', playsEntrada: ['Play de reativação com case novo', 'Play de ROI operacional'], potencialAbertura: 'Baixo no curto prazo', hipoteses: ['Novo case de eficiência de rota pode reativar interesse'], contasSimilares: ['Loggi Frota', 'Sascar'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
+    inteligencia: { sucessos: [], insucessos: ['2 demos em 2025 sem follow-up adequado.'], padroes: ['Empresas de frota decidem por investimento em H2 (capex Q3-Q4).'], learnings: ['Timing de budget é crítico em mobilidade (planejamento anual em Q1).'], hipoteses: ['Reativação com novo case pode converter em 45-60 dias.'], fatoresRecomendacao: ['Conta fria com histórico', 'Timing de budget incerto', 'Vertical com potencial'] },
     tecnografia: [],
-    historico: [],
-    reconciliationStatus: 'vazia'
+    historico: [{ data: '2026-03-25', tipo: 'Ação', descricao: 'Sequência de reativação iniciada com novo case.', icone: 'Activity' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '7', slug: 'agrocloud-sa', nome: 'AgroCloud', dominio: 'agrocloud.com', vertical: 'Agronegócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiânia, Brasil',
     ownerPrincipal: 'Ricardo Santos', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 65, risco: 20, prontidao: 60, coberturaRelacional: 30,
-    ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 78, crm: 70, vp: 85, ct: 30, ft: 60, budgetBrl: 2100000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Identificar champion na área de tecnologia agrícola.', resumoExecutivo: 'Conta em vertical de alta tração com sinais fortes de expansão de budget tech.',
-    leituraFactual: ['Vertical Potencial de 85%.', 'Baixa cobertura de contatos (30%).'], leituraInferida: ['Grande GAP de mapeamento, mas alto interesse técnico.'], leituraSugerida: ['Executar play de mapeamento de DMU.'],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Field Marketing', influencias: [] },
-    abm: { motivo: 'Liderança em vertical Agro.', fit: 'Médio', cluster: 'Agro Global', similaridade: '65%', coberturaInicialComite: '30%', playsEntrada: [], potencialAbertura: 'Médio-alto', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [],
-    historico: [],
-    reconciliationStatus: 'vazia'
+    ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 78, crm: 70, vp: 85, ct: 30, ft: 60, budgetBrl: 2100000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Plataforma de inteligência agrícola e otimização de plantio', proximaMelhorAcao: 'Identificar champion técnico na área de inovação agrícola e estruturar roadmap.',
+    resumoExecutivo: 'Líder em agronegócio com alto potencial de budget tech (R$ 2.1M). Maturidade digital elevada (VP 85%) mas com baixa cobertura de contatos (30%). GAP crítico de mapeamento de DMU técnico, mas com sinais fortes de interesse em IA agrícola.',
+    leituraFactual: ['Potencial de budget de R$ 2.1M identificado.', 'Maturity de VP (85%) indica infraestrutura robusta.', 'Baixa cobertura de contatos (30% - apenas stakeholder de produção).', '2 visitas recentes em materiais de IA agrícola.'],
+    leituraInferida: ['Alto potencial de VP indica infraestrutura cloud-ready.', 'Gap de cobertura no comitê técnico abre oportunidade clara de mapeamento.'],
+    leituraSugerida: ['Priorizar mapeamento de CTO/VP de Tecnologia (hoje ausente).', 'Estruturar play de IA agrícola com foco em otimização de plantio e redução de custos.'],
+    sinais: [
+      { id: 's24', titulo: 'Visitas em materiais de IA agrícola e otimização de plantio', tipo: 'Tendência', impacto: 'Médio', owner: 'Ricardo Santos', recomendacao: 'Agendar workshop de visão de IA agrícola até 20/04.', contexto: '2 acessos em última semana em case de IA para otimização de safra. Alto interesse em ROI de redução de custos.', data: '2026-04-02' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c29', nome: 'Sergio Almeida', cargo: 'Diretor de Produção e Operações Agrícolas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Validação operacional', forcaRelacional: 65, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 81, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Demonstrar redução de custos de plantio via IA de otimização.' }
+    ],
+    oportunidades: [
+      { id: 'o23', nome: 'Plataforma de inteligência agrícola e otimização de plantio', etapa: 'Prospecção', valor: 2100000, owner: 'Ricardo Santos', risco: 'Médio', probabilidade: 45, historico: ['Sinal de intenção via intent data', 'Mapeamento de DMU técnico em andamento'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Field Marketing', influencias: [{ canal: 'Field Marketing', campanha: 'AgriTech Summit 2026', tipo: 'Events', impacto: 'Geração de interesse em IA agrícola', data: '2026-02-20' }] },
+    abm: { motivo: 'Liderança em vertical Agro com alto orçamento de tech.', fit: 'Médio (65/100)', cluster: 'Agro Global', similaridade: '65%', coberturaInicialComite: '30% (apenas operações)', playsEntrada: ['Play de mapeamento de DMU técnico', 'Play de ROI agrícola'], potencialAbertura: 'Médio-alto se CTO for mapeado', hipoteses: ['Identificação de CTO abre oportunidade de 60+ dias.'], contasSimilares: ['JBS', 'Bunge Brasil'] },
+    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: ['Líderes de agronegócio priorizam ROI de redução de custos.'], learnings: ['VP score alto (85%) indica facilidade de implementação técnica.'], hipoteses: ['Mapeamento de CTO + demonstração de ROI converte em 60-75 dias.'], fatoresRecomendacao: ['Vertical alta tração', 'Gap crítico de DMU técnico', 'Budget confirmado'] },
+    tecnografia: ['AWS', 'SAP Analytics Cloud'],
+    historico: [{ data: '2026-04-02', tipo: 'Sinal', descricao: 'Visitas em materiais de IA agrícola detectadas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'enriquecida'
   },
   // --- CONTAS ÓRFÃS RECONCILIADAS (Shell Mínimas) --- (Shell Mínimas) ---
   // Estas contas são mencionadas em advancedSignals e initialActions mas não existiam em contasMock
@@ -1021,16 +1071,29 @@ export const contasMock: Conta[] = [
     segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Julia Mendes', ownersSecundarios: [],
     etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 72, risco: 22, prontidao: 65, coberturaRelacional: 40,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
-    icp: 85, crm: 52, vp: 80, ct: 50, ft: 70, budgetBrl: 3500000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Ativar campanha de retargeting para cluster.',
-    resumoExecutivo: 'Conta orfã reconciliada: cluster de 12 contas em avaliação simultânea. Status seed — sem mapeamento individual.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    icp: 85, crm: 52, vp: 80, ct: 50, ft: 70, budgetBrl: 3500000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Consolidação de stack de observabilidade para cluster fintech', proximaMelhorAcao: 'Ativar campanha de retargeting contextualizado para o cluster.',
+    resumoExecutivo: 'Cluster estratégico de 12 contas fintech em avaliação simultânea na região sudeste. Potencial de consolidação de observabilidade + IA em toda a base. Desafio: múltiplas DMUs, processo de decisão descentralizado.',
+    leituraFactual: ['Cluster de 12 fintechs em diferentes estágios de maturidade.', 'Potencial consolidado de R$ 3.5M em observabilidade.', 'Sinal de intenção detectado em 3 contas via intent data.'],
+    leituraInferida: ['Conglomerado de fintechs tende a decisão lenta mas com alto lifetime value.', 'Oportunidade de early consolidation antes de competidores mapearem cluster.'],
+    leituraSugerida: ['Estruturar play de expansion em múltiplas contas do cluster em paralelo.', 'Priorizar 3 contas com sinal de intenção clara.'],
+    sinais: [
+      { id: 's20', titulo: 'Sinais de intenção de consolidação em 3 contas do cluster', tipo: 'Tendência', impacto: 'Médio', owner: 'Julia Mendes', recomendacao: 'Priorizar 3 contas com maior probabilidade de decisão.', contexto: '3 contas acessaram content sobre observabilidade de múltiplos sistemas em 7 dias.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c24', nome: 'Thiago Rocha', cargo: 'VP de Tecnologia do Cluster', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisão de vendor de infraestrutura', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 78, potencialSucesso: 64, scoreSucesso: 60, ganchoReuniao: 'Demonstrar consolidação de observabilidade reduz overhead operacional.' }
+    ],
+    oportunidades: [
+      { id: 'o20', nome: 'Consolidação de stack de observabilidade para cluster fintech', etapa: 'Prospecção', valor: 3500000, owner: 'Julia Mendes', risco: 'Médio', probabilidade: 38, historico: ['Cluster identificado e priorizado', 'Sinais de intenção em 3 contas', 'Outbound contextualizado em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [{ canal: 'Intent Data', campanha: 'Fintech Consolidation', tipo: 'Inbound', impacto: 'Identificação de sinais de intenção', data: '2026-04-01' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: 'Cluster de contas em jornada paralela de expansão.', evolucaoJornada: 'Crescimento > escalabilidade > consolidação de tech stack.', maturidadeRelacional: 'Inicial em cluster, média em contas individuais.', sponsorAtivo: 'Em formação (VP de tech do cluster).', profundidadeComite: 'Baixa a moderada por conta.', continuidade: 'Depende de alinhamento entre contas.', expansao: 'Mapeamento de oportunidades por subcluster.', retencao: 'Não aplicável (novo).', riscoEstagnacao: 'Médio por fragmentação de decisão.' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: ['Clusters de fintechs decidem melhor em conjunto que isoladamente.'], learnings: ['Consolidação de vendor de infra impacta todas as contas.'], hipoteses: ['Outbound contextualizado para 3 contas piloto acelera para 60 dias.'], fatoresRecomendacao: ['Potencial de consolidação alto', 'Janela de decisão aberta', 'Múltiplas DMUs = complexidade'] },
+    tecnografia: ['AWS', 'Kubernetes', 'Splunk'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Intent data de observabilidade consolidada detectado em 3 contas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '11', slug: 'nexus-fintech', nome: 'Nexus Fintech', dominio: 'nexusfintech.com.br', vertical: 'Fintech',
@@ -1038,15 +1101,29 @@ export const contasMock: Conta[] = [
     etapa: 'Decisão', tipoEstrategico: 'ABM', potencial: 88, risco: 45, prontidao: 72, coberturaRelacional: 60,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Atenção',
     icp: 92, crm: 68, vp: 85, ct: 70, ft: 80, budgetBrl: 4500000, possuiOportunidade: true,
-    oportunidadePrincipal: 'Proposta de R$ 280k em estágio de Decisão', proximaMelhorAcao: 'Mapear novo decisor após saída de sponsor.',
-    resumoExecutivo: 'Conta orfã reconciliada: caso crítico de mudança de stakeholder. Status seed — contexto operacional referenciado.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [] },
-    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    oportunidadePrincipal: 'Plataforma de pagamentos - Contrato de R$ 280k em estágio de Decisão', proximaMelhorAcao: 'Mapear novo decisor técnico após saída de sponsor e estruturar apresentação para comitê.',
+    resumoExecutivo: 'Fintech de alto potencial com proposta avançada (R$ 280k, estágio Decisão) mas em risco crítico por saída de sponsor técnico. Necessário mapeamento rápido de novo decisor no comitê de tecnologia para manter momentum.',
+    leituraFactual: ['Proposta de R$ 280k em estágio de Decisão desde 25/03.', 'Sponsor técnico (CTO antigo) saiu da empresa no último mês.', 'Novo CTO ainda não validou roadmap.', 'Reunião de decisão estava agendada para semana de 07/04.'],
+    leituraInferida: ['Saída de sponsor reduz drasticamente chance de conversão se não houver bridge rápido.', 'Novo CTO pode ter prioridades diferentes (pode rediscutir escopo).'],
+    leituraSugerida: ['Mapear novo CTO e estruturar briefing técnico personalizado em 48h.', 'Confirmar comitê de decisão e reagendar se necessário.'],
+    sinais: [
+      { id: 's21', titulo: 'Saída de sponsor técnico (CTO)', tipo: 'Mudança', impacto: 'Alto', owner: 'Pablo Diniz', recomendacao: 'Mapear novo CTO e realizar re-briefing em 48h.', contexto: 'CTO anterior deixou empresa. Novo CTO em onboarding. Proposta em estágio final, mas sponsor mudou.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c25', nome: 'Carla Mendes', cargo: 'CFO e Membra do Comitê de Decisão', area: 'Finanças', senioridade: 'C-Level', papelComite: 'Aprovação de investimento', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 84, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar ROI de plataforma de pagamentos em termos de redução de custos.' },
+      { id: 'c26', nome: 'Felipe Barbosa', cargo: 'VP de Operações (provável novo bridge)', area: 'Operações', senioridade: 'C-Level', papelComite: 'Executivo patrocinador em potencial', forcaRelacional: 42, receptividade: 'Desconhecida', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Potencial Sponsor', 'Operações'], influencia: 76, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Mostrar impacto operacional de plataforma unificada de pagamentos.' }
+    ],
+    oportunidades: [
+      { id: 'o21', nome: 'Plataforma de pagamentos - Contrato full', etapa: 'Decisão', valor: 280000, owner: 'Pablo Diniz', risco: 'Alto', probabilidade: 62, historico: ['Proposta enviada em 25/03', 'Apresentação para comitê realizada', 'CTO saiu - risco de renegociação', 'Novo CTO em onboarding'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [{ canal: 'ABM', campanha: 'Fintech Pagamentos Q1', tipo: 'ABM', impacto: 'Abertura com CFO', data: '2026-02-25' }] },
+    abm: { motivo: 'Fit ICP altíssimo para fintech de pagamentos.', fit: 'Altíssimo (92/100)', cluster: 'Fintech Pagamentos Top', similaridade: '88%', coberturaInicialComite: '60% (CFO ativo, CTO saiu)', playsEntrada: ['Play de executive alignment pós-mudança', 'Play de bridge técnico'], potencialAbertura: 'Altíssimo se nova liderança técnica validar', hipoteses: ['Novo VP de Ops pode ser bridge melhor que CTO para operações.'], contasSimilares: ['PicPay', 'Wise Brasil'] },
+    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: ['CFO fortemente engajado e com autoridade de decisão.'], insucessos: ['Saída de sponsor técnico criou risco de renegociação.'], padroes: ['Mudanças de liderança técnica em fintechs frequentemente levam a rediscussão de roadmap.'], learnings: ['Múltiplos sponsors reduz risco de mudança isolada de executivo.'], hipoteses: ['Re-briefing com novo CTO + VP ops converte em 7 dias.'], fatoresRecomendacao: ['Oportunidade avançada', 'Mudança crítica de stakeholder', 'Possibilidade de rápida recuperação'] },
+    tecnografia: ['AWS', 'Stripe', 'PostgreSQL', 'Kubernetes'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Saída de CTO detectada. Risco de renegociação de escopo.', icone: 'AlertTriangle' }, { data: '2026-04-03', tipo: 'Ação', descricao: 'Proposta em estágio de Decisão no comitê.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '12', slug: 'v-tal', nome: 'V.tal', dominio: 'vtal.com.br', vertical: 'Telecom',
@@ -1084,30 +1161,57 @@ export const contasMock: Conta[] = [
     etapa: 'Expansão', tipoEstrategico: 'ABX', potencial: 81, risco: 15, prontidao: 75, coberturaRelacional: 70,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
     icp: 88, crm: 75, vp: 82, ct: 65, ft: 80, budgetBrl: 3200000, possuiOportunidade: true,
-    oportunidadePrincipal: 'Expansão de R$ 180k em nova unidade', proximaMelhorAcao: 'Agendar reunião executiva.',
-    resumoExecutivo: 'Conta orfã reconciliada: sinal de expansão detectado. Status seed — caso operacional referenciado.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    oportunidadePrincipal: 'Expansão de serviços de saúde digital em nova unidade regional', proximaMelhorAcao: 'Agendar reunião executiva para validação de business case regional.',
+    resumoExecutivo: 'Empresa de saúde em jornada de expansão regional com oportunidade confirmada de R$ 180k para nova unidade. Sinal forte de crescimento com potencial de replicação em 3+ unidades nos próximos 12 meses.',
+    leituraFactual: ['Expansão confirmada para nova unidade no Nordeste.', 'Budget de R$ 180k disponível para Q2 2026.', 'Modelo de sucesso validado em unidade piloto.', 'Potencial de replicação em 3 outras unidades.'],
+    leituraInferida: ['Sucesso em unidade piloto abre porta para expansão sistêmica.', 'Timing de budget disponível sugere decision window curta (Q2).'],
+    leituraSugerida: ['Agendar business review com sponsor de expansão regional.', 'Estruturar modelo de rollout para 3+ unidades em paralelo.'],
+    sinais: [
+      { id: 's22', titulo: 'Expansão confirmada em nova unidade regional', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Pablo Diniz', recomendacao: 'Validar business case e estruturar implementação até 20/04.', contexto: 'Expansão para Nordeste confirmada. Budget disponível. Modelo validado em piloto.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c27', nome: 'Dra. Beatriz Cardoso', cargo: 'Diretora de Estratégia e Expansão', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Decisão de investimento em expansão', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 86, potencialSucesso: 82, scoreSucesso: 80, ganchoReuniao: 'Estruturar modelo de escalabilidade regional com margens otimizadas.' }
+    ],
+    oportunidades: [
+      { id: 'o22', nome: 'Expansão de serviços de saúde digital em nova unidade regional', etapa: 'Qualificação', valor: 180000, owner: 'Pablo Diniz', risco: 'Baixo', probabilidade: 78, historico: ['Modelo validado em unidade piloto', 'Budget aprovado para Q2', 'Timeline: implementação até 30/06'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [{ canal: 'ABX', campanha: 'Healthcare Regional Expansion', tipo: 'ABX', impacto: 'Abertura de conversa sobre escalabilidade', data: '2026-03-20' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: 'Conta em jornada ativa de expansão regional.', evolucaoJornada: 'Piloto validado > expansão regional > replicação sistêmica.', maturidadeRelacional: 'Média-alta com sponsor claro.', sponsorAtivo: 'Diretora de Estratégia fortemente engajada.', profundidadeComite: 'Moderada (decisão regional).', continuidade: 'Ativa com plano de replicação.', expansao: 'Confirmada para Nordeste. Potencial para Centro-Oeste e Norte em 2026-2027.', retencao: 'Modelo inicial validado e retido.', riscoEstagnacao: 'Baixo com sponsor ativo e budget confirmado.' },
+    inteligencia: { sucessos: ['Modelo de sucesso validado em piloto reduz risco de expansão.'], insucessos: [], padroes: ['Empresas de saúde expandem região por região quando modelo é validado.'], learnings: ['Sponsor de estratégia é critico para decisões de expansão.'], hipoteses: ['Replicação em 3+ unidades gera ARR de R$ 540k+ em 12 meses.'], fatoresRecomendacao: ['Jornada ativa de expansão', 'Sponsor fortemente engajado', 'Budget confirmado', 'Potencial de replicação elevado'] },
+    tecnografia: ['Salesforce Health Cloud', 'AWS', 'Tableau', 'ServiceNow'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Expansão confirmada para nova unidade regional detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Opportunity for regional expansion validated.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '14', slug: 'operacao-interna', nome: 'Operação Interna', dominio: 'canopi.internal', vertical: 'Operação',
     segmento: 'Interno', porte: 'N/A', localizacao: 'Remoto', ownerPrincipal: 'Revenue Ops', ownersSecundarios: [],
     etapa: 'Operação', tipoEstrategico: 'Em andamento', potencial: 100, risco: 0, prontidao: 95, coberturaRelacional: 100,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Nenhum', statusGeral: 'Crítico',
-    icp: 100, crm: 95, vp: 100, ct: 100, ft: 100, budgetBrl: 0, possuiOportunidade: false,
-    proximaMelhorAcao: 'Monitorar integrações e resolver alertas.', resumoExecutivo: 'Conta orfã interna: alertas operacionais de sincronização. Status seed — caso sistêmico.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Integração', influencias: [] },
+    icp: 100, crm: 95, vp: 100, ct: 100, ft: 100, budgetBrl: 0, possuiOportunidade: true,
+    oportunidadePrincipal: 'Garantia de saúde operacional contínua da plataforma', proximaMelhorAcao: 'Monitorar integrações e resolver alertas operacionais de sincronização.',
+    resumoExecutivo: 'Conta interna de operação do Canopi. Monitora saúde de integrações, sincronização de dados e alertas sistêmicos da plataforma. Não é conta comercial, é infraestrutura operacional do sistema.',
+    leituraFactual: ['Integração com Supabase ativa.', 'Sincronização de seed a cada novo deployment.', 'Alertas operacionais: validação de coerência de dados.'],
+    leituraInferida: ['Saúde deste "cliente interno" determina leiturabilidade da plataforma.', 'Falhas aqui impactam visibilidade de todas as contas no cockpit.'],
+    leituraSugerida: ['Monitorar alertas de sincronização de seed.', 'Manter validação de coerência entre tabelas core (accounts, contacts, signals, actions, oportunidades).'],
+    sinais: [
+      { id: 's23', titulo: 'Alertas operacionais de sincronização', tipo: 'Operacional', impacto: 'Crítico', owner: 'Revenue Ops', recomendacao: 'Validar coerência de seed após cada deployment.', contexto: 'Validação automática de referência entre accounts, contacts, signals, actions, oportunidades.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c28', nome: 'Fábio Diniz', cargo: 'Diretor de Engenharia / Product', area: 'Operação', senioridade: 'Liderança', papelComite: 'Dono da plataforma', forcaRelacional: 100, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Dono', 'Operação'], influencia: 100, potencialSucesso: 100, scoreSucesso: 100, ganchoReuniao: 'Verificar saúde operacional do seed e coerência de dados.' }
+    ],
+    oportunidades: [
+      { id: 'o25', nome: 'Garantia de saúde operacional contínua da plataforma', etapa: 'Operação', valor: 0, owner: 'Revenue Ops', risco: 'Crítico', probabilidade: 100, historico: ['Validação de seed canônico estável', 'Monitoramento contínuo de coerência de dados'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Integração', influencias: [{ canal: 'Sistema', campanha: 'Monitoramento operacional', tipo: 'Sistema', impacto: 'Validação de seed e sincronização', data: '2026-04-06' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: ['Seed de base canônica estável desde Lote 1.'], insucessos: [], padroes: ['Coerência de dados determina confiança na plataforma.'], learnings: ['Validação de referências precisa ser automática.'], hipoteses: ['Monitoramento contínuo elimina falhas de sincronização.'], fatoresRecomendacao: ['Infraestrutura crítica para operação', 'Monitoramento contínuo necessário'] },
+    tecnografia: ['Supabase', 'PostgreSQL', 'Canopi Platform'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Alertas operacionais de sincronização monitorados.', icone: 'AlertTriangle' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Validação de seed canonico Bloco A materializada.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '15', slug: 'cluster-manufatura', nome: 'Cluster Manufatura', dominio: 'cluster-manufatura.com.br', vertical: 'Manufatura',
