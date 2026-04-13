@@ -87,6 +87,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [editingOp, setEditingOp] = useState<OportunidadeConta | null>(null);
   const [localInteligencia, setLocalInteligencia] = useState<Conta['inteligencia']>(account?.inteligencia ?? { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
   const [editingIntel, setEditingIntel] = useState<Conta['inteligencia'] | null>(null);
+  const [localLeitura, setLocalLeitura] = useState({ factual: account?.leituraFactual ?? [], inferida: account?.leituraInferida ?? [], sugerida: account?.leituraSugerida ?? [] });
+  const [editingLeitura, setEditingLeitura] = useState<typeof localLeitura | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -97,6 +99,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       setLocalContatos(account.contatos || []);
       setLocalOportunidades(account.oportunidades || []);
       setLocalInteligencia(account.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
+      setLocalLeitura({ factual: account.leituraFactual || [], inferida: account.leituraInferida || [], sugerida: account.leituraSugerida || [] });
     }
   }, [account]); // Dependência direta do objeto consolidado
 
@@ -228,24 +231,48 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
   const handleSaveInteligencia = () => {
     if (!editingIntel) return;
-    
+
     // 1. Snapshot do estado atual (o que foi editado no modal)
     const snapshot = { ...editingIntel };
-    
+
     // 2. Build: o objeto final já está pronto em snapshot
-    
+
     // 3. setState: atualiza o estado local síncrono
     setLocalInteligencia(snapshot);
-    
+
     // 4. Persist: chama o repositório Supabase (fire-and-forget)
     persistAccount({
       id: account.id,
       inteligencia: snapshot
     });
-    
+
     // 5. Cleanup UI
     setEditingIntel(null);
     setShowFeedback('Inteligência atualizada e persistida.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleSaveLeitura = () => {
+    if (!editingLeitura) return;
+
+    // 1. Snapshot do estado atual
+    const snapshot = { ...editingLeitura };
+
+    // 2. Build: conversão para os nomes canônicos da interface
+    // 3. setState: atualiza o estado local
+    setLocalLeitura(snapshot);
+
+    // 4. Persist: chama o repositório Supabase (fire-and-forget)
+    persistAccount({
+      id: account.id,
+      leituraFactual: snapshot.factual,
+      leituraInferida: snapshot.inferida,
+      leituraSugerida: snapshot.sugerida,
+    });
+
+    // 5. Cleanup UI
+    setEditingLeitura(null);
+    setShowFeedback('Leitura estruturada atualizada e persistida.');
     setTimeout(() => setShowFeedback(null), 3000);
   };
 
@@ -371,20 +398,30 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             ))}
           </div>
 
-          {/* Leitura Estruturada AI (Recorte 25) */}
+          {/* Leitura Estruturada AI (Recorte 25 + E17) */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <SparkleIcon className="w-4 h-4 text-blue-500" />
-              <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Leitura Canopi AI</h2>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <SparkleIcon className="w-4 h-4 text-blue-500" />
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Leitura Canopi AI</h2>
+              </div>
+              <button
+                onClick={() => setEditingLeitura(editingLeitura ? null : { ...localLeitura })}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                title={editingLeitura ? 'Cancelar edição' : 'Editar leitura'}
+              >
+                <Pencil className="w-3 h-3" />
+                {editingLeitura ? 'Cancelar' : 'Editar'}
+              </button>
             </div>
             <div className="p-4 rounded-xl bg-slate-800/40 border border-emerald-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Factual — Dados Verificáveis</span>
               </div>
-              {account.leituraFactual.length > 0 ? (
+              {localLeitura.factual.length > 0 ? (
                 <ul className="space-y-1.5">
-                  {account.leituraFactual.map((f, i) => (
+                  {localLeitura.factual.map((f, i) => (
                     <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
                       <span className="text-emerald-600 mt-0.5 flex-shrink-0">—</span>{f}
                     </li>
@@ -397,23 +434,81 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <Brain className="w-3.5 h-3.5 text-amber-400" />
                 <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest">Inferências — Padrão AI</span>
               </div>
-              {account.leituraInferida.map((f, i) => (
-                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                  <span className="text-amber-500 mt-0.5 flex-shrink-0">~</span>{f}
-                </li>
-              ))}
+              {localLeitura.inferida.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {localLeitura.inferida.map((f, i) => (
+                    <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                      <span className="text-amber-500 mt-0.5 flex-shrink-0">~</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="text-xs text-slate-600 italic">Sem inferências registradas.</p>}
             </div>
             <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Recomendações — Ação Sugerida</span>
               </div>
-              {account.leituraSugerida.map((f, i) => (
-                <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
-                  <span className="text-blue-400 mt-0.5 flex-shrink-0">→</span>{f}
-                </li>
-              ))}
+              {localLeitura.sugerida.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {localLeitura.sugerida.map((f, i) => (
+                    <li key={i} className="text-sm text-slate-300 flex items-start gap-2">
+                      <span className="text-blue-400 mt-0.5 flex-shrink-0">→</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="text-xs text-slate-600 italic">Sem recomendações registradas.</p>}
             </div>
+
+            {/* Editor Mínimo: Leitura Estruturada (Recorte E17) */}
+            {editingLeitura && (
+              <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-blue-500/20 space-y-3">
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Dados Factuais</label>
+                  <textarea
+                    value={editingLeitura.factual.join('\n')}
+                    onChange={(e) => setEditingLeitura({ ...editingLeitura, factual: e.target.value.split('\n').filter(l => l.trim()) })}
+                    placeholder="Uma observação por linha"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-emerald-500/50"
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-amber-500 uppercase tracking-widest">Padrões AI (Inferências)</label>
+                  <textarea
+                    value={editingLeitura.inferida.join('\n')}
+                    onChange={(e) => setEditingLeitura({ ...editingLeitura, inferida: e.target.value.split('\n').filter(l => l.trim()) })}
+                    placeholder="Uma inferência por linha"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-amber-500/50"
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-blue-500 uppercase tracking-widest">Ações Sugeridas</label>
+                  <textarea
+                    value={editingLeitura.sugerida.join('\n')}
+                    onChange={(e) => setEditingLeitura({ ...editingLeitura, sugerida: e.target.value.split('\n').filter(l => l.trim()) })}
+                    placeholder="Uma ação sugerida por linha"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-blue-500/50"
+                    rows={2}
+                  />
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <button
+                    onClick={() => setEditingLeitura(null)}
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveLeitura}
+                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ────── FILA DE FOGO / FIRE QUEUE (RECORTE 28) ────── */}
