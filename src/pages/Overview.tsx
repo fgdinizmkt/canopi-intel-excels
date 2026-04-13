@@ -4,12 +4,16 @@
  */
 
 import React, { useMemo } from 'react';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap, Target } from 'lucide-react';
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
+import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso } from '../lib/scoringRepository';
+import { useAccountDetail } from '../context/AccountDetailContext';
 
 export const Overview: React.FC = () => {
+  const { openAccount } = useAccountDetail();
+
   // ─── DERIVAÇÃO MEMOIZADA DE SINAIS (Nível de Severidade) ───────────────
   const { criticosSinais, alertasSinais, oportunidadesSinais, resolvedosSinais, topSignal, saudeOperacional, topPrioridades } = useMemo(() => {
     const crits = advancedSignals.filter(s => s.severity === 'crítico');
@@ -217,6 +221,18 @@ export const Overview: React.FC = () => {
       });
   }, []);
 
+  // ─── TRIAGEM POR SCORE (Recorte 54 — F2) ────────────────────────────────
+  const triageByScore = useMemo(() => {
+    const contas = contasMock.map(c => ({ conta: c, score: calculateAccountScore(c) }));
+
+    return {
+      criticas: contas.filter(x => isContaCritica(x.score)).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
+      altasPrio: contas.filter(x => isAltaPrioridade(x.score) && !isContaCritica(x.score)).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 3),
+      altoPotencialBaixaCobertura: contas.filter(x => x.score.potencial.score > 75 && x.score.cobertura.score < 50).sort((a, b) => b.score.potencial.score - a.score.potencial.score).slice(0, 3),
+      topOportunidades: contas.filter(x => (x.conta.oportunidades?.length ?? 0) > 0).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
+    };
+  }, []);
+
   // ─── ABM READINESS (Contas com prontidão > 70) ──────────────────────────
   const abmReadyAccounts = contasMock
     .filter(c => c.prontidao > 70 && c.playAtivo !== 'Nenhum' && c.reconciliationStatus !== 'vazia')
@@ -331,6 +347,83 @@ export const Overview: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* TRIAGEM OPERACIONAL — Orientada por Score (Recorte 54 — F2) */}
+      <section className="space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Target className="w-5 h-5 text-red-500" />
+          <h2 className="text-xl font-bold text-slate-900">Triagem Operacional por Score</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Contas Críticas */}
+          <Card className="border-l-4 border-l-red-500 bg-red-50">
+            <Badge variant="slate" className="mb-2 bg-red-100 text-red-700 border-red-200 text-[9px]">CRÍTICAS</Badge>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.criticas.length} contas</h3>
+            <div className="space-y-2">
+              {triageByScore.criticas.map(x => (
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
+                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
+                    {getPrincipalAviso(x.score) && <span className="text-[9px] text-red-600">{getPrincipalAviso(x.score)?.split(' ')[0]}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Altas Prioridades */}
+          <Card className="border-l-4 border-l-amber-500 bg-amber-50">
+            <Badge variant="slate" className="mb-2 bg-amber-100 text-amber-700 border-amber-200 text-[9px]">ALTAS PRIORIDADES</Badge>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altasPrio.length} contas</h3>
+            <div className="space-y-2">
+              {triageByScore.altasPrio.map(x => (
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
+                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
+                    <span className="text-[9px] bg-amber-200/30 px-1 py-0.5 rounded text-amber-700 font-semibold">{x.score.prioridade}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Alto Potencial + Baixa Cobertura */}
+          <Card className="border-l-4 border-l-blue-500 bg-blue-50">
+            <Badge variant="slate" className="mb-2 bg-blue-100 text-blue-700 border-blue-200 text-[9px]">ALTO POT. / BAIXA COB.</Badge>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altoPotencialBaixaCobertura.length} contas</h3>
+            <div className="space-y-2">
+              {triageByScore.altoPotencialBaixaCobertura.map(x => (
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
+                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
+                    <span className="text-[10px] text-slate-600">Cob. {x.score.cobertura.score}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Top Oportunidades por Score */}
+          <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
+            <Badge variant="slate" className="mb-2 bg-emerald-100 text-emerald-700 border-emerald-200 text-[9px]">TOP OPORTUNIDADES</Badge>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.topOportunidades.length} contas</h3>
+            <div className="space-y-2">
+              {triageByScore.topOportunidades.map(x => (
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
+                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
+                    <span className="text-[9px] text-slate-600">{x.conta.oportunidades?.length || 0} oport.</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </section>
 

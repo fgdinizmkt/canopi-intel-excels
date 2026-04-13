@@ -277,3 +277,27 @@ function generateAvisos(
 
   return avisos;
 }
+
+/**
+ * ─── HELPERS OPERACIONAIS (Recorte 54 — F2) ────────────────────────
+ * Pequenas funções reutilizáveis para triagem operacional
+ */
+
+export function isContaCritica(score: ScoringResult): boolean {
+  return score.prioridade === 'crítica';
+}
+
+export function isAltaPrioridade(score: ScoringResult): boolean {
+  return score.prioridade === 'crítica' || score.prioridade === 'alta';
+}
+
+export function getPrincipalAviso(score: ScoringResult): string | null {
+  return score.avisos.length > 0 ? score.avisos[0] : null;
+}
+
+export function getScoreHeadline(score: ScoringResult): string {
+  const aviso = getPrincipalAviso(score);
+  return aviso
+    ? `Score ${score.scoreTotal} • ${score.prioridade} • ${aviso}`
+    : `Score ${score.scoreTotal} • ${score.prioridade}`;
+}

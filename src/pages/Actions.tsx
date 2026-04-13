@@ -25,6 +25,7 @@ import {
 import { Badge, Button, Card } from '../components/ui';
 import { useAccountDetail } from "../context/AccountDetailContext";
 import { getActions } from "../lib/actionsRepository";
+import { calculateAccountScore, isContaCritica, isAltaPrioridade } from "../lib/scoringRepository";
 import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
 
 type ViewMode = "Lista" | "Kanban";
@@ -1290,6 +1291,15 @@ export const Actions: React.FC = () => {
     return merged;
   }, [sessionActions, supabaseActions]);
 
+  // ─── TRIAGEM DE CONTAS POR SCORE (Recorte 54 — F2) ──────────────────
+  const contasParaTriagem = useMemo(() => {
+    return contasMock
+      .map(c => ({ conta: c, score: calculateAccountScore(c) }))
+      .filter(x => isContaCritica(x.score) || isAltaPrioridade(x.score))
+      .sort((a, b) => b.score.scoreTotal - a.score.scoreTotal)
+      .slice(0, 5);
+  }, []);
+
   const [query, setQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("Todas");
   const [channelFilter, setChannelFilter] = useState("Todos");
@@ -1651,7 +1661,69 @@ export const Actions: React.FC = () => {
             </div>
           </div>
         )}
-        
+
+        {/* TRIAGEM DE CONTAS POR SCORE (Recorte 54 — F2) */}
+        {contasParaTriagem.length > 0 && (
+          <div className="mt-8 animate-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3 px-2 mb-4">
+              <Target className="w-5 h-5 text-red-500" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Contas que Exigem Ação Agora</h3>
+              <span className="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">TRIAGEM POR SCORE</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {contasParaTriagem.map((x) => (
+                <div
+                  key={x.conta.id}
+                  onClick={() => openAccount(x.conta.id)}
+                  className={cx(
+                    "p-4 rounded-2xl border cursor-pointer transition-all hover:shadow-md",
+                    isContaCritica(x.score)
+                      ? "bg-red-50 border-red-200 hover:border-red-400"
+                      : "bg-amber-50 border-amber-200 hover:border-amber-400"
+                  )}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <p className="text-sm font-bold text-slate-900 flex-1">{x.conta.nome}</p>
+                    <span
+                      className={cx(
+                        "text-xs font-black px-2 py-1 rounded-lg shrink-0",
+                        isContaCritica(x.score)
+                          ? "bg-red-200 text-red-700"
+                          : "bg-amber-200 text-amber-700"
+                      )}
+                    >
+                      {x.score.prioridade}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-600">Score</span>
+                      <span className="text-sm font-black text-slate-900">{x.score.scoreTotal}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-600 line-clamp-2">
+                      {x.score.avisos[0]?.split('•')[0].trim() || 'Sem avisos'}
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openAccount(x.conta.id);
+                    }}
+                    className={cx(
+                      "w-full mt-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
+                      isContaCritica(x.score)
+                        ? "bg-red-200 text-red-700 hover:bg-red-300"
+                        : "bg-amber-200 text-amber-700 hover:bg-amber-300"
+                    )}
+                  >
+                    Abrir Conta
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Playbook Library Bar (Recorte 20) */}
         <div className="mt-8">
            <div className="flex items-center justify-between px-2 mb-4">
