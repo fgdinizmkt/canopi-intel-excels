@@ -459,7 +459,7 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 45 concluído e publicado em origin/main. Último marco funcional: commit `81a1c6b`.
+- **Status Atual:** Recorte 47 concluído e publicado em origin/main. Último marco funcional: commit `9ec0667`.
 - **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
   - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
