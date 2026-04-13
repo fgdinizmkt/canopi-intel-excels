@@ -218,19 +218,20 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Oportunidades — read/write defensivo | ✅ | ✅ | R46 |
 | ABM — objeto `abm` completo + narrativos | ✅ | ✅ | R30/R32/R33/R40 |
 | ABX — objeto `abx` completo + narrativos | ✅ | ✅ | R31/R41 |
-| ABX — `tipoEstrategico`, `playAtivo` | ⬜ | ⬜ | ❓ Decisão pendente (seção 5) |
 
 ---
 
-## 7. Campos sem Cobertura Supabase por Decisão Implícita
+## 7. Campos com Cobertura Supabase Especializada (não via accountsRepository)
 
-Os seguintes campos existem no modelo `Conta` mas nunca foram incluídos em nenhum repository.
-Não há registro de decisão explícita de exclusão — apenas ausência de implementação.
+Os seguintes campos existem no modelo `Conta` e têm cobertura Supabase completa, mas através de repositories especializadas.
+Não são gerenciados via `accountsRepository` — cada um tem seu repositório independente de orquestração:
 
-- `sinais[]` — array de `SinalConta` (lidos via `signalsRepository`, não via `accountsRepository`)
-- `acoes[]` — array de `AcaoConta` (lidas via `actionsRepository`)
-- `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
-- `reconciliationStatus` — campo de controle interno — **sem repository Supabase**
+- `sinais[]` — array de `SinalConta` — lido e escrito via `signalsRepository`, não via `accountsRepository`
+- `acoes[]` — array de `AcaoConta` — lido e escrito via `actionsRepository`, não via `accountsRepository`
+- `contatos[]` — array de `ContatoConta` — lido e escrito via `contactsRepository`, não via `accountsRepository`
+
+**Campos sem cobertura Supabase (intencionais):**
+- `reconciliationStatus` — campo de controle interno exclusivamente local/mock, sem persistência Supabase
 
 ---
 

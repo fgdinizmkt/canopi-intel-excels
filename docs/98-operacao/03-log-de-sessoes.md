@@ -21,6 +21,20 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-13] — Recorte 52 (Documental): Fechamento Canônico da Fase E — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale (Encerramento).
+- **Objetivo:** Executar reconciliação factual dos documentos operacionais para eliminar inconsistências residuais entre mapa de cobertura, checkpoint e decisões arquiteturais, e formalizar o fechamento canônico da Fase E sem inventar novo escopo funcional.
+- **Ações Executadas:**
+  - **Auditoria Documental:** Identificadas 3 inconsistências: (1) linha orphan no resumo de cobertura sobre `ABX — tipoEstrategico, playAtivo` contradizendo seção 5 que formaliza ownership top-level; (2) seção 7 do mapa com terminologia confusa ("sem cobertura") para campos com cobertura Supabase especializada; (3) docs de status apontando para Recorte 52 "por definir" quando era recorte documental em andamento.
+  - **Correção Mapa:** Remoção de linha 221 (ABX tipoEstrategico/playAtivo) do resumo de cobertura, que contradiz resolução formal no Recorte 44 e seção 5. Clarificação terminológica da seção 7: renomeação para "Campos com Cobertura Supabase Especializada (não via accountsRepository)" com explicação que `sinais[]`, `acoes[]`, `contatos[]` têm persistência Supabase completa via repositories independentes, não via accountsRepository.
+  - **Atualização Status:** 00-status-atual.md marcando Recorte 52 como concluído (documental) e Fase E como concluída. Adição de entrada em 03-log-de-sessoes.md. Atualização de 06-checkpoint-atual.md para refletir estado final.
+  - **Build:** Nenhum — recorte puramente documental.
+- **Decisão Consolidada:** Fase E alcançou cobertura funcional E1–E20 (21 recortes) cobrindo leitura defensiva, escrita defensiva atômica e narrativas em todas as entidades principais. Padrão de persistência local-first + fire-and-forget consolidado e replicável. Campos sem cobertura Supabase explicitamente formalizados.
+- **Status:** ✅ Concluído e publicado em origin/main. Documentação operacional reconciliada. Fase E encerrada canonicamente. Próximo passo: direcionamento do Orquestrador para próxima frente macro a definir.
+
+---
+
 ## [2026-04-12] — Recorte 50 (Supabase E19): Tecnografia de Conta — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.

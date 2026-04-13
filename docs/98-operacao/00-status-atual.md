@@ -4,7 +4,7 @@
  `main` — sincronizada em 2026-04-12 (Recorte 51 — último marco funcional: 15b6371)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 51 — Supabase E20: Canais e Campanhas)
+**Fase E — Supabase Migration & Scale** (Concluída - Último Recorte: Recorte 52 — Fechamento Canônico)
 
 ---
 
@@ -472,7 +472,8 @@
 - **Recorte 47:** Concluído. Implementação do ciclo completo de leitura, merge e escrita defensiva atômica para o objeto `inteligencia` da entidade Conta. Read path fechado em `AccountDetailView.tsx` via `getAccounts()` do repositório.
 - **Recorte 48:** Concluído. Supabase E17: Leitura Estruturada da Conta. Implementação de leitura, merge defensivo e escrita atômica dos blocos `leituraFactual`, `leituraInferida` e `leituraSugerida`. Repository layer expandido em `accountsRepository.ts` com query defensiva e fallback para mock. UI local-first com editor modal mínimo em `AccountDetailView.tsx`. Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist. Publicação: commit `569c665`.
 - **Recorte 51:** Concluído. Supabase E20: Canais e Campanhas. Implementação completa de leitura, merge defensivo e escrita defensiva atômica para `canaisCampanhas`. Repository layer: `AccountRow` e `AccountPersistPayload` expandidos, `getAccounts()` query com merge defensivo em cascata. UI: estado local-first `localCanaisCampanhas`, editor modal com input para `origemPrincipal` e textarea para `influenciasJson`. Validação: `JSON.parse()` com try/catch como barreira canônica, validação de shape (canal, campanha, tipo, impacto, data). Publicação: commit `15b6371`.
-- **Próximo passo funcional:** Definição do Recorte 52 pelo Orquestrador.
+- **Recorte 52:** Concluído (Documental). Fechamento Canônico da Fase E. Reconciliação factual dos documentos operacionais para eliminar inconsistências entre mapa, checkpoint e decisões. Correção: remoção de linha inconsistente sobre `tipoEstrategico`/`playAtivo` em ABX no resumo de cobertura. Clarificação terminológica: campos com cobertura Supabase especializada via repositories independentes vs. campos sem persistência.
+- **Próximo passo:** Aguardando direcionamento do Orquestrador para próxima frente macro a definir.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 51 (Supabase E20) Concluído
+# Checkpoint Atual — Recorte 52 (Fechamento Canônico da Fase E) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 51 Concluído
-- **Status da Infra:** Build íntegro, canaisCampanhas read-write implementado, validação defensiva com JSON.parse barreira canônica, editor com estado `{ origemPrincipal, influenciasJson }`.
+- **Marco:** Recorte 52 Concluído (Documental)
+- **Status da Infra:** Fase E (E1–E20) funcional consolidada. Documentação operacional reconciliada. Arquitetura de persistência local-first + fire-and-forget implementada e replicável. Campos sem cobertura Supabase formalizados. Pronto para próxima fase macro.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -120,10 +120,11 @@
   - Publicação: commit `15b6371` em `origin/main`.
 
 ## O que está pendente
-- Definição do Recorte 52 pelo Orquestrador.
+- Nenhum recorte em andamento. Fase E encerrada canonicamente.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 52.
+Aguardar direcionamento do Orquestrador para próxima frente macro a definir.
 
 ---
-*Último estado funcional confiável: Recorte 51 (`15b6371`)*
+*Último estado funcional confiável: Recorte 51 (`15b6371`) — Funcional*
+*Último estado documental confiável: Recorte 52 — Reconciliação e Fechamento da Fase E*
