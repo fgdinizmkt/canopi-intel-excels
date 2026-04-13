@@ -416,6 +416,7 @@ export const initialActions: ActionItem[] = [
     description:
       "O workshop gerou boa percepção, mas ainda não virou avanço formal. A ação precisa transformar aprendizado em proposta concreta, definir sponsor e evitar esfriamento do interesse.",
     accountName: "MSD Saúde Animal",
+    relatedAccountId: "17",
     accountContext: "Enterprise Pharma · Oportunidade",
     origin: "Pós-evento sem avanço",
     relatedSignal: "7 dias sem desdobramento após workshop, apesar do retorno positivo do cliente.",
@@ -461,6 +462,7 @@ export const initialActions: ActionItem[] = [
     description:
       "A conta internacional passou a buscar temas ligados a modernização de canais e governança de dados. A ação organiza abordagem consultiva inicial com prova de capacidade adequada ao contexto.",
     accountName: "FHLB",
+    relatedAccountId: "18",
     accountContext: "Conta internacional · Prospecção",
     origin: "Sinal externo de expansão digital",
     relatedSignal: "Movimentos públicos recentes e consumo de conteúdo sobre digital modernization.",
@@ -639,6 +641,7 @@ export const initialActions: ActionItem[] = [
     description:
       "Uma conta VIP de lost deal voltou a navegar páginas técnicas e cases após meses sem atividade. A ação precisa contextualizar esse retorno, definir owner e preparar abordagem curta ainda hoje.",
     accountName: "Clever Devices",
+    relatedAccountId: "19",
     accountContext: "VIP · Reativação",
     origin: "Retorno de interesse ao site",
     relatedSignal: "4 visitas em páginas de arquitetura e case nas últimas 48h, após 4 meses sem atividade.",
@@ -1273,6 +1276,89 @@ export const contasMock: Conta[] = [
     inteligencia: { sucessos: ['Conversão de landing estável indica qualidade de copy/oferta.'], insucessos: ['Origem do tráfego com baixa aderência ICP.'], padroes: ['Healthtech responde bem a campanhas focadas em compliance + eficiência operacional.'], learnings: ['Concentração de gasto em poucos conjuntos amplia risco de desperdício.'], hipoteses: ['Distribuição uniforme de gasto reduz CPL em 20%.'], fatoresRecomendacao: ['Desvio de performance', 'Potencial de recuperação rápida', 'Ação tática simples'] },
     tecnografia: ['Google Ads', 'Meta Ads', 'HubSpot', 'Segment'],
     historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Alerta persistente de CPL acima da meta gerado por Canopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
+    reconciliationStatus: 'enriquecida'
+  },
+  // --- LOTE 3A: CONTAS ÓRFÃS RECONCILIADAS ---
+  {
+    id: '17', slug: 'msd-saude-animal', nome: 'MSD Saúde Animal', dominio: 'msdanimal.com.br', vertical: 'Saúde Animal', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
+    ownerPrincipal: 'Patricia Silva', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 72, risco: 18, prontidao: 68, coberturaRelacional: 45,
+    ultimaMovimentacao: '2026-04-08', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 78, crm: 65, vp: 75, ct: 55, ft: 70, budgetBrl: 1200000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Implementação de plataforma de saúde animal inteligente', proximaMelhorAcao: 'Formalizar próximo passo pós-workshop de IA e agendar POC.',
+    resumoExecutivo: 'Líder em saúde animal com elevada maturidade de negócio. Workshop de IA bem-sucedido no mês anterior abriu janela de decisão. Diretoria executiva engajada e budget aprovado. Momento crítico para consolidação de proposta.',
+    leituraFactual: ['Workshop de IA em saúde animal realizado em 03/2026.', 'Budget de R$ 1.2M aprovado para FY2026.', '2 contatos de nível executivo presentes no workshop.', 'High intent data em plataforma de gerenciamento veterinário.'],
+    leituraInferida: ['Implementação pode começar em 60 dias se alinhamento técnico for validado.', 'Veterinários em empresas decisionoras respondem bem a provas de resultado.'],
+    leituraSugerida: ['Estruturar POC de 30 dias com caso real de clínica.', 'Enviar roadmap de implementação validado com arquiteto técnico.'],
+    sinais: [
+      { id: 's25', titulo: 'Pós-workshop: alta receptividade para POC em saúde animal', tipo: 'Oportunidade', impacto: 'Alto', owner: 'Patricia Silva', recomendacao: 'Agendar POC kickoff até 15/04 com full technical team.', contexto: 'Workshop realizado com sucesso. Diretoria quer validar com caso real de clínica. Budget aprovado.', data: '2026-04-08' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c30', nome: 'Dr. Paulo Mendes', cargo: 'Diretor de Inovação em Saúde Animal', area: 'Estratégia', senioridade: 'C-Level', papelComite: 'Patrocinador de tecnologia', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 80, scoreSucesso: 78, ganchoReuniao: 'Demonstrar redução de mortalidade animal com IA preditiva.' },
+      { id: 'c31', nome: 'Dra. Beatriz Gomes', cargo: 'Gerente de Tecnologia Veterinária', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c30', influencia: 76, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar integração com sistemas de registro veterinário existentes.' }
+    ],
+    oportunidades: [
+      { id: 'o26', nome: 'Implementação de plataforma de saúde animal inteligente', etapa: 'Qualificação', valor: 1200000, owner: 'Patricia Silva', risco: 'Baixo', probabilidade: 62, historico: ['Workshop de IA realizado com sucesso', 'Budget aprovado corporativamente', 'POC em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [{ canal: 'Webinar', campanha: 'IA em Veterinária 2026', tipo: 'Inbound', impacto: 'Geração de interesse em IA preditiva para clínicas', data: '2026-03-15' }] },
+    abm: { motivo: 'Vertical de alto potencial com maturidade tecnológica.', fit: 'Médio-alto (78/100)', cluster: 'Saúde Animal Enterprise', similaridade: '72%', coberturaInicialComite: '45% (apenas executivos)', playsEntrada: ['Play de POC veterinário', 'Play de resultados em redução de mortalidade'], potencialAbertura: 'Alto se POC validar', hipoteses: ['Validação técnica em 30 dias abre caminho para full implementation'], contasSimilares: ['Ceva Animal Health', 'Boehringer Ingelheim'] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: ['Workshop bem-estruturado gerou alta receptividade.'], insucessos: [], padroes: ['Executivos em saúde animal respondem bem a validação técnica real.'], learnings: ['Budget aprovado = decisão 80% encaminhada.'], hipoteses: ['POC de 30 dias converte para full deal em 90 dias.'], fatoresRecomendacao: ['Workshop bem-sucedido', 'Budget aprovado', 'Janela de decisão aberta'] },
+    tecnografia: ['AWS', 'PostgreSQL', 'Tableau', 'Salesforce Veterinary'],
+    historico: [{ data: '2026-04-08', tipo: 'Ação', descricao: 'Ação a7 reconciliada: formalizar próximo passo pós-workshop de IA.', icone: 'Zap' }],
+    reconciliationStatus: 'enriquecida'
+  },
+  {
+    id: '18', slug: 'fhlb-district', nome: 'FHLB District', dominio: 'fhlb.gov', vertical: 'Financeiro', segmento: 'Governo/Federal', porte: 'Grande', localizacao: 'Washington DC, USA',
+    ownerPrincipal: 'Julia Mendes', ownersSecundarios: ['Rafael Prado'], etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 80, risco: 35, prontidao: 65, coberturaRelacional: 30,
+    ultimaMovimentacao: '2026-04-09', atividadeRecente: 'Média', playAtivo: 'ABX', statusGeral: 'Saudável', icp: 82, crm: 58, vp: 80, ct: 40, ft: 72, budgetBrl: 3500000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Modernização de infraestrutura digital e automação regulatória', proximaMelhorAcao: 'Preparar outreach consultivo com ângulo de conformidade digital e eficiência operacional.',
+    resumoExecutivo: 'Instituição federal com orçamento significativo para modernização digital. Sinal de expansão identificado via intent data. Perspectiva de expansão de múltiplos distritos. Desafio: processo de decisão lento, mas decisão final de alto valor.',
+    leituraFactual: ['Sinal de expansão digital detectado em 5 páginas diferentes do site.', 'Budget disponível para modernização de infraestrutura.', 'Processo de RFI em preparação para Q2 2026.', 'Responsável corporativo de tecnologia identificado em LinkedIn.'],
+    leituraInferida: ['Federal institution budgets are multi-year, but expansion window is opening now.', 'Decisão será lenta, mas uma vez aprovada, implementação é garantida e lucro é alto.'],
+    leituraSugerida: ['Entrar cedo no processo com perspectiva de conformidade regulatória.', 'Estruturar solução com foco em auditoria e compliance de dados.'],
+    sinais: [
+      { id: 's26', titulo: 'Intent data: múltiplas visitas em modernização digital e compliance', tipo: 'Tendência', impacto: 'Médio', owner: 'Julia Mendes', recomendacao: 'Enviar white paper sobre conformidade digital em instituições federais.', contexto: '5+ visitas em 2 semanas em tópicos de modernização de infraestrutura. RFI em preparação.', data: '2026-04-09' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c32', nome: 'Dr. Michael Chen', cargo: 'VP de Tecnologia e Operações', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia federal', forcaRelacional: 58, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 82, potencialSucesso: 68, scoreSucesso: 62, ganchoReuniao: 'Apresentar case de modernização em instituição federal similar.' }
+    ],
+    oportunidades: [
+      { id: 'o27', nome: 'Modernização de infraestrutura digital e automação regulatória', etapa: 'Prospecção', valor: 3500000, owner: 'Julia Mendes', risco: 'Médio', probabilidade: 38, historico: ['Intent data identificado', 'RFI em preparação', 'White paper em desenvolvimento'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Intent Data', influencias: [{ canal: 'Intent Data', campanha: 'Federal Digital Modernization', tipo: 'Inbound', impacto: 'Identificação de sinal de expansão', data: '2026-04-05' }] },
+    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    abx: { motivo: 'Instituição federal com orçamento de expansão em modernização.', evolucaoJornada: 'Prospecção > validação de conformidade > RFI > contratação.', maturidadeRelacional: 'Baixa (apenas VP de tech identificado).', sponsorAtivo: 'Em formação (VP de Tecnologia como entrada).', profundidadeComite: 'Baixa a moderada (federal decision process é lento).', continuidade: 'Dependente de aprovação de orçamento para próximo fiscal year.', expansao: 'Potencial de expansão para múltiplos distritos do FHLB.', retencao: 'Não aplicável (novo).', riscoEstagnacao: 'Médio se RFI não viabilizar (processo federal lento).' },
+    inteligencia: { sucessos: [], insucessos: [], padroes: ['Instituições federais decidem lentamente, mas com valores altos e ciclos longos.'], learnings: ['Entrada cedo em RFI é crítica para federal opportunities.'], hipoteses: ['White paper sobre compliance federal converte para informational meeting em 45 dias.'], fatoresRecomendacao: ['Intent data claro', 'Budget de modernização disponível', 'RFI em preparação'] },
+    tecnografia: ['AWS GovCloud', 'Azure Federal', 'Salesforce Government Cloud', 'Splunk'],
+    historico: [{ data: '2026-04-09', tipo: 'Ação', descricao: 'Ação a8 reconciliada: preparar outreach consultivo para FHLB.', icone: 'Zap' }],
+    reconciliationStatus: 'enriquecida'
+  },
+  {
+    id: '19', slug: 'clever-devices', nome: 'Clever Devices', dominio: 'cleverdevices.com', vertical: 'IoT', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'São Paulo, Brasil',
+    ownerPrincipal: 'Marcos Oliveira', ownersSecundarios: [], etapa: 'Descoberta', tipoEstrategico: 'ABM', potencial: 58, risco: 25, prontidao: 52, coberturaRelacional: 35,
+    ultimaMovimentacao: '2026-04-10', atividadeRecente: 'Média', playAtivo: 'Nenhum', statusGeral: 'Saudável', icp: 55, crm: 48, vp: 60, ct: 45, ft: 52, budgetBrl: 800000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Plataforma de gerenciamento inteligente de dispositivos IoT', proximaMelhorAcao: 'Preparar retomada de Clever Devices com novo ângulo de eficiência operacional.',
+    resumoExecutivo: 'Empresa de IoT com histórico de visitação ao site retomada. Cold account mostrando sinais de reaquecimento. Budget moderado, mas potencial de expansion se pain point técnico for validado. Timing crítico para reativação.',
+    leituraFactual: ['Retorno ao site detectado após 4 meses de inatividade.', '3 visitas em 5 dias em seção de case studies de IoT.', 'Histórico anterior: 1 demo em 2025, sem objeção explícita.', 'Empresa com 150+ dispositivos em operação.'],
+    leituraInferida: ['Retorno ao site após pausa longa pode indicar mudança de ciclo de orçamento ou turnover de decisor.', 'Interesse em case studies é sinal de validação, não prospection fria.'],
+    leituraSugerida: ['Reativar com novo case de eficiência operacional específico para indústria.', 'Validar se houve turnover de decisor e reposicionar se necessário.'],
+    sinais: [
+      { id: 's27', titulo: 'Retorno ao site: visitação renovada em case de IoT', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência operacional com ROI de 6 meses.', contexto: '4 meses inativo, retorno com 3 visitas em 5 dias. Seção de case studies visitada.', data: '2026-04-10' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c33', nome: 'Carolina Ribeiro', cargo: 'Diretora de Operações', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 55, scoreSucesso: 50, ganchoReuniao: 'Demonstrar redução de overhead operacional em 6 meses.' }
+    ],
+    oportunidades: [
+      { id: 'o28', nome: 'Plataforma de gerenciamento inteligente de dispositivos IoT', etapa: 'Descoberta', valor: 800000, owner: 'Marcos Oliveira', risco: 'Médio', probabilidade: 35, historico: ['Visitação renovada detectada', 'Demo anterior em 2025', 'Reativação em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Inbound Retomado', influencias: [{ canal: 'Website', campanha: 'Case Studies IoT', tipo: 'Inbound', impacto: 'Reativação de interesse dorminte', data: '2026-04-10' }] },
+    abm: { motivo: 'Potencial de reativação em conta fria com budget disponível.', fit: 'Baixo-médio (55/100)', cluster: 'IoT Mid-Market', similaridade: '58%', coberturaInicialComite: '35% (apenas diretora)', playsEntrada: ['Play de reativação com novo case', 'Play de ROI operacional de 6 meses'], potencialAbertura: 'Médio se novo case validar pain point', hipoteses: ['Reativação com novo case converte em 60-75 dias.'], contasSimilares: ['Positivo Tecnologia', 'Sensix'] },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    inteligencia: { sucessos: ['Visitação renovada indica possível mudança de ciclo ou decisor.'], insucessos: ['Demo anterior em 2025 não avançou — motivo desconhecido.'], padroes: ['IoT buyers decidem melhor com case de ROI operacional específico.'], learnings: ['Visitação renovada após pausa longa é sinal de reaquecimento, não prospecção fria.'], hipoteses: ['Novo case de eficiência operacional reativa interesse em 30 dias.'], fatoresRecomendacao: ['Visitação renovada', 'Budget moderado disponível', 'Timing incerto mas janela aberta'] },
+    tecnografia: ['AWS', 'Azure IoT Hub', 'Raspberry Pi', 'Docker'],
+    historico: [{ data: '2026-04-10', tipo: 'Ação', descricao: 'Ação a12 reconciliada: preparar retomada baseada em retorno ao site.', icone: 'Zap' }],
     reconciliationStatus: 'enriquecida'
   }
 ];
