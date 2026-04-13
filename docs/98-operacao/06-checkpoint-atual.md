@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 49 (Supabase E18) Concluído
+# Checkpoint Atual — Recorte 50 (Supabase E19) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 49 Concluído
-- **Status da Infra:** Build íntegro, histórico estruturado read-write implementado, validação defensiva de entrada obrigatória, timeline integrada operacional.
+- **Marco:** Recorte 50 Concluído
+- **Status da Infra:** Build íntegro, tecnografia read-write implementado, validação defensiva completa (vazio e duplicata), editor com controle de estado null-based.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -84,6 +84,15 @@
   - Read path assíncrono fechado em `AccountDetailView.tsx`.
   - Publicação: commit `9ec0667` em `origin/main`.
 
+- ✅ Recorte 50 (Funcional): Tecnografia de Conta (E19)
+  - Ciclo completo de leitura, merge e escrita defensiva do array `tecnografia` (strings simples).
+  - Repository layer expandido: `AccountRow` e `AccountPersistPayload` incluem `tecnografia`, query em `getAccounts()` persistência fire-and-forget.
+  - UI local-first: `localTecnografia` como fonte de verdade, editor com controle de estado `string | null`.
+  - Validação defensiva: Guard clauses bloqueiam persistência se nome vazio ou duplicado.
+  - Editor mínimo: Input único para adicionar, botões inline com ✕ para remover.
+  - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
+  - Publicação: commit `90662a0` em `origin/main`.
+
 - ✅ Recorte 49 (Funcional): Histórico Operacional de Conta (E18)
   - Ciclo completo de leitura, merge e escrita defensiva do array `historico` estruturado.
   - Repository layer expandido: `AccountRow` e `AccountPersistPayload` incluem `historico`, query em `getAccounts()` persistência fire-and-forget.
@@ -102,10 +111,10 @@
   - Publicação: commit `569c665` em `origin/main`.
 
 ## O que está pendente
-- Definição do Recorte 50 pelo Orquestrador.
+- Definição do Recorte 51 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 50.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 51.
 
 ---
-*Último estado funcional confiável: Recorte 49 (`d3ed9d9`)*
+*Último estado funcional confiável: Recorte 50 (`90662a0`)*

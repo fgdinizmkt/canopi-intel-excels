@@ -5,6 +5,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-12] — Recorte 50 (Supabase E19): Tecnografia de Conta — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar o ciclo completo de leitura, merge e escrita defensiva atômica para o array `tecnografia` da entidade Conta, mantendo padrão local-first com editor mínimo para adicionar/remover itens de stack.
+- **Ações Executadas:**
+  - **Refatoração Repository:** `AccountRow` e `AccountPersistPayload` expandidos com suporte a `tecnografia`. Query defensiva em `getAccounts()` incluindo `tecnografia`. `persistAccount()` ampliado para persistir `tecnografia` com padrão fire-and-forget.
+  - **Refatoração UI:** Introduzido estado `localTecnografia` como fonte de verdade. Estado `editingTecnografia` como `string | null` para controle de abertura/fechamento do editor. Editor modal mínimo com input text único. `handleSaveTecnografia()` e `handleRemoveTecnografia()` implementam padrão E19: snapshot → setState → persist atômico.
+  - **Validação Defensiva:** Guard clauses bloqueiam persistência se nome vazio ou duplicado. Feedback curto exibido ao usuário. Remoção imediata via botão inline com persist fire-and-forget.
+  - **Header Sync:** Renderização de stack no header muda de `account.tecnografia` para `localTecnografia`.
+  - **Build:** Compilado com sucesso. Diff: +130, -6 linhas.
+- **Commits:** `90662a0` — feat(supabase): E19 account technography read-write layer
+- **Decisão Consolidada:** Padrão E19 estende E17/E18 para arrays simples de strings. Atomicidade e local-first coerência mantidas. Editor de estado (`string | null`) resolve controle de abertura/fechamento de forma clara e replicável.
+- **Status:** ✅ Publicado em origin/main. Documentação sincronizada. Próximo passo: definição do Recorte 51.
+
+---
+
 ## [2026-04-12] — Recorte 49 (Supabase E18): Histórico Operacional de Conta — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.

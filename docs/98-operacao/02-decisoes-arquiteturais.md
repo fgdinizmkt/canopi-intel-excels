@@ -954,26 +954,27 @@ No Recorte 41, expandimos o padrão defensivo e atômico para o domínio **ABX**
 
 ---
 
-### 8.4 Padrão Estruturado Leitura-Escrita em Arrays Aninhados (E14–E18: Oportunidades + Inteligência + Leitura Estruturada + Histórico)
+### 8.4 Padrão Estruturado Leitura-Escrita em Arrays Aninhados (E14–E19: Oportunidades + Inteligência + Leitura Estruturada + Histórico + Tecnografia)
 
-**Contexto (Recortes 45–49):**
-Ao expandir a cobertura Supabase para entidades com múltiplos arrays (Oportunidades: `etapa` + `risco`; Inteligência: 6 arrays de learnings; Leitura Estruturada: 3 arrays de strings; Histórico Operacional: array estruturado), consolidamos um padrão generalizado para read-write defensivo em estruturas profundas de Conta.
+**Contexto (Recortes 45–50):**
+Ao expandir a cobertura Supabase para entidades com múltiplos arrays (Oportunidades: `etapa` + `risco`; Inteligência: 6 arrays de learnings; Leitura Estruturada: 3 arrays de strings; Histórico Operacional: array estruturado; Tecnografia: array simples de strings), consolidamos um padrão generalizado para read-write defensivo em estruturas profundas de Conta.
 
-**Decisão consolidada (E14–E18):**
+**Decisão consolidada (E14–E19):**
 1. **Leitura defensiva:** Query em `getAccounts()` inclui os campos remotos; merge com mock no absence fallback (nullish coalescing ou empty array).
-2. **Estado local-first:** A UI mantém `local[fieldName]` (e.g., `localLeitura`, `localInteligencia`, `localOportunidades`, `localHistorico`) como fonte de verdade para renderização. Não usa `account.field` diretamente após setState local.
-3. **Editor modal ou inline:** Ao editar, `editingX` captura um snapshot **completo** de todos os campos relacionados (não apenas um).
-4. **Validação defensiva:** Guard clauses bloqueiam persistência de entradas inválidas (campos obrigatórios vazios), exibindo feedback ao usuário sem alterar o estado local.
+2. **Estado local-first:** A UI mantém `local[fieldName]` (e.g., `localLeitura`, `localInteligencia`, `localOportunidades`, `localHistorico`, `localTecnografia`) como fonte de verdade para renderização. Não usa `account.field` diretamente após setState local.
+3. **Editor modal ou inline:** Ao editar, `editingX` captura um snapshot **completo** de todos os campos relacionados (não apenas um). Para campos simples de strings, uso de `string | null` oferece controle de estado claro (null = fechado, string = em edição).
+4. **Validação defensiva:** Guard clauses bloqueiam persistência de entradas inválidas (campos obrigatórios vazios, duplicatas), exibindo feedback ao usuário sem alterar o estado local.
 4. **Atomicidade garantida:** 1 snapshot → 1 build → 1 setState → 1 persistX() fire-and-forget.
 5. **Merge com tipos:** Leitura remota respeita tipagem: arrays podem estar `undefined`, vazios ou preenchidos. No merge: `row.field || mockAccount.field || []`.
 6. **Zero ambiguidade:** Cada campo tem ownership e repositório claro (`accountsRepository` para top-level, `oportunidadesRepository` para oportunidades, etc). Sem dupla escrita.
 
-**Implicação estrutural (Recortes 45–49 consolidados):**
+**Implicação estrutural (Recortes 45–50 consolidados):**
 - **E14 (Recorte 45):** Leitura defensiva de Oportunidades via `getOportunidadesMap()`, orquestrada em `accountsRepository`.
 - **E15 (Recorte 46):** Escrita defensiva atômica de etapa + risco com UI overlay explícito "Salvar" (não auto-persist).
 - **E16 (Recorte 47):** Leitura + escrita defensiva atômica para objeto `inteligencia` (6 arrays) com state local-first.
 - **E17 (Recorte 48):** Extensão do E16 para arrays estruturados top-level (`leituraFactual`, `leituraInferida`, `leituraSugerida`), replicando padrão E16 exatamente.
 - **E18 (Recorte 49):** Extensão do E17 para array estruturado `historico` com estrutura de objeto por entrada, validação defensiva obrigatória, e timeline integrada que combina `sessionLogs` (local) + `localHistorico` (remoto) com separação clara de origem.
+- **E19 (Recorte 50):** Extensão do E18 para arrays simples de strings (`tecnografia`), com editor via estado `string | null`, validação contra vazio e duplicata, e remoção inline com persist.
 
 **Template genérico (replicável para futuras entidades):**
 ```typescript
@@ -1005,6 +1006,6 @@ const handleSaveNew = () => {
 };
 ```
 
-**Benefício arquitetural:** O padrão E14–E18 generaliza escalabilidade a novos campos estruturados profundos sem aumentar complexidade conceitual. A simetria remota-local-persistência é idêntica seja para 1 campo simples, 1 array, ou múltiplos arrays. A validação defensiva (E18+) protege integridade de persistência contra entradas inválidas.
+**Benefício arquitetural:** O padrão E14–E19 generaliza escalabilidade a novos campos estruturados profundos sem aumentar complexidade conceitual. A simetria remota-local-persistência é idêntica seja para 1 campo simples, 1 array, ou múltiplos arrays. A validação defensiva (E18+) protege integridade de persistência contra entradas inválidas. Controle de estado via `string | null` (E19) oferece alternativa limpa a booleanos de edição para casos de entrada simples.
 
-**Commits:** `81a1c6b` (E14), `2f91d47` (E15), `9ec0667` (E16), `569c665` (E17), `d3ed9d9` (E18)
+**Commits:** `81a1c6b` (E14), `2f91d47` (E15), `9ec0667` (E16), `569c665` (E17), `d3ed9d9` (E18), `90662a0` (E19)

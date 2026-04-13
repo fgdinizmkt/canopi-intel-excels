@@ -53,6 +53,7 @@ Nenhum campo será alterado como resultado deste documento.
 | `leituraInferida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 | `leituraSugerida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 | `historico` | `{ data, tipo, descricao, icone }[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 49) |
+| `tecnografia` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 50) |
 
 ### 1.2 Campos de objeto aninhado: `abm`
 
@@ -226,12 +227,11 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `acoes[]` — array de `AcaoConta` (lidas via `actionsRepository`)
 - `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
 - `canaisCampanhas` — objeto — **sem repository Supabase**
-- `tecnografia` — array de strings — **sem repository Supabase**
 - `reconciliationStatus` — campo de controle interno — **sem repository Supabase**
 
 ---
 
 *Documento criado em: 2026-04-10*
-*Última atualização: 2026-04-12 (Recorte 48: adição de cobertura para leituraFactual, leituraInferida, leituraSugerida)*
-*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97` (atualizado em `569c665`)*
-*Recorte 43 — documental, sem alteração de código; Recorte 48 — funcional, cobertura consolidada*
+*Última atualização: 2026-04-12 (Recorte 50: adição de cobertura para tecnografia)*
+*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97` (atualizado em `90662a0`)*
+*Recorte 43 — documental, sem alteração de código; Recortes 48, 49, 50 — funcional, cobertura consolidada*
