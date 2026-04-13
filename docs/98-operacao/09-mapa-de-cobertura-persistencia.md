@@ -49,6 +49,9 @@ Nenhum campo será alterado como resultado deste documento.
 | `atividadeRecente` | `string union` | ✅ `getAccounts()` | ⬜ | contasMock | campo derivado |
 | `possuiOportunidade` | `boolean` | ✅ `getAccounts()` | ⬜ | contasMock | campo derivado |
 | `reconciliationStatus` | `string union` | ⬜ | ⬜ | contasMock | campo de controle interno, não lido do Supabase |
+| `leituraFactual` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
+| `leituraInferida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
+| `leituraSugerida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 
 ### 1.2 Campos de objeto aninhado: `abm`
 
@@ -202,6 +205,7 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Accounts — campos editoriais (`resumoExecutivo`, `proximaMelhorAcao`) | ✅ | ✅ | R34/R35 |
 | Accounts — `tipoEstrategico`, `playAtivo` | ✅ | ✅ | R32/R33/R34/R35 |
 | Accounts — `inteligencia` (Cumulativa) | ✅ | ✅ | R47 |
+| Accounts — `leituraFactual`, `leituraInferida`, `leituraSugerida` | ✅ | ✅ | R48 |
 | Signals — operacionais + narrativos | ✅ | ✅ | R37 |
 | Contacts — todos os campos cobertos | ✅ | ✅ | R38 |
 | Actions — todos os campos cobertos | ✅ | ✅ | R39 |
@@ -223,11 +227,11 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `canaisCampanhas` — objeto — **sem repository Supabase**
 - `tecnografia` — array de strings — **sem repository Supabase**
 - `historico[]` — array — **sem repository Supabase**
-- `leituraFactual[]`, `leituraInferida[]`, `leituraSugerida[]` — arrays — **sem repository Supabase**
 - `reconciliationStatus` — campo de controle interno — **sem repository Supabase**
 
 ---
 
 *Documento criado em: 2026-04-10*
-*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97`*
-*Recorte 43 — documental, sem alteração de código*
+*Última atualização: 2026-04-12 (Recorte 48: adição de cobertura para leituraFactual, leituraInferida, leituraSugerida)*
+*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97` (atualizado em `569c665`)*
+*Recorte 43 — documental, sem alteração de código; Recorte 48 — funcional, cobertura consolidada*

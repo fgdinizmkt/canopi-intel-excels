@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-12 (Recorte 47 — último marco funcional: 9ec0667)
+ `main` — sincronizada em 2026-04-12 (Recorte 48 — último marco funcional: 569c665)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 47 — Supabase E16: Escrita Defensiva Atômica de Inteligência Acumulada)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 48 — Supabase E17: Leitura Estruturada da Conta)
 
 ---
 
@@ -470,7 +470,8 @@
 - **Recorte 45:** Concluído. Implementação de persistência de leitura (read layer defensivo) para Oportunidades via `oportunidadesRepository.ts`, orquestrado ativamente em `accountsRepository.ts`.
 - **Recorte 46:** Concluído. Escrita defensiva atômica de Oportunidades (`etapa` e `risco`) com padrão 1 snapshot → 1 build → 1 setState → 1 persist. Botão "Salvar" explícito no overlay de edição em `AccountDetailView.tsx`.
 - **Recorte 47:** Concluído. Implementação do ciclo completo de leitura, merge e escrita defensiva atômica para o objeto `inteligencia` da entidade Conta. Read path fechado em `AccountDetailView.tsx` via `getAccounts()` do repositório.
-- **Próximo passo funcional:** Definição do Recorte 48 pelo Orquestrador.
+- **Recorte 48:** Concluído. Supabase E17: Leitura Estruturada da Conta. Implementação de leitura, merge defensivo e escrita atômica dos blocos `leituraFactual`, `leituraInferida` e `leituraSugerida`. Repository layer expandido em `accountsRepository.ts` com query defensiva e fallback para mock. UI local-first com editor modal mínimo em `AccountDetailView.tsx`. Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist. Publicação: commit `569c665`.
+- **Próximo passo funcional:** Definição do Recorte 49 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -511,3 +512,4 @@
 | Supabase E14: Oportunidades | Recorte 45 Concluído (Fase E) | Leitura defensiva read-only de Oportunidades orquestrada através de accountsRepository |
 | Supabase E15: Escrita Oport. | Recorte 46 Concluído (Fase E) | Escrita defensiva atômica de `etapa` e `risco` em Oportunidades via save explícito |
 | Supabase E16: Inteligência | Recorte 47 Concluído (Fase E) | Leitura + merge + escrita atômica de `inteligencia` em Conta via repositório |
+| Supabase E17: Leitura Estruturada | Recorte 48 Concluído (Fase E) | Leitura + merge + escrita defensiva atômica de `leituraFactual`, `leituraInferida`, `leituraSugerida` |

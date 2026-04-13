@@ -951,3 +951,58 @@ No Recorte 41, expandimos o padrão defensivo e atômico para o domínio **ABX**
 **Benefício arquitetural:** Sexta aplicação consolidada do padrão atômico, agora abrangendo todos os principais domínios operacionais (Accounts, Signals, Actions, Contacts) e estratégicos (ABM, ABX). A simetria entre ABM e ABX simplifica a manutenção e garante que a tese estratégica da conta (entrada vs. expansão) seja capturada de forma consistente e segura, encerrando o ciclo de implementação da camada estratégica narrativamente editável.
 
 **Commits:** `616a8ca` (E13 implementação defensiva de narrativas estratégicas em ABX via Recorte 41 com atomicidade)
+
+---
+
+### 8.4 Padrão Estruturado Leitura-Escrita em Arrays Aninhados (E14–E17: Oportunidades + Inteligência + Leitura Estruturada)
+
+**Contexto (Recortes 45–48):**
+Ao expandir a cobertura Supabase para entidades com múltiplos arrays (Oportunidades: `etapa` + `risco`; Inteligência: 6 arrays de learnings; Leitura Estruturada: 3 arrays de strings), consolidamos um padrão generalizado para read-write defensivo em estruturas profundas de Conta.
+
+**Decisão consolidada (E14–E17):**
+1. **Leitura defensiva:** Query em `getAccounts()` inclui os campos remotos; merge com mock no absence fallback (nullish coalescing ou empty array).
+2. **Estado local-first:** A UI mantém `local[fieldName]` (e.g., `localLeitura`, `localInteligencia`, `localOportunidades`) como fonte de verdade para renderização. Não usa `account.field` diretamente após setState local.
+3. **Editor modal ou inline:** Ao editar, `editingX` captura um snapshot **completo** de todos os campos relacionados (não apenas um).
+4. **Atomicidade garantida:** 1 snapshot → 1 build → 1 setState → 1 persistX() fire-and-forget.
+5. **Merge com tipos:** Leitura remota respeita tipagem: arrays podem estar `undefined`, vazios ou preenchidos. No merge: `row.field || mockAccount.field || []`.
+6. **Zero ambiguidade:** Cada campo tem ownership e repositório claro (`accountsRepository` para top-level, `oportunidadesRepository` para oportunidades, etc). Sem dupla escrita.
+
+**Implicação estrutural (Recortes 45–48 consolidados):**
+- **E14 (Recorte 45):** Leitura defensiva de Oportunidades via `getOportunidadesMap()`, orquestrada em `accountsRepository`.
+- **E15 (Recorte 46):** Escrita defensiva atômica de etapa + risco com UI overlay explícito "Salvar" (não auto-persist).
+- **E16 (Recorte 47):** Leitura + escrita defensiva atômica para objeto `inteligencia` (6 arrays) com state local-first.
+- **E17 (Recorte 48):** Extensão do E16 para arrays estruturados top-level (`leituraFactual`, `leituraInferida`, `leituraSugerida`), replicando padrão E16 exatamente.
+
+**Template genérico (replicável para futuras entidades):**
+```typescript
+// Repository: tipo + query + fallback
+export type NewRow = { id: string; fieldA?: string[]; fieldB?: string[] };
+export async function getNew(): Promise<Conta[]> {
+  // Query inclui fieldA, fieldB
+  // Merge com mock: row.fieldA || mockAccount.fieldA || []
+}
+export async function persistNew(account: { id: string; fieldA?: string[]; fieldB?: string[] }) {
+  // Snapshot completo em payload defensivo
+  // Fire-and-forget, sem await bloqueador
+}
+
+// UI: estado local + editor modal
+const [localNew, setLocalNew] = useState({ fieldA: account?.fieldA ?? [], fieldB: account?.fieldB ?? [] });
+const [editingNew, setEditingNew] = useState<typeof localNew | null>(null);
+
+// Renderização: usa localNew (não account.field)
+{localNew.fieldA.map(...)}
+
+// Salvamento: snapshot → setState → persist (atômico)
+const handleSaveNew = () => {
+  if (!editingNew) return;
+  const snapshot = { ...editingNew };
+  setLocalNew(snapshot);
+  persistNew({ id: account.id, fieldA: snapshot.fieldA, fieldB: snapshot.fieldB });
+  setEditingNew(null);
+};
+```
+
+**Benefício arquitetural:** O padrão E14–E17 generaliza escalabilidade a novos campos estruturados profundos sem aumentar complexidade conceitual. A simetria remota-local-persistência é idêntica seja para 1 campo simples, 1 array, ou múltiplos arrays.
+
+**Commits:** `81a1c6b` (E14), `2f91d47` (E15), `9ec0667` (E16), `569c665` (E17)

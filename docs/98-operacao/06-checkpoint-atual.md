@@ -84,11 +84,18 @@
   - Read path assíncrono fechado em `AccountDetailView.tsx`.
   - Publicação: commit `9ec0667` em `origin/main`.
 
+- ✅ Recorte 48 (Funcional): Leitura Estruturada da Conta (E17)
+  - Ciclo completo de leitura, merge e escrita defensiva dos blocos estruturados: `leituraFactual`, `leituraInferida`, `leituraSugerida`.
+  - Repository layer expandido: query defensiva em `getAccounts()`, fallback para mock, persistência fire-and-forget.
+  - UI local-first: `localLeitura` como fonte de verdade, editor modal mínimo em `AccountDetailView.tsx`.
+  - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
+  - Publicação: commit `569c665` em `origin/main`.
+
 ## O que está pendente
-- Definição do Recorte 48 pelo Orquestrador.
+- Definição do Recorte 49 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 48.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 49.
 
 ---
-*Último estado funcional confiável: Recorte 47 (`9ec0667`)*
+*Último estado funcional confiável: Recorte 48 (`569c665`)*

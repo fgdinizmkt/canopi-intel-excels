@@ -5,6 +5,21 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-12] — Recorte 48 (Supabase E17): Leitura Estruturada da Conta — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar o ciclo completo de leitura, merge e escrita defensiva atômica para os blocos estruturados: `leituraFactual`, `leituraInferida`, `leituraSugerida` da entidade Conta, garantindo padrão local-first na UI com editor modal mínimo.
+- **Ações Executadas:**
+  - **Refatoração Repository:** `AccountRow` expandido com suporte aos 3 campos. Query defensiva em `getAccounts()` com fallback para mock. Merge defensivo com `mockAccount` como fallback. `persistAccount()` expandido para snapshot completo fire-and-forget.
+  - **Refatoração UI:** Introduzido estado `localLeitura` como fonte de verdade para renderização (padrão espelhado a `localInteligencia`). Editor modal mínimo com 3 textareas (um por tema). `handleSaveLeitura()` implementa padrão E17: snapshot → setState → persist atômico.
+  - **Coerência:** Renderização usa `localLeitura.*` (não `account.leitura...`) para garantir atualização imediata após `handleSaveLeitura()`. Zero dependência de recarga remota.
+  - **Build:** Compilado com sucesso. Diff: +145, -29 linhas.
+- **Commits:** `569c665` — feat(supabase): E17 structured account reading read-write layer
+- **Decisão Consolidada:** Padrão E17 estabelecido para campos estruturados com múltiplas arrays (como inteligencia em E16). Padrão é replicável para futuros campos similares (e.g., tags, categorias, narrativas lineares).
+- **Status:** ✅ Publicado em origin/main. Documentação sincronizada. Próximo passo: definição do Recorte 49.
+
+---
+
 ## [2026-04-12] — Sincronização Documental: Recorte 47 — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.
