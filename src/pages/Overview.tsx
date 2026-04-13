@@ -8,7 +8,7 @@ import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreH
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
-import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso } from '../lib/scoringRepository';
+import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
 export const Overview: React.FC = () => {
@@ -365,9 +365,10 @@ export const Overview: React.FC = () => {
               {triageByScore.criticas.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
                   <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
-                    {getPrincipalAviso(x.score) && <span className="text-[9px] text-red-600">{getPrincipalAviso(x.score)?.split(' ')[0]}</span>}
+                    {getPrincipalAviso(x.score) && <span className="text-[8px] text-red-600">{getPrincipalAviso(x.score)?.split(' ')[0]}</span>}
                   </div>
                 </div>
               ))}
@@ -382,9 +383,10 @@ export const Overview: React.FC = () => {
               {triageByScore.altasPrio.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
                   <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <span className="text-[9px] bg-amber-200/30 px-1 py-0.5 rounded text-amber-700 font-semibold">{x.score.prioridade}</span>
+                    <span className="text-[8px] bg-amber-200/30 px-1 py-0.5 rounded text-amber-700 font-semibold">{x.score.prioridade}</span>
                   </div>
                 </div>
               ))}
@@ -399,6 +401,7 @@ export const Overview: React.FC = () => {
               {triageByScore.altoPotencialBaixaCobertura.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
                   <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
                     <span className="text-[10px] text-slate-600">Cob. {x.score.cobertura.score}</span>
@@ -416,6 +419,7 @@ export const Overview: React.FC = () => {
               {triageByScore.topOportunidades.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
                   <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-1">
                     <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
                     <span className="text-[9px] text-slate-600">{x.conta.oportunidades?.length || 0} oport.</span>

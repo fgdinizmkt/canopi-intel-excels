@@ -25,7 +25,7 @@ import {
 import { Badge, Button, Card } from '../components/ui';
 import { useAccountDetail } from "../context/AccountDetailContext";
 import { getActions } from "../lib/actionsRepository";
-import { calculateAccountScore, isContaCritica, isAltaPrioridade } from "../lib/scoringRepository";
+import { calculateAccountScore, isContaCritica, isAltaPrioridade, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from "../lib/scoringRepository";
 import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
 
 type ViewMode = "Lista" | "Kanban";
@@ -1696,12 +1696,12 @@ export const Actions: React.FC = () => {
                     </span>
                   </div>
                   <div className="space-y-1.5">
+                    <div className="text-[9px] text-slate-700 italic line-clamp-2">
+                      {deriveProximaMelhorAcao(x.conta, x.score)}
+                    </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-600">Score</span>
                       <span className="text-sm font-black text-slate-900">{x.score.scoreTotal}</span>
-                    </div>
-                    <div className="text-[10px] text-slate-600 line-clamp-2">
-                      {x.score.avisos[0]?.split('•')[0].trim() || 'Sem avisos'}
                     </div>
                   </div>
                   <button

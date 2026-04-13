@@ -12,7 +12,7 @@ import {
 import { contasMock, ContatoConta, SinalConta, OportunidadeConta, Conta } from '../../data/accountsData';
 import { persistOportunidade } from '../../lib/oportunidadesRepository';
 import { persistAccount, getAccounts } from '../../lib/accountsRepository';
-import { calculateAccountScore, ScoringResult } from '../../lib/scoringRepository';
+import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from '../../lib/scoringRepository';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
@@ -636,6 +636,20 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Próxima Melhor Ação (Recorte 55 — F3) */}
+          {accountScore && (
+            <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 p-5 rounded-2xl border border-blue-700/40 space-y-3">
+              <div className="flex items-start gap-3">
+                <ChevronRight className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-black text-blue-300 uppercase tracking-widest mb-1">Próxima Melhor Ação</h3>
+                  <p className="text-sm font-bold text-slate-100 mb-2">{deriveProximaMelhorAcao(account, accountScore)}</p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">{deriveMotivoDaRecomendacao(account, accountScore)}</p>
+                </div>
+              </div>
             </div>
           )}
 

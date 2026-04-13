@@ -301,3 +301,93 @@ export function getScoreHeadline(score: ScoringResult): string {
     ? `Score ${score.scoreTotal} • ${score.prioridade} • ${aviso}`
     : `Score ${score.scoreTotal} • ${score.prioridade}`;
 }
+
+/**
+ * Deriva a próxima melhor ação operacional baseada em score e conta
+ * Lógica pura, determinística, sem ML/NLP
+ */
+export function deriveProximaMelhorAcao(account: Conta, score: ScoringResult): string {
+  // Risco crítico é a prioridade máxima
+  if (isContaCritica(score)) {
+    if (score.risco.score < 30) {
+      return 'Ativar blindagem executiva para mitigar risco crítico';
+    }
+  }
+
+  // Alto potencial sem oportunidades mapeadas
+  if (score.potencial.score > 75 && (account.oportunidades?.length ?? 0) === 0) {
+    return 'Identificar e mapear oportunidades latentes';
+  }
+
+  // Alto potencial com baixa cobertura
+  if (score.potencial.score > 75 && score.cobertura.score < 50) {
+    return 'Expandir cobertura relacional com contatos decisores';
+  }
+
+  // Sem contatos mapeados
+  if ((account.contatos?.length ?? 0) === 0) {
+    return 'Mapear estrutura de decisão e stakeholders-chave';
+  }
+
+  // Cobertura baixa (mesmo sem alto potencial)
+  if (score.cobertura.score < 40) {
+    return 'Aprofundar relacionamento com áreas críticas';
+  }
+
+  // Prontidão alta mas sem play ativo
+  if (score.prontidao.score > 70 && account.playAtivo === 'Nenhum') {
+    return 'Ativar play ABM ou ABX coerente com maturidade da conta';
+  }
+
+  // Alta prioridade geral
+  if (isAltaPrioridade(score)) {
+    return 'Revisar e executar próximas ações comerciais';
+  }
+
+  // Padrão
+  return 'Manter engajamento e monitorar sinais';
+}
+
+/**
+ * Deriva o motivo/contexto da recomendação
+ * Retorna string curta explicando por quê
+ */
+export function deriveMotivoDaRecomendacao(account: Conta, score: ScoringResult): string {
+  // Risco crítico
+  if (isContaCritica(score) && score.risco.score < 30) {
+    return `Risco crítico detectado (${score.risco.score}). Necessário ação executiva imediata.`;
+  }
+
+  // Alto potencial sem oportunidades
+  if (score.potencial.score > 75 && (account.oportunidades?.length ?? 0) === 0) {
+    return `Alto potencial (${score.potencial.score}) mas sem oportunidades mapeadas.`;
+  }
+
+  // Alto potencial + baixa cobertura
+  if (score.potencial.score > 75 && score.cobertura.score < 50) {
+    return `Potencial alto (${score.potencial.score}) com cobertura baixa (${score.cobertura.score}). Risco de perda de oportunidade.`;
+  }
+
+  // Sem contatos
+  if ((account.contatos?.length ?? 0) === 0) {
+    return 'Conta ativa mas sem contatos mapeados. Impossível avançar engajamento.';
+  }
+
+  // Cobertura baixa
+  if (score.cobertura.score < 40) {
+    return `Cobertura relacional baixa (${score.cobertura.score}). Necessário expandir relacionamento.`;
+  }
+
+  // Prontidão alta sem play
+  if (score.prontidao.score > 70 && account.playAtivo === 'Nenhum') {
+    return `Prontidão alta (${score.prontidao.score}) mas sem play ativo. Momento propício para ativação.`;
+  }
+
+  // Alta prioridade geral
+  if (isAltaPrioridade(score)) {
+    return `Prioridade ${score.prioridade}. Score ${score.scoreTotal} indica ação operacional necessária.`;
+  }
+
+  // Padrão
+  return 'Conta está estável. Continuar monitoramento regular.';
+}
