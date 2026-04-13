@@ -963,14 +963,28 @@ export const contasMock: Conta[] = [
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
     icp: 82, crm: 65, vp: 78, ct: 45, ft: 72, budgetBrl: 2800000, possuiOportunidade: true,
     oportunidadePrincipal: 'Expansão de infraestrutura MLOps', proximaMelhorAcao: 'Executar QBR com novo diretor industrial.',
-    resumoExecutivo: 'Conta orfã reconciliada: casos operacionais referenciados em sinais e ações. Status seed — sem histórico estruturado.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [] },
+    resumoExecutivo: 'Conta em expansão com mudança de stakeholder crítica. Novo diretor industrial requer aquecimento antes de QBR em 31/03. Roadmap de MLOps em risco se não houver alinhamento executivo.',
+    leituraFactual: ['Novo diretor industrial assumiu em 17/03.', 'QBR agendada para 31/03.', 'Projeto MLOps em validação de escopo.'],
+    leituraInferida: ['Sem alinhamento do novo diretor, há risco de reabertura de escopo da expansão.', 'Foco anterior em observabilidade pode divergir das prioridades do novo stakeholder.'],
+    leituraSugerida: ['Priorizar briefing executivo focado em ROI operacional.', 'Ativar patrocinador interno para alinhamento pré-QBR.'],
+    sinais: [
+      { id: 's8', titulo: 'Mudança no diretor industrial', tipo: 'Mudança', impacto: 'Alto', owner: 'Elber Costa', recomendacao: 'Mapear expectativas do novo diretor antes de 31/03.', contexto: 'Novo diretor assumiu em 17/03 e ainda não participou de ritos da conta.', data: '2026-03-17' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c8', nome: 'Ricardo Ferreira', cargo: 'Diretor Industrial', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Decisão final', forcaRelacional: 35, receptividade: 'Média', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 52, scoreSucesso: 48, ganchoReuniao: 'Mostrar impacto de MLOps na eficiência de processamento.' },
+      { id: 'c9', nome: 'Marina Costa', cargo: 'Gerente de Tecnologia', area: 'Operações/TI', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c8', influencia: 78, potencialSucesso: 75, scoreSucesso: 72, ganchoReuniao: 'Validar stack de observabilidade com novo gestor.' }
+    ],
+    oportunidades: [
+      { id: 'o8', nome: 'Expansão de infraestrutura MLOps', etapa: 'Proposta', valor: 2100000, owner: 'Elber Costa', risco: 'Médio', probabilidade: 58, historico: ['Escopo discutido com equipe técnica anterior', 'Validação pendente com novo diretor'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [{ canal: 'ABX', campanha: 'Continuidade MLOps', tipo: 'ABX', impacto: 'Aquecimento de novo stakeholder', data: '2026-03-17' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: 'Conta em jornada de expansão com mudança crítica de stakeholder.', evolucaoJornada: 'Adoção > expansão MLOps (em risco por mudança de diretor).', maturidadeRelacional: 'Média-alta mas volátil por mudança.', sponsorAtivo: 'Em transição.', profundidadeComite: 'Parcial, concentrada em área técnica anterior.', continuidade: 'Ameaçada sem alinhamento executivo novo.', expansao: 'Congelada até QBR.', retencao: 'Boa, mas precisa reforço.', riscoEstagnacao: 'Alto por falta de alinhamento.' },
+    inteligencia: { sucessos: ['Adoção de MLOps sem atrito em fase anterior.'], insucessos: ['Falta de cobertura financeira pode bloquear expansão.'], padroes: ['Novo diretor industrial tende a revisar prioridades de tecnologia.'], learnings: ['Executivos de operações precisam ver ROI operacional, não apenas técnico.'], hipoteses: ['Briefing focado em eficiência de processamento acelera aprovação.'], fatoresRecomendacao: ['Mudança crítica de stakeholder', 'Risco de retração'] },
+    tecnografia: ['SAP ERP', 'AWS Cloud', 'Tableau', 'Kafka'],
+    historico: [{ data: '2026-03-17', tipo: 'Sinal', descricao: 'Novo diretor industrial assumiu a posição.', icone: 'AlertTriangle' }, { data: '2026-03-20', tipo: 'Ação', descricao: 'Ação de aquecimento criada para QBR.', icone: 'Clock' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '9', slug: 'carteira-seguros-enterprise', nome: 'Carteira Seguros Enterprise', dominio: 'carteiraseguros.com.br', vertical: 'Seguros',
@@ -979,14 +993,28 @@ export const contasMock: Conta[] = [
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Híbrido', statusGeral: 'Saudável',
     icp: 80, crm: 55, vp: 72, ct: 48, ft: 68, budgetBrl: 1950000, possuiOportunidade: true,
     oportunidadePrincipal: 'Transformação digital do backend de sinistros', proximaMelhorAcao: 'Redirecionar leads enterprise de seguros.',
-    resumoExecutivo: 'Conta orfã reconciliada: casos de roteamento de leads. Status seed — sem histórico estruturado.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [] },
-    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    resumoExecutivo: 'Cluster estratégico de seguradoras enterprise com falha crítica de roteamento de leads. 13 leads de alta qualificação caíram em fila sem owner. Precisa correção urgente em HubSpot e reaproximação comercial.',
+    leituraFactual: ['13 leads enterprise em fila geral sem owner.', '3 leads já abriram proposta com concorrentes.', 'Tempo médio de primeiro contato subiu para 31h.'],
+    leituraInferida: ['Falha no roteamento está afetando taxa de conversão.', 'Oportunidade de demonstrar agilidade comercial se resolvido em 48h.'],
+    leituraSugerida: ['Corrigir regra de roteamento por porte + vertical no HubSpot.', 'Reaproximação proativa dos 13 leads com contexto comercial.'],
+    sinais: [
+      { id: 's9', titulo: 'Leads enterprise em fila sem dono', tipo: 'Alerta', impacto: 'Alto', owner: 'Ligia Martins', recomendacao: 'Reatribuir os 13 leads em até 18h.', contexto: '13 leads com score alto caíram na fila geral. 3 já abriram proposta concorrente.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c10', nome: 'Fernando Ribeiro', cargo: 'VP de Operações Comerciais', area: 'Vendas', senioridade: 'C-Level', papelComite: 'Autorização de compensação', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 80, potencialSucesso: 68, scoreSucesso: 64, ganchoReuniao: 'Mostrar impacto de leads perdidos por falha operacional.' },
+      { id: 'c11', nome: 'Camila Souza', cargo: 'Gerente de Transformação Digital', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação de ferramenta', forcaRelacional: 59, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c10', influencia: 72, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Descrever otimização do workflow de roteamento.' }
+    ],
+    oportunidades: [
+      { id: 'o9', nome: 'Transformação digital do backend de sinistros', etapa: 'Qualificação', valor: 1950000, owner: 'Ligia Martins', risco: 'Médio', probabilidade: 42, historico: ['Sinal de inbound detectado', 'Reaproximação em andamento'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Leads seguros enterprise', tipo: 'Inbound', impacto: 'Geração de demanda qualificada', data: '2026-04-05' }] },
+    abm: { motivo: 'Cluster estratégico para aquisição em seguros.', fit: 'Fit alto por transformação digital em curso.', cluster: 'Seguros Enterprise', similaridade: '76%', coberturaInicialComite: '48%', playsEntrada: ['Play de alinhamento operacional'], potencialAbertura: 'Elevado', hipoteses: ['Demonstração de operacional resolve rapidamente.'], contasSimilares: [] },
+    abx: { motivo: 'Cluster de oportunidades de cross-sell.', evolucaoJornada: 'Inbound > qualificação operacional.', maturidadeRelacional: 'Inicial', sponsorAtivo: 'Em formação', profundidadeComite: 'Baixa', continuidade: 'Ameaçada por falha operacional', expansao: 'Mapeamento futuro', retencao: 'Não aplicável', riscoEstagnacao: 'Médio por falha de roteamento' },
+    inteligencia: { sucessos: [], insucessos: ['Falha de roteamento criou impressão negativa.'], padroes: ['Seguradoras enterprise respondem bem a demonstração de agilidade.'], learnings: ['Roteamento por porte+vertical é crítico em seguros.'], hipoteses: ['Reaproximação rápida recupera 60% dos 13 leads.'], fatoresRecomendacao: ['Falha operacional crítica', 'Oportunidade de recuperação rápida'] },
+    tecnografia: ['Salesforce', 'HubSpot', 'AWS', 'Tableau'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Falha de roteamento detectada em 13 leads.', icone: 'AlertCircle' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '10', slug: 'cluster-fintech-sudeste', nome: 'Cluster Fintech Sudeste', dominio: 'cluster-fintech.com.br', vertical: 'Fintech',
@@ -1027,14 +1055,28 @@ export const contasMock: Conta[] = [
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Atenção',
     icp: 82, crm: 70, vp: 75, ct: 68, ft: 78, budgetBrl: 2600000, possuiOportunidade: true,
     oportunidadePrincipal: 'Renovação multi-unidade com expansão', proximaMelhorAcao: 'Reaquecer sponsor técnico.',
-    resumoExecutivo: 'Conta orfã reconciliada: caso de reengajamento de comitê. Status seed — contexto operacional referenciado.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [] },
-    abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
+    resumoExecutivo: 'Conta em risco de estagnação por queda abrupta de engajamento do comitê de inovação. Sponsor técnico não respondeu por 2 semanas. Open rate caiu 48%. Pipeline de R$ 1,2M em risco se não houver reengajamento urgente.',
+    leituraFactual: ['2 semanas sem resposta do sponsor técnico.', 'Open rate caiu 48% nos últimos 10 dias.', 'Reunião de revisão não foi reagendada.', 'Pipeline em estágio de Proposta: R$ 1,2M.'],
+    leituraInferida: ['Queda de engajamento indica prioridade concorrente interna.', 'Possível esfriamento de oportunidade se não houver reativação rápida.', 'Sponsor técnico pode estar sob pressão de outras iniciativas.'],
+    leituraSugerida: ['Ativar executivo patrocinador para restabelecer tração.', 'Enviar benchmark de telecom como gatilho de convergência.'],
+    sinais: [
+      { id: 's12', titulo: 'Queda de engajamento do comitê de inovação', tipo: 'Alerta', impacto: 'Alto', owner: 'Camila Ribeiro', recomendacao: 'Reativar sponsor técnico dentro de 24h.', contexto: 'Open rate caiu 48% e sponsor não respondeu por 2 semanas. Reunião de revisão não foi reagendada.', data: '2026-04-05' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c12', nome: 'Roberto Alves', cargo: 'Diretor de Inovação e Tecnologia', area: 'Tecnologia', senioridade: 'Diretoria', papelComite: 'Patrocinador da mudança', forcaRelacional: 54, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Risco', classificacao: ['Sponsor', 'Técnico'], influencia: 75, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Apresentar ganho de eficiência operacional via observabilidade.' },
+      { id: 'c13', nome: 'Juliana Mendes', cargo: 'Analista Sênior de Infraestrutura', area: 'Tecnologia', senioridade: 'Especialista', papelComite: 'Avaliação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c12', influencia: 70, potencialSucesso: 74, scoreSucesso: 71, ganchoReuniao: 'Validar performance de observabilidade versus concorrentes.' }
+    ],
+    oportunidades: [
+      { id: 'o12', nome: 'Renovação multi-unidade com expansão', etapa: 'Proposta', valor: 1200000, owner: 'Camila Ribeiro', risco: 'Alto', probabilidade: 45, historico: ['Proposta inicial enviada em março', 'Validação técnica em andamento', 'Sponsor em prioridades concorrentes'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'ABM', influencias: [{ canal: 'ABM', campanha: 'Telecom Inovação Q1', tipo: 'ABM', impacto: 'Engajamento de comitê técnico', data: '2026-02-20' }] },
+    abm: { motivo: 'Conta-alvo prioritária em telecom com fit elevado.', fit: 'Alto fit em transformação de observabilidade.', cluster: 'Telecom Enterprise', similaridade: '84%', coberturaInicialComite: '62%', playsEntrada: ['Play de executive engagement', 'Play de benchmark técnico'], potencialAbertura: 'Elevado se reengajado', hipoteses: ['Executivo patrocinador retoma tração em 24h.'], contasSimilares: ['TIM Brasil'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    inteligencia: { sucessos: ['Adoção de prova de conceito com bom ROI técnico.'], insucessos: ['Falta de cobertura executiva permitiu esfriamento.'], padroes: ['Telecom valida com comitê técnico e aprova com executivo.'], learnings: ['Executivo patrocinador é crítico para continuidade.'], hipoteses: ['Contato executivo externo reativa interesse.'], fatoresRecomendacao: ['Risco elevado de perda', 'Sponsor em prioridades concorrentes', 'Possibilidade de rápida recuperação'] },
+    tecnografia: ['Cisco DNA', 'Splunk', 'AWS', 'Kubernetes'],
+    historico: [{ data: '2026-04-05', tipo: 'Sinal', descricao: 'Queda de engajamento detectada pelo monitoramento de email.', icone: 'TrendingDown' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de reativação criada para preservar pipeline.', icone: 'AlertTriangle' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '13', slug: 'msd-saude', nome: 'MSD Saúde', dominio: 'msdsaude.com.br', vertical: 'Saúde',
@@ -1072,30 +1114,62 @@ export const contasMock: Conta[] = [
     segmento: 'Mid-Market + Enterprise', porte: 'Grande', localizacao: 'Região Sudeste, Brasil', ownerPrincipal: 'Daniel Rocha', ownersSecundarios: [],
     etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 68, risco: 28, prontidao: 55, coberturaRelacional: 35,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'ABX', statusGeral: 'Saudável',
-    icp: 72, crm: 48, vp: 68, ct: 42, ft: 65, budgetBrl: 2200000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Conectar sinais SEO ao play outbound.', resumoExecutivo: 'Conta orfã reconciliada: cluster de 34 contas, taxa de resposta baixa. Status seed — caso de cadência.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [] },
+    icp: 72, crm: 48, vp: 68, ct: 42, ft: 65, budgetBrl: 2200000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Implementação de automação industrial com observabilidade',
+    proximaMelhorAcao: 'Conectar sinais SEO ao play outbound.',
+    resumoExecutivo: 'Cluster de 34 contas-alvo em manufatura com sinal forte de intenção via SEO. 12 contas visitaram páginas de automação industrial e MLOps nos últimos 5 dias, com 4 retornos recorrentes. Oportunidade crítica de cadência contextualizada.',
+    leituraFactual: ['12 contas-alvo visitaram conteúdo técnico nos últimos 5 dias.', '4 contas retornaram 3+ vezes em uma semana.', 'Conteúdo sobre automação industrial ranqueando bem.'],
+    leituraInferida: ['Sinal de intenção real: visitas recorrentes indicam interesse ativo.', 'Janela de abordagem crítica enquanto interesse está elevado.'],
+    leituraSugerida: ['Priorizar contas com visitas recorrentes para SDR.', 'Desenvr cadência de outbound com ângulo de automação + observabilidade.'],
+    sinais: [
+      { id: 's15', titulo: 'Visitas recorrentes em conteúdo de automação industrial', tipo: 'Tendência', impacto: 'Médio', owner: 'Daniel Rocha', recomendacao: 'Entregar lista priorizada para SDR até quinta.', contexto: '12 contas-alvo visitaram páginas sobre automação industrial e MLOps. 4 contas retornaram 3+ vezes em 7 dias.', data: '2026-04-05' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c15', nome: 'Rodrigo Mendes', cargo: 'Diretor de Operações', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de iniciativas', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 74, potencialSucesso: 60, scoreSucesso: 56, ganchoReuniao: 'Demonstrar ganho de eficiência operacional via automação inteligente.' },
+      { id: 'c16', nome: 'Gustavo Silva', cargo: 'Gerente de Engenharia de Processo', area: 'Engenharia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 62, receptividade: 'Alta', acessibilidade: 'Alta', status: 'A ativar', classificacao: ['Champion', 'Técnico'], liderId: 'c15', influencia: 72, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Detalhar visibilidade de processos de automação.' }
+    ],
+    oportunidades: [
+      { id: 'o15', nome: 'Implementação de automação industrial com observabilidade', etapa: 'Diagnóstico', valor: 2200000, owner: 'Daniel Rocha', risco: 'Médio', probabilidade: 35, historico: ['Sinal de intenção detectado via SEO', 'Outbound contextualizado em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [{ canal: 'Inbound orgânico', campanha: 'SEO Automação Industrial', tipo: 'Inbound', impacto: 'Intent orgânico qualificado', data: '2026-04-01' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: 'Cluster de manufatura com sinal de intenção ativa.', evolucaoJornada: 'Inbound via SEO > qualificação > outbound contextualizado.', maturidadeRelacional: 'Inicial, baseada em visita.', sponsorAtivo: 'Em formação.', profundidadeComite: 'Baixa.', continuidade: 'Dependente de cadência rápida.', expansao: 'Mapeamento futuro.', retencao: 'Não aplicável.', riscoEstagnacao: 'Médio se cadência não for acionada em 48h.' },
+    inteligencia: { sucessos: [], insucessos: ['Taxa de resposta baixa em outbound anterior (sem contexto de intent).'], padroes: ['Manufatura com visitas a conteúdo técnico responde bem a outbound contextualizado.', 'Visitas recorrentes (3+) indicam alto potencial de conversão.'], learnings: ['Contexto de intent ativa (SEO) muda taxa de resposta.'], hipoteses: ['Outbound com referência ao tema visitado aumenta taxa de resposta em 40%.'], fatoresRecomendacao: ['Sinal de intenção ativa', 'Janela crítica de 48h', 'Oportunidade de diferenciação por contexto'] },
+    tecnografia: ['SAP', 'Siemens', 'ABB', 'AWS'],
+    historico: [{ data: '2026-04-05', tipo: 'Sinal', descricao: 'Consolidação de visitas qualificadas de cluster manufatura.', icone: 'TrendingUp' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de conexão SEO-outbound criada.', icone: 'Activity' }],
+    reconciliationStatus: 'enriquecida'
   },
   {
     id: '16', slug: 'cluster-healthtech', nome: 'Cluster Healthtech', dominio: 'cluster-healthtech.com.br', vertical: 'Saúde + Healthtech',
     segmento: 'Mid-Market + Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Camila Ribeiro', ownersSecundarios: [],
     etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 70, risco: 20, prontidao: 60, coberturaRelacional: 40,
-    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'Nenhum', statusGeral: 'Saudável',
-    icp: 75, crm: 50, vp: 70, ct: 45, ft: 68, budgetBrl: 2500000, possuiOportunidade: false,
-    proximaMelhorAcao: 'Recuperar campanha de mídia paga.', resumoExecutivo: 'Conta orfã reconciliada: cluster healthtech com CPL elevado. Status seed — caso de otimização.',
-    leituraFactual: [], leituraInferida: [], leituraSugerida: [],
-    sinais: [], acoes: [], contatos: [], oportunidades: [],
-    canaisCampanhas: { origemPrincipal: 'Paid Media', influencias: [] },
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'Paid Media', statusGeral: 'Saudável',
+    icp: 75, crm: 50, vp: 70, ct: 45, ft: 68, budgetBrl: 2500000, possuiOportunidade: true,
+    oportunidadePrincipal: 'Otimização de campanha de aquisição em healthtech',
+    proximaMelhorAcao: 'Recuperar campanha de mídia paga.',
+    resumoExecutivo: 'Cluster healthtech gerando volume, mas com CPL 37% acima da meta. Campanha continua em andamento com qualidade instável. 61% do gasto concentrado em 3 conjuntos pouco aderentes. Precisa urgente corte de desperdício e redistribuição de verba para intents altos.',
+    leituraFactual: ['CPL está 37% acima da meta há 9 dias.', '61% do gasto concentrado em 3 conjuntos com baixa aderência.', 'Conversão de landing continua estável (não é problema de copy).', 'Volume continua fluindo (campanha ainda viável).'],
+    leituraInferida: ['Problema está na origem do tráfego pago, não em conversão.', 'Potencial de recuperação é alto com ajuste rápido (48h).'],
+    leituraSugerida: ['Pausar conjuntos com desperdício imediatamente.', 'Redistribuir verba para intents altos de healthtech.'],
+    sinais: [
+      { id: 's16', titulo: 'CPL acima da meta em campanha healthtech', tipo: 'Alerta', impacto: 'Médio', owner: 'Camila Ribeiro', recomendacao: 'Pausar conjuntos com desperdício e redistribuir em 24h.', contexto: 'CPL está 37% acima da meta há 9 dias. 61% do gasto está em 3 conjuntos pouco aderentes.', data: '2026-04-06' }
+    ],
+    acoes: [],
+    contatos: [
+      { id: 'c17', nome: 'Mariana Teixeira', cargo: 'Gerente de Marketing Digital', area: 'Marketing', senioridade: 'Gerência', papelComite: 'Proprietária de campanha', forcaRelacional: 58, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 76, potencialSucesso: 72, scoreSucesso: 69, ganchoReuniao: 'Mostrar potencial de redução de CPL em 20% via otimização rápida.' },
+      { id: 'c18', nome: 'Rafael Costa', cargo: 'Analista de Mídia Paga', area: 'Marketing', senioridade: 'Especialista', papelComite: 'Executador tático', forcaRelacional: 66, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c17', influencia: 70, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar análise de conjuntos e oportunidade de pausa.' }
+    ],
+    oportunidades: [
+      { id: 'o16', nome: 'Otimização de campanha de aquisição em healthtech', etapa: 'Diagnóstico', valor: 2500000, owner: 'Camila Ribeiro', risco: 'Baixo', probabilidade: 72, historico: ['Campanha em andamento', 'Desvio de performance identificado', 'Plano de ação em preparação'] }
+    ],
+    canaisCampanhas: { origemPrincipal: 'Paid Media', influencias: [{ canal: 'Paid Media', campanha: 'Healthtech Acquisition Q2', tipo: 'Paid Media', impacto: 'Geração de leads qualificados', data: '2026-03-15' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
-    inteligencia: { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
-    tecnografia: [], historico: [], reconciliationStatus: 'orfã'
+    abx: { motivo: 'Cluster healthtech com campanha em otimização.', evolucaoJornada: 'Campanha de aquisição em ajuste tático.', maturidadeRelacional: 'Inicial, baseada em mídia paga.', sponsorAtivo: 'Gerente de marketing digital.', profundidadeComite: 'Baixa (apenas marketing).', continuidade: 'Dependente de melhoria de CPL.', expansao: 'Mapeamento futuro.', retencao: 'Não aplicável.', riscoEstagnacao: 'Médio se CPL não melhorar em 72h.' },
+    inteligencia: { sucessos: ['Conversão de landing estável indica qualidade de copy/oferta.'], insucessos: ['Origem do tráfego com baixa aderência ICP.'], padroes: ['Healthtech responde bem a campanhas focadas em compliance + eficiência operacional.'], learnings: ['Concentração de gasto em poucos conjuntos amplia risco de desperdício.'], hipoteses: ['Distribuição uniforme de gasto reduz CPL em 20%.'], fatoresRecomendacao: ['Desvio de performance', 'Potencial de recuperação rápida', 'Ação tática simples'] },
+    tecnografia: ['Google Ads', 'Meta Ads', 'HubSpot', 'Segment'],
+    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Alerta persistente de CPL acima da meta gerado por Canopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
+    reconciliationStatus: 'enriquecida'
   }
 ];
 
