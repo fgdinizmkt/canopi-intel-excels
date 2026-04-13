@@ -6,10 +6,11 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
+import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
-type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc';
+type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc' | 'score_desc' | 'score_asc';
 
 type Filtros = {
   busca: string;
@@ -131,6 +132,16 @@ export const Accounts = () => {
     data = data.sort((a, b) => {
       if (ordenacao === 'potencial_desc') return b.potencial - a.potencial;
       if (ordenacao === 'risco_desc') return b.risco - a.risco;
+      if (ordenacao === 'score_desc') {
+        const scoreA = calculateAccountScore(a).scoreTotal;
+        const scoreB = calculateAccountScore(b).scoreTotal;
+        return scoreB - scoreA;
+      }
+      if (ordenacao === 'score_asc') {
+        const scoreA = calculateAccountScore(a).scoreTotal;
+        const scoreB = calculateAccountScore(b).scoreTotal;
+        return scoreA - scoreB;
+      }
       return toDate(b.ultimaMovimentacao) - toDate(a.ultimaMovimentacao);
     });
 
@@ -282,6 +293,8 @@ export const Accounts = () => {
             <select value={ordenacao} onChange={(e) => setOrdenacao(e.target.value as Ordenacao)} className="px-3 py-2 rounded-xl border border-slate-200 text-sm">
               <option value="potencial_desc">Ordenar: Potencial (maior)</option>
               <option value="risco_desc">Ordenar: Risco (maior)</option>
+              <option value="score_desc">Ordenar: Score Derivado (maior)</option>
+              <option value="score_asc">Ordenar: Score Derivado (menor)</option>
               <option value="movimentacao_desc">Ordenar: Última movimentação</option>
             </select>
           </div>
@@ -373,7 +386,7 @@ export const Accounts = () => {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
               <tr>
-                <th className="p-3 text-left">Conta</th><th className="p-3 text-left">Vertical / Segmento</th><th className="p-3 text-left">Owner</th><th className="p-3 text-left">Etapa</th><th className="p-3 text-left">Tipo estratégico</th><th className="p-3 text-left">Play ativo</th><th className="p-3 text-left">Potencial</th><th className="p-3 text-left">Risco</th><th className="p-3 text-left">Cobertura relacional</th><th className="p-3 text-left">Última movimentação</th><th className="p-3 text-left">Oportunidade</th><th className="p-3 text-left">Próxima melhor ação</th><th className="p-3 text-left">Status geral</th>
+                <th className="p-3 text-left">Conta</th><th className="p-3 text-left">Vertical / Segmento</th><th className="p-3 text-left">Owner</th><th className="p-3 text-left">Etapa</th><th className="p-3 text-left">Tipo estratégico</th><th className="p-3 text-left">Play ativo</th><th className="p-3 text-left">Potencial</th><th className="p-3 text-left">Risco</th><th className="p-3 text-left">Cobertura relacional</th><th className="p-3 text-left">Score Derivado</th><th className="p-3 text-left">Última movimentação</th><th className="p-3 text-left">Oportunidade</th><th className="p-3 text-left">Próxima melhor ação</th><th className="p-3 text-left">Status geral</th>
               </tr>
             </thead>
             <tbody>
@@ -434,6 +447,19 @@ export const Accounts = () => {
                   <td className="p-3">{conta.potencial}</td>
                   <td className={`p-3 font-semibold ${riscoClasse(conta.risco)}`}>{conta.risco}</td>
                   <td className="p-3">{conta.coberturaRelacional}%</td>
+                  <td className="p-3">
+                    {(() => {
+                      const score = calculateAccountScore(conta);
+                      const bgColor = score.scoreTotal >= 75 ? 'bg-emerald-100 text-emerald-700' : score.scoreTotal >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700';
+                      const badgeColor = score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600';
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${bgColor}`}>{score.scoreTotal}</span>
+                          <span className={`text-[10px] font-semibold ${badgeColor}`}>{score.prioridade}</span>
+                        </div>
+                      );
+                    })()}
+                  </td>
                   <td className="p-3">{new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR')}</td>
                   <td className="p-3">{conta.oportunidadePrincipal ? <button onClick={() => openAccount(conta.id)} className="underline text-left">{conta.oportunidadePrincipal}</button> : '-'}</td>
                   <td className="p-3 max-w-[240px]">

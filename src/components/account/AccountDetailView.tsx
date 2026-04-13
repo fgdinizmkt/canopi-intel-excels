@@ -12,6 +12,7 @@ import {
 import { contasMock, ContatoConta, SinalConta, OportunidadeConta, Conta } from '../../data/accountsData';
 import { persistOportunidade } from '../../lib/oportunidadesRepository';
 import { persistAccount, getAccounts } from '../../lib/accountsRepository';
+import { calculateAccountScore, ScoringResult } from '../../lib/scoringRepository';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
@@ -131,6 +132,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
     return { tension, support, gaps };
   }, [account, localContatos]);
+
+  // Score Derivado (RECORTE 53 — F1)
+  const accountScore = React.useMemo(() => {
+    if (!account) return null;
+    return calculateAccountScore(account);
+  }, [account]);
 
   const renderTree = React.useCallback((contatos: ContatoConta[], parentId?: string, level = 0) => {
     const children = contatos.filter(c => c.liderId === parentId);
@@ -541,6 +548,96 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       {/* ── BODY ── */}
       <div className="flex-1 overflow-y-auto custom-scrollbar bg-slate-900/50">
         <div className={`p-6 space-y-8 ${isFullscreen ? 'max-w-7xl mx-auto w-full' : ''}`}>
+
+          {/* Score & Priorização (Recorte 53 — F1) */}
+          {accountScore && (
+            <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/40 p-6 rounded-2xl border border-slate-700/50 shadow-lg space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <Target className="w-4 h-4 text-blue-400" /> Score & Priorização
+                  </h2>
+
+                  {/* Score Total + Prioridade */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex flex-col items-start">
+                      <span className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1">Score Total</span>
+                      <div className={`text-3xl font-black ${accountScore.scoreTotal >= 75 ? 'text-emerald-400' : accountScore.scoreTotal >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                        {accountScore.scoreTotal}
+                      </div>
+                    </div>
+                    <div className="flex-1 h-12 bg-slate-700 rounded-lg overflow-hidden relative">
+                      <div
+                        className={`h-full transition-all duration-500 ${accountScore.scoreTotal >= 75 ? 'bg-emerald-500' : accountScore.scoreTotal >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${accountScore.scoreTotal}%` }}
+                      />
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1">Prioridade</span>
+                      <span className={`text-sm font-black uppercase tracking-wider px-3 py-1 rounded-lg ${
+                        accountScore.prioridade === 'crítica' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                        accountScore.prioridade === 'alta' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                        accountScore.prioridade === 'média' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                        'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                      }`}>
+                        {accountScore.prioridade}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 5 Dimensões */}
+                  <div className="grid grid-cols-5 gap-2.5">
+                    {[accountScore.potencial, accountScore.risco, accountScore.prontidao, accountScore.cobertura, accountScore.confianca].map((dim, i) => (
+                      <div key={i} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/40 hover:border-slate-600/60 transition-all">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{dim.name}</span>
+                          <span className={`text-sm font-black ${dim.score >= 75 ? 'text-emerald-400' : dim.score >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                            {dim.score}
+                          </span>
+                        </div>
+                        <div className="h-1 bg-slate-700 rounded-full overflow-hidden mb-2">
+                          <div
+                            className={`h-full transition-all ${dim.score >= 75 ? 'bg-emerald-500' : dim.score >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                            style={{ width: `${dim.score}%` }}
+                          />
+                        </div>
+                        <p className="text-[8px] text-slate-500 italic leading-tight">{dim.rationale}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Sinais por Dimensão */}
+                  <div className="grid grid-cols-5 gap-2.5 mt-3">
+                    {[accountScore.potencial, accountScore.risco, accountScore.prontidao, accountScore.cobertura, accountScore.confianca].map((dim, i) => (
+                      <div key={i} className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/25 text-[8px] text-slate-400 space-y-1">
+                        {dim.signals.slice(0, 2).map((sig, j) => (
+                          <div key={j} className="flex items-start gap-1">
+                            <span className="text-slate-600 flex-shrink-0 mt-0.5">•</span>
+                            <span className="leading-tight">{sig}</span>
+                          </div>
+                        ))}
+                        {dim.signals.length > 2 && (
+                          <span className="text-slate-500 italic">+{dim.signals.length - 2} mais</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Avisos Operacionais */}
+              {accountScore.avisos.length > 0 && (
+                <div className="pt-3 border-t border-slate-700/30 space-y-2">
+                  {accountScore.avisos.map((aviso, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2.5 bg-slate-800/50 rounded-lg border border-amber-500/20">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+                      <span className="text-[10px] text-slate-200">{aviso}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* KPIs táticos */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
