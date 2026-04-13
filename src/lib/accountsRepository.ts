@@ -43,6 +43,7 @@ export type AccountRow = {
   leituraFactual?: string[];
   leituraInferida?: string[];
   leituraSugerida?: string[];
+  historico?: Conta['historico'];
 };
 
 /**
@@ -60,6 +61,7 @@ type AccountPersistPayload = {
   leituraFactual?: string[];
   leituraInferida?: string[];
   leituraSugerida?: string[];
+  historico?: Conta['historico'];
 };
 
 /**
@@ -67,13 +69,13 @@ type AccountPersistPayload = {
  * Padrão fire-and-forget: não bloqueia, não retorna feedback, registra erro silenciosamente
  *
  * Caso de uso: mutação local-first no state, depois persist async sem UI feedback
- * Campos suportados: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao, inteligencia, leituraFactual, leituraInferida, leituraSugerida
+ * Campos suportados: tipoEstrategico, playAtivo, resumoExecutivo, proximaMelhorAcao, inteligencia, leituraFactual, leituraInferida, leituraSugerida, historico
  *
  * IMPORTANTE: Sempre enviar TODOS os campos (não deixar undefined) para evitar
  * sobrescrita mútua no banco. Caller (handlers em AccountDetailView.tsx) deve passar
  * o estado atual de cada campo em snapshot completo.
  */
-export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string; inteligencia?: Conta['inteligencia']; leituraFactual?: string[]; leituraInferida?: string[]; leituraSugerida?: string[] }): Promise<void> {
+export async function persistAccount(account: { id: string; tipoEstrategico?: TipoEstrategico; playAtivo?: AccountRow['playAtivo']; resumoExecutivo?: string; proximaMelhorAcao?: string; inteligencia?: Conta['inteligencia']; leituraFactual?: string[]; leituraInferida?: string[]; leituraSugerida?: string[]; historico?: Conta['historico'] }): Promise<void> {
   if (!isSupabaseConfigured()) {
     console.debug('[Accounts] Supabase não configurado. Persist ignorado.');
     return;
@@ -106,6 +108,9 @@ export async function persistAccount(account: { id: string; tipoEstrategico?: Ti
     }
     if (account.leituraSugerida !== undefined) {
       payload.leituraSugerida = account.leituraSugerida;
+    }
+    if (account.historico !== undefined) {
+      payload.historico = account.historico;
     }
 
     const { error } = await supabase!
@@ -169,7 +174,8 @@ export async function getAccounts(): Promise<Conta[]> {
         inteligencia,
         leituraFactual,
         leituraInferida,
-        leituraSugerida
+        leituraSugerida,
+        historico
       `);
 
     if (error) {
@@ -243,7 +249,7 @@ export async function getAccounts(): Promise<Conta[]> {
           },
           inteligencia: row.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] },
           tecnografia: [],
-          historico: [],
+          historico: row.historico || [],
         } as Conta;
       }
 

@@ -89,6 +89,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
   const [editingIntel, setEditingIntel] = useState<Conta['inteligencia'] | null>(null);
   const [localLeitura, setLocalLeitura] = useState({ factual: account?.leituraFactual ?? [], inferida: account?.leituraInferida ?? [], sugerida: account?.leituraSugerida ?? [] });
   const [editingLeitura, setEditingLeitura] = useState<typeof localLeitura | null>(null);
+  const [localHistorico, setLocalHistorico] = useState<Conta['historico']>(account?.historico ?? []);
+  const [editingHistorico, setEditingHistorico] = useState<{ data: string; tipo: string; descricao: string; icone?: string } | null>(null);
 
   React.useEffect(() => {
     if (initialContactId) setSelectedContactId(initialContactId);
@@ -100,6 +102,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
       setLocalOportunidades(account.oportunidades || []);
       setLocalInteligencia(account.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
       setLocalLeitura({ factual: account.leituraFactual || [], inferida: account.leituraInferida || [], sugerida: account.leituraSugerida || [] });
+      setLocalHistorico(account.historico || []);
     }
   }, [account]); // Dependência direta do objeto consolidado
 
@@ -273,6 +276,42 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     // 5. Cleanup UI
     setEditingLeitura(null);
     setShowFeedback('Leitura estruturada atualizada e persistida.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleSaveHistorico = () => {
+    if (!editingHistorico) return;
+
+    // Guard: validação obrigatória
+    if (!editingHistorico.tipo || !editingHistorico.descricao.trim()) {
+      setShowFeedback('Tipo e descrição são obrigatórios.');
+      setTimeout(() => setShowFeedback(null), 3000);
+      return;
+    }
+
+    // 1. Snapshot do estado atual: adiciona nova entrada ao histórico
+    const newEntry = {
+      data: editingHistorico.data || new Date().toLocaleDateString('pt-BR'),
+      tipo: editingHistorico.tipo,
+      descricao: editingHistorico.descricao,
+      icone: editingHistorico.icone || 'HistoryIcon'
+    };
+
+    const snapshot = [...localHistorico, newEntry];
+
+    // 2. Build: conversão para os nomes canônicos
+    // 3. setState: atualiza o estado local
+    setLocalHistorico(snapshot);
+
+    // 4. Persist: chama o repositório Supabase (fire-and-forget)
+    persistAccount({
+      id: account.id,
+      historico: snapshot,
+    });
+
+    // 5. Cleanup UI
+    setEditingHistorico(null);
+    setShowFeedback('Entrada histórica criada e persistida.');
     setTimeout(() => setShowFeedback(null), 3000);
   };
 
@@ -505,6 +544,108 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all"
                   >
                     Salvar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Histórico Operacional (Recorte 49: E18) */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <HistoryIcon className="w-4 h-4 text-slate-500" />
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Histórico Estruturado</h2>
+              </div>
+              <button
+                onClick={() => setEditingHistorico(editingHistorico ? null : { data: '', tipo: '', descricao: '', icone: 'HistoryIcon' })}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                title={editingHistorico ? 'Cancelar edição' : 'Adicionar entrada'}
+              >
+                <Pencil className="w-3 h-3" />
+                {editingHistorico ? 'Cancelar' : 'Adicionar'}
+              </button>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/30">
+              {localHistorico.length > 0 ? (
+                <ul className="space-y-2.5">
+                  {localHistorico.map((h, i) => (
+                    <li key={i} className="text-xs text-slate-300 flex items-start gap-2 pb-2 border-b border-slate-700/30 last:border-b-0">
+                      <span className="text-slate-500 flex-shrink-0 font-bold">{h.data}</span>
+                      <div className="flex-1">
+                        <div className="font-bold text-slate-200">{h.tipo}</div>
+                        <div className="text-slate-400 mt-0.5">{h.descricao}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : <p className="text-xs text-slate-600 italic">Sem entradas no histórico.</p>}
+            </div>
+
+            {/* Editor Mínimo: Nova Entrada Histórica (Recorte E18) */}
+            {editingHistorico && (
+              <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-amber-500/20 space-y-3">
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Data (dd/mm/aaaa)</label>
+                  <input
+                    type="text"
+                    value={editingHistorico.data}
+                    onChange={(e) => setEditingHistorico({ ...editingHistorico, data: e.target.value })}
+                    placeholder={new Date().toLocaleDateString('pt-BR')}
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-slate-600/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipo</label>
+                  <select
+                    value={editingHistorico.tipo}
+                    onChange={(e) => setEditingHistorico({ ...editingHistorico, tipo: e.target.value })}
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 focus:outline-none focus:border-slate-600/50"
+                  >
+                    <option value="">Selecionar tipo</option>
+                    <option value="Sinal Detectado">Sinal Detectado</option>
+                    <option value="Ação Executada">Ação Executada</option>
+                    <option value="Evento Crítico">Evento Crítico</option>
+                    <option value="Mudança Estratégica">Mudança Estratégica</option>
+                    <option value="Nota Operacional">Nota Operacional</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Descrição</label>
+                  <textarea
+                    value={editingHistorico.descricao}
+                    onChange={(e) => setEditingHistorico({ ...editingHistorico, descricao: e.target.value })}
+                    placeholder="Descreva a entrada histórica"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 placeholder-slate-600 focus:outline-none focus:border-slate-600/50"
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Ícone (opcional)</label>
+                  <select
+                    value={editingHistorico.icone || 'HistoryIcon'}
+                    onChange={(e) => setEditingHistorico({ ...editingHistorico, icone: e.target.value })}
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-2 text-sm text-slate-300 focus:outline-none focus:border-slate-600/50"
+                  >
+                    <option value="HistoryIcon">Histórico</option>
+                    <option value="AlertTriangle">Alerta</option>
+                    <option value="Clock">Relogio</option>
+                    <option value="TrendingUp">Tendência</option>
+                    <option value="Activity">Atividade</option>
+                  </select>
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <button
+                    onClick={() => setEditingHistorico(null)}
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveHistorico}
+                    className="px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 rounded-lg text-[9px] font-bold text-amber-400 hover:text-amber-300 transition-all"
+                  >
+                    Salvar Entrada
                   </button>
                 </div>
               </div>
@@ -950,13 +1091,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 {(() => {
                   const sLogs = sessionLogs[accountId] || [];
                   const combined = [
-                    ...sLogs.map(text => ({ 
-                      tipo: 'Log Manual', 
-                      data: 'Agora', 
-                      descricao: text, 
-                      icone: 'LogsIcon' 
+                    ...sLogs.map(text => ({
+                      tipo: 'Log Manual',
+                      data: 'Agora',
+                      descricao: text,
+                      icone: 'LogsIcon'
                     })),
-                    ...account.historico.map(h => ({ ...h, tipo: h.tipo as any }))
+                    ...localHistorico.map(h => ({ ...h, tipo: h.tipo as any }))
                   ];
                   return combined.map((h, i) => {
                     const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : h.icone === 'LogsIcon' ? LogsIcon : HistoryIcon;
