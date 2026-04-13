@@ -69,8 +69,23 @@ Nenhum campo será alterado como resultado deste documento.
 | `abm.strategyNarrative` | ✅ `getAbm()` | ✅ `persistAbm()` | Supabase | — (Recorte 40) |
 | `abm.riskAssessment` | ✅ `getAbm()` | ✅ `persistAbm()` | Supabase | — (Recorte 40) |
 | `abm.successCriteria` | ✅ `getAbm()` | ✅ `persistAbm()` | Supabase | — (Recorte 40) |
+### 1.3 Campos de objeto aninhado: `inteligencia` (Cumulativo)
 
-### 1.3 Campos de objeto aninhado: `abx`
+**Localização no modelo:** `Conta.inteligencia` (objeto dentro de Conta)
+**Repository:** `src/lib/accountsRepository.ts`
+
+| Campo | Leitura Supabase | Escrita Supabase | Fonte de Verdade | Lacuna |
+|---|---|---|---|---|
+| `inteligencia.sucessos` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+| `inteligencia.insucessos` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+| `inteligencia.padroes` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+| `inteligencia.learnings` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+| `inteligencia.hipoteses` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+| `inteligencia.fatoresRecomendacao` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 47) |
+
+---
+
+### 1.4 Campos de objeto aninhado: `abx`
 
 **Localização no modelo:** `Conta.abx` (objeto dentro de Conta, não top-level)
 **Repository:** `src/lib/abxRepository.ts`

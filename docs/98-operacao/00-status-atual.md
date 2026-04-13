@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-11 (Recorte 47 — último marco funcional: 9ec0667)
+ `main` — sincronizada em 2026-04-12 (Recorte 47 — último marco funcional: 9ec0667)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 47 — Supabase E16: Escrita Defensiva Atômica de Inteligência Acumulada)

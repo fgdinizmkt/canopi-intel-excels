@@ -5,6 +5,19 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-12] — Sincronização Documental: Recorte 47 — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Sincronizar toda a documentação operacional (`00-status-atual.md`, `03-log-de-sessoes.md`, `06-checkpoint-atual.md` e `09-mapa-de-cobertura-persistencia.md`) após a publicação estável do Recorte 47 funcional.
+- **Ações Executadas:**
+  - Atualizado status de sincronização em `00-status-atual.md`.
+  - Consolidado log de sessões em `03-log-de-sessoes.md`.
+  - Verificado checkpoint em `06-checkpoint-atual.md`.
+  - Expandido o `09-mapa-de-cobertura-persistencia.md` para incluir a cobertura detalhada do objeto `inteligencia` (Recorte 47).
+- **Status:** ✅ Documentação 100% sincronizada com a `main`. Pronto para definição do Recorte 48.
+
+---
+
 ## [2026-04-11] — Recorte 47 (Supabase E16): Escrita Defensiva Atômica de Inteligência Acumulada — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.
