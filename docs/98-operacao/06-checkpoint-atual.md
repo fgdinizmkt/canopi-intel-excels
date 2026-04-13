@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 50 (Supabase E19) Concluído
+# Checkpoint Atual — Recorte 51 (Supabase E20) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 50 Concluído
-- **Status da Infra:** Build íntegro, tecnografia read-write implementado, validação defensiva completa (vazio e duplicata), editor com controle de estado null-based.
+- **Marco:** Recorte 51 Concluído
+- **Status da Infra:** Build íntegro, canaisCampanhas read-write implementado, validação defensiva com JSON.parse barreira canônica, editor com estado `{ origemPrincipal, influenciasJson }`.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -110,11 +110,20 @@
   - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
   - Publicação: commit `569c665` em `origin/main`.
 
+- ✅ Recorte 51 (Funcional): Canais e Campanhas de Conta (E20)
+  - Ciclo completo de leitura, merge e escrita defensiva de `canaisCampanhas` (objeto aninhado com array estruturado).
+  - Repository layer expandido: `AccountRow` e `AccountPersistPayload` incluem `canaisCampanhas`, query em `getAccounts()` com merge defensivo em cascata, persistência fire-and-forget.
+  - UI local-first: `localCanaisCampanhas` como fonte de verdade, editor modal com input para `origemPrincipal` e textarea para `influenciasJson`.
+  - Validação defensiva barreira canônica: `JSON.parse()` com try/catch, validação de array, validação de shape (5 campos string).
+  - Guard clauses bloqueiam persistência se origemPrincipal vazio, JSON inválido, array inválido ou shape inválido.
+  - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
+  - Publicação: commit `15b6371` em `origin/main`.
+
 ## O que está pendente
-- Definição do Recorte 51 pelo Orquestrador.
+- Definição do Recorte 52 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 51.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 52.
 
 ---
-*Último estado funcional confiável: Recorte 50 (`90662a0`)*
+*Último estado funcional confiável: Recorte 51 (`15b6371`)*

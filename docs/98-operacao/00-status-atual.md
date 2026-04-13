@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-12 (Recorte 50 — último marco funcional: 90662a0)
+ `main` — sincronizada em 2026-04-12 (Recorte 51 — último marco funcional: 15b6371)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 50 — Supabase E19: Tecnografia de Conta)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 51 — Supabase E20: Canais e Campanhas)
 
 ---
 
@@ -471,7 +471,8 @@
 - **Recorte 46:** Concluído. Escrita defensiva atômica de Oportunidades (`etapa` e `risco`) com padrão 1 snapshot → 1 build → 1 setState → 1 persist. Botão "Salvar" explícito no overlay de edição em `AccountDetailView.tsx`.
 - **Recorte 47:** Concluído. Implementação do ciclo completo de leitura, merge e escrita defensiva atômica para o objeto `inteligencia` da entidade Conta. Read path fechado em `AccountDetailView.tsx` via `getAccounts()` do repositório.
 - **Recorte 48:** Concluído. Supabase E17: Leitura Estruturada da Conta. Implementação de leitura, merge defensivo e escrita atômica dos blocos `leituraFactual`, `leituraInferida` e `leituraSugerida`. Repository layer expandido em `accountsRepository.ts` com query defensiva e fallback para mock. UI local-first com editor modal mínimo em `AccountDetailView.tsx`. Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist. Publicação: commit `569c665`.
-- **Próximo passo funcional:** Definição do Recorte 49 pelo Orquestrador.
+- **Recorte 51:** Concluído. Supabase E20: Canais e Campanhas. Implementação completa de leitura, merge defensivo e escrita defensiva atômica para `canaisCampanhas`. Repository layer: `AccountRow` e `AccountPersistPayload` expandidos, `getAccounts()` query com merge defensivo em cascata. UI: estado local-first `localCanaisCampanhas`, editor modal com input para `origemPrincipal` e textarea para `influenciasJson`. Validação: `JSON.parse()` com try/catch como barreira canônica, validação de shape (canal, campanha, tipo, impacto, data). Publicação: commit `15b6371`.
+- **Próximo passo funcional:** Definição do Recorte 52 pelo Orquestrador.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
@@ -513,3 +514,6 @@
 | Supabase E15: Escrita Oport. | Recorte 46 Concluído (Fase E) | Escrita defensiva atômica de `etapa` e `risco` em Oportunidades via save explícito |
 | Supabase E16: Inteligência | Recorte 47 Concluído (Fase E) | Leitura + merge + escrita atômica de `inteligencia` em Conta via repositório |
 | Supabase E17: Leitura Estruturada | Recorte 48 Concluído (Fase E) | Leitura + merge + escrita defensiva atômica de `leituraFactual`, `leituraInferida`, `leituraSugerida` |
+| Supabase E18: Histórico Operacional | Recorte 49 Concluído (Fase E) | Leitura + merge + escrita defensiva do array `historico` estruturado em Conta com timeline integrada |
+| Supabase E19: Tecnografia | Recorte 50 Concluído (Fase E) | Leitura + merge + escrita defensiva do array `tecnografia` (strings simples) com editor mínimo |
+| Supabase E20: Canais e Campanhas | Recorte 51 Concluído (Fase E) | Leitura + merge + escrita defensiva de `canaisCampanhas` com JSON.parse barreira canônica e validação de shape |

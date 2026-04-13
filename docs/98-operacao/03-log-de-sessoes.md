@@ -5,6 +5,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-12] — Recorte 51 (Supabase E20): Canais e Campanhas — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar o ciclo completo de leitura, merge e escrita defensiva atômica para `canaisCampanhas` da entidade Conta, com validação obrigatória de JSON e shape factual como barreira canônica de integridade.
+- **Ações Executadas:**
+  - **Refatoração Repository:** `AccountRow` e `AccountPersistPayload` expandidos com `canaisCampanhas`. Query defensiva em `getAccounts()` incluindo `canaisCampanhas`. Merge defensivo em cascata: `row.canaisCampanhas || mockAccount.canaisCampanhas || { origemPrincipal: '', influencias: [] }`. `persistAccount()` ampliado para persistir `canaisCampanhas` com padrão fire-and-forget.
+  - **Refatoração UI:** Estado `localCanaisCampanhas` como fonte de verdade. Estado `editingCanaisCampanhas` redefinido como `{ origemPrincipal: string; influenciasJson: string }` para capturar JSON bruto. Editor modal com input para `origemPrincipal` e textarea para `influenciasJson` (não parsing em onChange).
+  - **Validação Barreira Canônica:** `handleSaveCanaisCampanhas()` implementa 4 guards sequenciais: origemPrincipal não vazio, JSON.parse com try/catch, validação de array, validação de shape (canal, campanha, tipo, impacto, data como strings). Cada falha bloqueia atomicamente (sem setState, sem persist).
+  - **Feedback:** Via `setShowFeedback()` com mensagens específicas por tipo de erro.
+  - **Build:** Compilado com sucesso. Diff: +150, -18 linhas.
+- **Commits:** `15b6371` — feat(supabase): E20 channels and campaigns read-write layer
+- **Decisão Consolidada:** Padrão E20 estende E19 para objetos aninhados com arrays estruturados. JSON.parse como barreira canônica garante integridade de entrada contra edição textual direta.
+- **Status:** ✅ Publicado em origin/main. Documentação sincronizada. Próximo passo: definição do Recorte 52.
+
+---
+
 ## [2026-04-12] — Recorte 50 (Supabase E19): Tecnografia de Conta — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.

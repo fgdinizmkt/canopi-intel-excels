@@ -54,6 +54,7 @@ Nenhum campo será alterado como resultado deste documento.
 | `leituraSugerida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 | `historico` | `{ data, tipo, descricao, icone }[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 49) |
 | `tecnografia` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 50) |
+| `canaisCampanhas` | `{ origemPrincipal: string; influencias: {canal, campanha, tipo, impacto, data}[] }` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 51) |
 
 ### 1.2 Campos de objeto aninhado: `abm`
 
@@ -208,6 +209,9 @@ Não há mais dupla fonte de escrita ou ambiguidade sobre esses campos.
 | Accounts — `tipoEstrategico`, `playAtivo` | ✅ | ✅ | R32/R33/R34/R35 |
 | Accounts — `inteligencia` (Cumulativa) | ✅ | ✅ | R47 |
 | Accounts — `leituraFactual`, `leituraInferida`, `leituraSugerida` | ✅ | ✅ | R48 |
+| Accounts — `historico` (Operacional) | ✅ | ✅ | R49 |
+| Accounts — `tecnografia` | ✅ | ✅ | R50 |
+| Accounts — `canaisCampanhas` | ✅ | ✅ | R51 |
 | Signals — operacionais + narrativos | ✅ | ✅ | R37 |
 | Contacts — todos os campos cobertos | ✅ | ✅ | R38 |
 | Actions — todos os campos cobertos | ✅ | ✅ | R39 |
@@ -226,12 +230,11 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `sinais[]` — array de `SinalConta` (lidos via `signalsRepository`, não via `accountsRepository`)
 - `acoes[]` — array de `AcaoConta` (lidas via `actionsRepository`)
 - `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
-- `canaisCampanhas` — objeto — **sem repository Supabase**
 - `reconciliationStatus` — campo de controle interno — **sem repository Supabase**
 
 ---
 
 *Documento criado em: 2026-04-10*
-*Última atualização: 2026-04-12 (Recorte 50: adição de cobertura para tecnografia)*
-*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97` (atualizado em `90662a0`)*
-*Recorte 43 — documental, sem alteração de código; Recortes 48, 49, 50 — funcional, cobertura consolidada*
+*Última atualização: 2026-04-12 (Recorte 51: adição de cobertura para canaisCampanhas)*
+*Fonte: leitura direta de `src/lib/` e `src/data/accountsData.ts` em commit `5672e97` (atualizado em `15b6371`)*
+*Recorte 43 — documental, sem alteração de código; Recortes 48, 49, 50, 51 — funcional, cobertura consolidada*

@@ -1009,3 +1009,26 @@ const handleSaveNew = () => {
 **Benefício arquitetural:** O padrão E14–E19 generaliza escalabilidade a novos campos estruturados profundos sem aumentar complexidade conceitual. A simetria remota-local-persistência é idêntica seja para 1 campo simples, 1 array, ou múltiplos arrays. A validação defensiva (E18+) protege integridade de persistência contra entradas inválidas. Controle de estado via `string | null` (E19) oferece alternativa limpa a booleanos de edição para casos de entrada simples.
 
 **Commits:** `81a1c6b` (E14), `2f91d47` (E15), `9ec0667` (E16), `569c665` (E17), `d3ed9d9` (E18), `90662a0` (E19)
+
+---
+
+### 8.5 JSON como Barreira Canônica de Integridade de Entrada (E20: Canais e Campanhas)
+
+**Contexto (Recorte 51):**
+Ao implementar leitura-escrita defensiva para `canaisCampanhas` (objeto aninhado com estrutura `{ origemPrincipal: string; influencias: {canal, campanha, tipo, impacto, data}[] }`), enfrentou-se o desafio de permitir edição textual de JSON em textarea sem normalizar silenciosamente dados inválidos. A solução consolidada estabelece `JSON.parse()` como a **barreira canônica obrigatória** de integridade de entrada, movendo toda validação para o momento de salvamento (não digitação).
+
+**Decisão consolidada (E20):**
+1. **Estado de edição desacoplado:** O campo `editingCanaisCampanhas` armazena `{ origemPrincipal: string; influenciasJson: string }`, onde `influenciasJson` é a string JSON bruta (não parseada) capturada do textarea.
+2. **Parse defensivo em handleSave:** `handleSaveCanaisCampanhas()` executa `JSON.parse(editingCanaisCampanhas.influenciasJson)` dentro de try/catch como primeira barreira de validação.
+3. **Validação sequencial:** Após parse bem-sucedido, quatro guards sequenciais protegem persistência:
+   - Guard 1: `origemPrincipal.trim()` não vazio (feedback: "Origem principal é obrigatória.")
+   - Guard 2: JSON.parse bem-sucedido (feedback: "JSON de influências inválido.")
+   - Guard 3: Resultado é array (feedback: "Influências devem ser um array JSON.")
+   - Guard 4: Cada item tem exatamente 5 campos string (`canal`, `campanha`, `tipo`, `impacto`, `data`) (feedback: "Cada influência deve ter: canal, campanha, tipo, impacto, data (todos strings).")
+4. **Atomicidade bloqueada:** Se qualquer guard falha, `return` imediato sem `setState` e sem `persistAccount()`. Feedback é exibido via `setShowFeedback()` com timeout auto-clear (3000ms).
+5. **Snapshot final:** Só após todos os guards passarem, o snapshot final `{ origemPrincipal, influencias: parsedInfluencias }` é construído (com influencias como array parseado) e persistido.
+6. **Inicialização do editor:** Ao abrir o editor, `influenciasJson` é inicializado com `JSON.stringify(localCanaisCampanhas.influencias, null, 2)` para edição formatada.
+
+**Benefício arquitetural:** E20 estabelece o padrão para campos cujos valores são estruturas complexas exigindo edição textual. Ao mover validação para o momento de save (não onChange), evita normalização silenciosa de dados inválidos e oferece ao usuário feedback explícito sobre a causa de rejeição. A barreira JSON.parse centralizada oferece consistência e clareza: "se parse passa, dados são estruturalmente válidos". O padrão é replicável para qualquer campo armazenado como JSON em Supabase (ex: metadata, configurações, hipoteses estruturadas).
+
+**Commits:** `15b6371` (E20 implementação defensiva com barreira canônica JSON.parse em handleSaveCanaisCampanhas)
