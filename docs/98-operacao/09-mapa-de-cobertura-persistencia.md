@@ -52,6 +52,7 @@ Nenhum campo será alterado como resultado deste documento.
 | `leituraFactual` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 | `leituraInferida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
 | `leituraSugerida` | `string[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 48) |
+| `historico` | `{ data, tipo, descricao, icone }[]` | ✅ `getAccounts()` | ✅ `persistAccount()` | Supabase | — (Recorte 49) |
 
 ### 1.2 Campos de objeto aninhado: `abm`
 
@@ -226,7 +227,6 @@ Não há registro de decisão explícita de exclusão — apenas ausência de im
 - `contatos[]` — array de `ContatoConta` (lidos via `contactsRepository`)
 - `canaisCampanhas` — objeto — **sem repository Supabase**
 - `tecnografia` — array de strings — **sem repository Supabase**
-- `historico[]` — array — **sem repository Supabase**
 - `reconciliationStatus` — campo de controle interno — **sem repository Supabase**
 
 ---

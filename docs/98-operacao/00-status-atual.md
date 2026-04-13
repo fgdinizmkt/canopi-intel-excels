@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-12 (Recorte 48 — último marco funcional: 569c665)
+ `main` — sincronizada em 2026-04-12 (Recorte 49 — último marco funcional: d3ed9d9)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 48 — Supabase E17: Leitura Estruturada da Conta)
+**Fase E — Supabase Migration & Scale** (Em execução - Último Recorte: Recorte 49 — Supabase E18: Histórico Operacional de Conta)
 
 ---
 

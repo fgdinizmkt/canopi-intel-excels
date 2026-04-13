@@ -5,6 +5,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-12] — Recorte 49 (Supabase E18): Histórico Operacional de Conta — Concluído
+
+- **Fase:** Fase E — Supabase Migration & Scale.
+- **Objetivo:** Implementar o ciclo completo de leitura, merge e escrita defensiva atômica para o array `historico` da entidade Conta, garantindo padrão local-first com editor modal para novas entradas estruturadas. Separação clara entre `sessionLogs` (local, efêmero) e `historico` (remoto, estruturado).
+- **Ações Executadas:**
+  - **Refatoração Repository:** `AccountRow` e `AccountPersistPayload` expandidos com suporte a `historico`. Query defensiva em `getAccounts()` incluindo `historico`. `persistAccount()` ampliado para persistir `historico` com padrão fire-and-forget.
+  - **Refatoração UI:** Introduzido estado `localHistorico` como fonte de verdade. Editor modal mínimo com 4 campos: `data` (dd/mm/aaaa, com fallback automático), `tipo` (dropdown de 5 opções), `descricao` (textarea), `icone` (opcional, 5 ícones). `handleSaveHistorico()` implementa padrão E18: snapshot → setState → persist atômico.
+  - **Validação:** Guard clause bloqueia persistência se `tipo` ou `descricao.trim()` vazios. Feedback curto exibido ao usuário.
+  - **Timeline Integrada:** Display combinado de `sessionLogs` (local) + `localHistorico` (remoto) em uma única linha do tempo. Separação clara de origem (tipo de entrada indica origem).
+  - **Invariante:** `sessionLogs` completamente intocado. Nenhuma mudança em `handleSaveLog()` ou contexto.
+  - **Build:** Compilado com sucesso. Diff: +157, -10 linhas.
+- **Commits:** `d3ed9d9` — feat(supabase): E18 structured operational history read-write layer
+- **Decisão Consolidada:** Padrão E18 segue o consolidado E17/E16 para campos estruturados com múltiplas entradas. Atomicidade e local-first coerência mantidas.
+- **Status:** ✅ Publicado em origin/main. Documentação sincronizada. Próximo passo: definição do Recorte 50.
+
+---
+
 ## [2026-04-12] — Recorte 48 (Supabase E17): Leitura Estruturada da Conta — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.

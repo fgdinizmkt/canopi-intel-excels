@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 47 (Supabase E16) Concluído
+# Checkpoint Atual — Recorte 49 (Supabase E18) Concluído
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 47 Concluído
-- **Status da Infra:** Build íntegro, read path fechado em AccountDetailView, escrita atômica de Inteligência Cumulativa validada.
+- **Marco:** Recorte 49 Concluído
+- **Status da Infra:** Build íntegro, histórico estruturado read-write implementado, validação defensiva de entrada obrigatória, timeline integrada operacional.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -84,6 +84,16 @@
   - Read path assíncrono fechado em `AccountDetailView.tsx`.
   - Publicação: commit `9ec0667` em `origin/main`.
 
+- ✅ Recorte 49 (Funcional): Histórico Operacional de Conta (E18)
+  - Ciclo completo de leitura, merge e escrita defensiva do array `historico` estruturado.
+  - Repository layer expandido: `AccountRow` e `AccountPersistPayload` incluem `historico`, query em `getAccounts()` persistência fire-and-forget.
+  - UI local-first: `localHistorico` como fonte de verdade, editor modal com 4 campos (data, tipo, descricao, icone).
+  - Validação defensiva: Guard clause bloqueia persistência se tipo ou descricao vazios.
+  - Timeline integrada: Display combinado de `sessionLogs` (local) + `localHistorico` (remoto).
+  - Separação: `sessionLogs` intocado, `historico` persiste separadamente em Supabase.
+  - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
+  - Publicação: commit `d3ed9d9` em `origin/main`.
+
 - ✅ Recorte 48 (Funcional): Leitura Estruturada da Conta (E17)
   - Ciclo completo de leitura, merge e escrita defensiva dos blocos estruturados: `leituraFactual`, `leituraInferida`, `leituraSugerida`.
   - Repository layer expandido: query defensiva em `getAccounts()`, fallback para mock, persistência fire-and-forget.
@@ -92,10 +102,10 @@
   - Publicação: commit `569c665` em `origin/main`.
 
 ## O que está pendente
-- Definição do Recorte 49 pelo Orquestrador.
+- Definição do Recorte 50 pelo Orquestrador.
 
 ## Próximo Passo Exato
-Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 49.
+Prosseguir Fase E — Supabase Migration & Scale. Próximo passo: definição do Recorte 50.
 
 ---
-*Último estado funcional confiável: Recorte 48 (`569c665`)*
+*Último estado funcional confiável: Recorte 49 (`d3ed9d9`)*
