@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-12 (Recorte 51 — último marco funcional: 15b6371)
+ `main` — sincronizada em 2026-04-13 (Recorte 56 — último marco funcional: 81447b4)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída - Último Recorte: Recorte 52 — Fechamento Canônico)
+**Fase E — Supabase Migration & Scale** (Concluída - Recortes 53–56: Camada de priorização derivada pós-Fase E integrada)
 
 ---
 
@@ -473,7 +473,10 @@
 - **Recorte 48:** Concluído. Supabase E17: Leitura Estruturada da Conta. Implementação de leitura, merge defensivo e escrita atômica dos blocos `leituraFactual`, `leituraInferida` e `leituraSugerida`. Repository layer expandido em `accountsRepository.ts` com query defensiva e fallback para mock. UI local-first com editor modal mínimo em `AccountDetailView.tsx`. Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist. Publicação: commit `569c665`.
 - **Recorte 51:** Concluído. Supabase E20: Canais e Campanhas. Implementação completa de leitura, merge defensivo e escrita defensiva atômica para `canaisCampanhas`. Repository layer: `AccountRow` e `AccountPersistPayload` expandidos, `getAccounts()` query com merge defensivo em cascata. UI: estado local-first `localCanaisCampanhas`, editor modal com input para `origemPrincipal` e textarea para `influenciasJson`. Validação: `JSON.parse()` com try/catch como barreira canônica, validação de shape (canal, campanha, tipo, impacto, data). Publicação: commit `15b6371`.
 - **Recorte 52:** Concluído (Documental). Fechamento Canônico da Fase E. Reconciliação factual dos documentos operacionais para eliminar inconsistências entre mapa, checkpoint e decisões. Correção: remoção de linha inconsistente sobre `tipoEstrategico`/`playAtivo` em ABX no resumo de cobertura. Clarificação terminológica: campos com cobertura Supabase especializada via repositories independentes vs. campos sem persistência.
-- **Próximo passo:** Aguardando direcionamento do Orquestrador para próxima frente macro a definir.
+- **Recorte 53:** Concluído. Scoring Derivado e Priorização de Contas. Implementação de `calculateAccountScore()` em `scoringRepository.ts` com 5 dimensões (potencial, risco, prontidão, cobertura, confiança). Derivação em leitura sem persistência. Helpers: `isContaCritica()`, `isAltaPrioridade()`. Publicação: commit `1825db0`.
+- **Recorte 54:** Concluído. Triagem Operacional Baseada em Score. Grid 4-cards em Overview.tsx (Críticas, Altas Prioridades, Alto Potencial/Baixa Cobertura, Top Oportunidades) com categorização automática por score. Integração em Actions.tsx. Publicação: commit `fc1923f`.
+- **Recorte 55:** Concluído. Próxima Melhor Ação Derivada por Score. Implementação de `deriveProximaMelhorAcao()` e `deriveMotivoDaRecomendacao()` em `scoringRepository.ts` com lógica determinística. Recomendação baseada em análise de score. Publicação: commit `b328523`.
+- **Recorte 56:** Concluído. Geração de Ação Operacional a partir da Recomendação. Implementação de `deriveAcaoOperacional()` transformando score em ActionItem estruturado. Botões em AccountDetailView e Overview cards. Ação entra na fila operacional local via `createAction()` com `sourceType: 'score-derivada'`. Publicação: commit `81447b4`.
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**

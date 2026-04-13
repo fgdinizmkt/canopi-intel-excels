@@ -1032,3 +1032,53 @@ Ao implementar leitura-escrita defensiva para `canaisCampanhas` (objeto aninhado
 **Benefício arquitetural:** E20 estabelece o padrão para campos cujos valores são estruturas complexas exigindo edição textual. Ao mover validação para o momento de save (não onChange), evita normalização silenciosa de dados inválidos e oferece ao usuário feedback explícito sobre a causa de rejeição. A barreira JSON.parse centralizada oferece consistência e clareza: "se parse passa, dados são estruturalmente válidos". O padrão é replicável para qualquer campo armazenado como JSON em Supabase (ex: metadata, configurações, hipoteses estruturadas).
 
 **Commits:** `15b6371` (E20 implementação defensiva com barreira canônica JSON.parse em handleSaveCanaisCampanhas)
+
+---
+
+### 9. Scoring Derivado em Leitura (Recortes 53–56)
+
+**Contexto (Pós-Fase E):**
+Recortes 53–56 implementam operacionalização em leitura: transformação de dados de conta em triagem automática e geração de ação operacional. Política: derivação em leitura sem persistência nova, sem schema novo, apenas lógica determinística.
+
+**Status Documental:** Decisão consolidada com funcionalidade publicada em commits `1825db0`, `fc1923f`, `b328523`, `81447b4`. Documentação em reconciliação (Recorte 57).
+
+**Padrão (Recortes 53–56):**
+
+**Recorte 53 — Scoring Derivado:**
+- `calculateAccountScore(account: Conta): ScoringResult` em `scoringRepository.ts` calcula score em leitura com 5 dimensões: `{ potencial, risco, prontidao, cobertura, confianca }`.
+- Cada dimensão é `ScoreDimension` com `{ name, score: 0-100, rationale, signals }`.
+- Resultado inclui `scoreTotal`, `prioridade` ('crítica' | 'alta' | 'média' | 'baixa'), `avisos[]`.
+- Nenhum dado de conta é modificado; é transformação de dados existentes para score.
+- Helpers: `isContaCritica()`, `isAltaPrioridade()`, `getPrincipalAviso()`.
+
+**Recorte 54 — Triagem Operacional:**
+- Grid 4-cards em Overview.tsx categoriza contas por score: Críticas, Altas Prioridades, Alto Potencial/Baixa Cobertura, Top Oportunidades.
+- Integração em Actions.tsx com as mesmas categorias.
+- Categorização é determinística baseada em score.
+
+**Recorte 55 — Próxima Melhor Ação Derivada:**
+- `deriveProximaMelhorAcao(account, score): string` retorna recomendação de ação baseada em análise de score.
+- `deriveMotivoDaRecomendacao(account, score): string` retorna contexto explicativo.
+- Lógica é determinística, baseada em dados de conta e score.
+- Bloco "Próxima Melhor Ação" em AccountDetailView exibe recomendação + motivo.
+
+**Recorte 56 — Geração de Ação Operacional:**
+- `deriveAcaoOperacional(account, score)` transforma score em ActionItem estruturado: `{ title, description, priority, category, expectedImpact, nextStep, sourceType: 'score-derivada' }`.
+- Botão "Gerar Ação Operacional" em AccountDetailView + botões "Ação" em todos 4 cards de triagem chamam `createAction()` com ActionItem derivado.
+- Ação entra na fila operacional local via `AccountDetailContext.createAction()` com `sourceType: 'score-derivada'` para rastreamento.
+- Schema: `ActionItem.sourceType` estendido em `accountsData.ts` para incluir `'score-derivada'`.
+
+**Padrão Arquitetural:**
+- **Determinismo:** Cada etapa (score → triagem → ação → geração) é função pura com lógica rastreável.
+- **Zero persistência:** Scoring derivado em leitura sem escrever em Supabase.
+- **Rastreabilidade:** `sourceType: 'score-derivada'` marca ações geradas por derivação vs. manuais.
+- **Cadeia completa:** Score (5 dimensões) → Triagem (4 categorias) → Próxima Ação (recomendação) → Ação Operacional (entra na fila local).
+
+**Publicados (Funcionalidade):**
+- Commit `1825db0` — feat(recorte 53): adiciona scoring derivado e priorização de contas
+- Commit `fc1923f` — feat(recorte 54): adiciona triagem operacional baseada em score
+- Commit `b328523` — feat(recorte 55): adiciona próxima melhor ação derivada por score
+- Commit `81447b4` — feat(recorte 56): gera ação operacional a partir da recomendação
+
+**Decisão de Nomenclatura:**
+Recortes 53–56 não formam "Fase F". Caracterizados como **"Camada de Priorização Derivada"** — operacionalização de leitura sobre base Fase E, sem persistência nova, apenas transformação determinística de dados em ação.

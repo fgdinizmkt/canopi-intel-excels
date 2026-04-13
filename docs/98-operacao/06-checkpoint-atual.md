@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 52 (Fechamento Canônico da Fase E) Concluído
+# Checkpoint Atual — Recorte 56 (Geração de Ação Operacional) Publicado
 
 ## Estado de Partida
-- **Branch:** `main` (sincronizada)
-- **Marco:** Recorte 52 Concluído (Documental)
-- **Status da Infra:** Fase E (E1–E20) funcional consolidada. Documentação operacional reconciliada. Arquitetura de persistência local-first + fire-and-forget implementada e replicável. Campos sem cobertura Supabase formalizados. Pronto para próxima fase macro.
+- **Branch:** `main` (sincronizada em 2026-04-13)
+- **Marco Funcional:** Recorte 56 publicado em origin/main
+- **Status da Infra:** Fase E (E1–E20) funcional consolidada. Recortes 53–56 implementados: scoring derivado em leitura (5 dimensões), triagem operacional determinística, próxima melhor ação derivada, geração de ação operacional. Sem persistência nova, sem schema novo.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -119,12 +119,43 @@
   - Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist.
   - Publicação: commit `15b6371` em `origin/main`.
 
+## 2. Recortes Publicados Pós-Fase E
+
+- ✅ Recorte 53 (Funcional): Scoring Derivado e Priorização de Contas
+  - Implementação de `calculateAccountScore()` em `scoringRepository.ts` com 5 dimensões: potencial, risco, prontidão, cobertura, confiança.
+  - Funções auxiliares: `isContaCritica()`, `isAltaPrioridade()`, `getPrincipalAviso()` com lógica pura e determinística.
+  - Triagem operacional integrada em Overview.tsx e Actions.tsx.
+  - Sem persistência nova, sem schema novo — apenas derivação em leitura.
+  - Publicação: commit `1825db0` em `origin/main`.
+
+- ✅ Recorte 54 (Funcional): Triagem Operacional Baseada em Score
+  - Grid 4-cards em Overview.tsx: Contas Críticas, Altas Prioridades, Alto Potencial/Baixa Cobertura, Top Oportunidades.
+  - Categorização automática por score com cálculo determinístico.
+  - Integração em Actions.tsx com as mesmas categorias de triagem.
+  - Publicação: commit `fc1923f` em `origin/main`.
+
+- ✅ Recorte 55 (Funcional): Próxima Melhor Ação Derivada por Score
+  - Implementação de `deriveProximaMelhorAcao()` e `deriveMotivoDaRecomendacao()` em `scoringRepository.ts`.
+  - Recomendação determinística baseada em análise pura de score (sem ML/NLP).
+  - Lógica: risco crítico → prontidão alta → prioridade geral → padrão.
+  - Bloco "Próxima Melhor Ação" em AccountDetailView exibindo recomendação e motivo.
+  - Publicação: commit `b328523` em `origin/main`.
+
+- ✅ Recorte 56 (Funcional): Geração de Ação Operacional a partir da Recomendação
+  - Implementação de `deriveAcaoOperacional()` em `scoringRepository.ts` transformando score em ActionItem estruturado.
+  - Botão "Gerar Ação Operacional" em AccountDetailView bloco "Próxima Melhor Ação".
+  - Botões "Ação" em todos 4 cards de triagem em Overview.tsx (Críticas, Altas Prioridades, Alto Potencial, Top Oportunidades).
+  - Ação gerada entra na fila operacional local via `createAction()` com `sourceType: 'score-derivada'`.
+  - Extensão de `ActionItem.sourceType` para incluir `'score-derivada'` em `accountsData.ts`.
+  - Publicação: commit `81447b4` em `origin/main`.
+
 ## O que está pendente
-- Nenhum recorte em andamento. Fase E encerrada canonicamente.
+- Reconciliação documental pós-Recortes 53–56 (Recorte 57, em proposta).
+- Nenhum recorte novo em andamento.
 
 ## Próximo Passo Exato
-Aguardar direcionamento do Orquestrador para próxima frente macro a definir.
+Aprovação de Recorte 57 (reconciliação documental) ou direcionamento para próxima frente macro.
 
 ---
-*Último estado funcional confiável: Recorte 51 (`15b6371`) — Funcional*
-*Último estado documental confiável: Recorte 52 — Reconciliação e Fechamento da Fase E*
+*Último estado funcional confirmado: Recorte 56 (`81447b4`) — Geração de Ação Operacional a partir da Recomendação*
+*Documentação: Proposta de Recorte 57 (reconciliação de 00-status-atual, 03-log-de-sessoes, 06-checkpoint, 02-decisoes-arquiteturais) aguardando aprovação*

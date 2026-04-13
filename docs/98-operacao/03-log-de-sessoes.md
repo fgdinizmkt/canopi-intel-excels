@@ -5,6 +5,38 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-13] — Recortes 53–56: Camada de Priorização Derivada — Publicados
+
+**Contexto:** Quatro recortes publicados em origin/main (commits `1825db0`, `fc1923f`, `b328523`, `81447b4`). Documentação operacional aguardando reconciliação (Recorte 57, em proposta).
+
+**Recorte 53 — Scoring Derivado e Priorização de Contas**
+- **Código:** `calculateAccountScore()` em `scoringRepository.ts` com 5 dimensões: potencial, risco, prontidão, cobertura, confiança.
+- **Helpers:** `isContaCritica()`, `isAltaPrioridade()`, `getPrincipalAviso()`.
+- **Política:** Derivação em leitura, sem persistência, sem schema novo.
+- **Commit publicado:** `1825db0`
+
+**Recorte 54 — Triagem Operacional Baseada em Score**
+- **Código:** Grid 4-cards em Overview.tsx (Críticas, Altas Prioridades, Alto Potencial/Baixa Cobertura, Top Oportunidades).
+- **Integração:** Actions.tsx com as mesmas categorias.
+- **Commit publicado:** `fc1923f`
+
+**Recorte 55 — Próxima Melhor Ação Derivada por Score**
+- **Código:** `deriveProximaMelhorAcao()` e `deriveMotivoDaRecomendacao()` em `scoringRepository.ts`.
+- **Lógica:** Determinística, baseada em análise de score e dados de conta.
+- **UI:** Bloco "Próxima Melhor Ação" em AccountDetailView.
+- **Commit publicado:** `b328523`
+
+**Recorte 56 — Geração de Ação Operacional a partir da Recomendação**
+- **Código:** `deriveAcaoOperacional()` em `scoringRepository.ts` transformando score em ActionItem.
+- **UI:** Botão "Gerar Ação Operacional" em AccountDetailView + botões "Ação" em todos 4 cards de triagem.
+- **Integração:** Ação entra na fila operacional local via `createAction()` com `sourceType: 'score-derivada'`.
+- **Schema:** Extensão de `ActionItem.sourceType` em `accountsData.ts`.
+- **Commit publicado:** `81447b4`
+
+**Quadro Técnico:** Quatro recortes consolidam cadeia operacional determinística: Score (5 dimensões) → Triagem Operacional (4 categorias) → Próxima Ação (recomendação) → Ação Operacional (entra na fila local). Sem persistência Supabase, sem ML/NLP, lógica pura e rastreável.
+
+---
+
 ## [2026-04-12] — Recorte 51 (Supabase E20): Canais e Campanhas — Concluído
 
 - **Fase:** Fase E — Supabase Migration & Scale.
