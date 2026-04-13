@@ -12,7 +12,7 @@ import {
 import { contasMock, ContatoConta, SinalConta, OportunidadeConta, Conta } from '../../data/accountsData';
 import { persistOportunidade } from '../../lib/oportunidadesRepository';
 import { persistAccount, getAccounts } from '../../lib/accountsRepository';
-import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from '../../lib/scoringRepository';
+import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../../lib/scoringRepository';
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
@@ -639,7 +639,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
           )}
 
-          {/* Próxima Melhor Ação (Recorte 55 — F3) */}
+          {/* Próxima Melhor Ação (Recorte 55 — F3) + Geração de Ação (Recorte 56 — F4) */}
           {accountScore && (
             <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 p-5 rounded-2xl border border-blue-700/40 space-y-3">
               <div className="flex items-start gap-3">
@@ -647,7 +647,29 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xs font-black text-blue-300 uppercase tracking-widest mb-1">Próxima Melhor Ação</h3>
                   <p className="text-sm font-bold text-slate-100 mb-2">{deriveProximaMelhorAcao(account, accountScore)}</p>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{deriveMotivoDaRecomendacao(account, accountScore)}</p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed mb-3">{deriveMotivoDaRecomendacao(account, accountScore)}</p>
+                  <button
+                    onClick={() => {
+                      const acaoEstruturada = deriveAcaoOperacional(account, accountScore);
+                      createAction({
+                        title: acaoEstruturada.title,
+                        description: acaoEstruturada.description,
+                        priority: acaoEstruturada.priority,
+                        category: acaoEstruturada.category,
+                        accountName: account.nome,
+                        accountContext: `${account.segmento} · ${account.vertical}`,
+                        expectedImpact: acaoEstruturada.expectedImpact,
+                        nextStep: acaoEstruturada.nextStep,
+                        sourceType: acaoEstruturada.sourceType,
+                        relatedAccountId: account.id,
+                      });
+                      setShowFeedback('✓ Ação operacional criada e adicionada à fila.');
+                      setTimeout(() => setShowFeedback(null), 3000);
+                    }}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors"
+                  >
+                    Gerar Ação Operacional
+                  </button>
                 </div>
               </div>
             </div>

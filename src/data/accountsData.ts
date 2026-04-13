@@ -110,7 +110,7 @@ export interface ActionItem {
   projectSteps: ProjectStep[];
   buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
   
-  sourceType?: "manual" | "signal" | "playbook";
+  sourceType?: "manual" | "signal" | "playbook" | "score-derivada";
   playbookName?: string;
   playbookRunId?: string;
   playbookStepId?: string;

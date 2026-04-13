@@ -8,11 +8,11 @@ import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreH
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
-import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from '../lib/scoringRepository';
+import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
 export const Overview: React.FC = () => {
-  const { openAccount } = useAccountDetail();
+  const { openAccount, createAction } = useAccountDetail();
 
   // ─── DERIVAÇÃO MEMOIZADA DE SINAIS (Nível de Severidade) ───────────────
   const { criticosSinais, alertasSinais, oportunidadesSinais, resolvedosSinais, topSignal, saudeOperacional, topPrioridades } = useMemo(() => {
@@ -363,12 +363,12 @@ export const Overview: React.FC = () => {
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.criticas.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.criticas.map(x => (
-                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
-                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 transition-all">
+                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-red-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
-                    {getPrincipalAviso(x.score) && <span className="text-[8px] text-red-600">{getPrincipalAviso(x.score)?.split(' ')[0]}</span>}
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-red-600 hover:text-red-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -381,12 +381,12 @@ export const Overview: React.FC = () => {
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altasPrio.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.altasPrio.map(x => (
-                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
-                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 transition-all">
+                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-amber-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <span className="text-[8px] bg-amber-200/30 px-1 py-0.5 rounded text-amber-700 font-semibold">{x.score.prioridade}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-amber-600 hover:text-amber-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -399,12 +399,12 @@ export const Overview: React.FC = () => {
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altoPotencialBaixaCobertura.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.altoPotencialBaixaCobertura.map(x => (
-                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
-                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 transition-all">
+                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-blue-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
-                    <span className="text-[10px] text-slate-600">Cob. {x.score.cobertura.score}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-blue-600 hover:text-blue-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -417,12 +417,12 @@ export const Overview: React.FC = () => {
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.topOportunidades.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.topOportunidades.map(x => (
-                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 cursor-pointer transition-all" onClick={() => openAccount(x.conta.id)}>
-                  <p className="text-[11px] font-semibold text-slate-900">{x.conta.nome}</p>
+                <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 transition-all">
+                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-emerald-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
-                  <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <span className="text-[9px] text-slate-600">{x.conta.oportunidades?.length || 0} oport.</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-emerald-600 hover:text-emerald-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}

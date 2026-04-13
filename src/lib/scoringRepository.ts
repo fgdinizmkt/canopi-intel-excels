@@ -349,6 +349,41 @@ export function deriveProximaMelhorAcao(account: Conta, score: ScoringResult): s
 }
 
 /**
+ * Estrutura uma ação operacional a partir da recomendação derivada
+ * Retorna objeto que pode ser passado a createAction
+ */
+export function deriveAcaoOperacional(
+  account: Conta,
+  score: ScoringResult
+): {
+  title: string;
+  description: string;
+  priority: 'Crítica' | 'Alta' | 'Média' | 'Baixa';
+  category: string;
+  expectedImpact: string;
+  nextStep: string;
+  sourceType: 'score-derivada';
+} {
+  const acao = deriveProximaMelhorAcao(account, score);
+  const motivo = deriveMotivoDaRecomendacao(account, score);
+
+  return {
+    title: acao,
+    description: motivo,
+    priority:
+      score.prioridade === 'crítica'
+        ? 'Crítica'
+        : score.prioridade === 'alta'
+          ? 'Alta'
+          : 'Média',
+    category: 'Score-Derivada',
+    expectedImpact: `Executar recomendação: ${acao}. Resultado esperado: avanço no engajamento da conta ${account.nome}.`,
+    nextStep: `Revisar recomendação e executar: ${acao}`,
+    sourceType: 'score-derivada',
+  };
+}
+
+/**
  * Deriva o motivo/contexto da recomendação
  * Retorna string curta explicando por quê
  */
