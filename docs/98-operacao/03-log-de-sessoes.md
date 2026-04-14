@@ -5,6 +5,55 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-14] — Frente de Restauração Funcional Crítica & Publicação
+
+- **Natureza:** Sessão funcional + documental. Dois commits publicados em origin/main. Working tree zerada.
+- **Objetivo:** Restaurar operação crítica de Accounts afetada por dataset parcial do Supabase. Implementar fallback defensivo com validação multi-critério.
+
+**Contexto do Problema Identificado:**
+- Symptoma operacional: Accounts exibindo apenas 2 contas, perdendo informação útil
+- Causa raiz: `getAccounts()` aceitava dataset vindo do Supabase mesmo que parcial/incompleto
+- Impacto: Página inoperante para gestão estratégica
+
+**Frente 1: Null-Safe Defensive Rendering (Commit `3ac7938`)**
+- **Escopo:** `src/pages/Accounts.tsx` e `src/pages/Overview.tsx`
+- **Mudanças:**
+  - `getInitials(name?: string)` helper com triple fallback: `||''`, `.toUpperCase()`, `||'??'`
+  - 7x `.substring(0,2)` substituído por `getInitials()` (defensiva contra nulo)
+  - `getAccountContext(conta)` helper para contexto seguro (segmento/vertical)
+  - Proteção `(c.nome || '')` antes de `.toLowerCase()` em filtro
+  - 4x fallback `accountName || 'Conta'` em `createAction()`
+- **Benefício:** Elimina crash runtime de campos nulos/undefined
+- **Commit:** `3ac7938` — `fix(ui): add null-safe defensive rendering in accounts and overview`
+- **Status:** ✅ Publicado em origin/main (via commit documental `8cb9d31`)
+
+**Frente 2: Fallback Defensivo de Volumetria & Integridade (Commit `915a2ba`)**
+- **Escopo:** `src/lib/accountsRepository.ts`
+- **Mudanças:**
+  - Validação de volumetria: rejeita dataset com < 20 contas
+  - Validação de integridade: rejeita se > 10% faltam `nome` ou `slug`
+  - Restauração automática de `contasMock` com warning descritivo no console
+- **Benefício:** Restaura operação canônica quando Supabase retorna dataset parcial/corrompido
+- **Impacto:** Accounts volta a operar com base estratégica válida, nunca mais com dados degradados
+- **Commit:** `915a2ba` — `feat(accounts): implement defensive fallback for insufficient/corrupted supabase dataset`
+- **Status:** ✅ Publicado em origin/main
+
+**Decisões Técnicas Consolidadas:**
+- Fallback defensivo não é máscara — valida qualidade antes de usar
+- Limiares (20 contas, 10% corrupção) são métricas explícitas do briefing, não arbitrárias
+- Read-only defensiveness, zero mutação, zero alteração de persistência
+- Console logging claro para rastreamento de fallbacks acionados
+
+**Estado Final:**
+- Local e `origin/main` 100% alinhados (commit `915a2ba`)
+- Working tree limpo (nenhuma modificação)
+- Dois commits publicados nesta sessão: `3ac7938` + `915a2ba`
+- Documentação operacional atualizada
+
+**Status:** ✅ Frente de Restauração Funcional Crítica concluída e publicada. Accounts operacional.
+
+---
+
 ## [2026-04-14] — Reconciliação de Memória Operacional & Handoff
 
 - **Natureza:** Sessão puramente documental e de auditoria. Nenhum arquivo de `src/` alterado.

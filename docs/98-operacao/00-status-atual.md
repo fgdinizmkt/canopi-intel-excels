@@ -1,10 +1,23 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-14 (HEAD: `8762ae4` — Refinamento Accounts subetapas 1–4c)
+ `main` — sincronizada em 2026-04-14 (HEAD: `915a2ba` — Defensive fallback para dataset insuficiente/corrompido)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c)
+**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo)
+
+---
+
+### MARCO: Fallback Defensivo para Dataset Insuficiente/Corrompido - 2026-04-14
+**Status: Publicado (Commit `915a2ba`)**
+
+- **Função alterada:** `getAccounts()` em `src/lib/accountsRepository.ts`
+- **Validação implementada:** 
+  1. **Volumetria:** Rejeita dataset com < 20 contas (mínimo para operação estratégica)
+  2. **Integridade:** Rejeita se > 10% dos registros faltam `nome` ou `slug` (identidade crítica)
+- **Comportamento:** Automaticamente restaura `contasMock` com warning no console quando dataset é insuficiente/corrompido
+- **Escopo:** Puro read-only, sem mutação de dados, sem alteração de persistência
+- **Impacto operacional:** Elimina risco de Accounts operar com base parcial. Sistema agora valida qualidade do dataset antes de usar, garantindo que sempre funciona com base canônica válida.
 
 ---
 
