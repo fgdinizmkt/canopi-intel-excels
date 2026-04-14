@@ -16,6 +16,10 @@ import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMo
 import { OrganogramNode } from './OrganogramNode';
 import { ContactDetailProfile } from './ContactDetailProfile';
 import { useAccountDetail } from '../../context/AccountDetailContext';
+import { getInteractionsByAccount } from '../../lib/interactionsRepository';
+import { getPlayRecommendationsByAccount } from '../../lib/playRecommendationsRepository';
+import { getCampaignsMap } from '../../lib/campaignsRepository';
+import { Interaction, PlayRecommendation, Campaign } from '../../../scripts/seed/buildBlockCSeed';
 
 interface AccountDetailViewProps {
   accountId: string;
@@ -48,6 +52,9 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 }) => {
   // ── ESTADO DE DADOS CONSOLIDADO (RECORTE 47: Read Path Fechado) ──
   const [liveAccount, setLiveAccount] = useState<Conta | null>(null);
+  const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const [playRecommendations, setPlayRecommendations] = useState<PlayRecommendation[]>([]);
+  const [campaignsMap, setCampaignsMap] = useState<Record<string, Campaign>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   React.useEffect(() => {
@@ -55,10 +62,19 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     async function load() {
       setIsLoading(true);
       try {
-        const all = await getAccounts();
-        const found = all.find(c => c.id === accountId);
-        if (found && active) {
-          setLiveAccount(found);
+        const [allAccounts, allInteractions, allPlays, allCampaigns] = await Promise.all([
+          getAccounts(),
+          getInteractionsByAccount(accountId),
+          getPlayRecommendationsByAccount(accountId),
+          getCampaignsMap()
+        ]);
+
+        const found = allAccounts.find(c => c.id === accountId);
+        if (active) {
+          if (found) setLiveAccount(found);
+          setInteractions(allInteractions);
+          setPlayRecommendations(allPlays);
+          setCampaignsMap(allCampaigns);
         }
       } catch (e) {
         console.error('[AccountDetailView] Falha crítica no read path:', e);
@@ -1456,6 +1472,43 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             ) : <div className="p-8 border border-slate-800 text-center text-xs italic text-slate-600">Nenhum contato mapeado.</div>}
           </div>
 
+          {/* Plays Recomendados (Canopi AI) — RECORTE BLOCO C */}
+          {playRecommendations.length > 0 && (
+            <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/60 p-5 rounded-2xl border border-blue-500/20 shadow-xl">
+              <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+                <SparkleIcon className="w-4 h-4 animate-pulse" /> Recomendações Estratégicas (Canopi AI)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {playRecommendations.map(play => (
+                  <div key={play.id} className="p-4 bg-slate-900/60 rounded-xl border border-slate-700/50 hover:border-blue-500/30 transition-all group">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter ${
+                        play.playType === 'expansion' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                        play.playType === 'entry' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                        'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      }`}>
+                        {play.playType}
+                      </span>
+                      <span className="text-xs font-black text-blue-500">{play.confidenceScore}% fit</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-100 mb-2 group-hover:text-blue-400 transition-colors uppercase italic">{play.playName}</h4>
+                    <p className="text-[11px] text-slate-400 leading-relaxed mb-4">{play.rationale}</p>
+                    <div className="flex flex-col gap-2 pt-3 border-t border-slate-800">
+                      <div className="flex justify-between text-[9px] font-black uppercase tracking-tight">
+                        <span className="text-slate-500">Valor Estimado</span>
+                        <span className="text-emerald-400">{fmt(play.estimatedValue)}</span>
+                      </div>
+                      <div className="flex justify-between text-[9px] font-black uppercase tracking-tight">
+                        <span className="text-slate-500">Próximo Passo</span>
+                        <span className="text-blue-400">{play.nextStepDescription}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Histórico e Sinais (RESTAURADOS ao nível de riqueza do Recorte 25) */}
           <div className={`grid gap-6 ${isFullscreen ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
@@ -1472,8 +1525,20 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       descricao: text,
                       icone: 'LogsIcon'
                     })),
+                    ...interactions.map(int => ({
+                      tipo: `Interação (${int.channel})`,
+                      data: int.date,
+                      descricao: `${int.interactionType.toUpperCase()}: ${int.description}${int.campaignId && campaignsMap[int.campaignId] ? ` [via ${campaignsMap[int.campaignId].name}]` : ''}`,
+                      icone: (int.interactionType === 'call' || int.interactionType === 'meeting' || int.interactionType === 'demo') ? 'Activity' : 
+                             (int.interactionType === 'email_open' || int.interactionType === 'email_click') ? 'Mail' : 
+                             int.interactionType === 'visit' ? 'Globe' : 'Clock'
+                    })),
                     ...localHistorico.map(h => ({ ...h, tipo: h.tipo as any }))
-                  ];
+                  ].sort((a, b) => {
+                    if (a.data === 'Agora') return -1;
+                    if (b.data === 'Agora') return 1;
+                    return b.data.localeCompare(a.data);
+                  });
                   return combined.map((h, i) => {
                     const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : h.icone === 'LogsIcon' ? LogsIcon : HistoryIcon;
                     return (
