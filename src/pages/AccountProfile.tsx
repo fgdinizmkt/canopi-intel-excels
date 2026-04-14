@@ -379,7 +379,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {account.contatos.sort((a,b) => b.influencia - a.influencia).map(c => (
-                          <tr key={c.id} className="group hover:bg-slate-800/30 transition-all cursor-pointer" onClick={() => (window as any).location.href=`/contas/${slug}/contato/${c.id}`}>
+                          <tr key={c.id} className="group hover:bg-slate-800/30 transition-all">
                             <td className="py-4">
                               <p className="text-sm font-bold text-slate-200 group-hover:text-brand transition-colors">{c.nome}</p>
                               <p className="text-[10px] text-slate-500 font-medium">{c.cargo}</p>

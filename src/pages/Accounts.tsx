@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search, ExternalLink } from 'lucide-react';
+import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search, ExternalLink, ArrowUpRight } from 'lucide-react';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { calculateAccountScore } from '../lib/scoringRepository';

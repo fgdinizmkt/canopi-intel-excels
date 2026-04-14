@@ -764,7 +764,8 @@ export const Overview: React.FC = () => {
                         )}
                      </div>
                   </div>
-                </div>
+                  </div>
+                </Link>
               ))}
               <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-600 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc&blocoCInteracoes=recente&blocoCPlays=com'}>Ver Ranking de Engajamento</Button>
             </div>
