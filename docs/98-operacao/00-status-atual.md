@@ -1,10 +1,10 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-14 (Recorte 60 — último marco funcional: ee3957f)
+ `main` — sincronizada em 2026-04-14 (HEAD: `8762ae4` — Refinamento Accounts subetapas 1–4c)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída: Accounts & Contacts Deep-Profile Parity Aprovada)
+**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c)
 
 ---
 
