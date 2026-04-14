@@ -761,6 +761,16 @@ export interface Conta {
   };
   tecnografia: string[];
   historico: { data: string; tipo: string; descricao: string; icone?: string }[];
+  /** Prioridade Macro de Atendimento (E14) */
+  prioridadeMacro?: 'Crítica' | 'Alta' | 'Média' | 'Baixa';
+  prioridadeRationale?: string;
+  /** Portfólio de Soluções e Expansão (E14) */
+  portfolio?: {
+     ativa: string[];
+     negociacao: string[];
+     risco: string[];
+     whitespace: string[];
+  };
   /** Reconciliação explícita: status operacional da conta para métricas */
   reconciliationStatus?: 'ativa' | 'seed' | 'prospecting' | 'orfã' | 'vazia';
 }
@@ -793,6 +803,14 @@ export const contasMock: Conta[] = [
     ct: 72,
     ft: 90,
     budgetBrl: 3200000,
+    prioridadeMacro: 'Alta',
+    prioridadeRationale: 'Oportunidade de renovação multi-unidade iminente com risco de sponsor técnico.',
+    portfolio: {
+       ativa: ['Suíte Analytics Operational', 'Sensor Core v2'],
+       negociacao: ['Módulo Preditivo Logística', 'Expansão Unidade Sul'],
+       risco: ['Suíte Analytics Operational (Vence em 60 dias)'],
+       whitespace: ['Canopi AI Autonomous', 'Dashboard de Governança ESG']
+    },
     oportunidadePrincipal: 'Renovação multi-unidade 2026',
     possuiOportunidade: true,
     proximaMelhorAcao: 'Executar reunião executiva com VP de Operações e Sponsor de TI.',

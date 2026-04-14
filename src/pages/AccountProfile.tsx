@@ -319,43 +319,92 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
         <aside className="col-span-4 space-y-6">
           {/* Identity & Structure */}
           <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider ${account.statusGeral === 'Saudável' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
-                {account.statusGeral}
-              </span>
-              <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                 <Building2 className="w-3 h-3" /> {account.porte}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col gap-1">
+                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Vertical Estratégica</span>
+                 <h2 className="text-2xl font-black text-white italic tracking-tighter">{account.vertical}</h2>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Potencial Growth</span>
+                 <span className="text-2xl font-black text-emerald-400">{account.potencial}%</span>
               </div>
             </div>
             
-            <div className="space-y-6">
-              <div>
-                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                   <Target className="w-3 h-3" /> Tipo Estratégico
-                </p>
-                <p className="text-sm font-bold text-slate-200 uppercase">{account.tipoEstrategico}</p>
-              </div>
+            <div className="grid grid-cols-2 gap-4 mb-8 pt-4 border-t border-slate-800">
+               <div>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                     <Target className="w-3 h-3" /> Modelo de Atendimento
+                  </p>
+                  <p className="text-xs font-bold text-slate-300 uppercase">{account.tipoEstrategico}</p>
+               </div>
+               <div>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                     <Building2 className="w-3 h-3" /> Porte Corporativo
+                  </p>
+                  <p className="text-xs font-bold text-slate-300 uppercase">{account.porte}</p>
+               </div>
+            </div>
 
               <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-800/50">
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Vertical</p>
-                  <p className="text-xs font-bold text-slate-100">{account.vertical}</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Status Geral</p>
+                  <p className={`text-xs font-bold uppercase ${account.statusGeral === 'Saudável' ? 'text-emerald-400' : 'text-amber-400'}`}>{account.statusGeral}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Budget BRL</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Budget Comercial</p>
                   <p className="text-xs font-bold text-emerald-400">{fmt(account.budgetBrl)}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Atividade</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Atividade Recente</p>
                   <p className={`text-xs font-bold ${account.atividadeRecente === 'Alta' ? 'text-emerald-400' : 'text-blue-500'}`}>{account.atividadeRecente}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Cobertura</p>
-                  <p className="text-xs font-bold text-blue-400">{account.coberturaRelacional}%</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Mapeamento</p>
+                  <p className="text-xs font-bold text-blue-400">{account.coberturaRelacional}% do Comitê</p>
                 </div>
               </div>
 
               <div className="pt-6 border-t border-slate-800/50">
+                 <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
+                    <span>Account Ownership</span>
+                    <Users className="w-3.5 h-3.5" />
+                 </p>
+                 <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                       <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px] font-black text-blue-400 border border-blue-500/20">
+                          {account.ownerPrincipal.substring(0,2).toUpperCase()}
+                       </div>
+                       <div>
+                          <p className="text-xs font-bold text-slate-200">{account.ownerPrincipal}</p>
+                          <p className="text-[9px] text-slate-500 font-black uppercase">Owner Principal</p>
+                       </div>
+                    </div>
+                    {account.ownersSecundarios && account.ownersSecundarios.length > 0 && (
+                       <div className="flex flex-wrap gap-2 pt-1">
+                          {account.ownersSecundarios.map(o => (
+                            <span key={o} className="px-2 py-1 bg-slate-800 text-[8px] font-black text-slate-400 rounded-md border border-slate-700 uppercase tracking-tighter">Co-owner: {o}</span>
+                          ))}
+                       </div>
+                    )}
+                 </div>
+              </div>
+
+              {/* Macro Priorização Section */}
+              <div className="pt-8 border-t border-slate-800/50">
+                 <div className="flex items-center justify-between mb-4">
+                    <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+                       <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Prioridade de Negócio
+                    </p>
+                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${account.prioridadeMacro === 'Crítica' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                       {account.prioridadeMacro || 'Normal'}
+                    </span>
+                 </div>
+                 <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+                    <p className="text-[11px] text-slate-400 leading-relaxed italic">&quot;{account.prioridadeRationale || 'Conta sob monitoramento padrão de ciclo de venda.'}&quot;</p>
+                 </div>
+              </div>
+
+              <div className="pt-8 border-t border-slate-800/50">
                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
                     <span>Priorização Baseada em Racional</span>
                     <TrendingUp className="w-3.5 h-3.5" />
@@ -377,6 +426,53 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                  </div>
                </div>
             </div>
+          </section>
+
+          {/* New: Portfólio & Expansão (E14) */}
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
+             <div className="absolute top-0 right-0 p-8 opacity-5">
+                <Database className="w-16 h-16 text-emerald-400" />
+             </div>
+             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <Database className="w-4 h-4 text-emerald-500" /> Portfólio & Contexto Comercial
+             </h3>
+             <div className="space-y-6">
+                {account.portfolio?.ativa.length ? (
+                  <div>
+                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.1em] mb-2 block">Ativo (O que já tem)</span>
+                    <div className="flex flex-wrap gap-2">
+                       {account.portfolio.ativa.map(p => <span key={p} className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded text-[9px] font-bold text-emerald-300">{p}</span>)}
+                    </div>
+                  </div>
+                ) : null}
+
+                {account.portfolio?.negociacao.length ? (
+                  <div className="pt-4 border-t border-slate-800">
+                    <span className="text-[9px] font-black text-blue-400 uppercase tracking-[0.1em] mb-2 block">Em Negociação / Pipeline</span>
+                    <div className="space-y-2">
+                       {account.portfolio.negociacao.map(p => <div key={p} className="flex items-center gap-2 text-[10px] text-slate-300 font-medium"><Plus className="w-3 h-3 text-blue-500" /> {p}</div>)}
+                    </div>
+                  </div>
+                ) : null}
+
+                {account.portfolio?.risco.length ? (
+                  <div className="pt-4 border-t border-slate-800">
+                    <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.1em] mb-2 block">Exposição de Risco (Churn)</span>
+                    <div className="space-y-2">
+                       {account.portfolio.risco.map(p => <div key={p} className="flex items-center gap-2 text-[10px] text-red-400 font-medium"><AlertTriangle className="w-3 h-3 text-red-500" /> {p}</div>)}
+                    </div>
+                  </div>
+                ) : null}
+
+                {account.portfolio?.whitespace.length ? (
+                  <div className="pt-4 border-t border-slate-800">
+                    <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.1em] mb-2 block">Oportunidade Whitespace</span>
+                    <div className="flex flex-wrap gap-2">
+                       {account.portfolio.whitespace.map(p => <span key={p} className="px-2 py-1 bg-amber-500/5 border border-amber-500/10 rounded text-[9px] font-bold text-amber-200/70">{p}</span>)}
+                    </div>
+                  </div>
+                ) : null}
+             </div>
           </section>
 
           {/* Technographics (Restored with Edit) */}
@@ -802,20 +898,25 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                       <tbody className="divide-y divide-slate-800">
                         {account.contatos.sort((a,b) => b.influencia - a.influencia).map(c => (
                           <tr key={c.id} className="group hover:bg-slate-800/30 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
-                            <td className="py-6">
-                               <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
-                                     {c.nome.substring(0,2).toUpperCase()}
-                                  </div>
-                                  <div>
-                                     <p className="text-sm font-black text-slate-100 group-hover:text-blue-400 transition-colors">{c.nome}</p>
-                                     <p className="text-[10px] font-bold text-slate-500">{c.cargo}</p>
-                                  </div>
-                               </div>
-                            </td>
-                            <td className="py-6 text-center">
-                               <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] font-black text-slate-400 uppercase border border-slate-800">{c.area}</span>
-                            </td>
+                             <td className="py-6">
+                                <div className="flex items-center gap-4">
+                                   <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
+                                      {c.nome.substring(0,2).toUpperCase()}
+                                   </div>
+                                   <div>
+                                      <p className="text-sm font-black text-slate-100 group-hover:text-blue-400 transition-colors">{c.nome}</p>
+                                      <p className="text-[10px] font-bold text-slate-500">{c.cargo}</p>
+                                   </div>
+                                </div>
+                             </td>
+                             <td className="py-6 text-center">
+                                <div className="flex flex-col items-center gap-2">
+                                   <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] font-black text-slate-400 uppercase border border-slate-800">{c.area}</span>
+                                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${c.status === 'Frio' ? 'bg-slate-800 text-slate-600' : c.status === 'Em Risco' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+                                      {c.status || 'Ativo'}
+                                   </span>
+                                </div>
+                             </td>
                             <td className="py-6 text-center">
                                <div className="flex items-center justify-center gap-4">
                                   <div className="flex flex-col items-center">
@@ -874,11 +975,29 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                           <button onClick={handleSaveLeitura} className="w-full py-4 bg-brand text-white text-[11px] font-black uppercase rounded-2xl shadow-xl shadow-brand/20">Persistir Inteligência Estruturada</button>
                        </div>
                     ) : (
-                       <div className="grid grid-cols-3 gap-8">
+                       <div className="grid grid-cols-4 gap-8">
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Factual (v6)</span>
-                             <div className="space-y-3">
+                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Origem da Conta</span>
+                             <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+                                <p className="text-xs font-black text-white italic">&quot;{account.canaisCampanhas.origemPrincipal}&quot;</p>
+                             </div>
+                             <div className="space-y-3 pt-4">
+                                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Factual (v6)</p>
                                 {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
+                             </div>
+                          </div>
+                          <div className="space-y-4">
+                             <span className="flex items-center gap-2 text-[10px] font-black text-violet-400 uppercase tracking-widest bg-violet-500/5 px-3 py-1.5 rounded-lg border border-violet-500/20 w-max">Influência de Canais</span>
+                             <div className="space-y-3">
+                                {account.canaisCampanhas.influencias.map((inf, i) => (
+                                   <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
+                                      <div className="flex items-center justify-between mb-1.5">
+                                         <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
+                                      </div>
+                                      <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
+                                      <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
+                                   </div>
+                                ))}
                              </div>
                           </div>
                           <div className="space-y-4">
