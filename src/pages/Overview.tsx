@@ -311,6 +311,16 @@ export const Overview: React.FC = () => {
     };
   }, [contasLocal, allInteractions, allPlays]);
 
+  // PRIORIDADE 3: Hotfix Runtime — Helpers defensivos para campos que podem chegar nulos
+  const getInitials = (name?: string) => (name || '').substring(0, 2).toUpperCase() || '??';
+
+  // Helper defensivo para contexto de conta (segmento · vertical)
+  const getAccountContext = (conta: any) => {
+    const seg = conta?.segmento || 'Indefinido';
+    const vert = conta?.vertical || 'Indefinido';
+    return `${seg} · ${vert}`;
+  };
+
   if (loading) {
     return <div className="p-8 text-slate-500 font-medium animate-pulse">Sincronizando inteligência executiva...</div>;
   }
@@ -453,7 +463,7 @@ export const Overview: React.FC = () => {
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-red-600 hover:text-red-700 font-bold uppercase">Ação</button>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-red-600 hover:text-red-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -473,7 +483,7 @@ export const Overview: React.FC = () => {
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-amber-600 hover:text-amber-700 font-bold uppercase">Ação</button>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-amber-600 hover:text-amber-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -493,7 +503,7 @@ export const Overview: React.FC = () => {
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-blue-600 hover:text-blue-700 font-bold uppercase">Ação</button>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-blue-600 hover:text-blue-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -513,7 +523,7 @@ export const Overview: React.FC = () => {
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome, accountContext: `${x.conta.segmento} · ${x.conta.vertical}`, expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-emerald-600 hover:text-emerald-700 font-bold uppercase">Ação</button>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-emerald-600 hover:text-emerald-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -684,7 +694,7 @@ export const Overview: React.FC = () => {
                   <div key={signal.id} className="flex items-center justify-between group cursor-pointer mb-3 pb-3 border-b border-slate-100 last:border-b-0">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500 uppercase">
-                        {signal.account.substring(0, 2)}
+                        {getInitials(signal.account)}
                       </div>
                       <div>
                         <p className="text-sm font-bold text-slate-900 group-hover:text-brand transition-colors">{signal.title}</p>
@@ -745,7 +755,7 @@ export const Overview: React.FC = () => {
                   <div className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:border-brand/30 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
-                      {item.conta.nome.substring(0, 2)}
+                      {getInitials(item.conta.nome)}
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-900 group-hover:text-brand">{item.conta.nome}</p>
@@ -778,7 +788,7 @@ export const Overview: React.FC = () => {
                 <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => openAccount(conta.id)}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-xs font-bold text-brand uppercase">
-                      {conta.nome.substring(0, 2)}
+                      {getInitials(conta.nome)}
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{conta.nome}</p>

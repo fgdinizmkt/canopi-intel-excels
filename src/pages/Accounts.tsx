@@ -60,6 +60,7 @@ const filtrosIniciais: Filtros = {
 };
 
 const toDate = (date: string) => new Date(date).getTime();
+const getInitials = (name?: string) => (name || '').substring(0, 2).toUpperCase() || '??';
 const badgeClasse = (status: Conta['statusGeral']) => status === 'Crítico' ? 'bg-rose-100 text-rose-700' : status === 'Atenção' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700';
 const riscoClasse = (risco: number) => risco >= 70 ? 'text-rose-600' : risco >= 40 ? 'text-amber-600' : 'text-emerald-600';
 
@@ -705,7 +706,7 @@ export const Accounts = () => {
                   <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-50">
                     <div className="flex items-center gap-2">
                        <div className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400">
-                          {conta.ownerPrincipal.substring(0,2).toUpperCase()}
+                          {getInitials(conta.ownerPrincipal)}
                        </div>
                        <span className="text-[10px] font-bold text-slate-500 truncate max-w-[100px]">{conta.ownerPrincipal}</span>
                     </div>
@@ -801,8 +802,8 @@ export const Accounts = () => {
           /* ── PREMIUM LIST VIEW ── */
           <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50">
             {(() => {
-              // 4C: Derivação única e higienizada para a visualização de lista
-              const listViewContas = filtradas.filter(c => c.nome.toLowerCase() !== 'operação interna');
+              // 4C: Derivação única e higienizada para a visualização de lista com Hotfix Runtime
+              const listViewContas = filtradas.filter(c => (c.nome || '').toLowerCase() !== 'operação interna');
               
               return (
                 <>
@@ -830,7 +831,7 @@ export const Accounts = () => {
                               <td className="py-5 px-4 pl-8">
                                 <div className="flex items-center gap-4">
                                   <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-[11px]">
-                                     {conta.nome.substring(0,2).toUpperCase()}
+                                     {getInitials(conta.nome)}
                                   </div>
                                   <div className="min-w-0">
                                      <div className="flex items-center gap-1.5 mb-1">
@@ -864,7 +865,7 @@ export const Accounts = () => {
                               <td className="py-5 px-4 text-slate-500 min-w-[140px]">
                                  <div className="flex items-center gap-2 leading-none text-slate-400">
                                    <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[8px] font-black">
-                                      {conta.ownerPrincipal.substring(0,2).toUpperCase()}
+                                      {getInitials(conta.ownerPrincipal)}
                                    </div>
                                    <p className="text-[10px] font-bold uppercase tracking-widest">{conta.ownerPrincipal}</p>
                                  </div>
