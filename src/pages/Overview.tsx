@@ -263,10 +263,17 @@ export const Overview: React.FC = () => {
     };
   }, []);
 
-  // ─── ABM READINESS (Contas com prontidão > 70) ──────────────────────────
-  const abmReadyAccounts = (contasLocal.length > 0 ? contasLocal : contasMock)
-    .filter(c => c.prontidao > 70 && c.playAtivo !== 'Nenhum' && c.reconciliationStatus !== 'vazia')
-    .slice(0, 2);
+  // ─── ABM READINESS (Contas com prontidão > 70 + Play Ativo do Bloco C) ───
+  const abmReadyAccounts = useMemo(() => {
+    const activeContas = contasLocal.length > 0 ? contasLocal : contasMock;
+    return activeContas
+      .filter(c => {
+        const hasBlockCPlays = allPlays.some(p => p.accountId === c.id && p.isActive);
+        return c.prontidao > 60 && hasBlockCPlays && c.reconciliationStatus !== 'vazia';
+      })
+      .sort((a, b) => b.prontidao - a.prontidao)
+      .slice(0, 2);
+  }, [contasLocal, allPlays]);
 
   // ─── BLOCO C EXECUTIVE SIGNALS ──────────────────────────────────────────
   const executiveBlockC = useMemo(() => {
@@ -410,9 +417,15 @@ export const Overview: React.FC = () => {
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{executiveBlockC.recentInteractionsCount}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-blue-600">
-                <Globe className="w-3 h-3" />
-                <span>interações recentes (30d)</span>
+              <div className="flex flex-col mt-1">
+                <div className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
+                  <Globe className="w-3 h-3" />
+                  <span>interações recentes (30d)</span>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-bold text-blue-500 mt-0.5">
+                  <Sparkles className="w-3 h-3" />
+                  <span>{executiveBlockC.activePlaysCount} plays recomendados</span>
+                </div>
               </div>
             </div>
           </div>
@@ -743,7 +756,7 @@ export const Overview: React.FC = () => {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-600 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc'}>Ver Ranking de Engajamento</Button>
+              <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-600 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc&blocoCInteracoes=recente&blocoCPlays=com'}>Ver Ranking de Engajamento</Button>
             </div>
           </Card>
 
