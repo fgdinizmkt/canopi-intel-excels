@@ -382,10 +382,10 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                           {account.ownersSecundarios.map(o => (
                             <span key={o} className="px-2 py-1 bg-slate-800 text-[8px] font-black text-slate-400 rounded-md border border-slate-700 uppercase tracking-tighter">Co-owner: {o}</span>
                           ))}
-                       </div>
-                    )}
-                 </div>
-              </div>
+                        </div>
+                     )}
+                  </div>
+               </div>
 
               {/* Macro Priorização Section */}
               <div className="pt-8 border-t border-slate-800/50">
@@ -408,9 +408,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     <TrendingUp className="w-3.5 h-3.5" />
                  </p>
                  <div className="space-y-4">
-                    {score && [
-                      score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca
-                    ].map(dim => (
+                    {score && [score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca].map(dim => (
                       <div key={dim.name} className="space-y-1.5">
                         <ScoreMiniBar label={dim.name} val={dim.score} />
                         <p className="text-[8px] text-slate-500 italic leading-tight pl-1">{dim.rationale}</p>
@@ -422,26 +420,26 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                       </div>
                     ))}
                  </div>
-               </div>
-          </section>
+              </div>
+           </section>
 
-          {/* New: Portfólio & Expansão (E14) */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
-             <div className="absolute top-0 right-0 p-8 opacity-5">
-                <Database className="w-16 h-16 text-emerald-400" />
-             </div>
-             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <Database className="w-4 h-4 text-emerald-500" /> Portfólio & Contexto Comercial
-             </h3>
-             <div className="space-y-6">
-                {account.portfolio?.ativa.length ? (
-                  <div>
-                    <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.1em] mb-2 block">Ativo (O que já tem)</span>
-                    <div className="flex flex-wrap gap-2">
-                       {account.portfolio.ativa.map(p => <span key={p} className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded text-[9px] font-bold text-emerald-300">{p}</span>)}
-                    </div>
-                  </div>
-                ) : null}
+           {/* New: Portfólio & Expansão */}
+           <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                 <Database className="w-16 h-16 text-emerald-400" />
+              </div>
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                 <Database className="w-4 h-4 text-emerald-500" /> Portfólio & Contexto Comercial
+              </h3>
+              <div className="space-y-6">
+                 {account.portfolio?.ativa?.length ? (
+                   <div>
+                     <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.1em] mb-2 block">Ativo (O que já tem)</span>
+                     <div className="flex flex-wrap gap-2">
+                        {account.portfolio.ativa.map(p => <span key={p} className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded text-[9px] font-bold text-emerald-300">{p}</span>)}
+                     </div>
+                   </div>
+                 ) : null}
 
                 {account.portfolio?.negociacao.length ? (
                   <div className="pt-4 border-t border-slate-800">
