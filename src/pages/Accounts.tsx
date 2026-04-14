@@ -523,23 +523,65 @@ export const Accounts = () => {
           </div>
         </section>
 
-        {/* Tactical Shortcuts */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-          <button onClick={() => { atualizarFiltro('risco', 'alto'); setOrdenacao('engajamento_desc'); }} className="p-4 bg-white border border-slate-200 hover:border-rose-500 hover:shadow-lg hover:shadow-rose-500/5 rounded-2xl text-left group transition-all">
-            <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest block mb-1">Atenção Prioritária</span>
-            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Alto risco com movimentação recente</p>
+        {/* ── TACTICAL SHORTCUTS & OPERATION PRESETS ── */}
+        <div className="mb-4 flex items-center justify-between px-2">
+          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+            <Layout className="w-3.5 h-3.5" /> Presets Operacionais
+          </h3>
+          <span className="text-[9px] font-bold text-slate-400 uppercase">Acesso Rápido por Contexto</span>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <button onClick={() => { atualizarFiltro('risco', 'alto'); setOrdenacao('engajamento_desc'); }} className="p-4 bg-white border border-slate-200 hover:border-rose-500 hover:shadow-lg hover:shadow-rose-500/5 rounded-[1.5rem] text-left group transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+              <AlertTriangle className="w-12 h-12 text-rose-600" />
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+              </div>
+              <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">Atenção Crítica</span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Contas de alto risco com movimentação recente detectada.</p>
           </button>
-          <button onClick={() => { atualizarFiltro('tipoConta', 'abm'); atualizarFiltro('cobertura', 'baixa'); }} className="p-4 bg-white border border-slate-200 hover:border-brand hover:shadow-lg hover:shadow-brand/5 rounded-2xl text-left group transition-all">
-            <span className="text-[9px] font-black text-brand uppercase tracking-widest block mb-1">Gap de Mapeamento</span>
-            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">ABM prontas para cobertura inicial</p>
+
+          <button onClick={() => { atualizarFiltro('tipoConta', 'abm'); atualizarFiltro('cobertura', 'baixa'); }} className="p-4 bg-white border border-slate-200 hover:border-brand hover:shadow-lg hover:shadow-brand/5 rounded-[1.5rem] text-left group transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+              <Users className="w-12 h-12 text-brand" />
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-brand/5 flex items-center justify-center">
+                <Users className="w-3.5 h-3.5 text-brand" />
+              </div>
+              <span className="text-[9px] font-black text-brand uppercase tracking-widest">Gap Relacional</span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Contas ABM prontas para início de mapeamento estratégico.</p>
           </button>
-          <button onClick={() => { atualizarFiltro('tipoConta', 'abx'); atualizarFiltro('oportunidade', 'com'); }} className="p-4 bg-white border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 rounded-2xl text-left group transition-all">
-            <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest block mb-1">Cross-sell / Expansão</span>
-            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Base instalada com pipeline aberto</p>
+
+          <button onClick={() => { atualizarFiltro('tipoConta', 'abx'); atualizarFiltro('oportunidade', 'com'); }} className="p-4 bg-white border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 rounded-[1.5rem] text-left group transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+              <TrendingUp className="w-12 h-12 text-blue-600" />
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+              </div>
+              <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Aceleração Base</span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Expansão em contas com pipeline e estratégia ABX ativa.</p>
           </button>
-          <button onClick={() => atualizarFiltro('blocoCPlays', 'com')} className="p-4 bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/5 rounded-2xl text-left group transition-all">
-            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest block mb-1">Inteligência Ativa</span>
-            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Contas com recomendações do Bloco C</p>
+
+          <button onClick={() => atualizarFiltro('blocoCPlays', 'com')} className="p-4 bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/5 rounded-[1.5rem] text-left group transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+              <Cpu className="w-12 h-12 text-emerald-600" />
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <Cpu className="w-3.5 h-3.5 text-emerald-600" />
+              </div>
+              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Machine Insight</span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Sugestão de plays recomendados pela inteligência Canopi.</p>
           </button>
         </div>
 
