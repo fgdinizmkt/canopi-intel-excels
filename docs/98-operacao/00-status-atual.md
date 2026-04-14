@@ -14,7 +14,7 @@
 - **Account Profile:** A nova página dedicada atingiu 100% de paridade operacional com o sistema legado. Inclui: Radar Relacional, Fila de Fogo Ativa, Score Rationale, Timeline 360, Portfólio & Whitespace, e Contexto Compacto de Origem/Canais.
 - **Contact Profile:** Materializado com navegabilidade Empresa -> Contato religada e paridade de edição de narrativas e classificação.
 - **Destaque:** Todos os CTAs da Fila de Fogo estão operacionais, injetando ações reais na fila de sessão com payloads táticos.
-- **Build:** Validado `npm run build` (sucesso completo).
+- **Build:** Status BUILD-STABLE atingido. Zeragem de erros de tipagem em `accountsData.ts` e inconsistências de JSX em `AccountProfile.tsx` e `ContactProfile.tsx`.
 
 **Operacionalização do Lifecycle (Commits `f0afafd`, `20edc2e`, `ee3957f`)**
 - **Resultado:** Canopi transformado de protótipo em motor de execução real com cockpit profundo.
@@ -465,13 +465,14 @@
 
 ## Próximo Passo
 
-- **Status Atual:** Recorte 47 concluído e publicado em origin/main. Último marco funcional: commit `9ec0667`.
+- **Marco Funcional:** Recorte 61 (Build Stable — Sanitização Bloco C) publicado em origin/main
+- **Status da Infra:** Fase E consolidada. Account Profile BUILD-STABLE e com dados sanitizados para migração Supabase.
 - **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
   - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
 - **Recorte 43:** Concluído como **mapa de cobertura de persistência documental**. Nenhum código alterado.
   - Documento: `docs/98-operacao/09-mapa-de-cobertura-persistencia.md`
-  - **Decisão de Orquestrador resolvida no Recorte 44:** ownership de `tipoEstrategico` e `playAtivo` centralizado em `accountsRepository`.
+- **Decisão de Orquestrador resolvida no Recorte 44:** ownership de `tipoEstrategico` e `playAtivo` centralizado em `accountsRepository`.
 - **Recorte 44:** Concluído doc+funcional. Ownership de `tipoEstrategico` e `playAtivo` realinhado centralmente sob `accountsRepository`.
 - **Recorte 45:** Concluído. Implementação de persistência de leitura (read layer defensivo) para Oportunidades via `oportunidadesRepository.ts`, orquestrado ativamente em `accountsRepository.ts`.
 - **Recorte 46:** Concluído. Escrita defensiva atômica de Oportunidades (`etapa` e `risco`) com padrão 1 snapshot → 1 build → 1 setState → 1 persist. Botão "Salvar" explícito no overlay de edição em `AccountDetailView.tsx`.

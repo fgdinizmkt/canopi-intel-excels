@@ -579,7 +579,7 @@ export const initialActions: ActionItem[] = [
     ],
     history: [
       { id: "a10h1", when: "Hoje · 10:10", actor: "Fábio", type: "mudança", text: "Marcou a ação como Concluída após revisão final do play." },
-      { id: "a10h2", when: "Hoje · 10:30", actor: "Liderança", type: "follow-up", text: "Pediu comunicação estruturada do play para o time comercial." },
+      { id: "a10h2", when: "Hoje · 10:30", actor: "Diretoria", type: "follow-up", text: "Pediu comunicação estruturada do play para o time comercial." },
     ],
     buttons: [
       { id: "view", label: "Ver perfil completo", tone: "secondary", action: "open" },
@@ -828,10 +828,10 @@ export const contasMock: Conta[] = [
       { id: 'a3', titulo: 'Validar proposta de expansão de escopo', status: 'Em andamento', owner: 'Leandro Silva', prioridade: 'Média', prazo: '2026-04-08' }
     ],
     contatos: [
-      { id: 'c1', nome: 'Roberta Lima', cargo: 'VP de Operações', area: 'Operações', senioridade: 'C-Level', papelComite: 'Decisão final', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 90, potencialSucesso: 85, scoreSucesso: 88, ganchoReuniao: 'Pautar expansão de ROI na vertical de logística.' },
-      { id: 'c2', nome: 'Carlos Mendes', cargo: 'Diretor de TI', area: 'Tecnologia', senioridade: 'Diretoria', papelComite: 'Validação técnica', forcaRelacional: 64, receptividade: 'Média', acessibilidade: 'Alta', status: 'Frio', classificacao: ['Influenciador', 'Técnico', 'Champion'], liderId: 'c1', influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Validar stack de observabilidade operacional.' },
+      { id: 'c1', nome: 'Roberta Lima', cargo: 'VP de Operações', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Decisão final', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 90, potencialSucesso: 85, scoreSucesso: 88, ganchoReuniao: 'Pautar expansão de ROI na vertical de logística.' },
+      { id: 'c2', nome: 'Carlos Mendes', cargo: 'Diretor de TI', area: 'Técnico', senioridade: 'Diretoria', papelComite: 'Validação técnica', forcaRelacional: 64, receptividade: 'Média', acessibilidade: 'Alta', status: 'Frio', classificacao: ['Influenciador', 'Técnico', 'Champion'], liderId: 'c1', influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Validar stack de observabilidade operacional.' },
       { id: 'c3', nome: 'Aline Prado', cargo: 'Gerente de Controladoria', area: 'Finanças', senioridade: 'Gerência', papelComite: 'Análise orçamentária', forcaRelacional: 41, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'Em Risco', classificacao: ['Blocker', 'Negócio'], liderId: 'c1', influencia: 68, potencialSucesso: 48, scoreSucesso: 42, ganchoReuniao: 'Apresentar business case de redução de churn.' },
-      { id: 'c4', nome: 'Davi Souza', cargo: 'Coordenador de Infra', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Influenciador técnico', forcaRelacional: 30, receptividade: 'Baixa', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Técnico'], influencia: 45, potencialSucesso: 50, scoreSucesso: 48 },
+      { id: 'c4', nome: 'Davi Souza', cargo: 'Coordenador de Infra', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Influenciador técnico', forcaRelacional: 30, receptividade: 'Baixa', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Técnico'], influencia: 45, potencialSucesso: 50, scoreSucesso: 48 },
       { id: 'c5', nome: 'Elena Torres', cargo: 'Head de Inovação', area: 'Inovação', senioridade: 'Diretoria', papelComite: 'Sponsor futuro', forcaRelacional: 10, receptividade: 'Alta', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Sponsor'], influencia: 70, potencialSucesso: 90, scoreSucesso: 85 }
     ],
     oportunidades: [
@@ -841,7 +841,7 @@ export const contasMock: Conta[] = [
     canaisCampanhas: {
       origemPrincipal: 'Outbound executivo',
       influencias: [
-        { canal: 'Outbound', campanha: 'Executivo Energia Q1', tipo: 'Outbound', impacto: 'Abertura de reunião com VP', data: '2026-01-10' },
+        { canal: 'Híbrido', campanha: 'Executivo Energia Q1', tipo: 'Híbrido', impacto: 'Abertura de reunião com VP', data: '2026-01-10' },
         { canal: 'CRM', campanha: 'Nutrição de caso de uso operacional', tipo: 'CRM', impacto: 'Aumento de engajamento técnico', data: '2026-02-14' }
       ]
     },
@@ -877,9 +877,9 @@ export const contasMock: Conta[] = [
     },
     tecnografia: ['Salesforce CRM', 'AWS Cloud', 'SAP S/4HANA', 'Tableau', 'ServiceNow'],
     historico: [
-      { data: '2026-03-29', tipo: 'Sinal', descricao: 'Mudança no comitê de compras detectada.', icone: 'AlertTriangle' },
+      { data: '2026-03-29', tipo: 'Tendência', descricao: 'Mudança no comitê de compras detectada.', icone: 'AlertTriangle' },
       { data: '2026-03-26', tipo: 'Ação', descricao: 'Reunião com sponsor adiada.', icone: 'Clock' },
-      { data: '2026-03-20', tipo: 'Oportunidade', descricao: 'Proposta de renovação enviada.', icone: 'TrendingUp' }
+      { data: '2026-03-20', tipo: 'Tendência', descricao: 'Proposta de renovação enviada.', icone: 'TrendingUp' }
     ]
   },
   {
@@ -890,9 +890,9 @@ export const contasMock: Conta[] = [
     leituraFactual: ['2 reuniões de descoberta realizadas.', 'Champion técnico identificado.'], leituraInferida: ['Jornada deve acelerar com prova de caso no segmento financeiro.'], leituraSugerida: ['Executar play ABM de entrada com conteúdo por persona.'],
     sinais: [{ id:'s3', titulo:'Acesso recorrente ao case financeiro', tipo:'Tendência', impacto:'Médio', owner:'Rafael Prado', recomendacao:'Priorizar contato com diretoria de operações.', contexto:'3 acessos em 5 dias no material de caso.', data:'2026-03-25' }],
     acoes: [{ id:'a4', titulo:'Agendar reunião com diretoria de operações', status:'Em andamento', owner:'Rafael Prado', prioridade:'Alta', prazo:'2026-04-04' }],
-    contatos: [{ id:'c4', nome:'Gustavo Rocha', cargo:'Head de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Patrocinador da mudança', forcaRelacional:58, receptividade:'Alta', acessibilidade:'Média', status:'Ativa', classificacao:['Sponsor','Negócio'], influencia:79, potencialSucesso:74, scoreSucesso: 70 }],
+    contatos: [{ id:'c4', nome:'Gustavo Rocha', cargo:'Head de Operações', area:'Negócio', senioridade:'Diretoria', papelComite:'Patrocinador da mudança', forcaRelacional:58, receptividade:'Alta', acessibilidade:'Média', status:'Ativo', classificacao:['Sponsor','Negócio'], influencia:79, potencialSucesso:74, scoreSucesso: 70 }],
     oportunidades: [{ id:'o3', nome:'Primeiro contrato plataforma ops', etapa:'Qualificação', valor:550000, owner:'Rafael Prado', risco:'Baixo', probabilidade:44, historico:['Descoberta inicial concluída'] }],
-    canaisCampanhas: { origemPrincipal:'Inbound orgânico', influencias:[{ canal:'Inbound', campanha:'SEO - Eficiência financeira', tipo:'Inbound', impacto:'Entrada da conta na base', data:'2026-02-05' }] },
+    canaisCampanhas: { origemPrincipal:'Inbound orgânico', influencias:[{ canal:'Híbrido', campanha:'SEO - Eficiência financeira', tipo:'Híbrido', impacto:'Entrada da conta na base', data:'2026-02-05' }] },
     abm: { motivo:'Conta alvo prioritária para expansão em fintechs.', fit:'Fit alto por maturidade digital e dor operacional.', cluster:'Fintech crescimento - Cluster B', similaridade:'81% com wins recentes.', coberturaInicialComite:'48% com lacuna em TI.', playsEntrada:['Play de valor por persona','Play técnico-funcional'], potencialAbertura:'Alto para frente de observabilidade operacional.', hipoteses:['Conteúdo técnico acelera validação interna.'], contasSimilares:['BrixPay','NexaBank'] },
     abx: { motivo:'Ainda sem maturidade ABX.', evolucaoJornada:'Início de relacionamento.', maturidadeRelacional:'Baixa', sponsorAtivo:'Em formação', profundidadeComite:'Baixa', continuidade:'Não aplicável', expansao:'Mapeamento futuro', retencao:'Não aplicável', riscoEstagnacao:'Baixo no curto prazo' },
     inteligencia: { sucessos:['Entrada via conteúdo de caso real.'], insucessos:['Contato financeiro sem personalização teve baixa resposta.'], padroes:['Diretoria de operações responde melhor que compras no estágio inicial.'], learnings:['Mensagem técnica com impacto financeiro converte mais.'], hipoteses:['Workshop técnico eleva taxa de avanço para proposta.'], fatoresRecomendacao:['Fit ICP alto','Cobertura relacional baixa'] },
@@ -907,7 +907,7 @@ export const contasMock: Conta[] = [
     leituraFactual: ['2 ações atrasadas.', 'Queda de uso em módulo de planejamento.', 'Renovação vence em 65 dias.'], leituraInferida: ['Sem reforço executivo, chance de churn parcial aumenta.'], leituraSugerida: ['Ativar play ABX de retenção e expansão assistida.'],
     sinais: [{ id:'s4', titulo:'Queda de uso do módulo core', tipo:'Alerta', impacto:'Alto', owner:'Daniel Moreira', recomendacao:'Entrar com squad de adoção em 7 dias.', contexto:'Uso semanal caiu 27% no último mês.', data:'2026-03-30' }],
     acoes: [{ id:'a5', titulo:'Plano de recuperação da renovação', status:'Atrasada', owner:'Daniel Moreira', prioridade:'Alta', prazo:'2026-03-25' }],
-    contatos: [{ id:'c5', nome:'Patrícia Gomes', cargo:'Diretora de Operações', area:'Operações', senioridade:'Diretoria', papelComite:'Renovação', forcaRelacional:46, receptividade:'Média', acessibilidade:'Baixa', status:'Risco', classificacao:['Decisor','Negócio'], influencia:84, potencialSucesso:52, scoreSucesso: 45 }],
+    contatos: [{ id:'c5', nome:'Patrícia Gomes', cargo:'Diretora de Operações', area:'Negócio', senioridade:'Diretoria', papelComite:'Renovação', forcaRelacional:46, receptividade:'Média', acessibilidade:'Baixa', status:'Em Risco', classificacao:['Decisor','Negócio'], influencia:84, potencialSucesso:52, scoreSucesso: 45 }],
     oportunidades: [{ id:'o4', nome:'Renovação anual plataforma core', etapa:'Negociação', valor:1800000, owner:'Daniel Moreira', risco:'Alto', probabilidade:36, historico:['Escopo de renovação reduzido pelo cliente'] }],
     canaisCampanhas: { origemPrincipal:'CRM de base instalada', influencias:[{ canal:'CRM', campanha:'Adoção e valor Q1', tipo:'CRM', impacto:'Engajamento de usuários finais', data:'2026-01-18' }] },
     abm: { motivo:'Conta não priorizada para ABM no momento.', fit:'Fit médio.', cluster:'Logística base instalada', similaridade:'64% com contas em retenção.', coberturaInicialComite:'39%', playsEntrada:['Play de retomada executiva'], potencialAbertura:'Moderado', hipoteses:['Fortalecer sponsor secundário reduz risco de churn.'], contasSimilares:['CargoFlux'] },
@@ -917,7 +917,7 @@ export const contasMock: Conta[] = [
     historico:[{data:'2026-03-30', tipo:'Sinal', descricao:'Queda de uso detectada no módulo core.', icone: 'AlertCircle'}]
   },
   {
-    id: '4', slug: 'alphabank-sa', nome: 'AlphaBank S.A.', dominio: 'alphabank.com.br', vertical: 'Financeiro', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
+    id: '4', slug: 'alphabank-sa', nome: 'AlphaBank S.A.', dominio: 'alphabank.com.br', vertical: 'Negócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
     ownerPrincipal: 'Beatriz Lima', ownersSecundarios: ['Rafael Prado'], etapa: 'Prospecção', tipoEstrategico: 'ABM', potencial: 88, risco: 15, prontidao: 82, coberturaRelacional: 74,
     ultimaMovimentacao: '2026-04-01', atividadeRecente: 'Alta', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 87, crm: 45, vp: 82, ct: 78, ft: 84, budgetBrl: 4200000, possuiOportunidade: true,
     oportunidadePrincipal: 'Implementação de governança de IA e LLMs', proximaMelhorAcao: 'Apresentar diagnóstico de AI Readiness para diretoria executiva.',
@@ -930,22 +930,22 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c19', nome: 'Gustavo Ferreira', cargo: 'VP de Tecnologia e Segurança', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Patrocinador de governança', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 82, scoreSucesso: 79, ganchoReuniao: 'Detalhar como IA governance reduz risco operacional e compliance.' },
-      { id: 'c20', nome: 'Natalia Rocha', cargo: 'Gerente de Risco e Compliance', area: 'Risco', senioridade: 'Gerência', papelComite: 'Validação de conformidade', forcaRelacional: 65, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Blocker'], liderId: 'c19', influencia: 80, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar framework de compliance para LLMs e IA generativa.' }
+      { id: 'c19', nome: 'Gustavo Ferreira', cargo: 'VP de Tecnologia e Segurança', area: 'Técnico', senioridade: 'C-Level', papelComite: 'Patrocinador de governança', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 82, scoreSucesso: 79, ganchoReuniao: 'Detalhar como IA governance reduz risco operacional e compliance.' },
+      { id: 'c20', nome: 'Natalia Rocha', cargo: 'Gerente de Risco e Compliance', area: 'Em Risco', senioridade: 'Gerência', papelComite: 'Validação de conformidade', forcaRelacional: 65, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Blocker'], liderId: 'c19', influencia: 80, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar framework de compliance para LLMs e IA generativa.' }
     ],
     oportunidades: [
       { id: 'o17', nome: 'Implementação de governança de IA e LLMs', etapa: 'Diagnóstico', valor: 4200000, owner: 'Beatriz Lima', risco: 'Baixo', probabilidade: 68, historico: ['Atividade de pesquisa detectada', 'Diagnóstico em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'MQL Consultivo', influencias: [{ canal: 'Inbound', campanha: 'AI Governance Financeiro', tipo: 'Inbound', impacto: 'Ativação de interesse de decisor', data: '2026-03-28' }] },
+    canaisCampanhas: { origemPrincipal: 'MQL Consultivo', influencias: [{ canal: 'Híbrido', campanha: 'AI Governance Financeiro', tipo: 'Híbrido', impacto: 'Ativação de interesse de decisor', data: '2026-03-28' }] },
     abm: { motivo: 'Fit ICP excelente para verticais financeiras de risco elevado.', fit: 'Alto (87/100)', cluster: 'Financeiro Top', similaridade: '92%', coberturaInicialComite: '74%', playsEntrada: ['Play consultivo de governança', 'Play de compliance por vertical'], potencialAbertura: 'Altíssimo', hipoteses: ['Diretoria executiva aprova se governance resolve compliance'], contasSimilares: ['Banco Central', 'Caixa Econômica'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Instituições financeiras priorizam governança antes de adoção de IA.'], learnings: ['Compliance e risco são gatilhos de entrada em banking.'], hipoteses: ['Diagnóstico customizado acelera para 2º conversation em 7 dias.'], fatoresRecomendacao: ['Fit ICP altíssimo', 'Janela de decisão aberta', 'Budget confirmado'] },
     tecnografia: ['Salesforce FSC', 'SailPoint IAM', 'Splunk', 'AWS GovCloud'],
-    historico: [{ data: '2026-04-01', tipo: 'Sinal', descricao: 'Atividade de pesquisa em IA governance detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Ação de diagnóstico criada para prospecção consultiva.', icone: 'Zap' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-01', tipo: 'Tendência', descricao: 'Atividade de pesquisa em IA governance detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Ação de diagnóstico criada para prospecção consultiva.', icone: 'Zap' }],
+    reconciliationStatus: 'ativa'
   },
   {
-    id: '5', slug: 'novasaude-global', nome: 'NovaSaude', dominio: 'novasaude.com', vertical: 'Saúde', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
+    id: '5', slug: 'novasaude-global', nome: 'NovaSaude', dominio: 'novasaude.com', vertical: 'Negócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
     ownerPrincipal: 'Lia Azevedo', ownersSecundarios: [], etapa: 'Qualificação', tipoEstrategico: 'ABM', potencial: 74, risco: 28, prontidao: 70, coberturaRelacional: 55,
     ultimaMovimentacao: '2026-04-02', atividadeRecente: 'Média', playAtivo: 'ABM', statusGeral: 'Saudável', icp: 72, crm: 80, vp: 68, ct: 55, ft: 70, budgetBrl: 1850000, possuiOportunidade: true,
     oportunidadePrincipal: 'Transformação digital de sistemas de gestão hospitalar', proximaMelhorAcao: 'Mapear decisores técnicos na filial sul e estruturar roadmap de ERP.',
@@ -958,19 +958,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c21', nome: 'Dr. Marcelo Santos', cargo: 'Diretor de Operações Corporativas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 71, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 86, potencialSucesso: 74, scoreSucesso: 70, ganchoReuniao: 'Detalhar ROI de unificação de sistemas entre unidades.' },
-      { id: 'c22', nome: 'Fernanda Lima', cargo: 'Gerente de TI Corporativa', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica e vendor', forcaRelacional: 64, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c21', influencia: 75, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Demonstrar facilidade de implementação com manutenção em paralelo.' }
+      { id: 'c21', nome: 'Dr. Marcelo Santos', cargo: 'Diretor de Operações Corporativas', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 71, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 86, potencialSucesso: 74, scoreSucesso: 70, ganchoReuniao: 'Detalhar ROI de unificação de sistemas entre unidades.' },
+      { id: 'c22', nome: 'Fernanda Lima', cargo: 'Gerente de TI Corporativa', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica e vendor', forcaRelacional: 64, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c21', influencia: 75, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Demonstrar facilidade de implementação com manutenção em paralelo.' }
     ],
     oportunidades: [
       { id: 'o18', nome: 'Transformação digital de sistemas de gestão hospitalar', etapa: 'Qualificação', valor: 1850000, owner: 'Lia Azevedo', risco: 'Médio', probabilidade: 52, historico: ['Pesquisa de mercado em andamento', 'Roadmap corporativo em discussão', 'Validação de budget por filial necessária'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [{ canal: 'Trade shows', campanha: 'Healthcare Tech Summit', tipo: 'Events', impacto: 'Geração de interesse em ERP cloud', data: '2026-02-15' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Trade shows', campanha: 'Healthcare Tech Summit', tipo: 'Events', impacto: 'Geração de interesse em ERP cloud', data: '2026-02-15' }] },
     abm: { motivo: 'Vertical prioritária com alta maturidade de negócio.', fit: 'Médio-alto (72/100)', cluster: 'Healthcare Enterprise', similaridade: '78%', coberturaInicialComite: '55% (apenas corporativo)', playsEntrada: ['Play de unificação de operações', 'Play de modernização de legacy'], potencialAbertura: 'Médio (depende de mapeamento regional)', hipoteses: ['Aceleração com aprovação regional de orçamento'], contasSimilares: ['Rede Ímpar', 'Amil'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Alto engajamento CRM indica receptividade de marketing.'], insucessos: ['Fragmentação de DMU bloqueou avanço anterior.'], padroes: ['Healthcare Brasil prioriza unificação de operações quando há múltiplas unidades.'], learnings: ['Decisão em saúde requer validação regional, não apenas corporativa.'], hipoteses: ['Workshop multi-regional eleva probabilidade em 15 p.p.'], fatoresRecomendacao: ['Oportunidade regional não explorada', 'Engajamento CRM elevado', 'Fragmentação de DMU é constraint'] },
     tecnografia: ['SAP S/4HANA Cloud', 'Salesforce Health Cloud', 'AWS', 'Tableau'],
-    historico: [{ data: '2026-04-02', tipo: 'Sinal', descricao: 'Alta atividade em pesquisa de ERP para saúde detectada.', icone: 'TrendingUp' }, { data: '2026-04-02', tipo: 'Ação', descricao: 'Ação de mapeamento regional criada.', icone: 'Activity' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-02', tipo: 'Tendência', descricao: 'Alta atividade em pesquisa de ERP para saúde detectada.', icone: 'TrendingUp' }, { data: '2026-04-02', tipo: 'Ação', descricao: 'Ação de mapeamento regional criada.', icone: 'Activity' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '6', slug: 'mobilitypro-sa', nome: 'MobilityPro', dominio: 'mobilitypro.com.br', vertical: 'Mobilidade', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'Belo Horizonte, Brasil',
@@ -982,22 +982,22 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Falta de alinhamento em 2025 pode ter sido por preço ou timing de budget.', 'Renovação de frota pode estar planejada para 2026 (Q2-Q3 típico).'],
     leituraSugerida: ['Reativar com ângulo de eficiência operacional (rotas + manutenção).', 'Validar timing de budget de capex para 2026.'],
     sinais: [
-      { id: 's19', titulo: 'Histórico de interesse em soluções de mobilidade moderna', tipo: 'Oportunidade', impacto: 'Baixo', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência de rota baseado em IA.', contexto: '2 demos em 2025. Sem objeção explícita, apenas perda de contato. Atividade recente retomada na última semana.', data: '2026-03-25' }
+      { id: 's19', titulo: 'Histórico de interesse em soluções de mobilidade moderna', tipo: 'Tendência', impacto: 'Baixo', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência de rota baseado em IA.', contexto: '2 demos em 2025. Sem objeção explícita, apenas perda de contato. Atividade recente retomada na última semana.', data: '2026-03-25' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c23', nome: 'Roberto Teixeira', cargo: 'Diretor de Operações de Frota', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 38, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'Frio', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 42, scoreSucesso: 35, ganchoReuniao: 'Demonstrar economia de combustível e extensão de vida útil da frota.' }
+      { id: 'c23', nome: 'Roberto Teixeira', cargo: 'Diretor de Operações de Frota', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 38, receptividade: 'Baixa', acessibilidade: 'Baixa', status: 'Frio', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 42, scoreSucesso: 35, ganchoReuniao: 'Demonstrar economia de combustível e extensão de vida útil da frota.' }
     ],
     oportunidades: [
       { id: 'o19', nome: 'Modernização de frota com telemática e IA de rotas', etapa: 'Prospecção', valor: 600000, owner: 'Marcos Oliveira', risco: 'Alto', probabilidade: 28, historico: ['2 demos em 2025 sem conversão', 'Reativação iniciada em 2026'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound Antigo', influencias: [{ canal: 'Inbound', campanha: 'Webinar Mobilidade Eficiente', tipo: 'Inbound', impacto: 'Entrada em 2025', data: '2025-06-15' }] },
+    canaisCampanhas: { origemPrincipal: 'Inbound Antigo', influencias: [{ canal: 'Híbrido', campanha: 'Webinar Mobilidade Eficiente', tipo: 'Híbrido', impacto: 'Entrada em 2025', data: '2025-06-15' }] },
     abm: { motivo: 'Potencial de vertical alto, mas conta fria.', fit: 'Baixo-médio (45/100)', cluster: 'Mobilidade Mid', similaridade: '45%', coberturaInicialComite: '40% (apenas director)', playsEntrada: ['Play de reativação com case novo', 'Play de ROI operacional'], potencialAbertura: 'Baixo no curto prazo', hipoteses: ['Novo case de eficiência de rota pode reativar interesse'], contasSimilares: ['Loggi Frota', 'Sascar'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: ['2 demos em 2025 sem follow-up adequado.'], padroes: ['Empresas de frota decidem por investimento em H2 (capex Q3-Q4).'], learnings: ['Timing de budget é crítico em mobilidade (planejamento anual em Q1).'], hipoteses: ['Reativação com novo case pode converter em 45-60 dias.'], fatoresRecomendacao: ['Conta fria com histórico', 'Timing de budget incerto', 'Vertical com potencial'] },
     tecnografia: [],
     historico: [{ data: '2026-03-25', tipo: 'Ação', descricao: 'Sequência de reativação iniciada com novo case.', icone: 'Activity' }],
-    reconciliationStatus: 'enriquecida'
+    reconciliationStatus: 'ativa'
   },
   {
     id: '7', slug: 'agrocloud-sa', nome: 'AgroCloud', dominio: 'agrocloud.com', vertical: 'Agronegócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiânia, Brasil',
@@ -1013,18 +1013,18 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c29', nome: 'Sergio Almeida', cargo: 'Diretor de Produção e Operações Agrícolas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Validação operacional', forcaRelacional: 65, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 81, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Demonstrar redução de custos de plantio via IA de otimização.' }
+      { id: 'c29', nome: 'Sergio Almeida', cargo: 'Diretor de Produção e Operações Agrícolas', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Validação operacional', forcaRelacional: 65, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 81, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Demonstrar redução de custos de plantio via IA de otimização.' }
     ],
     oportunidades: [
       { id: 'o23', nome: 'Plataforma de inteligência agrícola e otimização de plantio', etapa: 'Prospecção', valor: 2100000, owner: 'Ricardo Santos', risco: 'Médio', probabilidade: 45, historico: ['Sinal de intenção via intent data', 'Mapeamento de DMU técnico em andamento'] }
     ],
     canaisCampanhas: { origemPrincipal: 'Field Marketing', influencias: [{ canal: 'Field Marketing', campanha: 'AgriTech Summit 2026', tipo: 'Events', impacto: 'Geração de interesse em IA agrícola', data: '2026-02-20' }] },
     abm: { motivo: 'Liderança em vertical Agro com alto orçamento de tech.', fit: 'Médio (65/100)', cluster: 'Agro Global', similaridade: '65%', coberturaInicialComite: '30% (apenas operações)', playsEntrada: ['Play de mapeamento de DMU técnico', 'Play de ROI agrícola'], potencialAbertura: 'Médio-alto se CTO for mapeado', hipoteses: ['Identificação de CTO abre oportunidade de 60+ dias.'], contasSimilares: ['JBS', 'Bunge Brasil'] },
-    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Líderes de agronegócio priorizam ROI de redução de custos.'], learnings: ['VP score alto (85%) indica facilidade de implementação técnica.'], hipoteses: ['Mapeamento de CTO + demonstração de ROI converte em 60-75 dias.'], fatoresRecomendacao: ['Vertical alta tração', 'Gap crítico de DMU técnico', 'Budget confirmado'] },
     tecnografia: ['AWS', 'SAP Analytics Cloud'],
-    historico: [{ data: '2026-04-02', tipo: 'Sinal', descricao: 'Visitas em materiais de IA agrícola detectadas.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-02', tipo: 'Tendência', descricao: 'Visitas em materiais de IA agrícola detectadas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   // --- CONTAS ÓRFÃS RECONCILIADAS (Shell Mínimas) --- (Shell Mínimas) ---
   // Estas contas são mencionadas em advancedSignals e initialActions mas não existiam em contasMock
@@ -1045,8 +1045,8 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c8', nome: 'Ricardo Ferreira', cargo: 'Diretor Industrial', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Decisão final', forcaRelacional: 35, receptividade: 'Média', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 52, scoreSucesso: 48, ganchoReuniao: 'Mostrar impacto de MLOps na eficiência de processamento.' },
-      { id: 'c9', nome: 'Marina Costa', cargo: 'Gerente de Tecnologia', area: 'Operações/TI', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c8', influencia: 78, potencialSucesso: 75, scoreSucesso: 72, ganchoReuniao: 'Validar stack de observabilidade com novo gestor.' }
+      { id: 'c8', nome: 'Ricardo Ferreira', cargo: 'Diretor Industrial', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Decisão final', forcaRelacional: 35, receptividade: 'Média', acessibilidade: 'Baixa', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 52, scoreSucesso: 48, ganchoReuniao: 'Mostrar impacto de MLOps na eficiência de processamento.' },
+      { id: 'c9', nome: 'Marina Costa', cargo: 'Gerente de Tecnologia', area: 'Operações/TI', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c8', influencia: 78, potencialSucesso: 75, scoreSucesso: 72, ganchoReuniao: 'Validar stack de observabilidade com novo gestor.' }
     ],
     oportunidades: [
       { id: 'o8', nome: 'Expansão de infraestrutura MLOps', etapa: 'Proposta', valor: 2100000, owner: 'Elber Costa', risco: 'Médio', probabilidade: 58, historico: ['Escopo discutido com equipe técnica anterior', 'Validação pendente com novo diretor'] }
@@ -1056,8 +1056,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Conta em jornada de expansão com mudança crítica de stakeholder.', evolucaoJornada: 'Adoção > expansão MLOps (em risco por mudança de diretor).', maturidadeRelacional: 'Média-alta mas volátil por mudança.', sponsorAtivo: 'Em transição.', profundidadeComite: 'Parcial, concentrada em área técnica anterior.', continuidade: 'Ameaçada sem alinhamento executivo novo.', expansao: 'Congelada até QBR.', retencao: 'Boa, mas precisa reforço.', riscoEstagnacao: 'Alto por falta de alinhamento.' },
     inteligencia: { sucessos: ['Adoção de MLOps sem atrito em fase anterior.'], insucessos: ['Falta de cobertura financeira pode bloquear expansão.'], padroes: ['Novo diretor industrial tende a revisar prioridades de tecnologia.'], learnings: ['Executivos de operações precisam ver ROI operacional, não apenas técnico.'], hipoteses: ['Briefing focado em eficiência de processamento acelera aprovação.'], fatoresRecomendacao: ['Mudança crítica de stakeholder', 'Risco de retração'] },
     tecnografia: ['SAP ERP', 'AWS Cloud', 'Tableau', 'Kafka'],
-    historico: [{ data: '2026-03-17', tipo: 'Sinal', descricao: 'Novo diretor industrial assumiu a posição.', icone: 'AlertTriangle' }, { data: '2026-03-20', tipo: 'Ação', descricao: 'Ação de aquecimento criada para QBR.', icone: 'Clock' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-03-17', tipo: 'Tendência', descricao: 'Novo diretor industrial assumiu a posição.', icone: 'AlertTriangle' }, { data: '2026-03-20', tipo: 'Ação', descricao: 'Ação de aquecimento criada para QBR.', icone: 'Clock' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '9', slug: 'carteira-seguros-enterprise', nome: 'Carteira Seguros Enterprise', dominio: 'carteiraseguros.com.br', vertical: 'Seguros',
@@ -1075,19 +1075,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c10', nome: 'Fernando Ribeiro', cargo: 'VP de Operações Comerciais', area: 'Vendas', senioridade: 'C-Level', papelComite: 'Autorização de compensação', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 80, potencialSucesso: 68, scoreSucesso: 64, ganchoReuniao: 'Mostrar impacto de leads perdidos por falha operacional.' },
-      { id: 'c11', nome: 'Camila Souza', cargo: 'Gerente de Transformação Digital', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação de ferramenta', forcaRelacional: 59, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c10', influencia: 72, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Descrever otimização do workflow de roteamento.' }
+      { id: 'c10', nome: 'Fernando Ribeiro', cargo: 'VP de Operações Comerciais', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Autorização de compensação', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 80, potencialSucesso: 68, scoreSucesso: 64, ganchoReuniao: 'Mostrar impacto de leads perdidos por falha operacional.' },
+      { id: 'c11', nome: 'Camila Souza', cargo: 'Gerente de Transformação Digital', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação de ferramenta', forcaRelacional: 59, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c10', influencia: 72, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Descrever otimização do workflow de roteamento.' }
     ],
     oportunidades: [
       { id: 'o9', nome: 'Transformação digital do backend de sinistros', etapa: 'Qualificação', valor: 1950000, owner: 'Ligia Martins', risco: 'Médio', probabilidade: 42, historico: ['Sinal de inbound detectado', 'Reaproximação em andamento'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Leads seguros enterprise', tipo: 'Inbound', impacto: 'Geração de demanda qualificada', data: '2026-04-05' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Leads seguros enterprise', tipo: 'Híbrido', impacto: 'Geração de demanda qualificada', data: '2026-04-05' }] },
     abm: { motivo: 'Cluster estratégico para aquisição em seguros.', fit: 'Fit alto por transformação digital em curso.', cluster: 'Seguros Enterprise', similaridade: '76%', coberturaInicialComite: '48%', playsEntrada: ['Play de alinhamento operacional'], potencialAbertura: 'Elevado', hipoteses: ['Demonstração de operacional resolve rapidamente.'], contasSimilares: [] },
     abx: { motivo: 'Cluster de oportunidades de cross-sell.', evolucaoJornada: 'Inbound > qualificação operacional.', maturidadeRelacional: 'Inicial', sponsorAtivo: 'Em formação', profundidadeComite: 'Baixa', continuidade: 'Ameaçada por falha operacional', expansao: 'Mapeamento futuro', retencao: 'Não aplicável', riscoEstagnacao: 'Médio por falha de roteamento' },
     inteligencia: { sucessos: [], insucessos: ['Falha de roteamento criou impressão negativa.'], padroes: ['Seguradoras enterprise respondem bem a demonstração de agilidade.'], learnings: ['Roteamento por porte+vertical é crítico em seguros.'], hipoteses: ['Reaproximação rápida recupera 60% dos 13 leads.'], fatoresRecomendacao: ['Falha operacional crítica', 'Oportunidade de recuperação rápida'] },
     tecnografia: ['Salesforce', 'HubSpot', 'AWS', 'Tableau'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Falha de roteamento detectada em 13 leads.', icone: 'AlertCircle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Falha de roteamento detectada em 13 leads.', icone: 'AlertCircle' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '10', slug: 'cluster-fintech-sudeste', nome: 'Cluster Fintech Sudeste', dominio: 'cluster-fintech.com.br', vertical: 'Fintech',
@@ -1105,18 +1105,18 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c24', nome: 'Thiago Rocha', cargo: 'VP de Tecnologia do Cluster', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisão de vendor de infraestrutura', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 78, potencialSucesso: 64, scoreSucesso: 60, ganchoReuniao: 'Demonstrar consolidação de observabilidade reduz overhead operacional.' }
+      { id: 'c24', nome: 'Thiago Rocha', cargo: 'VP de Tecnologia do Cluster', area: 'Técnico', senioridade: 'C-Level', papelComite: 'Decisão de vendor de infraestrutura', forcaRelacional: 52, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Técnico'], influencia: 78, potencialSucesso: 64, scoreSucesso: 60, ganchoReuniao: 'Demonstrar consolidação de observabilidade reduz overhead operacional.' }
     ],
     oportunidades: [
       { id: 'o20', nome: 'Consolidação de stack de observabilidade para cluster fintech', etapa: 'Prospecção', valor: 3500000, owner: 'Julia Mendes', risco: 'Médio', probabilidade: 38, historico: ['Cluster identificado e priorizado', 'Sinais de intenção em 3 contas', 'Outbound contextualizado em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [{ canal: 'Intent Data', campanha: 'Fintech Consolidation', tipo: 'Inbound', impacto: 'Identificação de sinais de intenção', data: '2026-04-01' }] },
+    canaisCampanhas: { origemPrincipal: 'ABX', influencias: [{ canal: 'Intent Data', campanha: 'Fintech Consolidation', tipo: 'Híbrido', impacto: 'Identificação de sinais de intenção', data: '2026-04-01' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
     abx: { motivo: 'Cluster de contas em jornada paralela de expansão.', evolucaoJornada: 'Crescimento > escalabilidade > consolidação de tech stack.', maturidadeRelacional: 'Inicial em cluster, média em contas individuais.', sponsorAtivo: 'Em formação (VP de tech do cluster).', profundidadeComite: 'Baixa a moderada por conta.', continuidade: 'Depende de alinhamento entre contas.', expansao: 'Mapeamento de oportunidades por subcluster.', retencao: 'Não aplicável (novo).', riscoEstagnacao: 'Médio por fragmentação de decisão.' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Clusters de fintechs decidem melhor em conjunto que isoladamente.'], learnings: ['Consolidação de vendor de infra impacta todas as contas.'], hipoteses: ['Outbound contextualizado para 3 contas piloto acelera para 60 dias.'], fatoresRecomendacao: ['Potencial de consolidação alto', 'Janela de decisão aberta', 'Múltiplas DMUs = complexidade'] },
     tecnografia: ['AWS', 'Kubernetes', 'Splunk'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Intent data de observabilidade consolidada detectado em 3 contas.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Intent data de observabilidade consolidada detectado em 3 contas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '11', slug: 'nexus-fintech', nome: 'Nexus Fintech', dominio: 'nexusfintech.com.br', vertical: 'Fintech',
@@ -1134,19 +1134,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c25', nome: 'Carla Mendes', cargo: 'CFO e Membra do Comitê de Decisão', area: 'Finanças', senioridade: 'C-Level', papelComite: 'Aprovação de investimento', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 84, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar ROI de plataforma de pagamentos em termos de redução de custos.' },
-      { id: 'c26', nome: 'Felipe Barbosa', cargo: 'VP de Operações (provável novo bridge)', area: 'Operações', senioridade: 'C-Level', papelComite: 'Executivo patrocinador em potencial', forcaRelacional: 42, receptividade: 'Desconhecida', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Potencial Sponsor', 'Operações'], influencia: 76, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Mostrar impacto operacional de plataforma unificada de pagamentos.' }
+      { id: 'c25', nome: 'Carla Mendes', cargo: 'CFO e Membra do Comitê de Decisão', area: 'Finanças', senioridade: 'C-Level', papelComite: 'Aprovação de investimento', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 84, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar ROI de plataforma de pagamentos em termos de redução de custos.' },
+      { id: 'c26', nome: 'Felipe Barbosa', cargo: 'VP de Operações (provável novo bridge)', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Executivo patrocinador em potencial', forcaRelacional: 42, receptividade: 'Média', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Sponsor', 'Negócio'], influencia: 76, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Mostrar impacto operacional de plataforma unificada de pagamentos.' }
     ],
     oportunidades: [
       { id: 'o21', nome: 'Plataforma de pagamentos - Contrato full', etapa: 'Decisão', valor: 280000, owner: 'Pablo Diniz', risco: 'Alto', probabilidade: 62, historico: ['Proposta enviada em 25/03', 'Apresentação para comitê realizada', 'CTO saiu - risco de renegociação', 'Novo CTO em onboarding'] }
     ],
     canaisCampanhas: { origemPrincipal: 'ABM', influencias: [{ canal: 'ABM', campanha: 'Fintech Pagamentos Q1', tipo: 'ABM', impacto: 'Abertura com CFO', data: '2026-02-25' }] },
     abm: { motivo: 'Fit ICP altíssimo para fintech de pagamentos.', fit: 'Altíssimo (92/100)', cluster: 'Fintech Pagamentos Top', similaridade: '88%', coberturaInicialComite: '60% (CFO ativo, CTO saiu)', playsEntrada: ['Play de executive alignment pós-mudança', 'Play de bridge técnico'], potencialAbertura: 'Altíssimo se nova liderança técnica validar', hipoteses: ['Novo VP de Ops pode ser bridge melhor que CTO para operações.'], contasSimilares: ['PicPay', 'Wise Brasil'] },
-    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['CFO fortemente engajado e com autoridade de decisão.'], insucessos: ['Saída de sponsor técnico criou risco de renegociação.'], padroes: ['Mudanças de liderança técnica em fintechs frequentemente levam a rediscussão de roadmap.'], learnings: ['Múltiplos sponsors reduz risco de mudança isolada de executivo.'], hipoteses: ['Re-briefing com novo CTO + VP ops converte em 7 dias.'], fatoresRecomendacao: ['Oportunidade avançada', 'Mudança crítica de stakeholder', 'Possibilidade de rápida recuperação'] },
     tecnografia: ['AWS', 'Stripe', 'PostgreSQL', 'Kubernetes'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Saída de CTO detectada. Risco de renegociação de escopo.', icone: 'AlertTriangle' }, { data: '2026-04-03', tipo: 'Ação', descricao: 'Proposta em estágio de Decisão no comitê.', icone: 'CheckCircle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Saída de CTO detectada. Risco de renegociação de escopo.', icone: 'AlertTriangle' }, { data: '2026-04-03', tipo: 'Ação', descricao: 'Proposta em estágio de Decisão no comitê.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '12', slug: 'v-tal', nome: 'V.tal', dominio: 'vtal.com.br', vertical: 'Telecom',
@@ -1164,8 +1164,8 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c12', nome: 'Roberto Alves', cargo: 'Diretor de Inovação e Tecnologia', area: 'Tecnologia', senioridade: 'Diretoria', papelComite: 'Patrocinador da mudança', forcaRelacional: 54, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Risco', classificacao: ['Sponsor', 'Técnico'], influencia: 75, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Apresentar ganho de eficiência operacional via observabilidade.' },
-      { id: 'c13', nome: 'Juliana Mendes', cargo: 'Analista Sênior de Infraestrutura', area: 'Tecnologia', senioridade: 'Especialista', papelComite: 'Avaliação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c12', influencia: 70, potencialSucesso: 74, scoreSucesso: 71, ganchoReuniao: 'Validar performance de observabilidade versus concorrentes.' }
+      { id: 'c12', nome: 'Roberto Alves', cargo: 'Diretor de Inovação e Tecnologia', area: 'Técnico', senioridade: 'Diretoria', papelComite: 'Patrocinador da mudança', forcaRelacional: 54, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Em Risco', classificacao: ['Sponsor', 'Técnico'], influencia: 75, potencialSucesso: 58, scoreSucesso: 52, ganchoReuniao: 'Apresentar ganho de eficiência operacional via observabilidade.' },
+      { id: 'c13', nome: 'Juliana Mendes', cargo: 'Analista Sênior de Infraestrutura', area: 'Técnico', senioridade: 'Especialista', papelComite: 'Avaliação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c12', influencia: 70, potencialSucesso: 74, scoreSucesso: 71, ganchoReuniao: 'Validar performance de observabilidade versus concorrentes.' }
     ],
     oportunidades: [
       { id: 'o12', nome: 'Renovação multi-unidade com expansão', etapa: 'Proposta', valor: 1200000, owner: 'Camila Ribeiro', risco: 'Alto', probabilidade: 45, historico: ['Proposta inicial enviada em março', 'Validação técnica em andamento', 'Sponsor em prioridades concorrentes'] }
@@ -1175,11 +1175,11 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Adoção de prova de conceito com bom ROI técnico.'], insucessos: ['Falta de cobertura executiva permitiu esfriamento.'], padroes: ['Telecom valida com comitê técnico e aprova com executivo.'], learnings: ['Executivo patrocinador é crítico para continuidade.'], hipoteses: ['Contato executivo externo reativa interesse.'], fatoresRecomendacao: ['Risco elevado de perda', 'Sponsor em prioridades concorrentes', 'Possibilidade de rápida recuperação'] },
     tecnografia: ['Cisco DNA', 'Splunk', 'AWS', 'Kubernetes'],
-    historico: [{ data: '2026-04-05', tipo: 'Sinal', descricao: 'Queda de engajamento detectada pelo monitoramento de email.', icone: 'TrendingDown' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de reativação criada para preservar pipeline.', icone: 'AlertTriangle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-05', tipo: 'Tendência', descricao: 'Queda de engajamento detectada pelo monitoramento de email.', icone: 'TrendingDown' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de reativação criada para preservar pipeline.', icone: 'AlertTriangle' }],
+    reconciliationStatus: 'ativa'
   },
   {
-    id: '13', slug: 'msd-saude', nome: 'MSD Saúde', dominio: 'msdsaude.com.br', vertical: 'Saúde',
+    id: '13', slug: 'msd-saude', nome: 'MSD Saúde', dominio: 'msdsaude.com.br', vertical: 'Negócio',
     segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Pablo Diniz', ownersSecundarios: [],
     etapa: 'Expansão', tipoEstrategico: 'ABX', potencial: 81, risco: 15, prontidao: 75, coberturaRelacional: 70,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável',
@@ -1190,11 +1190,11 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em unidade piloto abre porta para expansão sistêmica.', 'Timing de budget disponível sugere decision window curta (Q2).'],
     leituraSugerida: ['Agendar business review com sponsor de expansão regional.', 'Estruturar modelo de rollout para 3+ unidades em paralelo.'],
     sinais: [
-      { id: 's22', titulo: 'Expansão confirmada em nova unidade regional', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Pablo Diniz', recomendacao: 'Validar business case e estruturar implementação até 20/04.', contexto: 'Expansão para Nordeste confirmada. Budget disponível. Modelo validado em piloto.', data: '2026-04-06' }
+      { id: 's22', titulo: 'Expansão confirmada em nova unidade regional', tipo: 'Tendência', impacto: 'Médio', owner: 'Pablo Diniz', recomendacao: 'Validar business case e estruturar implementação até 20/04.', contexto: 'Expansão para Nordeste confirmada. Budget disponível. Modelo validado em piloto.', data: '2026-04-06' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c27', nome: 'Dra. Beatriz Cardoso', cargo: 'Diretora de Estratégia e Expansão', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Decisão de investimento em expansão', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 86, potencialSucesso: 82, scoreSucesso: 80, ganchoReuniao: 'Estruturar modelo de escalabilidade regional com margens otimizadas.' }
+      { id: 'c27', nome: 'Dra. Beatriz Cardoso', cargo: 'Diretora de Estratégia e Expansão', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Decisão de investimento em expansão', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 86, potencialSucesso: 82, scoreSucesso: 80, ganchoReuniao: 'Estruturar modelo de escalabilidade regional com margens otimizadas.' }
     ],
     oportunidades: [
       { id: 'o22', nome: 'Expansão de serviços de saúde digital em nova unidade regional', etapa: 'Qualificação', valor: 180000, owner: 'Pablo Diniz', risco: 'Baixo', probabilidade: 78, historico: ['Modelo validado em unidade piloto', 'Budget aprovado para Q2', 'Timeline: implementação até 30/06'] }
@@ -1204,13 +1204,13 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Conta em jornada ativa de expansão regional.', evolucaoJornada: 'Piloto validado > expansão regional > replicação sistêmica.', maturidadeRelacional: 'Média-alta com sponsor claro.', sponsorAtivo: 'Diretora de Estratégia fortemente engajada.', profundidadeComite: 'Moderada (decisão regional).', continuidade: 'Ativa com plano de replicação.', expansao: 'Confirmada para Nordeste. Potencial para Centro-Oeste e Norte em 2026-2027.', retencao: 'Modelo inicial validado e retido.', riscoEstagnacao: 'Baixo com sponsor ativo e budget confirmado.' },
     inteligencia: { sucessos: ['Modelo de sucesso validado em piloto reduz risco de expansão.'], insucessos: [], padroes: ['Empresas de saúde expandem região por região quando modelo é validado.'], learnings: ['Sponsor de estratégia é critico para decisões de expansão.'], hipoteses: ['Replicação em 3+ unidades gera ARR de R$ 540k+ em 12 meses.'], fatoresRecomendacao: ['Jornada ativa de expansão', 'Sponsor fortemente engajado', 'Budget confirmado', 'Potencial de replicação elevado'] },
     tecnografia: ['Salesforce Health Cloud', 'AWS', 'Tableau', 'ServiceNow'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Expansão confirmada para nova unidade regional detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Opportunity for regional expansion validated.', icone: 'CheckCircle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Expansão confirmada para nova unidade regional detectada.', icone: 'TrendingUp' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Opportunity for regional expansion validated.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'ativa'
   },
   {
-    id: '14', slug: 'operacao-interna', nome: 'Operação Interna', dominio: 'canopi.internal', vertical: 'Operação',
+    id: '14', slug: 'operacao-interna', nome: 'Operação Interna', dominio: 'canopi.internal', vertical: 'Negócio',
     segmento: 'Interno', porte: 'N/A', localizacao: 'Remoto', ownerPrincipal: 'Revenue Ops', ownersSecundarios: [],
-    etapa: 'Operação', tipoEstrategico: 'Em andamento', potencial: 100, risco: 0, prontidao: 95, coberturaRelacional: 100,
+    etapa: 'Negócio', tipoEstrategico: 'Em andamento', potencial: 100, risco: 0, prontidao: 95, coberturaRelacional: 100,
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Nenhum', statusGeral: 'Crítico',
     icp: 100, crm: 95, vp: 100, ct: 100, ft: 100, budgetBrl: 0, possuiOportunidade: true,
     oportunidadePrincipal: 'Garantia de saúde operacional contínua da plataforma', proximaMelhorAcao: 'Monitorar integrações e resolver alertas operacionais de sincronização.',
@@ -1219,22 +1219,22 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Saúde deste "cliente interno" determina leiturabilidade da plataforma.', 'Falhas aqui impactam visibilidade de todas as contas no cockpit.'],
     leituraSugerida: ['Monitorar alertas de sincronização de seed.', 'Manter validação de coerência entre tabelas core (accounts, contacts, signals, actions, oportunidades).'],
     sinais: [
-      { id: 's23', titulo: 'Alertas operacionais de sincronização', tipo: 'Operacional', impacto: 'Crítico', owner: 'Revenue Ops', recomendacao: 'Validar coerência de seed após cada deployment.', contexto: 'Validação automática de referência entre accounts, contacts, signals, actions, oportunidades.', data: '2026-04-06' }
+      { id: 's23', titulo: 'Alertas operacionais de sincronização', tipo: 'Alerta', impacto: 'Alto', owner: 'Revenue Ops', recomendacao: 'Validar coerência de seed após cada deployment.', contexto: 'Validação automática de referência entre accounts, contacts, signals, actions, oportunidades.', data: '2026-04-06' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c28', nome: 'Fábio Diniz', cargo: 'Diretor de Engenharia / Product', area: 'Operação', senioridade: 'Liderança', papelComite: 'Dono da plataforma', forcaRelacional: 100, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Dono', 'Operação'], influencia: 100, potencialSucesso: 100, scoreSucesso: 100, ganchoReuniao: 'Verificar saúde operacional do seed e coerência de dados.' }
+      { id: 'c28', nome: 'Fábio Diniz', cargo: 'Diretor de Engenharia / Product', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Dono da plataforma', forcaRelacional: 100, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 100, potencialSucesso: 100, scoreSucesso: 100, ganchoReuniao: 'Verificar saúde operacional do seed e coerência de dados.' }
     ],
     oportunidades: [
-      { id: 'o25', nome: 'Garantia de saúde operacional contínua da plataforma', etapa: 'Operação', valor: 0, owner: 'Revenue Ops', risco: 'Crítico', probabilidade: 100, historico: ['Validação de seed canônico estável', 'Monitoramento contínuo de coerência de dados'] }
+      { id: 'o25', nome: 'Garantia de saúde operacional contínua da plataforma', etapa: 'Negócio', valor: 0, owner: 'Revenue Ops', risco: 'Alto', probabilidade: 100, historico: ['Validação de seed canônico estável', 'Monitoramento contínuo de coerência de dados'] }
     ],
     canaisCampanhas: { origemPrincipal: 'Integração', influencias: [{ canal: 'Sistema', campanha: 'Monitoramento operacional', tipo: 'Sistema', impacto: 'Validação de seed e sincronização', data: '2026-04-06' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
-    abx: { motivo: '', evolucioJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
+    abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Seed de base canônica estável desde Lote 1.'], insucessos: [], padroes: ['Coerência de dados determina confiança na plataforma.'], learnings: ['Validação de referências precisa ser automática.'], hipoteses: ['Monitoramento contínuo elimina falhas de sincronização.'], fatoresRecomendacao: ['Infraestrutura crítica para operação', 'Monitoramento contínuo necessário'] },
     tecnografia: ['Supabase', 'PostgreSQL', 'Canopi Platform'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Alertas operacionais de sincronização monitorados.', icone: 'AlertTriangle' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Validação de seed canonico Bloco A materializada.', icone: 'CheckCircle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Alertas operacionais de sincronização monitorados.', icone: 'AlertTriangle' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Validação de seed canonico Bloco A materializada.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '15', slug: 'cluster-manufatura', nome: 'Cluster Manufatura', dominio: 'cluster-manufatura.com.br', vertical: 'Manufatura',
@@ -1253,25 +1253,25 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c15', nome: 'Rodrigo Mendes', cargo: 'Diretor de Operações', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de iniciativas', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 74, potencialSucesso: 60, scoreSucesso: 56, ganchoReuniao: 'Demonstrar ganho de eficiência operacional via automação inteligente.' },
-      { id: 'c16', nome: 'Gustavo Silva', cargo: 'Gerente de Engenharia de Processo', area: 'Engenharia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 62, receptividade: 'Alta', acessibilidade: 'Alta', status: 'A ativar', classificacao: ['Champion', 'Técnico'], liderId: 'c15', influencia: 72, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Detalhar visibilidade de processos de automação.' }
+      { id: 'c15', nome: 'Rodrigo Mendes', cargo: 'Diretor de Operações', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de iniciativas', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'A desenvolver', classificacao: ['Decisor', 'Negócio'], influencia: 74, potencialSucesso: 60, scoreSucesso: 56, ganchoReuniao: 'Demonstrar ganho de eficiência operacional via automação inteligente.' },
+      { id: 'c16', nome: 'Gustavo Silva', cargo: 'Gerente de Engenharia de Processo', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 62, receptividade: 'Alta', acessibilidade: 'Alta', status: 'A mapear', classificacao: ['Champion', 'Técnico'], liderId: 'c15', influencia: 72, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Detalhar visibilidade de processos de automação.' }
     ],
     oportunidades: [
       { id: 'o15', nome: 'Implementação de automação industrial com observabilidade', etapa: 'Diagnóstico', valor: 2200000, owner: 'Daniel Rocha', risco: 'Médio', probabilidade: 35, historico: ['Sinal de intenção detectado via SEO', 'Outbound contextualizado em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [{ canal: 'Inbound orgânico', campanha: 'SEO Automação Industrial', tipo: 'Inbound', impacto: 'Intent orgânico qualificado', data: '2026-04-01' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Inbound orgânico', campanha: 'SEO Automação Industrial', tipo: 'Híbrido', impacto: 'Intent orgânico qualificado', data: '2026-04-01' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
     abx: { motivo: 'Cluster de manufatura com sinal de intenção ativa.', evolucaoJornada: 'Inbound via SEO > qualificação > outbound contextualizado.', maturidadeRelacional: 'Inicial, baseada em visita.', sponsorAtivo: 'Em formação.', profundidadeComite: 'Baixa.', continuidade: 'Dependente de cadência rápida.', expansao: 'Mapeamento futuro.', retencao: 'Não aplicável.', riscoEstagnacao: 'Médio se cadência não for acionada em 48h.' },
     inteligencia: { sucessos: [], insucessos: ['Taxa de resposta baixa em outbound anterior (sem contexto de intent).'], padroes: ['Manufatura com visitas a conteúdo técnico responde bem a outbound contextualizado.', 'Visitas recorrentes (3+) indicam alto potencial de conversão.'], learnings: ['Contexto de intent ativa (SEO) muda taxa de resposta.'], hipoteses: ['Outbound com referência ao tema visitado aumenta taxa de resposta em 40%.'], fatoresRecomendacao: ['Sinal de intenção ativa', 'Janela crítica de 48h', 'Oportunidade de diferenciação por contexto'] },
     tecnografia: ['SAP', 'Siemens', 'ABB', 'AWS'],
-    historico: [{ data: '2026-04-05', tipo: 'Sinal', descricao: 'Consolidação de visitas qualificadas de cluster manufatura.', icone: 'TrendingUp' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de conexão SEO-outbound criada.', icone: 'Activity' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-05', tipo: 'Tendência', descricao: 'Consolidação de visitas qualificadas de cluster manufatura.', icone: 'TrendingUp' }, { data: '2026-04-05', tipo: 'Ação', descricao: 'Ação de conexão SEO-outbound criada.', icone: 'Activity' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '16', slug: 'cluster-healthtech', nome: 'Cluster Healthtech', dominio: 'cluster-healthtech.com.br', vertical: 'Saúde + Healthtech',
     segmento: 'Mid-Market + Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil', ownerPrincipal: 'Camila Ribeiro', ownersSecundarios: [],
     etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 70, risco: 20, prontidao: 60, coberturaRelacional: 40,
-    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'Paid Media', statusGeral: 'Saudável',
+    ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Média', playAtivo: 'Híbrido', statusGeral: 'Saudável',
     icp: 75, crm: 50, vp: 70, ct: 45, ft: 68, budgetBrl: 2500000, possuiOportunidade: true,
     oportunidadePrincipal: 'Otimização de campanha de aquisição em healthtech',
     proximaMelhorAcao: 'Recuperar campanha de mídia paga.',
@@ -1284,19 +1284,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c17', nome: 'Mariana Teixeira', cargo: 'Gerente de Marketing Digital', area: 'Marketing', senioridade: 'Gerência', papelComite: 'Proprietária de campanha', forcaRelacional: 58, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 76, potencialSucesso: 72, scoreSucesso: 69, ganchoReuniao: 'Mostrar potencial de redução de CPL em 20% via otimização rápida.' },
-      { id: 'c18', nome: 'Rafael Costa', cargo: 'Analista de Mídia Paga', area: 'Marketing', senioridade: 'Especialista', papelComite: 'Executador tático', forcaRelacional: 66, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c17', influencia: 70, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar análise de conjuntos e oportunidade de pausa.' }
+      { id: 'c17', nome: 'Mariana Teixeira', cargo: 'Gerente de Marketing Digital', area: 'Negócio', senioridade: 'Gerência', papelComite: 'Proprietária de campanha', forcaRelacional: 58, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 76, potencialSucesso: 72, scoreSucesso: 69, ganchoReuniao: 'Mostrar potencial de redução de CPL em 20% via otimização rápida.' },
+      { id: 'c18', nome: 'Rafael Costa', cargo: 'Analista de Mídia Paga', area: 'Negócio', senioridade: 'Especialista', papelComite: 'Executador tático', forcaRelacional: 66, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c17', influencia: 70, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar análise de conjuntos e oportunidade de pausa.' }
     ],
     oportunidades: [
       { id: 'o16', nome: 'Otimização de campanha de aquisição em healthtech', etapa: 'Diagnóstico', valor: 2500000, owner: 'Camila Ribeiro', risco: 'Baixo', probabilidade: 72, historico: ['Campanha em andamento', 'Desvio de performance identificado', 'Plano de ação em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Paid Media', influencias: [{ canal: 'Paid Media', campanha: 'Healthtech Acquisition Q2', tipo: 'Paid Media', impacto: 'Geração de leads qualificados', data: '2026-03-15' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Healthtech Acquisition Q2', tipo: 'Híbrido', impacto: 'Geração de leads qualificados', data: '2026-03-15' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
     abx: { motivo: 'Cluster healthtech com campanha em otimização.', evolucaoJornada: 'Campanha de aquisição em ajuste tático.', maturidadeRelacional: 'Inicial, baseada em mídia paga.', sponsorAtivo: 'Gerente de marketing digital.', profundidadeComite: 'Baixa (apenas marketing).', continuidade: 'Dependente de melhoria de CPL.', expansao: 'Mapeamento futuro.', retencao: 'Não aplicável.', riscoEstagnacao: 'Médio se CPL não melhorar em 72h.' },
     inteligencia: { sucessos: ['Conversão de landing estável indica qualidade de copy/oferta.'], insucessos: ['Origem do tráfego com baixa aderência ICP.'], padroes: ['Healthtech responde bem a campanhas focadas em compliance + eficiência operacional.'], learnings: ['Concentração de gasto em poucos conjuntos amplia risco de desperdício.'], hipoteses: ['Distribuição uniforme de gasto reduz CPL em 20%.'], fatoresRecomendacao: ['Desvio de performance', 'Potencial de recuperação rápida', 'Ação tática simples'] },
     tecnografia: ['Google Ads', 'Meta Ads', 'HubSpot', 'Segment'],
-    historico: [{ data: '2026-04-06', tipo: 'Sinal', descricao: 'Alerta persistente de CPL acima da meta gerado por Canopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Alerta persistente de CPL acima da meta gerado por Canopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
+    reconciliationStatus: 'ativa'
   },
   // --- LOTE 3A: CONTAS ÓRFÃS RECONCILIADAS ---
   {
@@ -1309,26 +1309,26 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Implementação pode começar em 60 dias se alinhamento técnico for validado.', 'Veterinários em empresas decisionoras respondem bem a provas de resultado.'],
     leituraSugerida: ['Estruturar POC de 30 dias com caso real de clínica.', 'Enviar roadmap de implementação validado com arquiteto técnico.'],
     sinais: [
-      { id: 's25', titulo: 'Pós-workshop: alta receptividade para POC em saúde animal', tipo: 'Oportunidade', impacto: 'Alto', owner: 'Patricia Silva', recomendacao: 'Agendar POC kickoff até 15/04 com full technical team.', contexto: 'Workshop realizado com sucesso. Diretoria quer validar com caso real de clínica. Budget aprovado.', data: '2026-04-08' }
+      { id: 's25', titulo: 'Pós-workshop: alta receptividade para POC em saúde animal', tipo: 'Tendência', impacto: 'Alto', owner: 'Patricia Silva', recomendacao: 'Agendar POC kickoff até 15/04 com full technical team.', contexto: 'Workshop realizado com sucesso. Diretoria quer validar com caso real de clínica. Budget aprovado.', data: '2026-04-08' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c30', nome: 'Dr. Paulo Mendes', cargo: 'Diretor de Inovação em Saúde Animal', area: 'Estratégia', senioridade: 'C-Level', papelComite: 'Patrocinador de tecnologia', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 80, scoreSucesso: 78, ganchoReuniao: 'Demonstrar redução de mortalidade animal com IA preditiva.' },
-      { id: 'c31', nome: 'Dra. Beatriz Gomes', cargo: 'Gerente de Tecnologia Veterinária', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c30', influencia: 76, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar integração com sistemas de registro veterinário existentes.' }
+      { id: 'c30', nome: 'Dr. Paulo Mendes', cargo: 'Diretor de Inovação em Saúde Animal', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de tecnologia', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Técnico'], influencia: 88, potencialSucesso: 80, scoreSucesso: 78, ganchoReuniao: 'Demonstrar redução de mortalidade animal com IA preditiva.' },
+      { id: 'c31', nome: 'Dra. Beatriz Gomes', cargo: 'Gerente de Tecnologia Veterinária', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c30', influencia: 76, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Detalhar integração com sistemas de registro veterinário existentes.' }
     ],
     oportunidades: [
       { id: 'o26', nome: 'Implementação de plataforma de saúde animal inteligente', etapa: 'Qualificação', valor: 1200000, owner: 'Patricia Silva', risco: 'Baixo', probabilidade: 62, historico: ['Workshop de IA realizado com sucesso', 'Budget aprovado corporativamente', 'POC em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Eventos', influencias: [{ canal: 'Webinar', campanha: 'IA em Veterinária 2026', tipo: 'Inbound', impacto: 'Geração de interesse em IA preditiva para clínicas', data: '2026-03-15' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Webinar', campanha: 'IA em Veterinária 2026', tipo: 'Híbrido', impacto: 'Geração de interesse em IA preditiva para clínicas', data: '2026-03-15' }] },
     abm: { motivo: 'Vertical de alto potencial com maturidade tecnológica.', fit: 'Médio-alto (78/100)', cluster: 'Saúde Animal Enterprise', similaridade: '72%', coberturaInicialComite: '45% (apenas executivos)', playsEntrada: ['Play de POC veterinário', 'Play de resultados em redução de mortalidade'], potencialAbertura: 'Alto se POC validar', hipoteses: ['Validação técnica em 30 dias abre caminho para full implementation'], contasSimilares: ['Ceva Animal Health', 'Boehringer Ingelheim'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Workshop bem-estruturado gerou alta receptividade.'], insucessos: [], padroes: ['Executivos em saúde animal respondem bem a validação técnica real.'], learnings: ['Budget aprovado = decisão 80% encaminhada.'], hipoteses: ['POC de 30 dias converte para full deal em 90 dias.'], fatoresRecomendacao: ['Workshop bem-sucedido', 'Budget aprovado', 'Janela de decisão aberta'] },
     tecnografia: ['AWS', 'PostgreSQL', 'Tableau', 'Salesforce Veterinary'],
     historico: [{ data: '2026-04-08', tipo: 'Ação', descricao: 'Ação a7 reconciliada: formalizar próximo passo pós-workshop de IA.', icone: 'Zap' }],
-    reconciliationStatus: 'enriquecida'
+    reconciliationStatus: 'ativa'
   },
   {
-    id: '18', slug: 'fhlb-district', nome: 'FHLB District', dominio: 'fhlb.gov', vertical: 'Financeiro', segmento: 'Governo/Federal', porte: 'Grande', localizacao: 'Washington DC, USA',
+    id: '18', slug: 'fhlb-district', nome: 'FHLB District', dominio: 'fhlb.gov', vertical: 'Negócio', segmento: 'Governo/Federal', porte: 'Grande', localizacao: 'Washington DC, USA',
     ownerPrincipal: 'Julia Mendes', ownersSecundarios: ['Rafael Prado'], etapa: 'Prospecção', tipoEstrategico: 'ABX', potencial: 80, risco: 35, prontidao: 65, coberturaRelacional: 30,
     ultimaMovimentacao: '2026-04-09', atividadeRecente: 'Média', playAtivo: 'ABX', statusGeral: 'Saudável', icp: 82, crm: 58, vp: 80, ct: 40, ft: 72, budgetBrl: 3500000, possuiOportunidade: true,
     oportunidadePrincipal: 'Modernização de infraestrutura digital e automação regulatória', proximaMelhorAcao: 'Preparar outreach consultivo com ângulo de conformidade digital e eficiência operacional.',
@@ -1341,18 +1341,18 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c32', nome: 'Dr. Michael Chen', cargo: 'VP de Tecnologia e Operações', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia federal', forcaRelacional: 58, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 82, potencialSucesso: 68, scoreSucesso: 62, ganchoReuniao: 'Apresentar case de modernização em instituição federal similar.' }
+      { id: 'c32', nome: 'Dr. Michael Chen', cargo: 'VP de Tecnologia e Operações', area: 'Técnico', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia federal', forcaRelacional: 58, receptividade: 'Média', acessibilidade: 'Baixa', status: 'Ativo', classificacao: ['Decisor', 'Técnico'], influencia: 82, potencialSucesso: 68, scoreSucesso: 62, ganchoReuniao: 'Apresentar case de modernização em instituição federal similar.' }
     ],
     oportunidades: [
       { id: 'o27', nome: 'Modernização de infraestrutura digital e automação regulatória', etapa: 'Prospecção', valor: 3500000, owner: 'Julia Mendes', risco: 'Médio', probabilidade: 38, historico: ['Intent data identificado', 'RFI em preparação', 'White paper em desenvolvimento'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Intent Data', influencias: [{ canal: 'Intent Data', campanha: 'Federal Digital Modernization', tipo: 'Inbound', impacto: 'Identificação de sinal de expansão', data: '2026-04-05' }] },
+    canaisCampanhas: { origemPrincipal: 'Intent Data', influencias: [{ canal: 'Intent Data', campanha: 'Federal Digital Modernization', tipo: 'Híbrido', impacto: 'Identificação de sinal de expansão', data: '2026-04-05' }] },
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
     abx: { motivo: 'Instituição federal com orçamento de expansão em modernização.', evolucaoJornada: 'Prospecção > validação de conformidade > RFI > contratação.', maturidadeRelacional: 'Baixa (apenas VP de tech identificado).', sponsorAtivo: 'Em formação (VP de Tecnologia como entrada).', profundidadeComite: 'Baixa a moderada (federal decision process é lento).', continuidade: 'Dependente de aprovação de orçamento para próximo fiscal year.', expansao: 'Potencial de expansão para múltiplos distritos do FHLB.', retencao: 'Não aplicável (novo).', riscoEstagnacao: 'Médio se RFI não viabilizar (processo federal lento).' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Instituições federais decidem lentamente, mas com valores altos e ciclos longos.'], learnings: ['Entrada cedo em RFI é crítica para federal opportunities.'], hipoteses: ['White paper sobre compliance federal converte para informational meeting em 45 dias.'], fatoresRecomendacao: ['Intent data claro', 'Budget de modernização disponível', 'RFI em preparação'] },
     tecnografia: ['AWS GovCloud', 'Azure Federal', 'Salesforce Government Cloud', 'Splunk'],
     historico: [{ data: '2026-04-09', tipo: 'Ação', descricao: 'Ação a8 reconciliada: preparar outreach consultivo para FHLB.', icone: 'Zap' }],
-    reconciliationStatus: 'enriquecida'
+    reconciliationStatus: 'ativa'
   },
   {
     id: '19', slug: 'clever-devices', nome: 'Clever Devices', dominio: 'cleverdevices.com', vertical: 'IoT', segmento: 'Mid-Market', porte: 'Médio', localizacao: 'São Paulo, Brasil',
@@ -1364,22 +1364,22 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Retorno ao site após pausa longa pode indicar mudança de ciclo de orçamento ou turnover de decisor.', 'Interesse em case studies é sinal de validação, não prospection fria.'],
     leituraSugerida: ['Reativar com novo case de eficiência operacional específico para indústria.', 'Validar se houve turnover de decisor e reposicionar se necessário.'],
     sinais: [
-      { id: 's27', titulo: 'Retorno ao site: visitação renovada em case de IoT', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência operacional com ROI de 6 meses.', contexto: '4 meses inativo, retorno com 3 visitas em 5 dias. Seção de case studies visitada.', data: '2026-04-10' }
+      { id: 's27', titulo: 'Retorno ao site: visitação renovada em case de IoT', tipo: 'Tendência', impacto: 'Médio', owner: 'Marcos Oliveira', recomendacao: 'Enviar novo case de eficiência operacional com ROI de 6 meses.', contexto: '4 meses inativo, retorno com 3 visitas em 5 dias. Seção de case studies visitada.', data: '2026-04-10' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c33', nome: 'Carolina Ribeiro', cargo: 'Diretora de Operações', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 55, scoreSucesso: 50, ganchoReuniao: 'Demonstrar redução de overhead operacional em 6 meses.' }
+      { id: 'c33', nome: 'Carolina Ribeiro', cargo: 'Diretora de Operações', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Aprovação de investimento', forcaRelacional: 48, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 72, potencialSucesso: 55, scoreSucesso: 50, ganchoReuniao: 'Demonstrar redução de overhead operacional em 6 meses.' }
     ],
     oportunidades: [
       { id: 'o28', nome: 'Plataforma de gerenciamento inteligente de dispositivos IoT', etapa: 'Descoberta', valor: 800000, owner: 'Marcos Oliveira', risco: 'Médio', probabilidade: 35, historico: ['Visitação renovada detectada', 'Demo anterior em 2025', 'Reativação em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound Retomado', influencias: [{ canal: 'Website', campanha: 'Case Studies IoT', tipo: 'Inbound', impacto: 'Reativação de interesse dorminte', data: '2026-04-10' }] },
+    canaisCampanhas: { origemPrincipal: 'Inbound Retomado', influencias: [{ canal: 'Website', campanha: 'Case Studies IoT', tipo: 'Híbrido', impacto: 'Reativação de interesse dorminte', data: '2026-04-10' }] },
     abm: { motivo: 'Potencial de reativação em conta fria com budget disponível.', fit: 'Baixo-médio (55/100)', cluster: 'IoT Mid-Market', similaridade: '58%', coberturaInicialComite: '35% (apenas diretora)', playsEntrada: ['Play de reativação com novo case', 'Play de ROI operacional de 6 meses'], potencialAbertura: 'Médio se novo case validar pain point', hipoteses: ['Reativação com novo case converte em 60-75 dias.'], contasSimilares: ['Positivo Tecnologia', 'Sensix'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Visitação renovada indica possível mudança de ciclo ou decisor.'], insucessos: ['Demo anterior em 2025 não avançou — motivo desconhecido.'], padroes: ['IoT buyers decidem melhor com case de ROI operacional específico.'], learnings: ['Visitação renovada após pausa longa é sinal de reaquecimento, não prospecção fria.'], hipoteses: ['Novo case de eficiência operacional reativa interesse em 30 dias.'], fatoresRecomendacao: ['Visitação renovada', 'Budget moderado disponível', 'Timing incerto mas janela aberta'] },
     tecnografia: ['AWS', 'Azure IoT Hub', 'Raspberry Pi', 'Docker'],
     historico: [{ data: '2026-04-10', tipo: 'Ação', descricao: 'Ação a12 reconciliada: preparar retomada baseada em retorno ao site.', icone: 'Zap' }],
-    reconciliationStatus: 'enriquecida'
+    reconciliationStatus: 'ativa'
   },
   // --- LOTE 3B.1: PRIMEIRA ONDA DE EXPANSÃO DE VOLUME (6 ABM + 6 ABX) ---
   // ABM: 6 contas novas (acquisition targets)
@@ -1397,19 +1397,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c34', nome: 'Dr. André Martins', cargo: 'VP de Inovação', area: 'Estratégia', senioridade: 'C-Level', papelComite: 'Patrocinador de tecnologia', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 85, potencialSucesso: 76, scoreSucesso: 73, ganchoReuniao: 'Mostrar como automação melhora delivery de consultoria.' },
-      { id: 'c35', nome: 'Mariana Rocha', cargo: 'Diretora de Operações Consultivas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Validação operacional', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Negócio'], liderId: 'c34', influencia: 79, potencialSucesso: 74, scoreSucesso: 71, ganchoReuniao: 'Detalhar redução de overhead em projetos consultivos.' }
+      { id: 'c34', nome: 'Dr. André Martins', cargo: 'VP de Inovação', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de tecnologia', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Técnico'], influencia: 85, potencialSucesso: 76, scoreSucesso: 73, ganchoReuniao: 'Mostrar como automação melhora delivery de consultoria.' },
+      { id: 'c35', nome: 'Mariana Rocha', cargo: 'Diretora de Operações Consultivas', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Validação operacional', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Negócio'], liderId: 'c34', influencia: 79, potencialSucesso: 74, scoreSucesso: 71, ganchoReuniao: 'Detalhar redução de overhead em projetos consultivos.' }
     ],
     oportunidades: [
       { id: 'o29', nome: 'Modernização de infraestrutura de IA para consulting', etapa: 'Prospecção', valor: 2800000, owner: 'Fernando Costa', risco: 'Baixo', probabilidade: 45, historico: ['Interesse inicial detectado', 'Briefing em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'AI Automation Consulting', tipo: 'Inbound', impacto: 'Geração de interesse em automação', data: '2026-04-05' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'AI Automation Consulting', tipo: 'Híbrido', impacto: 'Geração de interesse em automação', data: '2026-04-05' }] },
     abm: { motivo: 'Consultoria de elevada maturidade com budget de inovação.', fit: 'Alto (80/100)', cluster: 'Tech Consulting Enterprise', similaridade: '82%', coberturaInicialComite: '40% (VP + Director)', playsEntrada: ['Play de IA consultiva', 'Play de diferenciação competitiva'], potencialAbertura: 'Alto', hipoteses: ['Posicionamento de diferencial competitivo converte em 60 dias.'], contasSimilares: ['Accenture', 'Deloitte'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Consultores decidem rápido quando veem diferencial competitivo.'], learnings: ['Alto VP score = infraestrutura pronta para implementação.'], hipoteses: ['Automação de processos consultivos acelera decisão.'], fatoresRecomendacao: ['Maturidade tecnológica alta', 'Budget de inovação em discussão', 'Opportunity para diferenciação'] },
     tecnografia: ['AWS', 'GCP', 'Salesforce', 'Tableau', 'Python'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Alto engajamento em materiais de IA detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Alto engajamento em materiais de IA detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '21', slug: 'globalpharma-solutions', nome: 'GlobalPharma Solutions', dominio: 'globalpharma.com', vertical: 'Farmacêutica', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Campinas, Brasil',
@@ -1425,19 +1425,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c36', nome: 'Dr. Ricardo Nascimento', cargo: 'Diretor de Regulatory Affairs', area: 'Compliance', senioridade: 'Diretoria', papelComite: 'Dono do projeto de compliance', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 88, potencialSucesso: 82, scoreSucesso: 80, ganchoReuniao: 'Demonstrar conformidade com deadline regulatório de 07/2026.' },
-      { id: 'c37', nome: 'Fernanda Lima', cargo: 'Gerente de TI Pharma', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c36', influencia: 76, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Detalhar integração com sistemas pharma existentes e timeline de setup.' }
+      { id: 'c36', nome: 'Dr. Ricardo Nascimento', cargo: 'Diretor de Regulatory Affairs', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Dono do projeto de compliance', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Decisor', 'Técnico'], influencia: 88, potencialSucesso: 82, scoreSucesso: 80, ganchoReuniao: 'Demonstrar conformidade com deadline regulatório de 07/2026.' },
+      { id: 'c37', nome: 'Fernanda Lima', cargo: 'Gerente de TI Pharma', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c36', influencia: 76, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Detalhar integração com sistemas pharma existentes e timeline de setup.' }
     ],
     oportunidades: [
       { id: 'o30', nome: 'Plataforma de compliance e rastreabilidade de medicamentos', etapa: 'Qualificação', valor: 3200000, owner: 'Isabella Santos', risco: 'Baixo', probabilidade: 68, historico: ['Pressão regulatória acionadora', 'Budget aprovado', 'Timeline apertado mas viável'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [{ canal: 'Outbound', campanha: 'Pharma Compliance 2026', tipo: 'Outbound', impacto: 'Ativação por compliance obrigatória', data: '2026-04-08' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Pharma Compliance 2026', tipo: 'Híbrido', impacto: 'Ativação por compliance obrigatória', data: '2026-04-08' }] },
     abm: { motivo: 'Pharma com pressão regulatória e budget. Urgência não é marketing.', fit: 'Altíssimo (88/100)', cluster: 'Pharma Enterprise', similaridade: '85%', coberturaInicialComite: '35% (Regulatory + TI)', playsEntrada: ['Play de conformidade regulatória', 'Play de implementação rápida'], potencialAbertura: 'Altíssimo', hipoteses: ['Deadline regulatório = decisão obrigatória antes de 01/07.'], contasSimilares: ['Aché Laboratórios', 'Cristália'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Pharma decide rápido quando regulação força urgência.'], learnings: ['Deadline regulatório converte compliance em must-have.'], hipoteses: ['Solução pronta para implementação vence competitors.'], fatoresRecomendacao: ['Urgência regulatória real', 'Budget confirmado', 'Timeline apertado = oportunidade'] },
     tecnografia: ['AWS', 'PostgreSQL', 'SAP Pharma', 'Salesforce', 'blockchain for traceability'],
-    historico: [{ data: '2026-04-11', tipo: 'Sinal', descricao: 'Sinal de urgência regulatória: pressão de compliance detectada.', icone: 'AlertTriangle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-11', tipo: 'Tendência', descricao: 'Sinal de urgência regulatória: pressão de compliance detectada.', icone: 'AlertTriangle' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '22', slug: 'sustainableenergy-group', nome: 'SustainableEnergy Group', dominio: 'sustainableenergy.com.br', vertical: 'Energia/Sustentabilidade', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Brasília, Brasil',
@@ -1453,19 +1453,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c38', nome: 'Dr. Gustavo Lima', cargo: 'VP de Operações', area: 'Operações', senioridade: 'C-Level', papelComite: 'Patrocinador de integração', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 82, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Mostrar como consolidação de sistemas reduz overhead operacional.' },
-      { id: 'c39', nome: 'Camila Oliveira', cargo: 'Gerente de TI de Operações', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica de integração', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c38', influencia: 74, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar arquitetura de integração e suporte a múltiplas fontes.' }
+      { id: 'c38', nome: 'Dr. Gustavo Lima', cargo: 'VP de Operações', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de integração', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 82, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Mostrar como consolidação de sistemas reduz overhead operacional.' },
+      { id: 'c39', nome: 'Camila Oliveira', cargo: 'Gerente de TI de Operações', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica de integração', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c38', influencia: 74, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar arquitetura de integração e suporte a múltiplas fontes.' }
     ],
     oportunidades: [
       { id: 'o31', nome: 'Plataforma de gestão integrada de energia renovável', etapa: 'Prospecção', valor: 2200000, owner: 'Paulo Vasconcelos', risco: 'Médio', probabilidade: 48, historico: ['Dor de integração identificada', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Renewable Energy Integration', tipo: 'Inbound', impacto: 'Geração de interesse em consolidação operacional', data: '2026-03-28' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Renewable Energy Integration', tipo: 'Híbrido', impacto: 'Geração de interesse em consolidação operacional', data: '2026-03-28' }] },
     abm: { motivo: 'Operadora renovável em crescimento com dor de integração.', fit: 'Médio-alto (76/100)', cluster: 'Energia Renovável Enterprise', similaridade: '78%', coberturaInicialComite: '30% (VP + TI Manager)', playsEntrada: ['Play de integração operacional', 'Play de eficiência de múltiplas fontes'], potencialAbertura: 'Médio-alto', hipoteses: ['Consolidação operacional acelera para 90 dias.'], contasSimilares: ['Neoenergia', 'Engie Brasil'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Operadores renováveis em crescimento priorizam integração operacional.'], learnings: ['Dor de integração de sistemas é acionadora real em energia.'], hipoteses: ['Workshop de visão converte para proposta em 45 dias.'], fatoresRecomendacao: ['Crescimento operacional rápido', 'Dor de integração clara', 'Budget disponível'] },
     tecnografia: ['AWS', 'SCADA', 'Power BI', 'SAP Utilities'],
-    historico: [{ data: '2026-04-10', tipo: 'Sinal', descricao: 'Crescimento de operações + dor de integração de sistemas.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-10', tipo: 'Tendência', descricao: 'Crescimento de operações + dor de integração de sistemas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '23', slug: 'retailinnovate-platform', nome: 'RetailInnovate Platform', dominio: 'retailinnovate.com.br', vertical: 'Varejo/E-commerce', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -1481,19 +1481,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c40', nome: 'Sophia Arantes', cargo: 'Diretora de Experiência do Cliente', area: 'Marketing/CX', senioridade: 'Diretoria', papelComite: 'Patrocinadora de omnichannel', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'CX'], influencia: 84, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Demonstrar unificação de experiência entre online e lojas.' },
-      { id: 'c41', nome: 'Bruno Martins', cargo: 'Gerente de Tecnologia de Varejo', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c40', influencia: 76, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar integração com múltiplos canais e sincronização de inventário.' }
+      { id: 'c40', nome: 'Sophia Arantes', cargo: 'Diretora de Experiência do Cliente', area: 'Marketing/CX', senioridade: 'Diretoria', papelComite: 'Patrocinadora de omnichannel', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 84, potencialSucesso: 78, scoreSucesso: 75, ganchoReuniao: 'Demonstrar unificação de experiência entre online e lojas.' },
+      { id: 'c41', nome: 'Bruno Martins', cargo: 'Gerente de Tecnologia de Varejo', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c40', influencia: 76, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar integração com múltiplos canais e sincronização de inventário.' }
     ],
     oportunidades: [
       { id: 'o32', nome: 'Plataforma de experiência omnichannel para varejo', etapa: 'Prospecção', valor: 2600000, owner: 'Lucia Mendes', risco: 'Baixo', probabilidade: 52, historico: ['Alto interesse em consolidação omnichannel', 'Briefing em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Retail Omnichannel 2026', tipo: 'Inbound', impacto: 'Geração de interesse em unificação de canais', data: '2026-04-06' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Retail Omnichannel 2026', tipo: 'Híbrido', impacto: 'Geração de interesse em unificação de canais', data: '2026-04-06' }] },
     abm: { motivo: 'Varejista grande com elevada maturidade e dor de consolidação.', fit: 'Alto (79/100)', cluster: 'Retail Enterprise Omnichannel', similaridade: '81%', coberturaInicialComite: '38% (CX + TI)', playsEntrada: ['Play de omnichannel unificado', 'Play de experiência cliente'], potencialAbertura: 'Alto', hipoteses: ['Consolidação omnichannel converte em 75 dias.'], contasSimilares: ['Renner', 'Arezzo'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Varejistas grandes priorizam omnichannel quando há elevada maturidade CRM.'], learnings: ['Múltiplas plataformas em paralelo = urgência de consolidação.'], hipoteses: ['Unificação de experiência cliente converte para ROI visível.'], fatoresRecomendacao: ['Maturidade CRM alta', 'Dor de múltiplas plataformas', 'Budget disponível'] },
     tecnografia: ['Salesforce Commerce Cloud', 'AWS', 'Tableau', 'Postgres'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Alto interesse em consolidação omnichannel detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Alto interesse em consolidação omnichannel detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '24', slug: 'fintechlabs-io', nome: 'FinTechLabs', dominio: 'fintechlabs.io', vertical: 'Fintech', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -1509,18 +1509,18 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c42', nome: 'Victoria Chen', cargo: 'VP de Operações Globais', area: 'Operações', senioridade: 'C-Level', papelComite: 'Patrocinadora de scaling', forcaRelacional: 73, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 86, potencialSucesso: 80, scoreSucesso: 77, ganchoReuniao: 'Demonstrar aceleração de scaling com automação de compliance.' }
+      { id: 'c42', nome: 'Victoria Chen', cargo: 'VP de Operações Globais', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinadora de scaling', forcaRelacional: 73, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 86, potencialSucesso: 80, scoreSucesso: 77, ganchoReuniao: 'Demonstrar aceleração de scaling com automação de compliance.' }
     ],
     oportunidades: [
       { id: 'o33', nome: 'Plataforma de automação e compliance para fintech scaling', etapa: 'Prospecção', valor: 3000000, owner: 'Camilo Perez', risco: 'Médio', probabilidade: 50, historico: ['Scaling global acionador', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Fintech Scaling 2026', tipo: 'Inbound', impacto: 'Geração de interesse em automação global', data: '2026-04-08' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Fintech Scaling 2026', tipo: 'Híbrido', impacto: 'Geração de interesse em automação global', data: '2026-04-08' }] },
     abm: { motivo: 'Fintech em scaling com urgência de operacional global.', fit: 'Altíssimo (84/100)', cluster: 'Fintech Scaling Enterprise', similaridade: '83%', coberturaInicialComite: '42% (VP Global)', playsEntrada: ['Play de scaling regulatório', 'Play de automação operacional'], potencialAbertura: 'Alto', hipoteses: ['Solução de compliance global converte em 60 dias.'], contasSimilares: ['Nubank', 'StoneCo'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Fintechs em scaling priorizam compliance automático quando expandem globalmente.'], learnings: ['Regulação múltipla = urgência real de automação.'], hipoteses: ['Solução de compliance global acelera para 90 dias.'], fatoresRecomendacao: ['Scaling global rápido', 'Pressão de compliance múltipla', 'Budget confirmado'] },
     tecnografia: ['AWS', 'Kubernetes', 'Postgres', 'RabbitMQ'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Scaling global + pressão de compliance regulatória.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Scaling global + pressão de compliance regulatória.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '25', slug: 'cloudsecure-systems', nome: 'CloudSecure Systems', dominio: 'cloudsecure.com.br', vertical: 'Cibersegurança', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
@@ -1536,18 +1536,18 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c43', nome: 'Arthur Gomes', cargo: 'VP de Arquitetura de Segurança', area: 'Segurança', senioridade: 'C-Level', papelComite: 'Patrocinador de zero-trust', forcaRelacional: 71, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Técnico'], influencia: 83, potencialSucesso: 75, scoreSucesso: 72, ganchoReuniao: 'Demonstrar implementação de zero-trust em cloud.' }
+      { id: 'c43', nome: 'Arthur Gomes', cargo: 'VP de Arquitetura de Segurança', area: 'Segurança', senioridade: 'C-Level', papelComite: 'Patrocinador de zero-trust', forcaRelacional: 71, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Técnico'], influencia: 83, potencialSucesso: 75, scoreSucesso: 72, ganchoReuniao: 'Demonstrar implementação de zero-trust em cloud.' }
     ],
     oportunidades: [
       { id: 'o34', nome: 'Plataforma integrada de segurança cloud e compliance', etapa: 'Prospecção', valor: 2400000, owner: 'Rogerio Almeida', risco: 'Baixo', probabilidade: 48, historico: ['Interesse em zero-trust', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Inbound', campanha: 'Cloud Security Zero Trust', tipo: 'Inbound', impacto: 'Geração de interesse em zero-trust architecture', data: '2026-04-10' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Híbrido', campanha: 'Cloud Security Zero Trust', tipo: 'Híbrido', impacto: 'Geração de interesse em zero-trust architecture', data: '2026-04-10' }] },
     abm: { motivo: 'Empresa segurança com maturidade tech e oportunidade de consolidação.', fit: 'Alto (81/100)', cluster: 'Cloud Security Enterprise', similaridade: '79%', coberturaInicialComite: '45% (VP Security)', playsEntrada: ['Play de zero-trust consolidado', 'Play de compliance integrado'], potencialAbertura: 'Médio-alto', hipoteses: ['Consolidação zero-trust converte em 70 dias.'], contasSimilares: ['Fortinet', 'Palo Alto'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Empresas segurança decidem rápido quando veem consolidação operacional.'], learnings: ['Zero-trust architecture = tema de decisão rápida em segurança.'], hipoteses: ['Workshop zero-trust converte para proposta em 45 dias.'], fatoresRecomendacao: ['Maturidade tech alta', 'Tema de zero-trust prioritário', 'Budget disponível'] },
     tecnografia: ['AWS', 'Azure', 'Kubernetes', 'HashiCorp', 'Vault'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Investimento em segurança cloud zero-trust detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Investimento em segurança cloud zero-trust detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   // ABX: 6 contas novas (expansion targets)
   {
@@ -1560,12 +1560,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso inicial = receptividade para expansão.', 'Supply chain = nova pain point descoberta.'],
     leituraSugerida: ['Estruturar roadmap de supply chain analytics.', 'Posicionar como expansão natural do core analytics.'],
     sinais: [
-      { id: 's34', titulo: 'Oportunidade de expansão para supply chain analytics', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Juliana Ferreira', recomendacao: 'Agendar roadmap de supply chain em 20/04.', contexto: 'Cliente em expansão. Nova demanda de visibilidade de supply chain. Receptividade alta.', data: '2026-04-12' }
+      { id: 's34', titulo: 'Oportunidade de expansão para supply chain analytics', tipo: 'Tendência', impacto: 'Médio', owner: 'Juliana Ferreira', recomendacao: 'Agendar roadmap de supply chain em 20/04.', contexto: 'Cliente em expansão. Nova demanda de visibilidade de supply chain. Receptividade alta.', data: '2026-04-12' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c44', nome: 'Rafael Costa', cargo: 'Diretor de Supply Chain', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Dono da expansão supply chain', forcaRelacional: 78, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Mostrar visibilidade de supply chain com analytics.' },
-      { id: 'c45', nome: 'Isabela Oliveira', cargo: 'Gerente de Analytics', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Champion técnica da expansão', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c44', influencia: 74, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar extensão de plataforma para supply chain.' }
+      { id: 'c44', nome: 'Rafael Costa', cargo: 'Diretor de Supply Chain', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Dono da expansão supply chain', forcaRelacional: 78, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Mostrar visibilidade de supply chain com analytics.' },
+      { id: 'c45', nome: 'Isabela Oliveira', cargo: 'Gerente de Analytics', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion técnica da expansão', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c44', influencia: 74, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar extensão de plataforma para supply chain.' }
     ],
     oportunidades: [
       { id: 'o35', nome: 'Expansão de analytics para operações e supply chain', etapa: 'Qualificação', valor: 1800000, owner: 'Juliana Ferreira', risco: 'Baixo', probabilidade: 72, historico: ['Cliente maduro com receptividade alta', 'Roadmap em preparação'] }
@@ -1575,11 +1575,11 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente maduro com alta receptividade. Expansão natural para supply chain.', evolucaoJornada: 'Core BI > supply chain analytics > operações integradas.', maturidadeRelacional: 'Alta (cliente desde 2023).', sponsorAtivo: 'Diretor de Supply Chain como novo sponsor.', profundidadeComite: 'Profunda — já há contatos no financeiro, IT e agora operações.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Supply chain é primeira janela; operações é segunda.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento.' },
     inteligencia: { sucessos: ['Implementação anterior bem-sucedida.'], insucessos: [], padroes: ['Clientes analytics maduros decidem rápido em expansões.'], learnings: ['Supply chain = pain point novo descoberto em expansão.'], hipoteses: ['Roadmap supply chain converte em 60 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Alta receptividade', 'Expansion clara e natural'] },
     tecnografia: ['Tableau', 'Snowflake', 'Python', 'AWS'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Oportunidade de expansão para supply chain analytics identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Oportunidade de expansão para supply chain analytics identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
-    id: '27', slug: 'multihealth-network', nome: 'MultiHealth Network', dominio: 'multihealth.com.br', vertical: 'Saúde', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Belo Horizonte, Brasil',
+    id: '27', slug: 'multihealth-network', nome: 'MultiHealth Network', dominio: 'multihealth.com.br', vertical: 'Negócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Belo Horizonte, Brasil',
     ownerPrincipal: 'Marisa Gomes', ownersSecundarios: [], etapa: 'Expansão', tipoEstrategico: 'ABX', potencial: 74, risco: 20, prontidao: 68, coberturaRelacional: 55,
     ultimaMovimentacao: '2026-04-11', atividadeRecente: 'Alta', playAtivo: 'ABX', statusGeral: 'Saudável', icp: 72, crm: 78, vp: 72, ct: 65, ft: 70, budgetBrl: 1500000, possuiOportunidade: true,
     oportunidadePrincipal: 'Expansão de plataforma para gestão de redes de clínicas', proximaMelhorAcao: 'Mapear clínicas parceiras e estruturar expansão regional.',
@@ -1588,12 +1588,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Crescimento de rede = oportunidade de expansão natural.', 'Franquias = nova receita por conta.'],
     leituraSugerida: ['Estruturar modelo de expansão por clínica.', 'Posicionar como habilitador de crescimento de rede.'],
     sinais: [
-      { id: 's35', titulo: 'Expansão de rede de clínicas parceiras', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Marisa Gomes', recomendacao: 'Agendar workshop de expansão de rede até 22/04.', contexto: '20+ clínicas parceiras identificadas. Budget de expansão aprovado.', data: '2026-04-11' }
+      { id: 's35', titulo: 'Expansão de rede de clínicas parceiras', tipo: 'Tendência', impacto: 'Médio', owner: 'Marisa Gomes', recomendacao: 'Agendar workshop de expansão de rede até 22/04.', contexto: '20+ clínicas parceiras identificadas. Budget de expansão aprovado.', data: '2026-04-11' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c46', nome: 'Dr. Henrique Pereira', cargo: 'Diretor de Operações de Rede', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de rede', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 80, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Demonstrar escalabilidade de plataforma para rede de clínicas.' },
-      { id: 'c47', nome: 'Carla Silva', cargo: 'Gerente de TI', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica de expansão', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c46', influencia: 70, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Detalhar integração com múltiplas clínicas e sincronização de dados.' }
+      { id: 'c46', nome: 'Dr. Henrique Pereira', cargo: 'Diretor de Operações de Rede', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de rede', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 80, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Demonstrar escalabilidade de plataforma para rede de clínicas.' },
+      { id: 'c47', nome: 'Carla Silva', cargo: 'Gerente de TI', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica de expansão', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c46', influencia: 70, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Detalhar integração com múltiplas clínicas e sincronização de dados.' }
     ],
     oportunidades: [
       { id: 'o36', nome: 'Expansão de plataforma para gestão de redes de clínicas', etapa: 'Qualificação', valor: 1500000, owner: 'Marisa Gomes', risco: 'Baixo', probabilidade: 68, historico: ['Rede de clínicas parceiras identificada', 'Budget aprovado', 'Workshop em preparação'] }
@@ -1603,8 +1603,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente saúde em crescimento de rede. Expansão clara e orgânica.', evolucaoJornada: 'Matriz > franquias > consolidação de rede.', maturidadeRelacional: 'Alta (cliente ativo com bom engajamento).', sponsorAtivo: 'Diretor de Rede como sponsor.', profundidadeComite: 'Média (operações + TI mapeados).', continuidade: 'Alta — cliente em expansão.', expansao: 'Clínicas parceiras são primeira janela de expansão.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — rede em crescimento orgânico.' },
     inteligencia: { sucessos: ['Implementação na matriz bem-sucedida.'], insucessos: [], padroes: ['Redes de saúde em crescimento decidem rápido em expansão.'], learnings: ['Franquias = nova receita por cliente.'], hipoteses: ['Modelo de expansão por clínica converte em 75 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Alta receptividade', 'Crescimento orgânico evidente'] },
     tecnografia: ['AWS', 'Salesforce Health Cloud', 'Python', 'Postgres'],
-    historico: [{ data: '2026-04-11', tipo: 'Sinal', descricao: 'Expansão de rede de clínicas parceiras em andamento.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-11', tipo: 'Tendência', descricao: 'Expansão de rede de clínicas parceiras em andamento.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '28', slug: 'logisticspro-fleet', nome: 'LogisticsPro Fleet', dominio: 'logisticspro.com.br', vertical: 'Logística', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Curitiba, Brasil',
@@ -1616,12 +1616,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Telemática estabelecida = base para IA de rotas.', 'Manutenção preditiva = ROI claro em frota.'],
     leituraSugerida: ['Estruturar com foco em otimização de rotas com IA.', 'Posicionar como redutor de custos operacionais.'],
     sinais: [
-      { id: 's36', titulo: 'Oportunidade de IA em otimização de rotas e manutenção preditiva', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Claudio Ferreira', recomendacao: 'Agendar workshop de IA de rotas até 23/04.', contexto: 'Cliente em telemática. Nova demanda de otimização. Alto potencial de ROI.', data: '2026-04-13' }
+      { id: 's36', titulo: 'Oportunidade de IA em otimização de rotas e manutenção preditiva', tipo: 'Tendência', impacto: 'Médio', owner: 'Claudio Ferreira', recomendacao: 'Agendar workshop de IA de rotas até 23/04.', contexto: 'Cliente em telemática. Nova demanda de otimização. Alto potencial de ROI.', data: '2026-04-13' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c48', nome: 'Gustavo Neves', cargo: 'Diretor de Operações Logísticas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de IA de rotas', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 81, potencialSucesso: 75, scoreSucesso: 73, ganchoReuniao: 'Mostrar redução de combustível via IA de rotas.' },
-      { id: 'c49', nome: 'Patricia Rocha', cargo: 'Gerente de Tecnologia Logística', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Champion técnica de IA', forcaRelacional: 73, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c48', influencia: 72, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar integração de IA com telemetria existente.' }
+      { id: 'c48', nome: 'Gustavo Neves', cargo: 'Diretor de Operações Logísticas', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de IA de rotas', forcaRelacional: 75, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 81, potencialSucesso: 75, scoreSucesso: 73, ganchoReuniao: 'Mostrar redução de combustível via IA de rotas.' },
+      { id: 'c49', nome: 'Patricia Rocha', cargo: 'Gerente de Tecnologia Logística', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion técnica de IA', forcaRelacional: 73, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c48', influencia: 72, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar integração de IA com telemetria existente.' }
     ],
     oportunidades: [
       { id: 'o37', nome: 'Expansão de telemetria para otimização de rotas e manutenção preditiva', etapa: 'Qualificação', valor: 1600000, owner: 'Claudio Ferreira', risco: 'Baixo', probabilidade: 70, historico: ['Cliente em telemática com receptividade alta', 'Workshop em preparação'] }
@@ -1631,8 +1631,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente logística com telemática estabelecida. Expansão natural para IA.', evolucaoJornada: 'Telemática > otimização de rotas > manutenção preditiva.', maturidadeRelacional: 'Alta (cliente desde 2024).', sponsorAtivo: 'Diretor de Operações como sponsor.', profundidadeComite: 'Média (operações + TI mapeados).', continuidade: 'Alta — cliente satisfeito.', expansao: 'IA de rotas é primeira janela de expansão.', retencao: 'Risco baixo — CS ativo.', riscoEstagnacao: 'Baixo — operador em crescimento.' },
     inteligencia: { sucessos: ['Implementação telemática bem-sucedida.'], insucessos: [], padroes: ['Operadores logísticos decidem rápido em IA quando há telemetria estabelecida.'], learnings: ['ROI de IA de rotas é claro e rápido em logística.'], hipoteses: ['IA de rotas converte em 70 dias com ROI visível.'], fatoresRecomendacao: ['Cliente maduro', 'Telemática já estabelecida', 'ROI claro de IA'] },
     tecnografia: ['AWS', 'Python', 'Google Maps API', 'Telematics Platform'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Oportunidade de IA em otimização de rotas detectada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Oportunidade de IA em otimização de rotas detectada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '29', slug: 'industrialai-solutions', nome: 'IndustrialAI Solutions', dominio: 'industrialai.com.br', vertical: 'Manufatura', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Santo André, Brasil',
@@ -1644,12 +1644,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Piloto bem-sucedido = receptividade para escala.', 'Múltiplas linhas = grande oportunidade de expansão.'],
     leituraSugerida: ['Estruturar roadmap de expansão para 8 linhas.', 'Posicionar como redutor de downtime operacional.'],
     sinais: [
-      { id: 's37', titulo: 'Sucesso piloto de IA em manutenção preditiva', tipo: 'Oportunidade', impacto: 'Alto', owner: 'Roberto Mendes', recomendacao: 'Agendar roadmap de expansão para 8 linhas até 24/04.', contexto: 'Piloto bem-sucedido em 1 linha. Demanda clara de expansão para todas as linhas.', data: '2026-04-12' }
+      { id: 's37', titulo: 'Sucesso piloto de IA em manutenção preditiva', tipo: 'Tendência', impacto: 'Alto', owner: 'Roberto Mendes', recomendacao: 'Agendar roadmap de expansão para 8 linhas até 24/04.', contexto: 'Piloto bem-sucedido em 1 linha. Demanda clara de expansão para todas as linhas.', data: '2026-04-12' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c50', nome: 'Fernando Alves', cargo: 'Diretor de Operações de Manufatura', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de IA', forcaRelacional: 77, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 82, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar redução de downtime com IA em todas as linhas.' },
-      { id: 'c51', nome: 'Beatriz Costa', cargo: 'Engenheira de Dados/Manufatura', area: 'Tecnologia', senioridade: 'Especialista', papelComite: 'Champion técnica do piloto', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c50', influencia: 73, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar escalabilidade de modelo para 8 linhas.' }
+      { id: 'c50', nome: 'Fernando Alves', cargo: 'Diretor de Operações de Manufatura', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de IA', forcaRelacional: 77, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 82, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar redução de downtime com IA em todas as linhas.' },
+      { id: 'c51', nome: 'Beatriz Costa', cargo: 'Engenheira de Dados/Manufatura', area: 'Técnico', senioridade: 'Especialista', papelComite: 'Champion técnica do piloto', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c50', influencia: 73, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar escalabilidade de modelo para 8 linhas.' }
     ],
     oportunidades: [
       { id: 'o38', nome: 'Expansão de IA de manutenção preditiva para toda a operação', etapa: 'Qualificação', valor: 1700000, owner: 'Roberto Mendes', risco: 'Baixo', probabilidade: 75, historico: ['Piloto bem-sucedido em 1 linha', 'Receptividade alta para expansão', 'Roadmap em preparação'] }
@@ -1659,8 +1659,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente manufatura com piloto bem-sucedido. Expansão natural para toda operação.', evolucaoJornada: 'Piloto 1 linha > expansão para 8 linhas > consolidação de insights.', maturidadeRelacional: 'Alta (cliente ativo com resultado claro).', sponsorAtivo: 'Diretor de Operações como sponsor.', profundidadeComite: 'Média (operações + engenharia mapeadas).', continuidade: 'Alta — cliente satisfeito com piloto.', expansao: 'Expansão para 8 linhas é imediata e clara.', retencao: 'Risco baixo — CS ativo.', riscoEstagnacao: 'Muito baixo — piloto em produção com ROI claro.' },
     inteligencia: { sucessos: ['Piloto bem-sucedido com ROI claro em 1 linha.'], insucessos: [], padroes: ['Fabricantes decidem rápido em IA quando piloto prova ROI.'], learnings: ['Manutenção preditiva em manufatura = ROI imediato.'], hipoteses: ['Expansão para 8 linhas converte em 90 dias.'], fatoresRecomendacao: ['Piloto bem-sucedido', 'ROI claro e comprovado', 'Expansão muito clara'] },
     tecnografia: ['AWS', 'Python', 'TensorFlow', 'IoT Sensors'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Sucesso piloto de IA preditiva em 1 linha. Demanda de expansão.', icone: 'CheckCircle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Sucesso piloto de IA preditiva em 1 linha. Demanda de expansão.', icone: 'CheckCircle' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '30', slug: 'insurancehub-connect', nome: 'InsuranceHub Connect', dominio: 'insurancehub.com.br', vertical: 'Seguros', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
@@ -1672,11 +1672,11 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Consolidação de dados = base para novos produtos.', 'Crescimento de portfólio = maior complexidade de integ.'],
     leituraSugerida: ['Estruturar expansão de data warehouse.', 'Posicionar como acelerador de time-to-market.'],
     sinais: [
-      { id: 's38', titulo: 'Expansão de portfólio de produtos de seguros', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Viviane Costa', recomendacao: 'Agendar workshop de novos produtos até 25/04.', contexto: '3+ novos produtos em roadmap de 2026. Budget aprovado para expansão.', data: '2026-04-11' }
+      { id: 's38', titulo: 'Expansão de portfólio de produtos de seguros', tipo: 'Tendência', impacto: 'Médio', owner: 'Viviane Costa', recomendacao: 'Agendar workshop de novos produtos até 25/04.', contexto: '3+ novos produtos em roadmap de 2026. Budget aprovado para expansão.', data: '2026-04-11' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c52', nome: 'Eduardo Borges', cargo: 'Diretor de Produtos', area: 'Produto', senioridade: 'Diretoria', papelComite: 'Patrocinador de novos produtos', forcaRelacional: 72, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 78, potencialSucesso: 70, scoreSucesso: 67, ganchoReuniao: 'Mostrar aceleração de time-to-market para novos produtos.' }
+      { id: 'c52', nome: 'Eduardo Borges', cargo: 'Diretor de Produtos', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de novos produtos', forcaRelacional: 72, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 78, potencialSucesso: 70, scoreSucesso: 67, ganchoReuniao: 'Mostrar aceleração de time-to-market para novos produtos.' }
     ],
     oportunidades: [
       { id: 'o39', nome: 'Expansão de consolidação de dados e relatórios para novos produtos', etapa: 'Prospecção', valor: 1400000, owner: 'Viviane Costa', risco: 'Médio', probabilidade: 58, historico: ['Portfólio de produtos em expansão', 'Workshop em preparação'] }
@@ -1686,8 +1686,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente seguros com portfólio em expansão. Oportunidade clara de dados.', evolucaoJornada: '5 produtos core > 8+ produtos com integração de dados.', maturidadeRelacional: 'Média (cliente em expansão).', sponsorAtivo: 'Diretor de Produtos como sponsor.', profundidadeComite: 'Baixa a moderada (apenas produto mapeado).', continuidade: 'Média — cliente em crescimento.', expansao: 'Novos produtos são janela clara de expansão.', retencao: 'Risco médio — necessário time de sucesso ativo.', riscoEstagnacao: 'Médio se expansão não for ativada.' },
     inteligencia: { sucessos: ['Consolidação de dados atual funciona bem.'], insucessos: [], padroes: ['Seguradoras em crescimento de produtos decidem em dados consolidados.'], learnings: ['Time-to-market é critério de decisão em seguros.'], hipoteses: ['Solução de dados para novos produtos converte em 75 dias.'], fatoresRecomendacao: ['Cliente em expansão', 'Consolidação atual bem-sucedida', 'Novos produtos claros'] },
     tecnografia: ['AWS', 'Snowflake', 'Tableau', 'Python'],
-    historico: [{ data: '2026-04-11', tipo: 'Sinal', descricao: 'Expansão de portfólio de produtos de seguros em andamento.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-11', tipo: 'Tendência', descricao: 'Expansão de portfólio de produtos de seguros em andamento.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '31', slug: 'edutech-academy', nome: 'EduTech Academy', dominio: 'edutech.com.br', vertical: 'Educação', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -1699,11 +1699,11 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Educação = entrada para corporativo de treinamento.', 'Análise de aprendizado = modelo escalável para corporativo.'],
     leituraSugerida: ['Estruturar oferta de treinamento corporativo.', 'Posicionar como habilitador de aprendizado corporativo.'],
     sinais: [
-      { id: 's39', titulo: 'Oportunidade de expansão para treinamento corporativo', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Vanessa Rocha', recomendacao: 'Agendar briefing de corporativo até 26/04.', contexto: 'Modelo de análise em educação. Interesse em corporativo. Budget disponível.', data: '2026-04-10' }
+      { id: 's39', titulo: 'Oportunidade de expansão para treinamento corporativo', tipo: 'Tendência', impacto: 'Médio', owner: 'Vanessa Rocha', recomendacao: 'Agendar briefing de corporativo até 26/04.', contexto: 'Modelo de análise em educação. Interesse em corporativo. Budget disponível.', data: '2026-04-10' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c53', nome: 'Dr. Leandro Silva', cargo: 'VP de Parcerias Corporativas', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de corporativo', forcaRelacional: 68, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 75, potencialSucesso: 66, scoreSucesso: 64, ganchoReuniao: 'Mostrar escalabilidade de modelo de análise para corporativo.' }
+      { id: 'c53', nome: 'Dr. Leandro Silva', cargo: 'VP de Parcerias Corporativas', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de corporativo', forcaRelacional: 68, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 75, potencialSucesso: 66, scoreSucesso: 64, ganchoReuniao: 'Mostrar escalabilidade de modelo de análise para corporativo.' }
     ],
     oportunidades: [
       { id: 'o40', nome: 'Expansão de plataforma de análise de aprendizado para corporativo', etapa: 'Prospecção', valor: 1200000, owner: 'Vanessa Rocha', risco: 'Médio', probabilidade: 54, historico: ['Modelo educacional bem-sucedido', 'Interesse em corporativo', 'Briefing em preparação'] }
@@ -1713,8 +1713,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente educação com modelo escalável. Expansão natural para corporativo.', evolucaoJornada: 'Educação > corporativo de treinamento > learning & development integrado.', maturidadeRelacional: 'Média (cliente em crescimento de negócio).', sponsorAtivo: 'VP de Parcerias como sponsor.', profundidadeComite: 'Baixa (apenas VP de negócio).', continuidade: 'Média — cliente em crescimento.', expansao: 'Corporativo é nova janela de receita.', retencao: 'Risco médio — novo segmento.', riscoEstagnacao: 'Médio se não expandir para corporativo.' },
     inteligencia: { sucessos: ['Modelo de análise bem-sucedido em educação.'], insucessos: [], padroes: ['Plataformas educacionais escalam para corporativo quando modelo é claro.'], learnings: ['Treinamento corporativo = nova receita por modelo.'], hipoteses: ['Expansão para corporativo converte em 90 dias.'], fatoresRecomendacao: ['Modelo escalável', 'Cliente em crescimento', 'Novo segmento claro'] },
     tecnografia: ['AWS', 'React', 'Node.js', 'Postgres'],
-    historico: [{ data: '2026-04-10', tipo: 'Sinal', descricao: 'Oportunidade de expansão para treinamento corporativo identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-10', tipo: 'Tendência', descricao: 'Oportunidade de expansão para treinamento corporativo identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   // --- LOTE 3B.2: SEGUNDA ONDA DE EXPANSÃO DE VOLUME (5 ABM + 7 ABX) ---
   // ABM: 5 contas novas (acquisition targets)
@@ -1732,19 +1732,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c54', nome: 'Dr. Gustavo Pereira', cargo: 'CTO', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia', forcaRelacional: 78, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 88, potencialSucesso: 80, scoreSucesso: 78, ganchoReuniao: 'Demonstrar redução de tempo de resolução em ambiente híbrido.' },
-      { id: 'c55', nome: 'Felipe Monteiro', cargo: 'Diretor de Operações de Cloud', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador operacional', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], liderId: 'c54', influencia: 80, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar economia operacional de observabilidade integrada.' }
+      { id: 'c54', nome: 'Dr. Gustavo Pereira', cargo: 'CTO', area: 'Técnico', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia', forcaRelacional: 78, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Técnico'], influencia: 88, potencialSucesso: 80, scoreSucesso: 78, ganchoReuniao: 'Demonstrar redução de tempo de resolução em ambiente híbrido.' },
+      { id: 'c55', nome: 'Felipe Monteiro', cargo: 'Diretor de Operações de Cloud', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador operacional', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], liderId: 'c54', influencia: 80, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Detalhar economia operacional de observabilidade integrada.' }
     ],
     oportunidades: [
       { id: 'o41', nome: 'Plataforma de automação e observabilidade de infraestrutura em nuvem', etapa: 'Qualificação', valor: 3600000, owner: 'Ricardo Mendes', risco: 'Baixo', probabilidade: 58, historico: ['Interesse técnico detectado', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Website', campanha: 'Cloud Observability', tipo: 'Inbound', impacto: 'Geração de interesse em observabilidade', data: '2026-04-07' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Website', campanha: 'Cloud Observability', tipo: 'Híbrido', impacto: 'Geração de interesse em observabilidade', data: '2026-04-07' }] },
     abm: { motivo: 'Data center operator com budget expressivo e pressão clara em observabilidade.', fit: 'Alto (86/100)', cluster: 'Cloud Infra Enterprise', similaridade: '84%', coberturaInicialComite: '42% (CTO + Diretor de Cloud)', playsEntrada: ['Play de arquitetura híbrida', 'Play de workshop técnico'], potencialAbertura: 'Alto', hipoteses: ['Posicionamento de observabilidade multi-nuvem converte em 75 dias.'], contasSimilares: ['Equinix', 'Digital Realty'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Cloud operators decidem rápido em observabilidade quando veem multi-nuvem.'], learnings: ['Alto vp score + infraestrutura híbrida = urgência de implementação.'], hipoteses: ['Workshop técnico converte em POC em 60 dias.'], fatoresRecomendacao: ['Budget expressivo', 'Maturidade técnica alta', 'Pain point claro de observabilidade'] },
     tecnografia: ['AWS', 'Kubernetes', 'Terraform', 'Prometheus', 'Grafana'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Múltiplas visitas em case de observabilidade multi-nuvem detectadas.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Múltiplas visitas em case de observabilidade multi-nuvem detectadas.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '33', slug: 'adbridge-media', nome: 'AdBridge Media', dominio: 'adbridge.com.br', vertical: 'Mídia/Publicidade', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
@@ -1760,19 +1760,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c56', nome: 'Marcia Santos', cargo: 'Diretora de Tecnologia e Operações', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinadora de automação', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Demonstrar ganho de eficiência de 30% em buying.', },
-      { id: 'c57', nome: 'Leonardo Alves', cargo: 'Consultor Técnico de Mídia', area: 'Tecnologia', senioridade: 'Especialista', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c56', influencia: 72, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar integração com plataformas de DSP e analytics.' }
+      { id: 'c56', nome: 'Marcia Santos', cargo: 'Diretora de Tecnologia e Operações', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinadora de automação', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Demonstrar ganho de eficiência de 30% em buying.', },
+      { id: 'c57', nome: 'Leonardo Alves', cargo: 'Consultor Técnico de Mídia', area: 'Técnico', senioridade: 'Especialista', papelComite: 'Validação técnica', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c56', influencia: 72, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar integração com plataformas de DSP e analytics.' }
     ],
     oportunidades: [
       { id: 'o42', nome: 'Plataforma de automação de campanha e analytics de performance', etapa: 'Descoberta', valor: 2400000, owner: 'Camila Mendes', risco: 'Médio', probabilidade: 46, historico: ['Interesse detectado', 'Demo em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Outbound', influencias: [{ canal: 'LinkedIn', campanha: 'Media Automation Efficiency', tipo: 'Outbound', impacto: 'Geração de interesse em automação', data: '2026-04-06' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'LinkedIn', campanha: 'Media Automation Efficiency', tipo: 'Híbrido', impacto: 'Geração de interesse em automação', data: '2026-04-06' }] },
     abm: { motivo: 'Agência em crescimento com pressão clara em automação de buying.', fit: 'Médio-alto (78/100)', cluster: 'Media Agency Growth', similaridade: '79%', coberturaInicialComite: '36% (Diretora Tech + Consultor)', playsEntrada: ['Play de automação de buying', 'Play de escalabilidade de operações'], potencialAbertura: 'Médio-alto', hipoteses: ['Demonstração de ganho de eficiência converte em 60 dias.'], contasSimilares: ['Grupo W', 'Omnicom Brasil'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Agências em crescimento decidem rápido em automação.'], learnings: ['VP score em 76% = infraestrutura pronta para mudança.'], hipoteses: ['POC em buying em 45 dias converte a cliente.'], fatoresRecomendacao: ['Crescimento rápido', 'Budget disponível', 'Pain point de eficiência claro'] },
     tecnografia: ['AWS', 'Node.js', 'React', 'Elasticsearch', 'Redis'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Interesse em automação de media buying detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Interesse em automação de media buying detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '34', slug: 'primeimobiliario', nome: 'PrimeImobiliário', dominio: 'primeimob.com.br', vertical: 'Real Estate/Imobiliário', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -1788,8 +1788,8 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c58', nome: 'Dr. Paulo Ribeiro', cargo: 'VP de Vendas Diretas', area: 'Vendas', senioridade: 'C-Level', papelComite: 'Patrocinador de CRM', forcaRelacional: 68, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Negócio'], influencia: 76, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Mostrar aceleração de ciclo de venda com CRM integrado.' },
-      { id: 'c59', nome: 'Julia Mendes', cargo: 'Gerente de Vendas', area: 'Vendas', senioridade: 'Gerência', papelComite: 'Champion operacional', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Negócio'], liderId: 'c58', influencia: 68, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar ganhos de produtividade com pipeline visual.' }
+      { id: 'c58', nome: 'Dr. Paulo Ribeiro', cargo: 'VP de Vendas Diretas', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de CRM', forcaRelacional: 68, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 76, potencialSucesso: 68, scoreSucesso: 65, ganchoReuniao: 'Mostrar aceleração de ciclo de venda com CRM integrado.' },
+      { id: 'c59', nome: 'Julia Mendes', cargo: 'Gerente de Vendas', area: 'Negócio', senioridade: 'Gerência', papelComite: 'Champion operacional', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Negócio'], liderId: 'c58', influencia: 68, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Detalhar ganhos de produtividade com pipeline visual.' }
     ],
     oportunidades: [
       { id: 'o43', nome: 'Plataforma de CRM e pipeline para gestão de imóveis e clientes', etapa: 'Descoberta', valor: 2200000, owner: 'Henrique Costa', risco: 'Médio', probabilidade: 42, historico: ['Interesse detectado', 'Demo em preparação'] }
@@ -1799,8 +1799,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Incorporadoras decidem em CRM quando veem case específico de imobiliário.'], learnings: ['Sales teams = early adopters de CRM melhorado.'], hipoteses: ['Ganho de 2 semanas no ciclo = argumento de venda forte.'], fatoresRecomendacao: ['Crescimento de sales', 'Budget disponível', 'Pain point de pipeline claro'] },
     tecnografia: ['Salesforce', 'AWS', 'Node.js', 'React', 'Postgres'],
-    historico: [{ data: '2026-04-11', tipo: 'Sinal', descricao: 'Interesse em plataforma de CRM imobiliário detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-11', tipo: 'Tendência', descricao: 'Interesse em plataforma de CRM imobiliário detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '35', slug: 'agrotech-innovation', nome: 'AgroTech Innovation', dominio: 'agrotech.com.br', vertical: 'Agritech/Agronegócio', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiás, Brasil',
@@ -1816,19 +1816,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c60', nome: 'Dr. Rafael Santana', cargo: 'CTO de Inovação', area: 'Tecnologia', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia agrícola', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Decisor', 'Técnico'], influencia: 84, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar acurácia de previsão em safra do cliente.' },
-      { id: 'c61', nome: 'Bianca Costa', cargo: 'Diretora de Operações Agrícolas', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinadora operacional', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], liderId: 'c60', influencia: 78, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar ganho de produtividade com IA agrícola.' }
+      { id: 'c60', nome: 'Dr. Rafael Santana', cargo: 'CTO de Inovação', area: 'Técnico', senioridade: 'C-Level', papelComite: 'Decisor de tecnologia agrícola', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Decisor', 'Técnico'], influencia: 84, potencialSucesso: 78, scoreSucesso: 76, ganchoReuniao: 'Demonstrar acurácia de previsão em safra do cliente.' },
+      { id: 'c61', nome: 'Bianca Costa', cargo: 'Diretora de Operações Agrícolas', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinadora operacional', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], liderId: 'c60', influencia: 78, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar ganho de produtividade com IA agrícola.' }
     ],
     oportunidades: [
       { id: 'o44', nome: 'Plataforma de IA para monitoramento de safra e previsão de rendimento', etapa: 'Qualificação', valor: 2600000, owner: 'Marcelo Silva', risco: 'Baixo', probabilidade: 54, historico: ['Interesse técnico detectado', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Website', campanha: 'Agri AI Monitoring', tipo: 'Inbound', impacto: 'Geração de interesse em IA agrícola', data: '2026-04-05' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Website', campanha: 'Agri AI Monitoring', tipo: 'Híbrido', impacto: 'Geração de interesse em IA agrícola', data: '2026-04-05' }] },
     abm: { motivo: 'Operadora agrícola em modernização com budget expressivo para IA.', fit: 'Alto (84/100)', cluster: 'AgriTech Enterprise', similaridade: '81%', coberturaInicialComite: '38% (CTO + Diretora)', playsEntrada: ['Play de IA agrícola', 'Play de POC com imagery'], potencialAbertura: 'Alto', hipoteses: ['POC com resultado visual converte em 90 dias.'], contasSimilares: ['BASF Agrícola', 'Corteva Seed'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Operadoras agrícolas decidem rápido em IA quando veem resultado em safra própria.'], learnings: ['Alto vp + CTO envolvido = urgência e viabilidade.'], hipoteses: ['POC com accuracy + visualização converte em 75 dias.'], fatoresRecomendacao: ['Budget expressivo', 'CTO mapeado', 'Pain point claro de produtividade'] },
     tecnografia: ['AWS SageMaker', 'Python', 'TensorFlow', 'Postgres', 'GDAL'],
-    historico: [{ data: '2026-04-10', tipo: 'Sinal', descricao: 'Alto interesse em IA preditiva para safra detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-10', tipo: 'Tendência', descricao: 'Alto interesse em IA preditiva para safra detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '36', slug: 'smartmobility-solutions', nome: 'SmartMobility Solutions', dominio: 'smartmobility.com.br', vertical: 'Automotive/Mobilidade', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Belo Horizonte, Brasil',
@@ -1844,19 +1844,19 @@ export const contasMock: Conta[] = [
     ],
     acoes: [],
     contatos: [
-      { id: 'c62', nome: 'Carlos Vieira', cargo: 'COO de Operações de Frota', area: 'Operações', senioridade: 'C-Level', papelComite: 'Patrocinador de telemetria', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 80, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Demonstrar redução de tempo de resposta com telemetria integrada.' },
-      { id: 'c63', nome: 'Fernanda Rocha', cargo: 'Gerente de Tecnologia de Frota', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c62', influencia: 74, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Detalhar integração com sistemas de frota existentes.' }
+      { id: 'c62', nome: 'Carlos Vieira', cargo: 'COO de Operações de Frota', area: 'Negócio', senioridade: 'C-Level', papelComite: 'Patrocinador de telemetria', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 80, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Demonstrar redução de tempo de resposta com telemetria integrada.' },
+      { id: 'c63', nome: 'Fernanda Rocha', cargo: 'Gerente de Tecnologia de Frota', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Validação técnica', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c62', influencia: 74, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Detalhar integração com sistemas de frota existentes.' }
     ],
     oportunidades: [
       { id: 'o45', nome: 'Plataforma integrada de telemetria e análise de frota para mobilidade urbana', etapa: 'Qualificação', valor: 3000000, owner: 'Beatriz Lima', risco: 'Baixo', probabilidade: 56, historico: ['Urgência operacional detectada', 'Workshop em preparação'] }
     ],
-    canaisCampanhas: { origemPrincipal: 'Inbound', influencias: [{ canal: 'Website', campanha: 'Fleet Telemetry Integration', tipo: 'Inbound', impacto: 'Geração de interesse em telemetria', data: '2026-04-08' }] },
+    canaisCampanhas: { origemPrincipal: 'Híbrido', influencias: [{ canal: 'Website', campanha: 'Fleet Telemetry Integration', tipo: 'Híbrido', impacto: 'Geração de interesse em telemetria', data: '2026-04-08' }] },
     abm: { motivo: 'Operadora de mobilidade em crescimento rápido com urgência em operações.', fit: 'Alto (82/100)', cluster: 'Mobility Enterprise', similaridade: '80%', coberturaInicialComite: '40% (COO + Gerente Tech)', playsEntrada: ['Play de telemetria integrada', 'Play de escalabilidade operacional'], potencialAbertura: 'Alto', hipoteses: ['Demonstração de redução de resposta converte em 65 dias.'], contasSimilares: ['99 Brasil', 'Loggi'] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: [], insucessos: [], padroes: ['Operadoras de mobilidade decidem rápido em telemetria quando urgência operacional é clara.'], learnings: ['Crescimento rápido = oportunidade de entrada urgente.'], hipoteses: ['Workshop com case de redução de resposta converte em 60 dias.'], fatoresRecomendacao: ['Crescimento rápido', 'Budget expressivo', 'Urgência operacional clara'] },
     tecnografia: ['AWS IoT', 'Node.js', 'React', 'Postgres', 'Kafka'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Urgência em telemetria integrada detectada.', icone: 'AlertTriangle' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Urgência em telemetria integrada detectada.', icone: 'AlertTriangle' }],
+    reconciliationStatus: 'ativa'
   },
   // ABX: 7 contas novas (expansion targets)
   {
@@ -1869,12 +1869,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em observabilidade = receptividade para expansão.', 'Compliance = nova pain point identificada.'],
     leituraSugerida: ['Estruturar roadmap de compliance e auditoria.', 'Posicionar como expansão natural de observabilidade.'],
     sinais: [
-      { id: 's45', titulo: 'Oportunidade de expansão para compliance e auditoria', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Thiago Campos', recomendacao: 'Agendar roadmap de compliance até 25/04.', contexto: 'Cliente em crescimento. Nova demanda de visibilidade de compliance. Receptividade alta.', data: '2026-04-13' }
+      { id: 's45', titulo: 'Oportunidade de expansão para compliance e auditoria', tipo: 'Tendência', impacto: 'Médio', owner: 'Thiago Campos', recomendacao: 'Agendar roadmap de compliance até 25/04.', contexto: 'Cliente em crescimento. Nova demanda de visibilidade de compliance. Receptividade alta.', data: '2026-04-13' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c64', nome: 'Dr. Rodrigo Gomes', cargo: 'Diretor de Compliance e Segurança', area: 'Compliance', senioridade: 'Diretoria', papelComite: 'Dono da expansão de compliance', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Compliance'], influencia: 80, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Mostrar visibilidade de compliance com observabilidade.' },
-      { id: 'c65', nome: 'Paula Souza', cargo: 'Gerente de Auditoria', area: 'Auditoria', senioridade: 'Gerência', papelComite: 'Champion de auditoria', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c64', influencia: 72, potencialSucesso: 70, scoreSucesso: 70, ganchoReuniao: 'Detalhar rastreabilidade de auditoria integrada.' }
+      { id: 'c64', nome: 'Dr. Rodrigo Gomes', cargo: 'Diretor de Compliance e Segurança', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Dono da expansão de compliance', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 80, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Mostrar visibilidade de compliance com observabilidade.' },
+      { id: 'c65', nome: 'Paula Souza', cargo: 'Gerente de Auditoria', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion de auditoria', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c64', influencia: 72, potencialSucesso: 70, scoreSucesso: 70, ganchoReuniao: 'Detalhar rastreabilidade de auditoria integrada.' }
     ],
     oportunidades: [
       { id: 'o46', nome: 'Expansão de observabilidade para operações e compliance', etapa: 'Qualificação', valor: 1700000, owner: 'Thiago Campos', risco: 'Baixo', probabilidade: 70, historico: ['Cliente maduro com receptividade alta', 'Roadmap em preparação'] }
@@ -1884,8 +1884,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente infraestrutura maduro com alta receptividade. Expansão natural para compliance.', evolucaoJornada: 'Observabilidade de operações > compliance e auditoria > segurança integrada.', maturidadeRelacional: 'Alta (cliente desde 2022).', sponsorAtivo: 'Diretor de Compliance como novo sponsor.', profundidadeComite: 'Profunda — já há contatos em operações, agora compliance.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Compliance é primeira janela; auditoria é segunda.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento.' },
     inteligencia: { sucessos: ['Implementação anterior bem-sucedida em operações.'], insucessos: [], padroes: ['Clientes infraestrutura maduros decidem rápido em expansão de compliance.'], learnings: ['Compliance = pain point novo descoberto em expansão.'], hipoteses: ['Roadmap compliance converte em 75 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Alta receptividade', 'Expansion clara e natural'] },
     tecnografia: ['AWS', 'Prometheus', 'Grafana', 'ELK Stack', 'Terraform'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Oportunidade de expansão para compliance identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Oportunidade de expansão para compliance identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '38', slug: 'telecom-regional-expansion', nome: 'TelecomRegional Expansão', dominio: 'telecomregional.com.br', vertical: 'Telecom', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Recife, Brasil',
@@ -1897,12 +1897,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso regional = receptividade para expansão.', 'Novas regiões = receita de replicação.'],
     leituraSugerida: ['Estruturar rollout de rede para novas regiões.', 'Posicionar como modelo de expansão regional.'],
     sinais: [
-      { id: 's46', titulo: 'Oportunidade de expansão de rede para novas regiões do Brasil', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Vanessa Rocha', recomendacao: 'Agendar workshop de expansão regional até 27/04.', contexto: 'Sucesso em nordeste. Interesse em sul/sudeste. Budget aprovado.', data: '2026-04-12' }
+      { id: 's46', titulo: 'Oportunidade de expansão de rede para novas regiões do Brasil', tipo: 'Tendência', impacto: 'Médio', owner: 'Vanessa Rocha', recomendacao: 'Agendar workshop de expansão regional até 27/04.', contexto: 'Sucesso em nordeste. Interesse em sul/sudeste. Budget aprovado.', data: '2026-04-12' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c66', nome: 'Gustavo Marins', cargo: 'Diretor de Expansão Regional', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão regional', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Demonstrar modelo replicável de expansão de rede.' },
-      { id: 'c67', nome: 'Mariana Ferreira', cargo: 'Gerente de Engenharia Regional', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Champion técnico de expansão', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c66', influencia: 72, potencialSucesso: 70, scoreSucesso: 70, ganchoReuniao: 'Detalhar replicação de arquitetura em novas regiões.' }
+      { id: 'c66', nome: 'Gustavo Marins', cargo: 'Diretor de Expansão Regional', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão regional', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Demonstrar modelo replicável de expansão de rede.' },
+      { id: 'c67', nome: 'Mariana Ferreira', cargo: 'Gerente de Engenharia Regional', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion técnico de expansão', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c66', influencia: 72, potencialSucesso: 70, scoreSucesso: 70, ganchoReuniao: 'Detalhar replicação de arquitetura em novas regiões.' }
     ],
     oportunidades: [
       { id: 'o47', nome: 'Expansão de solução de network para novas regiões do Brasil', etapa: 'Qualificação', valor: 1400000, owner: 'Vanessa Rocha', risco: 'Baixo', probabilidade: 66, historico: ['Modelo de sucesso em nordeste', 'Expansion com budget aprovado', 'Workshop em preparação'] }
@@ -1912,8 +1912,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente telecom regional em crescimento de expansão. Modelo de sucesso replicável.', evolucaoJornada: 'Nordeste > sul/sudeste > consolidação nacional.', maturidadeRelacional: 'Alta (cliente desde 2021).', sponsorAtivo: 'Diretor de Expansão como sponsor.', profundidadeComite: 'Profunda — operações e engenharia mapeadas.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Novas regiões são expansão natural.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento regional.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida em nordeste.'], insucessos: [], padroes: ['Operadoras regionais escalam rápido quando modelo funciona.'], learnings: ['Replicação regional = novos contratos.'], hipoteses: ['Modelo testado em nordeste converte em 2-3 novos contratos.'], fatoresRecomendacao: ['Cliente maduro', 'Modelo comprovado', 'Expansão clara e viável'] },
     tecnografia: ['Cisco', 'Juniper', 'AWS', 'Terraform', 'Ansible'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Oportunidade de expansão regional identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Oportunidade de expansão regional identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '39', slug: 'fintech-api-expansion', nome: 'FinTechAPI Solutions', dominio: 'fintechapi.com.br', vertical: 'Fintech', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -1925,12 +1925,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em transferências = receptividade para expansão de APIs.', 'Novos produtos = receita de integração e support.'],
     leituraSugerida: ['Estruturar roadmap de APIs para novos produtos.', 'Posicionar como facilitador de expansão de produtos.'],
     sinais: [
-      { id: 's47', titulo: 'Oportunidade de expansão de APIs para crédito e investimento', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Leonardo Pinto', recomendacao: 'Agendar roadmap de novos produtos até 29/04.', contexto: 'Cliente em expansão de linha de produtos. Nova demanda de APIs. Receptividade alta.', data: '2026-04-13' }
+      { id: 's47', titulo: 'Oportunidade de expansão de APIs para crédito e investimento', tipo: 'Tendência', impacto: 'Médio', owner: 'Leonardo Pinto', recomendacao: 'Agendar roadmap de novos produtos até 29/04.', contexto: 'Cliente em expansão de linha de produtos. Nova demanda de APIs. Receptividade alta.', data: '2026-04-13' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c68', nome: 'Dr. Ricardo Oliveira', cargo: 'Diretor de Novos Produtos', area: 'Produto', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de produtos', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Decisor', 'Negócio'], influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Mostrar aceleração de time-to-market com APIs integradas.' },
-      { id: 'c69', nome: 'Alice Mendes', cargo: 'Gerente de Integração de APIs', area: 'Tecnologia', senioridade: 'Gerência', papelComite: 'Champion técnico de expansão', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c68', influencia: 70, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar segurança e compliance de novas APIs.' }
+      { id: 'c68', nome: 'Dr. Ricardo Oliveira', cargo: 'Diretor de Novos Produtos', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de produtos', forcaRelacional: 76, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Decisor', 'Negócio'], influencia: 82, potencialSucesso: 76, scoreSucesso: 74, ganchoReuniao: 'Mostrar aceleração de time-to-market com APIs integradas.' },
+      { id: 'c69', nome: 'Alice Mendes', cargo: 'Gerente de Integração de APIs', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion técnico de expansão', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c68', influencia: 70, potencialSucesso: 74, scoreSucesso: 72, ganchoReuniao: 'Detalhar segurança e compliance de novas APIs.' }
     ],
     oportunidades: [
       { id: 'o48', nome: 'Expansão de APIs de pagamento para novos produtos (crédito, investimento)', etapa: 'Qualificação', valor: 1800000, owner: 'Leonardo Pinto', risco: 'Baixo', probabilidade: 72, historico: ['Cliente maduro com receptividade alta', 'Roadmap em preparação'] }
@@ -1940,8 +1940,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente fintech maduro com alta receptividade. Expansão natural para novos produtos.', evolucaoJornada: 'Transferências > crédito > investimento > ecosystem.', maturidadeRelacional: 'Alta (cliente desde 2023).', sponsorAtivo: 'Diretor de Novos Produtos como sponsor.', profundidadeComite: 'Profunda — produto e tecnologia mapeados.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Crédito é primeira janela; investimento é segunda.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento de produtos.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida em transferências.'], insucessos: [], padroes: ['FinTechs em crescimento decidem rápido em expansão de APIs.'], learnings: ['Novos produtos = receita de integração alta.'], hipoteses: ['Roadmap de APIs converte em 60 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Alta receptividade', 'Expansion clara e viável'] },
     tecnografia: ['AWS', 'Node.js', 'Python', 'Kafka', 'PostgreSQL'],
-    historico: [{ data: '2026-04-13', tipo: 'Sinal', descricao: 'Oportunidade de expansão para crédito e investimento identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-13', tipo: 'Tendência', descricao: 'Oportunidade de expansão para crédito e investimento identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '40', slug: 'manufatura-iot-expansion', nome: 'ManufaturaIoT Solutions', dominio: 'manufaturiot.com.br', vertical: 'Manufatura', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Sorocaba, Brasil',
@@ -1953,12 +1953,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em 1 linha = receptividade para expansão.', 'Múltiplas linhas = receita de replicação.'],
     leituraSugerida: ['Estruturar rollout de sensores para múltiplas linhas.', 'Posicionar como modelo de expansão de manufatura.'],
     sinais: [
-      { id: 's48', titulo: 'Oportunidade de expansão de IoT para linhas de produção', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Sergio Rocha', recomendacao: 'Agendar roadmap de expansão até 24/04.', contexto: 'Sucesso em linha piloto. Interesse em 5 linhas adicionais. Budget aprovado.', data: '2026-04-11' }
+      { id: 's48', titulo: 'Oportunidade de expansão de IoT para linhas de produção', tipo: 'Tendência', impacto: 'Médio', owner: 'Sergio Rocha', recomendacao: 'Agendar roadmap de expansão até 24/04.', contexto: 'Sucesso em linha piloto. Interesse em 5 linhas adicionais. Budget aprovado.', data: '2026-04-11' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c70', nome: 'Dr. Paulo Ferreira', cargo: 'Diretor de Operações de Manufatura', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de IoT', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 76, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Mostrar modelo escalável de IoT para múltiplas linhas.' },
-      { id: 'c71', nome: 'Beatriz Silva', cargo: 'Gerente de Automação Industrial', area: 'Engenharia', senioridade: 'Gerência', papelComite: 'Champion técnico', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c70', influencia: 72, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Detalhar integração de sensores em múltiplas linhas.' }
+      { id: 'c70', nome: 'Dr. Paulo Ferreira', cargo: 'Diretor de Operações de Manufatura', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de expansão de IoT', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 76, potencialSucesso: 70, scoreSucesso: 68, ganchoReuniao: 'Mostrar modelo escalável de IoT para múltiplas linhas.' },
+      { id: 'c71', nome: 'Beatriz Silva', cargo: 'Gerente de Automação Industrial', area: 'Técnico', senioridade: 'Gerência', papelComite: 'Champion técnico', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c70', influencia: 72, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Detalhar integração de sensores em múltiplas linhas.' }
     ],
     oportunidades: [
       { id: 'o49', nome: 'Expansão de IoT para linhas de produção adicionais', etapa: 'Qualificação', valor: 1600000, owner: 'Sergio Rocha', risco: 'Baixo', probabilidade: 64, historico: ['Modelo de sucesso em linha piloto', 'Budget aprovado para expansão', 'Roadmap em preparação'] }
@@ -1968,8 +1968,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente manufatura maduro com modelo escalável. Expansão natural para múltiplas linhas.', evolucaoJornada: 'Piloto > produção > consolidação de múltiplas linhas.', maturidadeRelacional: 'Alta (cliente desde 2022).', sponsorAtivo: 'Diretor de Manufatura como sponsor.', profundidadeComite: 'Profunda — operações e engenharia mapeados.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Múltiplas linhas são expansão natural.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento de linhas.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida na linha piloto.'], insucessos: [], padroes: ['Fabricantes escalam rápido em IoT quando piloto funciona.'], learnings: ['Múltiplas linhas = receita de suporte e ampliação.'], hipoteses: ['Roadmap de expansão converte em 80 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Modelo comprovado', 'Expansion viável'] },
     tecnografia: ['AWS IoT Core', 'Python', 'Node.js', 'Kubernetes', 'Grafana'],
-    historico: [{ data: '2026-04-11', tipo: 'Sinal', descricao: 'Oportunidade de expansão de IoT para múltiplas linhas identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-11', tipo: 'Tendência', descricao: 'Oportunidade de expansão de IoT para múltiplas linhas identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '41', slug: 'media-analytics-expansion', nome: 'MediaAnalytics Premium', dominio: 'mediaanalytics.com.br', vertical: 'Mídia/Publicidade', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Rio de Janeiro, Brasil',
@@ -1981,12 +1981,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em reporting = receptividade para atribuição.', 'Atribuição integrada = insight de ROI novo.'],
     leituraSugerida: ['Estruturar modelo de atribuição multi-canal.', 'Posicionar como insight de ROI integrado.'],
     sinais: [
-      { id: 's49', titulo: 'Interesse em atribuição cross-channel e ROI integrado', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Juliana Costa', recomendacao: 'Agendar workshop de atribuição até 21/04.', contexto: 'Cliente em crescimento de campanhas. Interesse em atribuição. Budget disponível.', data: '2026-04-10' }
+      { id: 's49', titulo: 'Interesse em atribuição cross-channel e ROI integrado', tipo: 'Tendência', impacto: 'Médio', owner: 'Juliana Costa', recomendacao: 'Agendar workshop de atribuição até 21/04.', contexto: 'Cliente em crescimento de campanhas. Interesse em atribuição. Budget disponível.', data: '2026-04-10' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c72', nome: 'Marcelo Teixeira', cargo: 'Diretor de Analytics', area: 'Análise', senioridade: 'Diretoria', papelComite: 'Patrocinador de atribuição', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Análise'], influencia: 74, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Demonstrar ROI integrado de todos os canais.' },
-      { id: 'c73', nome: 'Carolina Rocha', cargo: 'Analista de Dados Sênior', area: 'Análise', senioridade: 'Especialista', papelComite: 'Champion de analytics', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Técnico'], liderId: 'c72', influencia: 70, potencialSucesso: 66, scoreSucesso: 64, ganchoReuniao: 'Detalhar modelo de atribuição e integração de dados.' }
+      { id: 'c72', nome: 'Marcelo Teixeira', cargo: 'Diretor de Analytics', area: 'Técnico', senioridade: 'Diretoria', papelComite: 'Patrocinador de atribuição', forcaRelacional: 70, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Técnico'], influencia: 74, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Demonstrar ROI integrado de todos os canais.' },
+      { id: 'c73', nome: 'Carolina Rocha', cargo: 'Analista de Dados Sênior', area: 'Técnico', senioridade: 'Especialista', papelComite: 'Champion de analytics', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Técnico'], liderId: 'c72', influencia: 70, potencialSucesso: 66, scoreSucesso: 64, ganchoReuniao: 'Detalhar modelo de atribuição e integração de dados.' }
     ],
     oportunidades: [
       { id: 'o50', nome: 'Expansão de analytics para atribuição cross-channel e ROI integrado', etapa: 'Descoberta', valor: 1300000, owner: 'Juliana Costa', risco: 'Médio', probabilidade: 54, historico: ['Cliente em crescimento de campanhas', 'Interesse em atribuição', 'Workshop em preparação'] }
@@ -1996,8 +1996,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente mídia em crescimento de campanhas. Expansão natural para atribuição integrada.', evolucaoJornada: 'Reporting > atribuição > otimização de mix.', maturidadeRelacional: 'Média (cliente desde 2023).', sponsorAtivo: 'Diretor de Analytics como sponsor.', profundidadeComite: 'Média — analytics mapeada.', continuidade: 'Média — cliente em crescimento de campanhas.', expansao: 'Atribuição é primeira janela de expansão.', retencao: 'Risco médio — novo conceito de análise.', riscoEstagnacao: 'Médio se não expandir em atribuição.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida em reporting.'], insucessos: [], padroes: ['Agências decidem em atribuição quando veem ROI integrado.'], learnings: ['Atribuição multi-canal = insight novo que agências precisam.'], hipoteses: ['Workshop com case de atribuição converte em 75 dias.'], fatoresRecomendacao: ['Cliente em crescimento', 'Budget disponível', 'Expansion viável'] },
     tecnografia: ['Google Analytics 4', 'Python', 'Looker', 'BigQuery', 'Databricks'],
-    historico: [{ data: '2026-04-10', tipo: 'Sinal', descricao: 'Interesse em atribuição cross-channel identificado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-10', tipo: 'Tendência', descricao: 'Interesse em atribuição cross-channel identificado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '42', slug: 'agronegocio-supply-expansion', nome: 'AgroSupply Gestão', dominio: 'agrosupply.com.br', vertical: 'Agronegócio/Agritech', segmento: 'Enterprise', porte: 'Grande', localizacao: 'Goiás, Brasil',
@@ -2009,12 +2009,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em cooperativa = receptividade para fornecedores.', 'Supply chain de fornecedores = nova receita.'],
     leituraSugerida: ['Estruturar programa de integração de fornecedores.', 'Posicionar como habilitador de network effect.'],
     sinais: [
-      { id: 's50', titulo: 'Interesse em expansão de gestão para rede de fornecedores', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Carlos Oliveira', recomendacao: 'Agendar roadmap de network até 23/04.', contexto: 'Cliente em crescimento de rede. Interesse em integração de fornecedores. Budget moderado.', data: '2026-04-09' }
+      { id: 's50', titulo: 'Interesse em expansão de gestão para rede de fornecedores', tipo: 'Tendência', impacto: 'Médio', owner: 'Carlos Oliveira', recomendacao: 'Agendar roadmap de network até 23/04.', contexto: 'Cliente em crescimento de rede. Interesse em integração de fornecedores. Budget moderado.', data: '2026-04-09' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c74', nome: 'Oswaldo Silva', cargo: 'Diretor de Operações de Supply Chain', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de supply chain', forcaRelacional: 66, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 72, potencialSucesso: 62, scoreSucesso: 60, ganchoReuniao: 'Demonstrar eficiência de integração de fornecedores.' },
-      { id: 'c75', nome: 'Elisa Costa', cargo: 'Gerente de Logística', area: 'Operações', senioridade: 'Gerência', papelComite: 'Champion de logística', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Operações'], liderId: 'c74', influencia: 68, potencialSucesso: 64, scoreSucesso: 62, ganchoReuniao: 'Detalhar integração de fornecedores em plataforma.' }
+      { id: 'c74', nome: 'Oswaldo Silva', cargo: 'Diretor de Operações de Supply Chain', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de supply chain', forcaRelacional: 66, receptividade: 'Média', acessibilidade: 'Média', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 72, potencialSucesso: 62, scoreSucesso: 60, ganchoReuniao: 'Demonstrar eficiência de integração de fornecedores.' },
+      { id: 'c75', nome: 'Elisa Costa', cargo: 'Gerente de Logística', area: 'Negócio', senioridade: 'Gerência', papelComite: 'Champion de logística', forcaRelacional: 68, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Negócio'], liderId: 'c74', influencia: 68, potencialSucesso: 64, scoreSucesso: 62, ganchoReuniao: 'Detalhar integração de fornecedores em plataforma.' }
     ],
     oportunidades: [
       { id: 'o51', nome: 'Expansão de gestão de supply chain para fornecedores', etapa: 'Descoberta', valor: 1200000, owner: 'Carlos Oliveira', risco: 'Médio', probabilidade: 48, historico: ['Cliente em crescimento de rede', 'Interesse em fornecedores', 'Roadmap em preparação'] }
@@ -2024,8 +2024,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente agro em crescimento de rede. Expansão natural para fornecedores.', evolucaoJornada: 'Cooperativa > rede de fornecedores > ecosystem de supply chain.', maturidadeRelacional: 'Média (cliente desde 2022).', sponsorAtivo: 'Diretor de Supply Chain como sponsor.', profundidadeComite: 'Média — operações mapeada.', continuidade: 'Média — cliente em crescimento de rede.', expansao: 'Fornecedores é primeira janela de expansão.', retencao: 'Risco médio — novo conceito de network.', riscoEstagnacao: 'Médio se não expandir em rede.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida em cooperativa.'], insucessos: [], padroes: ['Cooperativas agrícolas escalam rápido quando veem network effect.'], learnings: ['Rede de fornecedores = receita nova de suporte.'], hipoteses: ['Program de integração converte em 90 dias.'], fatoresRecomendacao: ['Cliente em crescimento', 'Budget moderado', 'Expansion viável'] },
     tecnografia: ['AWS', 'Node.js', 'React', 'Postgres', 'Kafka'],
-    historico: [{ data: '2026-04-09', tipo: 'Sinal', descricao: 'Interesse em expansão de supply chain para fornecedores detectado.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-09', tipo: 'Tendência', descricao: 'Interesse em expansão de supply chain para fornecedores detectado.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   },
   {
     id: '43', slug: 'automotive-connected-expansion', nome: 'Connected Automotive Fleet', dominio: 'connectedauto.com.br', vertical: 'Automotive/Mobilidade', segmento: 'Enterprise', porte: 'Grande', localizacao: 'São Paulo, Brasil',
@@ -2037,12 +2037,12 @@ export const contasMock: Conta[] = [
     leituraInferida: ['Sucesso em telemática = receptividade para análise de direção.', 'Segurança = novo pain point.'],
     leituraSugerida: ['Estruturar programa de análise comportamental de direção.', 'Posicionar como habilitador de segurança e compliance.'],
     sinais: [
-      { id: 's51', titulo: 'Oportunidade de expansão para análise de direção e segurança', tipo: 'Oportunidade', impacto: 'Médio', owner: 'Fernanda Rodrigues', recomendacao: 'Agendar roadmap de segurança até 28/04.', contexto: 'Cliente em expansão de frota. Interesse em segurança. Receptividade alta.', data: '2026-04-12' }
+      { id: 's51', titulo: 'Oportunidade de expansão para análise de direção e segurança', tipo: 'Tendência', impacto: 'Médio', owner: 'Fernanda Rodrigues', recomendacao: 'Agendar roadmap de segurança até 28/04.', contexto: 'Cliente em expansão de frota. Interesse em segurança. Receptividade alta.', data: '2026-04-12' }
     ],
     acoes: [],
     contatos: [
-      { id: 'c76', nome: 'Marcelo Camargo', cargo: 'Diretor de Operações de Frota', area: 'Operações', senioridade: 'Diretoria', papelComite: 'Patrocinador de segurança', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Sponsor', 'Operações'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Mostrar redução de sinistros com análise de direção.' },
-      { id: 'c77', nome: 'Renata Sousa', cargo: 'Gerente de Segurança Veicular', area: 'Segurança', senioridade: 'Gerência', papelComite: 'Champion de segurança', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativa', classificacao: ['Champion', 'Operações'], liderId: 'c76', influencia: 70, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Detalhar análise comportamental e compliance regulatório.' }
+      { id: 'c76', nome: 'Marcelo Camargo', cargo: 'Diretor de Operações de Frota', area: 'Negócio', senioridade: 'Diretoria', papelComite: 'Patrocinador de segurança', forcaRelacional: 74, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Sponsor', 'Negócio'], influencia: 78, potencialSucesso: 72, scoreSucesso: 70, ganchoReuniao: 'Mostrar redução de sinistros com análise de direção.' },
+      { id: 'c77', nome: 'Renata Sousa', cargo: 'Gerente de Segurança Veicular', area: 'Segurança', senioridade: 'Gerência', papelComite: 'Champion de segurança', forcaRelacional: 72, receptividade: 'Alta', acessibilidade: 'Alta', status: 'Ativo', classificacao: ['Champion', 'Negócio'], liderId: 'c76', influencia: 70, potencialSucesso: 68, scoreSucesso: 66, ganchoReuniao: 'Detalhar análise comportamental e compliance regulatório.' }
     ],
     oportunidades: [
       { id: 'o52', nome: 'Expansão de conectividade para análise de direção e segurança', etapa: 'Qualificação', valor: 1500000, owner: 'Fernanda Rodrigues', risco: 'Baixo', probabilidade: 68, historico: ['Cliente maduro com receptividade alta', 'Roadmap em preparação'] }
@@ -2052,8 +2052,8 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cliente frota maduro com alta receptividade. Expansão natural para segurança.', evolucaoJornada: 'Telemática > segurança veicular > analytics comportamental.', maturidadeRelacional: 'Alta (cliente desde 2021).', sponsorAtivo: 'Diretor de Operações como sponsor.', profundidadeComite: 'Profunda — operações e segurança mapeados.', continuidade: 'Alta — cliente satisfeito com implementação anterior.', expansao: 'Segurança é primeira janela de expansão.', retencao: 'Risco baixo — customer success ativo.', riscoEstagnacao: 'Baixo — cliente em crescimento.' },
     inteligencia: { sucessos: ['Implementação bem-sucedida em telemática.'], insucessos: [], padroes: ['Operadoras de frota escalam rápido em segurança quando telemática funciona.'], learnings: ['Segurança veicular = novo pain point descoberto.'], hipoteses: ['Roadmap de segurança converte em 70 dias.'], fatoresRecomendacao: ['Cliente maduro', 'Alta receptividade', 'Expansion clara e viável'] },
     tecnografia: ['AWS IoT', 'Node.js', 'React', 'Postgres', 'Kafka'],
-    historico: [{ data: '2026-04-12', tipo: 'Sinal', descricao: 'Oportunidade de expansão para análise de direção e segurança identificada.', icone: 'TrendingUp' }],
-    reconciliationStatus: 'enriquecida'
+    historico: [{ data: '2026-04-12', tipo: 'Tendência', descricao: 'Oportunidade de expansão para análise de direção e segurança identificada.', icone: 'TrendingUp' }],
+    reconciliationStatus: 'ativa'
   }
 ];
 

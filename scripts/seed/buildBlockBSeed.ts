@@ -357,26 +357,26 @@ export function buildBlockBSeed(): BlockoBCanonical {
       connectedSince: '2024-02-01',
       lastChecked: new Date().toISOString(),
     }),
-    createIntegration('apollo', 'Apollo', 'Enrichment', {
+    createIntegration('apollo', 'Apollo', 'Other', {
       description: 'B2B enrichment e intent data',
       isActive: true,
       healthStatus: 'degraded',
       connectedSince: '2024-04-05',
       lastChecked: new Date().toISOString(),
     }),
-    createIntegration('outreach', 'Outreach', 'Sales Engagement', {
+    createIntegration('outreach', 'Outreach', 'Other', {
       description: 'Sales engagement e sequências',
       isActive: false,
       healthStatus: 'down',
       connectedSince: undefined,
     }),
-    createIntegration('salesloft', 'SalesLoft', 'Sales Engagement', {
+    createIntegration('salesloft', 'SalesLoft', 'Other', {
       description: 'Sales engagement alternativo',
       isActive: false,
       healthStatus: 'down',
       connectedSince: undefined,
     }),
-    createIntegration('rd_station', 'RD Station', 'Marketing Automation', {
+    createIntegration('rd_station', 'RD Station', 'Other', {
       description: 'Automação de marketing e leads',
       isActive: true,
       healthStatus: 'healthy',

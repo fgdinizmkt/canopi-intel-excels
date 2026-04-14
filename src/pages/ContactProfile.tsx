@@ -202,7 +202,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
              <div className="flex items-center gap-4 mb-2">
                 <h1 className="text-4xl font-black tracking-tighter">{contact.nome}</h1>
                 <Linkedin className="w-4 h-4 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer" />
-                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black border ${contact.status === 'Ativa' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black border ${contact.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
                   {contact.status}
                 </span>
              </div>
@@ -343,7 +343,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                     <Sparkles className="w-4 h-4 text-white/60 animate-pulse" />
                  </div>
                  <h2 className="text-2xl font-bold leading-tight mb-4 italic italic">
-                    "{contact.ganchoReuniao || 'Focar na eficiência operacional e redução de riscos táticos.'}"
+                    &quot;{contact.ganchoReuniao || 'Focar na eficiência operacional e redução de riscos táticos.'}&quot;
                  </h2>
                  <p className="text-white/60 text-sm max-w-2xl mb-8 leading-relaxed">
                     Stakeholder {contact.papelComite} com Score de Sucesso em {contact.scoreSucesso}%. Recomenda-se tom {contact.senioridade === 'C-Level' ? 'Executivo/ROI' : 'Técnico/Eficiência'}.

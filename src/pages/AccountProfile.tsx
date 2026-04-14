@@ -423,7 +423,6 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     ))}
                  </div>
                </div>
-            </div>
           </section>
 
           {/* New: Portfólio & Expansão (E14) */}
@@ -681,7 +680,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                             </div>
                             <div className="flex flex-col gap-1.5">
                                <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Diretriz IA</span>
-                               <p className="text-[11px] text-slate-400 italic">"Ativar play de blindagem executiva e alinhar resposta técnica."</p>
+                               <p className="text-[11px] text-slate-400 italic">&quot;Ativar play de blindagem executiva e alinhar resposta técnica.&quot;</p>
                             </div>
                          </div>
                           <button 
@@ -736,7 +735,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                              </div>
                              <div className="flex flex-col gap-1.5">
                                 <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
-                                <p className="text-[11px] text-slate-400 italic">"Padrão v6: Abertura via Champion de área adjacente."</p>
+                                <p className="text-[11px] text-slate-400 italic">&quot;Padrão v6: Abertura via Champion de área adjacente.&quot;</p>
                              </div>
                           </div>
                           <button 
@@ -780,7 +779,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                              <span className="text-[8px] font-black text-slate-600 uppercase">Prio #3</span>
                           </div>
                           <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
-                             Contexto atual favorável à replicação de padrão vitorioso: "Alinhamento de ROI com CXO".
+                             Contexto atual favorável à replicação de padrão vitorioso: &quot;Alinhamento de ROI com CXO&quot;.
                           </p>
                           <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
                              <div className="flex flex-col gap-1.5">
@@ -789,7 +788,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                              </div>
                              <div className="flex flex-col gap-1.5">
                                 <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
-                                <p className="text-[11px] text-slate-400 italic">"Padrão recorrente de destrave na vertical {account.vertical}."</p>
+                                <p className="text-[11px] text-slate-400 italic">&quot;Padrão recorrente de destrave na vertical {account.vertical}.&quot;</p>
                              </div>
                           </div>
                           <button 
