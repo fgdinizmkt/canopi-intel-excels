@@ -419,10 +419,11 @@ export const Accounts = () => {
           <p className="text-lg font-semibold text-slate-800">Nenhum resultado encontrado</p>
           <p className="text-sm text-slate-500 mt-1">Ajuste os filtros para visualizar contas compatíveis com sua consulta.</p>
         </div>
-      ) : visualizacao !== 'lista' ? (
+      ) : visualizacao === 'grade' ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {filtradas.map((conta) => {
             const acoesAtrasadas = conta.acoes.filter(a => a.status === 'Atrasada').length;
+            const signals = blocoCSignals[conta.id];
             return (
               <button 
                 key={conta.id} 
@@ -447,18 +448,69 @@ export const Accounts = () => {
                   {acoesAtrasadas > 0 && (
                     <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">{acoesAtrasadas} atras.</span>
                   )}
-                  {blocoCSignals[conta.id]?.interactionsCount > 0 && (
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1" title={blocoCSignals[conta.id].lastInteractionDate ? `Última inter.: ${new Date(blocoCSignals[conta.id].lastInteractionDate!).toLocaleDateString('pt-BR')}` : 'Interações (Bloco C)'}>
-                      <Activity className="w-2.5 h-2.5" /> {blocoCSignals[conta.id].interactionsCount}
+                  {signals?.interactionsCount > 0 && (
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1" title={signals.lastInteractionDate ? `Última inter.: ${new Date(signals.lastInteractionDate!).toLocaleDateString('pt-BR')}` : 'Interações (Bloco C)'}>
+                      <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                     </span>
                   )}
-                  {blocoCSignals[conta.id]?.playsCount > 0 && (
+                  {signals?.playsCount > 0 && (
                     <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded flex items-center gap-1" title="Plays Recomendados (Bloco C)">
-                      <Sparkles className="w-2.5 h-2.5" /> {blocoCSignals[conta.id].playsCount}
+                      <Sparkles className="w-2.5 h-2.5" /> {signals.playsCount}
                     </span>
                   )}
                 </div>
               </button>
+            );
+          })}
+        </div>
+      ) : visualizacao === 'board' ? (
+        <div className="flex gap-4 overflow-x-auto pb-4 items-start min-h-[60vh]">
+          {opcoes.etapas.map((etapa) => {
+            const contasNaEtapa = filtradas.filter(c => c.etapa === etapa);
+            return (
+              <div key={etapa} className="min-w-[300px] w-[300px] flex flex-col gap-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">{etapa}</h3>
+                  <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">{contasNaEtapa.length}</span>
+                </div>
+                <div className="space-y-3">
+                  {contasNaEtapa.map(conta => {
+                    const signals = blocoCSignals[conta.id];
+                    return (
+                      <button 
+                        key={conta.id} 
+                        onClick={() => openAccount(conta.id)} 
+                        className="bg-white border border-slate-200 rounded-xl p-3 hover:border-brand/40 hover:shadow-md transition-all text-left block w-full group shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="font-bold text-sm text-slate-900 leading-tight group-hover:text-brand transition-colors truncate">{conta.nome}</p>
+                          <span className={`shrink-0 w-2 h-2 rounded-full mt-1 ${conta.statusGeral === 'Crítico' ? 'bg-rose-500' : conta.statusGeral === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                        </div>
+                        <p className="text-[10px] text-slate-500 mb-2 truncate">{conta.vertical} · {conta.segmento}</p>
+                        
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[9px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">Pot. {conta.potencial}</span>
+                          {signals?.interactionsCount > 0 && (
+                            <span className="text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded flex items-center gap-1" title={signals.lastInteractionDate ? `Última inter.: ${new Date(signals.lastInteractionDate!).toLocaleDateString('pt-BR')}` : 'Interações'}>
+                              <Activity className="w-2 h-2" /> {signals.interactionsCount}
+                              {signals.lastInteractionDate && (
+                                <span className="text-[8px] opacity-70 border-l border-slate-200 pl-1 ml-0.5">
+                                  {new Date(signals.lastInteractionDate!).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                                </span>
+                              )}
+                            </span>
+                          )}
+                          {signals?.playsCount > 0 && (
+                            <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded flex items-center gap-1" title="Plays Recomendados">
+                              <Sparkles className="w-2 h-2" /> {signals.playsCount}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
