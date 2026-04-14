@@ -14,7 +14,7 @@ import { Activity, Sparkles, Mail, Globe } from 'lucide-react';
 import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
-type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc' | 'score_desc' | 'score_asc';
+type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc' | 'score_desc' | 'score_asc' | 'engajamento_desc';
 
 type Filtros = {
   busca: string;
@@ -117,6 +117,26 @@ export const Accounts = () => {
     etapas: Array.from(new Set(contas.map((c) => c.etapa)))
   }), [contas]);
 
+  // Agregação de Sinais do Bloco C por Conta (Movido para cima para ser usado no sort)
+  const blocoCSignals = useMemo(() => {
+    const map: Record<string, { interactionsCount: number; playsCount: number; lastInteractionDate?: string }> = {};
+
+    contas.forEach(c => {
+      const accountInteractions = allInteractions.filter(i => i.accountId === c.id);
+      const accountPlays = allPlays.filter(p => p.accountId === c.id && p.isActive);
+
+      map[c.id] = {
+        interactionsCount: accountInteractions.length,
+        playsCount: accountPlays.length,
+        lastInteractionDate: accountInteractions.length > 0
+          ? accountInteractions.sort((a, b) => b.date.localeCompare(a.date))[0].date
+          : undefined
+      };
+    });
+
+    return map;
+  }, [contas, allInteractions, allPlays]);
+
   const filtradas = useMemo(() => {
     let data = contas.filter((c) => {
       if (filtros.busca && !`${c.nome} ${c.dominio}`.toLowerCase().includes(filtros.busca.toLowerCase())) return false;
@@ -154,6 +174,11 @@ export const Accounts = () => {
         const scoreB = calculateAccountScore(b).scoreTotal;
         return scoreA - scoreB;
       }
+      if (ordenacao === 'engajamento_desc') {
+        const dateA = blocoCSignals[a.id]?.lastInteractionDate || '0000-00-00';
+        const dateB = blocoCSignals[b.id]?.lastInteractionDate || '0000-00-00';
+        return dateB.localeCompare(dateA);
+      }
       return toDate(b.ultimaMovimentacao) - toDate(a.ultimaMovimentacao);
     });
 
@@ -170,26 +195,6 @@ export const Accounts = () => {
     baixaCobertura: contas.filter((c) => c.coberturaRelacional < 50).length,
     oportunidades: contas.filter((c) => c.possuiOportunidade).length
   }), [contas]);
-
-  // Agregação de Sinais do Bloco C por Conta
-  const blocoCSignals = useMemo(() => {
-    const map: Record<string, { interactionsCount: number; playsCount: number; lastInteractionDate?: string }> = {};
-
-    contas.forEach(c => {
-      const accountInteractions = allInteractions.filter(i => i.accountId === c.id);
-      const accountPlays = allPlays.filter(p => p.accountId === c.id && p.isActive);
-
-      map[c.id] = {
-        interactionsCount: accountInteractions.length,
-        playsCount: accountPlays.length,
-        lastInteractionDate: accountInteractions.length > 0
-          ? accountInteractions.sort((a, b) => b.date.localeCompare(a.date))[0].date
-          : undefined
-      };
-    });
-
-    return map;
-  }, [contas, allInteractions, allPlays]);
 
   const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
 
@@ -327,6 +332,7 @@ export const Accounts = () => {
               <option value="risco_desc">Ordenar: Risco (maior)</option>
               <option value="score_desc">Ordenar: Score Derivado (maior)</option>
               <option value="score_asc">Ordenar: Score Derivado (menor)</option>
+              <option value="engajamento_desc">Ordenar: Engajamento Recente</option>
               <option value="movimentacao_desc">Ordenar: Última movimentação</option>
             </select>
           </div>
@@ -409,7 +415,7 @@ export const Accounts = () => {
                     <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">{acoesAtrasadas} atras.</span>
                   )}
                   {blocoCSignals[conta.id]?.interactionsCount > 0 && (
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1" title="Interações (Bloco C)">
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1" title={blocoCSignals[conta.id].lastInteractionDate ? `Última inter.: ${new Date(blocoCSignals[conta.id].lastInteractionDate!).toLocaleDateString('pt-BR')}` : 'Interações (Bloco C)'}>
                       <Activity className="w-2.5 h-2.5" /> {blocoCSignals[conta.id].interactionsCount}
                     </span>
                   )}
@@ -442,8 +448,13 @@ export const Accounts = () => {
                         <div className="flex items-center gap-2 mt-0.5">
                           <p className="text-xs text-slate-500">{conta.dominio}</p>
                           {blocoCSignals[conta.id]?.interactionsCount > 0 && (
-                            <span className="text-[9px] font-black text-slate-400 border border-slate-200 px-1 rounded flex items-center gap-0.5" title={`${blocoCSignals[conta.id].interactionsCount} Interações`}>
+                            <span className="text-[9px] font-black text-slate-400 border border-slate-200 px-1 rounded flex items-center gap-0.5" title={blocoCSignals[conta.id].lastInteractionDate ? `Última inter.: ${new Date(blocoCSignals[conta.id].lastInteractionDate!).toLocaleDateString('pt-BR')}` : `${blocoCSignals[conta.id].interactionsCount} Interações`}>
                               <Activity className="w-2 h-2" /> {blocoCSignals[conta.id].interactionsCount}
+                              {blocoCSignals[conta.id].lastInteractionDate && (
+                                <span className="ml-0.5 border-l border-slate-200 pl-1 text-[8px] font-bold text-slate-500 uppercase tracking-tighter">
+                                  {new Date(blocoCSignals[conta.id].lastInteractionDate!).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                                </span>
+                              )}
                             </span>
                           )}
                           {blocoCSignals[conta.id]?.playsCount > 0 && (
