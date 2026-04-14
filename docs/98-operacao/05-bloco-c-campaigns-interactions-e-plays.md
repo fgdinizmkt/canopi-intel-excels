@@ -1,9 +1,9 @@
 # Bloco C — Campanhas, Interações e Recomendações de Play
 
-**Status:** Aberto (scaffolding implementado, população em andamento)  
+**Status:** Concluído (Fase 1 e 2 integradas, determinismo garantido)  
 **Dependência:** Bloco A e Bloco B completos e validados  
 **Objetivo:** Adicionar profundidade analítica, histórico de jornada e recomendações acionáveis  
-**Fonte de Verdade:** `scripts/seed/buildBlockCSeed.ts` (estrutura canônica)
+**Fonte de Verdade:** `scripts/seed/buildBlockCSeed.ts` (lógica) e `seed/generated/bloco-c.parcial.json` (artefato versionado)
 
 ---
 
@@ -356,21 +356,24 @@ Sinal: 'Alta atividade em materiais de IA'
 
 ## 8. Ordem Oficial de População
 
-1. **Campanhas** (13 integrations → 13-26 campaigns)
+1. **Campanhas** (13 campanhas integradas)
    - 1-2 campanhas por integração ativa do Bloco B
    - Realismo: datas, budgets, métricas coerentes
+   - Fonte: deterministicamente geradas em `populateCampaigns()`
 
-2. **Interações** (43 accounts × 5-15 = 215-645 interactions)
-   - Distribuídas ao longo de 3-6 meses
+2. **Interações** (217 interações distribuídas)
+   - 5-8 interações por conta (totalizando 217 touchpoints)
+   - Distribuídas entre Fev/2026 e Abr/2026
    - Refletem campanhas e sinais do Bloco A
-   - Variedade de canais, tipos, sentimentos
+   - Variedade de canais, tipos, sentimentos (positive, neutral, negative)
 
-3. **Play Recommendations** (43 accounts × 1-3 = 43-129 plays)
+3. **Play Recommendations** (65 recomendações ativas)
    - Geradas baseado em:
      - Estado atual da conta (Bloco A)
      - Histórico de interações (Bloco C campaigns/interactions)
      - Sinais mais recentes (Bloco A signals)
    - Recomendações coerentes com tipo estratégico e etapa
+   - 32 contas possuem plays recomendados ativos (1-3 por conta conforme fit)
 
 ---
 
@@ -416,21 +419,30 @@ Este documento deve ser lido junto com:
 
 ## 12. Status deste Bloco
 
-**Status:** Documento de definição criado + scaffolding implementado  
+**Status:** Concluído e Fechado  
 **Estrutura:** Tipos, builders, validadores, runner funcionando  
-**Dados:** Ainda não povoados (próxima iteração)  
-**Validação:** Automatizada via `validateBlockCSeed.ts`  
-**Supabase:** Não tocar ainda — Bloco C é seed-first
+**Dados:** 100% povoados de forma determinística  
+**Validação:** Automatizada via `validateBlockCSeed.ts` (Passando)  
+**Artefato:** `seed/generated/bloco-c.parcial.json` (versionado no repositório)  
 
 ---
 
-## 13. Próxima Ação Oficial
+## 13. Determinismo e Artefatos
 
-A próxima ação oficial após este documento é:
+O Bloco C é **100% determinístico**. Duas execuções do runner geram o exato mesmo JSON.
 
-**Preencher as tabelas campaigns, interactions e play_recommendations com dados realistas para as 43 contas.**
+**Decisão de Versionamento:**
+O arquivo `seed/generated/bloco-c.parcial.json` **está versionado** no repositório para servir como baseline estável para o desenvolvimento da camada de persistência Supabase.
 
-Scaffolding esperado:
+Qualquer alteração na lógica de geração deve ser seguida de uma nova execução do runner e commit do artefato atualizado.
+
+---
+
+## 14. Próxima Ação Oficial (Pré-Supabase)
+
+O Bloco C está pronto. A próxima trilha oficial é a migração e população destas 3 tabelas no Supabase.
+
+Executar validação final:
 
 - `scripts/seed/buildBlockCSeed.ts` — população das 3 tabelas
 - `scripts/seed/exportBlockCSeedJson.ts` — exportação para JSON

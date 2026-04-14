@@ -188,7 +188,7 @@ export const PlayPool: PlayDefinition[] = [
 
 export function createCampaign(overrides: Partial<Campaign>): Campaign {
   const defaults: Campaign = {
-    id: `camp_${Date.now()}`,
+    id: 'PENDING_ID', // MUST be provided in overrides
     name: 'Campaign Name',
     type: 'inbound',
     channel: 'email',
@@ -200,16 +200,19 @@ export function createCampaign(overrides: Partial<Campaign>): Campaign {
     signalsGenerated: 0,
     isActive: true,
   };
+  if (!overrides.id || overrides.id === 'PENDING_ID') {
+    throw new Error('createCampaign: id must be provided in overrides');
+  }
   return { ...defaults, ...overrides };
 }
 
 export function createInteraction(overrides: Partial<Interaction>): Interaction {
   const defaults: Interaction = {
-    id: `int_${Date.now()}`,
+    id: 'PENDING_ID', // MUST be provided in overrides
     accountId: '',
     interactionType: 'visit',
-    timestamp: new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0],
+    timestamp: '2026-04-13T00:00:00Z',
+    date: '2026-04-13',
     channel: 'website',
     direction: 'inbound',
     initiator: 'conta',
@@ -219,6 +222,9 @@ export function createInteraction(overrides: Partial<Interaction>): Interaction 
     source: 'ga4',
     confidence: 75,
   };
+  if (!overrides.id || overrides.id === 'PENDING_ID') {
+    throw new Error('createInteraction: id must be provided in overrides');
+  }
   return { ...defaults, ...overrides };
 }
 

@@ -149,13 +149,21 @@
   - Extensão de `ActionItem.sourceType` para incluir `'score-derivada'` em `accountsData.ts`.
   - Publicação: commit `81447b4` em `origin/main`.
 
+- ✅ Consolidação Seed Canônico (Bloco C): Concluído e Fechado
+  - Auditoria completa do estado do Bloco C (Campaigns, Interactions, Plays).
+  - Remoção de não-determinismo em `createCampaign()` e `createInteraction()`.
+  - População final determinística: 13 campanhas, 217 interações, 65 recomendações de play.
+  - Decisão: Artefato `seed/generated/bloco-c.parcial.json` agora é versionado no repositório.
+  - Documentação `05-bloco-c-campaigns-interactions-e-plays.md` atualizada e sincronizada.
+  - Próximo Milestone: Preparação para população real de tabelas relacionais Supabase.
+
 ## O que está pendente
 - Reconciliação documental pós-Recortes 53–56 (Recorte 57, em proposta).
 - Nenhum recorte novo em andamento.
 
 ## Próximo Passo Exato
-Aprovação de Recorte 57 (reconciliação documental) ou direcionamento para próxima frente macro.
+Aprovação de Recorte 57 (reconciliação documental) ou início da trilha de população Supabase do Bloco C.
 
 ---
-*Último estado funcional confirmado: Recorte 56 (`81447b4`) — Geração de Ação Operacional a partir da Recomendação*
-*Documentação: Proposta de Recorte 57 (reconciliação de 00-status-atual, 03-log-de-sessoes, 06-checkpoint, 02-decisoes-arquiteturais) aguardando aprovação*
+*Último estado funcional confirmado: Consolidação Seed Bloco C (2026-04-13)*
+*Documentação: 05-bloco-c-campaigns-interactions-e-plays.md atualizada*
