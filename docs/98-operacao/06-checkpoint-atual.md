@@ -157,13 +157,20 @@
   - Documentação `05-bloco-c-campaigns-interactions-e-plays.md` atualizada e sincronizada.
   - Próximo Milestone: Preparação para população real de tabelas relacionais Supabase.
 
+- ✅ Trilha Supabase Bloco C — Infraestrutura: Concluído
+  - Mapeamento de schema concluído: `campaigns`, `interactions`, `play_recommendations`.
+  - Migration SQL criada em `supabase/migrations/20260413000000_bloco_c.sql`.
+  - Repositories defensivos com fallback (CAM/INT/PLAY) criados em `src/lib/`.
+  - Script de importação idempotente `scripts/supabase/importBlockCSeed.ts` implementado.
+  - Documentação operacional consolidada em `docs/98-operacao/11-trilha-supabase-bloco-c.md`.
+
 ## O que está pendente
 - Reconciliação documental pós-Recortes 53–56 (Recorte 57, em proposta).
 - Nenhum recorte novo em andamento.
 
 ## Próximo Passo Exato
-Aprovação de Recorte 57 (reconciliação documental) ou início da trilha de população Supabase do Bloco C.
+Executar migration/import do Bloco C no ambiente de desenvolvimento e iniciar consumo dos novos repositórios na UI.
 
 ---
-*Último estado funcional confirmado: Consolidação Seed Bloco C (2026-04-13)*
-*Documentação: 05-bloco-c-campaigns-interactions-e-plays.md atualizada*
+*Último estado funcional confirmado: Infraestrutura Supabase Bloco C (2026-04-13)*
+*Documentação: 11-trilha-supabase-bloco-c.md materializada*

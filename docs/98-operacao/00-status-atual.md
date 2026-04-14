@@ -522,3 +522,4 @@
 | Supabase E19: Tecnografia | Recorte 50 Concluído (Fase E) | Leitura + merge + escrita defensiva do array `tecnografia` (strings simples) com editor mínimo |
 | Supabase E20: Canais e Campanhas | Recorte 51 Concluído (Fase E) | Leitura + merge + escrita defensiva de `canaisCampanhas` com JSON.parse barreira canônica e validação de shape |
 | Consolidação Seed Bloco C | Concluído (2026-04-13) | População determinística de `campaigns`, `interactions` e `play_recommendations`. Artefato JSON versionado. |
+| Supabase Bloco C Infra | Concluído (2026-04-13) | Migration SQL, Repositories defensivos (CAM/INT/PLAY) e script de importação idempotente materializados. |
