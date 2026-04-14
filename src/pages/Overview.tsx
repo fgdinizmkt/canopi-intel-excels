@@ -4,15 +4,45 @@
  */
 
 import React, { useMemo } from 'react';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap, Target, Globe, Activity } from 'lucide-react';
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
 import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
+import { getAccounts } from '../lib/accountsRepository';
+import { getInteractions } from '../lib/interactionsRepository';
+import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
+import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
+import { type Conta } from '../data/accountsData';
 
 export const Overview: React.FC = () => {
   const { openAccount, createAction } = useAccountDetail();
+  const [loading, setLoading] = React.useState(true);
+  const [contasLocal, setContasLocal] = React.useState<Conta[]>([]);
+  const [allInteractions, setAllInteractions] = React.useState<Interaction[]>([]);
+  const [allPlays, setAllPlays] = React.useState<PlayRecommendation[]>([]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [dContas, dInteractions, dPlays] = await Promise.all([
+          getAccounts(),
+          getInteractions(),
+          getPlayRecommendations()
+        ]);
+        setContasLocal(dContas);
+        setAllInteractions(dInteractions);
+        setAllPlays(dPlays);
+      } catch (err) {
+        console.error('[Overview] Erro ao carregar dados do Bloco C:', err);
+        setContasLocal(contasMock);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // ─── DERIVAÇÃO MEMOIZADA DE SINAIS (Nível de Severidade) ───────────────
   const { criticosSinais, alertasSinais, oportunidadesSinais, resolvedosSinais, topSignal, saudeOperacional, topPrioridades } = useMemo(() => {
@@ -234,9 +264,48 @@ export const Overview: React.FC = () => {
   }, []);
 
   // ─── ABM READINESS (Contas com prontidão > 70) ──────────────────────────
-  const abmReadyAccounts = contasMock
+  const abmReadyAccounts = (contasLocal.length > 0 ? contasLocal : contasMock)
     .filter(c => c.prontidao > 70 && c.playAtivo !== 'Nenhum' && c.reconciliationStatus !== 'vazia')
     .slice(0, 2);
+
+  // ─── BLOCO C EXECUTIVE SIGNALS ──────────────────────────────────────────
+  const executiveBlockC = useMemo(() => {
+    const activeContas = contasLocal.length > 0 ? contasLocal : contasMock;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentInteractions = allInteractions.filter(i => new Date(i.date) >= thirtyDaysAgo);
+    const activePlaysCount = allPlays.filter(p => p.isActive).length;
+
+    // Engajamento por conta
+    const engagementMap = activeContas.map(c => {
+      const interactions = allInteractions.filter(i => i.accountId === c.id);
+      const plays = allPlays.filter(p => p.accountId === c.id && p.isActive);
+      const lastDate = interactions.length > 0 ? interactions.sort((a,b) => b.date.localeCompare(a.date))[0].date : null;
+      
+      return {
+        conta: c,
+        interactionsCount: interactions.length,
+        playsCount: plays.length,
+        lastDate
+      };
+    });
+
+    const topEngaged = engagementMap
+      .filter(x => x.lastDate)
+      .sort((a, b) => (b.lastDate || '').localeCompare(a.lastDate || ''))
+      .slice(0, 4);
+
+    return {
+      recentInteractionsCount: recentInteractions.length,
+      activePlaysCount,
+      topEngaged
+    };
+  }, [contasLocal, allInteractions, allPlays]);
+
+  if (loading) {
+    return <div className="p-8 text-slate-500 font-medium animate-pulse">Sincronizando inteligência executiva...</div>;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -335,15 +404,15 @@ export const Overview: React.FC = () => {
           </div>
         </div>
 
-        {/* KPI 6: Melhor Origem (Performance) */}
-        <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Maior Volume</p>
+        {/* KPI 6: Bloco C Engajamento (NEW) */}
+        <div className="p-5 rounded-2xl border border-blue-100 shadow-sm bg-blue-50/30 text-slate-900 ring-1 ring-blue-100/50">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-blue-500">Engajamento Bloco C</p>
           <div className="mt-2 flex items-end justify-between">
             <div>
-              <h3 className="text-xl font-bold font-headline">{performanceMetrics.bestOrigin}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-emerald-600">
-                <TrendingUp className="w-3 h-3" />
-                <span>origem principal</span>
+              <h3 className="text-2xl font-bold font-headline">{executiveBlockC.recentInteractionsCount}</h3>
+              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-blue-600">
+                <Globe className="w-3 h-3" />
+                <span>interações recentes (30d)</span>
               </div>
             </div>
           </div>
@@ -646,11 +715,43 @@ export const Overview: React.FC = () => {
             </div>
           </div>
 
+          {/* Top Engajamento Bloco C (NEW) */}
+          <Card title="Top Engajamento (Bloco C)" subtitle="Recência de atividades reais">
+            <div className="space-y-3">
+              {executiveBlockC.topEngaged.map((item) => (
+                <div key={item.conta.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:border-brand/30 transition-all cursor-pointer group" onClick={() => openAccount(item.conta.id)}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                      {item.conta.nome.substring(0, 2)}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900 group-hover:text-brand">{item.conta.nome}</p>
+                      <p className="text-[9px] text-slate-400 font-medium">Última: {new Date(item.lastDate!).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                     <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold text-slate-700 flex items-center gap-1">
+                           <Activity className="w-2.5 h-2.5" /> {item.interactionsCount}
+                        </span>
+                        {item.playsCount > 0 && (
+                          <span className="text-[9px] font-bold text-blue-500 flex items-center gap-1 mt-0.5">
+                             <Sparkles className="w-2 h-2" /> {item.playsCount} plays
+                          </span>
+                        )}
+                     </div>
+                  </div>
+                </div>
+              ))}
+              <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-600 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc'}>Ver Ranking de Engajamento</Button>
+            </div>
+          </Card>
+
           {/* ABM Readiness */}
           <Card title="Prontidão ABM/ABX" subtitle="Contas com picos de intenção">
             <div className="space-y-4">
               {abmReadyAccounts.map((conta, i) => (
-                <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => openAccount(conta.id)}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center text-xs font-bold text-brand uppercase">
                       {conta.nome.substring(0, 2)}
