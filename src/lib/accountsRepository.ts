@@ -195,8 +195,23 @@ export async function getAccounts(): Promise<Conta[]> {
       return contasMock;
     }
 
-    if (!data || data.length === 0) {
-      console.info('[Accounts] Nenhuma conta encontrada no Supabase. Usando contasMock.');
+    // ── FALLBACK DEFENSIVO DE SEGURANÇA (OBJETIVO 1) ──
+    const rows = (data || []) as AccountRow[];
+    
+    // 1. Validação de Volumetria: mínimo de 20 contas para operação estratégica
+    const countsInsufficient = rows.length < 20;
+
+    // 2. Validação de Integridade: ausência de identidade crítica (nome ou slug)
+    // Se mais de 10% do dataset estiver sem nome ou slug, consideramos base corrompida
+    const criticalMissing = rows.filter(r => !r.nome || !r.slug);
+    const corruptionThreshold = rows.length > 0 ? (criticalMissing.length / rows.length) > 0.1 : false;
+
+    if (countsInsufficient || corruptionThreshold) {
+      const reason = countsInsufficient 
+        ? `volume insuficiente (${rows.length} registros)` 
+        : `identidade crítica incompleta (${criticalMissing.length} registros corrompidos)`;
+      
+      console.warn(`[Accounts] Dataset Supabase rejeitado: ${reason}. Restaurando base canônica (contasMock).`);
       return contasMock;
     }
 
