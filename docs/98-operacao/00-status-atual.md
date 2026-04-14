@@ -1,17 +1,23 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-13 (Recorte 56 — último marco funcional: 81447b4)
+ `main` — sincronizada em 2026-04-14 (Recorte 60 — último marco funcional: ee3957f)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída - Recortes 53–56: Camada de priorização derivada pós-Fase E integrada)
+**Fase E — Supabase Migration & Scale** (Concluída: Accounts & Contacts Deep-Profile Parity Aprovada)
 
 ---
 
-### Marco Operacional Local-First (Concluído - 2026-04-04)
+### MARCO: Restauração de Paridade Funcional (Account & Contact Profile) - 2026-04-14
+**Status: Aprovado e Fechado (Commit `ee3957f`)**
 
-**Operacionalização do Lifecycle (Commits `f0afafd` e `20edc2e`)**
-- **Resultado:** Canopi transformado de protótipo em motor de execução real.
+- **Account Profile:** A nova página dedicada atingiu 100% de paridade operacional com o sistema legado. Inclui: Radar Relacional, Fila de Fogo Ativa, Score Rationale, Timeline 360, Portfólio & Whitespace, e Contexto Compacto de Origem/Canais.
+- **Contact Profile:** Materializado com navegabilidade Empresa -> Contato religada e paridade de edição de narrativas e classificação.
+- **Destaque:** Todos os CTAs da Fila de Fogo estão operacionais, injetando ações reais na fila de sessão com payloads táticos.
+- **Build:** Validado `npm run build` (sucesso completo).
+
+**Operacionalização do Lifecycle (Commits `f0afafd`, `20edc2e`, `ee3957f`)**
+- **Resultado:** Canopi transformado de protótipo em motor de execução real com cockpit profundo.
 - **Entidades:** Consolidação de Conta e Contato como hubs de ação.
 - **Persistência:** Implementação de `localStorage` para `sessionActions` e `sessionLogs` no `AccountDetailContext`.
 - **UX Operativa:** CTAs do Command Center (Executar Playbook, Registrar Log) agora materializam ações reais na fila global.
@@ -471,6 +477,13 @@
 - **Recorte 46:** Concluído. Escrita defensiva atômica de Oportunidades (`etapa` e `risco`) com padrão 1 snapshot → 1 build → 1 setState → 1 persist. Botão "Salvar" explícito no overlay de edição em `AccountDetailView.tsx`.
 - **Recorte 47:** Concluído. Implementação do ciclo completo de leitura, merge e escrita defensiva atômica para o objeto `inteligencia` da entidade Conta. Read path fechado em `AccountDetailView.tsx` via `getAccounts()` do repositório.
 - **Recorte 48:** Concluído. Supabase E17: Leitura Estruturada da Conta. Implementação de leitura, merge defensivo e escrita atômica dos blocos `leituraFactual`, `leituraInferida` e `leituraSugerida`. Repository layer expandido em `accountsRepository.ts` com query defensiva e fallback para mock. UI local-first com editor modal mínimo em `AccountDetailView.tsx`. Atomicidade: 1 snapshot → 1 build → 1 setState → 1 persist. Publicação: commit `569c665`.
+- **Recorte 57-59:** **Restauração de Paridade Funcional (Account/Contact Profile)**.
+  - ✅ Materialização da página dedicada `AccountProfile.tsx` e `ContactProfile.tsx`.
+  - ✅ Restauração do Radar Relacional, Fila de Fogo, Score Rationale e Timeline 360.
+  - ✅ Implementação do Contexto Compacto (Origem/Influência) e Status de Contatos Normalizado.
+  - ✅ Operacionalização de CTAs (Fila de Fogo → Ações Reais).
+  - ✅ Build Exit 0.
+  - **Commit:** `ee3957f` — final functional polish and parity approval.
 - **Recorte 51:** Concluído. Supabase E20: Canais e Campanhas. Implementação completa de leitura, merge defensivo e escrita defensiva atômica para `canaisCampanhas`. Repository layer: `AccountRow` e `AccountPersistPayload` expandidos, `getAccounts()` query com merge defensivo em cascata. UI: estado local-first `localCanaisCampanhas`, editor modal com input para `origemPrincipal` e textarea para `influenciasJson`. Validação: `JSON.parse()` com try/catch como barreira canônica, validação de shape (canal, campanha, tipo, impacto, data). Publicação: commit `15b6371`.
 - **Recorte 52:** Concluído (Documental). Fechamento Canônico da Fase E. Reconciliação factual dos documentos operacionais para eliminar inconsistências entre mapa, checkpoint e decisões. Correção: remoção de linha inconsistente sobre `tipoEstrategico`/`playAtivo` em ABX no resumo de cobertura. Clarificação terminológica: campos com cobertura Supabase especializada via repositories independentes vs. campos sem persistência.
 - **Recorte 53:** Concluído. Scoring Derivado e Priorização de Contas. Implementação de `calculateAccountScore()` em `scoringRepository.ts` com 5 dimensões (potencial, risco, prontidão, cobertura, confiança). Derivação em leitura sem persistência. Helpers: `isContaCritica()`, `isAltaPrioridade()`. Publicação: commit `1825db0`.

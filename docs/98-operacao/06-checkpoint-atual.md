@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 56 (Geração de Ação Operacional) Publicado
+# Checkpoint Atual — Recorte 60 (Restauração de Paridade Aprovada) Publicado
 
 ## Estado de Partida
-- **Branch:** `main` (sincronizada em 2026-04-13)
-- **Marco Funcional:** Recorte 56 publicado em origin/main
-- **Status da Infra:** Fase E (E1–E20) funcional consolidada. Recortes 53–56 implementados: scoring derivado em leitura (5 dimensões), triagem operacional determinística, próxima melhor ação derivada, geração de ação operacional. Sem persistência nova, sem schema novo.
+- **Branch:** `main` (sincronizada em 2026-04-14)
+- **Marco Funcional:** Recorte 60 (Commit `ee3957f`) publicado em origin/main
+- **Status da Infra:** Fase E (E1–E20) consolidada. Paridade funcional dos perfis de Conta e Contato aprovada e fechada.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -164,12 +164,19 @@
   - Script de importação idempotente `scripts/supabase/importBlockCSeed.ts` implementado.
   - Documentação operacional consolidada em `docs/98-operacao/11-trilha-supabase-bloco-c.md`.
 
+- ✅ **Marco Final: Paridade Funcional de Perfis (Accounts/Contacts)**: Concluído e Fechado
+  - ✅ **AccountProfile.tsx**: Radar Relacional, Fila de Fogo Ativa, Contexto Compacto (Origem/Influência), Timeline 360, Portfólio & Whitespace.
+  - ✅ **ContactProfile.tsx**: Paridade operacional aceitável e navegação restaurada.
+  - ✅ **Funcionalidade**: CTAs da Fila de Fogo religados a `createAction` real.
+  - ✅ **Infra**: Correção de hooks e padronização semântica de status de contatos.
+  - ✅ **Build**: Exit 0 em produção.
+  - **Commit Final:** `ee3957f` em `origin/main`.
+
 ## O que está pendente
-- Reconciliação documental pós-Recortes 53–56 (Recorte 57, em proposta).
-- Nenhum recorte novo em andamento.
+- Reconciliação final de escrita para Bloco C (E21).
 
 ## Próximo Passo Exato
-Executar migration/import do Bloco C no ambiente de desenvolvimento e iniciar consumo dos novos repositórios na UI.
+**População Real do Bloco C**: Executar a migration/import do Bloco C no Supabase remoto e iniciar o consumo dos novos repositórios na UI do Cockpit.
 
 ---
 *Último estado funcional confirmado: Infraestrutura Supabase Bloco C (2026-04-13)*
