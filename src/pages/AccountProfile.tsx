@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Building2, Target, Zap, Activity, ExternalLink, Mail, 
   MapPin, Users, AlertTriangle, ShieldCheck, Flame, Users2, 
   History as HistoryIcon, Globe, Sparkles, Layout, ChevronRight, 
-  CheckCircle2, Brain, Link2, Database, BarChart3, PieChart, TrendingUp
+  CheckCircle2, Brain, Link2, Database, BarChart3, PieChart, TrendingUp,
+  X, Pencil, Plus, Trash2, Network, List as ListIcon, Share2, Lightbulb,
+  CornerDownRight, MoreHorizontal, Edit3
 } from 'lucide-react';
-import { getAccounts } from '../lib/accountsRepository';
+import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { getInteractionsByAccount } from '../lib/interactionsRepository';
 import { getPlayRecommendationsByAccount } from '../lib/playRecommendationsRepository';
 import { getCampaignsMap } from '../lib/campaignsRepository';
-import { calculateAccountScore } from '../lib/scoringRepository';
-import { contasMock, Conta, ContatoConta } from '../data/accountsData';
+import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../lib/scoringRepository';
+import { persistOportunidade } from '../lib/oportunidadesRepository';
+import { contasMock, Conta, ContatoConta, OportunidadeConta, SinalConta, AcaoConta } from '../data/accountsData';
 import { Interaction, PlayRecommendation, Campaign } from '../../scripts/seed/buildBlockCSeed';
 import { useAccountDetail } from '../context/AccountDetailContext';
 
@@ -24,23 +27,76 @@ interface AccountProfileProps {
 const fmt = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' }).format(v);
 
-const ScoreCard = ({ label, val, color }: { label: string; val: number; color: string }) => (
-  <div className="bg-slate-800/50 border border-slate-700/50 p-3 rounded-xl flex flex-col items-center justify-center">
-    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">{label}</span>
-    <span className={`text-xl font-black ${color}`}>{val}</span>
-  </div>
-);
+const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
+  const bgColor = val >= 75 ? 'bg-emerald-500' : val >= 50 ? 'bg-blue-500' : 'bg-amber-500';
+  return (
+    <div className="flex-1 min-w-0">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
+        <span className="text-[10px] font-bold text-slate-300">{val}</span>
+      </div>
+      <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full transition-all duration-500 ${bgColor}`} style={{ width: `${val}%` }} />
+      </div>
+    </div>
+  );
+};
+
+// Organogram Node Component (Improved for real hierarchical look)
+const OrgNode = ({ contact, level, isRoot, onSelect }: { contact: ContatoConta; level: number; isRoot?: boolean; onSelect: (id: string) => void }) => {
+  const color = contact.classificacao.includes('Blocker') ? 'border-red-500 text-red-400 bg-red-500/5' :
+                contact.classificacao.includes('Sponsor') ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' :
+                contact.classificacao.includes('Decisor') ? 'border-amber-500 text-amber-400 bg-amber-500/5' :
+                'border-slate-700 text-slate-300 bg-slate-900';
+
+  return (
+    <div className="relative group">
+       {!isRoot && (
+         <div className="absolute -left-6 top-1/2 w-6 h-px bg-slate-800" />
+       )}
+       <div 
+         onClick={() => onSelect(contact.id)}
+         className={`p-3 rounded-xl border-l-4 ${color} transition-all hover:translate-x-1 cursor-pointer shadow-lg w-64 shrink-0`}
+       >
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs">
+                {contact.nome.substring(0,2).toUpperCase()}
+             </div>
+             <div className="min-w-0">
+                <p className="text-xs font-black truncate">{contact.nome}</p>
+                <p className="text-[10px] text-slate-500 truncate">{contact.cargo}</p>
+             </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+             <span className="text-[8px] font-black uppercase text-slate-500">{contact.papelComite}</span>
+             <span className="text-[9px] font-bold text-blue-500">{contact.influencia}/10 Inf.</span>
+          </div>
+       </div>
+    </div>
+  );
+};
 
 export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
   const router = useRouter();
-  const { createAction } = useAccountDetail();
+  const { createAction, sessionActions } = useAccountDetail();
   
+  // -- CONSOLIDATED DATA STATE --
   const [account, setAccount] = useState<Conta | null>(null);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [plays, setPlays] = useState<PlayRecommendation[]>([]);
   const [campaigns, setCampaigns] = useState<Record<string, Campaign>>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'operacional' | 'relacional' | 'inteligencia' | 'estrategia'>('operacional');
+
+  // -- LOCAL OPERATIONAL STATES --
+  const [localLeitura, setLocalLeitura] = useState({ factual: [] as string[], inferida: [] as string[], sugerida: [] as string[] });
+  const [editingLeitura, setEditingLeitura] = useState<typeof localLeitura | null>(null);
+  const [localInteligencia, setLocalInteligencia] = useState({ sucessos: [] as string[], insucessos: [] as string[], padroes: [] as string[], learnings: [] as string[], hipoteses: [] as string[], fatoresRecomendacao: [] as string[] });
+  const [editingIntel, setEditingIntel] = useState<typeof localInteligencia | null>(null);
+  const [localTecnografia, setLocalTecnografia] = useState<string[]>([]);
+  const [editingTecnografia, setEditingTecnografia] = useState<string | null>(null);
+  const [orgView, setOrgView] = useState<'tree' | 'list'>('tree');
+  const [showFeedback, setShowFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -59,6 +115,11 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
           setInteractions(int);
           setPlays(pl);
           setCampaigns(camp);
+
+          // Initialize local states
+          setLocalLeitura({ factual: found.leituraFactual || [], inferida: found.leituraInferida || [], sugerida: found.leituraSugerida || [] });
+          setLocalInteligencia(found.inteligencia || { sucessos: [], insucessos: [], padroes: [], learnings: [], hipoteses: [], fatoresRecomendacao: [] });
+          setLocalTecnografia(found.tecnografia || []);
         }
       } catch (err) {
         console.error('[AccountProfile] Error loading data:', err);
@@ -71,8 +132,93 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
   const score = useMemo(() => account ? calculateAccountScore(account) : null, [account]);
 
-  if (loading) return <div className="p-10 text-slate-500 font-medium animate-pulse bg-slate-900 min-h-screen">Sincronizando perfil 360 da conta...</div>;
-  if (!account) return <div className="p-10 text-slate-500 bg-slate-900 min-h-screen">Conta não encontrada.</div>;
+  // -- PERSISTENCE HANDLERS --
+  const handleSaveLeitura = () => {
+    if (!editingLeitura || !account) return;
+    setLocalLeitura(editingLeitura);
+    persistAccount({
+      id: account.id,
+      leituraFactual: editingLeitura.factual,
+      leituraInferida: editingLeitura.inferida,
+      leituraSugerida: editingLeitura.sugerida
+    });
+    setEditingLeitura(null);
+    setShowFeedback('Leitura IA persistida.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleSaveIntel = () => {
+    if (!editingIntel || !account) return;
+    setLocalInteligencia(editingIntel);
+    persistAccount({ id: account.id, inteligencia: editingIntel });
+    setEditingIntel(null);
+    setShowFeedback('Cérebro operacional atualizado.');
+    setTimeout(() => setShowFeedback(null), 3000);
+  };
+
+  const handleUpdateTecnografia = (newTech: string) => {
+    if (!account || !newTech.trim()) return;
+    const updated = [...localTecnografia, newTech.trim()];
+    setLocalTecnografia(updated);
+    persistAccount({ id: account.id, tecnografia: updated });
+    setEditingTecnografia(null);
+  };
+
+  const handleRemoveTecnografia = (tech: string) => {
+    if (!account) return;
+    const updated = localTecnografia.filter(t => t !== tech);
+    setLocalTecnografia(updated);
+    persistAccount({ id: account.id, tecnografia: updated });
+  };
+
+  // -- ORGANOGRAM RENDERING (MULTIPLE TREES / FOREST) --
+  const renderTree = useCallback((contatos: ContatoConta[], parentId?: string, level = 0) => {
+    const children = contatos.filter(c => c.liderId === parentId);
+    if (children.length === 0) return null;
+    
+    return (
+      <div className="flex flex-col gap-4 relative">
+        {children.map(contact => (
+          <div key={contact.id} className="flex items-start gap-6">
+            <OrgNode contact={contact} level={level} isRoot={level === 0} onSelect={(id) => router.push(`/contas/${slug}/contato/${id}`)} />
+            <div className="flex flex-col gap-4 border-l border-slate-800 pl-6">
+               {renderTree(contatos, contact.id, level + 1)}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }, [slug, router]);
+
+  const organogramForest = useMemo(() => {
+    if (!account) return null;
+    const roots = account.contatos.filter(c => !c.liderId || !account.contatos.some(p => p.id === c.liderId));
+    
+    return (
+      <div className="space-y-12 overflow-x-auto pb-8 scrollbar-thin">
+         {roots.map(root => (
+           <div key={root.id} className="inline-block min-w-max pr-12">
+              <div className="mb-4">
+                 <span className="px-3 py-1 bg-slate-800 border border-slate-700 text-[10px] font-black uppercase text-slate-500 rounded-lg tracking-widest italic">
+                    Árvore Hierárquica: {root.area}
+                 </span>
+              </div>
+              <div className="flex flex-col gap-6">
+                 <div className="flex items-start gap-6">
+                    <OrgNode contact={root} level={0} isRoot={true} onSelect={(id) => router.push(`/contas/${slug}/contato/${id}`)} />
+                    <div className="flex flex-col gap-4 border-l border-slate-800 pl-6">
+                       {renderTree(account.contatos, root.id, 1)}
+                    </div>
+                 </div>
+              </div>
+           </div>
+         ))}
+      </div>
+    );
+  }, [account, renderTree]);
+
+  if (loading) return <div className="p-10 text-slate-500 font-medium animate-pulse bg-slate-950 min-h-screen">Sincronizando perfil 360 da conta...</div>;
+  if (!account) return <div className="p-10 text-slate-500 bg-slate-950 min-h-screen">Conta não encontrada.</div>;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12 overflow-x-hidden">
@@ -96,6 +242,9 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {showFeedback && (
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mr-4 animate-pulse">✓ {showFeedback}</span>
+            )}
             <button className="px-4 py-2 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm">
               Sincronizar CRM
             </button>
@@ -106,362 +255,473 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-3 gap-8">
+      <main className="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-12 gap-8">
         
-        {/* ── LEFT COLUMN: IDENTITY & FIRMOGRAPHICS (1/3) ── */}
-        <aside className="col-span-1 space-y-6">
-          {/* Executive identity */}
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${account.statusGeral === 'Saudável' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
+        {/* ── LEFT COLUMN: IDENTITY & FIRMOGRAPHICS (4/12) ── */}
+        <aside className="col-span-4 space-y-6">
+          {/* Identity & Structure */}
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black tracking-wider ${account.statusGeral === 'Saudável' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
                 {account.statusGeral}
               </span>
-              <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest italic flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" /> Verificada por AI
-              </span>
+              <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                 <Building2 className="w-3 h-3" /> {account.porte}
+              </div>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Resumo Executivo</p>
-                <p className="text-sm text-slate-300 leading-relaxed italic">
-                  "{account.resumoExecutivo || 'Conta em fase de enriquecimento narrativo.'}"
+                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                   <Target className="w-3 h-3" /> Tipo Estratégico
                 </p>
+                <p className="text-sm font-bold text-slate-200 uppercase">{account.tipoEstrategico}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800/50">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-800/50">
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Porte</p>
-                  <p className="text-xs font-bold text-slate-200">{account.porte}</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Vertical</p>
+                  <p className="text-xs font-bold text-slate-100">{account.vertical}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Localização</p>
-                  <p className="text-xs font-bold text-slate-200">{account.localizacao}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Budget</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Budget BRL</p>
                   <p className="text-xs font-bold text-emerald-400">{fmt(account.budgetBrl)}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Score de Fit</p>
-                  <p className="text-xs font-bold text-blue-400">{account.icp}% ICP Match</p>
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Atividade</p>
+                  <p className={`text-xs font-bold ${account.atividadeRecente === 'Alta' ? 'text-emerald-400' : 'text-blue-500'}`}>{account.atividadeRecente}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Cobertura</p>
+                  <p className="text-xs font-bold text-blue-400">{account.coberturaRelacional}%</p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-800/50">
+                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2 flex items-center justify-between">
+                   <span>Radar de Sinais por Dimensão</span>
+                   <PieChart className="w-3 h-3" />
+                </p>
+                <div className="space-y-3">
+                   {score && [
+                     score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca
+                   ].map(dim => <ScoreMiniBar key={dim.name} label={dim.name} val={dim.score} />)}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Deep Scores */}
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <PieChart className="w-4 h-4" /> Matriz de Inteligência
-            </h3>
-            <div className="grid grid-cols-3 gap-3">
-              <ScoreCard label="ICP" val={account.icp} color="text-emerald-400" />
-              <ScoreCard label="CRM" val={account.crm} color="text-blue-400" />
-              <ScoreCard label="VP" val={account.vp} color="text-amber-400" />
-              <ScoreCard label="CT" val={account.ct} color="text-violet-400" />
-              <ScoreCard label="FT" val={account.ft} color="text-blue-500" />
-              <div className="bg-brand/10 border border-brand/20 p-3 rounded-xl flex flex-col items-center justify-center">
-                <span className="text-[9px] font-black text-brand uppercase tracking-widest mb-1">TOTAL</span>
-                <span className="text-xl font-black text-brand">{score?.scoreTotal}</span>
-              </div>
+          {/* Technographics (Restored with Edit) */}
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                 <Database className="w-4 h-4 text-blue-500" /> Stack Tecnológica
+              </h3>
+              <button onClick={() => setEditingTecnografia(editingTecnografia === null ? '' : null)} className="p-1 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-blue-400 transition-all">
+                 {editingTecnografia !== null ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              </button>
             </div>
-          </section>
+            
+            {editingTecnografia !== null && (
+              <div className="flex gap-2 mb-4">
+                 <input 
+                   type="text" 
+                   value={editingTecnografia}
+                   onChange={e => setEditingTecnografia(e.target.value)}
+                   className="flex-1 h-8 bg-slate-950 border border-slate-800 rounded-lg px-3 text-[10px] text-slate-200 outline-none focus:border-blue-500/50"
+                   placeholder="Nova tecnologia..."
+                 />
+                 <button onClick={() => handleUpdateTecnografia(editingTecnografia)} className="px-3 h-8 bg-blue-600 text-white text-[9px] font-black uppercase rounded-lg">Add</button>
+              </div>
+            )}
 
-          {/* Technographics */}
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Tecnografia & Soluções</h3>
             <div className="flex flex-wrap gap-2">
-              {account.tecnografia.map(tech => (
-                <span key={tech} className="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 rounded-full text-xs font-medium">
-                  {tech}
-                </span>
+              {localTecnografia.map(tech => (
+                <div key={tech} className="group relative">
+                  <span className="px-3 py-1 bg-slate-800/50 border border-slate-700 text-slate-300 rounded-xl text-[10px] font-black uppercase tracking-tight">
+                    {tech}
+                  </span>
+                  <button onClick={() => handleRemoveTecnografia(tech)} className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                     <X className="w-2.5 h-2.5 text-white" />
+                  </button>
+                </div>
               ))}
+              {localTecnografia.length === 0 && <p className="text-[10px] text-slate-600 italic">Sem stack registrada.</p>}
             </div>
           </section>
 
-          {/* Data Confidence */}
-          <section className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Database className="w-4 h-4 text-emerald-500" /> Confiança dos Dados
-            </h3>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="text-3xl font-black text-white">92%</div>
-              <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 w-[92%]" />
-              </div>
-            </div>
-            <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-              Alimentado por 4 fontes: CRM, ZoomInfo, Clearbit e Canopi AI Sinais v6. Próximo enriquecimento automático em 4h.
-            </p>
+          {/* Canais & Campanhas */}
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
+             <div className="absolute top-0 right-0 p-8 opacity-5">
+                <Link2 className="w-16 h-16 text-violet-400" />
+             </div>
+             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-violet-400" /> Campanhas & Touchpoints
+             </h3>
+             <div className="space-y-4">
+                {account.canaisCampanhas.influencias.slice(0, 3).map((inf, i) => (
+                   <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
+                      <div className="flex items-center justify-between mb-1.5">
+                         <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
+                         <span className="text-[8px] text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                      <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
+                      <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
+                   </div>
+                ))}
+             </div>
+          </section>
+
+          {/* History / Timeline Structural (Restored) */}
+          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <HistoryIcon className="w-4 h-4 text-amber-500" /> Memória Corporativa
+             </h3>
+             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin">
+                {account.historico.sort((a,b) => b.data.localeCompare(a.data)).map((h, i) => (
+                   <div key={i} className="relative pl-6 border-l border-slate-800 pb-4 last:pb-0">
+                      <div className="absolute top-0 -left-[5px] w-2.5 h-2.5 rounded-full bg-slate-800 border-2 border-amber-500" />
+                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">{h.data}</p>
+                      <p className="text-[11px] font-bold text-slate-200">{h.tipo}</p>
+                      <p className="text-[10px] text-slate-500 leading-tight">{h.descricao}</p>
+                   </div>
+                ))}
+             </div>
           </section>
         </aside>
 
-        {/* ── CENTRAL COLUMN: DEEP DIVE & TABS (2/3) ── */}
-        <div className="col-span-2 space-y-8">
+        {/* ── CENTRAL COLUMN: COMMAND CENTER & DRILL-DOWN (8/12) ── */}
+        <div className="col-span-8 space-y-8">
           
-          {/* Header Action / Recommendation */}
-          <section className="bg-white text-slate-900 rounded-2xl p-6 shadow-xl relative overflow-hidden group border border-slate-100">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-               <Brain className="w-32 h-32" />
+          {/* Executive Strategy & Next Action */}
+          <section className="bg-gradient-to-br from-brand to-brand-dark text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group border border-white/10">
+            <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
+               <Brain className="w-48 h-48" />
             </div>
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-2 py-1 bg-brand text-white text-[9px] font-black rounded uppercase tracking-widest shadow-sm">
-                   Next Best Action
+              <div className="flex items-center gap-3 mb-6">
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                   Canopi Command Engine
                 </span>
-                {score?.prioridade === 'crítica' && (
-                  <span className="flex items-center gap-1 text-[10px] font-black text-red-600 uppercase tracking-widest">
-                    <AlertTriangle className="w-3 h-3" /> Foco Imediato
-                  </span>
-                )}
+                <Sparkles className="w-4 h-4 text-white/50 animate-pulse" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 leading-tight mb-2">
-                {account.proximaMelhorAcao || 'Detectando próxima melhor ação operacional...'}
+              <h2 className="text-3xl font-black leading-tight mb-4 tracking-tighter">
+                {deriveProximaMelhorAcao(account, score!)}
               </h2>
-              <p className="text-slate-500 text-sm max-w-2xl mb-6">
-                Baseado em {interactions.length} interações recentes e {plays.length} plays recomendados pela inteligência de receita.
+              <p className="text-white/70 text-sm max-w-2xl mb-8 leading-relaxed font-medium">
+                {deriveMotivoDaRecomendacao(account, score!)}
               </p>
               <div className="flex items-center gap-4">
-                <button className="px-6 py-3 bg-brand text-white rounded-xl font-bold text-sm shadow-lg shadow-brand/20 hover:scale-[1.02] transition-transform">
-                  Ativar Sequência de Abordagem
+                <button 
+                  onClick={() => {
+                    const acao = deriveAcaoOperacional(account, score!);
+                    createAction(acao);
+                    setShowFeedback('Intervenção operacional injetada.');
+                    setTimeout(() => setShowFeedback(null), 3000);
+                  }}
+                  className="px-8 py-3.5 bg-white text-brand rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-dark/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  Gerar Ação Operacional
                 </button>
-                <button className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">
-                  Personalizar Inteligência
-                </button>
+                <div className="flex -space-x-2">
+                   {account.contatos.slice(0,3).map(c => (
+                     <div key={c.id} title={c.nome} className="w-9 h-9 rounded-full bg-brand-dark border-2 border-brand flex items-center justify-center font-bold text-[10px] text-white/80 shadow-lg">
+                        {c.nome.substring(0,1)}
+                     </div>
+                   ))}
+                </div>
               </div>
             </div>
           </section>
 
-          {/* Tab Navigation */}
-          <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
+          {/* Deep Tabs */}
+          <div className="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-inner">
             {[
-              { id: 'operacional', label: 'Visão Operacional', icon: Activity },
-              { id: 'relacional', label: 'Mapa Relacional', icon: Users2 },
-              { id: 'inteligencia', label: 'Canopi Intelligence', icon: Sparkles },
-              { id: 'estrategia', label: 'Estratégia & Metas', icon: Target },
+              { id: 'operacional', label: 'Estratégia & Fila', icon: Activity },
+              { id: 'relacional', label: 'Comitê & Organograma', icon: Users2 },
+              { id: 'inteligencia', label: 'Leitura Canopi AI', icon: Sparkles },
+              { id: 'estrategia', label: 'Pipeline & Metas', icon: Target },
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-slate-800 text-white shadow-sm ring-1 ring-slate-700' : 'text-slate-500 hover:text-slate-300'}`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-slate-800 text-white shadow-xl ring-1 ring-slate-700' : 'text-slate-500 hover:text-slate-300'}`}
               >
                 <tab.icon className="w-4 h-4" /> {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Dynamic Tab Content */}
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="space-y-8 min-h-[600px]">
             {activeTab === 'operacional' && (
-              <div className="grid grid-cols-2 gap-6">
-                {/* Timeline Recente (Bloco C) */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col overflow-hidden">
-                  <div className="flex items-center justify-between mb-6">
+              <div className="grid grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4">
+                {/* Timeline do Bloco C */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[500px]">
+                  <div className="flex items-center justify-between mb-8">
                     <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <HistoryIcon className="w-4 h-4 text-blue-400" /> Timeline Progressiva
+                      <Layout className="w-4 h-4 text-blue-400" /> Fila de Fogo (Interações)
                     </h3>
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-2 py-0.5 rounded-full">{interactions.length} Eventos</span>
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-3 py-1 rounded-full">{interactions.length} Logs</span>
                   </div>
-                  <div className="flex-1 overflow-y-auto space-y-6 pr-2 scrollbar-thin">
-                    {interactions.length > 0 ? interactions.sort((a,b) => b.date.localeCompare(a.date)).map((int, i) => (
-                      <div key={i} className="relative pl-6 border-l-2 border-slate-800 pb-2 last:pb-0">
-                         <div className="absolute top-0 -left-[9px] w-4 h-4 rounded-full bg-slate-900 border-2 border-blue-500" />
-                         <span className="text-[9px] font-bold text-slate-500 uppercase">{new Date(int.date).toLocaleDateString('pt-BR')}</span>
-                         <p className="text-xs font-bold text-slate-200 mt-1">{int.interactionType} - {int.description}</p>
-                         <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{int.nextStep}</p>
+                  <div className="flex-1 overflow-y-auto space-y-8 pr-4 scrollbar-thin">
+                    {interactions.sort((a,b) => b.date.localeCompare(a.date)).map((int, i) => (
+                      <div key={i} className="relative pl-8 border-l-2 border-slate-800 pb-2 group">
+                         <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-full bg-slate-950 border-2 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)] group-hover:scale-110 transition-transform" />
+                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{new Date(int.date).toLocaleDateString('pt-BR')}</span>
+                         <h4 className="text-sm font-black text-slate-100 mt-2">{int.interactionType}</h4>
+                         <p className="text-xs text-slate-400 mt-1 leading-relaxed font-medium">{int.description}</p>
+                         <div className="flex items-center gap-3 mt-4">
+                            <span className="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Sinal v6</span>
+                             <span className="text-[9px] font-bold text-slate-600">Projetado: {int.nextStep}</span>
+                         </div>
                       </div>
-                    )) : (
-                      <p className="text-xs text-slate-600 italic">Nenhuma interação registrada no Bloco C.</p>
-                    )}
+                    ))}
                   </div>
                 </div>
 
-                {/* Plays Recomendados */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col overflow-hidden">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-500" /> Plays Recomendados IA
+                {/* Plays Ativos & Recomendações */}
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[500px]">
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-500" /> Plays Recomendados IA
                   </h3>
-                  <div className="space-y-4 overflow-y-auto pr-2">
+                  <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin">
                     {plays.map((play, i) => (
-                      <div key={i} className="p-4 bg-slate-950 border border-slate-800 rounded-xl hover:border-brand/40 transition-all">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[9px] font-black text-brand uppercase tracking-widest">{play.playType}</span>
-                          <span className="text-[9px] font-bold text-emerald-400">Match {play.accountReadiness}%</span>
+                      <div key={i} className="p-5 bg-slate-950 border border-slate-800 rounded-2xl hover:border-brand/40 transition-all group relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-slate-800 group-hover:bg-brand transition-colors" />
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] font-black text-brand uppercase tracking-widest">{play.playType}</span>
+                          <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                         </div>
-                        <h4 className="text-sm font-bold text-slate-200 mb-2">{play.playName}</h4>
-                        <p className="text-[10px] text-slate-500 leading-relaxed mb-3">{play.keySignals}</p>
-                        <button className="w-full py-2 bg-slate-800 text-[10px] font-black text-slate-300 uppercase rounded-lg hover:bg-brand hover:text-white transition-all">
-                          Ver Detalhes do Play
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Histórico de Oportunidades */}
-                <div className="col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" /> Pipeline & Oportunidades Históricas
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {account.oportunidades.map((op, i) => (
-                      <div key={i} className="p-4 bg-slate-950 border border-slate-800 rounded-xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/30 group-hover:bg-emerald-500 transition-all" />
-                        <p className="text-[10px] font-bold text-slate-500 mb-1">{op.etapa}</p>
-                        <p className="text-sm font-bold text-slate-100 mb-2 group-hover:text-brand transition-colors">{op.nome}</p>
-                        <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-emerald-400 font-black">{fmt(op.valor)}</span>
-                          <span className="text-slate-600 font-bold uppercase">{op.etapa}</span>
+                        <h4 className="text-sm font-black text-slate-100 mb-3">{play.playName}</h4>
+                        <div className="flex gap-2">
+                           {play.keySignals.map(s => (
+                             <span key={s} className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-800 text-slate-500 rounded border border-slate-700">{s}</span>
+                           ))}
                         </div>
                       </div>
                     ))}
+                    <button className="w-full py-4 mt-4 border border-dashed border-slate-800 rounded-2xl text-[10px] font-black text-slate-600 uppercase hover:border-slate-600 hover:text-slate-400 transition-all">
+                       Configurar Novo Playbook AI
+                    </button>
                   </div>
                 </div>
               </div>
             )}
 
             {activeTab === 'relacional' && (
-              <div className="space-y-8">
-                {/* Heatmap de Cobertura Relacional */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-blue-400" /> Heatmap de Penetração Relacional
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-3">
-                       <span className="text-[10px] text-slate-600 font-bold uppercase underline underline-offset-4 decoration-emerald-500">Decisores Protegidos</span>
-                       <span className="text-[10px] text-slate-600 font-bold uppercase underline underline-offset-4 decoration-red-500">Lacunas Críticas</span>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-4">
-                    {['Marketing', 'Vendas', 'Produto', 'TI / Infra'].map(area => {
-                      const contatosArea = account.contatos.filter(c => c.area === area);
-                      const hasDecisionMaker = contatosArea.some(c => c.influencia > 7);
-                      const coverageScore = contatosArea.length * 25 > 100 ? 100 : contatosArea.length * 25;
-                      
-                      return (
-                        <div key={area} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col gap-3">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{area}</p>
-                          <div className="flex items-end justify-between">
-                             <span className={`text-2xl font-black ${coverageScore > 50 ? 'text-emerald-400' : 'text-amber-400'}`}>{coverageScore}%</span>
-                             <span className="text-[10px] font-bold text-slate-500">{contatosArea.length} contatos</span>
-                          </div>
-                          <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-                             <div className={`h-full ${coverageScore > 50 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${coverageScore}%` }} />
-                          </div>
-                          {hasDecisionMaker && (
-                            <div className="flex items-center gap-1.5 text-[9px] font-bold text-blue-400 uppercase mt-1">
-                               <ShieldCheck className="w-3 h-3" /> Sponsor Mapeado
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+              <div className="space-y-8 animate-in fade-in">
+                {/* Organograma Mode Toggle */}
+                <div className="flex items-center justify-between mb-4">
+                   <div className="flex items-center gap-4">
+                      <button 
+                        onClick={() => setOrgView('tree')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-500 hover:text-slate-300'}`}
+                      >
+                         <Network className="w-4 h-4" /> Organograma Profundo
+                      </button>
+                      <button 
+                        onClick={() => setOrgView('list')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${orgView === 'list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-500 hover:text-slate-300'}`}
+                      >
+                         <ListIcon className="w-4 h-4" /> Modo Lista
+                      </button>
+                   </div>
+                   <div className="text-[10px] text-slate-600 font-bold uppercase tracking-widest italic flex items-center gap-2">
+                      <ShieldCheck className="w-3.5 h-3.5" /> 100% Mapeado via CRM
+                   </div>
                 </div>
 
-                {/* Comitê Comprador */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Comitê Comprador & Influenciadores</h3>
-                  <div className="overflow-x-auto">
+                {orgView === 'tree' ? (
+                  <div className="bg-slate-900/50 border border-slate-800 rounded-[2rem] p-8 min-h-[500px]">
+                     {organogramForest}
+                  </div>
+                ) : (
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="text-[10px] font-black text-slate-600 uppercase border-b border-slate-800">
-                          <th className="pb-4">NOME</th>
-                          <th className="pb-4">CARGO / ÁREA</th>
-                          <th className="pb-4">CLASSIFICAÇÃO</th>
-                          <th className="pb-4 text-right">INFLUÊNCIA</th>
+                        <tr className="text-[10px] font-black text-slate-700 uppercase border-b border-slate-800">
+                          <th className="pb-6">STAKEHOLDER</th>
+                          <th className="pb-6 text-center">ÁREA / HIERARQUIA</th>
+                          <th className="pb-6 text-center">PODER & ACESSO</th>
+                          <th className="pb-6 text-right">AÇÕES</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {account.contatos.sort((a,b) => b.influencia - a.influencia).map(c => (
-                          <tr 
-                            key={c.id} 
-                            className="group hover:bg-slate-800/30 transition-all cursor-pointer"
-                            onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}
-                          >
-                            <td className="py-4">
-                              <p className="text-sm font-bold text-slate-200 group-hover:text-brand transition-colors">{c.nome}</p>
-                              <p className="text-[10px] text-slate-500 font-medium">{c.cargo}</p>
-                            </td>
-                            <td className="py-4">
-                              <p className="text-xs font-bold text-slate-300">{c.cargo}</p>
-                              <p className="text-[10px] text-slate-500 uppercase tracking-tight">{c.area}</p>
-                            </td>
-                            <td className="py-4">
-                               <div className="flex gap-1">
-                                 {c.classificacao.map(tag => (
-                                   <span key={tag} className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 text-slate-400 rounded-md text-[9px] font-bold">
-                                      {tag}
-                                   </span>
-                                 ))}
+                          <tr key={c.id} className="group hover:bg-slate-800/30 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
+                            <td className="py-6">
+                               <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
+                                     {c.nome.substring(0,2).toUpperCase()}
+                                  </div>
+                                  <div>
+                                     <p className="text-sm font-black text-slate-100 group-hover:text-blue-400 transition-colors">{c.nome}</p>
+                                     <p className="text-[10px] font-bold text-slate-500">{c.cargo}</p>
+                                  </div>
                                </div>
                             </td>
-                            <td className="py-4 text-right">
-                               <span className={`text-[11px] font-black ${c.influencia > 7 ? 'text-emerald-400' : 'text-slate-500'}`}>{c.influencia}/10</span>
+                            <td className="py-6 text-center">
+                               <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] font-black text-slate-400 uppercase border border-slate-800">{c.area}</span>
+                            </td>
+                            <td className="py-6 text-center">
+                               <div className="flex items-center justify-center gap-4">
+                                  <div className="flex flex-col items-center">
+                                     <span className="text-[9px] font-black text-slate-600 uppercase">Inf.</span>
+                                     <span className="text-xs font-black text-slate-300">{c.influencia}/10</span>
+                                  </div>
+                                  <div className="flex flex-col items-center">
+                                     <span className="text-[9px] font-black text-slate-600 uppercase">Relac.</span>
+                                     <span className="text-xs font-black text-emerald-400">{c.forcaRelacional}%</span>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="py-6 text-right">
+                               <button className="p-2 hover:bg-slate-950 rounded-lg text-slate-700 hover:text-blue-500 transition-all">
+                                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                                </button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
             {activeTab === 'inteligencia' && (
-              <div className="grid grid-cols-2 gap-6">
-                 {/* Sucessos e Insucessos */}
-                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                       <ShieldCheck className="w-4 h-4 text-emerald-400" /> O que funciona (Sucessos)
-                    </h3>
-                    <div className="space-y-4">
-                       {(account.inteligencia.sucessos || ['Frequência de abordagem multicanal', 'Demonstração focada em ROI operacional']).map((s, i) => (
-                         <div key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                            <p className="text-xs font-medium text-slate-300 leading-relaxed">{s}</p>
-                         </div>
-                       ))}
+              <div className="space-y-8 animate-in fade-in">
+                 {/* Leitura Canopi AI Section (Restored Parity) */}
+                 <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                       <Sparkles className="w-24 h-24 text-blue-500" />
+                    </div>
+                    <div className="flex items-center justify-between mb-8">
+                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-blue-500" /> Dril-down Canopi Intelligence
+                       </h3>
+                       <button onClick={() => setEditingLeitura(editingLeitura === null ? { ...localLeitura } : null)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-black text-slate-400 transition-all uppercase hover:text-blue-400">
+                          {editingLeitura ? <X className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />} {editingLeitura ? 'Cancelar' : 'Sugerir Insights'}
+                       </button>
+                    </div>
+
+                    {editingLeitura ? (
+                       <div className="space-y-6">
+                          {['factual', 'inferida', 'sugerida'].map(type => (
+                             <div key={type}>
+                               <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest block mb-2">{type === 'factual' ? 'Dados Verificáveis' : type === 'inferida' ? 'Inferências AI' : 'Ações Recomendadas'}</label>
+                               <textarea 
+                                 value={editingLeitura[type as keyof typeof localLeitura].join('\n')}
+                                 onChange={e => setEditingLeitura({ ...editingLeitura, [type]: e.target.value.split('\n') })}
+                                 className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 focus:border-blue-500/40 outline-none font-medium leading-relaxed"
+                                 placeholder="Uma entrada por linha..."
+                               />
+                             </div>
+                          ))}
+                          <button onClick={handleSaveLeitura} className="w-full py-4 bg-brand text-white text-[11px] font-black uppercase rounded-2xl shadow-xl shadow-brand/20">Persistir Inteligência Estruturada</button>
+                       </div>
+                    ) : (
+                       <div className="grid grid-cols-3 gap-8">
+                          <div className="space-y-4">
+                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Factual (v6)</span>
+                             <div className="space-y-3">
+                                {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
+                             </div>
+                          </div>
+                          <div className="space-y-4">
+                             <span className="flex items-center gap-2 text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/20 w-max">Inferências AI</span>
+                             <div className="space-y-3">
+                                {localLeitura.inferida.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-amber-500 transition-all">~ {f}</p>)}
+                             </div>
+                          </div>
+                          <div className="space-y-4">
+                             <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-max">Recomendações</span>
+                             <div className="space-y-3">
+                                {localLeitura.sugerida.map((f, i) => <p key={i} className="text-xs text-slate-200 font-bold leading-relaxed border-l-2 border-emerald-500/40 pl-3 group hover:border-emerald-500 transition-all">→ {f}</p>)}
+                             </div>
+                          </div>
+                       </div>
+                    )}
+                 </section>
+
+                 {/* Inteligência Cumulativa (Memória) */}
+                 <div className="grid grid-cols-2 gap-8">
+                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
+                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Vitórias & Padrões de Sucesso
+                       </h3>
+                       <ul className="space-y-3">
+                          {localInteligencia.sucessos.map((s, i) => (
+                            <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-xs text-slate-300 font-medium italic">{s}</li>
+                          ))}
+                       </ul>
+                    </div>
+                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
+                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-red-500" /> Riscos & Alertas de Segmento
+                       </h3>
+                       <ul className="space-y-3">
+                          {localInteligencia.insucessos.map((s, i) => (
+                            <li key={i} className="flex items-start gap-3 p-3 bg-red-500/5 border border-red-500/20 rounded-xl text-xs text-slate-300 font-medium italic">{s}</li>
+                          ))}
+                       </ul>
                     </div>
                  </div>
+              </div>
+            )}
 
-                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                       <AlertTriangle className="w-4 h-4 text-red-400" /> O que evitar (Insucessos)
+            {activeTab === 'estrategia' && (
+              <div className="space-y-8 animate-in fade-in">
+                 {/* Pipeline drill-down */}
+                 <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-10 flex items-center gap-2">
+                       <TrendingUp className="w-4 h-4 text-emerald-500" /> Pipeline Drill-down & Forecast
                     </h3>
-                    <div className="space-y-4">
-                       {(account.inteligencia.insucessos || ['Discussões técnicas sem contexto de negócio', 'Excesso de follow-ups automáticos']).map((s, i) => (
-                         <div key={i} className="flex items-start gap-3 p-3 bg-red-500/5 border border-red-500/20 rounded-xl">
-                            <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                            <p className="text-xs font-medium text-slate-300 leading-relaxed">{s}</p>
-                         </div>
-                       ))}
-                    </div>
-                 </div>
-
-                 {/* Sinais Recentes Enriquecidos */}
-                 <div className="col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Sinais Operacionais de Intenção (v6)</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                       {account.sinais.map((sinal, i) => (
-                         <div key={i} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl relative group">
-                            <div className="flex items-center justify-between mb-2">
-                               <span className={`text-[10px] font-black uppercase tracking-widest ${sinal.impacto === 'Alto' ? 'text-red-500' : 'text-blue-500'}`}>{sinal.tipo} · {sinal.impacto} Impacto</span>
-                               <span className="text-[10px] text-slate-600 font-bold">{new Date().toLocaleDateString('pt-BR')}</span>
-                            </div>
-                            <h4 className="text-sm font-bold text-slate-100 mb-2 truncate" title={sinal.titulo}>{sinal.titulo}</h4>
-                            <p className="text-[10px] text-slate-500 mb-3 line-clamp-2">{sinal.recomendacao}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                       {account.oportunidades.map((op, i) => (
+                         <div key={i} className="group p-6 bg-slate-950 border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col gap-4">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-slate-800 group-hover:bg-brand transition-all" />
                             <div className="flex items-center justify-between">
-                               <span className="text-[9px] font-bold text-slate-600 uppercase italic">Canal: {sinal.contexto}</span>
-                               <button className="text-[9px] font-black text-brand uppercase tracking-tighter group-hover:underline">Analisar Origem</button>
+                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{op.etapa}</span>
+                               <span className="text-[10px] font-black text-red-500 uppercase">{op.risco} Risco</span>
+                            </div>
+                            <h4 className="text-base font-bold text-slate-100 group-hover:text-brand transition-colors italic">{op.nome}</h4>
+                            <div className="mt-auto pt-4 border-t border-slate-800 flex items-end justify-between">
+                               <div>
+                                  <p className="text-[9px] font-black text-slate-600 uppercase mb-1">Valor Contratual</p>
+                                  <p className="text-xl font-black text-emerald-400">{fmt(op.valor)}</p>
+                               </div>
+                               <button className="p-2 hover:bg-slate-800 rounded-lg text-slate-600 transition-all">
+                                  <MoreHorizontal className="w-5 h-5" />
+                               </button>
                             </div>
                          </div>
                        ))}
+                    </div>
+                 </section>
+
+                 <div className="grid grid-cols-2 gap-8">
+                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
+                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Maturidade Relacional</h3>
+                       <div className="h-64 flex flex-col items-center justify-center gap-6">
+                          <div className="relative w-40 h-40 flex items-center justify-center">
+                             <div className="absolute inset-0 rounded-full border-8 border-slate-800" />
+                             <div className="absolute inset-0 rounded-full border-8 border-brand border-t-transparent animate-[spin_3s_linear_infinite]" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)'}} />
+                             <span className="text-4xl font-black text-white">{account.coberturaRelacional}%</span>
+                          </div>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest animate-pulse">Engajamento Profundo Detectado</p>
+                       </div>
+                    </div>
+                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
+                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Sinais Operacionais de Intenção</h3>
+                       <div className="space-y-3">
+                          {account.sinais.map((s, i) => (
+                             <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-slate-300">{s.titulo}</span>
+                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${s.impacto === 'Alto' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>{s.impacto}</span>
+                             </div>
+                          ))}
+                       </div>
                     </div>
                  </div>
               </div>
