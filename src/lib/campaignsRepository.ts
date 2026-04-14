@@ -5,7 +5,46 @@ import { buildBlockCSeed, type Campaign } from '../../scripts/seed/buildBlockCSe
  * Repositório de Campanhas — Camada de Leitura Supabase com Fallback
  */
 
-export type CampaignRow = Campaign;
+export type CampaignRow = {
+  id: string;
+  name: string;
+  type: Campaign['type'];
+  channel: string;
+  source: string;
+  start_date: string;
+  end_date?: string;
+  budget?: number;
+  objective: string;
+  target_audience?: string;
+  accounts_reached: number;
+  accounts_engaged: number;
+  signals_generated: number;
+  is_active: boolean;
+  performance?: number;
+};
+
+/**
+ * Mapeia uma linha do Supabase (snake_case) para o tipo do Domínio (camelCase)
+ */
+function mapCampaignRowToDomain(row: CampaignRow): Campaign {
+  return {
+    id: row.id,
+    name: row.name,
+    type: row.type,
+    channel: row.channel,
+    source: row.source,
+    startDate: row.start_date,
+    endDate: row.end_date,
+    budget: row.budget,
+    objective: row.objective,
+    targetAudience: row.target_audience,
+    accountsReached: row.accounts_reached,
+    accountsEngaged: row.accounts_engaged,
+    signalsGenerated: row.signals_generated,
+    isActive: row.is_active,
+    performance: row.performance,
+  };
+}
 
 /**
  * Busca todas as campanhas do Supabase com fallback para Seed
@@ -31,11 +70,7 @@ export async function getCampaigns(): Promise<Campaign[]> {
       return localSeed;
     }
 
-    // Merge/Map data
-    return (data as CampaignRow[]).map(row => ({
-      ...row,
-      // Ensure local overrides mapping if needed, but here structure is identical
-    }));
+    return (data as CampaignRow[]).map(mapCampaignRowToDomain);
   } catch (err) {
     console.error('[Campaigns] Exceção ao buscar campanhas:', err);
     return localSeed;
