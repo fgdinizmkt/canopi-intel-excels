@@ -739,7 +739,7 @@ export const Accounts = () => {
                   <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-400 tracking-[0.12em]">
                     <th className="p-3 pl-8 text-[9px]">Conta & Inteligência</th>
                     <th className="p-3 text-[9px]">Contexto / Owner</th>
-                    <th className="p-3 text-[9px]">Score / Stage</th>
+                    <th className="p-3 text-[9px]">Score & Pipeline</th>
                     <th className="p-3 text-[9px]">Estratégia & Play</th>
                     <th className="p-3 text-[9px]">Cobertura</th>
                     <th className="p-3 text-end pr-8 text-[9px]">Ação de Próximo Passo</th>
@@ -801,7 +801,7 @@ export const Accounts = () => {
                                  <div className="flex items-center gap-1 mb-0.5">
                                    <p className={`text-[9px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
                                    {conta.possuiOportunidade && (
-                                     <span className="px-1 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[7px] font-black uppercase tracking-tighter">Pip</span>
+                                     <span className="px-1 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[7px] font-black uppercase tracking-tighter">Pipeline</span>
                                    )}
                                  </div>
                                  <p className="text-[9px] font-bold text-slate-400 uppercase leading-none">{conta.etapa}</p>
@@ -812,7 +812,7 @@ export const Accounts = () => {
                            <div className="flex flex-col gap-1.5">
                               {/* Inline Tipo Estrategico Toggle */}
                               <div className="flex items-center gap-1 bg-slate-50 p-0.5 rounded-md border border-slate-100 w-fit">
-                                {(['ABM', 'ABX', 'Híbrida'] as const).map((t) => (
+                                {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
                                   <button
                                     key={t}
                                     onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
@@ -848,7 +848,7 @@ export const Accounts = () => {
                         <td className="p-3">
                            <div className="space-y-1">
                               <div className="flex items-baseline justify-between w-20">
-                                 <span className="text-[8px] font-black text-slate-400 uppercase">Cov</span>
+                                 <span className="text-[8px] font-black text-slate-400 uppercase">Coverage</span>
                                  <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
                               </div>
                               <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
@@ -873,7 +873,7 @@ export const Accounts = () => {
                                 <span className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
                                   {conta.statusGeral}
                                 </span>
-                                <Link href={`/contas/${conta.slug}`} className="text-[7px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">360</Link>
+                                <Link href={`/contas/${conta.slug}`} className="text-[7px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">Perfil 360</Link>
                               </div>
                            </div>
                         </td>
