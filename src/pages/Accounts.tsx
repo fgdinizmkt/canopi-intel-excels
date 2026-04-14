@@ -783,7 +783,7 @@ export const Accounts = () => {
                               className="text-[9px] font-black text-slate-500 hover:text-brand uppercase tracking-widest transition-colors flex items-center gap-1.5"
                               onClick={(e) => e.stopPropagation()}
                             >
-              Perfil <ArrowUpRight className="w-3 h-3" />
+                              Perfil <ArrowUpRight className="w-3 h-3" />
                             </Link>
                           </div>
                         </div>
@@ -894,23 +894,10 @@ export const Accounts = () => {
                                   </button>
                                 ))}
                               </div>
-                              <div className="flex items-center gap-2 px-1">
+                              {/* 4B: Compact Play Indicator replaces redundant selection */}
+                              <div className="flex items-center gap-2 px-1 text-[10px] font-bold text-slate-400">
                                 <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
-                                <div className="flex gap-1.5">
-                                  {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as const).map((p) => (
-                                    <button
-                                      key={p}
-                                      onClick={() => handleUpdatePlayAtivo(conta.id, p)}
-                                      className={`px-1.5 py-0.5 rounded text-[9px] font-bold border transition-all ${
-                                        conta.playAtivo === p 
-                                          ? 'bg-brand/5 border-brand/20 text-brand shadow-sm shadow-brand/5' 
-                                          : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300'
-                                      }`}
-                                    >
-                                      {p}
-                                    </button>
-                                  ))}
-                                </div>
+                                <span>Play ativo: {signals?.playsCount > 0 ? 'Sim' : 'Não'} · {signals?.playsCount || 0}</span>
                               </div>
                            </div>
                         </td>
