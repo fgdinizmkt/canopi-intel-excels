@@ -22,7 +22,8 @@ import {
   Layout,
   Users,
   TrendingUp,
-  Cpu
+  Cpu,
+  ChevronDown
 } from 'lucide-react';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
@@ -74,6 +75,8 @@ export const Accounts = () => {
   const [allPlays, setAllPlays] = useState<PlayRecommendation[]>([]);
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
   const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
+  // 4C: Estado para controle de volume exibido na lista principal
+  const [volume, setVolume] = useState<number>(10);
   const [filtros, setFiltros] = useState<Filtros>({
     ...filtrosIniciais,
     busca: searchParams?.get('busca') || '',
@@ -797,155 +800,206 @@ export const Accounts = () => {
         ) : (
           /* ── PREMIUM LIST VIEW ── */
           <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 z-10">
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-[0.12em]">
-                    <th className="py-5 px-4 pl-8 text-[10px]">Conta & Inteligência</th>
-                    <th className="py-5 px-4 text-[10px]">Contexto / Owner</th>
-                    <th className="py-5 px-4 text-[10px]">Score & Pipeline</th>
-                    <th className="py-5 px-4 text-[10px]">Estratégia & Play</th>
-                    <th className="py-5 px-4 text-[10px]">Cobertura</th>
-                    <th className="py-5 px-4 text-end pr-8 text-[10px]">Ação de Próximo Passo</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filtradas.map((conta) => {
-                    const score = calculateAccountScore(conta);
-                    const signals = blocoCSignals[conta.id];
-                    return (
-                      <tr key={conta.id} className="group hover:bg-white hover:shadow-md transition-all">
-                        {/* 1. IDENTITY & CONTEXT */}
-                        <td className="py-5 px-4 pl-8">
-                          <div className="flex items-center gap-4">
-                            <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-[11px]">
-                               {conta.nome.substring(0,2).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                               <div className="flex items-center gap-1.5 mb-1">
-                                 <button 
-                                   onClick={() => openAccount(conta.id)} 
-                                   className="text-[13px] font-bold text-slate-950 hover:text-brand tracking-tighter cursor-pointer block text-left truncate"
-                                 >
-                                   {conta.nome}
-                                 </button>
-                                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
-                               </div>
-                               <div className="flex items-center gap-3 mb-1.5">
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
-                                  {signals?.interactionsCount > 0 && (
-                                     <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
-                                       <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
-                                     </span>
-                                  )}
-                               </div>
-                               {/* Context Info moved below Identity to reduce horizontal tension */}
-                               <div className="flex items-center gap-2">
-                                  <span className="text-[10px] font-bold text-slate-500">{conta.vertical}</span>
-                                  <span className="text-[10px] font-black text-slate-200 uppercase">/</span>
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.05em]">{conta.segmento}</span>
-                               </div>
-                            </div>
-                          </div>
-                        </td>
+            {(() => {
+              // 4C: Derivação única e higienizada para a visualização de lista
+              const listViewContas = filtradas.filter(c => c.nome.toLowerCase() !== 'operação interna');
+              
+              return (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-[0.12em]">
+                          <th className="py-5 px-4 pl-8 text-[10px]">Conta & Inteligência</th>
+                          <th className="py-5 px-4 text-[10px]">Contexto / Owner</th>
+                          <th className="py-5 px-4 text-[10px]">Score & Pipeline</th>
+                          <th className="py-5 px-4 text-[10px]">Estratégia & Play</th>
+                          <th className="py-5 px-4 text-[10px]">Cobertura</th>
+                          <th className="py-5 px-4 text-end pr-8 text-[10px]">Ação de Próximo Passo</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {listViewContas
+                          .slice(0, volume)
+                          .map((conta) => {
+                          const score = calculateAccountScore(conta);
+                          const signals = blocoCSignals[conta.id];
+                          return (
+                            <tr key={conta.id} className="group hover:bg-white hover:shadow-md transition-all">
+                              {/* 1. IDENTITY & CONTEXT */}
+                              <td className="py-5 px-4 pl-8">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-[11px]">
+                                     {conta.nome.substring(0,2).toUpperCase()}
+                                  </div>
+                                  <div className="min-w-0">
+                                     <div className="flex items-center gap-1.5 mb-1">
+                                       <button 
+                                         onClick={() => openAccount(conta.id)} 
+                                         className="text-[13px] font-bold text-slate-950 hover:text-brand tracking-tighter cursor-pointer block text-left truncate"
+                                       >
+                                         {conta.nome}
+                                       </button>
+                                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
+                                     </div>
+                                     <div className="flex items-center gap-3 mb-1.5">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
+                                        {signals?.interactionsCount > 0 && (
+                                           <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
+                                             <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
+                                           </span>
+                                        )}
+                                     </div>
+                                     {/* Context Info moved below Identity to reduce horizontal tension */}
+                                     <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-slate-500">{conta.vertical}</span>
+                                        <span className="text-[10px] font-black text-slate-200 uppercase">/</span>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.05em]">{conta.segmento}</span>
+                                     </div>
+                                  </div>
+                                </div>
+                              </td>
 
-                        {/* 2. OWNER */}
-                        <td className="py-5 px-4 text-slate-500 min-w-[140px]">
-                           <div className="flex items-center gap-2 leading-none text-slate-400">
-                             <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[8px] font-black">
-                                {conta.ownerPrincipal.substring(0,2).toUpperCase()}
-                             </div>
-                             <p className="text-[10px] font-bold uppercase tracking-widest">{conta.ownerPrincipal}</p>
-                           </div>
-                        </td>
-
-                        {/* 3. SCORE & PIPELINE */}
-                        <td className="py-5 px-4">
-                           <div className="flex items-center gap-3">
-                              <div className="text-center bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-xl min-w-[45px] shadow-sm">
-                                 <p className="text-[12px] font-black text-slate-900">{score.scoreTotal}</p>
-                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Score</p>
-                              </div>
-                              <div className="min-w-0">
-                                 <div className="flex items-center gap-1.5 mb-1">
-                                   <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
-                                   {conta.possuiOportunidade && (
-                                     <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[8px] font-black uppercase tracking-tighter">Pipeline</span>
-                                   )}
+                              {/* 2. OWNER */}
+                              <td className="py-5 px-4 text-slate-500 min-w-[140px]">
+                                 <div className="flex items-center gap-2 leading-none text-slate-400">
+                                   <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[8px] font-black">
+                                      {conta.ownerPrincipal.substring(0,2).toUpperCase()}
+                                   </div>
+                                   <p className="text-[10px] font-bold uppercase tracking-widest">{conta.ownerPrincipal}</p>
                                  </div>
-                                 <p className="text-[10px] font-bold text-slate-400 uppercase leading-none tracking-tight">{conta.etapa}</p>
-                              </div>
-                           </div>
-                        </td>
+                              </td>
 
-                        {/* 4. STRATEGY & PLAY */}
-                        <td className="py-5 px-4">
-                           <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-1 bg-slate-50 p-0.5 rounded-lg border border-slate-100 w-fit">
-                                {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
-                                  <button
-                                    key={t}
-                                    onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
-                                    className={`px-2 py-1 rounded-md text-[9px] font-black uppercase transition-all ${
-                                      conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'
-                                    }`}
-                                  >
-                                    {t}
-                                  </button>
-                                ))}
-                              </div>
-                              {/* 4B: Compact Play Indicator replaces redundant selection */}
-                              <div className="flex items-center gap-2 px-1 text-[10px] font-bold text-slate-400">
-                                <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
-                                <span>Play ativo: {signals?.playsCount > 0 ? 'Sim' : 'Não'} · {signals?.playsCount || 0}</span>
-                              </div>
-                           </div>
-                        </td>
+                              {/* 3. SCORE & PIPELINE */}
+                              <td className="py-5 px-4">
+                                 <div className="flex items-center gap-3">
+                                    <div className="text-center bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-xl min-w-[45px] shadow-sm">
+                                       <p className="text-[12px] font-black text-slate-900">{score.scoreTotal}</p>
+                                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Score</p>
+                                    </div>
+                                    <div className="min-w-0">
+                                       <div className="flex items-center gap-1.5 mb-1">
+                                         <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
+                                         {conta.possuiOportunidade && (
+                                           <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[8px] font-black uppercase tracking-tighter">Pipeline</span>
+                                         )}
+                                       </div>
+                                       <p className="text-[10px] font-bold text-slate-400 uppercase leading-none tracking-tight">{conta.etapa}</p>
+                                    </div>
+                                 </div>
+                              </td>
 
-                        {/* 5. COVERAGE */}
-                        <td className="py-5 px-4">
-                           <div className="space-y-1.5">
-                              <div className="flex items-baseline justify-between w-24">
-                                 <span className="text-[8px] font-black text-slate-400 uppercase">Coverage</span>
-                                 <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
-                              </div>
-                              <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
-                                 <div 
-                                   className={`h-full rounded-full transition-all duration-1000 ${conta.coberturaRelacional >= 70 ? 'bg-emerald-500' : 'bg-blue-500'}`} 
-                                   style={{ width: `${conta.coberturaRelacional}%` }} 
-                                 />
-                              </div>
-                           </div>
-                        </td>
+                              {/* 4. STRATEGY & PLAY */}
+                              <td className="py-5 px-4">
+                                 <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-1 bg-slate-50 p-0.5 rounded-lg border border-slate-100 w-fit">
+                                      {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
+                                        <button
+                                          key={t}
+                                          onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
+                                          className={`px-2 py-1 rounded-md text-[9px] font-black uppercase transition-all ${
+                                            conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'
+                                          }`}
+                                        >
+                                          {t}
+                                        </button>
+                                      ))}
+                                    </div>
+                                    {/* 4B: Compact Play Indicator replaces redundant selection */}
+                                    <div className="flex items-center gap-2 px-1 text-[10px] font-bold text-slate-400">
+                                      <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
+                                      <span>Play ativo: {signals?.playsCount > 0 ? 'Sim' : 'Não'} · {signals?.playsCount || 0}</span>
+                                    </div>
+                                 </div>
+                              </td>
 
-                        {/* 6. NEXT STEP ACTIONS */}
-                        <td className="py-5 px-4 text-end pr-8">
-                           <div className="flex items-center justify-end gap-3">
-                              <div className="text-end min-w-0 max-w-[150px]">
-                                 <p className="text-[11px] font-bold text-slate-900 truncate tracking-tight">{conta.proximaMelhorAcao || 'Sem ação'}</p>
-                                 <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Próximo Passo</p>
-                              </div>
-                              <button 
-                                onClick={() => abrirEditorNarrativo(conta)} 
-                                className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
-                                title="Editar"
-                              >
-                                <Sparkles className="w-3.5 h-3.5" />
-                              </button>
-                              <div className="flex flex-col items-end gap-1">
-                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
-                                  {conta.statusGeral}
-                                </span>
-                                <Link href={`/contas/${conta.slug}`} className="text-[8px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">Perfil 360</Link>
-                              </div>
-                           </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                              {/* 5. COVERAGE */}
+                              <td className="py-5 px-4">
+                                 <div className="space-y-1.5">
+                                    <div className="flex items-baseline justify-between w-24">
+                                       <span className="text-[8px] font-black text-slate-400 uppercase">Coverage</span>
+                                       <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
+                                    </div>
+                                    <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
+                                       <div 
+                                         className={`h-full rounded-full transition-all duration-1000 ${conta.coberturaRelacional >= 70 ? 'bg-emerald-500' : 'bg-blue-500'}`} 
+                                         style={{ width: `${conta.coberturaRelacional}%` }} 
+                                       />
+                                    </div>
+                                 </div>
+                              </td>
+
+                              {/* 6. NEXT STEP ACTIONS */}
+                              <td className="py-5 px-4 text-end pr-8">
+                                 <div className="flex items-center justify-end gap-3">
+                                    <div className="text-end min-w-0 max-w-[150px]">
+                                       <p className="text-[11px] font-bold text-slate-900 truncate tracking-tight">{conta.proximaMelhorAcao || 'Sem ação'}</p>
+                                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Próximo Passo</p>
+                                    </div>
+                                    <button 
+                                      onClick={() => abrirEditorNarrativo(conta)} 
+                                      className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
+                                      title="Editar"
+                                    >
+                                      <Sparkles className="w-3.5 h-3.5" />
+                                    </button>
+                                    <div className="flex flex-col items-end gap-1">
+                                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
+                                        {conta.statusGeral}
+                                      </span>
+                                      <Link href={`/contas/${conta.slug}`} className="text-[8px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">Perfil 360</Link>
+                                    </div>
+                                 </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* 4C: Volume Control & Expansion Mechanism using consolidated derivation */}
+                  <div className="bg-slate-50/50 border-t border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Exibição:</span>
+                      <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
+                        {[10, 30, 50].map((v) => (
+                          <button
+                            key={v}
+                            onClick={() => setVolume(v)}
+                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                              volume === v ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                        <button
+                          onClick={() => setVolume(listViewContas.length)}
+                          className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                            volume >= listViewContas.length ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'
+                          }`}
+                        >
+                          TUDO
+                        </button>
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        Mostrando {Math.min(volume, listViewContas.length)} de {listViewContas.length} contas
+                      </span>
+                    </div>
+
+                    {volume < listViewContas.length && (
+                      <button
+                        onClick={() => setVolume(prev => prev + 20)}
+                        className="px-8 py-3 bg-white hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all shadow-sm hover:shadow-xl hover:shadow-slate-200/50 flex items-center gap-2"
+                      >
+                        Carregar mais contas <ChevronDown className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
       </main>
