@@ -453,7 +453,7 @@ export const Accounts = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             <select value={filtros.vertical} onChange={(e) => atualizarFiltro('vertical', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
               <option value="todos">Vertical: Todas</option>
               {opcoes.verticais.map((v) => <option key={v} value={v}>{v}</option>)}
@@ -471,11 +471,23 @@ export const Accounts = () => {
               {opcoes.etapas.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
             <select value={filtros.tipoConta} onChange={(e) => atualizarFiltro('tipoConta', e.target.value as Filtros['tipoConta'])} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
-              <option value="todas">Tipo: Todas</option>
+              <option value="todas">Estratégia: Todas</option>
               <option value="em_andamento">Em andamento</option>
               <option value="abm">ABM</option>
               <option value="abx">ABX</option>
               <option value="hibridas">Híbridas</option>
+            </select>
+            <select value={filtros.play} onChange={(e) => atualizarFiltro('play', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+              <option value="todos">Play: Todos</option>
+              <option value="abm">ABM</option>
+              <option value="abx">ABX</option>
+              <option value="híbrido">Híbrido</option>
+              <option value="nenhum">Nenhum</option>
+            </select>
+            <select value={filtros.atividade} onChange={(e) => atualizarFiltro('atividade', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+              <option value="todas">Atividade: Todas</option>
+              <option value="ativo">Ativo</option>
+              <option value="parado">Parado</option>
             </select>
             <select value={filtros.potencial} onChange={(e) => atualizarFiltro('potencial', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
               <option value="todos">Potencial: Todos</option>
@@ -487,11 +499,26 @@ export const Accounts = () => {
               <option value="alto">Alto</option>
               <option value="medio">Médio</option>
             </select>
+            <select value={filtros.cobertura} onChange={(e) => atualizarFiltro('cobertura', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+              <option value="todos">Cobertura: Todas</option>
+              <option value="alta">Alta</option>
+              <option value="baixa">Baixa</option>
+            </select>
+            <select value={filtros.oportunidade} onChange={(e) => atualizarFiltro('oportunidade', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+              <option value="todas">Pipeline: Todos</option>
+              <option value="com">Com Oportunidade</option>
+              <option value="sem">Sem Oportunidade</option>
+            </select>
             <select value={filtros.blocoCInteracoes} onChange={(e) => atualizarFiltro('blocoCInteracoes', e.target.value as Filtros['blocoCInteracoes'])} className="w-full bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-2.5 text-xs font-black text-emerald-400 focus:border-emerald-500 transition-all shadow-sm">
-              <option value="todos" className="bg-slate-950">Engajamento: Todos</option>
-              <option value="com" className="bg-slate-950">Com Interações</option>
-              <option value="sem" className="bg-slate-950">Sem Interações</option>
+              <option value="todos" className="bg-slate-950">Interações: Todas</option>
+              <option value="com" className="bg-slate-950">Com Sinais</option>
+              <option value="sem" className="bg-slate-950">Sem Sinais</option>
               <option value="recente" className="bg-slate-950">Recente (30d)</option>
+            </select>
+            <select value={filtros.blocoCPlays} onChange={(e) => atualizarFiltro('blocoCPlays', e.target.value as Filtros['blocoCPlays'])} className="w-full bg-blue-500/5 border border-blue-500/20 rounded-xl p-2.5 text-xs font-black text-blue-400 focus:border-blue-500 transition-all shadow-sm">
+              <option value="todos" className="bg-slate-950">Plays Sugeridos: Todos</option>
+              <option value="com" className="bg-slate-950">Com Recomendações</option>
+              <option value="sem" className="bg-slate-950">Sem Recomendações</option>
             </select>
           </div>
         </section>
@@ -711,11 +738,11 @@ export const Accounts = () => {
                 <thead>
                   <tr className="bg-slate-950/80 border-b border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-[0.15em]">
                     <th className="p-5 pl-8">Conta & Inteligência</th>
-                    <th className="p-5">Vertical / Segmento</th>
-                    <th className="p-5">Score (v6)</th>
+                    <th className="p-5">Contexto / Owner</th>
+                    <th className="p-5">Score & Pipeline</th>
                     <th className="p-5">Estratégia & Play</th>
-                    <th className="p-5">Mapeamento</th>
-                    <th className="p-5 text-end pr-8">Status</th>
+                    <th className="p-5">Cobertura</th>
+                    <th className="p-5 text-end pr-8">Ação de Próximo Passo</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
@@ -726,16 +753,19 @@ export const Accounts = () => {
                       <tr key={conta.id} className="group hover:bg-slate-800/20 transition-colors">
                         <td className="p-5 pl-8">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-400 italic">
+                            <div className="w-10 h-10 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-400 italic backdrop-blur-sm">
                                {conta.nome.substring(0,2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                               <button 
-                                 onClick={() => openAccount(conta.id)} 
-                                 className="text-sm font-black text-slate-100 hover:text-brand italic tracking-tighter cursor-pointer block mb-1 text-left"
-                               >
-                                 {conta.nome}
-                               </button>
+                               <div className="flex items-center gap-2 mb-1">
+                                 <button 
+                                   onClick={() => openAccount(conta.id)} 
+                                   className="text-sm font-black text-slate-100 hover:text-brand italic tracking-tighter cursor-pointer block text-left"
+                                 >
+                                   {conta.nome}
+                                 </button>
+                                 <span className={`w-1.5 h-1.5 rounded-full ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
+                               </div>
                                <div className="flex items-center gap-2">
                                   <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">{conta.dominio}</span>
                                   {signals?.interactionsCount > 0 && (
@@ -743,43 +773,75 @@ export const Accounts = () => {
                                        <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                      </span>
                                   )}
-                                  <Link href={`/contas/${conta.slug}`} className="opacity-0 group-hover:opacity-100 transition-opacity text-[8px] font-black text-brand uppercase tracking-widest pl-2">Perfil 360</Link>
                                </div>
                             </div>
                           </div>
                         </td>
                         <td className="p-5">
                           <div className="space-y-1">
-                             <p className="text-xs font-bold text-slate-300">{conta.vertical}</p>
-                             <p className="text-[10px] text-slate-600 font-black uppercase tracking-tighter">{conta.segmento}</p>
+                             <div className="flex items-center gap-2">
+                               <p className="text-xs font-bold text-slate-300">{conta.vertical}</p>
+                               <span className="text-[9px] text-slate-500 font-black uppercase">/ {conta.segmento}</span>
+                             </div>
+                             <div className="flex items-center gap-1.5 text-slate-500">
+                               <div className="w-4 h-4 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[7px] font-black">
+                                  {conta.ownerPrincipal.substring(0,2).toUpperCase()}
+                               </div>
+                               <p className="text-[9px] font-bold tracking-tight">{conta.ownerPrincipal}</p>
+                             </div>
                           </div>
                         </td>
                         <td className="p-5">
                            <div className="flex items-center gap-3">
-                              <div className="text-center bg-slate-950 border border-slate-800 p-2 rounded-xl min-w-[50px]">
+                              <div className="text-center bg-slate-950 border border-slate-800 p-2 rounded-xl min-w-[50px] shadow-inner">
                                  <p className="text-xs font-black text-white italic">{score.scoreTotal}</p>
-                                 <p className="text-[7px] font-black text-slate-600 uppercase">Derivado</p>
+                                 <p className="text-[7px] font-black text-slate-600 uppercase">Score</p>
                               </div>
                               <div className="space-y-1">
-                                 <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-500' : score.scoreTotal >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{score.prioridade}</p>
-                                 <p className="text-[9px] text-slate-600 italic leading-tight max-w-[120px] line-clamp-1">{conta.proximaMelhorAcao}</p>
+                                 <div className="flex items-center gap-1.5">
+                                   <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-500' : score.scoreTotal >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{score.prioridade}</p>
+                                   {conta.possuiOportunidade && (
+                                     <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md text-[8px] font-black uppercase tracking-widest">Pipeline</span>
+                                   )}
+                                 </div>
+                                 <p className="text-[9px] font-bold text-slate-700 uppercase">{conta.etapa}</p>
                               </div>
                            </div>
                         </td>
                         <td className="p-5">
-                           <div className="flex flex-col gap-2">
-                              <div className="flex gap-1.5">
-                                 <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${
-                                   conta.tipoEstrategico === 'ABM' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                   conta.tipoEstrategico === 'ABX' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                                   conta.tipoEstrategico === 'Híbrida' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                   'bg-slate-800 text-slate-500 border-slate-700'
-                                 }`}>{conta.tipoEstrategico}</span>
-                                 <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest bg-slate-950 px-2 py-0.5 rounded border border-slate-800">{conta.etapa}</span>
+                           <div className="flex flex-col gap-2.5">
+                              {/* Inline Tipo Estrategico Toggle */}
+                              <div className="flex items-center gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800 w-fit">
+                                {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
+                                  <button
+                                    key={t}
+                                    onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
+                                    className={`px-2 py-1 rounded text-[8px] font-black uppercase transition-all ${
+                                      conta.tipoEstrategico === t ? 'bg-slate-800 text-brand' : 'text-slate-600 hover:text-slate-400'
+                                    }`}
+                                  >
+                                    {t}
+                                  </button>
+                                ))}
                               </div>
-                              <div className="flex items-center gap-1.5">
-                                 <Zap className="w-2.5 h-2.5 text-brand opacity-50" />
-                                 <span className="text-[10px] font-bold text-slate-400">Play: {conta.playAtivo}</span>
+                              {/* Inline Play Selection */}
+                              <div className="flex items-center gap-2">
+                                <Zap className="w-3 h-3 text-brand opacity-40 shrink-0" />
+                                <div className="flex gap-1">
+                                  {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as const).map((p) => (
+                                    <button
+                                      key={p}
+                                      onClick={() => handleUpdatePlayAtivo(conta.id, p)}
+                                      className={`px-1.5 py-0.5 rounded text-[8px] font-bold border transition-all ${
+                                        conta.playAtivo === p 
+                                          ? 'bg-brand/10 text-brand border-brand/30' 
+                                          : 'bg-slate-950 text-slate-600 border-slate-800/50 hover:text-slate-400'
+                                      }`}
+                                    >
+                                      {p}
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
                            </div>
                         </td>
@@ -796,10 +858,25 @@ export const Accounts = () => {
                         </td>
                         <td className="p-5 text-end pr-8">
                            <div className="flex flex-col items-end gap-1.5">
-                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] ${badgeClasse(conta.statusGeral)} shadow-sm`}>
-                                {conta.statusGeral}
-                              </span>
-                              <p className="text-[9px] text-slate-600 font-bold uppercase tracking-tight italic">Últ: {new Date(conta.ultimaMovimentacao).toLocaleDateString('pt-BR', { month: 'short', day: '2-digit' })}</p>
+                              <div className="flex items-center gap-3">
+                                <div className="text-end">
+                                   <p className="text-[10px] font-black text-slate-200 italic line-clamp-1 max-w-[200px]">{conta.proximaMelhorAcao || 'Sem ação definida'}</p>
+                                   <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Próxima melhor ação</p>
+                                </div>
+                                <button 
+                                  onClick={() => abrirEditorNarrativo(conta)} 
+                                  className="p-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-500 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
+                                  title="Editar Narrativa"
+                                >
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                </button>
+                                <div className="flex flex-col items-end gap-0.5">
+                                  <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
+                                    {conta.statusGeral}
+                                  </span>
+                                  <Link href={`/contas/${conta.slug}`} className="text-[7px] font-black text-brand uppercase tracking-widest hover:underline mt-1">Perfil 360</Link>
+                                </div>
+                              </div>
                            </div>
                         </td>
                       </tr>
