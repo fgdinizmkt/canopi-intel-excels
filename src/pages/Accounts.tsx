@@ -205,7 +205,7 @@ export const Accounts = () => {
     });
 
     return data;
-  }, [filtros, ordenacao, contas]);
+  }, [filtros, ordenacao, contas, blocoCSignals]);
 
   const metricas = useMemo(() => ({
     prioritarias: contas.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
@@ -336,11 +336,11 @@ export const Accounts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#06080a] text-slate-300 font-sans selection:bg-brand/30 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-brand/30 selection:text-white">
       {/* ── PREMIUM HERO: COMMAND CENTER CONTEXT ── */}
-      <header className="relative overflow-hidden bg-slate-950 border-b border-slate-800/60 pb-12 pt-16">
-        <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <Building2 className="w-64 h-64 text-brand" />
+      <header className="relative overflow-hidden bg-slate-950 border-b border-slate-800/60 pb-10 pt-12">
+        <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+          <Building2 className="w-48 h-48 text-brand" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -368,10 +368,10 @@ export const Accounts = () => {
                   placeholder="Buscar conta ou domínio..." 
                 />
               </div>
-              <div className="inline-flex bg-slate-900 border border-slate-800 rounded-2xl p-1 shadow-inner">
-                <button onClick={() => setVisualizacao('lista')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'lista' ? 'bg-slate-800 text-brand border border-slate-700 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Lista"><List className="w-5 h-5" /></button>
-                <button onClick={() => setVisualizacao('grade')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'grade' ? 'bg-slate-800 text-brand border border-slate-700 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Grade"><LayoutGrid className="w-5 h-5" /></button>
-                <button onClick={() => setVisualizacao('board')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'board' ? 'bg-slate-800 text-brand border border-slate-700 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão Kanban"><KanbanSquare className="w-5 h-5" /></button>
+              <div className="inline-flex bg-slate-900/50 border border-slate-800 rounded-2xl p-1 shadow-inner backdrop-blur-md">
+                <button onClick={() => setVisualizacao('lista')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'lista' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Lista"><List className="w-5 h-5" /></button>
+                <button onClick={() => setVisualizacao('grade')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'grade' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Grade"><LayoutGrid className="w-5 h-5" /></button>
+                <button onClick={() => setVisualizacao('board')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'board' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão Kanban"><KanbanSquare className="w-5 h-5" /></button>
               </div>
             </div>
           </div>
@@ -380,7 +380,7 @@ export const Accounts = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all">
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Total de Contas</p>
-              <p className="text-3xl font-black text-white italic tracking-tighter">{contas.length}</p>
+              <p className="text-3xl font-black text-white tracking-tighter">{contas.length}</p>
               <div className="mt-3 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Base Ativa</span>
@@ -388,7 +388,7 @@ export const Accounts = () => {
             </div>
             <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, potencial: 'alto' }))}>
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Alto Potencial</p>
-              <p className="text-3xl font-black text-brand italic tracking-tighter">{metricas.altoPotencial}</p>
+              <p className="text-3xl font-black text-brand tracking-tighter">{metricas.altoPotencial}</p>
               <div className="mt-3 flex items-center gap-1.5 text-brand">
                 <Sparkles className="w-3 h-3" />
                 <span className="text-[10px] font-bold uppercase tracking-tight">Growth Fit</span>
@@ -396,7 +396,7 @@ export const Accounts = () => {
             </div>
             <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-rose-500/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, risco: 'alto' }))}>
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Exposição Crítica</p>
-              <p className="text-3xl font-black text-rose-500 italic tracking-tighter">{metricas.risco}</p>
+              <p className="text-3xl font-black text-rose-500 tracking-tighter">{metricas.risco}</p>
               <div className="mt-3 flex items-center gap-1.5 text-rose-500">
                 <AlertTriangle className="w-3 h-3" />
                 <span className="text-[10px] font-bold uppercase tracking-tight">Risco Detectado</span>
@@ -404,14 +404,14 @@ export const Accounts = () => {
             </div>
             <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-blue-500/30 transition-all">
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Cobertura Relacional</p>
-              <p className="text-3xl font-black text-slate-200 italic tracking-tighter">{coberturaBase}%</p>
+              <p className="text-3xl font-black text-slate-200 tracking-tighter">{coberturaBase}%</p>
               <div className="mt-3 w-full h-1 bg-slate-800 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: `${coberturaBase}%` }} />
               </div>
             </div>
             <div className="hidden lg:block bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, oportunidade: 'com' }))}>
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Pipeline Ativo</p>
-              <p className="text-3xl font-black text-white italic tracking-tighter">{metricas.oportunidades}</p>
+              <p className="text-3xl font-black text-white tracking-tighter">{metricas.oportunidades}</p>
               <div className="mt-3 flex items-center gap-1.5 text-emerald-500">
                 <Target className="w-3 h-3 text-brand" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Oportunidades</span>
@@ -423,9 +423,9 @@ export const Accounts = () => {
 
       <main className="max-w-7xl mx-auto px-6 pb-20 -mt-6">
         {/* ── REFINED FILTER COMMAND STRIP ── */}
-        <section className="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 shadow-2xl space-y-6 mb-8 relative">
+        <section className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 mb-8 relative">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-brand" /> Filtros e Segmentação
             </h2>
             <div className="flex items-center gap-4">
@@ -434,19 +434,19 @@ export const Accounts = () => {
                 <select 
                   value={ordenacao} 
                   onChange={(e) => setOrdenacao(e.target.value as Ordenacao)} 
-                  className="bg-transparent text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-brand focus:outline-none cursor-pointer"
+                  className="bg-transparent text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-brand focus:outline-none cursor-pointer"
                 >
-                  <option value="potencial_desc" className="bg-slate-900">Potencial (maior)</option>
-                  <option value="risco_desc" className="bg-slate-900">Risco (maior)</option>
-                  <option value="score_desc" className="bg-slate-900">Score Canopi (maior)</option>
-                  <option value="score_asc" className="bg-slate-900">Score Canopi (menor)</option>
-                  <option value="engajamento_desc" className="bg-slate-900">Engajamento Recente</option>
-                  <option value="movimentacao_desc" className="bg-slate-900">Última movimentação</option>
+                  <option value="potencial_desc">Potencial (maior)</option>
+                  <option value="risco_desc">Risco (maior)</option>
+                  <option value="score_desc">Score Canopi (maior)</option>
+                  <option value="score_asc">Score Canopi (menor)</option>
+                  <option value="engajamento_desc">Engajamento Recente</option>
+                  <option value="movimentacao_desc">Última movimentação</option>
                 </select>
               </div>
               <button 
                 onClick={() => setFiltros(filtrosIniciais)} 
-                className="text-[10px] font-black text-slate-600 uppercase tracking-widest hover:text-slate-400 transition-colors"
+                className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand transition-colors"
               >
                 Limpar Todos
               </button>
@@ -454,92 +454,92 @@ export const Accounts = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3">
-            <select value={filtros.vertical} onChange={(e) => atualizarFiltro('vertical', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.vertical} onChange={(e) => atualizarFiltro('vertical', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Vertical: Todas</option>
               {opcoes.verticais.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
-            <select value={filtros.segmento} onChange={(e) => atualizarFiltro('segmento', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.segmento} onChange={(e) => atualizarFiltro('segmento', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Segmento: Todos</option>
               {opcoes.segmentos.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
-            <select value={filtros.owner} onChange={(e) => atualizarFiltro('owner', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.owner} onChange={(e) => atualizarFiltro('owner', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Owner: Todos</option>
               {opcoes.owners.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
-            <select value={filtros.etapa} onChange={(e) => atualizarFiltro('etapa', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.etapa} onChange={(e) => atualizarFiltro('etapa', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todas">Etapa: Todas</option>
               {opcoes.etapas.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
-            <select value={filtros.tipoConta} onChange={(e) => atualizarFiltro('tipoConta', e.target.value as Filtros['tipoConta'])} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.tipoConta} onChange={(e) => atualizarFiltro('tipoConta', e.target.value as Filtros['tipoConta'])} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todas">Estratégia: Todas</option>
               <option value="em_andamento">Em andamento</option>
               <option value="abm">ABM</option>
               <option value="abx">ABX</option>
               <option value="hibridas">Híbridas</option>
             </select>
-            <select value={filtros.play} onChange={(e) => atualizarFiltro('play', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.play} onChange={(e) => atualizarFiltro('play', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Play: Todos</option>
               <option value="abm">ABM</option>
               <option value="abx">ABX</option>
               <option value="híbrido">Híbrido</option>
               <option value="nenhum">Nenhum</option>
             </select>
-            <select value={filtros.atividade} onChange={(e) => atualizarFiltro('atividade', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.atividade} onChange={(e) => atualizarFiltro('atividade', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todas">Atividade: Todas</option>
               <option value="ativo">Ativo</option>
               <option value="parado">Parado</option>
             </select>
-            <select value={filtros.potencial} onChange={(e) => atualizarFiltro('potencial', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.potencial} onChange={(e) => atualizarFiltro('potencial', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Potencial: Todos</option>
               <option value="alto">Alto</option>
               <option value="medio">Médio</option>
             </select>
-            <select value={filtros.risco} onChange={(e) => atualizarFiltro('risco', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.risco} onChange={(e) => atualizarFiltro('risco', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Risco: Todos</option>
               <option value="alto">Alto</option>
               <option value="medio">Médio</option>
             </select>
-            <select value={filtros.cobertura} onChange={(e) => atualizarFiltro('cobertura', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.cobertura} onChange={(e) => atualizarFiltro('cobertura', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todos">Cobertura: Todas</option>
               <option value="alta">Alta</option>
               <option value="baixa">Baixa</option>
             </select>
-            <select value={filtros.oportunidade} onChange={(e) => atualizarFiltro('oportunidade', e.target.value)} className="w-full bg-slate-950/50 border border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-300 focus:border-brand transition-all shadow-sm">
+            <select value={filtros.oportunidade} onChange={(e) => atualizarFiltro('oportunidade', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-700 focus:border-brand focus:bg-white transition-all shadow-sm">
               <option value="todas">Pipeline: Todos</option>
               <option value="com">Com Oportunidade</option>
               <option value="sem">Sem Oportunidade</option>
             </select>
-            <select value={filtros.blocoCInteracoes} onChange={(e) => atualizarFiltro('blocoCInteracoes', e.target.value as Filtros['blocoCInteracoes'])} className="w-full bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-2.5 text-xs font-black text-emerald-400 focus:border-emerald-500 transition-all shadow-sm">
-              <option value="todos" className="bg-slate-950">Interações: Todas</option>
-              <option value="com" className="bg-slate-950">Com Sinais</option>
-              <option value="sem" className="bg-slate-950">Sem Sinais</option>
-              <option value="recente" className="bg-slate-950">Recente (30d)</option>
+            <select value={filtros.blocoCInteracoes} onChange={(e) => atualizarFiltro('blocoCInteracoes', e.target.value as Filtros['blocoCInteracoes'])} className="w-full bg-emerald-50 border border-emerald-100 rounded-xl p-2.5 text-xs font-black text-emerald-600 focus:border-emerald-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Interações: Todas</option>
+              <option value="com">Com Sinais</option>
+              <option value="sem">Sem Sinais</option>
+              <option value="recente">Recente (30d)</option>
             </select>
-            <select value={filtros.blocoCPlays} onChange={(e) => atualizarFiltro('blocoCPlays', e.target.value as Filtros['blocoCPlays'])} className="w-full bg-blue-500/5 border border-blue-500/20 rounded-xl p-2.5 text-xs font-black text-blue-400 focus:border-blue-500 transition-all shadow-sm">
-              <option value="todos" className="bg-slate-950">Plays Sugeridos: Todos</option>
-              <option value="com" className="bg-slate-950">Com Recomendações</option>
-              <option value="sem" className="bg-slate-950">Sem Recomendações</option>
+            <select value={filtros.blocoCPlays} onChange={(e) => atualizarFiltro('blocoCPlays', e.target.value as Filtros['blocoCPlays'])} className="w-full bg-blue-50 border border-blue-100 rounded-xl p-2.5 text-xs font-black text-blue-600 focus:border-blue-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Plays Sugeridos: Todos</option>
+              <option value="com">Com Recomendações</option>
+              <option value="sem">Sem Recomendações</option>
             </select>
           </div>
         </section>
 
         {/* Tactical Shortcuts */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
-          <button onClick={() => { atualizarFiltro('risco', 'alto'); setOrdenacao('engajamento_desc'); }} className="p-4 bg-slate-900/50 border border-slate-800 hover:border-rose-500/30 rounded-2xl text-left group transition-all">
+          <button onClick={() => { atualizarFiltro('risco', 'alto'); setOrdenacao('engajamento_desc'); }} className="p-4 bg-white border border-slate-200 hover:border-rose-500 hover:shadow-lg hover:shadow-rose-500/5 rounded-2xl text-left group transition-all">
             <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest block mb-1">Atenção Prioritária</span>
-            <p className="text-xs font-medium text-slate-400 group-hover:text-slate-200">Alto risco com movimentação recente</p>
+            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Alto risco com movimentação recente</p>
           </button>
-          <button onClick={() => { atualizarFiltro('tipoConta', 'abm'); atualizarFiltro('cobertura', 'baixa'); }} className="p-4 bg-slate-900/50 border border-slate-800 hover:border-brand/30 rounded-2xl text-left group transition-all">
+          <button onClick={() => { atualizarFiltro('tipoConta', 'abm'); atualizarFiltro('cobertura', 'baixa'); }} className="p-4 bg-white border border-slate-200 hover:border-brand hover:shadow-lg hover:shadow-brand/5 rounded-2xl text-left group transition-all">
             <span className="text-[9px] font-black text-brand uppercase tracking-widest block mb-1">Gap de Mapeamento</span>
-            <p className="text-xs font-medium text-slate-400 group-hover:text-slate-200">ABM prontas para cobertura inicial</p>
+            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">ABM prontas para cobertura inicial</p>
           </button>
-          <button onClick={() => { atualizarFiltro('tipoConta', 'abx'); atualizarFiltro('oportunidade', 'com'); }} className="p-4 bg-slate-900/50 border border-slate-800 hover:border-blue-500/30 rounded-2xl text-left group transition-all">
+          <button onClick={() => { atualizarFiltro('tipoConta', 'abx'); atualizarFiltro('oportunidade', 'com'); }} className="p-4 bg-white border border-slate-200 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 rounded-2xl text-left group transition-all">
             <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest block mb-1">Cross-sell / Expansão</span>
-            <p className="text-xs font-medium text-slate-400 group-hover:text-slate-200">Base instalada com pipeline aberto</p>
+            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Base instalada com pipeline aberto</p>
           </button>
-          <button onClick={() => atualizarFiltro('blocoCPlays', 'com')} className="p-4 bg-slate-900/50 border border-slate-800 hover:border-emerald-500/30 rounded-2xl text-left group transition-all">
+          <button onClick={() => atualizarFiltro('blocoCPlays', 'com')} className="p-4 bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-500/5 rounded-2xl text-left group transition-all">
             <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest block mb-1">Inteligência Ativa</span>
-            <p className="text-xs font-medium text-slate-400 group-hover:text-slate-200">Contas com recomendações do Bloco C</p>
+            <p className="text-xs font-semibold text-slate-600 group-hover:text-slate-900">Contas com recomendações do Bloco C</p>
           </button>
         </div>
 
@@ -549,7 +549,7 @@ export const Accounts = () => {
             <div className="w-16 h-16 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Search className="w-8 h-8 text-slate-700" />
             </div>
-            <p className="text-lg font-black text-white italic tracking-tighter uppercase tracking-widest">Nenhum Registro Identificado</p>
+            <p className="text-lg font-black text-white tracking-tighter uppercase tracking-widest">Nenhum Registro Identificado</p>
             <p className="text-sm text-slate-500 mt-2 font-medium">Os critérios selecionados não retornaram contas compatíveis.</p>
             <button onClick={() => setFiltros(filtrosIniciais)} className="mt-8 px-6 py-2.5 bg-brand text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">Resetar Filtros</button>
           </div>
@@ -562,10 +562,10 @@ export const Accounts = () => {
               return (
                 <div 
                   key={conta.id} 
-                  className="bg-slate-900 border border-slate-800 rounded-[2rem] p-6 hover:border-brand/40 hover:bg-slate-900/80 transition-all group relative overflow-hidden flex flex-col h-full shadow-lg"
+                  className="bg-white border border-slate-200 rounded-[2rem] p-6 hover:border-brand/40 hover:shadow-2xl hover:shadow-slate-200/50 transition-all group relative overflow-hidden flex flex-col h-full"
                 >
-                  <div className="absolute top-0 right-0 py-10 px-6 opacity-0 group-hover:opacity-[0.03] pointer-events-none transition-opacity">
-                    <Building2 className="w-32 h-32 text-white" />
+                  <div className="absolute top-0 right-0 py-10 px-6 opacity-[0.03] group-hover:opacity-[0.08] pointer-events-none transition-opacity">
+                    <Building2 className="w-32 h-32 text-slate-900" />
                   </div>
                   
                   <div className="flex items-start justify-between mb-4 relative z-10">
@@ -574,10 +574,10 @@ export const Accounts = () => {
                         <span className={`w-1.5 h-1.5 rounded-full ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500 pulse-green' : conta.statusGeral === 'Atenção' ? 'bg-amber-500 pulse-amber' : 'bg-rose-500 pulse-red'}`} />
                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{conta.vertical}</span>
                       </div>
-                      <h3 onClick={() => openAccount(conta.id)} className="text-xl font-black text-white italic tracking-tighter leading-tight truncate cursor-pointer hover:text-brand transition-colors">
+                      <h3 onClick={() => openAccount(conta.id)} className="text-xl font-bold text-slate-900 tracking-tighter leading-tight truncate cursor-pointer hover:text-brand transition-colors">
                         {conta.nome}
                       </h3>
-                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter truncate mt-0.5">{conta.dominio}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate mt-0.5">{conta.dominio}</p>
                     </div>
                     
                     <div className="flex flex-col items-end gap-2">
@@ -588,9 +588,9 @@ export const Accounts = () => {
                       }`}>
                         {conta.statusGeral}
                       </span>
-                      <div className="bg-slate-950 border border-slate-800 p-1.5 flex items-center gap-2 rounded-xl">
-                        <span className="text-[10px] font-black text-slate-500 px-1">SCORE</span>
-                        <span className={`text-[11px] font-black italic px-2 py-0.5 rounded-lg ${score.scoreTotal >= 75 ? 'bg-emerald-500/20 text-emerald-400' : score.scoreTotal >= 50 ? 'bg-amber-500/20 text-amber-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                      <div className="bg-slate-50 border border-slate-200 p-1.5 flex items-center gap-2 rounded-xl">
+                        <span className="text-[10px] font-black text-slate-400 px-1">SCORE</span>
+                        <span className={`text-[11px] font-black px-2 py-0.5 rounded-lg ${score.scoreTotal >= 75 ? 'bg-emerald-500/10 text-emerald-600' : score.scoreTotal >= 50 ? 'bg-amber-500/10 text-amber-600' : 'bg-rose-500/10 text-rose-600'}`}>
                           {score.scoreTotal}
                         </span>
                       </div>
@@ -598,17 +598,17 @@ export const Accounts = () => {
                   </div>
 
                   <div className="flex-1 space-y-4 relative z-10">
-                    <div className="flex items-center justify-between text-[11px] border-y border-slate-800/50 py-3">
+                    <div className="flex items-center justify-between text-[11px] border-y border-slate-100 py-3">
                        <div className="space-y-1">
-                          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest block">Potencial</span>
-                          <span className="text-white font-bold">{conta.potencial}%</span>
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Potencial</span>
+                          <span className="text-slate-900 font-bold">{conta.potencial}%</span>
                        </div>
                        <div className="space-y-1 text-center">
-                          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest block">Mapeamento</span>
-                          <span className="text-white font-bold">{conta.coberturaRelacional}%</span>
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Mapeamento</span>
+                          <span className="text-slate-900 font-bold">{conta.coberturaRelacional}%</span>
                        </div>
                        <div className="space-y-1 text-end">
-                          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest block">Risco</span>
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Risco</span>
                           <span className={`font-bold ${riscoClasse(conta.risco)}`}>{conta.risco}</span>
                        </div>
                     </div>
@@ -635,16 +635,16 @@ export const Accounts = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-800/80">
+                  <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-50">
                     <div className="flex items-center gap-2">
-                       <div className="w-7 h-7 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] font-black text-slate-500">
+                       <div className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400">
                           {conta.ownerPrincipal.substring(0,2).toUpperCase()}
                        </div>
-                       <span className="text-[10px] font-bold text-slate-400 truncate max-w-[100px]">{conta.ownerPrincipal}</span>
+                       <span className="text-[10px] font-bold text-slate-500 truncate max-w-[100px]">{conta.ownerPrincipal}</span>
                     </div>
                     <Link 
                       href={`/contas/${conta.slug}`}
-                      className="px-4 py-2 bg-slate-950 hover:bg-brand border border-slate-800 hover:border-brand rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all shadow-sm"
+                      className="px-4 py-2 bg-slate-50 hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all shadow-sm"
                     >
                       Perfil 360
                     </Link>
@@ -662,7 +662,7 @@ export const Accounts = () => {
                   <div className="flex items-center justify-between px-3 mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 italic">{etapa}</h3>
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{etapa}</h3>
                     </div>
                     <span className="text-[10px] font-black bg-slate-900 border border-slate-800 text-slate-400 px-3 py-0.5 rounded-full">{contasNaEtapa.length}</span>
                   </div>
@@ -672,32 +672,32 @@ export const Accounts = () => {
                       return (
                         <div 
                           key={conta.id} 
-                          className="bg-slate-900 border border-slate-800 rounded-[1.5rem] p-5 hover:border-brand/40 group transition-all cursor-default shadow-sm hover:shadow-brand/5"
+                          className="bg-white border border-slate-200 rounded-[1.5rem] p-5 hover:border-brand/40 group transition-all cursor-default shadow-sm hover:shadow-xl hover:shadow-slate-200/50"
                         >
                           <div className="flex items-start justify-between gap-3 mb-3">
                             <div className="flex-1 min-w-0">
-                              <h4 onClick={() => openAccount(conta.id)} className="font-black text-white italic tracking-tighter truncate leading-tight cursor-pointer hover:text-brand transition-colors">
+                              <h4 onClick={() => openAccount(conta.id)} className="font-bold text-slate-900 tracking-tighter truncate leading-tight cursor-pointer hover:text-brand transition-colors">
                                 {conta.nome}
                               </h4>
-                              <p className="text-[9px] text-slate-600 font-bold uppercase truncate mt-0.5">{conta.vertical} · {conta.segmento}</p>
+                              <p className="text-[9px] text-slate-400 font-bold uppercase truncate mt-0.5">{conta.vertical} · {conta.segmento}</p>
                             </div>
-                            <span className={`shrink-0 w-2.5 h-2.5 rounded-full mt-1.5 ${conta.statusGeral === 'Crítico' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]' : conta.statusGeral === 'Atenção' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'}`} />
+                            <span className={`shrink-0 w-2.5 h-2.5 rounded-full mt-1.5 ${conta.statusGeral === 'Crítico' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]' : conta.statusGeral === 'Atenção' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'}`} />
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-800/50 my-3">
+                          <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-50 my-3">
                              <div className="text-center">
-                                <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Growth</span>
-                                <span className="text-[10px] font-bold text-slate-200">{conta.potencial}%</span>
+                                <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Growth</span>
+                                <span className="text-[10px] font-bold text-slate-900">{conta.potencial}%</span>
                              </div>
-                             <div className="text-center border-x border-slate-800/50">
-                                <span className="text-[8px] font-black text-slate-600 uppercase block mb-1">Risco</span>
+                             <div className="text-center border-x border-slate-50">
+                                <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Risco</span>
                                 <span className={`text-[10px] font-bold ${riscoClasse(conta.risco)}`}>{conta.risco}</span>
                              </div>
                              <div className="text-center">
-                                <span className="text-[10px] font-black text-slate-500 uppercase block mb-1">
+                                <span className="text-[10px] font-black text-slate-900 uppercase block mb-1">
                                   {calculateAccountScore(conta).scoreTotal}
                                 </span>
-                                <span className="text-[7px] font-black text-slate-700 uppercase">Score</span>
+                                <span className="text-[7px] font-black text-slate-400 uppercase">Score</span>
                              </div>
                           </div>
                           
@@ -732,20 +732,20 @@ export const Accounts = () => {
           </div>
         ) : (
           /* ── PREMIUM LIST VIEW ── */
-          <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-950/80 border-b border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-[0.15em]">
-                    <th className="p-5 pl-8">Conta & Inteligência</th>
-                    <th className="p-5">Contexto / Owner</th>
-                    <th className="p-5">Score & Pipeline</th>
-                    <th className="p-5">Estratégia & Play</th>
-                    <th className="p-5">Cobertura</th>
-                    <th className="p-5 text-end pr-8">Ação de Próximo Passo</th>
+                <thead className="sticky top-0 z-10">
+                  <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-400 tracking-[0.12em]">
+                    <th className="p-4 pl-8">Conta & Inteligência</th>
+                    <th className="p-4">Contexto / Owner</th>
+                    <th className="p-4">Score & Pipeline</th>
+                    <th className="p-4">Estratégia & Play</th>
+                    <th className="p-4">Cobertura</th>
+                    <th className="p-4 text-end pr-8">Ação de Próximo Passo</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/50">
+                <tbody className="divide-y divide-slate-100">
                   {filtradas.map((conta) => {
                     const score = calculateAccountScore(conta);
                     const signals = blocoCSignals[conta.id];
@@ -753,23 +753,23 @@ export const Accounts = () => {
                       <tr key={conta.id} className="group hover:bg-slate-800/20 transition-colors">
                         <td className="p-5 pl-8">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-400 italic backdrop-blur-sm">
+                            <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400">
                                {conta.nome.substring(0,2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
                                <div className="flex items-center gap-2 mb-1">
                                  <button 
                                    onClick={() => openAccount(conta.id)} 
-                                   className="text-sm font-black text-slate-100 hover:text-brand italic tracking-tighter cursor-pointer block text-left"
+                                   className="text-sm font-bold text-slate-950 hover:text-brand tracking-tighter cursor-pointer block text-left"
                                  >
                                    {conta.nome}
                                  </button>
                                  <span className={`w-1.5 h-1.5 rounded-full ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                                </div>
                                <div className="flex items-center gap-2">
-                                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tighter">{conta.dominio}</span>
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leadning-none">{conta.dominio}</span>
                                   {signals?.interactionsCount > 0 && (
-                                     <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/5 px-1.5 rounded flex items-center gap-1 border border-emerald-500/10">
+                                     <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 rounded flex items-center gap-1 border border-emerald-100">
                                        <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                      </span>
                                   )}
@@ -780,11 +780,11 @@ export const Accounts = () => {
                         <td className="p-5">
                           <div className="space-y-1">
                              <div className="flex items-center gap-2">
-                               <p className="text-xs font-bold text-slate-300">{conta.vertical}</p>
+                               <p className="text-xs font-bold text-slate-700">{conta.vertical}</p>
                                <span className="text-[9px] text-slate-500 font-black uppercase">/ {conta.segmento}</span>
                              </div>
                              <div className="flex items-center gap-1.5 text-slate-500">
-                               <div className="w-4 h-4 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[7px] font-black">
+                               <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[7px] font-black">
                                   {conta.ownerPrincipal.substring(0,2).toUpperCase()}
                                </div>
                                <p className="text-[9px] font-bold tracking-tight">{conta.ownerPrincipal}</p>
@@ -793,31 +793,31 @@ export const Accounts = () => {
                         </td>
                         <td className="p-5">
                            <div className="flex items-center gap-3">
-                              <div className="text-center bg-slate-950 border border-slate-800 p-2 rounded-xl min-w-[50px] shadow-inner">
-                                 <p className="text-xs font-black text-white italic">{score.scoreTotal}</p>
-                                 <p className="text-[7px] font-black text-slate-600 uppercase">Score</p>
+                              <div className="text-center bg-slate-50 border border-slate-200 p-2 rounded-xl min-w-[50px] shadow-sm">
+                                 <p className="text-xs font-black text-slate-900">{score.scoreTotal}</p>
+                                 <p className="text-[7px] font-black text-slate-400 uppercase">Score</p>
                               </div>
                               <div className="space-y-1">
                                  <div className="flex items-center gap-1.5">
-                                   <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-500' : score.scoreTotal >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{score.prioridade}</p>
+                                   <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
                                    {conta.possuiOportunidade && (
-                                     <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-md text-[8px] font-black uppercase tracking-widest">Pipeline</span>
+                                     <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[8px] font-black uppercase tracking-widest">Pipeline</span>
                                    )}
                                  </div>
-                                 <p className="text-[9px] font-bold text-slate-700 uppercase">{conta.etapa}</p>
+                                 <p className="text-[9px] font-bold text-slate-400 uppercase">{conta.etapa}</p>
                               </div>
                            </div>
                         </td>
                         <td className="p-5">
                            <div className="flex flex-col gap-2.5">
                               {/* Inline Tipo Estrategico Toggle */}
-                              <div className="flex items-center gap-1 bg-slate-950/50 p-1 rounded-lg border border-slate-800 w-fit">
+                              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200 w-fit">
                                 {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
                                   <button
                                     key={t}
                                     onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
                                     className={`px-2 py-1 rounded text-[8px] font-black uppercase transition-all ${
-                                      conta.tipoEstrategico === t ? 'bg-slate-800 text-brand' : 'text-slate-600 hover:text-slate-400'
+                                      conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'
                                     }`}
                                   >
                                     {t}
@@ -826,7 +826,7 @@ export const Accounts = () => {
                               </div>
                               {/* Inline Play Selection */}
                               <div className="flex items-center gap-2">
-                                <Zap className="w-3 h-3 text-brand opacity-40 shrink-0" />
+                                <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
                                 <div className="flex gap-1">
                                   {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as const).map((p) => (
                                     <button
@@ -835,7 +835,7 @@ export const Accounts = () => {
                                       className={`px-1.5 py-0.5 rounded text-[8px] font-bold border transition-all ${
                                         conta.playAtivo === p 
                                           ? 'bg-brand/10 text-brand border-brand/30' 
-                                          : 'bg-slate-950 text-slate-600 border-slate-800/50 hover:text-slate-400'
+                                          : 'bg-white text-slate-400 border-slate-200 hover:text-slate-600'
                                       }`}
                                     >
                                       {p}
@@ -848,10 +848,10 @@ export const Accounts = () => {
                         <td className="p-5">
                            <div className="space-y-1.5">
                               <div className="flex items-baseline justify-between w-24">
-                                 <span className="text-[9px] font-black text-slate-600 uppercase">Coverage</span>
-                                 <span className="text-[10px] font-bold text-white">{conta.coberturaRelacional}%</span>
+                                 <span className="text-[9px] font-black text-slate-400 uppercase">Coverage</span>
+                                 <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
                               </div>
-                              <div className="w-24 h-1 bg-slate-950 border border-slate-800 rounded-full overflow-hidden shadow-inner">
+                              <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                                  <div className={`h-full rounded-full transition-all duration-1000 ${conta.coberturaRelacional >= 70 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-blue-500'}`} style={{ width: `${conta.coberturaRelacional}%` }} />
                               </div>
                            </div>
@@ -860,12 +860,12 @@ export const Accounts = () => {
                            <div className="flex flex-col items-end gap-1.5">
                               <div className="flex items-center gap-3">
                                 <div className="text-end">
-                                   <p className="text-[10px] font-black text-slate-200 italic line-clamp-1 max-w-[200px]">{conta.proximaMelhorAcao || 'Sem ação definida'}</p>
-                                   <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">Próxima melhor ação</p>
+                                   <p className="text-[10px] font-bold text-slate-900 line-clamp-1 max-w-[200px]">{conta.proximaMelhorAcao || 'Sem ação definida'}</p>
+                                   <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Próxima melhor ação</p>
                                 </div>
                                 <button 
                                   onClick={() => abrirEditorNarrativo(conta)} 
-                                  className="p-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-500 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
+                                  className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
                                   title="Editar Narrativa"
                                 >
                                   <Sparkles className="w-3.5 h-3.5" />
