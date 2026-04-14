@@ -4,6 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
+import Link from 'next/link';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreHorizontal, Sparkles, AlertTriangle, Zap, Target, Globe, Activity } from 'lucide-react';
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
@@ -446,7 +447,9 @@ export const Overview: React.FC = () => {
             <div className="space-y-2">
               {triageByScore.criticas.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 transition-all">
-                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-red-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
+                  <Link href={`/contas/${x.conta.slug}`}>
+                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-red-700">{x.conta.nome}</p>
+                  </Link>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
@@ -464,7 +467,9 @@ export const Overview: React.FC = () => {
             <div className="space-y-2">
               {triageByScore.altasPrio.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 transition-all">
-                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-amber-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
+                  <Link href={`/contas/${x.conta.slug}`}>
+                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-amber-700">{x.conta.nome}</p>
+                  </Link>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
@@ -482,7 +487,9 @@ export const Overview: React.FC = () => {
             <div className="space-y-2">
               {triageByScore.altoPotencialBaixaCobertura.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 transition-all">
-                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-blue-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
+                  <Link href={`/contas/${x.conta.slug}`}>
+                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-blue-700">{x.conta.nome}</p>
+                  </Link>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
@@ -500,7 +507,9 @@ export const Overview: React.FC = () => {
             <div className="space-y-2">
               {triageByScore.topOportunidades.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 transition-all">
-                  <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-emerald-700" onClick={() => openAccount(x.conta.id)}>{x.conta.nome}</p>
+                  <Link href={`/contas/${x.conta.slug}`}>
+                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-brand">{x.conta.nome}</p>
+                  </Link>
                   <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
@@ -732,7 +741,8 @@ export const Overview: React.FC = () => {
           <Card title="Top Engajamento (Bloco C)" subtitle="Recência de atividades reais">
             <div className="space-y-3">
               {executiveBlockC.topEngaged.map((item) => (
-                <div key={item.conta.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:border-brand/30 transition-all cursor-pointer group" onClick={() => openAccount(item.conta.id)}>
+                <Link key={item.conta.id} href={`/contas/${item.conta.slug}`}>
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:border-brand/30 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
                       {item.conta.nome.substring(0, 2)}

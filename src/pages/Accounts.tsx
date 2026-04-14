@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search } from 'lucide-react';
+import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search, ExternalLink } from 'lucide-react';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { calculateAccountScore } from '../lib/scoringRepository';
@@ -431,7 +431,19 @@ export const Accounts = () => {
                 className="bg-white border border-slate-200 rounded-xl p-4 hover:border-brand/50 hover:shadow-md transition-all text-left block w-full group"
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="font-bold text-slate-900 leading-tight group-hover:text-brand transition-colors">{conta.nome}</p>
+                  <div className="flex-1">
+                    <p className="font-bold text-slate-900 leading-tight group-hover:text-brand transition-colors flex items-center gap-1.5">
+                      {conta.nome}
+                      <Link 
+                        href={`/contas/${conta.slug}`}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-100 rounded text-brand transition-all"
+                        title="Ver Perfil 360"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </p>
+                  </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClasse(conta.statusGeral)}`}>{conta.statusGeral}</span>
                 </div>
                 <p className="text-xs text-slate-500 mb-3">{conta.vertical} · {conta.segmento}</p>
@@ -483,7 +495,18 @@ export const Accounts = () => {
                         className="bg-white border border-slate-200 rounded-xl p-3 hover:border-brand/40 hover:shadow-md transition-all text-left block w-full group shadow-sm"
                       >
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="font-bold text-sm text-slate-900 leading-tight group-hover:text-brand transition-colors truncate">{conta.nome}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-sm text-slate-900 leading-tight group-hover:text-brand transition-colors truncate flex items-center gap-1.5">
+                               {conta.nome}
+                               <Link 
+                                 href={`/contas/${conta.slug}`} 
+                                 className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-slate-100 rounded text-brand transition-all"
+                                 onClick={(e) => e.stopPropagation()}
+                               >
+                                 <ExternalLink className="w-2.5 h-2.5" />
+                               </Link>
+                            </p>
+                          </div>
                           <span className={`shrink-0 w-2 h-2 rounded-full mt-1 ${conta.statusGeral === 'Crítico' ? 'bg-rose-500' : conta.statusGeral === 'Atenção' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                         </div>
                         <p className="text-[10px] text-slate-500 mb-2 truncate">{conta.vertical} · {conta.segmento}</p>
@@ -547,6 +570,12 @@ export const Accounts = () => {
                               <Sparkles className="w-2 h-2" /> {blocoCSignals[conta.id].playsCount}
                             </span>
                           )}
+                          <Link 
+                            href={`/contas/${conta.slug}`}
+                            className="text-[9px] font-black text-blue-500 uppercase tracking-tighter opacity-0 group-hover/cell:opacity-100 transition-opacity flex items-center gap-1"
+                          >
+                            Perfil 360 <ArrowUpRight className="w-2.5 h-2.5" />
+                          </Link>
                         </div>
                       </div>
                     </div>

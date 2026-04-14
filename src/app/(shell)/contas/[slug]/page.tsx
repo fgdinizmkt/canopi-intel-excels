@@ -1,14 +1,14 @@
 "use client";
 
 import { useParams, useRouter } from 'next/navigation';
-import { AccountDetailView } from '../../../../components/account/AccountDetailView';
+import { AccountProfile } from '../../../../pages/AccountProfile';
 import { contaPorSlug } from '../../../../data/accountsData';
 
 export default function ContaDetalhePage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
   
-  // Resolução semântica correta via Slug
+  // Resolução semântica via Slug
   const account = contaPorSlug(params?.slug || '');
 
   if (!account) {
@@ -25,23 +25,6 @@ export default function ContaDetalhePage() {
     );
   }
 
-  const handleClose = () => {
-    // Comportamento de saída inteligente: tenta voltar ou vai para a listagem
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push('/contas');
-    }
-  };
-
-  return (
-    <div className="h-[calc(100vh-80px)] -m-6">
-      <AccountDetailView 
-        accountId={account.id} 
-        viewMode="fullscreen" 
-        onClose={handleClose} 
-        onToggleViewMode={() => {}} 
-      />
-    </div>
-  );
+  // A página dedicada agora assume o layout 360 profundo
+  return <AccountProfile slug={params!.slug} />;
 }
