@@ -333,7 +333,7 @@ export function buildBlockBSeed(): BlockoBCanonical {
     createIntegration('meta_ads', 'Meta Ads', 'Ads', {
       description: 'Facebook/Instagram para campanhas',
       isActive: true,
-      healthStatus: 'degraded',
+      healthStatus: 'down',
       connectedSince: '2024-02-20',
       lastChecked: new Date().toISOString(),
     }),
@@ -430,15 +430,16 @@ export function buildBlockBSeed(): BlockoBCanonical {
       confidenceLevel: 96,
       lastSyncDuration: 60,
     }),
-    // Meta Ads — partial
+    // Meta Ads — error (API authentication failed)
     createSourceSnapshot('snap_meta_ads_2026_04_13', 'meta_ads', '2026-04-13', {
-      recordsReceived: 3400,
-      recordsProcessed: 3200,
-      recordsFailedCount: 200,
-      dataConsistency: 78,
-      syncStatus: 'partial_failure',
-      confidenceLevel: 75,
-      lastSyncDuration: 90,
+      recordsReceived: 0,
+      recordsProcessed: 0,
+      recordsFailedCount: 3400,
+      dataConsistency: 0,
+      syncStatus: 'failure',
+      errorMessage: 'API authentication failed: invalid credentials or token expired',
+      confidenceLevel: 0,
+      lastSyncDuration: 5,
     }),
     // GA4 — connected
     createSourceSnapshot('snap_ga4_2026_04_13', 'ga4', '2026-04-13', {
@@ -678,15 +679,16 @@ export function buildBlockBSeed(): BlockoBCanonical {
       isMonitored: true,
     }),
     createSyncStatus('sync_meta_ads', 'meta_ads', {
-      currentStatus: 'partial',
+      currentStatus: 'error',
       lastSyncAttempt: new Date().toISOString(),
-      lastSuccessfulSync: new Date().toISOString(),
+      lastSuccessfulSync: new Date('2026-04-10').toISOString(),
       syncIntervalMinutes: 90,
-      successCount: 145,
-      errorCount: 8,
-      statusReason: 'Alguns campos faltando; taxa de erro em 5%',
+      successCount: 142,
+      errorCount: 11,
+      statusReason: 'API authentication failed: invalid credentials or token expired. Requer reconexão manual.',
       isMonitored: true,
-      alertsActive: 1,
+      alertsActive: 3,
+      nextRetryAt: new Date(Date.now() + 3600000).toISOString(), // 1 hora
     }),
     createSyncStatus('sync_linkedin_ads', 'linkedin_ads', {
       currentStatus: 'missing',
