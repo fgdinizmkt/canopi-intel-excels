@@ -3,14 +3,33 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, ArrowUpDown, LayoutGrid, List, KanbanSquare, Search, ExternalLink, ArrowUpRight, Building2, Target, Zap } from 'lucide-react';
+import { 
+  AlertTriangle, 
+  ArrowUpDown, 
+  LayoutGrid, 
+  List, 
+  KanbanSquare, 
+  Search, 
+  ExternalLink, 
+  ArrowUpRight, 
+  Building2, 
+  Target, 
+  Zap,
+  Activity, 
+  Sparkles, 
+  Mail, 
+  Globe,
+  Layout,
+  Users,
+  TrendingUp,
+  Cpu
+} from 'lucide-react';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { getInteractions } from '../lib/interactionsRepository';
 import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
-import { Activity, Sparkles, Mail, Globe } from 'lucide-react';
 import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
@@ -336,94 +355,97 @@ export const Accounts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-brand/30 selection:text-white">
-      {/* ── PREMIUM HERO: COMMAND CENTER CONTEXT ── */}
-      <header className="relative overflow-hidden bg-slate-950 border-b border-slate-800/60 pb-10 pt-12">
-        <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-          <Building2 className="w-48 h-48 text-brand" />
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
-                <span className="text-[10px] font-black text-brand uppercase tracking-[0.2em]">Operational Cockpit</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter leading-tight flex items-center gap-4">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-brand/30 selection:text-white pb-20">
+      {/* ── ALIGNED EXECUTIVE HERO ── */}
+      <div className="max-w-[1600px] mx-auto px-6 pt-6 text-center md:text-left">
+        <header className="relative overflow-hidden bg-[#020617] rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-blue-900/20 border border-white/5">
+          {/* Subtle Glow Overlays */}
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand/10 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
+          
+          <div className="relative z-10">
+            {/* Top Context Pills */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-black text-slate-400 uppercase tracking-widest">Revenue Intelligence</span>
+              <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[8px] font-black text-emerald-400 uppercase tracking-widest">Cockpit Ativo</span>
+              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-black text-slate-400 uppercase tracking-widest">Portfólio Estratégico</span>
+            </div>
+
+            {/* Breadcrumb & Title Area */}
+            <div className="mb-6">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-2">Canopi · Intelligence · Portfolio</p>
+              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none mb-4">
                 Portfólio de Contas
               </h1>
-              <p className="max-w-2xl text-slate-400 text-sm leading-relaxed font-medium">
-                Visão centralizada de inteligência para priorização de contas, monitoramento de sinais do Bloco C e orquestração de rotinas estratégicas.
+              <p className="text-slate-400 text-sm md:text-base font-medium max-w-3xl leading-relaxed mx-auto md:mx-0">
+                Monitoramento estratégico e orquestração operacional do portfólio de contas.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="relative group">
-                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-brand transition-colors" />
+            {/* Middle Controls (View Toggle & Search) */}
+            <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 mb-8">
+              <div className="flex bg-white/5 border border-white/10 p-1 rounded-full backdrop-blur-md">
+                <button onClick={() => setVisualizacao('lista')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'lista' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Lista</button>
+                <button onClick={() => setVisualizacao('grade')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'grade' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Grade</button>
+                <button onClick={() => setVisualizacao('board')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'board' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Board</button>
+              </div>
+              <div className="relative group flex-1 max-w-xs">
+                <Search className="w-3.5 h-3.5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors" />
                 <input 
                   value={filtros.busca} 
                   onChange={(e) => atualizarFiltro('busca', e.target.value)} 
-                  className="w-full md:w-80 pl-11 pr-5 py-3.5 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:outline-none focus:border-brand/50 focus:ring-4 focus:ring-brand/5 transition-all placeholder:text-slate-600 font-medium" 
-                  placeholder="Buscar conta ou domínio..." 
+                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all placeholder:text-slate-600" 
+                  placeholder="Localizar conta..." 
                 />
               </div>
-              <div className="inline-flex bg-slate-900/50 border border-slate-800 rounded-2xl p-1 shadow-inner backdrop-blur-md">
-                <button onClick={() => setVisualizacao('lista')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'lista' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Lista"><List className="w-5 h-5" /></button>
-                <button onClick={() => setVisualizacao('grade')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'grade' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão de Grade"><LayoutGrid className="w-5 h-5" /></button>
-                <button onClick={() => setVisualizacao('board')} className={`p-2.5 rounded-xl transition-all ${visualizacao === 'board' ? 'bg-brand text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`} title="Visão Kanban"><KanbanSquare className="w-5 h-5" /></button>
+            </div>
+
+            {/* Integrated Metrics (Aligned Boxes) */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+              <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group text-left">
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Total de Contas</p>
+                <p className="text-2xl font-black text-white tracking-tighter">{contas.length}</p>
+                <p className="mt-1 text-[9px] font-bold text-emerald-500 uppercase">Base Ativa</p>
               </div>
+
+              <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, potencial: 'alto' }))}>
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Alto Potencial</p>
+                <p className="text-2xl font-black text-white tracking-tighter">{metricas.altoPotencial}</p>
+                <p className="mt-1 text-[9px] font-bold text-brand uppercase">Growth Fit</p>
+              </div>
+
+              <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, risco: 'alto' }))}>
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Exposição Crítica</p>
+                <p className="text-2xl font-black text-white tracking-tighter">{metricas.risco}</p>
+                <p className="mt-2 text-[10px] font-bold text-rose-500 uppercase">Risco Detectado</p>
+              </div>
+
+              <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group text-left">
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Cobertura Relacional</p>
+                <p className="text-2xl font-black text-white tracking-tighter">{coberturaBase}%</p>
+                <p className="mt-1 text-[9px] font-bold text-blue-400 uppercase">Saúde</p>
+              </div>
+
+              <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, oportunidade: 'com' }))}>
+                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Pipeline Ativo</p>
+                <p className="text-2xl font-black text-white tracking-tighter">{metricas.oportunidades}</p>
+                <p className="mt-1 text-[9px] font-bold text-brand uppercase">Oportunidades</p>
+              </div>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="flex justify-center md:justify-start gap-3">
+              <button className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+                <ArrowUpRight className="w-3 h-3" /> Exportar Intel
+              </button>
             </div>
           </div>
+        </header>
+      </div>
 
-          {/* Strategic Metrics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Total de Contas</p>
-              <p className="text-3xl font-black text-white tracking-tighter">{contas.length}</p>
-              <div className="mt-3 flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Base Ativa</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, potencial: 'alto' }))}>
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Alto Potencial</p>
-              <p className="text-3xl font-black text-brand tracking-tighter">{metricas.altoPotencial}</p>
-              <div className="mt-3 flex items-center gap-1.5 text-brand">
-                <Sparkles className="w-3 h-3" />
-                <span className="text-[10px] font-bold uppercase tracking-tight">Growth Fit</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-rose-500/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, risco: 'alto' }))}>
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Exposição Crítica</p>
-              <p className="text-3xl font-black text-rose-500 tracking-tighter">{metricas.risco}</p>
-              <div className="mt-3 flex items-center gap-1.5 text-rose-500">
-                <AlertTriangle className="w-3 h-3" />
-                <span className="text-[10px] font-bold uppercase tracking-tight">Risco Detectado</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-blue-500/30 transition-all">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Cobertura Relacional</p>
-              <p className="text-3xl font-black text-slate-200 tracking-tighter">{coberturaBase}%</p>
-              <div className="mt-3 w-full h-1 bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${coberturaBase}%` }} />
-              </div>
-            </div>
-            <div className="hidden lg:block bg-slate-900/40 border border-slate-800/50 p-5 rounded-3xl backdrop-blur-sm group hover:border-brand/30 transition-all cursor-pointer" onClick={() => setFiltros(f => ({ ...f, oportunidade: 'com' }))}>
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Pipeline Ativo</p>
-              <p className="text-3xl font-black text-white tracking-tighter">{metricas.oportunidades}</p>
-              <div className="mt-3 flex items-center gap-1.5 text-emerald-500">
-                <Target className="w-3 h-3 text-brand" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Oportunidades</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 pb-20 -mt-6">
+      <main className="max-w-[1600px] mx-auto px-6 mt-12 mb-20">
         {/* ── REFINED FILTER COMMAND STRIP ── */}
-        <section className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 space-y-6 mb-8 relative">
+        <section className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 space-y-6 mb-8 relative">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-brand" /> Filtros e Segmentação
