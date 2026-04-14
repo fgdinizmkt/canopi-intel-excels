@@ -8,6 +8,10 @@ import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsDa
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
+import { getInteractions } from '../lib/interactionsRepository';
+import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
+import { Activity, Sparkles, Mail, Globe } from 'lucide-react';
+import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
 type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc' | 'score_desc' | 'score_asc';
@@ -44,6 +48,8 @@ export const Accounts = () => {
 
   const [loading, setLoading] = useState(true);
   const [contas, setContas] = useState<Conta[]>([]);
+  const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
+  const [allPlays, setAllPlays] = useState<PlayRecommendation[]>([]);
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
   const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
   const [filtros, setFiltros] = useState<Filtros>({
@@ -65,10 +71,16 @@ export const Accounts = () => {
   useEffect(() => {
     const carregarContas = async () => {
       try {
-        const dados = await getAccounts();
-        setContas(dados);
+        const [dadosContas, dadosInteractions, dadosPlays] = await Promise.all([
+          getAccounts(),
+          getInteractions(),
+          getPlayRecommendations()
+        ]);
+        setContas(dadosContas);
+        setAllInteractions(dadosInteractions);
+        setAllPlays(dadosPlays);
       } catch (err) {
-        console.error('[Accounts] Erro ao carregar contas:', err);
+        console.error('[Accounts] Erro ao carregar contas ou bloco C:', err);
         setContas(contasMock);
       }
     };
@@ -158,6 +170,26 @@ export const Accounts = () => {
     baixaCobertura: contas.filter((c) => c.coberturaRelacional < 50).length,
     oportunidades: contas.filter((c) => c.possuiOportunidade).length
   }), [contas]);
+
+  // Agregação de Sinais do Bloco C por Conta
+  const blocoCSignals = useMemo(() => {
+    const map: Record<string, { interactionsCount: number; playsCount: number; lastInteractionDate?: string }> = {};
+
+    contas.forEach(c => {
+      const accountInteractions = allInteractions.filter(i => i.accountId === c.id);
+      const accountPlays = allPlays.filter(p => p.accountId === c.id && p.isActive);
+
+      map[c.id] = {
+        interactionsCount: accountInteractions.length,
+        playsCount: accountPlays.length,
+        lastInteractionDate: accountInteractions.length > 0
+          ? accountInteractions.sort((a, b) => b.date.localeCompare(a.date))[0].date
+          : undefined
+      };
+    });
+
+    return map;
+  }, [contas, allInteractions, allPlays]);
 
   const atualizarFiltro = <K extends keyof Filtros>(chave: K, valor: Filtros[K]) => setFiltros((prev) => ({ ...prev, [chave]: valor }));
 
@@ -376,6 +408,16 @@ export const Accounts = () => {
                   {acoesAtrasadas > 0 && (
                     <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">{acoesAtrasadas} atras.</span>
                   )}
+                  {blocoCSignals[conta.id]?.interactionsCount > 0 && (
+                    <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded flex items-center gap-1" title="Interações (Bloco C)">
+                      <Activity className="w-2.5 h-2.5" /> {blocoCSignals[conta.id].interactionsCount}
+                    </span>
+                  )}
+                  {blocoCSignals[conta.id]?.playsCount > 0 && (
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded flex items-center gap-1" title="Plays Recomendados (Bloco C)">
+                      <Sparkles className="w-2.5 h-2.5" /> {blocoCSignals[conta.id].playsCount}
+                    </span>
+                  )}
                 </div>
               </button>
             );
@@ -397,7 +439,19 @@ export const Accounts = () => {
                       <span className={`w-2 h-2 rounded-full shrink-0 ${conta.atividadeRecente === 'Alta' ? 'bg-emerald-500' : conta.atividadeRecente === 'Média' ? 'bg-amber-500' : 'bg-slate-400'}`} />
                       <div>
                         <button onClick={() => openAccount(conta.id)} className="font-bold text-brand hover:underline text-left">{conta.nome}</button>
-                        <p className="text-xs text-slate-500">{conta.dominio}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-xs text-slate-500">{conta.dominio}</p>
+                          {blocoCSignals[conta.id]?.interactionsCount > 0 && (
+                            <span className="text-[9px] font-black text-slate-400 border border-slate-200 px-1 rounded flex items-center gap-0.5" title={`${blocoCSignals[conta.id].interactionsCount} Interações`}>
+                              <Activity className="w-2 h-2" /> {blocoCSignals[conta.id].interactionsCount}
+                            </span>
+                          )}
+                          {blocoCSignals[conta.id]?.playsCount > 0 && (
+                            <span className="text-[9px] font-black text-blue-400 border border-blue-100 px-1 rounded flex items-center gap-0.5" title={`${blocoCSignals[conta.id].playsCount} Plays Recomendados`}>
+                              <Sparkles className="w-2 h-2" /> {blocoCSignals[conta.id].playsCount}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </td>
