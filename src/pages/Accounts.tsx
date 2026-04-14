@@ -29,11 +29,14 @@ type Filtros = {
   oportunidade: string;
   atividade: string;
   play: string;
+  blocoCInteracoes: 'todos' | 'com' | 'sem' | 'recente';
+  blocoCPlays: 'todos' | 'com' | 'sem';
 };
 
 const filtrosIniciais: Filtros = {
   busca: '', vertical: 'todos', segmento: 'todos', owner: 'todos', etapa: 'todas',
-  tipoConta: 'todas', potencial: 'todos', risco: 'todos', cobertura: 'todos', oportunidade: 'todas', atividade: 'todas', play: 'todos'
+  tipoConta: 'todas', potencial: 'todos', risco: 'todos', cobertura: 'todos', oportunidade: 'todas', atividade: 'todas', play: 'todos',
+  blocoCInteracoes: 'todos', blocoCPlays: 'todos'
 };
 
 const toDate = (date: string) => new Date(date).getTime();
@@ -65,7 +68,9 @@ export const Accounts = () => {
     cobertura: searchParams?.get('cobertura') || 'todos',
     oportunidade: searchParams?.get('oportunidade') || 'todas',
     atividade: searchParams?.get('atividade') || 'todas',
-    play: searchParams?.get('play') || 'todos'
+    play: searchParams?.get('play') || 'todos',
+    blocoCInteracoes: (searchParams?.get('blocoCInteracoes') as Filtros['blocoCInteracoes']) || 'todos',
+    blocoCPlays: (searchParams?.get('blocoCPlays') as Filtros['blocoCPlays']) || 'todos'
   });
 
   useEffect(() => {
@@ -105,6 +110,8 @@ export const Accounts = () => {
     if (filtros.oportunidade !== 'todas') params.set('oportunidade', filtros.oportunidade);
     if (filtros.atividade !== 'todas') params.set('atividade', filtros.atividade);
     if (filtros.play !== 'todos') params.set('play', filtros.play);
+    if (filtros.blocoCInteracoes !== 'todos') params.set('blocoCInteracoes', filtros.blocoCInteracoes);
+    if (filtros.blocoCPlays !== 'todos') params.set('blocoCPlays', filtros.blocoCPlays);
     params.set('view', visualizacao);
     params.set('sort', ordenacao);
     router.replace(`${pathname}?${params.toString()}`);
@@ -158,6 +165,21 @@ export const Accounts = () => {
       if (filtros.oportunidade === 'sem' && c.possuiOportunidade) return false;
       if (filtros.atividade !== 'todas' && c.atividadeRecente.toLowerCase() !== filtros.atividade) return false;
       if (filtros.play !== 'todos' && c.playAtivo.toLowerCase() !== filtros.play) return false;
+
+      // FILTROS BLOCO C (Supersede ou complementa os manuais)
+      const signals = blocoCSignals[c.id];
+      if (filtros.blocoCInteracoes === 'com' && (!signals || signals.interactionsCount === 0)) return false;
+      if (filtros.blocoCInteracoes === 'sem' && signals && signals.interactionsCount > 0) return false;
+      if (filtros.blocoCInteracoes === 'recente') {
+        if (!signals || !signals.lastInteractionDate) return false;
+        const lastDate = new Date(signals.lastInteractionDate);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        if (lastDate < thirtyDaysAgo) return false;
+      }
+      if (filtros.blocoCPlays === 'com' && (!signals || signals.playsCount === 0)) return false;
+      if (filtros.blocoCPlays === 'sem' && signals && signals.playsCount > 0) return false;
+
       return true;
     });
 
@@ -371,6 +393,17 @@ export const Accounts = () => {
         <select value={filtros.oportunidade} onChange={(e) => atualizarFiltro('oportunidade', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todas">Oportunidade: todas</option><option value="com">Com oportunidade</option><option value="sem">Sem oportunidade</option></select>
         <select value={filtros.atividade} onChange={(e) => atualizarFiltro('atividade', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todas">Atividade recente</option><option value="alta">Alta</option><option value="média">Média</option><option value="baixa">Baixa</option></select>
         <select value={filtros.play} onChange={(e) => atualizarFiltro('play', e.target.value)} className="p-2 border rounded-lg text-sm"><option value="todos">Play ativo</option><option value="abm">ABM</option><option value="abx">ABX</option><option value="híbrido">Híbrido</option></select>
+        <select value={filtros.blocoCInteracoes} onChange={(e) => atualizarFiltro('blocoCInteracoes', e.target.value as Filtros['blocoCInteracoes'])} className="p-2 border border-blue-200 bg-blue-50/10 rounded-lg text-sm font-medium">
+          <option value="todos">Bloco C: Interações (todas)</option>
+          <option value="com">Com Interações</option>
+          <option value="sem">Sem Interações</option>
+          <option value="recente">Engajamento Recente (30d)</option>
+        </select>
+        <select value={filtros.blocoCPlays} onChange={(e) => atualizarFiltro('blocoCPlays', e.target.value as Filtros['blocoCPlays'])} className="p-2 border border-blue-200 bg-blue-50/10 rounded-lg text-sm font-medium">
+          <option value="todos">Bloco C: Plays (todos)</option>
+          <option value="com">Com Plays Ativos</option>
+          <option value="sem">Sem Plays Ativos</option>
+        </select>
         <button onClick={() => setFiltros(filtrosIniciais)} className="p-2 border rounded-lg text-sm font-semibold text-slate-600">Limpar filtros</button>
       </section>
 
