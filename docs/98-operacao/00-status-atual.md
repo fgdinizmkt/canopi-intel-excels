@@ -465,8 +465,10 @@
 
 ## Próximo Passo
 
-- **Marco Funcional:** Recorte 61 (Build Stable — Sanitização Bloco C) publicado em origin/main
-- **Status da Infra:** Fase E consolidada. Account Profile BUILD-STABLE e com dados sanitizados para migração Supabase.
+- **Marco Funcional:** Último commit publicado: `8762ae4` — Refinamento Accounts subetapas 1–4c concluído.
+- **Status da Infra:** Fase E consolidada. Bloco C infra + seed publicados. Consumo UI do Bloco C publicado. AccountProfile/ContactProfile com paridade funcional aprovada e fechada. Refinamento de Accounts (8 subetapas) publicado.
+- **Pendência funcional:** E21 — Population Real do Bloco C no Supabase remoto (não iniciado).
+- **Pendência local (congelada):** 3 arquivos modificados em working tree (`accountsRepository.ts`, `Accounts.tsx`, `Overview.tsx`) aguardando revisão e decisão de commit.
 - **Recorte 42:** Concluído como **especificação visual documental**. Nenhum código alterado. Implementação bloqueada pela régua de risco zero.
   - Especificação em: `docs/98-operacao/07-especificacoes-visuais.md`
   - Commit de referência (não publicado): `e374cca` (descartado via `git reset`)
@@ -537,3 +539,6 @@
 | Supabase E20: Canais e Campanhas | Recorte 51 Concluído (Fase E) | Leitura + merge + escrita defensiva de `canaisCampanhas` com JSON.parse barreira canônica e validação de shape |
 | Consolidação Seed Bloco C | Concluído (2026-04-13) | População determinística de `campaigns`, `interactions` e `play_recommendations`. Artefato JSON versionado. |
 | Supabase Bloco C Infra | Concluído (2026-04-13) | Migration SQL, Repositories defensivos (CAM/INT/PLAY) e script de importação idempotente materializados. |
+| Bloco C Consumo UI | Concluído (2026-04-13/14) | Board (Kanban), filtros operacionais, recência, volume agregado em Accounts. Indicadores executivos em Overview. Timeline com eventos em AccountDetail. Commits: `9612b2b` a `27d4e68`. |
+| AccountProfile & ContactProfile Parity | Concluído e Fechado (2026-04-14) | Materialização de páginas dedicadas com Radar Relacional, Fila de Fogo Ativa, Timeline 360, Score Rationale, Portfólio & Whitespace. CTAs operacionais via createAction(). Build Exit 0. Commit final: `ee3957f`. Freeze documental: `6cb5eaf`. |
+| Refinamento Accounts — Subetapas 1–4c | Concluído (2026-04-14) | 8 commits de refinamento progressivo (visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls). Commit final publicado: `8762ae4`. |

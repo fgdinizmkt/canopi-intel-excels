@@ -1,9 +1,9 @@
-# Checkpoint Atual — Recorte 60 (Restauração de Paridade Aprovada) Publicado
+# Checkpoint Atual — Estado Real do main (2026-04-14)
 
 ## Estado de Partida
 - **Branch:** `main` (sincronizada em 2026-04-14)
-- **Marco Funcional:** Recorte 60 (Commit `ee3957f`) publicado em origin/main
-- **Status da Infra:** Fase E (E1–E20) consolidada. Paridade funcional dos perfis de Conta e Contato aprovada e fechada.
+- **HEAD real publicado:** `8762ae4` — `feat(accounts): apply 4c list volume and hygiene controls`
+- **Status da Infra:** Fase E (E1–E20) consolidada. Bloco C infra + seed publicados. Consumo UI do Bloco C publicado. Paridade funcional dos perfis aprovada e fechada. Refinamento Accounts (8 subetapas) publicado.
 
 ## 1. Recortes Concluídos (Fase E)
 
@@ -172,12 +172,38 @@
   - ✅ **Build**: Exit 0 em produção.
   - **Commit Final:** `ee3957f` em `origin/main`.
 
-## O que está pendente
-- Reconciliação final de escrita para Bloco C (E21).
+## 3. Marcos Pós-Paridade (Publicados — pós ee3957f)
+
+Esses marcos foram publicados em `origin/main` mas não estavam refletidos neste documento até esta reconciliação (2026-04-14).
+
+- ✅ Accounts refinamento subetapas 1–4c (8 commits): visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls.
+  - Commits: `efc3fba` → `8762ae4` (HEAD atual).
+  - Inclui: restore funcional (`c0e9578`), layout consolidation (`a8e1282`), fix JSX (`a5a28d1`), sanitize accountsData (`a9c29fc`), docs governance (`c69d7c0`, `6cb5eaf`).
+
+## 4. Pendência Local Congelada (NÃO publicada)
+
+> **Status: CONGELADA — aguarda decisão do Orquestrador**
+
+Os seguintes arquivos estão modificados no working tree local, NÃO commitados e NÃO publicados:
+
+- `src/lib/accountsRepository.ts` — +19 linhas (expansão defensiva)
+- `src/pages/Accounts.tsx` — +20 linhas (hygiene controls)
+- `src/pages/Overview.tsx` — +24 linhas (helpers `getInitials()`, `getAccountContext()`, guards defensivos)
+
+Essas mudanças representam o material conhecido como "último refinamento local" e estão aguardando revisão e aprovação formal antes de qualquer commit.
+
+Não existem "Restauração Funcional Crítica" nem "Recorte 61" publicados. Qualquer referência a esses termos no histórico anterior era estado documental inválido — agora eliminada nesta reconciliação.
 
 ## Próximo Passo Exato
-**População Real do Bloco C**: Executar a migration/import do Bloco C no Supabase remoto e iniciar o consumo dos novos repositórios na UI do Cockpit.
+
+**Decisão pendente do Orquestrador:**
+
+- **Opção A (Higiene):** Revisar, aprovar e commitar as 3 mudanças locais.
+- **Opção B (E21):** Executar migration SQL do Bloco C no Supabase remoto + import do seed + validação do consumo na UI.
+- **Opção C (Documental):** Registrar entradas dos marcos pós-ee3957f em `00-status-atual.md` (concluído agora) e finalizar log de sessões.
+- **Opção D (Nova frente):** Definir próximo recorte funcional.
 
 ---
-*Último estado funcional confirmado: Infraestrutura Supabase Bloco C (2026-04-13)*
-*Documentação: 11-trilha-supabase-bloco-c.md materializada*
+*Reconciliação documental: 2026-04-14T19:50 BRT*
+*Último commit real: `8762ae4` — origin/main*
+*Documentos sinc: 00-status-atual.md, 05-handoff-atual.md, 06-checkpoint-atual.md*

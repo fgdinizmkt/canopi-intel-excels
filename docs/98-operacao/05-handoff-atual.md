@@ -1,72 +1,107 @@
 # 05 - Handoff atual
 
-## Estado atual
-- **Fase:** Fase 9 — Data Intelligence & Scale
-- **Último trabalho concluído:** Hotfix de Chat — Scroll overflow resolvido e validado em navegador
-- **Últimos commits relevantes:** 
-  - `18b8d8b` (fix(chat): corrige overflow e scroll do Assistant no container do Card) — Validado em navegador
-  - `f9cf7a7` (feat(plays): adiciona bloco de plays recomendados com derivação inteligente)
-  - `6fff541` (feat(copiloto): integra inteligência operacional enriquecida no Assistente)
-  - `7fdce40` (fix(overview): cleanup técnico — memoização, anomalias e derivações)
-  - `05c36c8` (feat(overview): consolidação inteligente — Performance + Actions Intelligence)
-  - `27bdd69` (feat(data): reconciliação explícita de datasets — vinculação accountId/relatedAccountId)
-  - `1e7bf81` (feat(performance): adiciona leitura dinamica por canal e origem)
-  - `3fbf890` (feat(actions): adiciona deteccao operacional de anomalias na fila)
-- **Data:** 2026-04-06
-- **Ambiente:** Next.js 15 App Router / main íntegra (Build 100% OK, 42.5 kB Assistant, 6.86 kB Overview)
-- **Idioma Operacional:** Português do Brasil (Regra Mandatória 04-regras-do-processo.md :: Seção 8)
+## Estado atual — 2026-04-14
 
-## Status de Qualidade (Auditado)
-- **Saneamento Técnico:** Zeragem de classes legadas (`perf-*`) e estilos inline em `Performance.tsx`, `ABXOrchestration.tsx` e `Outbound.tsx`.
-- **Governança de Estilos:** Implementação de `colorMap` e `cx` como padrão de conformidade com Tailwind v4.
-- **Performance:** Memoização ativa e redução de dívida técnica visual.
-- **Build:** 100% Íntegro. `npm run build` validado (Exit 0) após cada recorte.
+- **Branch:** `main` — sincronizada com `origin/main`
+- **Último commit em origin/main:** `8762ae4` — `feat(accounts): apply 4c list volume and hygiene controls`
+- **Status do build:** BUILD-STABLE (Exit 0 confirmado em todos os recortes publicados)
+- **Idioma Operacional:** Português do Brasil (Seção 8 de `04-regras-do-processo.md`)
+
+---
+
+## Histórico Macro — O que foi entregue (Cronológico)
+
+### Fase E — Supabase Migration & Scale (Concluída)
+- **E1–E5 (Recortes 22–25):** Leitura defensiva de Accounts, Signals, Contacts, Actions.
+- **E6–E9C (Recortes 26–36):** Escrita defensiva e narrativas em Actions, Signals, Contacts, Accounts. Padrão atômico `1 snapshot → 1 setState → 1 persist` consolidado.
+- **E10A/E10B (Recortes 30–31):** ABM + ABX Repository layers (read-only).
+- **E11A/E11B (Recortes 32–33):** Escrita defensiva em ABM — `tipoEstrategico` e `playAtivo`.
+- **E12/E13 (Recortes 40–41):** Narrativas estratégicas em ABM + ABX.
+- **E14/E15 (Recortes 45–46):** Leitura + Escrita defensiva de Oportunidades.
+- **E16 (Recorte 47):** Ciclo completo de Inteligência Acumulada (`inteligencia`).
+- **E17/E18/E19/E20 (Recortes 48–51):** Leitura Estruturada, Histórico Operacional, Tecnografia, Canais & Campanhas.
+- **Recorte 52 (Documental):** Fechamento canônico da Fase E. Mapa de cobertura reconciliado.
+
+### Fase Scoring (Recortes 53–56) — Publicado
+- **Recorte 53:** `calculateAccountScore()` em `scoringRepository.ts` — 5 dimensões.
+- **Recorte 54:** Grid 4-cards em Overview.tsx (Críticas, Altas Prioridades, Alto Potencial, Top Oportunidades).
+- **Recorte 55:** `deriveProximaMelhorAcao()` — recomendação determinística por score.
+- **Recorte 56:** `deriveAcaoOperacional()` — ActionItem derivado do score, entra na fila local.
+- **Commits:** `1825db0`, `fc1923f`, `b328523`, `81447b4`
+
+### Bloco C — Seed + Infraestrutura Supabase (Publicado)
+- Seed canônico consolidado: 13 campanhas, 217 interações, 65 play_recommendations.
+- Migration SQL em `supabase/migrations/20260413000000_bloco_c.sql`.
+- Repositories defensivos: `campaignsRepository.ts`, `interactionsRepository.ts`, `playRecommendationsRepository.ts`.
+- Script de importação idempotente: `scripts/supabase/importBlockCSeed.ts`.
+- **Commits relevantes:** `37c49e0`, `91043a6`, `458da13`
+
+### Bloco C — Consumo na UI (Publicado)
+- **Consumer Accounts:** filtros, recência, volume agregado e Board (Kanban) com sinais Bloco C.
+- **Consumer Overview:** Indicadores executivos derivados de campanhas + interações do Bloco C.
+- **Consumer AccountDetail:** Timeline com eventos do Bloco C integrada.
+- **Commits:** `f3b6343`, `f8376a8`, `1a9381b`, `6a9c413`, `27d4e68`
+
+### Paridade Funcional — AccountProfile & ContactProfile (Aprovado e Fechado)
+- Nova página dedicada `AccountProfile.tsx`: Radar Relacional, Fila de Fogo Ativa, Score Rationale, Timeline 360, Portfólio & Whitespace, Contexto Compacto (Origem/Influência).
+- CTAs da Fila de Fogo operacionais: injetam ações reais via `createAction()`.
+- `ContactProfile.tsx`: paridade operacional, navegação Empresa → Contato religada.
+- Build EXIT 0 após sanitização de `accountsData.ts` e correções JSX.
+- **Commit Final:** `ee3957f`, `a9c29fc`, `6cb5eaf`, `c69d7c0`
+
+### Refinamento Accounts.tsx — Subetapas 1–4 (Publicado)
+- Subetapa 1 (`efc3fba`): Visual direction refinement.
+- Subetapa 2 (`4eaa3a4`): Ergonomic refinement.
+- Subetapa 3 (`9d1cd85`): Shortcut contextualization.
+- Subetapas 4a/4b/4c (`9dca7c7`, `5dde7e3`, `8762ae4`): List readability, play simplification, volume & hygiene controls.
+- **Último commit publicado:** `8762ae4`
+
+---
+
+## Estado do Working Tree (2026-04-14)
+
+**3 arquivos modificados localmente, não commitados:**
+- `src/lib/accountsRepository.ts`
+- `src/pages/Accounts.tsx`
+- `src/pages/Overview.tsx`
+
+**Natureza das mudanças (diff auditado):**
+- `Overview.tsx`: Guards defensivos (`conta.nome || 'Conta'`) + helper `getAccountContext()` substituindo template string inline + `getInitials()` substituindo `.substring(0, 2)` bruto em avatares.
+- `Accounts.tsx`: Mudanças relacionadas às subetapas recentes (hygiene controls).
+- `accountsRepository.ts`: Expansão defensiva do repositório (+19 linhas).
+
+**⚠️ Decisão pendente:** Essas mudanças precisam ser revisadas, aprovadas e commitadas antes de avançar para o próximo recorte.
+
+---
+
+## Pendências Abertas
+
+1. **Commit das mudanças locais** — 3 arquivos modificados aguardam revisão e commit.
+2. **Reconciliação do Bloco C no Supabase remoto** — Migration e import do seed Bloco C ainda não foram executados no Supabase de produção (E21 pendente).
+3. **Documentação** — `00-status-atual.md` e `06-checkpoint-atual.md` precisam de entrada para os recortes de Bloco C consumo + Refinamento Accounts + AccountProfile parity.
+
+---
+
+## Próximo Passo Exato
+
+**Opção A (Higiene imediata):** Revisar, aprovar e commitar as 3 mudanças locais pendentes.
+
+**Opção B (Próxima frente macro — E21):** Executar a migration SQL do Bloco C no Supabase remoto real e validar o consumo dos novos repositories na UI.
+
+**Opção C (Novas features):** Definir Recorte 61 — expansão de inteligência, UX refinements ou nova frente.
+
+---
 
 ## Regras obrigatórias (Reforço)
-1. Manter a disciplina de `npm run build` antes de cada commit de fechamento de recorte.
-2. Toda comunicação operativa deve ser em **Português do Brasil**.
-3. Preservar o histórico completo nos documentos de operação.
-4. Não introduzir estilos inline em componentes já migrados para Tailwind.
 
-## O que foi entregue (Recortes 9 a 15 — Fase 9 + Fixes)
-1.  **Saneamento PaidMedia.tsx:** Migração integral para Tailwind v4 utilitário e zeragem de 100% dos estilos estáticos (`Exit 0`).
-2.  **Saneamento SeoInbound.tsx:** Migração integral para Tailwind v4 utilitário e estabilização de build (`Exit 0`).
-3.  **Saneamento Performance.tsx:** Migração integral para Tailwind v4 e zeragem de ~240 blocos de estilo inline (mantidas 31 instâncias dinâmicas justificadas).
-4.  **Saneamento ABXOrchestration.tsx:** Redução de 6 para 2 ocorrências de `style={{` (apenas larguras dinâmicas legítimas).
-5.  **Saneamento Outbound.tsx:** Reescrita integral para eliminar 100% das interpolações de classe e reduzir `style={{` a 1 única ocorrência legítima.
-6.  **Inteligência de Performance (Canais/Origens):** Substituição de mocks estáticos por derivação dinâmica em `Performance.tsx`. Pipeline e conversão (critério `resolved`) agora são factuais e auditáveis. Zeragem de `Math.random()`.
-7.  **Reconciliação de Datasets:** Linking explícito entre `advancedSignals` (accountId), `initialActions` (relatedAccountId), e `contasMock` (reconciliationStatus). Três camadas canônicas independentes com linking sem destructive merge.
-8.  **Overview.tsx Consolidada (Opção B):** Painel de controle inteligente integrando Performance + Actions. 6 KPIs dinâmicos, 4 anomalias operacionais detectadas, hierarquia visual coerente, exclusão de contas 'vazia', memoização ativa.
-9.  **Copiloto Operacional Real (Opção 3):** Helper `operationalIntelligence.ts` consolidando toda inteligência. Integração no Assistant.tsx com card de Prioridades Imediatas. Enriquecimento de `src/app/api/chat/route.ts` com 5 blocos de contexto operacional injetados na system instruction. Assistant responde melhor: 1) atenção, 2) risco, 3) melhoria, 4) play, 5) foco.
-10. **Plays Recomendados (Recorte 15):** Função `deriveRecommendedPlays()` que gera até 4 recomendações explícitas baseadas em padrões detectados (Ghosting→Atribuição, Cascata→Destravamento, Congestionamento→Redistribuição, Vazão→Desbloqueio, Conta em Risco→Intervenção, Sinal Crítico→Ativação). Bloco visual com cards responsivos, cores por urgência, botões "Chat" e "Copiar". Fecha loop: inteligência → ação.
-11. **Hotfix Chat Overflow & Scroll:** Correção estrutural em Assistant.tsx para respostas longas. Problema raiz: Card renderiza com `overflow-hidden`, bloqueava scroll interno. Solução: Adiciona `!overflow-y-auto !overflow-x-hidden` ao Card (sobrescreve base). Ajusta padding granular (Card `p-0`, seções com `px-6 pb-6`). Melhora prose spacing (`my-2`/`my-3`) e destaque visual. Validado em navegador: scrollbar funciona, texto completo visível, input acessível. Commit: `18b8d8b`.
-12. **Assistant Orquestrador (Recorte 16):** Evolução do Assistant de chat puro para orquestrador operacional com cards acionáveis. Backend: expansão OperationalContext com availableEntities, tipos ResponseCard (4 variantes), parser extractCards(), instrução expandida (ENTIDADES + GERAÇÃO DE CARDS), retorno { text, cards? }. Frontend: validação rigorosa de cards contra entidades reais, checkActionDuplicate() para prevenção de duplicação, handleCreateAction() para criar novas ações, renderResponseCards() com 4 tipos (existing_account/signal/action → deep links; new_action → FlowStrip + criação). Cards renderizados abaixo de mensagens do assistant. Build: Exit 0, zero inline styles, parser defensivo. Commit: `fe9d5f9`. Status: commitado localmente, aguardando aprovação.
+1. `npm run build` obrigatório antes de cada commit de fechamento de recorte (Exit 0).
+2. Toda comunicação operativa em **Português do Brasil**.
+3. Preservar histórico completo nos documentos de operação.
+4. Não introduzir estilos inline em componentes já migrados para Tailwind v4.
+5. Nenhum recorte funcional avança sem aprovação formal do Orquestrador.
 
-## Pendências e Observações (Auditado)
-1.  **Warnings Recharts:** Alertas de `width(-1)` estabilizados em `SeoInbound.tsx` e `PaidMedia.tsx` via `ClientOnly`.
-
-## Próximos passos (Fase 9 — Continuação)
-- **Estado Anterior:** Recorte 15 (Plays) publicado em origin/main. Hotfix Chat (scroll overflow) publicado (`18b8d8b`).
-- **Estado Atual (Recorte 16 em Desenvolvimento):** Assistant Orquestrador — Cards de Ação e Encaminhamento (commitado localmente, build validado, awaiting approval).
-- **Recorte 16 Status:** ✅ Build Exit 0 (44.8 kB Assistant, +2.3 kB por nova lógica de cards). ✅ Cards validados contra entidades reais. ✅ Duplicação de ações prevenida. ✅ FlowStrip visual enxuto. ✅ Zero inline styles.
-- **Working Tree:** Limpa com 1 commit novo (`fe9d5f9`), 1 commit ahead of origin/main.
-- **Pipeline Evoluído:** Inteligência Operacional → Plays Recomendados → Chat Hotfix → **Cards Acionáveis (orquestração operacional)**. Assistant passa de chat puro a orquestrador com encaminhamento claro para itens existentes + criação de novas ações.
-
-## Recomendações para próximo recorte (Fase 10)
-1. **Validação UX de Cores:** Verificar se amber/orange (Prioridades) e red/orange/blue (Plays) oferecem contraste suficiente e clareza.
-2. **Teste de Fluxo Chat→Input:** Confirmar que "Chat" preenchendo input seja intuitivo. Considerar auto-focus após clique.
-3. **Limite de Plays:** Monitorar se 4 é o número ideal ou se deve variar com context (mobile: 1-2, desktop: 3-4).
-4. **Enriquecimento Futuro:** Adicionar botão "Investigar" que abre detalhes da anomalia. Considerar histórico de plays.
-5. **Métricas:** Rastrear taxa de clique em "Chat" vs "Copiar" para otimizar UX de engajamento.
-
-## Próximos Recortes Sugeridos (Ordem Canônica)
-1. **Validação A/B de UX:** Testar se cores de urgência realmente melhoram clareza.
-2. **Investigação Detalhada:** Botão "Investigar" que expande contexto da anomalia.
-3. **Histórico de Plays:** Rastrear quais plays foram usados, clicados, ignorados.
-4. **Automação de Play:** Considerar "Executar Automaticamente" para plays de baixa complexidade.
+---
 
 > [!IMPORTANT]
 > **Governança Operacional: Ordem Canônica**
 > Deve-se respeitar rigorosamente a sequência de fases e recortes definida nos documentos de roadmap e handoff. É expressamente proibido pular recortes, antecipar execuções futuras ou tratar recomendações técnicas como recortes já iniciados sem aprovação formal.
-- **Consistency Check:** colorMap estendido para anomalia types (`Ghosting`, `Vazão`, `Congestionamento`, `Cascata`) + urgency levels (`crítica`, `alta`, `média`) em próximo recorte, se necessário.
-- **Sincronização:** ✅ Main sincronizada com origin/main (Recorte 15 + Hotfix Chat publicados).

@@ -5,6 +5,33 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-14] — Reconciliação de Memória Operacional & Handoff
+
+- **Natureza:** Sessão puramente documental e de auditoria. Nenhum arquivo de `src/` alterado.
+- **Objetivo:** Auditar o estado real do repositório `origin/main` e reconciliar todos os documentos operacionais após lacuna de sessão pós-recortes de Bloco C e Refinamento Accounts.
+
+**Auditoria Executada:**
+- `git log` revisado: 30+ commits analisados desde `ba849e7` (reconciliação 53–56) até `8762ae4` (HEAD atual).
+- **Commits pós-última reconciliação identificados:**
+  - `f3b6343` a `27d4e68`: Série de consumo do Bloco C na UI (Board Kanban, filtros, recência, indicadores Overview, timeline AccountDetail).
+  - `9063a41` a `a9c29fc`: Materialização de AccountProfile.tsx + ContactProfile.tsx (paridade funcional aprovada e fechada).
+  - `c69d7c0`, `6cb5eaf`: Documentação de governança e congelamento do estado de paridade.
+  - `efc3fba` a `8762ae4`: 8 commits de refinamento de Accounts.tsx (subetapas 1–4c).
+- **Working Tree:** 3 arquivos modificados não commitados (`accountsRepository.ts` +19 linhas, `Accounts.tsx` +20 linhas, `Overview.tsx` +24 linhas com helpers defensivos).
+
+**Documentos Atualizados:**
+- `05-handoff-atual.md`: Reescrito completamente com estado real de 2026-04-14.
+- `03-log-de-sessoes.md`: Esta entrada.
+
+**Decisões Consolidadas:**
+- Working tree com 3 arquivos modificados precisa de revisão e commit antes do próximo recorte.
+- Próximo passo macro: commit das mudanças locais OU execução do E21 (migration Bloco C no Supabase remoto).
+- `00-status-atual.md` e `06-checkpoint-atual.md` precisam de entradas para Bloco C consumo + AccountProfile parity.
+
+**Status:** ✅ Memória operacional auditada. Próxima frente aguarda decisão do Orquestrador.
+
+---
+
 ## [2026-04-13] — Recortes 53–56: Camada de Priorização Derivada — Publicados
 
 **Contexto:** Quatro recortes publicados em origin/main (commits `1825db0`, `fc1923f`, `b328523`, `81447b4`). Documentação operacional aguardando reconciliação (Recorte 57, em proposta).
