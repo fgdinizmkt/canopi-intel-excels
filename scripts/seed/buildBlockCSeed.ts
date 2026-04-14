@@ -225,8 +225,9 @@ export function createInteraction(overrides: Partial<Interaction>): Interaction 
 export function createPlayRecommendation(
   overrides: Partial<PlayRecommendation>
 ): PlayRecommendation {
+  // NOTE: 'id' MUST be provided in overrides (no dynamic generation)
   const defaults: PlayRecommendation = {
-    id: `play_rec_${Date.now()}`,
+    id: 'PLACEHOLDER_ID', // MUST be overridden
     accountId: '',
     playId: 'play_abm_entry_bi',
     playName: 'ABM Entry — BI & Analytics',
@@ -241,6 +242,11 @@ export function createPlayRecommendation(
     successProbability: 60,
     nextStepDescription: 'Schedule initial discovery call',
   };
+
+  if (!overrides.id || overrides.id === 'PLACEHOLDER_ID') {
+    throw new Error('createPlayRecommendation: id must be provided in overrides (no dynamic IDs)');
+  }
+
   return { ...defaults, ...overrides };
 }
 
@@ -556,6 +562,230 @@ function populateCampaigns(): Campaign[] {
   return campaigns;
 }
 
+function getInteractionsByAccount(interactions: Interaction[]): Map<string, Interaction[]> {
+  const map = new Map<string, Interaction[]>();
+  for (const interaction of interactions) {
+    if (!map.has(interaction.accountId)) {
+      map.set(interaction.accountId, []);
+    }
+    map.get(interaction.accountId)!.push(interaction);
+  }
+  return map;
+}
+
+function populatePlayRecommendations(interactions: Interaction[]): PlayRecommendation[] {
+  const recommendations: PlayRecommendation[] = [];
+  const interactionsByAccount = getInteractionsByAccount(interactions);
+  const owners = ['Mariana Costa', 'Leandro Silva', 'Paula Nogueira'];
+  let playCounter = 0;
+
+  // Iterate over all accounts to determine eligible plays
+  for (const account of contasMock) {
+    const interactionsForAccount = interactionsByAccount.get(account.id) || [];
+    const highRisk = account.risco >= 60;
+    const highPotential = account.potencial >= 75;
+    const lowPotential = account.potencial < 50;
+    const isABM = account.tipoEstrategico === 'ABM';
+    const isABX = account.tipoEstrategico === 'ABX';
+    const isEarlyStage = ['Prospecção', 'Descoberta'].includes(account.etapa);
+    const isProposal = account.etapa === 'Proposta';
+    const isExpansion = account.etapa === 'Expansão';
+
+    // Count interactions by type for this account
+    const interactionCounts: Record<string, number> = {};
+    for (const int of interactionsForAccount) {
+      interactionCounts[int.interactionType] = (interactionCounts[int.interactionType] || 0) + 1;
+    }
+
+    const demoCount = interactionCounts['demo'] || 0;
+    const meetingCount = interactionCounts['meeting'] || 0;
+    const inboundCount = (interactionCounts['visit'] || 0) + (interactionCounts['download'] || 0) + (interactionCounts['email_open'] || 0);
+
+    // Build list of eligible plays for this account
+    const eligiblePlays: Array<{ playId: string; playType: string; order: number }> = [];
+
+    if (isABM) {
+      // ABM accounts in early stages → entry plays
+      if (isEarlyStage && inboundCount > 0) {
+        eligiblePlays.push({ playId: 'play_abm_entry_bi', playType: 'entry', order: 0 });
+        if (highPotential) {
+          eligiblePlays.push({ playId: 'play_abm_entry_consulting', playType: 'entry', order: 1 });
+        }
+        eligiblePlays.push({ playId: 'play_abm_entry_platform', playType: 'entry', order: 2 });
+      }
+      // ABM in proposal/expansion → engagement
+      if ((isProposal || isExpansion) && meetingCount > 0) {
+        eligiblePlays.push({ playId: 'play_abm_entry_consulting', playType: 'engagement', order: 3 });
+      }
+    }
+
+    if (isABX) {
+      // ABX accounts in advanced stages → expansion plays
+      if ((isProposal || isExpansion) && (demoCount > 0 || meetingCount > 0)) {
+        eligiblePlays.push({ playId: 'play_abx_expansion_upsell', playType: 'expansion', order: 0 });
+        if (highPotential) {
+          eligiblePlays.push({ playId: 'play_abx_expansion_crosssell', playType: 'expansion', order: 1 });
+        }
+      }
+    }
+
+    // High risk → retention play (any type)
+    if (highRisk && meetingCount >= 1) {
+      eligiblePlays.push({ playId: 'play_abx_retention_risk', playType: 'retention', order: 10 });
+    }
+
+    // Low potential but with some engagement → reactivation
+    if (lowPotential && interactionsForAccount.length > 0 && account.prontidao < 50) {
+      // Could add reactivation play if we had one
+    }
+
+    // Sort by order and avoid duplicates
+    eligiblePlays.sort((a, b) => a.order - b.order);
+    const seenPlayIds = new Set<string>();
+
+    // Generate recommendations for eligible plays
+    for (const eligiblePlay of eligiblePlays) {
+      if (seenPlayIds.has(eligiblePlay.playId)) {
+        continue; // Skip duplicate plays
+      }
+      seenPlayIds.add(eligiblePlay.playId);
+
+      const playDef = PlayPool.find(p => p.id === eligiblePlay.playId);
+      if (!playDef) continue;
+
+      const seed = `${account.id}_play_${eligiblePlay.playId}`;
+
+      // Determine readiness, confidence, success probability
+      const readiness = deterministicInt(seed + '_readiness', highPotential ? 65 : 50, highPotential ? 88 : 72);
+      const confidence = deterministicInt(seed + '_confidence', highPotential ? 70 : 55, highPotential ? 88 : 75);
+      const successProb = deterministicInt(seed + '_success', highPotential ? 65 : 50, highPotential ? 85 : 70);
+
+      // Estimate value based on play category and account potential
+      const baseValue = playDef.estimatedValueRange.min;
+      const maxValue = playDef.estimatedValueRange.max;
+      const valueHash = stableHash(seed + '_value');
+      const estimatedValue = baseValue + (valueHash % (maxValue - baseValue + 1));
+
+      // Build rationale from account state and interactions
+      const rationale = buildPlayRationale(account, eligiblePlay.playId, interactionCounts, highPotential);
+
+      // Build key signals from interactions and account state
+      const keySignals = buildKeySignals(account, interactionCounts, eligiblePlay.playId);
+
+      // Owner assignment
+      const ownerSeed = seed + '_owner';
+      const owner = pickDeterministic(owners, ownerSeed);
+
+      // Next step deadline (deterministic, ~4 weeks from now)
+      const startDate = new Date('2026-04-13');
+      const weeksAhead = playDef.idealTimelineWeeks;
+      const deadline = new Date(startDate.getTime() + weeksAhead * 7 * 24 * 60 * 60 * 1000);
+      const deadlineStr = deadline.toISOString().split('T')[0];
+
+      const playId = playCounter++;
+      const recommendation = createPlayRecommendation({
+        id: `play_rec_${account.id}_${eligiblePlay.playId}_${playId}`,
+        accountId: account.id,
+        playId: eligiblePlay.playId,
+        playName: playDef.name,
+        playType: eligiblePlay.playType as any,
+        rationale,
+        keySignals,
+        accountReadiness: readiness,
+        estimatedValue,
+        timelineWeeks: playDef.idealTimelineWeeks,
+        confidenceScore: confidence,
+        isActive: account.etapa !== 'Conclusão' && account.etapa !== 'Arquivado',
+        startedAt: '2026-04-13',
+        successProbability: successProb,
+        nextStepDescription: buildNextStepDescription(eligiblePlay.playId, account),
+        nextStepOwner: owner,
+        nextStepDeadline: deadlineStr,
+      });
+
+      recommendations.push(recommendation);
+
+      // Limit to max 3 plays per account to avoid explosion
+      if (seenPlayIds.size >= 3) {
+        break;
+      }
+    }
+  }
+
+  return recommendations;
+}
+
+function buildPlayRationale(
+  account: any,
+  playId: string,
+  interactionCounts: Record<string, number>,
+  isHighPotential: boolean
+): string {
+  const demoCount = interactionCounts['demo'] || 0;
+  const meetingCount = interactionCounts['meeting'] || 0;
+  const inboundCount = (interactionCounts['visit'] || 0) + (interactionCounts['download'] || 0);
+
+  if (playId.includes('entry')) {
+    const engagement = inboundCount + demoCount + meetingCount;
+    return `Account shows strong ${account.tipoEstrategico} engagement (${engagement} touchpoints). Ready for structured entry play based on demonstrated interest and fit.`;
+  } else if (playId.includes('expansion')) {
+    return `${account.nome} is in ${account.etapa} stage with proven success history. Expansion opportunity aligns with growth trajectory and existing relationship strength.`;
+  } else if (playId.includes('retention')) {
+    return `Account shows risk signals (score: ${account.risco}) but has demonstrated value. Targeted retention play with executive engagement recommended to mitigate churn risk.`;
+  }
+
+  return `Strategic recommendation based on account state (${account.etapa}) and engagement pattern.`;
+}
+
+function buildKeySignals(
+  account: any,
+  interactionCounts: Record<string, number>,
+  playId: string
+): string[] {
+  const signals: string[] = [];
+
+  if (account.potencial >= 75) {
+    signals.push('High strategic potential');
+  }
+
+  const demoCount = interactionCounts['demo'] || 0;
+  if (demoCount >= 1) {
+    signals.push('Product demo scheduled/completed');
+  }
+
+  const meetingCount = interactionCounts['meeting'] || 0;
+  if (meetingCount >= 1) {
+    signals.push('Executive alignment meeting completed');
+  }
+
+  const inboundCount = (interactionCounts['visit'] || 0) + (interactionCounts['download'] || 0);
+  if (inboundCount >= 2) {
+    signals.push('Strong inbound engagement');
+  }
+
+  if (playId.includes('entry')) {
+    signals.push('Fit-gap analysis supports move to next stage');
+  } else if (playId.includes('expansion')) {
+    signals.push('Current contract performance validates expansion readiness');
+  } else if (playId.includes('retention')) {
+    signals.push('Risk mitigation requires immediate executive attention');
+  }
+
+  return signals.slice(0, 5); // Max 5 signals
+}
+
+function buildNextStepDescription(playId: string, account: any): string {
+  if (playId.includes('entry')) {
+    return `Schedule discovery workshop with ${account.nome} stakeholders to validate use case and define scope.`;
+  } else if (playId.includes('expansion')) {
+    return `Prepare expansion proposal highlighting new capability ROI for ${account.nome} organization.`;
+  } else if (playId.includes('retention')) {
+    return `Executive win-back meeting with ${account.nome} C-level to address concerns and lock retention.`;
+  }
+
+  return `Schedule alignment call to discuss next steps with ${account.nome}.`;
+}
+
 function populateInteractions(): Interaction[] {
   const interactions: Interaction[] = [];
   let interactionCounter = 1;
@@ -665,7 +895,7 @@ function populateInteractions(): Interaction[] {
 export function buildBlockCSeed(): BlockoCCanonical {
   const campaigns = populateCampaigns();
   const interactions = populateInteractions();
-  const playRecommendations: PlayRecommendation[] = [];
+  const playRecommendations = populatePlayRecommendations(interactions);
 
   const interactionTypesCount: Record<string, number> = {};
   for (const interaction of interactions) {
