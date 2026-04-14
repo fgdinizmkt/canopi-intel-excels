@@ -78,7 +78,7 @@ const OrgNode = ({ contact, level, isRoot, onSelect }: { contact: ContatoConta; 
 
 export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
   const router = useRouter();
-  const { createAction, sessionActions } = useAccountDetail();
+  const { createAction, sessionActions, sessionLogs } = useAccountDetail();
   
   // -- CONSOLIDATED DATA STATE --
   const [account, setAccount] = useState<Conta | null>(null);
@@ -238,10 +238,8 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     );
   }, [account, renderTree]);
 
-  // -- TIMELINE 360 UNIFICADA (RECORTE 2) --
   const unifiedTimeline = useMemo(() => {
     if (!account) return [];
-    const { sessionLogs } = useAccountDetail(); // Re-accessing for the memo logic
     const logs = sessionLogs[account.id] || [];
     
     const combined = [
@@ -514,25 +512,47 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             </div>
           </section>
 
-          {/* Canais & Campanhas */}
+          {/* Canais, Origem & Campanhas (Compact Context) */}
           <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
              <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Link2 className="w-16 h-16 text-violet-400" />
              </div>
-             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <Link2 className="w-4 h-4 text-violet-400" /> Campanhas & Touchpoints
-             </h3>
-             <div className="space-y-4">
-                {account.canaisCampanhas.influencias.slice(0, 3).map((inf, i) => (
-                   <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
-                      <div className="flex items-center justify-between mb-1.5">
-                         <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
-                         <span className="text-[8px] text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                      <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
-                      <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
+             
+             <div className="mb-6 space-y-4">
+                <div>
+                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                       <Globe className="w-3 h-3 text-blue-500" /> Origem da Conta
+                   </span>
+                   <p className="text-xs font-black text-blue-100 italic">&quot;{account.canaisCampanhas.origemPrincipal}&quot;</p>
+                </div>
+                <div className="pt-4 border-t border-slate-800/50">
+                   <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                      <Zap className="w-3.5 h-3.5 text-violet-400" /> Influência de Canais
+                   </h3>
+                   <div className="flex flex-wrap gap-2">
+                      {account.canaisCampanhas.influencias.map((inf, i) => (
+                         <span key={i} className="px-2 py-1 bg-violet-500/5 border border-violet-500/10 rounded text-[8px] font-black text-violet-400 uppercase tracking-tighter" title={inf.impacto}>{inf.canal}</span>
+                      ))}
                    </div>
-                ))}
+                </div>
+             </div>
+
+             <div className="pt-4 border-t border-slate-800/50">
+                <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                   <Link2 className="w-4 h-4 text-violet-400" /> Touchpoints em Andamento
+                </h3>
+                <div className="space-y-4">
+                   {account.canaisCampanhas.influencias.slice(0, 3).map((inf, i) => (
+                      <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
+                         <div className="flex items-center justify-between mb-1.5">
+                            <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
+                            <span className="text-[8px] text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
+                         </div>
+                         <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
+                         <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
+                      </div>
+                   ))}
+                </div>
              </div>
           </section>
 
@@ -664,65 +684,143 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                                <p className="text-[11px] text-slate-400 italic">"Ativar play de blindagem executiva e alinhar resposta técnica."</p>
                             </div>
                          </div>
-                         <button className="w-full mt-6 py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all">
-                            Ativar Play de Blindagem
-                         </button>
-                      </div>
+                          <button 
+                            onClick={() => {
+                               createAction({
+                                  priority: 'Alta',
+                                  category: 'Operação',
+                                  channel: 'Comercial',
+                                  status: 'Nova',
+                                  title: `Play de Blindagem: ${account.nome}`,
+                                  description: `Ativar resposta técnica e blindagem executiva para mitigar sinal de alto impacto em ${radar.tension[0]?.area || 'área crítica'}.`,
+                                  accountName: account.nome,
+                                  accountContext: account.vertical,
+                                  origin: 'Fila de Fogo: Alerta Crítico',
+                                  relatedSignal: account.sinais[0]?.titulo || 'Sinal detectado pelo Radar',
+                                  suggestedOwner: account.ownerPrincipal,
+                                  ownerTeam: 'SDR/AE',
+                                  slaStatus: 'ok',
+                                  expectedImpact: 'Mantenção de momentum e proteção de stakeholder influente.',
+                                  nextStep: 'Agendar call de resgate tático.',
+                                  history: [],
+                                  buttons: [], // generic
+                                  createdAt: new Date().toISOString()
+                               } as any);
+                               setShowFeedback('Play de Blindagem injetado na fila.');
+                               setTimeout(() => setShowFeedback(null), 3000);
+                            }}
+                            className="w-full mt-6 py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all"
+                          >
+                             Ativar Play de Blindagem
+                          </button>
+                       </div>
 
-                      {/* 카드 2: GAP DE COBERTURA */}
-                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all group">
-                         <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2">
-                               <Users2 className="w-4 h-4 text-blue-500" />
-                               <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Gap de Cobertura</span>
-                            </div>
-                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #2</span>
-                         </div>
-                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
-                            {radar.gaps.length > 0 
-                              ? `Sinal estratégico em ${radar.gaps[0]} sem interlocutor mapeado. Risco de silêncio operacional.` 
-                              : 'Vazios de interlocução em áreas com sinais recentes de tendência.'}
-                         </p>
-                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
-                            <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Área Expansiva</span>
-                               <p className="text-[11px] text-slate-400">{radar.gaps[0] || 'Área sem cobertura'}</p>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
-                               <p className="text-[11px] text-slate-400 italic">"Padrão v6: Abertura via Champion de área adjacente."</p>
-                            </div>
-                         </div>
-                         <button className="w-full mt-6 py-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all">
-                            Infiltrar Champion
-                         </button>
-                      </div>
+                       {/* 카드 2: GAP DE COBERTURA */}
+                       <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all group">
+                          <div className="flex items-center justify-between mb-4">
+                             <div className="flex items-center gap-2">
+                                <Users2 className="w-4 h-4 text-blue-500" />
+                                <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Gap de Cobertura</span>
+                             </div>
+                             <span className="text-[8px] font-black text-slate-600 uppercase">Prio #2</span>
+                          </div>
+                          <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                             {radar.gaps.length > 0 
+                               ? `Sinal estratégico em ${radar.gaps[0]} sem interlocutor mapeado. Risco de silêncio operacional.` 
+                               : 'Vazios de interlocução em áreas com sinais recentes de tendência.'}
+                          </p>
+                          <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                             <div className="flex flex-col gap-1.5">
+                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Área Expansiva</span>
+                                <p className="text-[11px] text-slate-400">{radar.gaps[0] || 'Área sem cobertura'}</p>
+                             </div>
+                             <div className="flex flex-col gap-1.5">
+                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
+                                <p className="text-[11px] text-slate-400 italic">"Padrão v6: Abertura via Champion de área adjacente."</p>
+                             </div>
+                          </div>
+                          <button 
+                            onClick={() => {
+                               createAction({
+                                  priority: 'Média',
+                                  category: 'Mapeamento',
+                                  channel: 'Linkedin',
+                                  status: 'Nova',
+                                  title: `Mapeamento IA: ${radar.gaps[0] || 'Nova Área'}`,
+                                  description: `Infiltrar champion para mapear interlocutores em ${radar.gaps[0] || 'área desejada'}.`,
+                                  accountName: account.nome,
+                                  accountContext: account.vertical,
+                                  origin: 'Fila de Fogo: Gap de Cobertura',
+                                  relatedSignal: 'Ausência de contato em área com sinal de tendência.',
+                                  suggestedOwner: 'IA-System',
+                                  ownerTeam: 'Marketing/SDR',
+                                  slaStatus: 'ok',
+                                  expectedImpact: 'Mapeamento de 100% dos influenciadores da vertical.',
+                                  nextStep: 'Encontrar contatos similares via SalesNav.',
+                                  history: [],
+                                  buttons: [],
+                                  createdAt: new Date().toISOString()
+                               } as any);
+                               setShowFeedback('Mapeamento solicitado.');
+                               setTimeout(() => setShowFeedback(null), 3000);
+                            }}
+                            className="w-full mt-6 py-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all"
+                          >
+                             Infiltrar Champion
+                          </button>
+                       </div>
 
-                      {/* 카드 3: INTELIGÊNCIA CUMULATIVA */}
-                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group">
-                         <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2">
-                               <Zap className="w-4 h-4 text-emerald-500" />
-                               <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Atalhos Operacionais</span>
-                            </div>
-                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #3</span>
-                         </div>
-                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
-                            Contexto atual favorável à replicação de padrão vitorioso: "Alinhamento de ROI com CXO".
-                         </p>
-                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
-                            <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese IA</span>
-                               <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Acelerar via Business Case'}</p>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
-                               <p className="text-[11px] text-slate-400 italic">"Padrão recorrente de destrave na vertical {account.vertical}."</p>
-                            </div>
-                         </div>
-                         <button className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all">
-                            Simular ROI Canopi
-                         </button>
+                       {/* 카드 3: INTELIGÊNCIA CUMULATIVA */}
+                       <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group">
+                          <div className="flex items-center justify-between mb-4">
+                             <div className="flex items-center gap-2">
+                                <Zap className="w-4 h-4 text-emerald-500" />
+                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Atalhos Operacionais</span>
+                             </div>
+                             <span className="text-[8px] font-black text-slate-600 uppercase">Prio #3</span>
+                          </div>
+                          <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                             Contexto atual favorável à replicação de padrão vitorioso: "Alinhamento de ROI com CXO".
+                          </p>
+                          <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                             <div className="flex flex-col gap-1.5">
+                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese IA</span>
+                                <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Acelerar via Business Case'}</p>
+                             </div>
+                             <div className="flex flex-col gap-1.5">
+                                <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
+                                <p className="text-[11px] text-slate-400 italic">"Padrão recorrente de destrave na vertical {account.vertical}."</p>
+                             </div>
+                          </div>
+                          <button 
+                            onClick={() => {
+                               createAction({
+                                  priority: 'Baixa',
+                                  category: 'Vendas',
+                                  channel: 'Reunião',
+                                  status: 'Nova',
+                                  title: `Simulação ROI: ${account.nome}`,
+                                  description: `Agendar apresentação de business case baseado no padrão vitorioso da vertical ${account.vertical}.`,
+                                  accountName: account.nome,
+                                  accountContext: account.vertical,
+                                  origin: 'Fila de Fogo: Atalho Operacional',
+                                  relatedSignal: 'Padrão v6 detectado.',
+                                  suggestedOwner: account.ownerPrincipal,
+                                  ownerTeam: 'AE',
+                                  slaStatus: 'ok',
+                                  expectedImpact: 'Aceleração de ciclo de fechamento.',
+                                  nextStep: 'Preparar deck de ROI customizado.',
+                                  history: [],
+                                  buttons: [],
+                                  createdAt: new Date().toISOString()
+                               } as any);
+                               setShowFeedback('Simulação de ROI agendada.');
+                               setTimeout(() => setShowFeedback(null), 3000);
+                            }}
+                            className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all"
+                          >
+                             Simular ROI Canopi
+                          </button>
                       </div>
                    </div>
                 </section>
@@ -912,7 +1010,13 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                              <td className="py-6 text-center">
                                 <div className="flex flex-col items-center gap-2">
                                    <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] font-black text-slate-400 uppercase border border-slate-800">{c.area}</span>
-                                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${c.status === 'Frio' ? 'bg-slate-800 text-slate-600' : c.status === 'Em Risco' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+                                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${
+                                      c.status === 'Frio' ? 'bg-slate-800 text-slate-600' : 
+                                      c.status === 'Em Risco' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
+                                      c.status === 'A desenvolver' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                                      c.status === 'A mapear' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 border-dashed' :
+                                      'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                   }`}>
                                       {c.status || 'Ativo'}
                                    </span>
                                 </div>
@@ -975,29 +1079,11 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                           <button onClick={handleSaveLeitura} className="w-full py-4 bg-brand text-white text-[11px] font-black uppercase rounded-2xl shadow-xl shadow-brand/20">Persistir Inteligência Estruturada</button>
                        </div>
                     ) : (
-                       <div className="grid grid-cols-4 gap-8">
+                       <div className="grid grid-cols-3 gap-8">
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Origem da Conta</span>
-                             <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                                <p className="text-xs font-black text-white italic">&quot;{account.canaisCampanhas.origemPrincipal}&quot;</p>
-                             </div>
-                             <div className="space-y-3 pt-4">
-                                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Factual (v6)</p>
-                                {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
-                             </div>
-                          </div>
-                          <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-violet-400 uppercase tracking-widest bg-violet-500/5 px-3 py-1.5 rounded-lg border border-violet-500/20 w-max">Influência de Canais</span>
+                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Factual (v6)</span>
                              <div className="space-y-3">
-                                {account.canaisCampanhas.influencias.map((inf, i) => (
-                                   <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
-                                      <div className="flex items-center justify-between mb-1.5">
-                                         <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
-                                      </div>
-                                      <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
-                                      <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
-                                   </div>
-                                ))}
+                                {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
                              </div>
                           </div>
                           <div className="space-y-4">
@@ -1007,7 +1093,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                              </div>
                           </div>
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-max">Recomendações</span>
+                             <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-max">Recomendações</span>
                              <div className="space-y-3">
                                 {localLeitura.sugerida.map((f, i) => <p key={i} className="text-xs text-slate-200 font-bold leading-relaxed border-l-2 border-emerald-500/40 pl-3 group hover:border-emerald-500 transition-all">→ {f}</p>)}
                              </div>
