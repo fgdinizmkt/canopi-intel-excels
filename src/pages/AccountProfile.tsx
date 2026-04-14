@@ -132,6 +132,27 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
   const score = useMemo(() => account ? calculateAccountScore(account) : null, [account]);
 
+  // -- RADAR RELACIONAL LOGIC (PORTED FROM AUDIT) --
+  const radar = useMemo(() => {
+    if (!account) return { tension: [], support: [], gaps: [] };
+    const contatos = account.contatos || [];
+    const sinais = account.sinais || [];
+    
+    const tension = contatos.filter(c =>
+      (c.classificacao.includes('Blocker') || c.influencia > 7) &&
+      sinais.some(s => s.contexto === c.area && s.impacto === 'Alto')
+    );
+    const support = contatos.filter(c =>
+      (c.classificacao.includes('Champion') || c.classificacao.includes('Sponsor')) &&
+      sinais.some(s => s.contexto === c.area && (s.tipo === 'Tendência' || s.tipo === 'Mudança'))
+    );
+    const areasComSinais = Array.from(new Set(sinais.filter(s => s.impacto === 'Alto').map(s => s.contexto)));
+    const areasComContatos = Array.from(new Set(contatos.map(c => c.area)));
+    const gaps = areasComSinais.filter(a => !areasComContatos.includes(a));
+
+    return { tension, support, gaps };
+  }, [account]);
+
   // -- PERSISTENCE HANDLERS --
   const handleSaveLeitura = () => {
     if (!editingLeitura || !account) return;
@@ -217,6 +238,43 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     );
   }, [account, renderTree]);
 
+  // -- TIMELINE 360 UNIFICADA (RECORTE 2) --
+  const unifiedTimeline = useMemo(() => {
+    if (!account) return [];
+    const { sessionLogs } = useAccountDetail(); // Re-accessing for the memo logic
+    const logs = sessionLogs[account.id] || [];
+    
+    const combined = [
+      ...logs.map(text => ({
+        tipo: 'Log Manual',
+        data: new Date().toISOString().split('T')[0], // Placeholder for current session logs
+        descricao: text,
+        icone: 'LogsIcon',
+        color: 'text-blue-500'
+      })),
+      ...interactions.map(int => ({
+        tipo: `Interação (${int.channel})`,
+        data: int.date,
+        descricao: `${int.interactionType.toUpperCase()}: ${int.description}`,
+        icone: 'Activity',
+        color: 'text-emerald-500'
+      })),
+      ...account.historico.map(h => ({
+        tipo: h.tipo,
+        data: h.data.includes('/') ? h.data.split('/').reverse().join('-') : h.data, // normalization
+        descricao: h.descricao,
+        icone: h.icone || 'HistoryIcon',
+        color: 'text-amber-500'
+      }))
+    ].sort((a,b) => b.data.localeCompare(a.data));
+
+    return combined;
+  }, [account, interactions]);
+
+  const accountActions = useMemo(() => {
+    return sessionActions.filter(a => a.accountName === account?.nome);
+  }, [sessionActions, account?.nome]);
+
   if (loading) return <div className="p-10 text-slate-500 font-medium animate-pulse bg-slate-950 min-h-screen">Sincronizando perfil 360 da conta...</div>;
   if (!account) return <div className="p-10 text-slate-500 bg-slate-950 min-h-screen">Conta não encontrada.</div>;
 
@@ -298,16 +356,26 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
               </div>
 
               <div className="pt-6 border-t border-slate-800/50">
-                <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2 flex items-center justify-between">
-                   <span>Radar de Sinais por Dimensão</span>
-                   <PieChart className="w-3 h-3" />
-                </p>
-                <div className="space-y-3">
-                   {score && [
-                     score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca
-                   ].map(dim => <ScoreMiniBar key={dim.name} label={dim.name} val={dim.score} />)}
-                </div>
-              </div>
+                 <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
+                    <span>Priorização Baseada em Racional</span>
+                    <TrendingUp className="w-3.5 h-3.5" />
+                 </p>
+                 <div className="space-y-4">
+                    {score && [
+                      score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca
+                    ].map(dim => (
+                      <div key={dim.name} className="space-y-1.5">
+                        <ScoreMiniBar label={dim.name} val={dim.score} />
+                        <p className="text-[8px] text-slate-500 italic leading-tight pl-1">{dim.rationale}</p>
+                        <div className="flex flex-wrap gap-1 pl-1">
+                           {dim.signals.slice(0, 3).map((sig, idx) => (
+                             <span key={idx} className="text-[7px] text-blue-400 opacity-60">• {sig}</span>
+                           ))}
+                        </div>
+                      </div>
+                    ))}
+                 </div>
+               </div>
             </div>
           </section>
 
@@ -454,55 +522,167 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
           <div className="space-y-8 min-h-[600px]">
             {activeTab === 'operacional' && (
-              <div className="grid grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4">
-                {/* Timeline do Bloco C */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[500px]">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <Layout className="w-4 h-4 text-blue-400" /> Fila de Fogo (Interações)
-                    </h3>
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-3 py-1 rounded-full">{interactions.length} Logs</span>
-                  </div>
-                  <div className="flex-1 overflow-y-auto space-y-8 pr-4 scrollbar-thin">
-                    {interactions.sort((a,b) => b.date.localeCompare(a.date)).map((int, i) => (
-                      <div key={i} className="relative pl-8 border-l-2 border-slate-800 pb-2 group">
-                         <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-full bg-slate-950 border-2 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)] group-hover:scale-110 transition-transform" />
-                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{new Date(int.date).toLocaleDateString('pt-BR')}</span>
-                         <h4 className="text-sm font-black text-slate-100 mt-2">{int.interactionType}</h4>
-                         <p className="text-xs text-slate-400 mt-1 leading-relaxed font-medium">{int.description}</p>
-                         <div className="flex items-center gap-3 mt-4">
-                            <span className="text-[9px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Sinal v6</span>
-                             <span className="text-[9px] font-bold text-slate-600">Projetado: {int.nextStep}</span>
-                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                
+                {/* ── FILA DE FOGO: A PRIORIZAÇÃO ESTRATÉGICA (RESTAURADO) ── */}
+                <section className="relative p-8 bg-gradient-to-br from-red-500/10 to-transparent rounded-[2.5rem] border border-red-500/20 shadow-2xl overflow-hidden">
+                   <div className="absolute top-0 right-0 p-12 opacity-[0.03]">
+                      <Flame className="w-48 h-48 text-red-500" />
+                   </div>
+                   
+                   <div className="flex justify-between items-center mb-8 relative z-10">
+                     <div className="flex items-center gap-4">
+                        <div className="p-2.5 bg-red-500/10 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                           <Flame className="w-5 h-5 text-red-500" />
+                        </div>
+                        <div>
+                           <h2 className="text-xs font-black text-slate-100 uppercase tracking-[0.2em]">Fila de Fogo: Inteligência de Intervenção</h2>
+                           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 whitespace-nowrap">Cruzamento de Sinais, Memória e Radar Relacional</p>
+                        </div>
+                     </div>
+                     <span className="px-3 py-1 rounded bg-red-500/10 border border-red-500/20 text-[9px] font-black text-red-400">PRÓXIMO MELHOR PLAY</span>
+                   </div>
 
-                {/* Plays Ativos & Recomendações */}
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[500px]">
-                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-amber-500" /> Plays Recomendados IA
-                  </h3>
-                  <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin">
-                    {plays.map((play, i) => (
-                      <div key={i} className="p-5 bg-slate-950 border border-slate-800 rounded-2xl hover:border-brand/40 transition-all group relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-slate-800 group-hover:bg-brand transition-colors" />
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-[10px] font-black text-brand uppercase tracking-widest">{play.playType}</span>
-                          <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                        </div>
-                        <h4 className="text-sm font-black text-slate-100 mb-3">{play.playName}</h4>
-                        <div className="flex gap-2">
-                           {play.keySignals.map(s => (
-                             <span key={s} className="text-[8px] font-black uppercase px-2 py-0.5 bg-slate-800 text-slate-500 rounded border border-slate-700">{s}</span>
-                           ))}
-                        </div>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                      {/* 카드 1: INTELIGÊNCIA RELACIONAL + SINAIS */}
+                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-red-500/40 transition-all group">
+                         <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                               <AlertTriangle className="w-4 h-4 text-amber-500" />
+                               <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Alerta Crítico</span>
+                            </div>
+                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #1</span>
+                         </div>
+                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                            {radar.tension.length > 0 
+                              ? `Stakeholder em área crítica (${radar.tension[0].area}) com sinal de alto impacto detectado.` 
+                              : 'Alerta detectado em stakeholder estratégico com risco de bloqueio iminente.'}
+                         </p>
+                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Sinal Prioritário</span>
+                               <p className="text-[11px] text-slate-400">{account.sinais[0]?.titulo || 'Mudança Estrutural Detectada'}</p>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Diretriz IA</span>
+                               <p className="text-[11px] text-slate-400 italic">"Ativar play de blindagem executiva e alinhar resposta técnica."</p>
+                            </div>
+                         </div>
+                         <button className="w-full mt-6 py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all">
+                            Ativar Play de Blindagem
+                         </button>
                       </div>
-                    ))}
-                    <button className="w-full py-4 mt-4 border border-dashed border-slate-800 rounded-2xl text-[10px] font-black text-slate-600 uppercase hover:border-slate-600 hover:text-slate-400 transition-all">
-                       Configurar Novo Playbook AI
-                    </button>
+
+                      {/* 카드 2: GAP DE COBERTURA */}
+                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all group">
+                         <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                               <Users2 className="w-4 h-4 text-blue-500" />
+                               <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Gap de Cobertura</span>
+                            </div>
+                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #2</span>
+                         </div>
+                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                            {radar.gaps.length > 0 
+                              ? `Sinal estratégico em ${radar.gaps[0]} sem interlocutor mapeado. Risco de silêncio operacional.` 
+                              : 'Vazios de interlocução em áreas com sinais recentes de tendência.'}
+                         </p>
+                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Área Expansiva</span>
+                               <p className="text-[11px] text-slate-400">{radar.gaps[0] || 'Área sem cobertura'}</p>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
+                               <p className="text-[11px] text-slate-400 italic">"Padrão v6: Abertura via Champion de área adjacente."</p>
+                            </div>
+                         </div>
+                         <button className="w-full mt-6 py-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all">
+                            Infiltrar Champion
+                         </button>
+                      </div>
+
+                      {/* 카드 3: INTELIGÊNCIA CUMULATIVA */}
+                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group">
+                         <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                               <Zap className="w-4 h-4 text-emerald-500" />
+                               <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Atalhos Operacionais</span>
+                            </div>
+                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #3</span>
+                         </div>
+                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                            Contexto atual favorável à replicação de padrão vitorioso: "Alinhamento de ROI com CXO".
+                         </p>
+                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese IA</span>
+                               <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Acelerar via Business Case'}</p>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                               <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
+                               <p className="text-[11px] text-slate-400 italic">"Padrão recorrente de destrave na vertical {account.vertical}."</p>
+                            </div>
+                         </div>
+                         <button className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all">
+                            Simular ROI Canopi
+                         </button>
+                      </div>
+                   </div>
+                </section>
+
+                <div className="grid grid-cols-2 gap-8">
+                  {/* TIMELINE 360 UNIFICADA (RESTAURADA) */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[600px]">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                        <HistoryIcon className="w-4 h-4 text-amber-500" /> Timeline Unificada 360
+                      </h3>
+                      <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-3 py-1 rounded-full">{unifiedTimeline.length} Entradas</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto space-y-8 pr-4 scrollbar-thin">
+                      {unifiedTimeline.map((item, i) => (
+                        <div key={i} className="relative pl-8 border-l-2 border-slate-800 pb-2 group">
+                           <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-lg bg-slate-900 border-2 border-slate-700 flex items-center justify-center shadow-lg z-10">
+                              {item.icone === 'LogsIcon' ? <Edit3 className="w-2.5 h-2.5 text-blue-400" /> :
+                               item.icone === 'Activity' ? <Activity className="w-2.5 h-2.5 text-emerald-400" /> :
+                               <HistoryIcon className="w-2.5 h-2.5 text-amber-400" />}
+                           </div>
+                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{item.data}</span>
+                           <h4 className={`text-[10px] font-black uppercase mt-1 ${item.color}`}>{item.tipo}</h4>
+                           <p className="text-xs text-slate-400 mt-1 leading-relaxed font-medium">{item.descricao}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* AÇÕES OPERACIONAIS ATIVAS (RESTAURADO) */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[600px]">
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 flex items-center gap-2">
+                       <Zap className="w-4 h-4 text-blue-500" /> Intervenções em Andamento
+                    </h3>
+                    <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin">
+                       {accountActions.map((action, i) => (
+                         <div key={i} className="p-5 bg-slate-950 border border-slate-800 rounded-2xl border-l-4 border-l-blue-500 shadow-lg">
+                            <div className="flex justify-between items-start mb-3">
+                               <span className="text-[8px] font-black uppercase text-blue-400 px-2 py-0.5 bg-blue-500/5 rounded border border-blue-500/20">{action.status}</span>
+                               <span className="text-[8px] font-black text-slate-600 uppercase">{action.category}</span>
+                            </div>
+                            <h4 className="text-sm font-black text-slate-100 mb-2 leading-tight">{action.title}</h4>
+                            <p className="text-[10px] text-slate-500 mb-4">{action.description}</p>
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                               <span className="text-[9px] font-bold text-slate-400">Owner: {action.ownerName || 'IA-System'}</span>
+                               <span className={`text-[9px] font-black ${action.priority === 'Alta' ? 'text-red-400' : 'text-slate-500'}`}>{action.priority}</span>
+                            </div>
+                         </div>
+                       ))}
+                       {accountActions.length === 0 && (
+                         <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
+                            <CheckCircle2 className="w-12 h-12 text-slate-700 mb-4" />
+                            <p className="text-[10px] font-black uppercase text-slate-600 tracking-widest leading-loose">Nenhuma ação ativa<br/>Gere uma intervenção acima</p>
+                         </div>
+                       )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -510,6 +690,79 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
             {activeTab === 'relacional' && (
               <div className="space-y-8 animate-in fade-in">
+                
+                {/* ── RADAR DE INTELIGÊNCIA RELACIONAL (RESTAURADO) ── */}
+                <div className="p-8 bg-blue-500/5 rounded-[2.5rem] border border-blue-500/10 shadow-lg">
+                  <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-8 flex items-center gap-3">
+                    <Network className="w-5 h-5" /> Radar de Inteligência Relacional (Auditoria V6)
+                    <div className="flex-1 h-px bg-blue-500/20" />
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Pontos de Tensão */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Tensão (Blockers)</span>
+                      </div>
+                      <div className="space-y-3">
+                        {radar.tension.map(c => (
+                          <div key={c.id} className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-center gap-4 group hover:bg-red-500/10 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
+                            <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center font-black text-xs text-red-400 border border-red-500/20">
+                              {c.nome.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-black text-slate-100 truncate group-hover:text-red-400">{c.nome}</p>
+                              <p className="text-[9px] text-red-500/70 uppercase font-black tracking-tighter">{c.area} • Exposição Crítica</p>
+                            </div>
+                          </div>
+                        ))}
+                        {radar.tension.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Nenhum stakeholder influente sob alerta direto.</p>}
+                      </div>
+                    </div>
+
+                    {/* Pontos de Apoio */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Apoio (Sponsors)</span>
+                      </div>
+                      <div className="space-y-3">
+                        {radar.support.map(c => (
+                          <div key={c.id} className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl flex items-center gap-4 group hover:bg-emerald-500/10 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center font-black text-xs text-emerald-400 border border-emerald-500/20">
+                              {c.nome.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-black text-slate-100 truncate group-hover:text-emerald-400">{c.nome}</p>
+                              <p className="text-[9px] text-emerald-500/70 uppercase font-black tracking-tighter">{c.area} • Driver de Sucesso</p>
+                            </div>
+                          </div>
+                        ))}
+                        {radar.support.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Sem sponsors ativos para os sinais atuais.</p>}
+                      </div>
+                    </div>
+
+                    {/* Gaps de Cobertura */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Target className="w-3.5 h-3.5 text-blue-500" />
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gaps (Lacunas de Mapeamento)</span>
+                      </div>
+                      <div className="space-y-3">
+                        {radar.gaps.map((area, i) => (
+                          <div key={i} className="p-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl group hover:border-blue-500/30 transition-all">
+                            <p className="text-xs font-black text-slate-200 group-hover:text-blue-400">{area}</p>
+                            <p className="text-[9px] text-blue-500/60 uppercase font-black tracking-tighter mt-1">Sinal Crítico Detectado • Sem Contato Mapeado</p>
+                            <button className="mt-3 text-[8px] font-black uppercase text-blue-400 hover:underline">Solicitar Mapeamento IA</button>
+                          </div>
+                        ))}
+                        {radar.gaps.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Toda área crítica possui interlocução mapeada.</p>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Organograma Mode Toggle */}
                 <div className="flex items-center justify-between mb-4">
                    <div className="flex items-center gap-4">
@@ -644,30 +897,84 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     )}
                  </section>
 
-                 {/* Inteligência Cumulativa (Memória) */}
-                 <div className="grid grid-cols-2 gap-8">
-                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Vitórias & Padrões de Sucesso
-                       </h3>
-                       <ul className="space-y-3">
-                          {localInteligencia.sucessos.map((s, i) => (
-                            <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-xs text-slate-300 font-medium italic">{s}</li>
-                          ))}
-                       </ul>
-                    </div>
-                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-red-500" /> Riscos & Alertas de Segmento
-                       </h3>
-                       <ul className="space-y-3">
-                          {localInteligencia.insucessos.map((s, i) => (
-                            <li key={i} className="flex items-start gap-3 p-3 bg-red-500/5 border border-red-500/20 rounded-xl text-xs text-slate-300 font-medium italic">{s}</li>
-                          ))}
-                       </ul>
-                    </div>
-                 </div>
-              </div>
+                 {/* Inteligência Cumulativa (Memória Operacional Profunda) */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                     
+                     {/* Coluna 1: Memória de Prospecção (Fatos) */}
+                     <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col gap-6">
+                        <div>
+                           <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Vitórias & Padrões de Sucesso
+                           </h3>
+                           <ul className="space-y-3">
+                              {localInteligencia.sucessos.map((s, i) => (
+                                <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-xs text-slate-300 font-medium italic group hover:border-emerald-500/30 transition-all">{s}</li>
+                              ))}
+                           </ul>
+                        </div>
+                        <div className="pt-6 border-t border-slate-800">
+                           <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                              <AlertTriangle className="w-4 h-4 text-red-500" /> Riscos & Alertas de Segmento
+                           </h3>
+                           <ul className="space-y-3">
+                              {localInteligencia.insucessos.map((s, i) => (
+                                <li key={i} className="flex items-start gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-xl text-xs text-slate-400 font-medium italic group hover:border-red-500/30 transition-all">{s}</li>
+                              ))}
+                           </ul>
+                        </div>
+                     </div>
+
+                     {/* Coluna 2: Cérebro Estratégico (Padrões e Lições) */}
+                     <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 border border-blue-500/10 rounded-3xl flex flex-col gap-8">
+                        <div>
+                           <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-6 block">Padrões Observados IA</span>
+                           <div className="space-y-4">
+                              {localInteligencia.padroes.map((p, i) => (
+                                <div key={i} className="bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 italic text-xs text-slate-200 font-medium leading-relaxed relative overflow-hidden group">
+                                   <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-20 group-hover:opacity-100 transition-all" />
+                                   &quot;{p}&quot;
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+                        <div className="pt-8 border-t border-slate-700/50">
+                           <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 block">A Maior Lição (Canopi Core)</span>
+                           <div className="flex items-start gap-4 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
+                              <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-1" />
+                              <p className="text-xs text-amber-200/90 font-bold leading-relaxed">
+                                 {localInteligencia.learnings[0] || 'Nenhuma lição crítica extraída desta conta até o momento.'}
+                              </p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Coluna 3: Futuro Operacional (Hipóteses) */}
+                     <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col gap-6">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Hipóteses de Destrave Strat</span>
+                        <div className="space-y-4">
+                           {localInteligencia.hipoteses.map((h, i) => (
+                              <div key={i} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col gap-2 group hover:border-blue-500/20 transition-all">
+                                 <div className="flex items-center gap-2">
+                                    <Sparkles className="w-3 h-3 text-blue-400" />
+                                    <p className="text-[10px] font-black text-slate-300 uppercase">Hipótese #{i+1}</p>
+                                 </div>
+                                 <p className="text-[11px] text-slate-500 leading-relaxed group-hover:text-slate-300 transition-colors">{h}</p>
+                              </div>
+                           ))}
+                        </div>
+                        {localInteligencia.fatoresRecomendacao.length > 0 && (
+                           <div className="mt-auto pt-6 border-t border-slate-800">
+                              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3">Fatores de Qualificação AI</p>
+                              <div className="flex flex-wrap gap-2">
+                                 {localInteligencia.fatoresRecomendacao.map((f, i) => (
+                                   <span key={i} className="text-[8px] px-2 py-1 bg-slate-800 text-slate-500 rounded-lg border border-slate-700 font-black uppercase tracking-tighter">{f}</span>
+                                 ))}
+                              </div>
+                           </div>
+                        )}
+                     </div>
+                  </div>
+               </div>
             )}
 
             {activeTab === 'estrategia' && (
