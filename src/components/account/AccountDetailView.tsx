@@ -1539,8 +1539,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     if (b.data === 'Agora') return 1;
                     return b.data.localeCompare(a.data);
                   });
-                  return combined.map((h, i) => {
-                    const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : h.icone === 'Clock' ? Clock : h.icone === 'TrendingUp' ? TrendingUp : h.icone === 'Activity' ? Activity : h.icone === 'LogsIcon' ? LogsIcon : HistoryIcon;
+                    return combined.map((h, i) => {
+                      const IconComp = h.icone === 'AlertTriangle' ? AlertTriangle : 
+                                      h.icone === 'Clock' ? Clock : 
+                                      h.icone === 'TrendingUp' ? TrendingUp : 
+                                      h.icone === 'Activity' ? Activity : 
+                                      h.icone === 'Mail' ? Mail :
+                                      h.icone === 'Globe' ? Globe :
+                                      h.icone === 'LogsIcon' ? LogsIcon : HistoryIcon;
                     return (
                       <div key={i} className="relative pl-9">
                         <div className="absolute left-0 top-0 w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center z-10 shadow-lg">
