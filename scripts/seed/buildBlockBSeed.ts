@@ -294,23 +294,476 @@ export function computeBlockBSummary(canonical: BlockoBCanonical): BlockoBCanoni
 // ============================================================================
 
 /**
- * SCAFFOLDING: Initialize Bloco B with empty structure
+ * POPULATION: Bloco B Canonical Data for Cenário Parcial
  *
- * This is the entry point for building Bloco B data.
- * Data population happens by calling builders above.
+ * This populates Bloco B with realistic integration states,
+ * snapshots, coverage, and sync status based on:
+ * - scenarios/parcial.ts (source states)
+ * - Bloco A account data (43 contas)
+ * - Coherence rules (ABM/ABX coverage patterns)
  *
- * @returns Empty Bloco B structure ready for population
+ * @returns Populated Bloco B structure
  */
 export function buildBlockBSeed(): BlockoBCanonical {
   const canonical = initializeBlockBCanonical();
 
-  // TODO: Population of integrations
-  // TODO: Population of source snapshots
-  // TODO: Population of account source coverage
-  // TODO: Population of sync statuses
-  //
-  // Next iteration: Populate with actual data for 43 accounts
-  // and integration states from scenarios/parcial.ts
+  // ====== POPULATE INTEGRATIONS ======
+  canonical.integrations = [
+    createIntegration('hubspot', 'HubSpot', 'CRM', {
+      description: 'CRM principal para conta, contato, oportunidade',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-01-15',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('salesforce', 'Salesforce', 'CRM', {
+      description: 'CRM secundário, integração legada',
+      isActive: true,
+      healthStatus: 'degraded',
+      connectedSince: '2023-06-01',
+      lastChecked: new Date('2026-03-15').toISOString(),
+    }),
+    createIntegration('google_ads', 'Google Ads', 'Ads', {
+      description: 'Paid media para analytics e atribuição',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-03-10',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('meta_ads', 'Meta Ads', 'Ads', {
+      description: 'Facebook/Instagram para campanhas',
+      isActive: true,
+      healthStatus: 'degraded',
+      connectedSince: '2024-02-20',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('linkedin_ads', 'LinkedIn Ads', 'Ads', {
+      description: 'LinkedIn para B2B campaigns',
+      isActive: false,
+      healthStatus: 'down',
+      connectedSince: undefined,
+    }),
+    createIntegration('ga4', 'Google Analytics 4', 'Analytics', {
+      description: 'Website analytics e comportamento',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-01-20',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('search_console', 'Google Search Console', 'Analytics', {
+      description: 'SEO e busca orgânica',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-02-01',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('apollo', 'Apollo', 'Enrichment', {
+      description: 'B2B enrichment e intent data',
+      isActive: true,
+      healthStatus: 'degraded',
+      connectedSince: '2024-04-05',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('outreach', 'Outreach', 'Sales Engagement', {
+      description: 'Sales engagement e sequências',
+      isActive: false,
+      healthStatus: 'down',
+      connectedSince: undefined,
+    }),
+    createIntegration('salesloft', 'SalesLoft', 'Sales Engagement', {
+      description: 'Sales engagement alternativo',
+      isActive: false,
+      healthStatus: 'down',
+      connectedSince: undefined,
+    }),
+    createIntegration('rd_station', 'RD Station', 'Marketing Automation', {
+      description: 'Automação de marketing e leads',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-01-10',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('bigquery', 'Google BigQuery', 'Analytics', {
+      description: 'Data warehouse para análises complexas',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-03-01',
+      lastChecked: new Date().toISOString(),
+    }),
+    createIntegration('slack', 'Slack', 'Communication', {
+      description: 'Notificações e comunicação',
+      isActive: true,
+      healthStatus: 'healthy',
+      connectedSince: '2024-02-10',
+      lastChecked: new Date().toISOString(),
+    }),
+  ];
+
+  // ====== POPULATE SOURCE SNAPSHOTS ======
+  // Gerar 1-2 snapshots por integração ativa
+  canonical.sourceSnapshots = [
+    // HubSpot — connected
+    createSourceSnapshot('snap_hubspot_2026_04_12', 'hubspot', '2026-04-12', {
+      recordsReceived: 2340,
+      recordsProcessed: 2340,
+      dataConsistency: 98,
+      syncStatus: 'success',
+      confidenceLevel: 98,
+      lastSyncDuration: 45,
+    }),
+    // Salesforce — stale
+    createSourceSnapshot('snap_salesforce_2026_02_15', 'salesforce', '2026-02-15', {
+      recordsReceived: 1850,
+      recordsProcessed: 1750,
+      recordsFailedCount: 100,
+      dataConsistency: 72,
+      syncStatus: 'partial_failure',
+      confidenceLevel: 65,
+      lastSyncDuration: 120,
+    }),
+    // Google Ads — connected
+    createSourceSnapshot('snap_google_ads_2026_04_13', 'google_ads', '2026-04-13', {
+      recordsReceived: 5600,
+      recordsProcessed: 5600,
+      dataConsistency: 96,
+      syncStatus: 'success',
+      confidenceLevel: 96,
+      lastSyncDuration: 60,
+    }),
+    // Meta Ads — partial
+    createSourceSnapshot('snap_meta_ads_2026_04_13', 'meta_ads', '2026-04-13', {
+      recordsReceived: 3400,
+      recordsProcessed: 3200,
+      recordsFailedCount: 200,
+      dataConsistency: 78,
+      syncStatus: 'partial_failure',
+      confidenceLevel: 75,
+      lastSyncDuration: 90,
+    }),
+    // GA4 — connected
+    createSourceSnapshot('snap_ga4_2026_04_13', 'ga4', '2026-04-13', {
+      recordsReceived: 12000,
+      recordsProcessed: 12000,
+      dataConsistency: 94,
+      syncStatus: 'success',
+      confidenceLevel: 94,
+      lastSyncDuration: 180,
+    }),
+    // Search Console — connected
+    createSourceSnapshot('snap_search_console_2026_04_12', 'search_console', '2026-04-12', {
+      recordsReceived: 8500,
+      recordsProcessed: 8500,
+      dataConsistency: 95,
+      syncStatus: 'success',
+      confidenceLevel: 95,
+      lastSyncDuration: 120,
+    }),
+    // Apollo — partial
+    createSourceSnapshot('snap_apollo_2026_04_11', 'apollo', '2026-04-11', {
+      recordsReceived: 4200,
+      recordsProcessed: 3800,
+      recordsFailedCount: 400,
+      dataConsistency: 68,
+      syncStatus: 'partial_failure',
+      confidenceLevel: 70,
+      lastSyncDuration: 150,
+    }),
+    // RD Station — connected
+    createSourceSnapshot('snap_rd_station_2026_04_13', 'rd_station', '2026-04-13', {
+      recordsReceived: 6700,
+      recordsProcessed: 6700,
+      dataConsistency: 92,
+      syncStatus: 'success',
+      confidenceLevel: 92,
+      lastSyncDuration: 75,
+    }),
+    // BigQuery — connected
+    createSourceSnapshot('snap_bigquery_2026_04_13', 'bigquery', '2026-04-13', {
+      recordsReceived: 45000,
+      recordsProcessed: 45000,
+      dataConsistency: 99,
+      syncStatus: 'success',
+      confidenceLevel: 99,
+      lastSyncDuration: 300,
+    }),
+    // Slack — connected
+    createSourceSnapshot('snap_slack_2026_04_13', 'slack', '2026-04-13', {
+      recordsReceived: 2100,
+      recordsProcessed: 2100,
+      dataConsistency: 100,
+      syncStatus: 'success',
+      confidenceLevel: 100,
+      lastSyncDuration: 20,
+    }),
+  ];
+
+  // ====== POPULATE ACCOUNT SOURCE COVERAGE ======
+  // Emular cobertura realista por conta
+  // ABM: focus em inbound (GA4, Google Ads, RD Station, Search Console)
+  // ABX: focus em CRM (HubSpot, Salesforce), Sales (Apollo)
+
+  const accounts = require('../../src/data/accountsData').contasMock;
+
+  for (const account of accounts) {
+    // Define base coverage por tipo estratégico
+    const isABM = account.tipoEstrategico === 'ABM';
+    const isABX = account.tipoEstrategico === 'ABX';
+    const isMature = account.prontidao > 70;
+
+    // HubSpot — sempre tem cobertura
+    if (isABX || isMature) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_hubspot`,
+          account.id,
+          'hubspot',
+          {
+            coverageLevel: isABX || isMature ? 'full' : 'partial',
+            contactsCovered: true,
+            signalsCovered: true,
+            opportunitiesCovered: true,
+            companyDataCovered: true,
+            engagementDataCovered: true,
+            lastSyncDate: '2026-04-13',
+            dataFreshness: 'real-time',
+            dataQualityScore: isABX || isMature ? 92 : 78,
+            completenessScore: isABX || isMature ? 95 : 75,
+          }
+        )
+      );
+    }
+
+    // GA4 — mais forte em ABM (inbound)
+    if (isABM || account.potencial > 75) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_ga4`,
+          account.id,
+          'ga4',
+          {
+            coverageLevel: 'partial',
+            contactsCovered: false,
+            signalsCovered: true,
+            opportunitiesCovered: false,
+            companyDataCovered: true,
+            engagementDataCovered: true,
+            lastSyncDate: '2026-04-13',
+            dataFreshness: 'hourly',
+            dataQualityScore: 88,
+            completenessScore: 82,
+          }
+        )
+      );
+    }
+
+    // Google Ads — accounts com alto potencial
+    if (account.potencial > 70) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_google_ads`,
+          account.id,
+          'google_ads',
+          {
+            coverageLevel: 'partial',
+            contactsCovered: false,
+            signalsCovered: true,
+            opportunitiesCovered: false,
+            companyDataCovered: false,
+            engagementDataCovered: true,
+            lastSyncDate: '2026-04-13',
+            dataFreshness: 'daily',
+            dataQualityScore: 85,
+            completenessScore: 80,
+          }
+        )
+      );
+    }
+
+    // RD Station — marketing automation
+    if (account.atividadeRecente === 'Alta' || isABM) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_rd_station`,
+          account.id,
+          'rd_station',
+          {
+            coverageLevel: 'partial',
+            contactsCovered: false,
+            signalsCovered: true,
+            opportunitiesCovered: false,
+            companyDataCovered: false,
+            engagementDataCovered: true,
+            lastSyncDate: '2026-04-13',
+            dataFreshness: 'daily',
+            dataQualityScore: 80,
+            completenessScore: 75,
+          }
+        )
+      );
+    }
+
+    // Apollo — enrichment, mostly ABX/mature
+    if (isABX || isMature) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_apollo`,
+          account.id,
+          'apollo',
+          {
+            coverageLevel: 'weak',
+            contactsCovered: true,
+            signalsCovered: false,
+            opportunitiesCovered: false,
+            companyDataCovered: true,
+            engagementDataCovered: false,
+            lastSyncDate: '2026-04-11',
+            dataFreshness: 'weekly',
+            dataQualityScore: 72,
+            completenessScore: 65,
+          }
+        )
+      );
+    }
+
+    // Search Console — accounts com website activity
+    if (account.coberturaRelacional > 40) {
+      canonical.accountSourceCoverage.push(
+        createAccountSourceCoverage(
+          `cov_${account.id}_search_console`,
+          account.id,
+          'search_console',
+          {
+            coverageLevel: 'weak',
+            contactsCovered: false,
+            signalsCovered: true,
+            opportunitiesCovered: false,
+            companyDataCovered: false,
+            engagementDataCovered: true,
+            lastSyncDate: '2026-04-12',
+            dataFreshness: 'weekly',
+            dataQualityScore: 75,
+            completenessScore: 70,
+          }
+        )
+      );
+    }
+  }
+
+  // ====== POPULATE SYNC STATUSES ======
+  canonical.syncStatuses = [
+    createSyncStatus('sync_hubspot', 'hubspot', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 30,
+      successCount: 245,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_salesforce', 'salesforce', {
+      currentStatus: 'stale',
+      lastSyncAttempt: new Date('2026-04-13').toISOString(),
+      lastSuccessfulSync: new Date('2026-02-15').toISOString(),
+      syncIntervalMinutes: 120,
+      errorCount: 18,
+      statusReason: 'Última sincronização em fevereiro; requer reconexão',
+      isMonitored: true,
+      alertsActive: 2,
+    }),
+    createSyncStatus('sync_google_ads', 'google_ads', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 60,
+      successCount: 180,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_meta_ads', 'meta_ads', {
+      currentStatus: 'partial',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 90,
+      successCount: 145,
+      errorCount: 8,
+      statusReason: 'Alguns campos faltando; taxa de erro em 5%',
+      isMonitored: true,
+      alertsActive: 1,
+    }),
+    createSyncStatus('sync_linkedin_ads', 'linkedin_ads', {
+      currentStatus: 'missing',
+      lastSyncAttempt: new Date('2026-01-30').toISOString(),
+      lastSuccessfulSync: undefined,
+      syncIntervalMinutes: 120,
+      statusReason: 'Integração não conectada',
+      isMonitored: false,
+    }),
+    createSyncStatus('sync_ga4', 'ga4', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 60,
+      successCount: 200,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_search_console', 'search_console', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 120,
+      successCount: 140,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_apollo', 'apollo', {
+      currentStatus: 'partial',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 180,
+      successCount: 95,
+      errorCount: 12,
+      statusReason: 'Taxa de erro em ~11%; dados parciais',
+      isMonitored: true,
+      alertsActive: 1,
+    }),
+    createSyncStatus('sync_outreach', 'outreach', {
+      currentStatus: 'missing',
+      lastSyncAttempt: new Date('2025-12-20').toISOString(),
+      lastSuccessfulSync: undefined,
+      syncIntervalMinutes: 60,
+      statusReason: 'Integração não conectada',
+      isMonitored: false,
+    }),
+    createSyncStatus('sync_salesloft', 'salesloft', {
+      currentStatus: 'missing',
+      lastSyncAttempt: new Date('2025-11-15').toISOString(),
+      lastSuccessfulSync: undefined,
+      syncIntervalMinutes: 60,
+      statusReason: 'Integração não conectada',
+      isMonitored: false,
+    }),
+    createSyncStatus('sync_rd_station', 'rd_station', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 45,
+      successCount: 190,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_bigquery', 'bigquery', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 120,
+      successCount: 150,
+      isMonitored: true,
+    }),
+    createSyncStatus('sync_slack', 'slack', {
+      currentStatus: 'connected',
+      lastSyncAttempt: new Date().toISOString(),
+      lastSuccessfulSync: new Date().toISOString(),
+      syncIntervalMinutes: 30,
+      successCount: 210,
+      isMonitored: true,
+    }),
+  ];
 
   // Compute summary before returning
   canonical.summary = computeBlockBSummary(canonical);
