@@ -249,6 +249,74 @@ export function createPlayRecommendation(
 // ============================================================================
 
 // ============================================================================
+// DETERMINISTIC HELPERS
+// ============================================================================
+
+/**
+ * Generate a deterministic hash from a string seed.
+ * Always returns the same number for the same input.
+ */
+function stableHash(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Pick a deterministic value from an array based on a seed.
+ */
+function pickDeterministic<T>(items: T[], seed: string): T {
+  const hash = stableHash(seed);
+  const index = hash % items.length;
+  return items[index];
+}
+
+/**
+ * Generate a deterministic integer within a range based on a seed.
+ */
+function deterministicInt(seed: string, min: number, max: number): number {
+  const hash = stableHash(seed);
+  const range = max - min + 1;
+  return min + (hash % range);
+}
+
+/**
+ * Build a deterministic timeline of dates for an account.
+ */
+function buildDeterministicTimeline(
+  accountId: string,
+  count: number
+): string[] {
+  const startDate = new Date('2026-02-01');
+  const endDate = new Date('2026-04-13');
+  const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  const dates: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const seed = `${accountId}_interaction_${i}`;
+    const dayOffset = deterministicInt(seed, 0, days);
+    const interactionDate = new Date(startDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+    dates.push(interactionDate.toISOString().split('T')[0]);
+  }
+
+  dates.sort();
+  return dates;
+}
+
+/**
+ * Get deterministic hour and minute for a date.
+ */
+function getDeterministicTime(seed: string): { hour: number; minute: number } {
+  const hour = deterministicInt(seed + '_hour', 8, 18);
+  const minute = deterministicInt(seed + '_minute', 0, 59);
+  return { hour, minute };
+}
+
+// ============================================================================
 // POPULATION FUNCTIONS
 // ============================================================================
 
@@ -492,7 +560,7 @@ function populateInteractions(): Interaction[] {
   const interactions: Interaction[] = [];
   let interactionCounter = 1;
 
-  // Helper function to add interaction
+  // Helper function to add interaction (deterministic)
   const addInteraction = (
     accountId: string,
     type: Interaction['interactionType'],
@@ -503,47 +571,49 @@ function populateInteractions(): Interaction[] {
     campaignId?: string,
     relevance: number = 60
   ) => {
+    const seed = `${accountId}_interaction_${interactionCounter}`;
+    const timeData = getDeterministicTime(seed);
+    const sentimentSeed = stableHash(seed + '_sentiment');
+    const sentiments: Array<'positive' | 'neutral' | 'negative'> = ['positive', 'neutral', 'negative'];
+    const owners = ['Mariana Costa', 'Leandro Silva', 'Paula Nogueira'];
+
     interactions.push(
       createInteraction({
         id: `int_${accountId}_${interactionCounter++}`,
         accountId,
         campaignId,
         interactionType: type,
-        timestamp: new Date(`${date}T${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00Z`).toISOString(),
+        timestamp: new Date(
+          `${date}T${String(timeData.hour).padStart(2, '0')}:${String(timeData.minute).padStart(2, '0')}:00Z`
+        ).toISOString(),
         date,
         channel,
         direction: ['visit', 'download', 'email_open', 'email_click', 'content_consumption'].includes(type) ? 'inbound' : 'outbound',
         initiator: ['visit', 'download', 'email_open', 'email_click', 'content_consumption', 'submission'].includes(type) ? 'conta' : 'empresa',
         description,
         relevance,
-        sentiment: Math.random() > 0.3 ? 'positive' : 'neutral',
-        owner: ['call', 'demo', 'meeting'].includes(type) ? ['Mariana Costa', 'Leandro Silva', 'Paula Nogueira'][Math.floor(Math.random() * 3)] : undefined,
+        sentiment: sentiments[sentimentSeed % 3] as 'positive' | 'neutral' | 'negative',
+        owner: ['call', 'demo', 'meeting'].includes(type) ? pickDeterministic(owners, seed + '_owner') : undefined,
         followUpRequired: type === 'demo' || type === 'meeting' || type === 'submission',
         nextStep: ['demo', 'meeting', 'submission'].includes(type) ? 'Schedule follow-up call' : undefined,
         source,
-        confidence: 75 + Math.floor(Math.random() * 25),
+        confidence: 75 + deterministicInt(seed + '_confidence', 0, 24),
       })
     );
   };
 
-  // Create interactions for each account (5-8 per account)
+  // Create interactions for each account (5-8 per account, deterministic)
   for (const account of contasMock) {
     const isABM = account.tipoEstrategico === 'ABM';
     const isEarlyStage = ['Prospecção', 'Descoberta'].includes(account.etapa);
-    const numInteractions = isEarlyStage ? 5 + Math.floor(Math.random() * 2) : 6 + Math.floor(Math.random() * 2);
 
-    // Timeline: Feb 1 - Apr 13, distributed
-    const startDate = new Date('2026-02-01');
-    const endDate = new Date('2026-04-13');
-    const days = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Deterministic number of interactions based on account state
+    const baseCount = isEarlyStage ? 5 : 6;
+    const additionalSeed = stableHash(account.id + '_interactions_count');
+    const numInteractions = baseCount + (additionalSeed % 2);
 
-    const dates: string[] = [];
-    for (let i = 0; i < numInteractions; i++) {
-      const randomDay = Math.floor(Math.random() * days);
-      const interactionDate = new Date(startDate.getTime() + randomDay * 24 * 60 * 60 * 1000);
-      dates.push(interactionDate.toISOString().split('T')[0]);
-    }
-    dates.sort();
+    // Timeline: Feb 1 - Apr 13, distributed (deterministic)
+    const dates = buildDeterministicTimeline(account.id, numInteractions);
 
     // Pattern for ABM vs ABX
     if (isABM) {
@@ -611,7 +681,7 @@ export function buildBlockCSeed(): BlockoCCanonical {
     playRecommendations,
     playPool: PlayPool,
     metadata: {
-      generatedAt: new Date().toISOString(),
+      generatedAt: '2026-04-13T00:00:00Z', // Fixed deterministic timestamp
       version: '1.0.0',
       summary: {
         totalCampaigns: campaigns.length,
