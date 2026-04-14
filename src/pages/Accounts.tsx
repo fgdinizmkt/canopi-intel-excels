@@ -737,12 +737,12 @@ export const Accounts = () => {
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-400 tracking-[0.12em]">
-                    <th className="p-4 pl-8">Conta & Inteligência</th>
-                    <th className="p-4">Contexto / Owner</th>
-                    <th className="p-4">Score & Pipeline</th>
-                    <th className="p-4">Estratégia & Play</th>
-                    <th className="p-4">Cobertura</th>
-                    <th className="p-4 text-end pr-8">Ação de Próximo Passo</th>
+                    <th className="p-3 pl-8 text-[9px]">Conta & Inteligência</th>
+                    <th className="p-3 text-[9px]">Contexto / Owner</th>
+                    <th className="p-3 text-[9px]">Score / Stage</th>
+                    <th className="p-3 text-[9px]">Estratégia & Play</th>
+                    <th className="p-3 text-[9px]">Cobertura</th>
+                    <th className="p-3 text-end pr-8 text-[9px]">Ação de Próximo Passo</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -750,26 +750,26 @@ export const Accounts = () => {
                     const score = calculateAccountScore(conta);
                     const signals = blocoCSignals[conta.id];
                     return (
-                      <tr key={conta.id} className="group hover:bg-slate-800/20 transition-colors">
-                        <td className="p-5 pl-8">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400">
+                      <tr key={conta.id} className="group hover:bg-white hover:shadow-md transition-all">
+                        <td className="p-3 pl-8">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-[10px]">
                                {conta.nome.substring(0,2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                               <div className="flex items-center gap-2 mb-1">
+                               <div className="flex items-center gap-1.5 mb-0.5">
                                  <button 
                                    onClick={() => openAccount(conta.id)} 
-                                   className="text-sm font-bold text-slate-950 hover:text-brand tracking-tighter cursor-pointer block text-left"
+                                   className="text-[12px] font-bold text-slate-950 hover:text-brand tracking-tighter cursor-pointer block text-left truncate"
                                  >
                                    {conta.nome}
                                  </button>
-                                 <span className={`w-1.5 h-1.5 rounded-full ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
+                                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                                </div>
                                <div className="flex items-center gap-2">
-                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leadning-none">{conta.dominio}</span>
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
                                   {signals?.interactionsCount > 0 && (
-                                     <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 rounded flex items-center gap-1 border border-emerald-100">
+                                     <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 px-1 rounded flex items-center gap-0.5 border border-emerald-100">
                                        <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                      </span>
                                   )}
@@ -777,46 +777,46 @@ export const Accounts = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="p-5">
-                          <div className="space-y-1">
-                             <div className="flex items-center gap-2">
-                               <p className="text-xs font-bold text-slate-700">{conta.vertical}</p>
-                               <span className="text-[9px] text-slate-500 font-black uppercase">/ {conta.segmento}</span>
+                        <td className="p-3 text-slate-500 min-w-[120px]">
+                          <div className="space-y-0.5">
+                             <div className="flex items-center gap-1.5">
+                               <p className="text-[11px] font-bold text-slate-700">{conta.vertical}</p>
+                               <span className="text-[8px] font-black uppercase text-slate-300">/ {conta.segmento}</span>
                              </div>
-                             <div className="flex items-center gap-1.5 text-slate-500">
-                               <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[7px] font-black">
+                             <div className="flex items-center gap-1 leading-none text-slate-400">
+                               <div className="w-3.5 h-3.5 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[7px] font-black">
                                   {conta.ownerPrincipal.substring(0,2).toUpperCase()}
                                </div>
-                               <p className="text-[9px] font-bold tracking-tight">{conta.ownerPrincipal}</p>
+                               <p className="text-[9px] font-bold uppercase tracking-tighter">{conta.ownerPrincipal}</p>
                              </div>
                           </div>
                         </td>
-                        <td className="p-5">
-                           <div className="flex items-center gap-3">
-                              <div className="text-center bg-slate-50 border border-slate-200 p-2 rounded-xl min-w-[50px] shadow-sm">
-                                 <p className="text-xs font-black text-slate-900">{score.scoreTotal}</p>
-                                 <p className="text-[7px] font-black text-slate-400 uppercase">Score</p>
+                        <td className="p-3">
+                           <div className="flex items-center gap-2">
+                              <div className="text-center bg-slate-50 border border-slate-200 p-1.5 rounded-lg min-w-[40px] shadow-sm">
+                                 <p className="text-[11px] font-black text-slate-900">{score.scoreTotal}</p>
+                                 <p className="text-[6px] font-black text-slate-400 uppercase">Score</p>
                               </div>
-                              <div className="space-y-1">
-                                 <div className="flex items-center gap-1.5">
-                                   <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
+                              <div className="min-w-0">
+                                 <div className="flex items-center gap-1 mb-0.5">
+                                   <p className={`text-[9px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
                                    {conta.possuiOportunidade && (
-                                     <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-md text-[8px] font-black uppercase tracking-widest">Pipeline</span>
+                                     <span className="px-1 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[7px] font-black uppercase tracking-tighter">Pip</span>
                                    )}
                                  </div>
-                                 <p className="text-[9px] font-bold text-slate-400 uppercase">{conta.etapa}</p>
+                                 <p className="text-[9px] font-bold text-slate-400 uppercase leading-none">{conta.etapa}</p>
                               </div>
                            </div>
                         </td>
-                        <td className="p-5">
-                           <div className="flex flex-col gap-2.5">
+                        <td className="p-3">
+                           <div className="flex flex-col gap-1.5">
                               {/* Inline Tipo Estrategico Toggle */}
-                              <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200 w-fit">
-                                {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as const).map((t) => (
+                              <div className="flex items-center gap-1 bg-slate-50 p-0.5 rounded-md border border-slate-100 w-fit">
+                                {(['ABM', 'ABX', 'Híbrida'] as const).map((t) => (
                                   <button
                                     key={t}
                                     onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
-                                    className={`px-2 py-1 rounded text-[8px] font-black uppercase transition-all ${
+                                    className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase transition-all ${
                                       conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'
                                     }`}
                                   >
@@ -825,17 +825,17 @@ export const Accounts = () => {
                                 ))}
                               </div>
                               {/* Inline Play Selection */}
-                              <div className="flex items-center gap-2">
-                                <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
+                              <div className="flex items-center gap-1.5">
+                                <Zap className="w-2.5 h-2.5 text-brand opacity-60 shrink-0" />
                                 <div className="flex gap-1">
                                   {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as const).map((p) => (
                                     <button
                                       key={p}
                                       onClick={() => handleUpdatePlayAtivo(conta.id, p)}
-                                      className={`px-1.5 py-0.5 rounded text-[8px] font-bold border transition-all ${
+                                      className={`px-1 py-0.5 rounded text-[8px] font-bold border transition-all ${
                                         conta.playAtivo === p 
-                                          ? 'bg-brand/10 text-brand border-brand/30' 
-                                          : 'bg-white text-slate-400 border-slate-200 hover:text-slate-600'
+                                          ? 'bg-brand/10 text-brand border-brand/20' 
+                                          : 'bg-white text-slate-400 border-slate-100 hover:text-slate-500'
                                       }`}
                                     >
                                       {p}
@@ -845,37 +845,35 @@ export const Accounts = () => {
                               </div>
                            </div>
                         </td>
-                        <td className="p-5">
-                           <div className="space-y-1.5">
-                              <div className="flex items-baseline justify-between w-24">
-                                 <span className="text-[9px] font-black text-slate-400 uppercase">Coverage</span>
+                        <td className="p-3">
+                           <div className="space-y-1">
+                              <div className="flex items-baseline justify-between w-20">
+                                 <span className="text-[8px] font-black text-slate-400 uppercase">Cov</span>
                                  <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
                               </div>
-                              <div className="w-24 h-1 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                                 <div className={`h-full rounded-full transition-all duration-1000 ${conta.coberturaRelacional >= 70 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-blue-500'}`} style={{ width: `${conta.coberturaRelacional}%` }} />
+                              <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                 <div className={`h-full rounded-full transition-all duration-1000 ${conta.coberturaRelacional >= 70 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${conta.coberturaRelacional}%` }} />
                               </div>
                            </div>
                         </td>
-                        <td className="p-5 text-end pr-8">
-                           <div className="flex flex-col items-end gap-1.5">
-                              <div className="flex items-center gap-3">
-                                <div className="text-end">
-                                   <p className="text-[10px] font-bold text-slate-900 line-clamp-1 max-w-[200px]">{conta.proximaMelhorAcao || 'Sem ação definida'}</p>
-                                   <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Próxima melhor ação</p>
-                                </div>
-                                <button 
-                                  onClick={() => abrirEditorNarrativo(conta)} 
-                                  className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 hover:text-brand hover:border-brand/40 transition-all shadow-sm"
-                                  title="Editar Narrativa"
-                                >
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                </button>
-                                <div className="flex flex-col items-end gap-0.5">
-                                  <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
-                                    {conta.statusGeral}
-                                  </span>
-                                  <Link href={`/contas/${conta.slug}`} className="text-[7px] font-black text-brand uppercase tracking-widest hover:underline mt-1">Perfil 360</Link>
-                                </div>
+                        <td className="p-3 text-end pr-8">
+                           <div className="flex items-center justify-end gap-3">
+                              <div className="text-end min-w-0 max-w-[150px]">
+                                 <p className="text-[10px] font-bold text-slate-900 truncate">{conta.proximaMelhorAcao || 'Sem ação'}</p>
+                                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Próximo Passo</p>
+                              </div>
+                              <button 
+                                onClick={() => abrirEditorNarrativo(conta)} 
+                                className="p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-400 hover:text-brand hover:border-brand/40 transition-all"
+                                title="Editar"
+                              >
+                                <Sparkles className="w-3 h-3" />
+                              </button>
+                              <div className="flex flex-col items-end gap-0.5">
+                                <span className={`px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
+                                  {conta.statusGeral}
+                                </span>
+                                <Link href={`/contas/${conta.slug}`} className="text-[7px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">360</Link>
                               </div>
                            </div>
                         </td>
