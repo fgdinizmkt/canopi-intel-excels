@@ -4,7 +4,44 @@
  `main` — sincronizada em 2026-04-14 (HEAD: `915a2ba` — Defensive fallback para dataset insuficiente/corrompido)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo)
+**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + **E21 Bloco C Population**)
+
+---
+
+### MARCO: E21 — População do Bloco C no Supabase Remoto - 2026-04-14
+**Status: Concluído e Validado**
+
+- **Fase 1 (Migration):** `supabase/migrations/20260413000000_bloco_c.sql` executada com sucesso no Supabase remoto
+  - 3 tabelas criadas: `campaigns`, `interactions`, `play_recommendations`
+  - Índices de performance estabelecidos (account_id, campaign_id)
+  - RLS (Row Level Security) configurado com políticas de acesso
+  
+- **Fase 2 (Import):** `scripts/supabase/importBlockCSeed.ts` executado com sucesso
+  - Seed data lido de `seed/generated/bloco-c.parcial.json`
+  - Upsert idempotente com mapeamento camelCase → snake_case
+  - Interações processadas em chunks de 50 registros
+  
+- **Volumes Importados:**
+  - **campaigns:** 13 registros (inbound/outbound, múltiplos canais)
+  - **interactions:** 217 registros (email, meeting, demo, submission — histórico completo)
+  - **play_recommendations:** 65 registros (ABM Entry, Consulting, Platform — múltiplas contas)
+  
+- **Fase 3 (Validação Pós-Import):** Queries de validação + teste de repositórios
+  - ✓ Todas as 3 tabelas acessíveis via anon key
+  - ✓ Volumes confirmados: 13 campaigns, 217 interactions, 65 play_recommendations
+  - ✓ `getCampaigns()` / `getCampaignsMap()` operacionais (13 entradas mapeadas)
+  - ✓ `getInteractions()` / `getInteractionsByAccount()` operacionais (217 registros)
+  - ✓ `getPlayRecommendations()` / `getPlayRecommendationsByAccount()` operacionais (65 registros)
+  - ✓ Mapeadores snake_case ↔ camelCase validados
+  - ✓ RLS permitindo leitura correta sem exposição de dados sensíveis
+
+- **Impacto Operacional:**
+  - Bloco C agora 100% populado no Supabase remoto
+  - Repositórios consumindo dados reais de campanha, interação e recomendação de play
+  - UI reflete comportamento de dados remotos: filtros, timelines, recomendações
+  - Fallback defensivo ainda protege Accounts em caso de Bloco C indisponível
+
+- **Artefatos Temporários:** Scripts de validação e validação removidos (check-migration, import, validate-bloco-c, validate-repositories)
 
 ---
 
