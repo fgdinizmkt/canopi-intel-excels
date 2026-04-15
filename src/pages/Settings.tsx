@@ -16,7 +16,7 @@ export const Settings: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-20 max-w-[1400px] mx-auto">
-      {/* HERO: Estado Verificável em Runtime */}
+      {/* HERO: Estado Verificável em Tempo de Execução */}
       <div className="relative overflow-hidden bg-slate-950 rounded-[40px] p-10 text-white shadow-2xl border border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-indigo-600/10 opacity-50"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
@@ -123,8 +123,8 @@ export const Settings: React.FC = () => {
                   </div>
                   <div className="space-y-2 text-[10px] text-amber-100">
                     <p>✗ Node.js/Next.js versão</p>
-                    <p>✗ Vercel Fluid Compute (deployment)</p>
-                    <p>✗ Listeners/realtime (não há observabilidade)</p>
+                    <p>✗ Vercel Fluid Compute (implantação)</p>
+                    <p>✗ Listeners/tempo real (não há observabilidade)</p>
                     <p>✗ Última sincronização (não auditada)</p>
                     <p>✗ Latência de conexão</p>
                     <p>✗ Taxa de uptime</p>
@@ -145,21 +145,21 @@ export const Settings: React.FC = () => {
 
           <div className="space-y-4 mt-10">
             {[
-              { name: 'Accounts', sub: 'getAccounts()', type: 'Supabase + Fallback', impl: 'accountsRepository.ts' },
-              { name: 'Interactions', sub: 'getInteractions()', type: 'Supabase + Fallback', impl: 'interactionsRepository.ts' },
-              { name: 'PlayRecommendations', sub: 'getPlayRecommendations()', type: 'Supabase + Fallback', impl: 'playRecommendationsRepository.ts' },
-              { name: 'CampaignsCanonical (E22)', sub: 'getCampaignsCanonical()', type: 'Supabase + Fallback', impl: 'campaignsCanonicalRepository.ts' },
-              { name: 'Opportunities', sub: 'getOportunidadesMap()', type: 'Mock/Fallback', impl: 'oportunidadesRepository.ts' },
+              { name: 'Accounts', sub: 'getAccounts()', type: 'Supabase + contingência', impl: 'accountsRepository.ts' },
+              { name: 'Interactions', sub: 'getInteractions()', type: 'Supabase + contingência', impl: 'interactionsRepository.ts' },
+              { name: 'PlayRecommendations', sub: 'getPlayRecommendations()', type: 'Supabase + contingência', impl: 'playRecommendationsRepository.ts' },
+              { name: 'CampaignsCanonical (E22)', sub: 'getCampaignsCanonical()', type: 'Supabase + contingência', impl: 'campaignsCanonicalRepository.ts' },
+              { name: 'Opportunities', sub: 'getOportunidadesMap()', type: 'Mock + contingência', impl: 'oportunidadesRepository.ts' },
               { name: 'advancedSignals', sub: 'Importado direto', type: 'Apenas Mock', impl: 'data/signalsV6.ts' },
               { name: 'initialActions', sub: 'Importado direto', type: 'Apenas Mock', impl: 'data/accountsData.ts' },
-              { name: 'METRICS, FRENTES, SQUAD_OWNERS', sub: 'Arrays hardcoded', type: 'Apenas Estática', impl: 'Performance.tsx' },
+              { name: 'METRICS, FRENTES, SQUAD_OWNERS', sub: 'Arrays fixos em código', type: 'Apenas Estática', impl: 'Performance.tsx' },
             ].map((source, i) => (
               <div key={i} className="p-4 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{source.name}</span>
-                      <Badge className={`text-[8px] font-black px-2 py-0.5 ${source.type === 'Supabase + Fallback' ? 'bg-emerald-100 text-emerald-700' : source.type === 'Mock/Fallback' ? 'bg-blue-100 text-blue-700' : source.type === 'Apenas Mock' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
+                      <Badge className={`text-[8px] font-black px-2 py-0.5 ${source.type === 'Supabase + contingência' ? 'bg-emerald-100 text-emerald-700' : source.type === 'Mock + contingência' ? 'bg-blue-100 text-blue-700' : source.type === 'Apenas Mock' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
                         {source.type}
                       </Badge>
                     </div>
@@ -174,10 +174,10 @@ export const Settings: React.FC = () => {
           <div className="mt-10 p-6 bg-blue-50 rounded-3xl border border-blue-200">
              <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2">📋 Legenda</p>
              <div className="text-[10px] text-slate-700 space-y-1">
-               <p><strong>Supabase + Fallback:</strong> Código tenta ler real, cai para mock se indisponível</p>
-               <p><strong>Mock/Fallback:</strong> Lógica mista (ex: oportunidades ainda em E2)</p>
+               <p><strong>Supabase + contingência:</strong> Código tenta ler real, cai para mock se indisponível</p>
+               <p><strong>Mock + contingência:</strong> Lógica mista (ex: oportunidades ainda em E2)</p>
                <p><strong>Apenas Mock:</strong> Importa direto, zero tentativa de ler Supabase</p>
-               <p><strong>Apenas Estática:</strong> Arrays hardcoded em código (ex: Performance.tsx)</p>
+               <p><strong>Apenas Estática:</strong> Arrays fixos em código (ex: Performance.tsx)</p>
              </div>
           </div>
         </Card>
@@ -192,7 +192,7 @@ export const Settings: React.FC = () => {
             {[
               { page: 'Accounts', label: 'Alta', color: 'emerald', desc: 'Tenta Supabase real; fallback mock confiável' },
               { page: 'Overview', label: 'Baixa', color: 'red', desc: 'Mock direto (advancedSignals), não reconciliado' },
-              { page: 'Performance', label: 'Nenhuma', color: 'red', desc: 'Arrays hardcoded (não tem fonte real)' },
+              { page: 'Performance', label: 'Nenhuma', color: 'red', desc: 'Arrays fixos em código (não tem fonte real)' },
               { page: 'Settings', label: 'Média', color: 'amber', desc: 'Mostra mapeamento estrutural (este painel)' },
             ].map((screen, i) => (
               <div key={i} className="p-4 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all">
@@ -224,9 +224,9 @@ export const Settings: React.FC = () => {
           <div className="space-y-4 mt-10">
             {[
               { aspect: 'Overview', note: 'Importa advancedSignals direto (mock)', status: 'Documentado' },
-              { aspect: 'Performance', note: 'Arrays METRICS/FRENTES hardcoded', status: 'Documentado' },
+              { aspect: 'Performance', note: 'Arrays METRICS/FRENTES fixos em código', status: 'Documentado' },
               { aspect: 'Accounts', note: 'Tenta getAccounts() real, fallback contasMock', status: 'Ativo' },
-              { aspect: 'E22.1 Campanhas', note: 'Integração em exploração — aguardando user review', status: 'Exploratório' },
+              { aspect: 'E22.1 Campanhas', note: 'Integração em exploração — aguardando avaliação do usuário', status: 'Exploratório' },
             ].map((item, i) => (
               <div key={i} className="p-4 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all">
                 <div className="flex justify-between items-start">
