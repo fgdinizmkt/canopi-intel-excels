@@ -97,5 +97,33 @@ Não assumir que a taxonomia está aprovada só porque houve implementação té
 
 ---
 
+## Governança canônica: não deixar pontas soltas
+
+### Princípio
+Toda frente aberta, recorte iniciado ou diagnóstico concluído deve terminar em estado explícito e inequívoco. Não há meio-termo nem ambiguidade tolerada.
+
+### Estados finais válidos (e apenas estes)
+1. **Publicado**: commit feito, push realizado, evidência em GitHub
+2. **Revertido**: mudança desfeita completamente, repositório volta ao estado anterior
+3. **Isolado com fronteira limpa**: código contaminante removido, mudança voltada ao seu escopo original, próximo passo bloqueado e explícito
+4. **Pendente com registro formal**: registrado formalmente no repositório, com motivo, dono, data esperada e próximo passo único e não ambíguo
+
+### Proibido (sem exceção)
+- deixar sobra local sem decisão (não "vou decidir depois")
+- recorte contaminado por avanço de outra frente (E22 não pode carregar E22.1)
+- estado de chat confundido com estado publicado (conversa !== repositório)
+- implementação parcialmente validada tratada como concluída
+- mudança visual não aprovada explicitamente pelo usuário
+- diagnóstico incompleto com próximo passo ambíguo ou múltiplo
+- corrigir apenas parte do problema deixando a outra metade aberta
+
+### Obrigatório
+- sempre que um diagnóstico for concluído, o próximo passo operacional deve estar definido de forma única
+- sempre que houver correção de governança, ela deve fechar a pendência por completo, não parcialmente
+- toda mudança substancial deve ter aprovação visual ou técnica documentada antes de commit
+- toda pendência deve estar registrada no repositório (memory, branch, issue, ou documento operacional), nunca apenas em chat
+
+---
+
 ## Ponto sugerido de retomada
 > O estado publicado do projeto está fechado até `2e6331d`. A E21 está concluída. Existe uma frente visual não publicada em `Accounts.tsx` para campanhas, já implementada localmente segundo relato do Claude Code, mas aguardando avaliação visual do usuário e possivelmente uma definição conceitual melhor da taxonomia de campanhas antes de qualquer commit.
