@@ -31,7 +31,8 @@ import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { getInteractions } from '../lib/interactionsRepository';
 import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
-import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
+import { getCampaignsMap } from '../lib/campaignsRepository';
+import { Interaction, PlayRecommendation, Campaign } from '../../scripts/seed/buildBlockCSeed';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
 type Ordenacao = 'potencial_desc' | 'risco_desc' | 'movimentacao_desc' | 'score_desc' | 'score_asc' | 'engajamento_desc';
@@ -51,12 +52,13 @@ type Filtros = {
   play: string;
   blocoCInteracoes: 'todos' | 'com' | 'sem' | 'recente';
   blocoCPlays: 'todos' | 'com' | 'sem';
+  blocoCCampanhas: 'todos' | 'com' | 'inbound' | 'outbound' | 'earned' | 'partnership';
 };
 
 const filtrosIniciais: Filtros = {
   busca: '', vertical: 'todos', segmento: 'todos', owner: 'todos', etapa: 'todas',
   tipoConta: 'todas', potencial: 'todos', risco: 'todos', cobertura: 'todos', oportunidade: 'todas', atividade: 'todas', play: 'todos',
-  blocoCInteracoes: 'todos', blocoCPlays: 'todos'
+  blocoCInteracoes: 'todos', blocoCPlays: 'todos', blocoCCampanhas: 'todos'
 };
 
 const toDate = (date: string) => new Date(date).getTime();
@@ -74,6 +76,7 @@ export const Accounts = () => {
   const [contas, setContas] = useState<Conta[]>([]);
   const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
   const [allPlays, setAllPlays] = useState<PlayRecommendation[]>([]);
+  const [campaignsMap, setCampaignsMap] = useState<Record<string, Campaign>>({});
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
   const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
   // 4C: Estado para controle de volume exibido na lista principal
@@ -93,20 +96,23 @@ export const Accounts = () => {
     atividade: searchParams?.get('atividade') || 'todas',
     play: searchParams?.get('play') || 'todos',
     blocoCInteracoes: (searchParams?.get('blocoCInteracoes') as Filtros['blocoCInteracoes']) || 'todos',
-    blocoCPlays: (searchParams?.get('blocoCPlays') as Filtros['blocoCPlays']) || 'todos'
+    blocoCPlays: (searchParams?.get('blocoCPlays') as Filtros['blocoCPlays']) || 'todos',
+    blocoCCampanhas: (searchParams?.get('blocoCCampanhas') as Filtros['blocoCCampanhas']) || 'todos'
   });
 
   useEffect(() => {
     const carregarContas = async () => {
       try {
-        const [dadosContas, dadosInteractions, dadosPlays] = await Promise.all([
+        const [dadosContas, dadosInteractions, dadosPlays, dadosCampanhas] = await Promise.all([
           getAccounts(),
           getInteractions(),
-          getPlayRecommendations()
+          getPlayRecommendations(),
+          getCampaignsMap()
         ]);
         setContas(dadosContas);
         setAllInteractions(dadosInteractions);
         setAllPlays(dadosPlays);
+        setCampaignsMap(dadosCampanhas);
       } catch (err) {
         console.error('[Accounts] Erro ao carregar contas ou bloco C:', err);
         setContas(contasMock);
@@ -135,6 +141,7 @@ export const Accounts = () => {
     if (filtros.play !== 'todos') params.set('play', filtros.play);
     if (filtros.blocoCInteracoes !== 'todos') params.set('blocoCInteracoes', filtros.blocoCInteracoes);
     if (filtros.blocoCPlays !== 'todos') params.set('blocoCPlays', filtros.blocoCPlays);
+    if (filtros.blocoCCampanhas !== 'todos') params.set('blocoCCampanhas', filtros.blocoCCampanhas);
     params.set('view', visualizacao);
     params.set('sort', ordenacao);
     router.replace(`${pathname}?${params.toString()}`);
@@ -166,6 +173,39 @@ export const Accounts = () => {
 
     return map;
   }, [contas, allInteractions, allPlays]);
+
+  // Agregação de Campanhas por Conta (Bloco C - Campanhas)
+  const blocoCCampagnas = useMemo(() => {
+    const map: Record<string, { campaignIds: Set<string>; campaignsByType: Record<string, number>; campaignNames: string[] }> = {};
+
+    contas.forEach(c => {
+      const accountInteractions = allInteractions.filter(i => i.accountId === c.id);
+      const uniqueCampaignIds = new Set<string>(
+        accountInteractions
+          .filter(i => i.campaignId && campaignsMap[i.campaignId])
+          .map(i => i.campaignId as string)
+      );
+
+      const campaignsByType: Record<string, number> = {};
+      const campaignNames: string[] = [];
+
+      Array.from(uniqueCampaignIds).forEach((cid: string) => {
+        const campaign = campaignsMap[cid];
+        if (campaign) {
+          campaignsByType[campaign.type] = (campaignsByType[campaign.type] || 0) + 1;
+          campaignNames.push(campaign.name);
+        }
+      });
+
+      map[c.id] = {
+        campaignIds: uniqueCampaignIds,
+        campaignsByType,
+        campaignNames
+      };
+    });
+
+    return map;
+  }, [contas, allInteractions, campaignsMap]);
 
   const filtradas = useMemo(() => {
     let data = contas.filter((c) => {
@@ -203,6 +243,13 @@ export const Accounts = () => {
       if (filtros.blocoCPlays === 'com' && (!signals || signals.playsCount === 0)) return false;
       if (filtros.blocoCPlays === 'sem' && signals && signals.playsCount > 0) return false;
 
+      // Filtro de Campanhas
+      const campaigns = blocoCCampagnas[c.id];
+      if (filtros.blocoCCampanhas === 'com' && (!campaigns || campaigns.campaignIds.size === 0)) return false;
+      if (filtros.blocoCCampanhas !== 'todos' && filtros.blocoCCampanhas !== 'com') {
+        if (!campaigns || campaigns.campaignsByType[filtros.blocoCCampanhas] === undefined) return false;
+      }
+
       return true;
     });
 
@@ -228,7 +275,7 @@ export const Accounts = () => {
     });
 
     return data;
-  }, [filtros, ordenacao, contas, blocoCSignals]);
+  }, [filtros, ordenacao, contas, blocoCSignals, blocoCCampagnas]);
 
   const metricas = useMemo(() => ({
     prioritarias: contas.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
@@ -546,6 +593,14 @@ export const Accounts = () => {
               <option value="com">Com Recomendações</option>
               <option value="sem">Sem Recomendações</option>
             </select>
+            <select value={filtros.blocoCCampanhas} onChange={(e) => atualizarFiltro('blocoCCampanhas', e.target.value as Filtros['blocoCCampanhas'])} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Campanhas: Todas</option>
+              <option value="com">Com Campanhas</option>
+              <option value="inbound">Inbound</option>
+              <option value="outbound">Outbound</option>
+              <option value="earned">Earned</option>
+              <option value="partnership">Partnership</option>
+            </select>
           </div>
         </section>
 
@@ -694,6 +749,36 @@ export const Accounts = () => {
                             <span className="text-[10px] font-black text-blue-400">{signals.playsCount} PLAYS</span>
                           </div>
                         )}
+                        {(() => {
+                          const campaigns = blocoCCampagnas[conta.id];
+                          if (!campaigns || campaigns.campaignIds.size === 0) return null;
+                          const campaignTypes = Object.entries(campaigns.campaignsByType).map(([type, count]) => ({ type, count }));
+                          const displayed = campaignTypes.slice(0, 2);
+                          const remaining = campaignTypes.length - 2;
+                          return (
+                            <>
+                              {displayed.map(({ type }) => {
+                                const typeColorMap: Record<string, { bg: string; text: string; border: string }> = {
+                                  inbound: { bg: 'bg-violet-500/5', text: 'text-violet-400', border: 'border-violet-500/10' },
+                                  outbound: { bg: 'bg-orange-500/5', text: 'text-orange-400', border: 'border-orange-500/10' },
+                                  earned: { bg: 'bg-teal-500/5', text: 'text-teal-400', border: 'border-teal-500/10' },
+                                  partnership: { bg: 'bg-fuchsia-500/5', text: 'text-fuchsia-400', border: 'border-fuchsia-500/10' }
+                                };
+                                const colors = typeColorMap[type] || typeColorMap.inbound;
+                                return (
+                                  <div key={type} className={`px-2 py-1 ${colors.bg} border ${colors.border} rounded-lg`} title={`${type.charAt(0).toUpperCase() + type.slice(1)} campaign`}>
+                                    <span className={`text-[9px] font-black uppercase ${colors.text}`}>{type.slice(0, 3)}</span>
+                                  </div>
+                                );
+                              })}
+                              {remaining > 0 && (
+                                <div className="px-2 py-1 bg-slate-500/5 border border-slate-500/10 rounded-lg">
+                                  <span className="text-[9px] font-black text-slate-400">+{remaining}</span>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                         {acoesAtrasadas > 0 && (
                           <div className="px-2 py-1 bg-rose-500/5 border border-rose-500/10 rounded-lg flex items-center gap-1.5">
                             <AlertTriangle className="w-3 h-3 text-rose-500" />
@@ -843,13 +928,43 @@ export const Accounts = () => {
                                        </button>
                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                                      </div>
-                                     <div className="flex items-center gap-3 mb-1.5">
+                                     <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
                                         {signals?.interactionsCount > 0 && (
                                            <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
                                              <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                            </span>
                                         )}
+                                        {(() => {
+                                          const campaigns = blocoCCampagnas[conta.id];
+                                          if (!campaigns || campaigns.campaignIds.size === 0) return null;
+                                          const campaignTypes = Object.entries(campaigns.campaignsByType).map(([type]) => type);
+                                          const displayed = campaignTypes.slice(0, 2);
+                                          const remaining = campaignTypes.length - 2;
+                                          return (
+                                            <>
+                                              {displayed.map((type) => {
+                                                const typeColorMap: Record<string, { text: string; bg: string; border: string }> = {
+                                                  inbound: { text: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+                                                  outbound: { text: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
+                                                  earned: { text: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-100' },
+                                                  partnership: { text: 'text-fuchsia-600', bg: 'bg-fuchsia-50', border: 'border-fuchsia-100' }
+                                                };
+                                                const colors = typeColorMap[type] || typeColorMap.inbound;
+                                                return (
+                                                  <span key={type} className={`text-[8px] font-black ${colors.text} ${colors.bg} px-1.5 py-0.5 rounded border ${colors.border}`}>
+                                                    {type.slice(0, 3).toUpperCase()}
+                                                  </span>
+                                                );
+                                              })}
+                                              {remaining > 0 && (
+                                                <span className="text-[8px] font-black text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                                  +{remaining}
+                                                </span>
+                                              )}
+                                            </>
+                                          );
+                                        })()}
                                      </div>
                                      {/* Context Info moved below Identity to reduce horizontal tension */}
                                      <div className="flex items-center gap-2">
