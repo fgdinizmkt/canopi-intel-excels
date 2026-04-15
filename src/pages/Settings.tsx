@@ -8,7 +8,7 @@ import {
 import { isSupabaseConfigured, getEnvironment } from '../lib/supabaseClient';
 
 export const Settings: React.FC = () => {
-  // Estado verificável em runtime
+  // Estado verificável em tempo de execução
   const runtimeState = useMemo(() => ({
     supabaseConfigured: isSupabaseConfigured(),
     environment: getEnvironment(),
@@ -25,7 +25,7 @@ export const Settings: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Badge className="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 text-[10px] font-black tracking-widest uppercase">
-                Settings & Diagnostics
+                Configurações & Diagnósticos
               </Badge>
             </div>
             <div>
@@ -33,7 +33,7 @@ export const Settings: React.FC = () => {
                 Plataforma: Transparência de Dados
               </h1>
               <p className="text-slate-400 mt-3 text-sm font-medium max-w-xl leading-relaxed">
-                Mapeamento estrutural de fontes de dados (real, mock, static) e estado verificável em runtime.
+                Mapeamento estrutural de fontes de dados (real, mock, estática) e estado verificável em tempo de execução.
               </p>
             </div>
           </div>
@@ -41,7 +41,7 @@ export const Settings: React.FC = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 pt-10 border-t border-white/10">
           {[
-            { label: 'Ambiente Detectado', val: runtimeState.environment || '?', sub: 'Do env vars' },
+            { label: 'Ambiente Detectado', val: runtimeState.environment || '?', sub: 'De variáveis de ambiente' },
             { label: 'Supabase', val: runtimeState.supabaseConfigured ? 'Configurado' : 'Não configurado', sub: runtimeState.supabaseConfigured ? 'Irá usar dados reais' : 'Usando mock apenas' },
             { label: 'Estado Estrutural', val: 'Mapeado', sub: 'Ver blocos abaixo' },
             { label: 'Auditoria', val: 'Documento 25', sub: 'Leia doc 25 para detalhes' },
@@ -74,7 +74,7 @@ export const Settings: React.FC = () => {
             <div className="space-y-8">
               <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <div className="flex justify-between items-center mb-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado Verificável em Runtime</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado Verificável em Tempo de Execução</p>
                 </div>
                 <div className="space-y-3 text-[10px] text-slate-600">
                   <div className="flex justify-between">
@@ -87,7 +87,7 @@ export const Settings: React.FC = () => {
                       {runtimeState.supabaseConfigured ? 'Configurado' : 'Não configurado'}
                     </span>
                   </div>
-                  <p className="text-[9px] text-slate-400 italic mt-2">Leitura de: env vars e isSupabaseConfigured()</p>
+                  <p className="text-[9px] text-slate-400 italic mt-2">Leitura de: variáveis de ambiente e isSupabaseConfigured()</p>
                 </div>
               </div>
 
@@ -150,16 +150,16 @@ export const Settings: React.FC = () => {
               { name: 'PlayRecommendations', sub: 'getPlayRecommendations()', type: 'Supabase + Fallback', impl: 'playRecommendationsRepository.ts' },
               { name: 'CampaignsCanonical (E22)', sub: 'getCampaignsCanonical()', type: 'Supabase + Fallback', impl: 'campaignsCanonicalRepository.ts' },
               { name: 'Opportunities', sub: 'getOportunidadesMap()', type: 'Mock/Fallback', impl: 'oportunidadesRepository.ts' },
-              { name: 'advancedSignals', sub: 'Importado direto', type: 'Mock Apenas', impl: 'data/signalsV6.ts' },
-              { name: 'initialActions', sub: 'Importado direto', type: 'Mock Apenas', impl: 'data/accountsData.ts' },
-              { name: 'METRICS, FRENTES, SQUAD_OWNERS', sub: 'Arrays hardcoded', type: 'Static Apenas', impl: 'Performance.tsx' },
+              { name: 'advancedSignals', sub: 'Importado direto', type: 'Apenas Mock', impl: 'data/signalsV6.ts' },
+              { name: 'initialActions', sub: 'Importado direto', type: 'Apenas Mock', impl: 'data/accountsData.ts' },
+              { name: 'METRICS, FRENTES, SQUAD_OWNERS', sub: 'Arrays hardcoded', type: 'Apenas Estática', impl: 'Performance.tsx' },
             ].map((source, i) => (
               <div key={i} className="p-4 border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{source.name}</span>
-                      <Badge className={`text-[8px] font-black px-2 py-0.5 ${source.type === 'Supabase + Fallback' ? 'bg-emerald-100 text-emerald-700' : source.type === 'Mock/Fallback' ? 'bg-blue-100 text-blue-700' : source.type === 'Mock Apenas' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
+                      <Badge className={`text-[8px] font-black px-2 py-0.5 ${source.type === 'Supabase + Fallback' ? 'bg-emerald-100 text-emerald-700' : source.type === 'Mock/Fallback' ? 'bg-blue-100 text-blue-700' : source.type === 'Apenas Mock' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
                         {source.type}
                       </Badge>
                     </div>
@@ -176,8 +176,8 @@ export const Settings: React.FC = () => {
              <div className="text-[10px] text-slate-700 space-y-1">
                <p><strong>Supabase + Fallback:</strong> Código tenta ler real, cai para mock se indisponível</p>
                <p><strong>Mock/Fallback:</strong> Lógica mista (ex: oportunidades ainda em E2)</p>
-               <p><strong>Mock Apenas:</strong> Importa direto, zero tentativa de ler Supabase</p>
-               <p><strong>Static Apenas:</strong> Arrays hardcoded em código (ex: Performance.tsx)</p>
+               <p><strong>Apenas Mock:</strong> Importa direto, zero tentativa de ler Supabase</p>
+               <p><strong>Apenas Estática:</strong> Arrays hardcoded em código (ex: Performance.tsx)</p>
              </div>
           </div>
         </Card>
