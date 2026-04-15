@@ -596,19 +596,22 @@ export const Accounts = () => {
               <option value="sem">Sem Recomendações</option>
             </select>
             {/* E22.1: Filtros Canônicos de Campanhas */}
-            <select value={filtros.usoPrincipal} onChange={(e) => atualizarFiltro('usoPrincipal', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+            <div className="col-span-full">
+              <span className="text-[8px] font-black text-fuchsia-600 uppercase tracking-widest">Campanhas Canônicas</span>
+            </div>
+            <select value={filtros.usoPrincipal} onChange={(e) => atualizarFiltro('usoPrincipal', e.target.value)} title="ABM, ABX ou Híbrido — define a audiência alvo principal da campanha" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Uso Principal: Todos</option>
               {opcoesCanonicas.usoPrincipal.map((u) => <option key={u} value={u}>{u}</option>)}
             </select>
-            <select value={filtros.origem} onChange={(e) => atualizarFiltro('origem', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+            <select value={filtros.origem} onChange={(e) => atualizarFiltro('origem', e.target.value)} title="Orgânico, Pago, Prospecção Ativa, Parceria, Base Existente, Indicação, Direto — fonte ou natureza da campanha" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Origem: Todos</option>
               {opcoesCanonicas.origem.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
-            <select value={filtros.escala} onChange={(e) => atualizarFiltro('escala', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+            <select value={filtros.escala} onChange={(e) => atualizarFiltro('escala', e.target.value)} title="1:1, 1:Few, 1:Many — amplitude de alcance da campanha" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Escala: Todos</option>
               {opcoesCanonicas.escala.map((e) => <option key={e} value={e}>{e}</option>)}
             </select>
-            <select value={filtros.tipoCampanha} onChange={(e) => atualizarFiltro('tipoCampanha', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+            <select value={filtros.tipoCampanha} onChange={(e) => atualizarFiltro('tipoCampanha', e.target.value)} title="Webinar, Workshop, Podcast, Videocast, Whitepaper, etc — formato ou tipo de conteúdo/evento" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Tipo Campanha: Todos</option>
               {opcoesCanonicas.tipoCampanha.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -769,7 +772,7 @@ export const Accounts = () => {
                         {campanhasCanonicasPorConta[conta.id]?.length > 0 && (
                           <div className="px-2 py-1 bg-fuchsia-500/5 border border-fuchsia-500/10 rounded-lg flex items-center gap-1.5" title="Campanhas Canônicas">
                             <Mail className="w-3 h-3 text-fuchsia-500" />
-                            <span className="text-[10px] font-black text-fuchsia-400">{campanhasCanonicasPorConta[conta.id].length} C</span>
+                            <span className="text-[10px] font-black text-fuchsia-400">{campanhasCanonicasPorConta[conta.id].length} CAM</span>
                           </div>
                         )}
                     </div>
