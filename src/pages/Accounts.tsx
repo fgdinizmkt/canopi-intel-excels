@@ -611,7 +611,7 @@ export const Accounts = () => {
               <option value="todos">Escala: Todos</option>
               {opcoesCanonicas.escala.map((e) => <option key={e} value={e}>{e}</option>)}
             </select>
-            <select value={filtros.tipoCampanha} onChange={(e) => atualizarFiltro('tipoCampanha', e.target.value)} title="Webinar, Workshop, Podcast, Videocast, Whitepaper, etc — formato ou tipo de conteúdo/evento" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+            <select value={filtros.tipoCampanha} onChange={(e) => atualizarFiltro('tipoCampanha', e.target.value)} title="Conteúdo, Captação, Nutrição, Prospecção, Conversão, Relacionamento, Reativação, Expansão, Co-Marketing, Prova Social — natureza principal da campanha" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Tipo Campanha: Todos</option>
               {opcoesCanonicas.tipoCampanha.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
