@@ -1,47 +1,22 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { Card, Button, Badge } from '../components/ui';
+import React, { useMemo } from 'react';
+import { Card, Badge } from '../components/ui';
 import {
-  Search, Bell, HelpCircle, Zap, BarChart3, Target, Check, AlertCircle,
-  Info, Shield, ChevronDown, GripVertical, User, Briefcase, Megaphone,
-  Clock, BrainCircuit, Activity, Database, Globe, RefreshCw, Layers, ShieldCheck,
-  Server, Wifi, WifiOff, Cpu
+  AlertCircle, BarChart3, Check, Database, Info, Cpu
 } from 'lucide-react';
 import { isSupabaseConfigured, getEnvironment } from '../lib/supabaseClient';
 
 export const Settings: React.FC = () => {
-  const [toggles, setToggles] = useState({ nexus_ai: true, auto_sync: true, risk_alert: true });
-  const [enginePower, setEnginePower] = useState(85);
-
   // Estado verificável em runtime
   const runtimeState = useMemo(() => ({
     supabaseConfigured: isSupabaseConfigured(),
     environment: getEnvironment(),
   }), []);
 
-  // Mapeamentos estáticos para blindagem de cores Tailwind (Evita interpolação frágil)
-  const bgMap: Record<string, string> = {
-    emerald: 'bg-emerald-500',
-    blue: 'bg-blue-500',
-    amber: 'bg-amber-500',
-    red: 'bg-red-500',
-    'emerald-pale': 'bg-emerald-50',
-    'blue-pale': 'bg-blue-50',
-    'amber-pale': 'bg-amber-50',
-    'red-pale': 'bg-red-50'
-  };
-
-  const textMap: Record<string, string> = {
-    emerald: 'text-emerald-600',
-    blue: 'text-blue-600',
-    amber: 'text-amber-600',
-    red: 'text-red-600'
-  };
-
   return (
     <div className="space-y-8 animate-in fade-in duration-700 pb-20 max-w-[1400px] mx-auto">
-      {/* 1. WORKSPACE HEALTH - HERO PROTAGONISTA */}
+      {/* HERO: Estado Verificável em Runtime */}
       <div className="relative overflow-hidden bg-slate-950 rounded-[40px] p-10 text-white shadow-2xl border border-white/5">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-transparent to-indigo-600/10 opacity-50"></div>
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
@@ -277,18 +252,11 @@ export const Settings: React.FC = () => {
         </Card>
       </div>
 
-      {/* FOOTER ACTIONS - CONTEXTO OPERACIONAL */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-10 border-t border-slate-200">
-        <div className="flex items-center gap-4">
-           <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white font-black text-xs">AD</div>
-           <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Authorization</p>
-              <p className="text-xs font-bold text-slate-900 leading-none mt-0.5">Fábio Diniz • 2026-04-01 23:30</p>
-           </div>
-        </div>
-        <div className="flex gap-4 w-full md:w-auto">
-          <Button variant="outline" className="flex-1 md:flex-none py-6 px-10 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-500 border-slate-200 hover:bg-slate-50 h-14">Descartar Configuração</Button>
-          <Button className="flex-1 md:flex-none py-6 px-10 rounded-2xl font-black text-[10px] uppercase tracking-widest bg-blue-600 text-white shadow-xl shadow-blue-600/20 hover:bg-blue-700 h-14">Publicar Governança</Button>
+      {/* RODAPÉ: Aviso sobre Escopo Documental */}
+      <div className="pt-10 border-t border-slate-200">
+        <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200">
+           <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-2">ℹ️ Escopo desta Página</p>
+           <p className="text-sm text-slate-700 leading-snug">Configurações em Settings.tsx é <strong>diagnóstica e documental</strong>. Não persiste dados, não salva estado, não executa ações operacionais. Consulte <strong>docs/98-operacao/25-auditoria-canonicidade-fontes-dados.md</strong> para detalhes completos.</p>
         </div>
       </div>
     </div>
