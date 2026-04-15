@@ -31,6 +31,8 @@ import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { getInteractions } from '../lib/interactionsRepository';
 import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
+import { getCampaignsCanonical } from '../lib/campaignsCanonicalRepository';
+import { type CampaignCanonical } from '../data/campaignCanonicalDictionary';
 import { Interaction, PlayRecommendation } from '../../scripts/seed/buildBlockCSeed';
 
 type Visualizacao = 'lista' | 'grade' | 'board';
@@ -51,12 +53,17 @@ type Filtros = {
   play: string;
   blocoCInteracoes: 'todos' | 'com' | 'sem' | 'recente';
   blocoCPlays: 'todos' | 'com' | 'sem';
+  usoPrincipal: string;
+  origem: string;
+  escala: string;
+  tipoCampanha: string;
 };
 
 const filtrosIniciais: Filtros = {
   busca: '', vertical: 'todos', segmento: 'todos', owner: 'todos', etapa: 'todas',
   tipoConta: 'todas', potencial: 'todos', risco: 'todos', cobertura: 'todos', oportunidade: 'todas', atividade: 'todas', play: 'todos',
-  blocoCInteracoes: 'todos', blocoCPlays: 'todos'
+  blocoCInteracoes: 'todos', blocoCPlays: 'todos',
+  usoPrincipal: 'todos', origem: 'todos', escala: 'todos', tipoCampanha: 'todos'
 };
 
 const toDate = (date: string) => new Date(date).getTime();
@@ -74,6 +81,7 @@ export const Accounts = () => {
   const [contas, setContas] = useState<Conta[]>([]);
   const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
   const [allPlays, setAllPlays] = useState<PlayRecommendation[]>([]);
+  const [allCampaignsCanonical, setAllCampaignsCanonical] = useState<CampaignCanonical[]>([]);
   const [visualizacao, setVisualizacao] = useState<Visualizacao>((searchParams?.get('view') as Visualizacao) || 'lista');
   const [ordenacao, setOrdenacao] = useState<Ordenacao>((searchParams?.get('sort') as Ordenacao) || 'potencial_desc');
   // 4C: Estado para controle de volume exibido na lista principal
@@ -93,20 +101,26 @@ export const Accounts = () => {
     atividade: searchParams?.get('atividade') || 'todas',
     play: searchParams?.get('play') || 'todos',
     blocoCInteracoes: (searchParams?.get('blocoCInteracoes') as Filtros['blocoCInteracoes']) || 'todos',
-    blocoCPlays: (searchParams?.get('blocoCPlays') as Filtros['blocoCPlays']) || 'todos'
+    blocoCPlays: (searchParams?.get('blocoCPlays') as Filtros['blocoCPlays']) || 'todos',
+    usoPrincipal: searchParams?.get('usoPrincipal') || 'todos',
+    origem: searchParams?.get('origem') || 'todos',
+    escala: searchParams?.get('escala') || 'todos',
+    tipoCampanha: searchParams?.get('tipoCampanha') || 'todos'
   });
 
   useEffect(() => {
     const carregarContas = async () => {
       try {
-        const [dadosContas, dadosInteractions, dadosPlays] = await Promise.all([
+        const [dadosContas, dadosInteractions, dadosPlays, dadosCampanhasCanonical] = await Promise.all([
           getAccounts(),
           getInteractions(),
-          getPlayRecommendations()
+          getPlayRecommendations(),
+          getCampaignsCanonical()
         ]);
         setContas(dadosContas);
         setAllInteractions(dadosInteractions);
         setAllPlays(dadosPlays);
+        setAllCampaignsCanonical(dadosCampanhasCanonical);
       } catch (err) {
         console.error('[Accounts] Erro ao carregar contas ou bloco C:', err);
         setContas(contasMock);
@@ -135,6 +149,10 @@ export const Accounts = () => {
     if (filtros.play !== 'todos') params.set('play', filtros.play);
     if (filtros.blocoCInteracoes !== 'todos') params.set('blocoCInteracoes', filtros.blocoCInteracoes);
     if (filtros.blocoCPlays !== 'todos') params.set('blocoCPlays', filtros.blocoCPlays);
+    if (filtros.usoPrincipal !== 'todos') params.set('usoPrincipal', filtros.usoPrincipal);
+    if (filtros.origem !== 'todos') params.set('origem', filtros.origem);
+    if (filtros.escala !== 'todos') params.set('escala', filtros.escala);
+    if (filtros.tipoCampanha !== 'todos') params.set('tipoCampanha', filtros.tipoCampanha);
     params.set('view', visualizacao);
     params.set('sort', ordenacao);
     router.replace(`${pathname}?${params.toString()}`);
@@ -166,6 +184,30 @@ export const Accounts = () => {
 
     return map;
   }, [contas, allInteractions, allPlays]);
+
+  // E22.1: Agregação de Campanhas Canônicas por Conta
+  const campanhasCanonicasPorConta = useMemo(() => {
+    const map: Record<string, CampaignCanonical[]> = {};
+
+    contas.forEach(c => {
+      // Campanhas inferidas via interaction.campaignId
+      const accountCampaigns = allCampaignsCanonical.filter(camp => {
+        const relatedInteractions = allInteractions.filter(i => i.accountId === c.id && i.campaignId === camp.campaignaId);
+        return relatedInteractions.length > 0;
+      });
+      map[c.id] = accountCampaigns;
+    });
+
+    return map;
+  }, [contas, allCampaignsCanonical, allInteractions]);
+
+  // E22.1: Gerar opções dinâmicas para filtros canônicos
+  const opcoesCanonicas = useMemo(() => ({
+    usoPrincipal: Array.from(new Set(allCampaignsCanonical.map(c => c.usoPrincipal).filter(Boolean))),
+    origem: Array.from(new Set(allCampaignsCanonical.map(c => c.origem).filter(Boolean))),
+    escala: Array.from(new Set(allCampaignsCanonical.map(c => c.escala).filter(Boolean))),
+    tipoCampanha: Array.from(new Set(allCampaignsCanonical.map(c => c.tipoCampanha).filter(Boolean)))
+  }), [allCampaignsCanonical]);
 
   const filtradas = useMemo(() => {
     let data = contas.filter((c) => {
@@ -203,6 +245,13 @@ export const Accounts = () => {
       if (filtros.blocoCPlays === 'com' && (!signals || signals.playsCount === 0)) return false;
       if (filtros.blocoCPlays === 'sem' && signals && signals.playsCount > 0) return false;
 
+      // E22.1: Filtros de Campanhas Canônicas
+      const accountCampaigns = campanhasCanonicasPorConta[c.id] || [];
+      if (filtros.usoPrincipal !== 'todos' && !accountCampaigns.some(camp => camp.usoPrincipal === filtros.usoPrincipal)) return false;
+      if (filtros.origem !== 'todos' && !accountCampaigns.some(camp => camp.origem === filtros.origem)) return false;
+      if (filtros.escala !== 'todos' && !accountCampaigns.some(camp => camp.escala === filtros.escala)) return false;
+      if (filtros.tipoCampanha !== 'todos' && !accountCampaigns.some(camp => camp.tipoCampanha === filtros.tipoCampanha)) return false;
+
       return true;
     });
 
@@ -228,7 +277,7 @@ export const Accounts = () => {
     });
 
     return data;
-  }, [filtros, ordenacao, contas, blocoCSignals]);
+  }, [filtros, ordenacao, contas, blocoCSignals, campanhasCanonicasPorConta]);
 
   const metricas = useMemo(() => ({
     prioritarias: contas.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,
@@ -546,6 +595,23 @@ export const Accounts = () => {
               <option value="com">Com Recomendações</option>
               <option value="sem">Sem Recomendações</option>
             </select>
+            {/* E22.1: Filtros Canônicos de Campanhas */}
+            <select value={filtros.usoPrincipal} onChange={(e) => atualizarFiltro('usoPrincipal', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Uso Principal: Todos</option>
+              {opcoesCanonicas.usoPrincipal.map((u) => <option key={u} value={u}>{u}</option>)}
+            </select>
+            <select value={filtros.origem} onChange={(e) => atualizarFiltro('origem', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Origem: Todos</option>
+              {opcoesCanonicas.origem.map((o) => <option key={o} value={o}>{o}</option>)}
+            </select>
+            <select value={filtros.escala} onChange={(e) => atualizarFiltro('escala', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Escala: Todos</option>
+              {opcoesCanonicas.escala.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+            <select value={filtros.tipoCampanha} onChange={(e) => atualizarFiltro('tipoCampanha', e.target.value)} className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
+              <option value="todos">Tipo Campanha: Todos</option>
+              {opcoesCanonicas.tipoCampanha.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
           </div>
         </section>
 
@@ -700,6 +766,12 @@ export const Accounts = () => {
                             <span className="text-[10px] font-black text-rose-400">{acoesAtrasadas} ATRASADAS</span>
                           </div>
                         )}
+                        {campanhasCanonicasPorConta[conta.id]?.length > 0 && (
+                          <div className="px-2 py-1 bg-fuchsia-500/5 border border-fuchsia-500/10 rounded-lg flex items-center gap-1.5" title="Campanhas Canônicas">
+                            <Mail className="w-3 h-3 text-fuchsia-500" />
+                            <span className="text-[10px] font-black text-fuchsia-400">{campanhasCanonicasPorConta[conta.id].length} C</span>
+                          </div>
+                        )}
                     </div>
                   </div>
 
@@ -848,6 +920,11 @@ export const Accounts = () => {
                                         {signals?.interactionsCount > 0 && (
                                            <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
                                              <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
+                                           </span>
+                                        )}
+                                        {campanhasCanonicasPorConta[conta.id]?.length > 0 && (
+                                           <span className="text-[9px] font-black text-fuchsia-600 bg-fuchsia-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-fuchsia-100">
+                                             <Mail className="w-2.5 h-2.5" /> {campanhasCanonicasPorConta[conta.id].length} CAMP
                                            </span>
                                         )}
                                      </div>
