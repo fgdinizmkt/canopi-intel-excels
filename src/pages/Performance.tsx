@@ -1,6 +1,8 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { contasMock } from '../data/accountsData';
 import { advancedSignals } from '../data/signalsV6';
+import { getAccounts } from '../lib/accountsRepository';
+import { getCampaignsCanonical } from '../lib/campaignsCanonicalRepository';
  
 // ─── GOVERNANÇA VISUAL (Tailwind v4 native) ──────────────────────────────────
 const colorMap: Record<string, { bg: string, text: string, border: string }> = {
@@ -140,7 +142,7 @@ const PerformanceMetrics = React.memo(({ m }: { m: any }) => (
 ));
 PerformanceMetrics.displayName = 'PerformanceMetrics';
 
-const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin }: { channels: any[], pl: string, bestOrigin?: string }) => (
+const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin, isOriginExploratoria }: { channels: any[], pl: string, bestOrigin?: string, isOriginExploratoria?: boolean }) => (
   <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="flex items-center justify-between mb-4">
       <div>
@@ -149,7 +151,7 @@ const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin }: { channels: a
       </div>
       {bestOrigin && (
         <div className="flex flex-col items-end">
-          <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Maior Volume por Origem</div>
+          <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Maior Volume por Origem {isOriginExploratoria && <span className="text-amber-500 ml-1">· exploratório</span>}</div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
             <span className="text-xs">📈</span>
             <span className="text-[11px] font-black uppercase tracking-tight">{bestOrigin}</span>
@@ -184,7 +186,7 @@ ExecutiveSummary.displayName = 'ExecutiveSummary';
 const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[], panelId: string, onOpen: (f: any) => void }) => (
   <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="mb-4">
-      <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Performance por Frente Operacional</div>
+      <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Performance por Frente Operacional <span className="text-slate-400 text-[11px]">· editorial</span></div>
       <div className="text-[13px] text-[#64748b]">Clique em qualquer frente para análise detalhada no painel lateral</div>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -247,7 +249,15 @@ export default function Performance() {
   const [dateTo, setDateTo]           = useState('2026-03-30');
   const [toast, setToast]             = useState<{msg:string;sub?:string}|null>(null);
   const [chartTip, setChartTip]       = useState<{show:boolean;label:string;val:string}>({show:false,label:'',val:''});
- 
+  const [contasLocal, setContasLocal] = useState<any[]>([]);
+  const [campanhasCanonical, setCampanhasCanonical] = useState<any[]>([]);
+
+  useEffect(() => {
+    Promise.all([getAccounts(), getCampaignsCanonical()])
+      .then(([c, camps]) => { setContasLocal(c); setCampanhasCanonical(camps); })
+      .catch(err => console.error('[Performance] Erro ao carregar fontes reais:', err));
+  }, []);
+
   const m  = METRICS[period] ?? METRICS['30d'];
   const pl = PERIOD_LABEL[period] ?? 'Personalizado';
 
@@ -259,7 +269,7 @@ export default function Performance() {
     const sevMap:     Record<string, string>  = { 'Alto': 'crítico', 'Médio': 'alerta', 'Baixo': 'oportunidade' };
     const canalMap:   Record<string, string>  = { 'ABM': 'ABM', 'ABX': 'ABX', 'Híbrido': 'ABM + ABX', 'Nenhum': 'Orgânico' };
 
-    return [...contasMock]
+    return [...(contasLocal.length > 0 ? contasLocal : contasMock)]
       .sort((a, b) => {
         const so = (statusOrder[a.statusGeral] ?? 9) - (statusOrder[b.statusGeral] ?? 9);
         return so !== 0 ? so : b.potencial - a.potencial;
@@ -289,7 +299,7 @@ export default function Performance() {
           actions: c.acoes.slice(0, 3).map(a => ({ title: a.titulo, owner: a.owner, status: a.status })),
         };
       });
-  }, []);
+  }, [contasLocal]);
 
   const ALERTS = useMemo(() => {
     const severityOrder:  Record<string, number> = { 'crítico': 0, 'alerta': 1, 'oportunidade': 2 };
@@ -328,8 +338,8 @@ export default function Performance() {
       'Outbound': { pipeline: 0, totalSinais: 0, resolvidos: 0 },
     };
 
-    // 1. Pipeline por Canal (contasMock)
-    contasMock.forEach(c => {
+    // 1. Pipeline por Canal (contasLocal com fallback)
+    (contasLocal.length > 0 ? contasLocal : contasMock).forEach(c => {
       const canal = c.playAtivo === 'ABM' ? 'ABM' : 
                     c.playAtivo === 'ABX' || (c.playAtivo as string) === 'Híbrida' || (c.playAtivo as string) === 'Híbrido' ? 'ABX' : 
                     'Outros';
@@ -367,19 +377,29 @@ export default function Performance() {
         rawVazao: stats.totalSinais
       };
     });
-  }, []);
+  }, [contasLocal]);
 
   const BEST_VOLUME_ORIGIN = useMemo(() => {
-    // Derivação factual da origem com maior volume de sinais no período
+    if (campanhasCanonical.length > 0) {
+      const byOrigem = campanhasCanonical.reduce((acc: Record<string, number>, c: any) => {
+        const src = c.origem || 'direto';
+        acc[src] = (acc[src] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      const best = Object.entries(byOrigem).sort((a, b) => (b[1] as number) - (a[1] as number))[0];
+      return best ? best[0] : undefined;
+    }
+    // fallback exploratório enquanto carrega
     const origins = advancedSignals.reduce((acc, s) => {
       const src = s.source || 'Direto';
       acc[src] = (acc[src] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    
     const best = Object.entries(origins).sort((a, b) => b[1] - a[1])[0];
     return best ? best[0] : undefined;
-  }, []);
+  }, [campanhasCanonical]);
+
+  const isOriginExploratoria = campanhasCanonical.length === 0;
  
   function showToast(msg: string, sub?: string) {
     setToast({msg, sub});
@@ -496,7 +516,11 @@ export default function Performance() {
           <button onClick={() => setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit hover:bg-white/10 transition-all">📅 Personalizado</button>
         </div>
 
-        {/* Metrics */}
+        {/* Metrics — Editorial */}
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-[10px] font-bold text-white/60 uppercase tracking-[0.16em]">Métricas por Período</span>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">· editorial</span>
+        </div>
         <PerformanceMetrics m={m} />
 
         <div className="flex gap-2.5">
@@ -506,7 +530,7 @@ export default function Performance() {
       </div>
 
       <div className="p-5 sm:p-7 pb-12 flex flex-col gap-4">
-        <ExecutiveSummary channels={DYNAMIC_CHANNELS} pl={pl} bestOrigin={BEST_VOLUME_ORIGIN} />
+        <ExecutiveSummary channels={DYNAMIC_CHANNELS} pl={pl} bestOrigin={BEST_VOLUME_ORIGIN} isOriginExploratoria={isOriginExploratoria} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* ── CARD: TENDÊNCIA ── */}
@@ -665,11 +689,11 @@ export default function Performance() {
           </div>
         </div>
 
-        {/* ── ALERTAS ── */}
+        {/* ── ALERTAS — EXPLORATÓRIO ── */}
         <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
           <div className="mb-6 leading-tight">
             <div className="text-[10px] font-black tracking-tight uppercase text-[#94a3b8] mb-1">Próximos Sinais</div>
-            <div className="text-[18px] font-black tracking-tight text-[#0f172a]">Alertas de Desempenho</div>
+            <div className="text-[18px] font-black tracking-tight text-[#0f172a]">Alertas de Desempenho <span className="text-amber-500 text-[12px]">· exploratório</span></div>
             <div className="text-[12px] text-[#64748b]">O desempenho atual está gerando estes sinais — clique para acessar</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -697,7 +721,7 @@ export default function Performance() {
           <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <div className="flex items-center justify-between mb-6 leading-tight">
               <div>
-                <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Squads · Execução e SLA</div>
+                <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Squads · Execução e SLA <span className="text-slate-400 text-[12px]">· editorial</span></div>
                 <div className="text-[12px] text-[#64748b]">Performance por owner no período · clique para análise</div>
               </div>
               <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-600 border border-green-200">84% global</span>
@@ -726,7 +750,7 @@ export default function Performance() {
 
           <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
             <div className="mb-6 leading-tight">
-              <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Tecnologias · Integrações</div>
+              <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Tecnologias · Integrações <span className="text-slate-400 text-[12px]">· editorial</span></div>
               <div className="text-[12px] text-[#64748b]">Saúde das conexões e impacto nos dados</div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

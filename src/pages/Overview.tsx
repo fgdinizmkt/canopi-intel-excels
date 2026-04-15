@@ -9,7 +9,7 @@ import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, ShieldCheck, MoreH
 import { advancedSignals } from '../data/signalsV6';
 import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
-import { calculateAccountScore, isContaCritica, isAltaPrioridade, getPrincipalAviso, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../lib/scoringRepository';
+import { calculateAccountScore, isContaCritica, isAltaPrioridade, deriveProximaMelhorAcao, deriveAcaoOperacional } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { getAccounts } from '../lib/accountsRepository';
 import { getInteractions } from '../lib/interactionsRepository';
@@ -254,7 +254,7 @@ export const Overview: React.FC = () => {
 
   // ─── TRIAGEM POR SCORE (Recorte 54 — F2) ────────────────────────────────
   const triageByScore = useMemo(() => {
-    const contas = contasMock.map(c => ({ conta: c, score: calculateAccountScore(c) }));
+    const contas = (contasLocal.length > 0 ? contasLocal : contasMock).map(c => ({ conta: c, score: calculateAccountScore(c) }));
 
     return {
       criticas: contas.filter(x => isContaCritica(x.score)).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
@@ -262,7 +262,7 @@ export const Overview: React.FC = () => {
       altoPotencialBaixaCobertura: contas.filter(x => x.score.potencial.score > 75 && x.score.cobertura.score < 50).sort((a, b) => b.score.potencial.score - a.score.potencial.score).slice(0, 3),
       topOportunidades: contas.filter(x => (x.conta.oportunidades?.length ?? 0) > 0).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
     };
-  }, []);
+  }, [contasLocal]);
 
   // ─── ABM READINESS (Contas com prontidão > 70 + Play Ativo do Bloco C) ───
   const abmReadyAccounts = useMemo(() => {
@@ -352,7 +352,7 @@ export const Overview: React.FC = () => {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* KPI 1: Pipeline (Performance) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-brand text-white">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-100">Pipeline Total</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-100">Pipeline Total <span className="text-amber-200 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{performanceMetrics.totalPipeline}</h3>
@@ -369,7 +369,7 @@ export const Overview: React.FC = () => {
 
         {/* KPI 2: Conversão (Performance) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Taxa de Conversão</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Taxa de Conversão <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{performanceMetrics.conversionRate}%</h3>
@@ -383,7 +383,7 @@ export const Overview: React.FC = () => {
 
         {/* KPI 3: Sinais Ativos */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sinais Ativos</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sinais Ativos <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{advancedSignals.length}</h3>
@@ -397,7 +397,7 @@ export const Overview: React.FC = () => {
 
         {/* KPI 4: Ações Críticas (Queue Intelligence) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ações Críticas</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ações Críticas <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{queueIntelligence.critical}</h3>
@@ -410,7 +410,7 @@ export const Overview: React.FC = () => {
 
         {/* KPI 5: Em Risco de SLA (Queue Intelligence) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">SLA em Risco</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">SLA em Risco <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{queueIntelligence.delayed}</h3>
@@ -629,7 +629,7 @@ export const Overview: React.FC = () => {
 
           {/* Channel Health */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Saúde dos Canais & Orquestração</h3>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Saúde dos Canais & Orquestração <span className="text-amber-500 text-[10px]">· exploratório</span></h3>
             <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {channels.map((channel, i) => (
                 <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
@@ -645,8 +645,8 @@ export const Overview: React.FC = () => {
             </section>
           </div>
 
-          {/* Performance por Origem (Inteligência Dinâmica) */}
-          <Card title="Volume e Vazão por Origem de Sinal">
+          {/* Performance por Origem (Inteligência Dinâmica) — Exploratório */}
+          <Card title="Volume e Vazão por Origem de Sinal · exploratório">
             <div className="space-y-6 pt-4">
               {originBreakdown.map((item) => (
                 <div key={item.origin} className="space-y-2">
