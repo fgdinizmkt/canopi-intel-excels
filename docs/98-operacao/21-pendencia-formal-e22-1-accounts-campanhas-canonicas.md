@@ -12,94 +12,76 @@ Integrar o read model canônico de campanhas (gerado em E22) na página `Account
 
 ---
 
-## Estado Atual
+## Estado Atual (Posterior ao Commit 45eb830)
 
-### Implementação Local Completa
-- ✅ Importações de `getCampaignsCanonical()` + tipos
-- ✅ Estado React: `campaignasCanonica` (com typo pendente)
-- ✅ Carregamento em useEffect com fallback gracioso
-- ✅ Filtragem: 4 novos filtros canônicos (usoPrincipal, origem, escala, tipoCampanha)
-- ✅ Persistência em URL (searchParams)
-- ✅ Lógica de agregação: `blocoCCampagnasCanonicas` (useMemo otimizado)
-- ✅ Filtragem de contas: AND conjunction sobre dimensões canônicas
-- ✅ Representação visual:
-  - Grade: badge compacto "X C" (mail icon, cor fúcsia)
-  - Lista: badge "X CAMP" integrado em linha com sinais/plays
-  - Board: sem mudanças (conforme escopo)
-- ✅ Build: npm run build passa sem erros
+### O Que Aconteceu
+1. **Implementação experimental:** Um recorte E22.1 foi desenvolvido localmente com toda a integração técnica
+2. **Validação técnica:** Código foi validado com `npm run build` (sem erros)
+3. **Análise visual:** Implementação foi analisada via inspeção de código, indicando visual sem conflitos
+4. **Falta crítica:** Não houve aprovação visual explícita do usuário vendo a mudança no front
+5. **Ação de limpeza:** Para manter disciplina governamental (regra [877a350](https://github.com/fgdinizmkt/canopi-intel-excels/commit/877a350)), a implementação foi revertida (checkout completo de `src/pages/Accounts.tsx`)
+6. **Registro formal:** Esta pendência foi registrada no repositório para reabertura controlada futura
 
-### Arquivo Afetado
-- `src/pages/Accounts.tsx`: 141 linhas adicionadas (importações, estado, lógica, UI)
+### Arquivo Afetado (Histórico)
+- `src/pages/Accounts.tsx`: Recebeu 141 linhas adicionadas durante experimento (REVERTIDAS)
+- **Status atual:** Idêntico ao HEAD~1, sem alterações locais
 
 ---
 
-## Por Que Ainda Não Pode Ser Commitado
-
-### 1. Ajustes Finos Pendentes (5 min de trabalho)
-- **Typo em nomenclatura:** `campaignasCanonica` → `campanhasCanonica` (falta 'h' em "campanhas")
-- **Setter afetado:** `setCampagnaCanonica` → `setCampanhasCanonica`
-- **7 referências internas** precisam ser renomeadas para consistência com padrão do projeto
-
-### 2. Validação Visual Não Realizada
-- Implementação está pronta e validada via `npm run build`
-- Falta: aprovação visual explícita do usuário vendo os filtros e badges no front
-- Não há screenshot ou confirmação de que visual está aceitável
-
-### 3. Confirmação de Limitação Funcional
-- Campanhas são inferidas APENAS via `interaction.campaignId`
-- Se interaction.campaignId for undefined/null, campanha não aparece
-- Falta: confirmação do usuário de que isso é aceitável para E22.1 (seed popula campaignId sempre?)
-
----
-
-## Bloqueio Formal
+## Motivo do Bloqueio
 
 **Bloqueador:** Falta de aprovação visual explícita do usuário  
-**Por quê:** Conforme registrado em [12-regras-chat-e-retomada-campanhas.md](./12-regras-chat-e-retomada-campanhas.md):
+**Por quê:** Conforme regra canônica em [12-regras-chat-e-retomada-campanhas.md](./12-regras-chat-e-retomada-campanhas.md):
 > "mudança visual não aprovada explicitamente pelo usuário" = Proibido
 
-**Não é possível commitar sem:**
-1. ✅ Build passar (FEITO)
-2. ✅ Código estar pronto (FEITO)
-3. ❌ Aprovação visual do usuário (PENDENTE)
-4. ❌ Confirmação sobre limitação de inferência (PENDENTE)
+**Implementação não foi commitada porque:**
+1. ✅ Build passa (VALIDADO)
+2. ✅ Código está pronto (VALIDADO)
+3. ❌ Aprovação visual do usuário (FALTANTE)
+4. ⚠️ Confirmação sobre limitação de inferência via `interaction.campaignId` (RECOMENDAÇÃO TÉCNICA)
+
+**Decisão:** Reverter a implementação ao working tree, documentar formalmente a pendência, e aguardar janela de validação visual explícita antes de reabertura.
 
 ---
 
-## Próximo Passo Único
+## Critério de Reabertura (Próximo Passo Único)
 
-1. Usuário acessa `localhost:3004/Accounts` (servidor dev já está configurado)
-2. Usuário visualiza:
-   - Nova faixa de filtros (usoPrincipal, origem, escala, tipoCampanha) em fúcsia
-   - Badges de campanha na grade (X C)
-   - Badges de campanha na lista (X CAMP)
-3. Usuário confirma:
-   - Aprovação visual: "visual está OK" OU "ajustar antes de commit"
-   - Limitação: "sim, seed popula campaignId sempre" OU "não, precisa refactor"
-4. Após confirmação:
-   - Claude Code faz ajuste de nomenclatura (5 min)
-   - Commit único com todas as mudanças + este documento de pendência finalizada
+Quando houver disponibilidade para validação visual explícita:
+
+1. **Reabrir E22.1 em novo recorte controlado** (não reutilizar implementação experimental anterior)
+2. **Usuário acessa versão ao vivo** (dev ou staging)
+3. **Usuário aprova visualmente:**
+   - Faixa de filtros (usoPrincipal, origem, escala, tipoCampanha) em fúcsia não poluem hierarquia
+   - Badges de campanha na grade ("X C") e lista ("X CAMP") não competem com sinais/plays
+   - Espaçamento, wrap e truncamento estão corretos
+4. **Usuário confirma limitação técnica:**
+   - Campanhas são inferidas APENAS via `interaction.campaignId` (opcional)
+   - Aceitável para E22.1?
+5. **Após aprovação:** Novo recorte com implementação limpa, rename de variáveis, e commit
 
 ---
 
 ## Referência Técnica
 
-**Implementação local em:** `src/pages/Accounts.tsx` (working tree, não commitado)  
-**Código dependente:** `src/lib/campaignsCanonicalRepository.ts` (E22, já publicado em commit [5ef44fa](https://github.com/fgdinizmkt/canopi-intel-excels/commit/5ef44fa))  
-**Tipos:** `src/data/campaignCanonicalDictionary.ts` (E22, já publicado em commit [5ef44fa](https://github.com/fgdinizmkt/canopi-intel-excels/commit/5ef44fa))  
-**Documentação:** Seção "Próximo Passo Funcional Recomendado" em [20-ponte-transitoria-bloco-c-canonico.md](./20-ponte-transitoria-bloco-c-canonico.md)
+**Código dependente:** 
+- `src/lib/campaignsCanonicalRepository.ts` (E22, publicado em [5ef44fa](https://github.com/fgdinizmkt/canopi-intel-excels/commit/5ef44fa))  
+- `src/data/campaignCanonicalDictionary.ts` (E22, publicado em [5ef44fa](https://github.com/fgdinizmkt/canopi-intel-excels/commit/5ef44fa))
+
+**Documentação de referência:** 
+- [20-ponte-transitoria-bloco-c-canonico.md](./20-ponte-transitoria-bloco-c-canonico.md) — Seção "Próximo Passo Funcional Recomendado"
 
 ---
 
 ## Resumo
 
-E22.1 está **implementado localmente, validado tecnicamente, e aguardando validação visual explícita do usuário antes de publicação**. Esta pendência foi registrada formalmente no repositório conforme regra canônica de governança (877a350), eliminando a sobra local/chat.
+E22.1 **foi experimentado localmente, validado tecnicamente, revertido para manter disciplina governamental, e agora está formalmente registrado** conforme regra [877a350](https://github.com/fgdinizmkt/canopi-intel-excels/commit/877a350). 
 
-**Nenhuma mudança será commitada até que aprovação visual for obtida.**
+Pendência não está mais presa em chat. Está no repositório como escopo formal para reabertura controlada quando aprovação visual explícita for obtida.
 
 ---
 
-**Versão:** 1.0  
+**Versão:** 1.1  
 **Data:** 2026-04-15  
-**Dono:** Claude Code (executando)  
+**Status:** Pendente com registro formal  
+**Dono:** Claude Code (registrando)  
 **Regra:** [877a350](https://github.com/fgdinizmkt/canopi-intel-excels/commit/877a350)
