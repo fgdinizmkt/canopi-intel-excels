@@ -5,7 +5,7 @@
 
 import React, { Suspense } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, Bell, Settings, ChevronRight } from 'lucide-react';
+import { Search, Bell, Settings, ChevronRight, User } from 'lucide-react';
 
 import Image from 'next/image';
 
@@ -129,7 +129,10 @@ export const Topbar: React.FC = () => {
           <Settings className="w-4 h-4" />
         </button>
         <div className="h-6 w-px bg-slate-100 mx-1"></div>
-        <div className="flex items-center gap-3 pl-2">
+        <button
+          onClick={() => router.push('/usuario')}
+          className="flex items-center gap-3 pl-2 hover:opacity-70 transition-opacity"
+        >
           <div className="text-right hidden sm:block">
             <p className="text-[11px] font-bold text-slate-900 uppercase tracking-tight">Fábio Diniz</p>
             <div className="flex flex-col items-end leading-none">
@@ -145,7 +148,7 @@ export const Topbar: React.FC = () => {
             unoptimized
             className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50"
           />
-        </div>
+        </button>
       </div>
     </header>
   );
