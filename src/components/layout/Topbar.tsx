@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, Bell, Settings, ChevronRight, User } from 'lucide-react';
-
+import { Search, Bell, Settings, ChevronRight, LogOut } from 'lucide-react';
 import Image from 'next/image';
+
+// Avatar padrão masculino — seed 'James' gera avatar masculino no DiceBear v7 avataaars
+const MALE_AVATAR_URL =
+  'https://api.dicebear.com/7.x/avataaars/svg?seed=James&backgroundColor=b6e3f4';
+
+
 
 const AbmTabs: React.FC = () => {
   const router = useRouter();
@@ -34,6 +39,27 @@ const AbmTabs: React.FC = () => {
 export const Topbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem('canopi_auth');
+    localStorage.removeItem('user_avatar_photo');
+    router.push('/login');
+  };
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('user_avatar_photo');
+      if (stored) setAvatarSrc(stored);
+    } catch { /* ignore */ }
+
+    // Listen for storage changes from other tabs/pages
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'user_avatar_photo') setAvatarSrc(e.newValue);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const pageTitles: Record<string, string> = {
     '/visao-geral': 'Visão Geral',
@@ -121,11 +147,11 @@ export const Topbar: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-3">
-        <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative">
+        <button title="Notificações" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative">
           <Bell className="w-4 h-4" />
           <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
         </button>
-        <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+        <button title="Configurações" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
           <Settings className="w-4 h-4" />
         </button>
         <div className="h-6 w-px bg-slate-100 mx-1"></div>
@@ -140,14 +166,31 @@ export const Topbar: React.FC = () => {
               <p className="text-[8px] text-slate-400 font-medium lowercase tracking-tighter">fabio.diniz@canopi.com</p>
             </div>
           </div>
-          <Image
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=Fabio"
-            alt="Avatar"
-            width={32}
-            height={32}
-            unoptimized
-            className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50"
-          />
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarSrc}
+              alt="Foto de perfil"
+              className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50 object-cover"
+            />
+          ) : (
+            <Image
+              src={MALE_AVATAR_URL}
+              alt="Avatar"
+              width={32}
+              height={32}
+              unoptimized
+              className="w-8 h-8 rounded-full border border-slate-200 bg-slate-50"
+            />
+          )}
+        </button>
+        <div className="h-4 w-px bg-slate-100 mx-2"></div>
+        <button
+          onClick={handleLogout}
+          title="Sair"
+          className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
         </button>
       </div>
     </header>

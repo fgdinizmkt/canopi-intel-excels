@@ -16,7 +16,7 @@ export default function LoginPage() {
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (mode === 'signup') {
       window.alert('[SIMULAÇÃO] Criação de conta. Em um ambiente real, você receberia um e-mail de confirmação.');
       setMode('signin');
@@ -30,13 +30,27 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    // Mock autentication
+    // Get credentials from localStorage (or use defaults)
     setTimeout(() => {
-      if (username === 'fabio.diniz' && password === '1234') {
+      const storedCreds = localStorage.getItem('user_credentials');
+      let validUsername = 'fabio.diniz';
+      let validPassword = '1234';
+
+      if (storedCreds) {
+        try {
+          const creds = JSON.parse(storedCreds);
+          validUsername = creds.username;
+          validPassword = creds.password;
+        } catch (e) {
+          console.error('Erro ao ler credenciais:', e);
+        }
+      }
+
+      if (username === validUsername && password === validPassword) {
         localStorage.setItem('canopi_auth', 'true');
         router.push('/');
       } else {
-        setError('Credenciais inválidas. Tente fabio.diniz / 1234');
+        setError(`Credenciais inválidas. Tente ${validUsername} / ${validPassword}`);
         setLoading(false);
       }
     }, 1500);

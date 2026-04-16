@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '../../components/layout/Sidebar';
 import { Topbar } from '../../components/layout/Topbar';
 import { Modal, Button } from '../../components/ui';
@@ -8,7 +9,40 @@ import { Rocket, Target, Users, Zap } from 'lucide-react';
 import { AccountDetailProvider } from '../../context/AccountDetailContext';
 
 export default function ShellLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
+
+  // Check authentication on mount
+  useEffect(() => {
+    try {
+      const auth = localStorage.getItem('canopi_auth');
+      if (auth === 'true') {
+        setIsAuthenticated(true);
+      } else {
+        // Not authenticated, redirect to login
+        router.push('/login');
+      }
+    } catch (e) {
+      console.error('Erro ao verificar autenticação:', e);
+      router.push('/login');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  // While checking auth, show nothing
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="text-slate-500">Verificando acesso...</div>
+    </div>;
+  }
+
+  // If not authenticated (after loading), don't render anything (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <AccountDetailProvider>
