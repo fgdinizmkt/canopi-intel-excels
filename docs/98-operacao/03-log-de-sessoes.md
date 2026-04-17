@@ -5,6 +5,70 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-17] — Frente de Contenção de Sistema de Tema
+
+- **Natureza:** Sessão de estabilização e contenção. 3 iterações de tentativa de dark mode bidirecional falharam. Decisão estratégica de abandonar escuro e travar plataforma em claro.
+- **Objetivo:** Resolver problema crítico de persistência de tema onde dark mode permanecia ativo apesar de múltiplas tentativas de sincronização entre ThemeContext, localStorage e DOM.
+
+**Contexto do Problema:**
+- Frente iniciada em commit `281c5a2` com dark mode incompleto
+- Iteração 1: Tentativa de implementar ThemeContext com sync bidirecional localStorage + DOM
+- Iteração 2: Adicionar tema selector em /usuario page para preferência persistida
+- Iteração 3: Sincronizar preferência global com estado de navegação
+- **Raiz-causa identificada:** Browser aplicava `prefers-color-scheme: dark` do sistema operacional, ativando Tailwind dark: classes independentemente de DOM manipulation ou localStorage state
+
+**Decisão Estratégica (Contínuo):**
+- Criteriosidade: 3 iterações consumiram 3 sessões sem resolução permanente
+- Aprovação user: "vamos VOLTAR para o tema claro definitivamente, por enquanto" + "vamos REMOVER a opção de tema da interface"
+- Escopo mínimo: Disable dark mode completamente via remoção de todas classes dark: + neutralização ThemeContext
+
+**Implementação (Commit `6943485`):**
+1. **ThemeContext.tsx** (criado): Tipo Context sempre retorna `{ theme: 'claro', setTheme: () => {}, isDark: false }`
+   - Remoção: todos localStorage.getItem/setItem (previamente `canopi_theme`)
+   - Remoção: documentElement.classList.add/remove('dark')
+   - Remoção: useEffect hooks para hydration e cross-tab sync
+   - Efeito: Previne qualquer reativação via código de dark mode
+
+2. **layout.tsx, shell/layout.tsx, Sidebar.tsx, Topbar.tsx**: Remoção agressiva de 100% das classes dark:
+   - `dark:bg-[#020617]` → `bg-slate-50` (backgrounds claros)
+   - `dark:text-slate-100` → `text-slate-900` (textos escuros)
+   - `dark:border-*` → light border equivalents
+   - Efeito: Mesmo se browser ativa prefers-color-scheme, classes dark: não existem para ativar
+
+3. **usuario/page.tsx**: Remoção UI do seletor de tema
+   - Remoção: import ThemeContext
+   - Remoção: hook `useTheme()` 
+   - Remoção: `handleThemeChange()` function
+   - Remoção: card "Tema Global" com dropdown 
+   - Remoção: `setTheme()` call from preferences handler
+   - Efeito: User não consegue ativar dark mode via UI
+
+4. **globals.css**: Remoção de dark: base styles
+   - Remoção: `dark:bg-[#020617] dark:text-slate-100`
+   - Efeito: Root CSS não fornece fallback dark
+
+**Raiz-Causa Factual:**
+- Tailwind v4 suporta `dark:` modifier baseado em:
+  1. Classe `dark` no documentElement (controlável via JS)
+  2. `prefers-color-scheme: dark` do browser (read-only do SO)
+- ThemeContext manipulava (1) mas browser continuava aplicando (2)
+- Solução foi eliminar (1) via remoção de classes + eliminar (2) via remoção de `dark:` classes
+
+**Validação:**
+- ✅ Build Exit 0 ("Compiled successfully in 9.8s")
+- ✅ Visual: Plataforma fixa em modo claro em todas páginas
+- ✅ Git status: 1 file changed (ThemeContext.tsx criado, 32 insertions)
+- ✅ Reversibilidade: Restauração de dark mode possível em iteração futura restaurando classes + ThemeContext lógica
+
+**Estado Final:**
+- Working tree zerado
+- Tema irreversível para claro (não é regressão, é decision point)
+- Frente concluída e documentada
+
+**Status:** ✅ Concluído com Sucesso. Plataforma estável em modo claro. Frente fechada.
+
+---
+
 ## [2026-04-14] — E21: População do Bloco C no Supabase Remoto
 
 - **Natureza:** Sessão de execução infraestrutural. Migration + Import + Validação pós-import (sem commits).
