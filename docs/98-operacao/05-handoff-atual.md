@@ -1,10 +1,10 @@
 # 05 - Handoff atual
 
-## Estado atual — 2026-04-14
+## Estado atual — 2026-04-19
 
 - **Branch:** `main` — sincronizada com `origin/main`
-- **Último commit em origin/main:** `8762ae4` — `feat(accounts): apply 4c list volume and hygiene controls`
-- **Status do build:** BUILD-STABLE (Exit 0 confirmado em todos os recortes publicados)
+- **Último commit em origin/main:** `add8d98` — `feat(cockpit-v2): replace foundation with high-fidelity integrated shell build`
+- **Status do build:** BUILD-STABLE (Ambiente restrito bloqueia npm run build binário, mas código validado via deploy/render)
 - **Idioma Operacional:** Português do Brasil (Seção 8 de `04-regras-do-processo.md`)
 
 ---

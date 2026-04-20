@@ -1,9 +1,9 @@
-# Checkpoint Atual — Estado Real do main (2026-04-14)
+# Checkpoint Atual — Estado Real do main (2026-04-19)
 
 ## Estado de Partida
-- **Branch:** `main` (sincronizada em 2026-04-14)
-- **HEAD real publicado:** `8762ae4` — `feat(accounts): apply 4c list volume and hygiene controls`
-- **Status da Infra:** Fase E (E1–E20) consolidada. Bloco C infra + seed publicados. Consumo UI do Bloco C publicado. Paridade funcional dos perfis aprovada e fechada. Refinamento Accounts (8 subetapas) publicado.
+- **Branch:** `main` (sincronizada em 2026-04-19)
+- **HEAD real publicado:** `add8d98` — `feat(cockpit-v2): replace foundation with high-fidelity integrated shell build`
+- **Status da Infra:** Fase E consolidada. Cockpit V2 Foundation Replacement concluído. Nova base integrada ao shell real via Pages Router.
 
 ## 1. Recortes Concluídos (Fase E)
 
