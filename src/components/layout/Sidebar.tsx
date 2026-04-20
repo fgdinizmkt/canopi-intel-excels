@@ -18,7 +18,8 @@ import {
   Puzzle, 
   Settings,
   Plus,
-  LogOut
+  LogOut,
+  Activity
 } from 'lucide-react';
 
 interface SidebarItemProps {
@@ -141,6 +142,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
             />
           ))}
         </nav>
+
+        <div className="mt-6 mb-2 px-3">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Testes</p>
+        </div>
+        <nav className="space-y-0.5">
+          {[
+            { id: 'CockpitV2', label: 'Cockpit V2 (teste)', icon: Activity },
+          ].map((item) => (
+            <SidebarItem
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              active={pathname === '/' + item.id}
+              onClick={() => {
+                router.push('/' + item.id);
+              }}
+            />
+          ))}
+        </nav>
+
 
         <div className="mt-auto p-6 border-t border-slate-50 space-y-4">
           <button 

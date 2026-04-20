@@ -45,7 +45,7 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <AccountDetailProvider>
+    <AccountDetailProvider routerProp={router}>
       <div className="flex min-h-screen bg-slate-50">
         <Sidebar onNewCampaign={() => setIsCampaignModalOpen(true)} />
         <div className="ml-60 flex flex-col min-h-screen flex-1">

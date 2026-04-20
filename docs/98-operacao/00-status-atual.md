@@ -593,3 +593,11 @@
 | AccountProfile & ContactProfile Parity | Concluído e Fechado (2026-04-14) | Materialização de páginas dedicadas com Radar Relacional, Fila de Fogo Ativa, Timeline 360, Score Rationale, Portfólio & Whitespace. CTAs operacionais via createAction(). Build Exit 0. Commit final: `ee3957f`. Freeze documental: `6cb5eaf`. |
 | Refinamento Accounts — Subetapas 1–4c | Concluído (2026-04-14) | 8 commits de refinamento progressivo (visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls). Commit final publicado: `8762ae4`. |
 | Contenção de Sistema de Tema | Concluído (2026-04-17) | 3 iterações de dark mode bidirecional falharam; decisão de abandonar escuro e travar plataforma em modo claro permanentemente. ThemeContext neutralizado (sempre isDark: false). Todas as classes dark: removidas do codebase. Seletor de tema removido de /usuario UI. Commit: `6943485`. |
+| Cockpit V2 Foundation Replacement | Concluído (2026-04-19) | Substituição da base legada pela nova fundação integrada ao shell real. Onion chart responsivo, painel contextual unificado e roteamento independente via Pages Router. |
+
+---
+
+## Próximo Passo
+
+- **Evolução Funcional Cockpit V2:** Iniciar o refinamento dos recortes analíticos e interativos sobre a nova fundação estabilizada.
+- **Pendência técnica:** Monitorar performance do SVG foreignObject em densidades extremas de sinal.

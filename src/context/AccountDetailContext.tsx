@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { contasMock, ActionItem, HistoryItem, initialActions } from '../data/accountsData';
 import { persistAction } from '../lib/actionsRepository';
 
@@ -159,8 +158,8 @@ function applyActionPatch(
 /**
  * Provider global para gestão da profundidade da conta
  */
-export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const router = useRouter();
+export const AccountDetailProvider: React.FC<{ children: React.ReactNode; routerProp?: any }> = ({ children, routerProp }) => {
+  const router = routerProp;
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -227,7 +226,9 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsOpen(true);
 
     // Navegação física para a subpágina dedicada
-    router.push(`/contas/${identifier}`);
+    if (router && typeof router.push === 'function') {
+      router.push(`/contas/${identifier}`);
+    }
   }, [router]);
 
   /**
@@ -243,13 +244,15 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
     setOriginPath(null);
     setOriginStateKey(null);
     
-    // Prioriza o retorno para o path de origem registrado
-    if (path && typeof window !== 'undefined' && path !== window.location.pathname) {
-      router.push(path);
-    } else if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push('/contas');
+    if (router && typeof router.push === 'function') {
+      // Prioriza o retorno para o path de origem registrado
+      if (path && typeof window !== 'undefined' && path !== window.location.pathname) {
+        router.push(path);
+      } else if (typeof window !== 'undefined' && window.history.length > 1 && typeof router.back === 'function') {
+        router.back();
+      } else {
+        router.push('/contas');
+      }
     }
   }, [router, originPath]);
 
@@ -333,12 +336,41 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 /**
- * Hook para interagir com o Perfil da Conta de qualquer lugar do Canopi
+ * Contexto de fallback para quando o hook é usado fora do Provider.
+ * Retorna operações no-op em vez de lançar erro fatal (previne 500 em App Router).
+ */
+const FALLBACK_CONTEXT: AccountDetailContextType = {
+  selectedAccountId: null,
+  selectedContactId: null,
+  isOpen: false,
+  viewMode: 'drawer',
+  originModule: null,
+  originPath: null,
+  originStateKey: null,
+  openAccount: () => {},
+  closeAccount: () => {},
+  toggleViewMode: () => {},
+  sessionActions: [],
+  sessionLogs: {},
+  createAction: () => '',
+  updateAction: () => {},
+  addLog: () => {},
+};
+
+/**
+ * Hook para interagir com o Perfil da Conta de qualquer lugar do Canopi.
+ * Fora do Provider retorna um contexto de fallback seguro (no-op) em vez de throw.
  */
 export const useAccountDetail = () => {
   const context = useContext(AccountDetailContext);
   if (!context) {
-    throw new Error('useAccountDetail must be used within an AccountDetailProvider');
+    // Fallback seguro: não lança erro, retorna operações no-op.
+    // Garante que componentes em rotas App Router não colapam o runtime
+    // quando o Provider ainda não montou ou não está na árvore.
+    if (typeof window !== 'undefined') {
+      console.warn('[Canopi] useAccountDetail chamado fora do AccountDetailProvider — retornando fallback no-op.');
+    }
+    return FALLBACK_CONTEXT;
   }
   return context;
 };

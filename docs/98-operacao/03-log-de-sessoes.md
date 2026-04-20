@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-19] — Congelamento Estrutural e Substituição da Base Cockpit V2
+
+- **Natureza:** Sessão de congelamento estrutural e publicação da nova fundação visual.
+- **Objetivo:** Substituir a base antiga (legada) da Cockpit V2 por uma nova fundação de alta fidelidade integrada ao shell real da plataforma Canopi.
+- **Contexto:** 
+  - A base visual anterior foi abandonada devido a limitações de flexibilidade.
+  - A nova fundação foi construída em `src/pages/CockpitV2.tsx` (Pages Router) para escapar das restrições de layout do App Router.
+  - A rota de teste foi exposta via Sidebar em "Cockpit V2 (teste)".
+  - A página `Overview.tsx` oficial foi preservada intocada.
+- **Decisões Consolidadas:**
+  - Abandonar definitivamente a base anterior da Cockpit V2.
+  - Utilizar o Pages Router para a fundação operacional para garantir controle total de largura/espaço.
+  - Integrar Sidebar e Topbar nativamente na página para desacoplar do shell global restritivo.
+- **Arquivos Alterados:**
+  - `src/pages/CockpitV2.tsx`: Nova fundação visual e lógica.
+  - `src/components/layout/Sidebar.tsx`: Inclusão do link de teste.
+  - `src/context/AccountDetailContext.tsx`: Estabilização de injeção de router para evitar erros de hidratação.
+  - `src/app/layout.tsx` / `src/pages/_app.tsx`: Harmonização de provedores entre App e Pages Router.
+- **Resultado:** Nova base publicada em `origin/main` e pronta para evolução funcional por recortes.
+
+---
+
 ## [2026-04-17] — Frente de Contenção de Sistema de Tema
 
 - **Natureza:** Sessão de estabilização e contenção. 3 iterações de tentativa de dark mode bidirecional falharam. Decisão estratégica de abandonar escuro e travar plataforma em claro.

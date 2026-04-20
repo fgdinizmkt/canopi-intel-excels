@@ -326,7 +326,8 @@ export const Overview: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <>
+      <div className="space-y-8 animate-in fade-in duration-500">
       {/* Welcome Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden">
         <div className="relative z-10">
@@ -809,6 +810,7 @@ export const Overview: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
