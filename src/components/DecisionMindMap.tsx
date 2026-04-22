@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from 'react';
-import { Save, X, Info, Target, AlertCircle, CheckCircle2, TrendingUp, Zap, Clock, Users } from 'lucide-react';
+import { X, Info, Target, AlertCircle, CheckCircle2, TrendingUp, Zap, Clock, Users } from 'lucide-react';
 import { signalSituations } from '../data/signalSituations';
 
 const STAGES_X = [140, 440, 740, 1040, 1340, 1640, 1940];
@@ -61,7 +61,7 @@ const DecisionMindMap: React.FC = () => {
   const getNodeData = useCallback((id: string) => {
     switch (id) {
       case 'trigger': return { title: 'Risco de Churn', category: 'Trigger', icon: <Zap className="w-5 h-5" />, detail: situation.situationTitle, desc: situation.context, metric: 'Health: 22', status: 'Crítico' };
-      case 'signal1': return { title: 'Queda de Uso', category: 'Signal', icon: < TrendingUp className="w-5 h-5 rotate-180 text-red-500" />, detail: situation.timeline[0].indicator, desc: situation.timeline[0].impact, metric: '-45%', status: 'Alerta' };
+      case 'signal1': return { title: 'Queda de Uso', category: 'Signal', icon: <TrendingUp className="w-5 h-5 rotate-180 text-red-500" />, detail: situation.timeline[0].indicator, desc: situation.timeline[0].impact, metric: '-45%', status: 'Alerta' };
       case 'signal2': return { title: 'Champion Churn', category: 'Signal', icon: <Users className="w-5 h-5 text-orange-500" />, detail: situation.timeline[1].indicator, desc: situation.timeline[1].impact, metric: 'CFO Left', status: 'Crítico' };
       case 'signal3': return { title: 'Contract Risk', category: 'Signal', icon: <AlertCircle className="w-5 h-5 text-amber-500" />, detail: situation.timeline[4].indicator, desc: situation.timeline[4].impact, metric: '60 Days', status: 'Alerta' };
       case 'reading': return { title: 'Churn Preditivo', category: 'Analysis', icon: <Target className="w-5 h-5 text-blue-600" />, detail: 'Análise de Cluster FinanceFlow', desc: situation.decisionPoints[0].analysis, metric: '85% Prob.', status: 'Validado' };
@@ -359,7 +359,7 @@ const DecisionMindMap: React.FC = () => {
                       <p className="text-[12px] text-slate-800 font-bold leading-relaxed">{getNodeData(selectedCard).detail}</p>
                    </div>
                    <div className="p-6 bg-white border border-slate-100 rounded-[2rem] shadow-sm">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">< Zap className="w-3 h-3" /> Impacto & Resumo</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><Zap className="w-3 h-3" /> Impacto & Resumo</p>
                       <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{getNodeData(selectedCard).desc}</p>
                    </div>
                    <div className="grid grid-cols-2 gap-4">
@@ -385,8 +385,8 @@ const DecisionMindMap: React.FC = () => {
                </div>
             </div>
          </div>
-         <button disabled={chosenOptionIndex === null} className="relative flex items-center gap-4 px-12 py-5 bg-slate-900 text-white rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-black disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-[0_20px_60px_rgba(0,0,0,0.3)] active:scale-95 group overflow-hidden" onClick={() => { alert(`Intelligence Materialized and Synced to Core DB.`); }}>
-           <Save className="w-4 h-4" /> <span>Finalize Strategic Action</span>
+         <button disabled={chosenOptionIndex === null} className="relative flex items-center gap-4 px-12 py-5 bg-slate-900 text-white rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-black disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-[0_20px_60px_rgba(0,0,0,0.3)] active:scale-95 group overflow-hidden" onClick={() => setSelectedCard('action')}>
+           <Info className="w-4 h-4 text-blue-400" /> <span>Review Strategic Action</span>
            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
          </button>
       </div>
