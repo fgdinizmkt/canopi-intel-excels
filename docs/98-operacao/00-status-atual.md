@@ -4,7 +4,20 @@
  `main` — sincronizada em 2026-04-14 (HEAD: `915a2ba` — Defensive fallback para dataset insuficiente/corrompido)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + **E21 Bloco C Population**)
+**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + **E22 CockpitV2 Tactical Polish**)
+
+---
+
+### MARCO: CockpitV2 Intelligence & Tactical UX — 2026-04-20
+**Status: Concluído e Validado Visualmente**
+
+- **Evolução do Sinal:** Primeiro nó da árvore (`signal`) transformado em uma evolução direta do card de seleção, mantendo hierarquia (Conta > Sinal) e severidade.
+- **Painel Tático (Drawer):** Redesenho integral com dark theme tático (`#16181D`). Segmentação clara entre Contexto Operacional, Evidências e Matriz de Decisão.
+- **Matriz de Decisão:** Implementação de análise de consequências, probabilidade de sucesso e atribuição de responsável para cada opção estratégica.
+- **Sincronização Atômica DOM:** Zeragem de lag nos conectores durante drag via injeção direta de atributos no SVG (bypass React render).
+- **Dados:** Persistência de `consequence` no modelo de dados e registro atômico na jornada de decisões.
+- **Build de Produção:** Validado com `npm run build` (Exit 0).
+- **Aprovação:** Validado visualmente pelo usuário conforme requisitos de alta fidelidade operacional.
 
 ---
 

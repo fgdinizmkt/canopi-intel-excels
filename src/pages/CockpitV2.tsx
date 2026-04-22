@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Search, Bell, Settings, Home, List, PieChart, Users, ChevronDown,
-  Sparkles, CheckCircle2, ChevronRight, Share2, MessageSquare, Heart, Bookmark, Zap, Activity, AlertTriangle, Target, Link, Globe
+  Sparkles, CheckCircle2, ChevronRight, Share2, MessageSquare, Heart, Bookmark, Zap, Activity, AlertTriangle, Target, Link, Globe, TrendingUp
 } from 'lucide-react';
 import { Card, Button } from '../components/ui';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Topbar } from '../components/layout/Topbar';
 import DecisionMindMap from '../components/DecisionMindMap';
+import { signalCases } from '../data/signalCases';
 
 const polar = (r, deg) => {
   const rad = (deg - 90) * Math.PI / 180.0;
@@ -97,11 +98,26 @@ const motorsData = [
 const CockpitV2 = () => {
   const [hoveredMotor, setHoveredMotor] = useState<string | null>(null);
   const [pinnedMotor, setPinnedMotor] = useState<string | null>(null);
+  const [selectedSignalId, setSelectedSignalId] = useState<string | null>('SIG-4068');
   const [hoveredSlice, setHoveredSlice] = useState<any>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  
+  const [decisionLedger, setDecisionLedger] = useState<Array<{
+    stage: number;
+    nodeId: string;
+    nodeType: string;
+    title: string;
+    summary: string;
+    timestamp: string;
+  }>>([]);
+  const [highlightedActionId, setHighlightedActionId] = useState<string | null>(null);
+
   const activeFocus = pinnedMotor || hoveredMotor;
   const currentMotor = activeFocus ? motorsData.find(m => m.id === activeFocus) : null;
+
+  const selectedSignalCase = useMemo(() => {
+    if (!selectedSignalId) return null;
+    return signalCases[selectedSignalId] || null;
+  }, [selectedSignalId]);
 
   const totalSignals = motorsData.reduce((acc, m) => acc + m.signalCount, 0);
   let currentStart = 0;
@@ -143,9 +159,9 @@ const CockpitV2 = () => {
 
       <div className="flex-1 flex flex-col ml-60 h-screen overflow-y-auto w-full">
         <Topbar />
-        
+
         <main className="w-full max-w-[1700px] mx-auto p-6 md:p-10 space-y-8 animate-in fade-in duration-700" onMouseMove={handleMouseMove} onClick={() => {if(hoveredMotor === null && pinnedMotor) setPinnedMotor(null)}}>
-          
+
           <div className="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-sm relative overflow-hidden gap-6">
             <div className="relative z-10 w-full">
               <div className="flex items-center gap-3 mb-2">
@@ -153,12 +169,15 @@ const CockpitV2 = () => {
                   <Activity className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">System Overview</h2>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">Cross-Intelligence Cockpit</span>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{selectedSignalCase ? 'Signal Analysis' : 'System Overview'}</h2>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">{selectedSignalCase ? `Focused Decision Flow — ${selectedSignalCase.accountName}` : 'Cross-Intelligence Cockpit'}</span>
                 </div>
               </div>
               <p className="text-slate-500 text-xs mb-4 leading-relaxed max-w-xl">
-                A Canopi monitora continuamente a saúde da sua geração de receita cruzando sinais orgânicos vindos de todas as suas frentes dimensionais ativas.
+                {selectedSignalCase
+                  ? `Navegando decisão sobre ${selectedSignalCase.signalType === 'risk' ? 'risco' : 'oportunidade'} com confiança de ${Math.round(selectedSignalCase.confidence)}%. Registre marcos relevantes na jornada.`
+                  : 'A Canopi monitora continuamente a saúde da sua geração de receita cruzando sinais orgânicos vindos de todas as suas frentes dimensionais ativas.'
+                }
               </p>
             </div>
             <div className="flex flex-col gap-2 shrink-0 z-10 w-full md:w-auto">
@@ -204,7 +223,7 @@ const CockpitV2 = () => {
                     const hasItemsLayer = motor.items.length > 0;
                     
                     return (
-                      <g key={motor.id} 
+                      <g key={motor.id}
                          style={{ opacity: opacityMod, transition: 'opacity 0.2s', cursor: 'pointer' }}
                          onMouseEnter={() => setHoveredMotor(motor.id)}
                          onMouseLeave={() => setHoveredMotor(null)}
@@ -353,7 +372,7 @@ const CockpitV2 = () => {
             <div className="w-full flex justify-end z-20">
               <div className="w-full max-w-[600px] shadow-2xl rounded-3xl bg-white border border-slate-200 overflow-hidden transform transition-all duration-500 h-[750px] flex flex-col">
               {!currentMotor ? (
-                // IDLE STATE
+                // IDLE STATE (resumo geral, sem motor na cebola)
                 <div className="flex-1 p-8 overflow-y-auto w-full">
                    <h4 className="text-lg font-black uppercase tracking-widest text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
                      <Globe className="w-5 h-5 text-brand" /> Nenhum Motor Selecionado
@@ -363,7 +382,7 @@ const CockpitV2 = () => {
                    </p>
                 </div>
               ) : (
-                // ACTIVE STATE
+                // MOTOR ACTIVE STATE
                  <div className="flex-1 p-8 flex flex-col relative overflow-hidden bg-white w-full">
                    <div className="absolute -top-10 -right-10 w-48 h-48 opacity-10 rounded-full" style={{backgroundColor: currentMotor.hex}} />
                    
@@ -623,10 +642,219 @@ const CockpitV2 = () => {
 
             </div>
 
+            {/* SELETOR DE SINAIS PILOTO */}
+
+            <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Selecionar Sinal para Análise</h3>
+              <div className="flex gap-3 flex-wrap">
+                {Object.entries(signalCases).map(([signalId, signalCase]) => (
+                  <button
+                    key={signalId}
+                    onClick={() => {
+                      setSelectedSignalId(signalId);
+                      setDecisionLedger([]);
+                    }}
+                    className={`px-4 py-3 rounded-lg border-2 transition-all ${
+                      selectedSignalId === signalId
+                        ? 'border-blue-600 bg-blue-50 text-blue-900'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <div className="text-[12px] font-black uppercase">
+                        {signalCase.signalType === 'risk' ? '🔴' : '🟢'} {signalCase.accountName}
+                      </div>
+                      <div className="text-[10px] text-slate-500">{signalCase.signalTitle}</div>
+                      <div className="text-[9px] mt-1">
+                        <span className={`px-1.5 py-0.5 rounded font-black uppercase ${
+                          signalCase.severity === 'critical' ? 'bg-red-100 text-red-700' :
+                          signalCase.severity === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {signalCase.severity}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* MAPA MENTAL DECISÓRIO - Substitui Ramificações Estratégicas Preditivas */}
 
             <div className="w-full h-[750px] bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-              <DecisionMindMap />
+              {selectedSignalCase && (
+                <DecisionMindMap
+                  key={selectedSignalCase.id}
+                  signalCase={selectedSignalCase}
+                  onDecisionRecorded={(entry) => {
+                    // Filtrar apenas marcos relevantes (excluir timeline)
+                    const relevantTypes = ['signal', 'evidence', 'factor', 'decision', 'decision-choice', 'option', 'action'];
+                    if (!relevantTypes.includes(entry.nodeType)) {
+                      return;
+                    }
+
+                    // Deduplicação: não registrar se último entry tem mesmo nodeId
+                    if (decisionLedger.length > 0) {
+                      const lastEntry = decisionLedger[decisionLedger.length - 1];
+                      if (lastEntry.nodeId === entry.nodeId) {
+                        return;
+                      }
+                    }
+
+                    const timestamp = new Date().toLocaleTimeString('pt-BR');
+                    setDecisionLedger(prev => [...prev, { ...entry, timestamp }]);
+
+                    if (entry.nodeType === 'decision-choice') {
+                      // Simular ativação da primeira ação recomendada como sendo a derivada
+                      setHighlightedActionId('derived-action');
+                    }
+                  }}
+                />
+              )}
+            </div>
+
+            {/* DECISION LEDGER - Acumula decisões tomadas */}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">📋 Jornada de Decisões</h3>
+                {decisionLedger.length === 0 ? (
+                  <p className="text-xs text-slate-500">Marcos relevantes aparecerão aqui. Navegue a árvore para registrar decisões.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {decisionLedger.map((entry, idx) => {
+                      const stageLabels: Record<string, string> = {
+                        'signal': 'Sinal Validado',
+                        'evidence': 'Evidência Priorizada',
+                        'factor': 'Fator Crítico',
+                        'decision': 'Decisão Deliberada',
+                        'decision-choice': 'Opção Selecionada',
+                        'option': 'Opção Confirmada',
+                        'action': 'Ação Executada'
+                      };
+
+                      const typeColors: Record<string, string> = {
+                        'signal': 'bg-blue-100 text-blue-700',
+                        'evidence': 'bg-orange-100 text-orange-700',
+                        'factor': 'bg-amber-100 text-amber-700',
+                        'decision': 'bg-purple-100 text-purple-700',
+                        'decision-choice': 'bg-emerald-100 text-emerald-700',
+                        'option': 'bg-teal-100 text-teal-700',
+                        'action': 'bg-red-100 text-red-700'
+                      };
+
+                      // Simplificar títulos removendo prefixos que já aparecem no badge
+                      let displayTitle = entry.title;
+                      if (entry.nodeType === 'decision-choice' && displayTitle.startsWith('Decisão: ')) {
+                        displayTitle = displayTitle.replace('Decisão: ', '');
+                      } else if (entry.nodeType === 'option' && displayTitle.startsWith('Opção Escolhida: ')) {
+                        displayTitle = displayTitle.replace('Opção Escolhida: ', '');
+                      } else if (entry.nodeType === 'option' && displayTitle.startsWith('Opção Confirmada: ')) {
+                        displayTitle = displayTitle.replace('Opção Confirmada: ', '');
+                      } else if (entry.nodeType === 'action' && displayTitle.startsWith('Ação: ')) {
+                        displayTitle = displayTitle.replace('Ação: ', '');
+                      } else if (entry.nodeType === 'action' && displayTitle.startsWith('Ação Confirmada: ')) {
+                        displayTitle = displayTitle.replace('Ação Confirmada: ', '');
+                      } else if (entry.nodeType === 'evidence' && displayTitle.startsWith('Evidência: ')) {
+                        displayTitle = displayTitle.replace('Evidência: ', '');
+                      } else if (entry.nodeType === 'factor' && displayTitle.startsWith('Fator: ')) {
+                        displayTitle = displayTitle.replace('Fator: ', '');
+                      } else if (entry.nodeType === 'decision' && displayTitle.startsWith('Decisão: ')) {
+                        displayTitle = displayTitle.replace('Decisão: ', '');
+                      }
+
+                      return (
+                        <div key={idx} className="flex gap-2.5 p-2.5 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100/50 transition-colors">
+                          <div className="flex-shrink-0 pt-0.5">
+                            <span className={`text-[9px] font-black px-2 py-0.5 rounded whitespace-nowrap ${typeColors[entry.nodeType] || 'bg-slate-100 text-slate-700'}`}>
+                              {stageLabels[entry.nodeType] || `Etapa ${entry.stage + 1}`}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-semibold text-slate-900 line-clamp-1">{displayTitle}</p>
+                            <p className="text-[9px] text-slate-500 line-clamp-1 mt-0.5">{entry.summary}</p>
+                            <p className="text-[7px] text-slate-400 mt-0.5">{entry.timestamp}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">⚡ Ações Recomendadas</h3>
+                  {decisionLedger.length > 0 && (decisionLedger[decisionLedger.length - 1].nodeType === 'option' || decisionLedger[decisionLedger.length - 1].nodeType === 'decision-choice') && (
+                    <span className="text-[8px] font-black bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full uppercase tracking-widest border border-purple-200">Ativada pela Decisão</span>
+                  )}
+                </div>
+                {!selectedSignalCase ? (
+                  <p className="text-xs text-slate-500">Selecione um sinal para ver ações recomendadas.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {decisionLedger.length > 0 && (decisionLedger[decisionLedger.length - 1].nodeType === 'decision-choice') && (
+                      <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl">
+                        <p className="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Opção Escolhida</p>
+                        <p className="text-[13px] font-black text-slate-900">{decisionLedger[decisionLedger.length - 1].title}</p>
+                        <p className="text-[9px] text-slate-600 mt-1.5 font-semibold">{decisionLedger[decisionLedger.length - 1].summary}</p>
+                      </div>
+                    )}
+                    {selectedSignalCase.outputActions.slice(0, 4).map((action, idx) => {
+                      const isHighlighted = highlightedActionId === 'derived-action' && idx === 0;
+
+                      return (
+                        <div key={idx} className={`p-4 rounded-xl border-2 transition-all relative overflow-hidden ${
+                          isHighlighted 
+                            ? 'bg-purple-50 border-purple-500 shadow-[0_10px_30px_rgba(147,51,234,0.15)] scale-[1.02]' 
+                            : 'bg-white border-slate-100 hover:border-slate-200'
+                        }`}>
+                          {isHighlighted && (
+                            <div className="absolute top-0 right-0">
+                               <div className="bg-purple-600 text-white text-[7px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-lg shadow-lg flex items-center gap-1.5 anim-pulse">
+                                 <Zap size={10} strokeWidth={3} /> Ação Ativada
+                               </div>
+                            </div>
+                          )}
+                          <div className="flex items-start gap-4">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                              isHighlighted ? 'bg-purple-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500'
+                            }`}>
+                              {idx === 0 ? <Activity size={20} /> : <Zap size={20} />}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className={`text-xs font-black uppercase tracking-tight ${isHighlighted ? 'text-slate-900' : 'text-slate-800'}`}>
+                                  {action.title}
+                                </h4>
+                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest ${
+                                  action.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                  {action.priority}
+                                </span>
+                              </div>
+                              <p className={`text-[10px] leading-relaxed mb-3 ${isHighlighted ? 'text-slate-600 font-medium' : 'text-slate-500'}`}>
+                                {action.description}
+                              </p>
+                              <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100/50">
+                                <div className="flex items-center gap-2">
+                                  <Users size={12} className="text-slate-400" />
+                                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{action.ownerSuggestion || 'Pendente'}</span>
+                                </div>
+                                <Button className={`h-auto py-1.5 px-4 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg transition-all ${
+                                  isHighlighted ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-md' : 'bg-slate-900 text-white'
+                                }`}>
+                                  Executar
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* SOCIAL MEDIA (TABLE) */}

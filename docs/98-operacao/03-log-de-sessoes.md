@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-20] — Recorte 58: CockpitV2 Tactical Panel & Signal Evolution
+
+- **Natureza:** Sessão de refinamento de UX de alta fidelidade e estruturação de inteligência.
+- **Objetivo:** Upgradear o drawer de detalhes em um painel tático de alta fidelidade e evoluir a visualização do nó inicial para continuidade visual completa no DecisionMindMap.
+- **Contexto:**
+  - O canvas estrutural da CockpitV2 já estava estabilizado.
+  - Havia necessidade de tornar a interface mais "tática" e informativa.
+  - O nó inicial (`signal`) não estava alinhado visualmente com a seleção prévia.
+- **Decisões Técnicas:**
+  - **Identidade do Sinal:** O nó `signal` agora exibe o Account Name e o Signal Title com hierarquia clara e bordas coloridas por severidade (`border-l-8`).
+  - **Tactical Dark Drawer:** Implementação de um tema escuro profundo (`#16181D`) para o drawer lateral, segmentando a informação em blocos de "Contexto", "Análise de Fatores" e "Matriz de Decisão".
+  - **Matriz de Decisão:** Introduzido o conceito de `consequence` no modelo de dados das opções, permitindo uma análise mais profunda do risco/retorno antes do registro.
+  - **Atomicidade de Conectores:** Preservado o bypass de render reativo para os conectores SVG, garantindo sincronização rígida durante o drag.
+- **Arquivos Alterados:**
+  - `src/components/DecisionMindMap.tsx`: Redesenho do Drawer e evolução do nó de sinal.
+  - `src/data/signalSituations.ts`: Expansão da interface `DecisionOption` com campo `consequence`.
+  - `src/data/signalCases.ts`: Adição de dados reais de consequências para os canários de teste.
+- **Status:** ✅ Concluído. Validado visualmente pelo usuário conforme requisitos de alta fidelidade operacional.
+
+---
+
 ## [2026-04-19] — Congelamento Estrutural e Substituição da Base Cockpit V2
 
 - **Natureza:** Sessão de congelamento estrutural e publicação da nova fundação visual.

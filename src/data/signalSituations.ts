@@ -17,6 +17,8 @@ export interface DecisionOption {
   timeline: string;
   riskLevel?: 'baixo' | 'médio' | 'alto';
   successProbability?: number;
+  consequence?: string;
+  actionDerived?: string;
   subOptions?: Array<{
     suboption: string;
     description: string;
