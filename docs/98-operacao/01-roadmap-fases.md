@@ -96,6 +96,7 @@ Recortes concluídos:
 - [x] **Integrations.tsx** — Dashboard de confiabilidade e KPIs de saúde do stack (commit `cdea929`).
 - [x] **Outbound.tsx** — Cockpit tático com fila de intervenção e Contexto ICP (commit `281613e`).
 - [x] **Centro de Comando (Completo)** — Perfil da Conta, Organograma Visual e Perfil do Contato (commit `8135da4`).
+- [x] **Decision MindMap** — Árvore de decisão navegável com exclusividade local de opções por ponto de decisão (fase encerrada com baseline utilizável, checkpoint registrado em PHASE-CHECKPOINT.md).
 
 Itens em andamento/previstos:
 - Revisar qualidade das telas remanescentes (Assistente, Configurações).
