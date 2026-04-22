@@ -67,3 +67,10 @@ O usuário só precisa entrar como aprovador final quando a implementação já 
 **Status:** Ativo
 **Data:** 2026-04-15
 **Responsável:** ChatGPT | Canopi
+
+---
+
+## Registro de Aprovação — Recorte 57 (CockpitV2 MindMap)
+**Data:** 2026-04-21
+**Estado:** **APROVADO POR VALIDAÇÃO VISUAL DO USUÁRIO**
+**Evidência:** O usuário confirmou visualmente a rigidez geométrica dos conectores (Zero Lag) e a funcionalidade da camada informacional (Hover e Details Drawer) em ambiente local. A aprovação encerra o ciclo de refinamento visual e estrutural do MindMap.

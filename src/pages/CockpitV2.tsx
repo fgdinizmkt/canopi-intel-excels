@@ -1,11 +1,14 @@
+'use client';
+
 import React, { useState } from 'react';
-import { 
-  Search, Bell, Settings, Home, List, PieChart, Users, ChevronDown, 
+import {
+  Search, Bell, Settings, Home, List, PieChart, Users, ChevronDown,
   Sparkles, CheckCircle2, ChevronRight, Share2, MessageSquare, Heart, Bookmark, Zap, Activity, AlertTriangle, Target, Link, Globe
 } from 'lucide-react';
 import { Card, Button } from '../components/ui';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Topbar } from '../components/layout/Topbar';
+import DecisionMindMap from '../components/DecisionMindMap';
 
 const polar = (r, deg) => {
   const rad = (deg - 90) * Math.PI / 180.0;
@@ -348,42 +351,16 @@ const CockpitV2 = () => {
 
             {/* RIGHT PANEL - GRID LAYOUT (Não se sobrepõe) */}
             <div className="w-full flex justify-end z-20">
-              <div className="w-full max-w-[500px] shadow-2xl rounded-3xl bg-white border border-slate-200 overflow-hidden transform transition-all duration-500 h-[750px] flex flex-col">
+              <div className="w-full max-w-[600px] shadow-2xl rounded-3xl bg-white border border-slate-200 overflow-hidden transform transition-all duration-500 h-[750px] flex flex-col">
               {!currentMotor ? (
-                // RESTORED IDLE STATE COM TODAS AS FRENTES
+                // IDLE STATE
                 <div className="flex-1 p-8 overflow-y-auto w-full">
                    <h4 className="text-lg font-black uppercase tracking-widest text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
-                     <Globe className="w-5 h-5 text-brand" /> Malha Integrada Operacional
+                     <Globe className="w-5 h-5 text-brand" /> Nenhum Motor Selecionado
                    </h4>
                    <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">
-                     O painel agrupa todos os nós capturados, mantendo 100% de visão holística. Os limites de radar respondem nativamente à densidade computada de cada frente de ação da conta.
+                     Passe o cursor sobre os quadrantes do gráfico à esquerda para investigar suas células contextuais, ou clique para isolar uma frente.
                    </p>
-                   
-                   <div className="space-y-3">
-                     {motorsRenderData.map((m, i) => (
-                        <div key={i} className="flex justify-between items-center p-4 bg-slate-50 border border-slate-100 rounded-xl hover:border-slate-300 hover:shadow-md transition-all cursor-pointer" 
-                             onMouseEnter={() => setHoveredMotor(m.id)}>
-                           <span className="text-sm font-bold text-slate-800 flex items-center gap-3">
-                             <div className={`p-2 rounded-lg ${m.bgSlate}`}>
-                                <m.icon className="w-4 h-4 text-white" />
-                             </div>
-                             {m.name}
-                           </span>
-                           <div className="flex items-center gap-4">
-                              <span className="text-xs font-bold text-slate-400">{Math.round((m.signalCount / totalSignals)*100)}%</span>
-                              <span className="text-[10px] uppercase font-black tracking-widest px-2.5 py-1.5 rounded-md bg-white border border-slate-200 text-slate-600 shadow-sm">
-                                {m.signalCount} Sinais
-                              </span>
-                           </div>
-                        </div>
-                     ))}
-                   </div>
-                   
-                   <div className="mt-8 bg-brand/5 rounded-xl p-4 border border-brand/20">
-                     <p className="text-xs text-brand font-medium italic text-center">
-                       Passe o cursor sobre os quadrantes do gráfico à esquerda para investigar suas células contextuais, ou clique para isolar uma frente.
-                     </p>
-                   </div>
                 </div>
               ) : (
                 // ACTIVE STATE
@@ -646,100 +623,10 @@ const CockpitV2 = () => {
 
             </div>
 
-            {/* SEARCH INTENT FLOW (DIAGRAM) */}
+            {/* MAPA MENTAL DECISÓRIO - Substitui Ramificações Estratégicas Preditivas */}
 
-            <div>
-
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Ramificações Estratégicas Preditivas</h3>
-
-              <Card className="p-8 border-slate-200 flex flex-col items-center bg-slate-50/50 overflow-x-auto min-h-[300px]">
-
-                {/* Visual approximation of the horizontal tree flow */}
-
-                <div className="flex items-center gap-8 min-w-max">
-
-                  {/* Root */}
-
-                  <div className="bg-white border border-indigo-200 p-4 rounded-xl shadow-sm z-10 relative">
-
-                    <p className="text-xs font-black text-slate-800">Cluster: "Estratégia Enterprise"</p>
-
-                  </div>
-
-                  
-
-                  {/* Connectors */}
-
-                  <div className="w-16 h-[2px] bg-indigo-200 relative">
-
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-400" />
-
-                  </div>
-
-                  {/* Level 1 */}
-
-                  <div className="flex flex-col gap-16 relative">
-
-                     {/* Lines rendering for branches */}
-
-                     <svg className="absolute w-16 h-full -left-16" style={{ top: '50%', transform: 'translateY(-50%)' }}>
-
-                        <path d="M 0 50 C 30 50, 30 20, 64 20" fill="none" stroke="#c7d2fe" strokeWidth="2" />
-
-                        <path d="M 0 50 C 30 50, 30 80, 64 80" fill="none" stroke="#c7d2fe" strokeWidth="2" />
-
-                     </svg>
-
-                     
-
-                     <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm w-48 relative z-10">
-
-                        <p className="text-[10px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Top of Funnel</p>
-
-                        <p className="text-xs font-black text-slate-800">"Como orquestrar contas B2B"</p>
-
-                     </div>
-
-                     <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-sm w-48 relative z-10">
-
-                        <p className="text-[10px] font-bold text-slate-600 mb-1 uppercase tracking-wider">Bottom of Funnel</p>
-
-                        <p className="text-xs font-black text-slate-800">"Canopi vs Concorrentes 2026"</p>
-
-                     </div>
-
-                  </div>
-
-                  
-
-                  {/* Level 2 (Connected from bottom right) */}
-
-                  <div className="w-16 h-[2px] bg-slate-200 self-end mb-6 relative">
-
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-300" />
-
-                  </div>
-
-                  <div className="flex flex-col gap-3 self-end -mb-8">
-
-                     {['Anomalia Concorrente A', 'Comparação de Preços', 'Funcionalidades Enterprise'].map((item, i) => (
-
-                        <div key={i} className="bg-white border border-slate-100 px-3 py-2 rounded-lg flex items-center gap-2 shadow-sm">
-
-                           <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-
-                           <span className="text-xs font-bold text-slate-600">{item}</span>
-
-                        </div>
-
-                     ))}
-
-                  </div>
-
-                </div>
-
-              </Card>
-
+            <div className="w-full h-[750px] bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+              <DecisionMindMap />
             </div>
 
             {/* SOCIAL MEDIA (TABLE) */}
