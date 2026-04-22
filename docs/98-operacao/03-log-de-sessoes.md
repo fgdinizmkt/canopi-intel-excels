@@ -2881,3 +2881,19 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 **Status:** Recorte 27 (Fase E7 — Escrita Defensiva em Signals) concluído. Commit: `054254a0c96f07cb72f7433c069d2b08a40a8350`.
 - ✅ Publicado em origin/main
 - ✅ Cobertura: 2 mutações reais (confirmAssign, archive) acopladas com persistência defensiva
+
+---
+
+### Sessão: 2026-04-21 — Recorte 57 (CockpitV2 MindMap)
+**Agente:** Antigravity
+
+**Objetivo:** Finalização do Decision MindMap em CockpitV2 com Sincronização Atômica e Camada Informacional.
+
+**Ações:**
+1.  **Sincronização Atômica (Zero Lag):** Implementado movimento simultâneo de cards e conectores via injeção direta no DOM no loop do `mousemove`, eliminando a latência de renderização do React durante o arraste.
+2.  **Camada Informacional:** Adicionados estados de hover premium com tooltips contextuais e gaveta lateral de detalhes (Drawer) de alta densidade.
+3.  **Integração de Dados:** Conexão com `signalSituations.ts` para prover contexto operacional real da FinanceFlow em cada nó do fluxo.
+4.  **Estabilidade Espacial:** Corrigida lógica de scroll horizontal e remoção de qualquer recentralização automática, garantindo fluxo estável de leitura e progressão para a direita.
+5.  **Aprovação Visual:** **Aprovado pelo usuário após validação visual direta** confirmando a rigidez geométrica absoluta (conectores "soldados" aos cards) e fluidez da camada de detalhes.
+
+**Status:** Recorte 57 (Fase Cockpit V2) concluído. Commit: `6a24f54`.
