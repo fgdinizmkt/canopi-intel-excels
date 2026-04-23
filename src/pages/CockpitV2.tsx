@@ -104,14 +104,27 @@ const CockpitV2 = () => {
     // Se houver scoringRules, podemos tentar influenciar o status
     // Exemplo: se ABX Readiness threshold for alto em Configurações, ABX pode estar em Alerta
     return base.map(m => {
-      const rule = scoringRules.find((r: any) => r.id.toLowerCase().includes(m.id));
+      const rule = scoringRules.find((r: any) => r.id?.toLowerCase().includes(m.id?.toLowerCase()) || r.name?.toLowerCase().includes(m.name?.toLowerCase()));
+      
+      const motorWithSettings = {
+        ...m,
+        sensitivity: 'Normal' as 'Normal' | 'Alta',
+        threshold: 70,
+        weight: 1
+      };
+
       if (rule) {
-        // Lógica simplificada: se threshold > 80 e é um motor de risco (ABM/ABX), marcar como Crítico
-        if (rule.threshold > 80 && (m.id === 'abm' || m.id === 'abx')) {
-          return { ...m, status: 'Foco Total' };
-        }
+        // Lógica: se o threshold da regra for > 70, o motor entra em estado de Monitoramento Intenso
+        const isSensitive = rule.threshold > 70;
+        const finalStatus = isSensitive ? (m.status === 'Crítico' ? 'Foco Total' : 'Monitoramento') : m.status;
+        
+        motorWithSettings.status = finalStatus;
+        motorWithSettings.sensitivity = isSensitive ? 'Alta' : 'Normal';
+        motorWithSettings.threshold = rule.threshold;
+        motorWithSettings.weight = rule.weight;
       }
-      return m;
+
+      return motorWithSettings;
     });
   }, [scoringRules]);
   const [hoveredMotor, setHoveredMotor] = useState<string | null>(null);
@@ -419,9 +432,19 @@ const CockpitV2 = () => {
                          <h4 className="text-2xl font-black uppercase tracking-widest mb-1 text-slate-900" style={{color: currentMotor.hex}}>
                            {currentMotor.name}
                          </h4>
-                         <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-1">
-                           <span className="bg-slate-100 px-2 py-1 rounded text-slate-700 border border-slate-200 shadow-sm">{Math.round((currentMotor.signalCount / totalSignals)*100)}% Visibilidade Ativa</span>
-                         </p>
+                         <div className="flex items-center gap-2 mt-1 flex-wrap">
+                           <span className="bg-slate-100 px-2 py-1 rounded text-slate-700 border border-slate-200 shadow-sm text-[10px] font-bold">
+                             {Math.round((currentMotor.signalCount / totalSignals)*100)}% Visibilidade
+                           </span>
+                           {currentMotor.sensitivity === 'Alta' && (
+                             <span className="bg-indigo-600 px-2 py-1 rounded text-white shadow-sm text-[10px] font-black uppercase animate-pulse flex items-center gap-1">
+                               <Zap size={10} strokeWidth={3} /> Foco Sensível
+                             </span>
+                           )}
+                           <span className="bg-slate-900 px-2 py-1 rounded text-white shadow-sm text-[10px] font-bold">
+                             Threshold: {currentMotor.threshold || 70}%
+                           </span>
+                         </div>
                        </div>
                      </div>
                    </div>
@@ -432,6 +455,18 @@ const CockpitV2 = () => {
                           <span className="text-xs font-black text-slate-800 leading-tight block">{kpi}</span>
                        </div>
                      ))}
+                     <div className="bg-indigo-50/50 border border-indigo-100 p-3 rounded-xl flex flex-col justify-center">
+                       <span className="text-[9px] uppercase font-bold text-indigo-400 mb-1">Regra de Scoring</span>
+                       <span className="text-[11px] font-black text-indigo-700 truncate">
+                         {scoringRules.find((r: any) => r.id?.toLowerCase().includes(currentMotor.id?.toLowerCase()))?.name || 'Padrão'}
+                       </span>
+                     </div>
+                     <div className="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col justify-center">
+                       <span className="text-[9px] uppercase font-bold text-slate-500 mb-1">Peso Operacional</span>
+                       <span className="text-[11px] font-black text-white">
+                         {(currentMotor as any).weight || 1}.0x
+                       </span>
+                     </div>
                    </div>
 
                    <div className="space-y-4 mb-8 flex-1 relative z-10 overflow-y-auto pr-2">

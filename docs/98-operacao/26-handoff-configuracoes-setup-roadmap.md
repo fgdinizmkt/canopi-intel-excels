@@ -636,8 +636,8 @@ As configurações publicadas deixaram de ser apenas visual/mock e passaram a se
 - **Contas (`/accounts`):** Consumo real de `scoring_rules` para cálculo dinâmico e ordenação.
 - **Sinais (`/sinais`):** Engine de processamento reativo que aplica severidade, SLA e Owner via `signal_configs` e `routing_rules`.
 - **Overview (`/overview`):** Triagem de contas críticas e alta prioridade baseada em regras publicadas.
-- **Ações (`/actions`):** Listagem e tags de roteamento baseadas em `routing_rules` e `scoring_rules`.
-- **Cockpit V2:** Status dos motores influenciados pelos thresholds de ABX Readiness.
+- **Ações (`/actions`):** Roteamento operacional completo. Injeção dinâmica de `owner` e `fallback` via `routing_rules`, com sinalização visual de ancoragem (⚓) aplicada deterministicamente.
+- **Cockpit V2:** Status dos motores regidos por `scoring_rules`. Exibição de **Foco Sensível**, multiplicadores de peso operacional e thresholds reais no painel de detalhes do motor.
 
 ---
 

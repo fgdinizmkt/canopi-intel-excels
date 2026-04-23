@@ -348,9 +348,9 @@ function ActionListCard({
         <div className="flex-1 min-w-0">
           {/* Badges */}
           <div className="flex flex-wrap gap-2 items-center">
-            {routingRules.some((r: any) => r.category === item.category) && (
-              <span className="rounded-full border border-fuchsia-200 bg-fuchsia-100/50 px-2.5 py-1 text-[11px] font-black text-fuchsia-600 uppercase tracking-tighter">
-                Roteada via Fluxo Ativo
+            {item.isRouted && (
+              <span className="rounded-full border border-emerald-200 bg-emerald-100/50 px-2.5 py-1 text-[11px] font-black text-emerald-600 uppercase tracking-tighter flex items-center gap-1">
+                ⚓ {item.routingFlow || 'Roteado via Fluxo Ativo'}
               </span>
             )}
             <span className={cx(priorityClasses[item.priority], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
@@ -485,9 +485,9 @@ function KanbanCard({
           <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500 truncate">
             {item.category}
           </span>
-          {item.sourceType === "playbook" && (
-            <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-sky-600 truncate">
-              PB: {item.playbookName}
+          {item.isRouted && (
+            <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-600 truncate flex items-center gap-1 max-w-[80px]">
+              ⚓ {item.routingFlow || 'Roteado'}
             </span>
           )}
         </div>
@@ -1290,17 +1290,42 @@ export const Actions: React.FC = () => {
 
   // Merge explícito e determinístico: sessionActions vence sempre por id
   const allItems = useMemo(() => {
+    // Adiciona apenas ações do Supabase que não existem em sessionActions
     const merged = [...sessionActions];
     const mergedIds = new Set(merged.map(a => a.id));
 
-    // Adiciona apenas ações do Supabase que não existem em sessionActions
     for (const action of supabaseActions) {
       if (!mergedIds.has(action.id)) {
         merged.push(action);
       }
     }
 
-    return merged;
+    // APLICAR CONSUMO OPERACIONAL (Recorte 54 - F2+)
+    // Processa a lista final para injetar roteamento dinâmico e gestão de owners baseada em settings
+    return merged.map(action => {
+      // 1. Procurar regra de roteamento compatível (via categoria ou nome do alvo)
+      const rule = routingRules.find((r: any) => 
+        r.category?.toLowerCase() === action.category?.toLowerCase() ||
+        r.target?.toLowerCase() === action.ownerName?.toLowerCase()
+      );
+
+      let finalAction = {
+        ...action,
+        isRouted: !!rule,
+        routingFlow: rule ? rule.name : undefined
+      };
+
+      // 2. Se houver regra e fallback definido nas configurações, aplicar logicamente
+      if (rule && rule.fallback) {
+        // Se a ação não tem owner ou o owner atual é o alvo da regra, podemos forçar o fallback
+        if (!action.ownerName || action.ownerName === rule.target) {
+          finalAction.ownerName = rule.fallback;
+          finalAction.ownerTeam = "Fila Automática (Roteada)";
+        }
+      }
+
+      return finalAction;
+    });
   }, [sessionActions, supabaseActions]);
 
   // ─── TRIAGEM DE CONTAS POR SCORE (Recorte 54 — F2) ──────────────────

@@ -47,6 +47,8 @@ export type SignalItem = {
   nextSteps?: string[];
   actions?: any[];
   sla?: string;
+  isConfigInfluenced?: boolean;
+  isRouted?: boolean;
 };
 
 export type SignalRow = {

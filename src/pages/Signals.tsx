@@ -80,7 +80,9 @@ export const Signals: React.FC = () => {
             ...s,
             severity: finalSeverity,
             owner: finalOwner,
-            sla: finalSLA
+            sla: finalSLA,
+            isConfigInfluenced: config ? true : false,
+            isRouted: matchingRule ? true : false
           };
         });
 
@@ -473,6 +475,8 @@ export const Signals: React.FC = () => {
                   <div className="sig-meta">
                     <span className={`badge ${bc(s.severity)}`}>{s.severity}</span>
                     <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--slate-400)' }}>{s.id} · {s.timestamp}</span>
+                    {s.isConfigInfluenced && <span className="badge" style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>⚙ Ajustado via Sistema</span>}
+                    {s.isRouted && <span className="badge" style={{ backgroundColor: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' }}>⚓ Roteamento Ativo</span>}
                     <span className="badge badge-slate" style={{ marginLeft: 'auto' }}>{s.category}</span>
                     {s.resolved && <span className="badge badge-green">✓ Resolvido</span>}
                   </div>

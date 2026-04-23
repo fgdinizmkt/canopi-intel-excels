@@ -109,7 +109,6 @@ export interface ActionItem {
   projectSuccess: string;
   projectSteps: ProjectStep[];
   buttons: { id: string; label: string; tone: "primary" | "secondary" | "danger"; action: "open" | "assign" | "start" | "escalate" | "complete" | "project" }[];
-  
   sourceType?: "manual" | "signal" | "playbook" | "score-derivada";
   playbookName?: string;
   playbookRunId?: string;
@@ -118,6 +117,9 @@ export interface ActionItem {
   resolutionPath?: string;
   executionNotes?: string;
   learnings?: string;
+  isRouted?: boolean;
+  routingFlow?: string;
+  isDraft?: boolean;
   createdAt: string;
 }
 
