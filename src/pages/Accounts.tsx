@@ -280,7 +280,7 @@ export const Accounts = () => {
     });
 
     return data;
-  }, [filtros, ordenacao, contas, blocoCSignals, campanhasCanonicasPorConta]);
+  }, [filtros, ordenacao, contas, blocoCSignals, campanhasCanonicasPorConta, scoringRules]);
 
   const metricas = useMemo(() => ({
     prioritarias: contas.filter((c) => c.potencial >= 80 || c.statusGeral !== 'Saudável').length,

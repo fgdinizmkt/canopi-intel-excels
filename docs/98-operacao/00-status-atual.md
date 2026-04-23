@@ -4,7 +4,18 @@
  `main` — sincronizada em 2026-04-14 (HEAD: `915a2ba` — Defensive fallback para dataset insuficiente/corrompido)
 
 ## Fase atual do plano
-**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + **E22 CockpitV2 Tactical Polish**)
+**Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
+
+---
+
+### MARCO: Saneamento Absoluto Final do Repositório — 2026-04-22
+
+**Status: Concluído (Build & Lint 0 Warnings)**
+
+- **Hooks Integrity:** Zeragem total de warnings `exhaustive-deps` em componentes críticos (`AccountProfile`, `Overview`, `Signals`, `Actions`, `AbmStrategy`, `usuario/page`, `DecisionMindMap`).
+- **Acessibilidade:** Correção de labels e atributos ARIA em formulários e seletores em `Signals.tsx` e `usuario/page.tsx`.
+- **Build de Produção:** Validado com `npm run build` (Exit 0) e `npm run lint` (0 warnings).
+- **Estabilização:** Repositório em estado "pristine" para entrega e governança futura.
 
 ---
 

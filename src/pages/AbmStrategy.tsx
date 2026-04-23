@@ -501,7 +501,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
     }
 
     return merged;
-  }, [supabaseAbm, supabaseAbx]);
+  }, [supabaseAbm, supabaseAbx, supabaseAccounts]);
 
   // Initialize activeAccountId once accounts is available
   useEffect(() => {
@@ -531,7 +531,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
       setAbxNarrativeStatus(null);
       setEditingAbxNarrative(false);
     }
-  }, [activeAccount?.id]);
+  }, [activeAccount]);
 
   // Camada Derivada: Transforma accounts (merged) para o formato do Heatmap
   const abmHeatmapAccounts = useMemo(() => {

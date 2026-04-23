@@ -96,7 +96,7 @@ export const Signals: React.FC = () => {
     if (!settingsLoading) {
       carregarSignals();
     }
-  }, [settingsLoading, signalConfigs]);
+  }, [settingsLoading, signalConfigs, routingRules]);
 
   // Specific Panel states
   const [intFixed, setIntFixed] = useState(false);
@@ -122,9 +122,17 @@ export const Signals: React.FC = () => {
     }
   }, [searchParams, signals]);
 
-  const active = signals.filter(s => !s.archived);
-  const archived = signals.filter(s => s.archived);
-  
+  const { active, archived, counts } = useMemo(() => {
+    const act = signals.filter(s => !s.archived);
+    const arc = signals.filter(s => s.archived);
+    const cnt = {
+      critico: act.filter(s => s.severity === 'crítico').length,
+      alerta: act.filter(s => s.severity === 'alerta').length,
+      oportunidade: act.filter(s => s.severity === 'oportunidade').length
+    };
+    return { active: act, archived: arc, counts: cnt };
+  }, [signals]);
+
   const filtered = useMemo(() => {
     return active.filter(s => {
       const q = search.toLowerCase();
@@ -132,8 +140,6 @@ export const Signals: React.FC = () => {
       return ms && (!filterSev || s.severity === filterSev) && (!filterType || s.type === filterType) && (!filterCat || s.category === filterCat);
     });
   }, [search, filterSev, filterType, filterCat, active]);
-
-  const counts = { critico: active.filter(s => s.severity === 'crítico').length, alerta: active.filter(s => s.severity === 'alerta').length, oportunidade: active.filter(s => s.severity === 'oportunidade').length };
 
   const t2 = (title: string, sub: string = '') => {
     setToast({ show: true, title, sub });
@@ -449,14 +455,14 @@ export const Signals: React.FC = () => {
 
       <div className="page-body">
         <div className="filter-bar">
-          <div className="filter-search"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar conta, sinal, owner..." /></div>
-          <select className="filter-select" value={filterSev} onChange={e => setFilterSev(e.target.value)}>
+          <div className="filter-search"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar conta, sinal, owner..." aria-label="Buscar conta, sinal ou responsável" /></div>
+          <select className="filter-select" value={filterSev} onChange={e => setFilterSev(e.target.value)} aria-label="Filtrar por severidade">
             <option value="">Severidade: todas</option>
             <option value="crítico">Crítico</option>
             <option value="alerta">Alerta</option>
             <option value="oportunidade">Oportunidade</option>
           </select>
-          <select className="filter-select" value={filterCat} onChange={e => setFilterCat(e.target.value)}>
+          <select className="filter-select" value={filterCat} onChange={e => setFilterCat(e.target.value)} aria-label="Filtrar por categoria">
             <option value="">Categoria: todas</option>
             {Array.from(new Set(active.map(s => s.category))).map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -567,8 +573,8 @@ export const Signals: React.FC = () => {
             ))}
           </div>
           <div style={{ marginBottom: '18px' }}>
-            <label className="form-label">Mensagem (opcional)</label>
-            <textarea className="inp" rows={2} value={assignNote} onChange={e => setAssignNote(e.target.value)} placeholder="Ex: Lead quente, score 98. Atendimento prioritário." style={{ resize: 'none' }}></textarea>
+            <label htmlFor="assignNote" className="form-label">Mensagem (opcional)</label>
+            <textarea id="assignNote" className="inp" rows={2} value={assignNote} onChange={e => setAssignNote(e.target.value)} placeholder="Ex: Lead quente, score 98. Atendimento prioritário." style={{ resize: 'none' }}></textarea>
           </div>
           <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '12px 16px', marginBottom: '18px', fontSize: '12px', color: '#374151' }}>
             <strong style={{ color: '#16a34a' }}>Ao confirmar:</strong> lead atribuído, sinal resolvido e ação criada na fila operacional.

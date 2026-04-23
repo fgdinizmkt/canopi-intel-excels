@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-22] — Saneamento Absoluto Final do Repositório
+
+- **Natureza:** Sessão de limpeza técnica profunda e estabilização de build.
+- **Objetivo:** Zerar warnings de build/lint, eliminar alertas de runtime conhecidos e deixar o repositório em estado limpo e coerente.
+- **Destaques:**
+  - **Exhaustive Deps:** Correção cirúrgica de dependências em `useEffect` e `useMemo` em:
+    - `AccountProfile.tsx` (sessionLogs, router, slug)
+    - `Overview.tsx` (resolvedosSinais.length)
+    - `Signals.tsx` (routingRules)
+    - `Actions.tsx` (item object)
+    - `AbmStrategy.tsx` (supabaseAccounts, activeAccount)
+    - `src/app/(shell)/usuario/page.tsx` (userProfile)
+    - `src/components/DecisionMindMap.tsx` (offsets, getNodeDepth)
+  - **Acessibilidade:** Implementação de `aria-label` e labels em `Signals.tsx` e `usuario/page.tsx`.
+  - **Build Integrity:** `npm run build` e `npm run lint` retornando 0 warnings e 0 erros.
+- **Status:** ✅ Concluído. Repositório pronto para finalização e governança.
+
+---
+
 ## [2026-04-20] — Recorte 58: CockpitV2 Tactical Panel & Signal Evolution
 
 - **Natureza:** Sessão de refinamento de UX de alta fidelidade e estruturação de inteligência.

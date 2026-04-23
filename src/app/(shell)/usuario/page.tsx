@@ -298,7 +298,7 @@ export default function UsuarioPage() {
         localStorage.setItem('user_profile', JSON.stringify(newProfile));
       }
     } catch { /* silently ignore */ }
-  }, []);
+  }, [userProfile]);
 
   const handleAvatarUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

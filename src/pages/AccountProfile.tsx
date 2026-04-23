@@ -19,6 +19,7 @@ import { persistOportunidade } from '../lib/oportunidadesRepository';
 import { contasMock, Conta, ContatoConta, OportunidadeConta, SinalConta, AcaoConta } from '../data/accountsData';
 import { Interaction, PlayRecommendation, Campaign } from '../../scripts/seed/buildBlockCSeed';
 import { useAccountDetail } from '../context/AccountDetailContext';
+import { usePublishedSettings } from '../hooks/usePublishedSettings';
 
 interface AccountProfileProps {
   slug: string;
@@ -79,6 +80,8 @@ const OrgNode = ({ contact, level, isRoot, onSelect }: { contact: ContatoConta; 
 export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
   const router = useRouter();
   const { createAction, sessionActions, sessionLogs } = useAccountDetail();
+  const { getSetting } = usePublishedSettings();
+  const scoringRules = getSetting('scoring_rules', []);
   
   // -- CONSOLIDATED DATA STATE --
   const [account, setAccount] = useState<Conta | null>(null);
@@ -130,7 +133,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     load();
   }, [slug]);
 
-  const score = useMemo(() => account ? calculateAccountScore(account) : null, [account]);
+  const score = useMemo(() => account ? calculateAccountScore(account, scoringRules) : null, [account, scoringRules]);
 
   // -- RADAR RELACIONAL LOGIC (PORTED FROM AUDIT) --
   const radar = useMemo(() => {
@@ -236,7 +239,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
          ))}
       </div>
     );
-  }, [account, renderTree]);
+  }, [account, renderTree, router, slug]);
 
   const unifiedTimeline = useMemo(() => {
     if (!account) return [];
@@ -267,7 +270,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     ].sort((a,b) => b.data.localeCompare(a.data));
 
     return combined;
-  }, [account, interactions]);
+  }, [account, interactions, sessionLogs]);
 
   const accountActions = useMemo(() => {
     return sessionActions.filter(a => a.accountName === account?.nome);

@@ -824,7 +824,7 @@ function ActionOverlay({
     setLearnings(item.learnings || "");
     setEditingNarrative(false);
     setNarrativeStatus(null);
-  }, [item?.id]);
+  }, [item]);
 
   if (!item) return null;
 
@@ -1326,7 +1326,7 @@ export const Actions: React.FC = () => {
 
       return finalAction;
     });
-  }, [sessionActions, supabaseActions]);
+  }, [sessionActions, supabaseActions, routingRules]);
 
   // ─── TRIAGEM DE CONTAS POR SCORE (Recorte 54 — F2) ──────────────────
   const contasParaTriagem = useMemo(() => {

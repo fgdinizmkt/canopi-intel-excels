@@ -82,7 +82,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
 
   useEffect(() => {
     offsetRef.current = { ...offsets };
-  }, []);
+  }, [offsets]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -479,7 +479,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragging, dragOffset, dragStartPos, dragMoved, updateAllConnectors, onDecisionRecorded, selectedCard, visibleCards]);
+  }, [dragging, dragOffset, dragStartPos, dragMoved, updateAllConnectors, onDecisionRecorded, selectedCard, visibleCards, getNodeDepth]);
 
   const handleMouseDown = (e: React.MouseEvent, id: string) => {
     if ((e.target as HTMLElement).closest('button')) return;
