@@ -8,6 +8,59 @@
 
 ---
 
+### MARCO: Configurações & Setup (Etapa 5: Intelligence Exchange e Governança) — 2026-04-23
+
+**Status: Concluído no Front-end (Materializado)**
+
+- **Intelligence Exchange:** Camada funcional de propagação de inteligência (ABM ↔ ABX) com regras de confiança e validade.
+- **Learning Repository:** Catálogo de padrões e recomendações reaproveitáveis entre contextos.
+- **Governança:** Setup de versionamento, políticas de publicação (peer review) e log histórico de alterações.
+- **Permissões:** Controle de acesso granular por domínio de inteligência (mídia, sinais, plays, exchange).
+- **Finalização:** Etapa final do Roadmap de Setup materializada e validada via Build.
+
+---
+
+### MARCO: Configurações & Setup (Etapa 4: Plays, ABM e ABX) — 2026-04-23
+
+**Status: Concluído no Front-end (Materializado)**
+
+- **Biblioteca de Plays:** Materialização de 7 táticas canônicas (Executive Intro, Stakeholder Expansion, etc.) com critérios de sucesso e governança.
+- **ABM Setup:** Parametrização de ICP (verticals, technographics), Tiers de conta e clusters operacionais baseados em lógica de segmentação.
+- **ABX Orchestration:** Definição de regras de orquestração de jornada, triggers de multi-threading e critérios de prontidão para expansão (Readiness).
+
+---
+
+### MARCO: Configurações & Setup (Etapa 3: Scores, Sinais e Roteamento) — 2026-04-22
+
+**Status: Concluído no Front-end (Materializado)**
+
+- **Scores & Atribuição:** Implementação de engine de pesos para Lead Fit, Engagement e Account Potential com visualização de gatilhos.
+- **Sinais & Triggers:** Parametrização de severidade, cooldown e dependência de fontes para os 6 alertas canônicos do Cockpit.
+- **Roteamento & SLA:** Tabela de roteamento funcional baseada em tier de conta e criticidade de sinal, com fluxos de fallback.
+
+---
+
+### MARCO: Configurações & Setup (Etapa 2: Mídia & Conversões) — 2026-04-22
+
+**Status: Concluído no Front-end (Materializado)**
+
+- **Mídia & Analytics:** Parametrização funcional de GA4, Google Ads, Meta e LinkedIn com monitoramento de status e frequência de sync.
+- **Eventos & Conversões:** Registro de eventos canônicos (primary/secondary) com mapeamento de origem e destino na Canopi.
+- **Atribuição & Taxonomia:** Definição de modelos de atribuição multi-touch e regras de nomenclatura de UTMs para ABM/ABX Plays.
+
+---
+
+### MARCO: Configurações & Setup (Etapa 1: Objetos, Campos, CRM e Matching) — 2026-04-22
+
+**Status: Concluído no Front-end (Materializado)**
+
+- **Entidades-Base:** Mapeamento de Conta, Contato, Oportunidade e Campanha como fontes primárias.
+- **Source of Truth:** Configuração de prioridade de fontes e regras de overwrite em caso de conflito.
+- **Lifecycle & Pipeline:** Setup de estágios operacionais (MQL, SQL, Won, Lost) e critérios de passagem.
+- **Matching Logic:** Definição de regras de deduplicação por domínio e email.
+
+---
+
 ### MARCO: CockpitV2 Intelligence & Tactical UX — 2026-04-20
 **Status: Concluído e Validado Visualmente**
 
