@@ -46,6 +46,7 @@ export type SignalItem = {
   stakeholders?: any[];
   nextSteps?: string[];
   actions?: any[];
+  sla?: string;
 };
 
 export type SignalRow = {

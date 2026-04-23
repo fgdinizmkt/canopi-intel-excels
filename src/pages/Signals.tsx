@@ -4,6 +4,7 @@ import { advancedSignals, ownersList, stSuggestionsList } from '../data/signalsV
 import { getSignals, persistSignal, SignalItem } from '../lib/signalsRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { contasMock } from '../data/accountsData';
+import { usePublishedSettings } from '../hooks/usePublishedSettings';
 
 export const Signals: React.FC = () => {
   const searchParams = useSearchParams();
@@ -36,20 +37,64 @@ export const Signals: React.FC = () => {
   const [editProbableCause, setEditProbableCause] = useState('');
   const [editRecommendation, setEditRecommendation] = useState('');
 
+  const { getSetting, isLoading: settingsLoading } = usePublishedSettings();
+  const signalConfigs = getSetting('signal_configs', []);
+  const routingRules = getSetting('routing_rules', []);
+
   // Carrega sinais do Supabase com fallback para advancedSignals
   useEffect(() => {
     const carregarSignals = async () => {
       try {
         const dados = await getSignals();
-        setSignals(dados);
+        
+        // Aplicar configurações publicadas (sobreposição funcional)
+        const processados = dados.map(s => {
+          // 1. Aplicar configuração específica do sinal (severidade, SLA, owner padrão)
+          const config = signalConfigs.find((c: any) => c.category === s.category || c.title === s.title || c.name === s.title);
+          let finalSeverity = s.severity;
+          let finalOwner = s.owner;
+          let finalSLA = s.sla;
+
+          if (config) {
+            finalSeverity = config.severity === 'critical' ? 'crítico' : config.severity === 'high' ? 'alerta' : config.severity === 'medium' ? 'alerta' : 'oportunidade';
+            if (config.defaultOwner && (!s.owner || s.owner === 'Não atribuído' || s.owner === 'Pablo Diniz')) {
+               finalOwner = config.defaultOwner;
+            }
+            if (config.slaHours) {
+               finalSLA = `${config.slaHours}h`;
+            }
+          }
+
+          // 2. Aplicar regras de roteamento se o sinal ainda não tiver um owner forte ou se a severidade disparar regra
+          const matchingRule = [...routingRules].sort((a: any, b: any) => a.priority - b.priority).find((r: any) => {
+             if (r.criteria.includes('severity == "critical"') && finalSeverity === 'crítico') return true;
+             if (r.criteria.includes('severity == "high"') && finalSeverity === 'alerta') return true;
+             return false;
+          });
+
+          if (matchingRule && (!finalOwner || finalOwner === 'Não atribuído')) {
+             finalOwner = matchingRule.target;
+          }
+
+          return {
+            ...s,
+            severity: finalSeverity,
+            owner: finalOwner,
+            sla: finalSLA
+          };
+        });
+
+        setSignals(processados);
       } catch (err) {
         console.error('[Signals] Erro ao carregar sinais:', err);
         setSignals(advancedSignals);
       }
     };
 
-    carregarSignals();
-  }, []);
+    if (!settingsLoading) {
+      carregarSignals();
+    }
+  }, [settingsLoading, signalConfigs]);
 
   // Specific Panel states
   const [intFixed, setIntFixed] = useState(false);

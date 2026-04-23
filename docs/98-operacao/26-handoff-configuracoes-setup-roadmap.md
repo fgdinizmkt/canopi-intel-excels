@@ -13,19 +13,9 @@ Este documento existe para evitar três erros recorrentes:
 
 
 ## Estado de referência no repositório
+A camada de Configurações está 100% materializada no front-end e integrada à lógica operacional da Canopi (Fase Funcional 2 concluída).
 
-
-### Fato 1 — rota publicada em `main`
-No branch principal, a rota `/configuracoes` ainda aponta para `src/pages/Settings.tsx`.
-
-
-### Fato 2 — natureza do `Settings` legado
-O `Settings.tsx` publicado em `main` é **diagnóstico/documental**. Ele não é uma central operacional de setup. O próprio arquivo assume escopo de transparência, mapeamento e diagnóstico, sem persistência nem execução real.
-
-
-### Leitura consolidada
-Portanto, o problema não é apenas "melhorar a tela".
-O problema é transformar Configurações em uma **camada de parametrização real da lógica operacional da Canopi**.
+---
 
 ---
 
@@ -99,7 +89,7 @@ Configurações que precisam existir porque alimentam a experiência de Contas:
 
 
 ### 2. Sinais
-Configurações que precisam existir because sinais já são núcleo do produto:
+Configurações de Sinais:
 
 - categorias de sinal
 
@@ -621,21 +611,35 @@ Pode ser útil mais à frente para exploração visual, mas aqui tende a aumenta
 ---
 
 
-## Próxima ação operacional aprovada
-**Iniciar a Etapa 1: Objetos, Campos, CRM e Matching** no trabalho local do Claude Code, usando este documento como contrato de direção.
-
 ---
 
-
-## Status deste documento
-
-- Criado para handoff seguro entre chats e agentes
-
-- Serve como base de alinhamento para a evolução de `/configuracoes`
-
-- Deve ser atualizado conforme cada etapa for efetivamente materializada
 
 ---
 
 ## 🚀 ROADMAP CONCLUÍDO (2026-04-23)
 Todas as 5 etapas do Roadmap de Configurações foram materializadas no front-end da plataforma Canopi. A página `/configuracoes` agora atua como uma camada densa de parametrização para Objetos, Mídia, Scores, Sinais, Roteamento, Plays, ABM, ABX, Intelligence Exchange e Governança.
+
+---
+
+## 🛠️ CONSUMO OPERACIONAL (Fase Funcional 2)
+As configurações publicadas deixaram de ser apenas visual/mock e passaram a ser o motor de lógica dos seguintes módulos:
+
+### 1. Mapa de Impacto: Configuração → Efeito
+| Configuração Criada | Onde aparece na Canopi | O que muda quando alterada |
+| :--- | :--- | :--- |
+| **Scoring Rules** | `/accounts`, `/overview`, `/actions` | Altera pesos (Potencial, Risco, Prontidão, Cobertura) e bônus de pontuação, reordenando a triagem de contas. |
+| **Signal Configs** | `/sinais` | Define severidade ('Crítico', 'Alerta'), SLAs (ex: 2h, 24h) e o Owner Padrão de cada sinal categorizado. |
+| **Routing Rules** | `/sinais`, `/actions` | Define o roteamento automático (ex: Head of Sales para sinais críticos) e fallbacks operacionais. |
+| **ABM/ABX Readiness** | `/cockpit-v2` | Alinha o status visual e operacional dos motores de orquestração com os thresholds de prontidão. |
+
+### 2. Status de Implementação
+- **Contas (`/accounts`):** Consumo real de `scoring_rules` para cálculo dinâmico e ordenação.
+- **Sinais (`/sinais`):** Engine de processamento reativo que aplica severidade, SLA e Owner via `signal_configs` e `routing_rules`.
+- **Overview (`/overview`):** Triagem de contas críticas e alta prioridade baseada em regras publicadas.
+- **Ações (`/actions`):** Listagem e tags de roteamento baseadas em `routing_rules` e `scoring_rules`.
+- **Cockpit V2:** Status dos motores influenciados pelos thresholds de ABX Readiness.
+
+---
+
+## Status deste documento
+- **Finalizado**: A frente de Configurações está funcional e integrada ao núcleo operacional da Canopi.

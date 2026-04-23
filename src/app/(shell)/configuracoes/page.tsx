@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Database, Users, Zap, Link2, Layers, MapPin, Save, X, Plus, Edit2,
-  AlertCircle, CheckCircle, Clock, ChevronRight, Copy, Trash2, Eye, Maximize2, Minimize2, PlayCircle
+  AlertCircle, CheckCircle, Clock, ChevronRight, Copy, Trash2, Eye, Maximize2, Minimize2, PlayCircle,
+  Loader2, RefreshCw
 } from 'lucide-react';
 import { Card, Badge } from '../../../components/ui';
+import { getAllSettings, saveSettings, SystemSetting } from '../../../lib/settingsRepository';
 
 // ===== TIPOS =====
 type EntityType = 'conta' | 'contato' | 'oportunidade' | 'campanha' | 'sinal' | 'acao' | 'stakeholder' | 'owner' | 'media' | 'event';
@@ -254,6 +256,13 @@ const ConfigStage1: React.FC = () => {
   const [drawer, setDrawer] = useState<{ type: string; id?: string } | null>(null);
   const [publishStatus, setPublishStatus] = useState<PublishStatus>('draft');
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  
+  // ===== FUNCTIONAL STATE =====
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [version, setVersion] = useState(1);
 
   // ===== ETAPA 3 STATE: SCORES =====
   const [scoringRules, setScoringRules] = useState<ScoringRule[]>([
@@ -633,6 +642,111 @@ const ConfigStage1: React.FC = () => {
     { id: '4', entity: 'contato', criteria: 'Email Primário', priority: 1, enabled: true, conflictResolution: 'merge', fuzzyMatch: false },
     { id: '5', entity: 'contato', criteria: 'LinkedIn URL', priority: 2, enabled: true, conflictResolution: 'manual', fuzzyMatch: false },
   ]);
+
+  // ===== DATA FETCHING =====
+  const loadAllConfig = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const allSettings = await getAllSettings();
+      if (allSettings.length > 0) {
+        // Map settings to states
+        allSettings.forEach(setting => {
+          switch (setting.key) {
+            case 'objects_entities':
+              // setEntities(setting.data); break; // Entities is currently static-like, but we could make it dynamic
+              break;
+            case 'scoring_rules':
+              setScoringRules(setting.data); break;
+            case 'signal_configs':
+              setSignalConfigs(setting.data); break;
+            case 'routing_rules':
+              setRoutingRules(setting.data); break;
+            // Add more as needed
+          }
+          
+          // Use the status and version of the most "advanced" block for global state for now
+          if (setting.key === 'scoring_rules') {
+            setPublishStatus(setting.status);
+            setVersion(setting.version);
+            setLastSaved(setting.updated_at || null);
+          }
+        });
+      }
+    } catch (e) {
+      setError("Erro ao carregar configurações. Verifique sua conexão com o Supabase.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAllConfig();
+  }, [loadAllConfig]);
+
+  // ===== ACTIONS =====
+  const handleSaveDraft = async () => {
+    setIsLoading(true);
+    try {
+      // Create settings blocks
+      const blocks: SystemSetting[] = [
+        { key: 'scoring_rules', data: scoringRules, status: 'draft', version },
+        { key: 'signal_configs', data: signalConfigs, status: 'draft', version },
+        { key: 'routing_rules', data: routingRules, status: 'draft', version }
+      ];
+
+      for (const block of blocks) {
+        await saveSettings(block);
+      }
+
+      setPublishStatus('draft');
+      setIsDirty(false);
+      setLastSaved(new Date().toISOString());
+    } catch (e) {
+      setError("Erro ao salvar rascunho.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    // 1. Basic Validation
+    const hasMissingWeights = scoringRules.some(r => r.weight === 0);
+    const hasEmptySignals = signalConfigs.some(s => !s.threshold);
+    
+    if (hasMissingWeights || hasEmptySignals) {
+      alert("Inconsistência detectada: existem regras com peso zero ou sinais sem threshold definido.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const nextVersion = version + 1;
+      const blocks: SystemSetting[] = [
+        { key: 'scoring_rules', data: scoringRules, status: 'published', version: nextVersion },
+        { key: 'signal_configs', data: signalConfigs, status: 'published', version: nextVersion },
+        { key: 'routing_rules', data: routingRules, status: 'published', version: nextVersion }
+      ];
+
+      for (const block of blocks) {
+        await saveSettings(block);
+      }
+
+      setPublishStatus('published');
+      setVersion(nextVersion);
+      setIsDirty(false);
+      setLastSaved(new Date().toISOString());
+      setDrawer(null);
+    } catch (e) {
+      setError("Erro ao publicar alterações.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const markDirty = () => {
+    if (!isDirty) setIsDirty(true);
+  };
 
   // ===== TAB: OBJETOS =====
   const ObjectsSection = () => (
@@ -1192,7 +1306,18 @@ const ConfigStage1: React.FC = () => {
               </div>
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <p className="text-xs text-slate-600 italic">Impacto: {rule.impact}</p>
-                <button className="text-xs font-bold text-blue-600 hover:underline">Ajustar Pesos</button>
+                <button 
+                  onClick={() => {
+                    const newVal = prompt(`Novo threshold para ${rule.name}:`, rule.threshold.toString());
+                    if (newVal) {
+                      setScoringRules(scoringRules.map(r => r.id === rule.id ? { ...r, threshold: parseInt(newVal) } : r));
+                      markDirty();
+                    }
+                  }}
+                  className="text-xs font-bold text-blue-600 hover:underline"
+                >
+                  Ajustar Limite
+                </button>
               </div>
             </div>
           ))}
@@ -1242,7 +1367,18 @@ const ConfigStage1: React.FC = () => {
                     <span className="text-slate-500">•</span>
                     <span className="text-slate-500 font-bold">OWNER: {config.defaultOwner}</span>
                   </div>
-                  <button className="text-blue-600 font-bold group-hover:underline">Parametrizar</button>
+                  <button 
+                    onClick={() => {
+                      const newVal = prompt(`Nova Severidade para ${config.name} (low, medium, high, critical):`, config.severity);
+                      if (newVal && ['low', 'medium', 'high', 'critical'].includes(newVal)) {
+                        setSignalConfigs(signalConfigs.map(s => s.id === config.id ? { ...s, severity: newVal as any } : s));
+                        markDirty();
+                      }
+                    }}
+                    className="text-blue-600 font-bold group-hover:underline"
+                  >
+                    Parametrizar
+                  </button>
                 </div>
               </div>
             </div>
@@ -1710,96 +1846,255 @@ const ConfigStage1: React.FC = () => {
     </div>
   );
 
+  // ===== MACROBLOCKS =====
+  const macroBlocks = [
+    {
+      id: 'objects',
+      label: 'Objetos & CRM',
+      icon: Database,
+      tabs: [
+        { id: 'objetos', label: 'Entidades' },
+        { id: 'source', label: 'Source of Truth' },
+        { id: 'pipeline', label: 'Pipeline' },
+        { id: 'campos', label: 'Campos Críticos' },
+        { id: 'owners', label: 'Stakeholders' },
+        { id: 'matching', label: 'Matching' },
+        { id: 'hierarquia', label: 'Hierarquia' },
+      ]
+    },
+    {
+      id: 'analytics',
+      label: 'Medição & Ads',
+      icon: Layers,
+      tabs: [
+        { id: 'midia', label: 'Mídia & Inbound' },
+        { id: 'conversoes', label: 'Conversões' },
+        { id: 'atribuicao', label: 'Atribuição' },
+        { id: 'audiencias', label: 'Audiências' },
+      ]
+    },
+    {
+      id: 'intelligence',
+      label: 'Scores & Sinais',
+      icon: Zap,
+      tabs: [
+        { id: 'scores', label: 'Scores' },
+        { id: 'sinais', label: 'Sinais' },
+        { id: 'roteamento', label: 'Roteamento' },
+      ]
+    },
+    {
+      id: 'strategy',
+      label: 'Plays & ABM',
+      icon: PlayCircle,
+      tabs: [
+        { id: 'plays', label: 'Plays Library' },
+        { id: 'abm', label: 'Setup ABM' },
+        { id: 'abx', label: 'Orquestração ABX' },
+      ]
+    },
+    {
+      id: 'governance',
+      label: 'Governança',
+      icon: Settings,
+      tabs: [
+        { id: 'exchange', label: 'Exchange' },
+        { id: 'learnings', label: 'Learnings' },
+        { id: 'governanca', label: 'Setup Geral' },
+        { id: 'permissoes', label: 'Permissões' },
+      ]
+    }
+  ];
+
+  const currentMacro = macroBlocks.find(m => m.tabs.some(t => t.id === activeTab)) || macroBlocks[0];
+
   // ===== RENDER =====
   return (
-    <div className="h-full flex flex-col bg-slate-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-black text-slate-900 mb-2">Configurações & Setup</h1>
-            <p className="text-slate-600">Parametrização da Camada Operacional • Etapas 1, 2 e 3</p>
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+      {/* Top Header */}
+      <div className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between z-10 shrink-0">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 leading-tight">Configurações & Setup</h1>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Canopi Cockpit • Parametrização Real</p>
+        </div>
+        <div className="flex items-center gap-4">
+          {isDirty && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-lg border border-amber-200">
+              <AlertCircle className="w-3 h-3 text-amber-600" />
+              <span className="text-[10px] font-bold text-amber-700 uppercase">Alterações Pendentes</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
+            <div className={`w-2 h-2 rounded-full ${publishStatus === 'published' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+            <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
+              Status: {publishStatus.replace('_', ' ')} • v{version}
+            </span>
           </div>
           <button
-            onClick={() => setPublishStatus(publishStatus === 'draft' ? 'published' : 'draft')}
-            className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${
-              publishStatus === 'published'
-                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                : 'bg-amber-600 text-white hover:bg-amber-700'
+            onClick={handleSaveDraft}
+            disabled={isLoading || !isDirty}
+            className="px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2 border border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Salvar Rascunho
+          </button>
+          <button
+            onClick={handlePublish}
+            disabled={isLoading || !isDirty}
+            className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm ${
+              publishStatus === 'published' && !isDirty
+                ? 'bg-emerald-600 text-white cursor-default'
+                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
           >
-            <Save className="w-4 h-4" />
-            {publishStatus === 'draft' ? 'Publicar Alterações' : 'Publicado'}
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {publishStatus === 'draft' ? 'Publicar Alterações' : isDirty ? 'Republicar' : 'Salvo'}
           </button>
         </div>
-
-        {/* Tabs */}
-        <nav className="flex gap-0 border-b border-slate-200 overflow-x-auto no-scrollbar">
-          {[
-            { id: 'objetos' as const, label: 'Objetos', category: 'Estrutura' },
-            { id: 'source' as const, label: 'Source of Truth', category: 'Estrutura' },
-            { id: 'pipeline' as const, label: 'Pipeline', category: 'Estrutura' },
-            { id: 'campos' as const, label: 'Campos', category: 'Estrutura' },
-            { id: 'owners' as const, label: 'Stakeholders', category: 'Estrutura' },
-            { id: 'matching' as const, label: 'Matching', category: 'Estrutura' },
-            { id: 'hierarquia' as const, label: 'Hierarquia', category: 'Estrutura' },
-            { id: 'midia' as const, label: 'Mídia & Inbound', category: 'Etapa 2' },
-            { id: 'conversoes' as const, label: 'Conversões', category: 'Etapa 2' },
-            { id: 'atribuicao' as const, label: 'Atribuição', category: 'Etapa 2' },
-            { id: 'audiencias' as const, label: 'Audiências', category: 'Etapa 2' },
-            { id: 'scores' as const, label: 'Scores', category: 'Etapa 3' },
-            { id: 'sinais' as const, label: 'Sinais', category: 'Etapa 3' },
-            { id: 'roteamento' as const, label: 'Roteamento', category: 'Etapa 3' },
-            { id: 'plays' as const, label: 'Plays', category: 'Etapa 4' },
-            { id: 'abm' as const, label: 'ABM', category: 'Etapa 4' },
-            { id: 'abx' as const, label: 'ABX', category: 'Etapa 4' },
-            { id: 'exchange' as const, label: 'Exchange', category: 'Etapa 5' },
-            { id: 'learnings' as const, label: 'Learnings', category: 'Etapa 5' },
-            { id: 'governanca' as const, label: 'Governança', category: 'Etapa 5' },
-            { id: 'permissoes' as const, label: 'Permissões', category: 'Etapa 5' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-3 font-bold text-xs border-b-2 transition-all flex flex-col items-center min-w-[100px] ${
-                activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600 bg-blue-50/30'
-                  : 'border-transparent text-slate-500 hover:text-slate-900'
-              }`}
-            >
-              <span className="text-[8px] uppercase tracking-widest mb-1 opacity-60 font-black">{tab.category}</span>
-              {tab.label}
-            </button>
-          ))}
-        </nav>
       </div>
 
-      {/* Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-8">
-          {activeTab === 'objetos' && <ObjectsSection />}
-          {activeTab === 'source' && <SourceOfTruthSection />}
-          {activeTab === 'pipeline' && <PipelineSection />}
-          {activeTab === 'campos' && <FieldsSection />}
-          {activeTab === 'owners' && <OwnersSection />}
-          {activeTab === 'matching' && <MatchingSection />}
-          {activeTab === 'hierarquia' && <HierarchySection />}
-          {activeTab === 'midia' && <MediaSection />}
-          {activeTab === 'conversoes' && <ConversionsSection />}
-          {activeTab === 'atribuicao' && <AttributionTaxonomySection />}
-          {activeTab === 'audiencias' && <AudienceSyncSection />}
-          {activeTab === 'scores' && <ScoresSection />}
-          {activeTab === 'sinais' && <SignalsSection />}
-          {activeTab === 'roteamento' && <RoutingSection />}
-          {activeTab === 'plays' && <PlaysSection />}
-          {activeTab === 'abm' && <ABMSection />}
-          {activeTab === 'abx' && <ABXSection />}
-          {activeTab === 'exchange' && <IntelligenceExchangeSection />}
-          {activeTab === 'learnings' && <LearningRepositorySection />}
-          {activeTab === 'governanca' && <GovernanceSection />}
-          {activeTab === 'permissoes' && <PermissionsSection />}
-        </div>
-      </main>
+      <div className="flex-1 flex overflow-hidden">
+        {/* Fixed Sidebar Navigation */}
+        <aside className="w-72 bg-white border-r border-slate-200 flex flex-col overflow-y-auto shrink-0 no-scrollbar">
+          <div className="p-4 space-y-1">
+            <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Módulos de Configuração</p>
+            {macroBlocks.map((macro) => {
+              const isActive = currentMacro.id === macro.id;
+              const Icon = macro.icon;
+              return (
+                <div key={macro.id} className="space-y-1">
+                  <button
+                    onClick={() => {
+                      if (isDirty) {
+                        if (!confirm("Existem alterações não salvas. Deseja trocar de módulo mesmo assim?")) return;
+                      }
+                      setActiveTab(macro.tabs[0].id as any);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      isActive 
+                        ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' 
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <span className="font-extrabold text-sm text-left flex-1">{macro.label}</span>
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? 'rotate-90 text-blue-600' : 'text-slate-300'}`} />
+                  </button>
+                  
+                  {isActive && (
+                    <div className="pl-12 pr-4 py-2 space-y-1">
+                      {macro.tabs.map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id as any)}
+                          className={`w-full text-left py-2 px-1 text-xs font-bold transition-all flex items-center justify-between group ${
+                            activeTab === tab.id ? 'text-blue-600' : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          {tab.label}
+                          {activeTab === tab.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.6)]" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-auto p-6 border-t border-slate-100 bg-slate-50/50">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <Settings className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-900 leading-none">Canopi Setup</p>
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">v2.4.0 • Enterprise</p>
+              </div>
+            </div>
+            <p className="text-[9px] text-slate-400 leading-relaxed font-medium">Camada operacional estável e documentada conforme roadmap oficial.</p>
+          </div>
+        </aside>
+
+        {/* Dynamic Content Area */}
+        <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+          {/* Sub-header Contextual Navigation (Chips) */}
+          <div className="bg-white border-b border-slate-200 px-8 py-3 flex items-center gap-2 shrink-0">
+            {currentMacro.tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tight transition-all border ${
+                  activeTab === tab.id
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                    : 'bg-white text-slate-500 border-slate-100 hover:border-slate-300 hover:text-slate-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+            <div className="max-w-5xl">
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-700">
+                  <AlertCircle className="w-5 h-5" />
+                  <p className="text-sm font-bold">{error}</p>
+                  <button onClick={loadAllConfig} className="ml-auto p-1 hover:bg-red-100 rounded-lg">
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {isLoading ? (
+                <div className="h-64 flex flex-col items-center justify-center text-slate-400">
+                  <Loader2 className="w-12 h-12 animate-spin mb-4" />
+                  <p className="text-sm font-bold uppercase tracking-widest">Carregando Parametrização Real...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest">{currentMacro.label}</h2>
+                      {lastSaved && (
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                          Último salvamento: {new Date(lastSaved).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-3xl font-black text-slate-900 mb-8">
+                      {currentMacro.tabs.find(t => t.id === activeTab)?.label}
+                    </h3>
+                  </div>
+
+                  {activeTab === 'objetos' && <ObjectsSection />}
+              {activeTab === 'source' && <SourceOfTruthSection />}
+              {activeTab === 'pipeline' && <PipelineSection />}
+              {activeTab === 'campos' && <FieldsSection />}
+              {activeTab === 'owners' && <OwnersSection />}
+              {activeTab === 'matching' && <MatchingSection />}
+              {activeTab === 'hierarquia' && <HierarchySection />}
+              {activeTab === 'midia' && <MediaSection />}
+              {activeTab === 'conversoes' && <ConversionsSection />}
+              {activeTab === 'atribuicao' && <AttributionTaxonomySection />}
+              {activeTab === 'audiencias' && <AudienceSyncSection />}
+              {activeTab === 'scores' && <ScoresSection />}
+              {activeTab === 'sinais' && <SignalsSection />}
+              {activeTab === 'roteamento' && <RoutingSection />}
+              {activeTab === 'plays' && <PlaysSection />}
+              {activeTab === 'abm' && <ABMSection />}
+              {activeTab === 'abx' && <ABXSection />}
+              {activeTab === 'exchange' && <IntelligenceExchangeSection />}
+              {activeTab === 'learnings' && <LearningRepositorySection />}
+              {activeTab === 'governanca' && <GovernanceSection />}
+                  {activeTab === 'permissoes' && <PermissionsSection />}
+                </>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

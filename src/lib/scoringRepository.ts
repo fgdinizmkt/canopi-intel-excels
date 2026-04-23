@@ -32,13 +32,14 @@ export interface ScoringResult {
 
 /**
  * Calcula score derivado de uma conta baseado em dados já existentes
- * Sem persistência, apenas derivação factual
+ * Sem persistência, apenas derivação factual. Aceita configurações externas.
  */
-export function calculateAccountScore(account: Conta): ScoringResult {
-  const potencial = calculatePotencial(account);
-  const risco = calculateRisco(account);
-  const prontidao = calculateProntidao(account);
-  const cobertura = calculateCobertura(account);
+export function calculateAccountScore(account: Conta, settings?: any[]): ScoringResult {
+  const rules = settings || [];
+  const potencial = calculatePotencial(account, rules);
+  const risco = calculateRisco(account, rules);
+  const prontidao = calculateProntidao(account, rules);
+  const cobertura = calculateCobertura(account, rules);
   const confianca = calculateConfianca(account);
 
   // Weighted sum: potencial×0.25 + risco×0.25 + prontidao×0.20 + cobertura×0.15 + confianca×0.15
@@ -71,10 +72,13 @@ export function calculateAccountScore(account: Conta): ScoringResult {
  * Dimensão 1: Potencial (0-100)
  * Derivado de account.potencial + oportunidades
  */
-function calculatePotencial(account: Conta): ScoreDimension {
+function calculatePotencial(account: Conta, rules: any[]): ScoreDimension {
+  const rule = rules.find((r: any) => r.id === 'account_potential' || r.id === 'lead_fit');
+  const bonusFactor = rule && rule.enabled ? (rule.weight / 10) : 1;
+
   const basePotencial = account.potencial || 0;
-  const oportunidadeBonus = account.oportunidades?.length > 0 ? 10 : 0;
-  const budgetBonus = (account.budgetBrl || 0) > 500000 ? 10 : 0;
+  const oportunidadeBonus = account.oportunidades?.length > 0 ? (10 * bonusFactor) : 0;
+  const budgetBonus = (account.budgetBrl || 0) > 500000 ? (10 * bonusFactor) : 0;
 
   const score = Math.min(100, basePotencial + oportunidadeBonus + budgetBonus);
   const signals = [
@@ -95,7 +99,10 @@ function calculatePotencial(account: Conta): ScoreDimension {
  * Dimensão 2: Risco (0-100, invertido)
  * Derivado de account.risco + statusGeral + sinais críticos
  */
-function calculateRisco(account: Conta): ScoreDimension {
+function calculateRisco(account: Conta, rules: any[]): ScoreDimension {
+  const rule = rules.find((r: any) => r.id === 'relationship_strength');
+  const penaltyFactor = rule && rule.enabled ? (rule.weight / 10) : 1;
+
   let risco = account.risco || 0;
 
   // Penalidade por status geral
@@ -135,7 +142,10 @@ function calculateRisco(account: Conta): ScoreDimension {
  * Dimensão 3: Prontidão (0-100)
  * Derivado de account.prontidao + atividade recente + conta no ativa
  */
-function calculateProntidao(account: Conta): ScoreDimension {
+function calculateProntidao(account: Conta, rules: any[]): ScoreDimension {
+  const rule = rules.find((r: any) => r.id === 'engagement' || r.id === 'abx_readiness');
+  const bonusFactor = rule && rule.enabled ? (rule.weight / 10) : 1;
+
   let prontidao = account.prontidao || 0;
 
   // Bonus por atividade recente
@@ -164,7 +174,10 @@ function calculateProntidao(account: Conta): ScoreDimension {
  * Dimensão 4: Cobertura (0-100)
  * Derivado de coberturaRelacional + número de contatos + sinais por canal
  */
-function calculateCobertura(account: Conta): ScoreDimension {
+function calculateCobertura(account: Conta, rules: any[]): ScoreDimension {
+  const rule = rules.find((r: any) => r.id === 'committee_completeness');
+  const bonusFactor = rule && rule.enabled ? (rule.weight / 10) : 1;
+
   let cobertura = account.coberturaRelacional || 0;
 
   // Bonus por contatos

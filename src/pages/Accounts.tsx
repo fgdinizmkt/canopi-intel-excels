@@ -29,6 +29,7 @@ import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsDa
 import { getAccounts, persistAccount } from '../lib/accountsRepository';
 import { calculateAccountScore } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
+import { usePublishedSettings } from '../hooks/usePublishedSettings';
 import { getInteractions } from '../lib/interactionsRepository';
 import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
 import { getCampaignsCanonical } from '../lib/campaignsCanonicalRepository';
@@ -76,6 +77,8 @@ export const Accounts = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { openAccount } = useAccountDetail();
+  const { getSetting, isLoading: settingsLoading } = usePublishedSettings();
+  const scoringRules = getSetting('scoring_rules', []);
 
   const [loading, setLoading] = useState(true);
   const [contas, setContas] = useState<Conta[]>([]);
@@ -259,13 +262,13 @@ export const Accounts = () => {
       if (ordenacao === 'potencial_desc') return b.potencial - a.potencial;
       if (ordenacao === 'risco_desc') return b.risco - a.risco;
       if (ordenacao === 'score_desc') {
-        const scoreA = calculateAccountScore(a).scoreTotal;
-        const scoreB = calculateAccountScore(b).scoreTotal;
+        const scoreA = calculateAccountScore(a, scoringRules).scoreTotal;
+        const scoreB = calculateAccountScore(b, scoringRules).scoreTotal;
         return scoreB - scoreA;
       }
       if (ordenacao === 'score_asc') {
-        const scoreA = calculateAccountScore(a).scoreTotal;
-        const scoreB = calculateAccountScore(b).scoreTotal;
+        const scoreA = calculateAccountScore(a, scoringRules).scoreTotal;
+        const scoreB = calculateAccountScore(b, scoringRules).scoreTotal;
         return scoreA - scoreB;
       }
       if (ordenacao === 'engajamento_desc') {
@@ -695,7 +698,7 @@ export const Accounts = () => {
             {filtradas.map((conta) => {
               const acoesAtrasadas = conta.acoes.filter(a => a.status === 'Atrasada').length;
               const signals = blocoCSignals[conta.id];
-              const score = calculateAccountScore(conta);
+              const score = calculateAccountScore(conta, scoringRules);
               return (
                 <div 
                   key={conta.id} 

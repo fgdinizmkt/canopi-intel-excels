@@ -11,6 +11,7 @@ import { contasMock, initialActions } from '../data/accountsData';
 import { Card, Badge, Button } from '../components/ui';
 import { calculateAccountScore, isContaCritica, isAltaPrioridade, deriveProximaMelhorAcao, deriveAcaoOperacional } from '../lib/scoringRepository';
 import { useAccountDetail } from '../context/AccountDetailContext';
+import { usePublishedSettings } from '../hooks/usePublishedSettings';
 import { getAccounts } from '../lib/accountsRepository';
 import { getInteractions } from '../lib/interactionsRepository';
 import { getPlayRecommendations } from '../lib/playRecommendationsRepository';
@@ -23,6 +24,8 @@ export const Overview: React.FC = () => {
   const [contasLocal, setContasLocal] = React.useState<Conta[]>([]);
   const [allInteractions, setAllInteractions] = React.useState<Interaction[]>([]);
   const [allPlays, setAllPlays] = React.useState<PlayRecommendation[]>([]);
+  const { getSetting } = usePublishedSettings();
+  const scoringRules = getSetting('scoring_rules', []);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -254,7 +257,7 @@ export const Overview: React.FC = () => {
 
   // ─── TRIAGEM POR SCORE (Recorte 54 — F2) ────────────────────────────────
   const triageByScore = useMemo(() => {
-    const contas = (contasLocal.length > 0 ? contasLocal : contasMock).map(c => ({ conta: c, score: calculateAccountScore(c) }));
+    const contas = (contasLocal.length > 0 ? contasLocal : contasMock).map(c => ({ conta: c, score: calculateAccountScore(c, scoringRules) }));
 
     return {
       criticas: contas.filter(x => isContaCritica(x.score)).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
@@ -262,7 +265,7 @@ export const Overview: React.FC = () => {
       altoPotencialBaixaCobertura: contas.filter(x => x.score.potencial.score > 75 && x.score.cobertura.score < 50).sort((a, b) => b.score.potencial.score - a.score.potencial.score).slice(0, 3),
       topOportunidades: contas.filter(x => (x.conta.oportunidades?.length ?? 0) > 0).sort((a, b) => b.score.scoreTotal - a.score.scoreTotal).slice(0, 4),
     };
-  }, [contasLocal]);
+  }, [contasLocal, scoringRules]);
 
   // ─── ABM READINESS (Contas com prontidão > 70 + Play Ativo do Bloco C) ───
   const abmReadyAccounts = useMemo(() => {

@@ -27,6 +27,7 @@ import { useAccountDetail } from "../context/AccountDetailContext";
 import { getActions } from "../lib/actionsRepository";
 import { calculateAccountScore, isContaCritica, isAltaPrioridade, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao } from "../lib/scoringRepository";
 import { contasMock, ActionItem, ActionStatus, Priority, SlaStatus, HistoryItem, ProjectStep } from "../data/accountsData";
+import { usePublishedSettings } from "../hooks/usePublishedSettings";
 
 type ViewMode = "Lista" | "Kanban";
 type ModalTab = "resumo" | "projeto" | "historico" | "narrativa";
@@ -296,6 +297,8 @@ function ActionListCard({
   onTitleClick: (item: ActionItem) => void;
   onButtonAction: (item: ActionItem, action: ActionItem["buttons"][number]["action"]) => void;
 }) {
+  const { getSetting } = usePublishedSettings();
+  const routingRules = getSetting('routing_rules', []);
   const { openAccount } = useAccountDetail();
   const getAccountIdByName = (name: string) => {
     const account = contasMock.find(c => c.nome.toLowerCase() === name.toLowerCase());
@@ -345,6 +348,11 @@ function ActionListCard({
         <div className="flex-1 min-w-0">
           {/* Badges */}
           <div className="flex flex-wrap gap-2 items-center">
+            {routingRules.some((r: any) => r.category === item.category) && (
+              <span className="rounded-full border border-fuchsia-200 bg-fuchsia-100/50 px-2.5 py-1 text-[11px] font-black text-fuchsia-600 uppercase tracking-tighter">
+                Roteada via Fluxo Ativo
+              </span>
+            )}
             <span className={cx(priorityClasses[item.priority], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
               {item.priority}
             </span>
@@ -1253,6 +1261,10 @@ const KpiCard = ({ label, value, color = "text-slate-900", trend, variant }: { l
 );
 
 export const Actions: React.FC = () => {
+  const { getSetting, isLoading: settingsLoading } = usePublishedSettings();
+  const routingRules = getSetting('routing_rules', []);
+  const scoringRules = getSetting('scoring_rules', []);
+  
   const searchParams = useSearchParams();
   const { openAccount, sessionActions, updateAction, createAction } = useAccountDetail();
 
@@ -1294,11 +1306,11 @@ export const Actions: React.FC = () => {
   // ─── TRIAGEM DE CONTAS POR SCORE (Recorte 54 — F2) ──────────────────
   const contasParaTriagem = useMemo(() => {
     return contasMock
-      .map(c => ({ conta: c, score: calculateAccountScore(c) }))
+      .map(c => ({ conta: c, score: calculateAccountScore(c, scoringRules) }))
       .filter(x => isContaCritica(x.score) || isAltaPrioridade(x.score))
       .sort((a, b) => b.score.scoreTotal - a.score.scoreTotal)
       .slice(0, 5);
-  }, []);
+  }, [scoringRules]);
 
   const [query, setQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("Todas");

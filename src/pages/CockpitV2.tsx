@@ -10,6 +10,7 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { Topbar } from '../components/layout/Topbar';
 import DecisionMindMap from '../components/DecisionMindMap';
 import { signalCases } from '../data/signalCases';
+import { usePublishedSettings } from '../hooks/usePublishedSettings';
 
 const polar = (r, deg) => {
   const rad = (deg - 90) * Math.PI / 180.0;
@@ -32,70 +33,87 @@ const getArcCenter = (rInner, rOuter, startDeg, endDeg) => {
   return polar(rMid, degMid);
 };
 
-const motorsData = [
-  {
-    id: "abm", name: "ABM",
-    hex: "#4338ca", bgSlate: "bg-indigo-900",
-    status: "Crítico", signalCount: 14, icon: Target,
-    kpis: ["3 Tier A offline", "4 Sponsors perdidos", "Cobertura: 32%"],
-    risk: "Sponsors Tier A sem follow-up há >15d.",
-    opportunity: "Retarget de decisores frios na conta Acme.",
-    nextMove: "Reengajar Sponsor Principal",
-    sources: ["Salesforce", "LinkedIn", "Clearbit"],
-    items: ["Estratégia Tier A", "Oport. Globex", "Aberturas Acme", "Sponsors Hooli"],
-    sublayer: ["Contratos ABM", "Mapeamento Sponsor", "Risco Pipeline", "Expansão Contas"],
-  },
-  {
-    id: "abx", name: "ABX",
-    hex: "#6d28d9", bgSlate: "bg-violet-900",
-    status: "Alerta", signalCount: 22, icon: List,
-    kpis: ["7 Plays Ativos", "12 Contas no-play", "Ativação: 48%"],
-    risk: "Queda na conversão de Plays Enterprise.",
-    opportunity: "Orquestrar contas alta intenção sem plays.",
-    nextMove: "Ativar Playbook Intenção",
-    sources: ["HubSpot", "6sense", "Canopi"],
-    items: ["Plays Scale MM", "Intent Surge", "Camp. Retenção", "Maturidade Q3"],
-    sublayer: ["Ativação de Plays", "Identific. Lacunas", "Maturidade Tecnológica", "Orquestração Dinâmica"],
-  },
-  {
-    id: "paga", name: "Mídia Paga",
-    hex: "#1d4ed8", bgSlate: "bg-blue-900",
-    status: "Estável", signalCount: 9, icon: Search,
-    kpis: ["CAC R$ 2.4k", "ROI +12%", "3 Ads Saturados"],
-    risk: "Desperdício em cluster SMB B2C.",
-    opportunity: "Realocar budget excedente para Top Tier B2B.",
-    nextMove: "Escalar Campanhas ABM",
-    sources: ["LinkedIn Ads", "Google Ads", "Meta"],
-    items: [],
-    sublayer: ["Monitor Campanhas", "Clusters Perfil B2B", "Otimização LTV/CAC", "Eficiência Custo Aquisição"],
-  },
-  {
-    id: "organico", name: "Orgânico",
-    hex: "#047857", bgSlate: "bg-emerald-900",
-    status: "Crescente", signalCount: 17, icon: Globe,
-    kpis: ["+15% Tráfego B2B", "+4 Posições Top3", "Alta Intenção"],
-    risk: "Perda de posição na key 'B2B CRM'.",
-    opportunity: "Capitalizar termo 'AI Revenue' com assets.",
-    nextMove: "Revisar Cluster Estratégico",
-    sources: ["Google Search", "Semrush", "Analytics"],
-    items: [],
-    sublayer: ["Ativos Institucionais", "Performance SERP", "Sinais de Busca", "Trafego Especializado"],
-  },
-  {
-    id: "outbound", name: "Outbound",
-    hex: "#b45309", bgSlate: "bg-amber-900",
-    status: "Atenção", signalCount: 31, icon: Share2,
-    kpis: ["14 Cadências", "Rep. 4%", "12 SLA Quebrados"],
-    risk: "Follow-up atrasado no cluster Mid-Market.",
-    opportunity: "Respostas mornas podem virar reuniões com call ágil.",
-    nextMove: "Forçar Follow-ups",
-    sources: ["Apollo", "SalesLoft", "Gmail"],
-    items: ["Cad. Liderança", "Operador Inativo", "SLA Vencendo", "Replies Mornas", "Bounce Rate"],
-    sublayer: ["Cadências Ativas", "Produtividade Time", "SLA & Repostas", "Controle SPAM"],
-  }
-];
-
 const CockpitV2 = () => {
+  const { getSetting, isLoading: settingsLoading } = usePublishedSettings();
+  const scoringRules = getSetting('scoring_rules', []);
+
+  const motorsData = useMemo(() => {
+    const base = [
+      {
+        id: "abm", name: "ABM",
+        hex: "#4338ca", bgSlate: "bg-indigo-900",
+        status: "Crítico", signalCount: 14, icon: Target,
+        kpis: ["3 Tier A offline", "4 Sponsors perdidos", "Cobertura: 32%"],
+        risk: "Sponsors Tier A sem follow-up há >15d.",
+        opportunity: "Retarget de decisores frios na conta Acme.",
+        nextMove: "Reengajar Sponsor Principal",
+        sources: ["Salesforce", "LinkedIn", "Clearbit"],
+        items: ["Estratégia Tier A", "Oport. Globex", "Aberturas Acme", "Sponsors Hooli"],
+        sublayer: ["Contratos ABM", "Mapeamento Sponsor", "Risco Pipeline", "Expansão Contas"],
+      },
+      {
+        id: "abx", name: "ABX",
+        hex: "#6d28d9", bgSlate: "bg-violet-900",
+        status: "Alerta", signalCount: 22, icon: List,
+        kpis: ["7 Plays Ativos", "12 Contas no-play", "Ativação: 48%"],
+        risk: "Queda na conversão de Plays Enterprise.",
+        opportunity: "Orquestrar contas alta intenção sem plays.",
+        nextMove: "Ativar Playbook Intenção",
+        sources: ["HubSpot", "6sense", "Canopi"],
+        items: ["Plays Scale MM", "Intent Surge", "Camp. Retenção", "Maturidade Q3"],
+        sublayer: ["Ativação de Plays", "Identific. Lacunas", "Maturidade Tecnológica", "Orquestração Dinâmica"],
+      },
+      {
+        id: "paga", name: "Mídia Paga",
+        hex: "#1d4ed8", bgSlate: "bg-blue-900",
+        status: "Estável", signalCount: 9, icon: Search,
+        kpis: ["CAC R$ 2.4k", "ROI +12%", "3 Ads Saturados"],
+        risk: "Desperdício em cluster SMB B2C.",
+        opportunity: "Realocar budget excedente para Top Tier B2B.",
+        nextMove: "Escalar Campanhas ABM",
+        sources: ["LinkedIn Ads", "Google Ads", "Meta"],
+        items: [],
+        sublayer: ["Monitor Campanhas", "Clusters Perfil B2B", "Otimização LTV/CAC", "Eficiência Custo Aquisição"],
+      },
+      {
+        id: "organico", name: "Orgânico",
+        hex: "#047857", bgSlate: "bg-emerald-900",
+        status: "Crescente", signalCount: 17, icon: Globe,
+        kpis: ["+15% Tráfego B2B", "+4 Posições Top3", "Alta Intenção"],
+        risk: "Perda de posição na key 'B2B CRM'.",
+        opportunity: "Capitalizar termo 'AI Revenue' com assets.",
+        nextMove: "Revisar Cluster Estratégico",
+        sources: ["Google Search", "Semrush", "Analytics"],
+        items: [],
+        sublayer: ["Ativos Institucionais", "Performance SERP", "Sinais de Busca", "Trafego Especializado"],
+      },
+      {
+        id: "outbound", name: "Outbound",
+        hex: "#b45309", bgSlate: "bg-amber-900",
+        status: "Atenção", signalCount: 31, icon: Share2,
+        kpis: ["14 Cadências", "Rep. 4%", "12 SLA Quebrados"],
+        risk: "Follow-up atrasado no cluster Mid-Market.",
+        opportunity: "Respostas mornas podem virar reuniões com call ágil.",
+        nextMove: "Forçar Follow-ups",
+        sources: ["Apollo", "SalesLoft", "Gmail"],
+        items: ["Cad. Liderança", "Operador Inativo", "SLA Vencendo", "Replies Mornas", "Bounce Rate"],
+        sublayer: ["Cadências Ativas", "Produtividade Time", "SLA & Repostas", "Controle SPAM"],
+      }
+    ];
+
+    // Se houver scoringRules, podemos tentar influenciar o status
+    // Exemplo: se ABX Readiness threshold for alto em Configurações, ABX pode estar em Alerta
+    return base.map(m => {
+      const rule = scoringRules.find((r: any) => r.id.toLowerCase().includes(m.id));
+      if (rule) {
+        // Lógica simplificada: se threshold > 80 e é um motor de risco (ABM/ABX), marcar como Crítico
+        if (rule.threshold > 80 && (m.id === 'abm' || m.id === 'abx')) {
+          return { ...m, status: 'Foco Total' };
+        }
+      }
+      return m;
+    });
+  }, [scoringRules]);
   const [hoveredMotor, setHoveredMotor] = useState<string | null>(null);
   const [pinnedMotor, setPinnedMotor] = useState<string | null>(null);
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>('SIG-4068');
