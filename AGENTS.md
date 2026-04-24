@@ -15,9 +15,10 @@ Este projeto é a plataforma Canopi | intel excels.
 
 ### Protocolo Diário
 - **Sync:** Validar `git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`. Só dar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
-- **Contexto:** Leitura obrigatória dos docs de governança (`docs/98-operacao/`) e status atual.
+- **Contexto:** Leitura obrigatória dos docs de governança (`docs/98-operacao/`), status atual e `docs/98-operacao/31-protocolo-fechamento-de-fase.md` antes de qualquer fechamento de fase, recorte ou módulo.
 - **Seleção:** Informar explicitamente qual agente assumirá a tarefa antes de agir.
 - **Aprovação:** Seguir o fluxo: *Executar → Build → Diff Stat → Diff Real → Aprovação Usuário → Commit*.
+- **Fechamento:** Nenhuma fase pode ser declarada fechada apenas com build, TSC, commit, tag ou preview. Fechamento exige evidência técnica, visual e operacional, conforme `docs/98-operacao/31-protocolo-fechamento-de-fase.md`.
 - **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
 - **Retomada:** Em caso de quebra, usar estritamente a documentação como fonte da verdade.
 - **Continuidade Operacional:** Após cada validação, aprovação ou fechamento de estado, se houver continuidade operacional clara, entregar exatamente **1 próximo prompt operacional**. Só parar sem novo prompt quando o usuário mandar aguardar retorno de outro agente ou bloquear novas ações. Encerrar em "estado validado" sem converter isso no próximo comando é erro de processo recorrente e não deve se repetir.
@@ -74,6 +75,21 @@ Toda implementação segue esta sequência, sem exceção:
 
 Commitar antes da aprovação explícita é uma violação de processo, mesmo que o build esteja limpo e o recorte esteja dentro do escopo autorizado.
 
+## Protocolo obrigatório de fechamento de fase
+
+Antes de declarar qualquer fase, recorte, módulo ou frente como fechado, é obrigatório aplicar `docs/98-operacao/31-protocolo-fechamento-de-fase.md`.
+
+Checklist mínimo:
+
+1. comprovar estado Git controlado;
+2. comprovar build e typecheck;
+3. validar runtime nas rotas ou fluxos afetados;
+4. gerar evidência visual auditável quando houver UI, onboarding, configuração, demonstração ou material de venda;
+5. registrar o que ainda é local state, simulação ou front-end sem backend real;
+6. atualizar a memória operacional.
+
+Se a evidência visual ou funcional ainda não existir, a fase não está fechada. Ela pode estar apenas “fechada tecnicamente”, “estabilizada em runtime” ou “disponível para validação”.
+
 ## Memória operacional — regra obrigatória
 
 A pasta `docs/98-operacao/` é a memória viva do projeto. Toda sessão deve mantê-la atualizada.
@@ -86,6 +102,7 @@ A pasta `docs/98-operacao/` é a memória viva do projeto. Toda sessão deve man
 | Fase muda de status | `00-status-atual.md`, `01-roadmap-fases.md`, `03-log-de-sessoes.md` |
 | Decisão arquitetural consolidada ou alterada | `02-decisoes-arquiteturais.md` |
 | Pendência identificada | `00-status-atual.md` (seção riscos e pendências) |
+| Regra de fechamento, auditoria ou handoff alterada | `AGENTS.md`, `docs/98-operacao/31-protocolo-fechamento-de-fase.md` e o documento de handoff da frente afetada |
 
 ### O que registrar
 
