@@ -643,3 +643,32 @@ As configurações publicadas deixaram de ser apenas visual/mock e passaram a se
 
 ## Status deste documento
 - **Finalizado**: A frente de Configurações está funcional e integrada ao núcleo operacional da Canopi.
+
+---
+
+## 🔒 Fechamento técnico — Configurações → Objetos → Contas V2 (2026-04-23)
+
+O recorte funcional de hardening da entidade Contas foi concluído com sucesso em estado local.
+
+### 1. Entregas Fiscais e Técnicas
+- **Contas V2 Modularizada:** Implementação de hub minimalista redirecionando para módulo dedicado com 9 subpáginas (Fontes, Identidade, Camada Canônica, Classificação ABM/ABX, Writeback, Upload/LGPD, Governança, Validação e Visão Geral).
+- **Motor de Blockers Centralizado:** Lógica de validação estrita implementada no `ContasConfigContext.tsx` via `getAccountConfigBlockers`.
+- **Blockers Implementados (Gating):**
+  - `CONECTOR_MISSING`: Impede publicação sem fonte selecionada.
+  - `CONNECTOR_INCOMPLETE`: Exige preenchimento de objeto nativo e PK em conectores padrão.
+  - `LGPD_LEGAL_BASIS_MISSING`: Mandatório para CSV e fontes de alto risco.
+  - `IDENTITY_CONFLICT`: Bloqueia se não houver chave primária ativa na Identidade.
+  - `CANONICAL_MAPPING_INCOMPLETE`: Exige 8 campos mínimos (external_account_id, canonical_name, primary_domain, account_owner, account_operating_mode, targeting_status, abm_tier, abx_stage).
+  - `WRITEBACK_UNSAFE`: Protege contra corrupção de dados no CRM se a política for insegura (Permite apenas Append ou Manual Review).
+  - `CUSTOM_CONNECTOR_INCOMPLETE`: Hardening completo para "Outro CRM" (Nome, Obj, PK, Secundárias, Obrigatórios, Confiança, Política).
+- **Presets Consolidados:** Mudança para `src/lib/contaConnectorsV2.ts` eliminando duplicidade de lógica.
+- **Remoção de Arquivos Legados:**
+  - `src/lib/contaConnectors.ts` (Removido)
+  - `src/lib/entityConfigs.ts` (Removido)
+  - `AccountConnectors.tsx` (Removido)
+- **Infraestrutura:** Build aprovado e Type checking (TSC) validado.
+
+### 2. Limitações e Escopo de Homologação
+- **Ambiente:** Funcional em Local State (React Context).
+- **Dados:** Persistência volátil (navegação atual).
+- **Exclusões:** Este recorte **NÃO** inclui integração real com Backend (API/Supabase), Auth OAuth, Sync real de CRM ou Deploy em produção real com escrita em banco.

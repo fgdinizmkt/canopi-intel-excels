@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Database, Users, Zap, Link2, Layers, MapPin, Save, X, Plus, Edit2,
@@ -252,6 +253,7 @@ interface PermissionProfile {
 type ActiveTab = 'objetos' | 'source' | 'pipeline' | 'campos' | 'owners' | 'matching' | 'hierarquia' | 'midia' | 'conversoes' | 'atribuicao' | 'audiencias' | 'scores' | 'sinais' | 'roteamento' | 'plays' | 'abm' | 'abx' | 'exchange' | 'learnings' | 'governanca' | 'permissoes';
 
 const ConfigStage1: React.FC = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<ActiveTab>('objetos');
   const [drawer, setDrawer] = useState<{ type: string; id?: string } | null>(null);
   const [publishStatus, setPublishStatus] = useState<PublishStatus>('draft');
@@ -795,7 +797,13 @@ const ConfigStage1: React.FC = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setDrawer({ type: 'entity', id: entity.id })}
+                  onClick={() => {
+                    if (entity.id === 'conta') {
+                      router.push('/configuracoes/objetos/contas');
+                    } else {
+                      setDrawer({ type: 'entity', id: entity.id });
+                    }
+                  }}
                   className="ml-4 p-2 hover:bg-slate-100 rounded-lg transition-all"
                   title="Configurar Entidade"
                 >
