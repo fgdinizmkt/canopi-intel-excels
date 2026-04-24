@@ -134,7 +134,51 @@ Aplicar protocolo de fechamento: Git controlado, build, typecheck, runtime, evid
 
 Saída: frente Contas V2 formalmente fechada.
 
-## 8. Protocolo de execução por patch
+## 8. Gestão e delegação entre agentes
+
+A frente Contas V2 deve operar com um único executor ativo por vez. Não executar Claude Code, Antigravity e Codex simultaneamente sobre a mesma working tree.
+
+### Papéis
+
+| Ator | Papel | Pode fazer | Não pode fazer |
+|---|---|---|---|
+| Fábio | Product owner e aprovador final | Validar conceito, prints, decisão de produto e autorização de commit/deploy | Aprovar no escuro sem evidência técnica/visual |
+| ChatGPT | Orquestrador e revisor crítico | Definir escopo, escrever prompts, revisar outputs, decidir próximo agente, manter documentação e protocolo | Inventar contexto, aprovar sem evidência, prometer execução futura |
+| Claude Code | Executor principal de patches locais | Ler código, editar arquivos autorizados, rodar build/typecheck, gerar evidências e prints | Mudar escopo, commitar, taguear, fazer deploy ou dar pull sem ordem explícita |
+| Antigravity | Apoio visual/UI quando estável | Navegar, revisar UX, validar prints, apoiar ajustes visuais controlados | Entrar em loop, rodar comandos longos sem necessidade, virar executor principal sem autorização |
+| Codex | Auditor técnico/reserva | Fazer diagnóstico terminal, comparar diffs, validar runtime e propor patches cirúrgicos | Consumir contexto em tarefas visuais longas ou concorrer com Claude Code |
+
+### Regra de handoff entre agentes
+
+Todo handoff deve conter:
+
+1. fase atual;
+2. objetivo do patch;
+3. arquivos permitidos;
+4. arquivos proibidos;
+5. estado Git antes da ação;
+6. comandos que podem ser rodados;
+7. critérios de aceite;
+8. evidências esperadas;
+9. confirmação de que não haverá commit, tag, deploy ou pull sem autorização.
+
+### Quando usar cada agente
+
+Usar Claude Code para patches de código, refatoração local, build, typecheck e validação funcional.
+
+Usar Antigravity para inspeção visual e UX quando o ambiente estiver estável e a tarefa exigir olhar de navegação/tela.
+
+Usar Codex para auditoria técnica, comparação de hipóteses, runtime, investigação de cache/build ou quando Claude/Antigravity travarem.
+
+Usar ChatGPT para governança: decidir a ordem dos patches, revisar criticamente, manter a rota, criar prompts fechados e bloquear decisões precipitadas.
+
+Usar Fábio para decisões finais de produto: aprovar se a tela comunica corretamente o conceito, se o fluxo faz sentido para venda/demonstração e se pode virar commit.
+
+### Regra de parada
+
+Se qualquer agente travar em comando simples, entrar em loop, alterar arquivo fora de escopo ou tentar commitar/deployar sem autorização, parar imediatamente e retornar o controle ao ChatGPT/Fábio.
+
+## 9. Protocolo de execução por patch
 
 Todo patch deve:
 
@@ -149,7 +193,7 @@ Todo patch deve:
 9. confirmar que não houve commit, tag ou deploy;
 10. aguardar aprovação explícita antes de commit.
 
-## 9. Riscos
+## 10. Riscos
 
 | Risco | Severidade | Mitigação |
 |---|---|---|
@@ -160,17 +204,20 @@ Todo patch deve:
 | Botão sem consequência | Alta | Conectar a estado real ou remover |
 | Uso indevido de logos oficiais | Média | Usar placeholder honesto até asset autorizado |
 | Handoff depender de chat | Alta | Manter esta rota e logs atualizados |
+| Agentes concorrendo na mesma working tree | Alta | Um executor ativo por vez |
+| Agente visual travando em comandos simples | Média | Parar e trocar para executor terminal |
+| Consumo excessivo de contexto/tokens | Média | Reservar Codex para auditoria técnica e Claude para execução |
 
-## 10. Marca e conectores
+## 11. Marca e conectores
 
 Não usar logo oficial de terceiro sem asset local autorizado. Até existir autorização, usar fallback textual premium e não chamar fallback de logo oficial.
 
-## 11. Próximo passo recomendado
+## 12. Próximo passo recomendado
 
 Executar Fase A: separar responsabilidades de Fontes e Conectores.
 
 Não iniciar Cockpit completo enquanto Contas V2 estiver nesse estado intermediário.
 
-## 12. Regra de handoff
+## 13. Regra de handoff
 
 Se houver divergência entre memória de chat e este documento, usar este documento como ponto de partida e conferir o estado real do repositório antes de agir.
