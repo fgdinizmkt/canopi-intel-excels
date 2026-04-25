@@ -261,6 +261,31 @@ Próximo passo:
 
 C2 permanece como recorte para primeiro conector real end-to-end.
 
+### Recorte C1.3 — Lapidação visual final de Fontes e Conectores
+
+Objetivo:
+
+reduzir densidade visual residual, deixar a hierarquia de uso mais clara e eliminar ambiguidade entre campos obrigatórios, complementares e detalhes técnicos futuros.
+
+Resultados esperados:
+
+- bloco de campos opcionais mais leve e claramente complementar;
+- detalhes técnicos da conexão futura mais compactos e secundários;
+- fatos da fonte e próximas etapas em formato mais enxuto;
+- microcopy do salvamento local sem ambiguidade com salvar geral do topo;
+- setup local editável, persistência por provider e validação local preservados.
+
+Limites:
+
+- sem OAuth/token/API/sync real;
+- sem backend funcional de conexão externa;
+- sem alteração de persistência, validação local ou localSourceConfigByProvider;
+- sem mudança no recorte de conexão real futura.
+
+Próximo passo:
+
+C2 continua sendo o primeiro recorte de conector real prioritário.
+
 ### Fase C — Identidade e Dedupe real
 
 Criar identityRules. Conectar strict/fuzzy, política de conflito e confirmação explícita da etapa.

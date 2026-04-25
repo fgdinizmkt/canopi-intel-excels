@@ -356,7 +356,7 @@ export function AccountSources() {
           Esta etapa define a origem da base de contas e o contrato local de leitura.
         </p>
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
-          Esta etapa não conecta CRM externo. Ela prepara apenas o setup local/simulado para o mapeamento canônico.
+          Setup local/simulado da fonte para o mapeamento canônico.
         </div>
       </header>
 
@@ -459,7 +459,7 @@ export function AccountSources() {
             {activePreset ? activePreset.name : 'Selecione uma fonte para continuar'}
           </h3>
           <p className="mt-2 max-w-4xl text-sm font-medium text-slate-600">
-            Esta configuração não conecta o CRM externo. Ela apenas define o contrato local de leitura que o Canopi usará como base para mapeamento canônico e para uma futura conexão real.
+            Aqui você ajusta apenas o contrato local de leitura. Conexão real continua fora deste recorte.
           </p>
         </div>
 
@@ -497,9 +497,12 @@ export function AccountSources() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Bloco B — Campos opcionais</h4>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Bloco B — Campos opcionais</h4>
+                <span className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Complementares, não obrigatórios</span>
+              </div>
+              <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
                 <Field label="Campos customizados esperados" value={draftConfig.expectedCustomFields} onChange={(v) => updateDraft('expectedCustomFields', v)} />
                 <Field label="Campo de CNPJ/documento" value={draftConfig.taxIdField} onChange={(v) => updateDraft('taxIdField', v)} />
                 <Field label="Campo de segmento" value={draftConfig.segmentField} onChange={(v) => updateDraft('segmentField', v)} />
@@ -511,8 +514,8 @@ export function AccountSources() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5">
-              <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Bloco C — Observações locais</h4>
+            <div className="rounded-2xl border border-slate-100 bg-white p-4">
+              <h4 className="mb-2 text-xs font-black uppercase tracking-[0.28em] text-slate-400">Bloco C — Observações locais</h4>
               <Field label="Observações locais" value={draftConfig.localNotes} onChange={(v) => updateDraft('localNotes', v)} textarea />
             </div>
 
@@ -557,10 +560,10 @@ export function AccountSources() {
               </div>
             )}
 
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
                   onClick={saveLocalConfig}
                   className="rounded-xl bg-slate-900 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700"
                 >
@@ -577,24 +580,27 @@ export function AccountSources() {
                   {hasDraftChanges ? 'Edição local pendente de salvar' : 'Configuração local sincronizada'}
                 </span>
               </div>
+              <p className="mt-2 text-[11px] font-medium text-slate-500">
+                Salva apenas este contrato local. Não publica nem conecta CRM.
+              </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Revisar e validar contrato local</h4>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 mb-3">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <h4 className="mb-2 text-xs font-black uppercase tracking-[0.28em] text-slate-400">Revisar e validar contrato local</h4>
+              <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.sourceName}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entidade</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.primaryObject}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Chave primária</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.primaryKeyField}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Objeto prioritário</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.priorityTestObject}</p>
                 </div>
@@ -622,33 +628,33 @@ export function AccountSources() {
             </div>
 
             {activeAdapter && realConnectionContract && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
                 <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Detalhes técnicos da conexão futura</h4>
                 <p className="mt-1 text-xs font-medium text-slate-500">
                   Informativo. Não solicita credenciais e não executa conexão nesta etapa.
                 </p>
-                <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <div className="mt-2 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-xl border border-slate-200 bg-white p-2.5">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Autenticação prevista</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{getAuthTypeLabel(realConnectionContract.authType)}</p>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                  <div className="rounded-xl border border-slate-200 bg-white p-2.5">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status atual</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{getConnectionStatusLabel(realConnectionContract.connectionStatus)}</p>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                  <div className="rounded-xl border border-slate-200 bg-white p-2.5">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Refresh token</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.supportsRefreshToken ? 'Previsto no modelo' : 'Não aplicável no modelo'}</p>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                  <div className="rounded-xl border border-slate-200 bg-white p-2.5">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos customizados</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.supportsCustomFields ? 'Suportado no modelo' : 'Não suportado no modelo'}</p>
                   </div>
                 </div>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <div className="mt-2 flex flex-wrap items-start gap-2">
+                  <div className="rounded-xl border border-slate-200 bg-white px-3 py-2">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Escopos mínimos</p>
-                    <div className="mt-1 flex flex-wrap gap-2">
+                    <div className="mt-1 flex flex-wrap gap-1.5">
                       {realConnectionContract.requiredScopes.length === 0 && (
                         <span className="text-xs font-medium text-slate-500">Sem escopo obrigatório nesta origem.</span>
                       )}
@@ -657,9 +663,9 @@ export function AccountSources() {
                       ))}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-slate-200 bg-white p-3">
+                  <div className="rounded-xl border border-slate-200 bg-white px-3 py-2">
                     <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Objetos prioritários</p>
-                    <div className="mt-1 flex flex-wrap gap-2">
+                    <div className="mt-1 flex flex-wrap gap-1.5">
                       {activeAdapter.priorityObjectsForFirstTest.map((objectName) => (
                         <span key={objectName} className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-700">{objectName}</span>
                       ))}
@@ -670,12 +676,12 @@ export function AccountSources() {
             )}
 
             {selectedConnector !== 'other_crm' && activePreset.instructions.factsAboutConnector.length > 0 && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Fatos da fonte</h4>
-                <div className="space-y-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-2">Fatos da fonte</h4>
+                <div className="space-y-1.5">
                   {activePreset.instructions.factsAboutConnector.map((fact, index) => (
                     <div key={index} className="flex gap-2 text-sm font-medium text-slate-600">
-                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
                       <span>{fact}</span>
                     </div>
                   ))}
@@ -683,14 +689,14 @@ export function AccountSources() {
               </div>
             )}
 
-            <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+            <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
                 <div className="space-y-1.5">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-700">Próximas etapas</h4>
                   <ul className="space-y-1 text-sm font-medium text-amber-900">
-                    <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-amber-600" />Identidade e Dedupe: chaves, domínio corporativo e política de conflito.</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-amber-600" />Camada Canônica: mapeamento técnico dos campos da fonte para o modelo Canopi.</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 shrink-0 text-amber-600" />Identidade e Dedupe: chaves, domínio corporativo e política de conflito.</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="h-3 w-3 shrink-0 text-amber-600" />Camada Canônica: mapeamento técnico dos campos da fonte para o modelo Canopi.</li>
                   </ul>
                 </div>
               </div>
