@@ -108,6 +108,25 @@ Esta auditoria valida a conclusão integral das 5 etapas do Roadmap de Configura
 2. **Auth de Mídia:** Substituição das flags de status simuladas por tokens de acesso reais.
 3. **Execution Engine:** Ativação física das regras de roteamento e propagação configuradas.
 
+## 6. Ressalva Operacional Pós-C0 (Contas V2)
+
+Esta auditoria consolidada permanece válida como leitura macro da frente de Configurações em termos de estrutura, navegação e coerência de setup local.
+
+Para Contas V2, isso não significa conexão real com CRM externo.
+
+Estado operacional atual de Contas V2:
+
+- setup local/simulado;
+- contrato local de leitura;
+- validação local;
+- ausência de OAuth, token, API real e sincronização real.
+
+O commit `3f0d28d` (`fix(settings): clarify local account source setup semantics`) saneou a semântica da UI para remover indução de conexão real em Fontes e Conectores, Hub e Validação Local.
+
+A conexão real com CRM permanece como recorte futuro específico, com modelagem técnica dedicada.
+
+Fonte de verdade operacional para Contas V2: `docs/98-operacao/32-rota-desenvolvimento-contas-v2.md`.
+
 
 ### Proposta de Mensagem de Commit
 

@@ -375,6 +375,16 @@ Não iniciar Cockpit completo enquanto Contas V2 estiver nesse estado intermedi�
 
 Não iniciar OAuth/Token antes de fechar o setup local com gates e artefatos coerentes.
 
+## 13.1 Diretrizes para C1 — Modelo de Conexão Real
+
+Registro de premissas técnicas para o próximo recorte. Esta seção não implementa C1 e não altera o estado atual local/simulado.
+
+1. Estabilidade OAuth: prever renovação automática quando houver refresh token; evitar quebra silenciosa da análise por expiração; tratar estados explícitos de token válido, token expirado, refresh falhou e reconexão necessária.
+2. Mapeamento de metadados: estruturar captura de objetos, campos padrão e campos customizados; permitir uso da mesma lógica canônica para HubSpot, Salesforce, RD Station e futuros CRMs; separar metadados de origem do schema canônico da Canopi.
+3. Segurança de escopo: aplicar menor privilégio; solicitar apenas permissões necessárias para leitura, teste de conexão e sync planejado; documentar scopes por provedor antes da implementação.
+4. Adaptadores por CRM: isolar cada CRM em adapter próprio; evitar acoplamento direto de Salesforce/HubSpot/RD no núcleo do app; permitir novo provedor por novo adapter sem refatorar o core.
+5. Separação obrigatória de responsabilidades: provider adapter; auth handler; metadata discovery; field mapping; sync strategy; connection status; data confidence.
+
 ## 14. Regra de handoff
 
 Se houver divergência entre memória de chat e este documento, usar este documento como ponto de partida e conferir o estado real do repositório antes de agir.
