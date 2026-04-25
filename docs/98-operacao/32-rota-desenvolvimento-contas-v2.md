@@ -209,6 +209,33 @@ Próximo passo após C1:
 
 Executar C2 para escolher o primeiro conector real prioritário e implementar fluxo seguro end-to-end (auth + teste + status), mantendo princípio de menor privilégio.
 
+### Recorte C1.1 — Configuração local editável do contrato da fonte
+
+Objetivo:
+
+Transformar Fontes e Conectores em uma etapa prática de configuração local editável, sem conexão real com CRM.
+
+Entregas esperadas:
+
+- painel “Configuração local da fonte selecionada” com campos editáveis de contrato;
+- carregamento de defaults por preset/adapter ao selecionar a fonte;
+- persistência da configuração em estado local/sessionStorage (via `customConfig`);
+- botões de salvar configuração local e restaurar preset da fonte;
+- contrato local volta para pendente quando houver edição após validação;
+- bloco de conexão futura permanece informativo, não transacional.
+
+Limites do recorte:
+
+- sem OAuth real;
+- sem token real;
+- sem API externa real;
+- sem sincronização real;
+- sem coleta/armazenamento de credenciais.
+
+Próximo passo após C1.1:
+
+seguir para C2 e escolher o primeiro conector real prioritário para fluxo seguro de conexão.
+
 ### Fase C — Identidade e Dedupe real
 
 Criar identityRules. Conectar strict/fuzzy, política de conflito e confirmação explícita da etapa.
