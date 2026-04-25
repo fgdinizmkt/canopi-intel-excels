@@ -7,6 +7,11 @@ import {
   CONNECTOR_PRESETS,
   CONTA_CANONICAL_FIELDS_MINIMUM
 } from '@/src/lib/contaConnectorsV2';
+import {
+  type AccountRealConnectionContract,
+  buildInitialRealConnectionContract,
+} from '@/src/lib/accountConnectionModel';
+import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
 
 // --- SESSION PERSISTENCE ---
 
@@ -208,6 +213,7 @@ interface ContasConfigContextType {
   updateCanonicalMappingField: (canonicalField: string, updates: Partial<FieldMapping>) => void;
   setCanonicalMappingReviewed: (val: boolean) => void;
   resetCanonicalMappingToPreset: () => void;
+  realConnectionContract: AccountRealConnectionContract | null;
 }
 
 const ContasConfigContext = createContext<ContasConfigContextType | undefined>(undefined);
@@ -489,6 +495,15 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     ];
   }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, selectedConnector]);
 
+  const realConnectionContract = useMemo<AccountRealConnectionContract | null>(() => {
+    if (!selectedConnector) return null;
+
+    const adapter = getAccountConnectorAdapter(selectedConnector);
+    return buildInitialRealConnectionContract(adapter, {
+      hasLocalSetup: connectorLocalValidated,
+    });
+  }, [selectedConnector, connectorLocalValidated]);
+
   const save = async () => {
     setIsSaving(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -517,6 +532,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       updateCanonicalMappingField,
       setCanonicalMappingReviewed,
       resetCanonicalMappingToPreset,
+      realConnectionContract,
     }}>
       {children}
     </ContasConfigContext.Provider>

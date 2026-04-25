@@ -15,6 +15,59 @@ import {
   CONNECTOR_PRESETS,
   type ConnectorType,
 } from '@/src/lib/contaConnectorsV2';
+import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
+
+function getAuthTypeLabel(authType: string): string {
+  switch (authType) {
+    case 'oauth2_authorization_code': return 'OAuth 2.0 (Authorization Code)';
+    case 'private_app_token': return 'Token de App Privado';
+    case 'api_token': return 'Token de API';
+    case 'bearer_token': return 'Bearer Token';
+    case 'basic_auth': return 'Basic Auth';
+    case 'none': return 'Sem autenticação';
+    default: return authType;
+  }
+}
+
+function getConnectionStatusLabel(status: string): string {
+  switch (status) {
+    case 'not_configured': return 'Ainda não configurado';
+    case 'local_setup_only': return 'Apenas setup local';
+    case 'credentials_required': return 'Credenciais necessárias';
+    case 'ready_to_test': return 'Pronto para teste';
+    case 'testing': return 'Teste em andamento';
+    case 'connected': return 'Conexão real ativa';
+    case 'token_expired': return 'Token expirado';
+    case 'refresh_failed': return 'Renovação falhou';
+    case 'connection_error': return 'Erro de conexão';
+    case 'disconnected': return 'Desconectado';
+    default: return status;
+  }
+}
+
+function getMetadataStatusLabel(status: string): string {
+  switch (status) {
+    case 'not_discovered': return 'Metadados não descobertos';
+    case 'ready_to_discover': return 'Pronto para descobrir metadados';
+    case 'discovering': return 'Descobrindo metadados';
+    case 'discovered': return 'Metadados descobertos';
+    case 'failed': return 'Falha na descoberta';
+    default: return status;
+  }
+}
+
+function getSyncStatusLabel(status: string): string {
+  switch (status) {
+    case 'not_available': return 'Não disponível';
+    case 'not_configured': return 'Não configurado';
+    case 'ready': return 'Pronto';
+    case 'running': return 'Executando';
+    case 'succeeded': return 'Concluído com sucesso';
+    case 'failed': return 'Falhou';
+    case 'stale': return 'Desatualizado';
+    default: return status;
+  }
+}
 
 function ConnectorLogo({ type, isActive }: { type: ConnectorType; isActive: boolean }) {
   const brands: Record<ConnectorType, { abbr: string; color: string }> = {
@@ -76,10 +129,12 @@ export function AccountSources() {
     customConfig,
     connectorLocalValidated,
     setConnectorLocalValidated,
+    realConnectionContract,
   } = useContasConfig();
 
   const connectorTypes: ConnectorType[] = ['salesforce', 'hubspot', 'rd_station', 'csv_upload', 'other_crm'];
   const activePreset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
+  const activeAdapter = selectedConnector ? getAccountConnectorAdapter(selectedConnector) : null;
 
   const canValidateLocally = Boolean(selectedConnector) && (
     selectedConnector !== 'other_crm' ||
@@ -392,6 +447,117 @@ export function AccountSources() {
             </div>
 
             {/* Fatos da fonte (conectores nativos) */}
+            {activeAdapter && realConnectionContract && (
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                <div className="space-y-2 mb-5">
+                  <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">
+                    Modelo de conexão real futura
+                  </h4>
+                  <p className="text-sm font-medium text-slate-600">
+                    Este bloco descreve a arquitetura esperada para conexão real futura. Nenhuma credencial é solicitada ou armazenada nesta etapa.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Autenticação prevista</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">{getAuthTypeLabel(realConnectionContract.authType)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Status atual</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">{getConnectionStatusLabel(realConnectionContract.connectionStatus)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Sincronização planejada</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">{getSyncStatusLabel(realConnectionContract.syncStatus)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Metadados</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">{getMetadataStatusLabel(realConnectionContract.metadataStatus)}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Campos customizados</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">
+                      {realConnectionContract.supportsCustomFields ? 'Suportado no modelo' : 'Não suportado no modelo'}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Refresh token</p>
+                    <p className="mt-2 text-sm font-black text-slate-900">
+                      {realConnectionContract.supportsRefreshToken ? 'Previsto no modelo' : 'Não aplicável no modelo'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Escopos mínimos (least privilege)</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {realConnectionContract.requiredScopes.length === 0 && (
+                        <span className="text-sm font-medium text-slate-500">Sem escopo obrigatório nesta origem.</span>
+                      )}
+                      {realConnectionContract.requiredScopes.map((scope) => (
+                        <span key={scope} className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-700">
+                          {scope}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Escopos opcionais</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {realConnectionContract.optionalScopes.length === 0 && (
+                        <span className="text-sm font-medium text-slate-500">Sem escopos opcionais definidos.</span>
+                      )}
+                      {realConnectionContract.optionalScopes.map((scope) => (
+                        <span key={scope} className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-700">
+                          {scope}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Objetos prioritários (primeiro teste)</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {activeAdapter.priorityObjectsForFirstTest.map((objectName) => (
+                        <span key={objectName} className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-700">
+                          {objectName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Objetos futuros previstos</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {activeAdapter.futureObjectsPlanned.length === 0 && (
+                        <span className="text-sm font-medium text-slate-500">Sem objetos adicionais previstos.</span>
+                      )}
+                      {activeAdapter.futureObjectsPlanned.map((objectName) => (
+                        <span key={objectName} className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black text-slate-700">
+                          {objectName}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-amber-100 bg-amber-50 p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-amber-700">Próximo recorte técnico</p>
+                  <p className="mt-2 text-sm font-medium text-amber-900">{activeAdapter.nextRecommendedStep}</p>
+                </div>
+              </div>
+            )}
+
             {selectedConnector !== 'other_crm' && activePreset.instructions.factsAboutConnector.length > 0 && (
               <div className="rounded-3xl border border-slate-200 bg-white p-6">
                 <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-4">

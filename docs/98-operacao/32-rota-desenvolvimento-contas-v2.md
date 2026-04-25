@@ -175,6 +175,40 @@ Critério de saída futuro:
 - build e typecheck aprovados;
 - evidência visual aprovada.
 
+### Recorte C1 — Modelo estrutural de conexão real (sem conexão real ativa)
+
+Objetivo:
+
+Preparar a arquitetura da conexão real para Contas V2 sem implementar OAuth/token/API/sync reais neste recorte.
+
+Status esperado deste recorte:
+
+- tipos centrais de conexão real definidos em contrato dedicado;
+- adapters declarativos por provedor (Salesforce, HubSpot, RD Station, CSV e Outro CRM);
+- separação explícita de responsabilidades (adapter, auth, metadata, mapping, sync, status e confidence);
+- exposição do modelo na UI apenas como referência de arquitetura futura;
+- nenhuma credencial real solicitada/armazenada;
+- nenhuma chamada externa real executada.
+
+Artefatos estruturais do C1:
+
+- `accountConnectionModel` para status, credenciais, metadados, sync e escopos;
+- `accountConnectorAdapters/*` com capacidades, limitações, escopos e próximos passos por CRM;
+- bloco informativo em Fontes e Conectores com método previsto, escopos, objetos esperados e status local;
+- aviso informativo em Validação Local reforçando que conexão real ainda não foi implementada.
+
+Limites do recorte:
+
+- sem OAuth real;
+- sem token real;
+- sem chamada real de API externa;
+- sem sincronização real;
+- sem backend funcional de conexão externa.
+
+Próximo passo após C1:
+
+Executar C2 para escolher o primeiro conector real prioritário e implementar fluxo seguro end-to-end (auth + teste + status), mantendo princípio de menor privilégio.
+
 ### Fase C — Identidade e Dedupe real
 
 Criar identityRules. Conectar strict/fuzzy, política de conflito e confirmação explícita da etapa.

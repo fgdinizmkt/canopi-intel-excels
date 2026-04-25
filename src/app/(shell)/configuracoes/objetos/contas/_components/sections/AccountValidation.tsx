@@ -6,7 +6,7 @@ import { useContasConfig } from '../ContasConfigContext';
 import { AlertCircle, CheckCircle2, ShieldAlert, Zap, ArrowRight, Database } from 'lucide-react';
 
 export const AccountValidation = () => {
-  const { blockers, canPublish, readinessScore, stepStatus } = useContasConfig();
+  const { blockers, canPublish, readinessScore, stepStatus, selectedConnector, realConnectionContract } = useContasConfig();
   const stepStatusMap = new Map(stepStatus.map((step) => [step.slug, step]));
 
   return (
@@ -36,6 +36,17 @@ export const AccountValidation = () => {
           Conexão real com CRM ainda não implementada. Esta validação cobre apenas presets, campos e contrato local.
         </p>
       </div>
+
+      {selectedConnector && realConnectionContract && (
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+          <p className="text-sm font-medium text-blue-900">
+            Modelo de conexão real futura documentado, mas conexão real ainda não implementada.
+          </p>
+          <p className="mt-2 text-xs font-medium text-blue-700">
+            Status atual do modelo: {realConnectionContract.connectionStatus} • Autenticação prevista: {realConnectionContract.authType}.
+          </p>
+        </div>
+      )}
 
       {/* Blockers List */}
       <div className="grid grid-cols-1 gap-4">
