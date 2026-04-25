@@ -242,6 +242,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     customWritebackTargets: [] as string[],
     customConfidence: 0,
     connectorLocalValidated: false,
+    localSourceConfig: undefined as Record<string, unknown> | undefined,
+    localSourceConfigByProvider: {} as Record<string, unknown>,
   };
 
   const [customConfig, setCustomConfig] = useState(() => {
@@ -252,7 +254,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setConnector = (type: ConnectorType) => {
     setSelectedConnector(type);
     const preset = CONNECTOR_PRESETS[type];
-    setCustomConfig({
+    setCustomConfig((prev: any) => ({
+      ...prev,
       fieldMappings: preset?.fieldMappings || [],
       canonicalMapping: preset?.fieldMappings || [],
       canonicalMappingReviewed: false,
@@ -269,7 +272,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       writebackEnabled: false,
       writebackTarget: type === 'other_crm' ? '' : (preset?.writebackTargets?.[0] || ''),
       connectorLocalValidated: false,
-    });
+    }));
   };
 
   const updateCustomConfig = (updates: any) => {

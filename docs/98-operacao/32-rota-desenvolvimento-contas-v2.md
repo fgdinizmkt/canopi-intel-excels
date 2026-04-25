@@ -236,6 +236,31 @@ Próximo passo após C1.1:
 
 seguir para C2 e escolher o primeiro conector real prioritário para fluxo seguro de conexão.
 
+### Recorte C1.2 — Refinamento visual de Fontes e Conectores
+
+Objetivo:
+
+reduzir densidade visual da tela, melhorar hierarquia e tornar o fluxo de uso mais claro sem alterar o escopo funcional do setup local.
+
+Resultados esperados:
+
+- cards de fonte mais compactos, mantendo informações essenciais;
+- resumo operacional da fonte selecionada em bloco compacto;
+- reorganização do painel editável em blocos (essenciais, opcionais, observações e específicos por fonte);
+- destaque da ação principal (configurar, salvar e validar contrato local);
+- bloco de conexão futura mantido como seção técnica secundária.
+
+Limites:
+
+- nenhuma funcionalidade real de conexão adicionada;
+- sem OAuth/token/API/sync real;
+- sem coleta de credenciais;
+- persistência local/sessionStorage preservada.
+
+Próximo passo:
+
+C2 permanece como recorte para primeiro conector real end-to-end.
+
 ### Fase C — Identidade e Dedupe real
 
 Criar identityRules. Conectar strict/fuzzy, política de conflito e confirmação explícita da etapa.
