@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Próxima fase: Fase B — Camada Canônica real.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). Próxima fase: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -110,6 +110,61 @@ Observação: Contas V2 ainda não está fechada; apenas o recorte da Fase A foi
 Mover a tabela de mapeamento para Camada Canônica. Criar ou consolidar canonicalMapping e revisão local do mapeamento.
 
 Saída: mapeamento revisável e persistido na sessão.
+
+### Fase B.1 — Revisão local do mapeamento canônico
+
+Status: concluída.
+
+Commit final: `73ff047` — `feat(settings): add canonical account mapping review`
+
+Resultado:
+
+- canonicalMapping criado/consolidado como artefato local da sessão;
+- canonicalMappingReviewed criado;
+- Camada Canônica passou a operar como etapa real de revisão local do schema;
+- ações reais adicionadas:
+- revisar campo;
+- reabrir revisão;
+- marcar revisão da sessão;
+- restaurar padrão da fonte;
+- status traduzidos para português;
+- UI deixou claro que a revisão é local/simulada e não representa backend real;
+- publicação/readiness/gates globais não foram alterados.
+
+Evidências:
+
+- build aprovado;
+- typecheck aprovado;
+- validação visual aprovada com prints finais:
+- `01-canonica-inicial-ajuste.png`
+- `02-canonica-revisada-ajuste.png`
+
+Observação:
+
+Contas V2 ainda não está fechada; apenas o recorte B.1 foi concluído.
+
+### Fase B.2 — Integração da Camada Canônica com validação/blockers locais
+
+Objetivo:
+
+Conectar o artefato canonicalMapping/canonicalMappingReviewed à validação local da frente Contas V2, sem antecipar a Fase D de gates globais.
+
+Escopo futuro:
+
+- exibir no AccountValidation se canonicalMapping foi revisado;
+- adicionar blocker local ou aviso específico para Camada Canônica quando não revisada;
+- manter publicação bloqueada quando ainda houver blocker crítico;
+- não alterar o fluxo global de etapas além do necessário para refletir o artefato;
+- não mexer em OAuth/Token;
+- não mexer em Supabase;
+- não mexer em Cockpit.
+
+Critério de saída futuro:
+
+- AccountValidation reconhece o estado da Camada Canônica;
+- o usuário entende se o schema foi revisado ou não;
+- build e typecheck aprovados;
+- evidência visual aprovada.
 
 ### Fase C — Identidade e Dedupe real
 
@@ -305,7 +360,7 @@ Evitar:
 
 ## 13. Próximo passo recomendado
 
-Executar Fase B — Camada Canônica real.
+Executar Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 
 Não iniciar Cockpit completo enquanto Contas V2 estiver nesse estado intermediário.
 
