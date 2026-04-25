@@ -479,7 +479,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       },
       {
         slug: 'validacao-publicacao',
-        label: '9. Validação e Publicação',
+        label: '9. Validação Local',
         href: '/configuracoes/objetos/contas/validacao-publicacao',
         status: blockers.length > 0 ? 'blocked' : hasConnector ? 'configured' : 'pending',
         prerequisite: 'Concluir as etapas aplicáveis e resolver bloqueadores críticos.',

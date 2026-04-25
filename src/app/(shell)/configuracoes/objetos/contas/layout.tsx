@@ -31,7 +31,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-3">
              <div className="mr-6 text-right hidden xl:block">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Readiness Score</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase">Prontidão do setup local</p>
                 <div className="flex items-center gap-2">
                    <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
@@ -57,7 +57,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
                 canPublish ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
               }`}
              >
-                Publicar Módulo
+                Concluir etapa local
              </button>
           </div>
         </div>

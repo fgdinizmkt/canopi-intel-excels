@@ -71,6 +71,15 @@ Não deve conter:
 - campos que pareçam cadastro individual de conta;
 - promessa de OAuth simples sem backend real.
 
+### 5.1 Verdade operacional (estado atual)
+
+- Fontes e Conectores hoje é setup local/simulado;
+- não há OAuth, token, chamada de API ou sincronização real nesta etapa;
+- a fase atual valida apenas o contrato local de leitura da fonte;
+- conexão real deve ser tratada em recorte futuro específico (Fase I / conexão real);
+- Camada Canônica não significa CRM conectado;
+- ABM/ABX estão fora do escopo deste recorte.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.

@@ -14,9 +14,9 @@ export const AccountValidation = () => {
       {/* Header & Readiness */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-800">Validação & Publicação</h2>
+          <h2 className="text-xl font-bold text-slate-800">Validação do Setup Local</h2>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase">Readiness Score:</span>
+            <span className="text-xs font-bold text-slate-500 uppercase">Prontidão do contrato local:</span>
             <div className="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
               <div 
                 className={`h-full transition-all duration-1000 ${readinessScore > 80 ? 'bg-emerald-500' : readinessScore > 50 ? 'bg-amber-500' : 'bg-red-500'}`}
@@ -27,7 +27,13 @@ export const AccountValidation = () => {
           </div>
         </div>
         <p className="text-sm text-slate-500 max-w-2xl">
-          Esta é a barreira final de segurança. O motor de governança da Canopi analisa mapeamentos, conformidade LGPD e integridade de chaves antes de liberar a carga de dados.
+          Este score mede apenas completude do setup local (presets, campos e contrato local). Ele não representa conexão real com CRM externo.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <p className="text-sm font-medium text-amber-900">
+          Conexão real com CRM ainda não implementada. Esta validação cobre apenas presets, campos e contrato local.
         </p>
       </div>
 
@@ -36,8 +42,8 @@ export const AccountValidation = () => {
         {blockers.length === 0 ? (
           <div className="bg-emerald-50 border border-emerald-200 p-8 rounded-2xl text-center">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-emerald-800">Configuração Validada</h3>
-            <p className="text-sm text-emerald-600 mt-1">Nenhum impedimento crítico encontrado. O módulo está pronto para publicação.</p>
+            <h3 className="text-lg font-bold text-emerald-800">Setup local validado</h3>
+            <p className="text-sm text-emerald-600 mt-1">Nenhum impedimento crítico local encontrado. Pronto para revisão local.</p>
           </div>
         ) : (
           blockers.map((blocker) => (
@@ -76,7 +82,7 @@ export const AccountValidation = () => {
                         </Link>
                       ) : (
                         <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          Revisar em Validação & Publicação
+                          Revisar em Validação Local
                         </span>
                       )}
                     </div>
@@ -95,25 +101,25 @@ export const AccountValidation = () => {
             <Zap className={`w-6 h-6 ${canPublish ? 'text-yellow-400' : 'text-slate-500'}`} />
           </div>
           <div>
-            <p className="text-lg font-black leading-none mb-1">Publicação de Contas</p>
+            <p className="text-lg font-black leading-none mb-1">Conclusão da etapa local</p>
             <p className="text-xs text-slate-400 font-medium">
               {canPublish
-                ? 'Critérios de conformidade atendidos. Pronto para deploy.'
-                : 'Selecione uma fonte e valide o contrato local de leitura antes de publicar.'}
+                ? 'Critérios locais atendidos. Pronto para registrar validação local.'
+                : 'Selecione uma fonte e valide o contrato local de leitura antes de concluir a etapa local.'}
             </p>
           </div>
         </div>
 
         <button 
           disabled={!canPublish}
-          onClick={() => alert('ENTREGA: O módulo Contas V2 foi pré-configurado e validado em Local State.')}
+          onClick={() => alert('ENTREGA: A etapa local de Contas V2 foi registrada. Não houve publicação em produção nem conexão real com CRM externo.')}
           className={`px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all ${
             canPublish 
               ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-900/20' 
               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/5'
           }`}
         >
-          {canPublish ? 'Publicar Agora' : 'Publicação Bloqueada'}
+          {canPublish ? 'Registrar validação local' : 'Validação local bloqueada'}
         </button>
       </div>
 

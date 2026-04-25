@@ -67,7 +67,7 @@ export default function ContasHubPage() {
     { 
       id: 'fontes', 
       title: '2. Fontes e Conectores', 
-      desc: 'CRM Native Integration & Field Mappings.', 
+      desc: 'Setup local/simulado da fonte e contrato local de leitura.', 
       icon: Database, 
       color: 'text-purple-600', 
       bg: 'bg-purple-50',
@@ -85,7 +85,7 @@ export default function ContasHubPage() {
     { 
       id: 'canonica', 
       title: '4. Camada Canônica', 
-      desc: 'Schema rígido e estruturação de dados.', 
+      desc: 'Revisão local do mapeamento e schema Canopi (sem conexão real).', 
       icon: Table, 
       color: 'text-orange-600', 
       bg: 'bg-orange-50',
@@ -129,8 +129,8 @@ export default function ContasHubPage() {
     },
     { 
       id: 'validacao', 
-      title: '9. Validação & Publicação', 
-      desc: 'Hard Blockers e Checklist Final.', 
+      title: '9. Validação Local', 
+      desc: 'Checklist local de blockers e registro de validação da etapa.', 
       icon: Lock, 
       color: 'text-red-600', 
       bg: 'bg-red-50',
@@ -145,13 +145,16 @@ export default function ContasHubPage() {
           <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-4">Módulo de Configuração</h2>
           <p className="text-lg text-slate-500 font-medium leading-relaxed">
             Selecione uma área para configurar a inteligência de Contas. 
-            O progresso é monitorado em tempo real pelo <strong className="text-blue-600">Readiness Score</strong>.
+            O progresso é monitorado em tempo real pela <strong className="text-blue-600">Prontidão do setup local</strong>.
+          </p>
+          <p className="text-sm text-slate-500 font-medium leading-relaxed mt-3">
+            Conexão real com CRM (OAuth, token, API e sincronização) ainda não está implementada neste fluxo.
           </p>
         </div>
         <div className="p-6 bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-100 flex items-center gap-6">
            <div className="text-right">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Health Status</p>
-              <p className="text-xl font-black text-slate-900 uppercase tracking-tight">{readinessScore >= 100 ? 'Pronto p/ Validação' : 'Setup em Progresso'}</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Prontidão do setup local</p>
+              <p className="text-xl font-black text-slate-900 uppercase tracking-tight">{readinessScore >= 100 ? 'Pronto para revisão local' : 'Setup local em progresso'}</p>
            </div>
            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${readinessScore >= 100 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
               <ShieldCheck className="w-6 h-6" />
@@ -204,6 +207,27 @@ export default function ContasHubPage() {
                   <p className="text-xs text-slate-600 font-medium leading-relaxed">{step.impact}</p>
                 </div>
 
+                {section.slug === 'fontes-conectores' && (
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Escopo atual</p>
+                    <p className="text-xs font-medium text-blue-900 mt-1">Define apenas fonte e contrato local. Não conecta CRM externo.</p>
+                  </div>
+                )}
+
+                {section.slug === 'camada-canonica' && (
+                  <div className="rounded-2xl border border-orange-100 bg-orange-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-700">Escopo atual</p>
+                    <p className="text-xs font-medium text-orange-900 mt-1">Revisa mapeamento local do schema. Não implica conexão real.</p>
+                  </div>
+                )}
+
+                {section.slug === 'validacao-publicacao' && (
+                  <div className="rounded-2xl border border-red-100 bg-red-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-700">Escopo atual</p>
+                    <p className="text-xs font-medium text-red-900 mt-1">Valida apenas setup local e blockers. Não publica em produção.</p>
+                  </div>
+                )}
+
                 {hasBlockers && (
                   <div className="rounded-2xl border border-red-100 bg-red-50 p-4 space-y-2">
                     <div className="flex items-center gap-2 text-red-700">
@@ -244,7 +268,7 @@ export default function ContasHubPage() {
          </div>
          <div className="space-y-2 relative">
             <h3 className="text-2xl font-black uppercase tracking-tighter">Workflow de Configuração</h3>
-            <p className="text-sm text-slate-400 font-medium">Siga a ordem numérica para garantir a integridade total do objeto Contas.</p>
+            <p className="text-sm text-slate-400 font-medium">Siga a ordem numérica para consolidar o setup local do objeto Contas antes de qualquer recorte de conexão real.</p>
          </div>
          <div className="flex items-center gap-3 relative">
             <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase hover:bg-blue-50 transition-all shadow-xl">

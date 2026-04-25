@@ -34,11 +34,11 @@ function ConnectorLogo({ type, isActive }: { type: ConnectorType; isActive: bool
 
 function getIngestMethod(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'REST API (OAuth 2.0)';
-    case 'hubspot':    return 'Private App API';
-    case 'rd_station': return 'REST API (Token)';
-    case 'csv_upload': return 'Upload em lote (arquivo)';
-    case 'other_crm':  return 'API ou banco (manual)';
+    case 'salesforce': return 'Método futuro previsto: API + OAuth 2.0';
+    case 'hubspot':    return 'Método futuro previsto: Private App API';
+    case 'rd_station': return 'Método futuro previsto: API + Token';
+    case 'csv_upload': return 'Método atual: upload local em lote (arquivo)';
+    case 'other_crm':  return 'Método futuro previsto: API, banco ou middleware';
   }
 }
 
@@ -99,9 +99,14 @@ export function AccountSources() {
         <p className="text-lg text-slate-500 max-w-3xl font-medium">
           Esta etapa define a origem da base de contas. Ela não cria contas manualmente.
         </p>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-medium text-amber-900">
+          Esta etapa ainda não conecta ao CRM externo. A seleção abaixo apenas define a fonte local/simulada e o contrato de leitura
+          que será usado pela Camada Canônica. OAuth, token, chamada de API e sincronização real serão tratados em um recorte futuro
+          de conexão real.
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-medium text-blue-900">
-            Defina de onde o Canopi vai ler a base de contas em lote.
+            Defina de onde o Canopi vai ler a base de contas em lote no setup local.
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-700">
             O mapeamento técnico de campos será feito na etapa <strong>Camada Canônica</strong>.
@@ -164,7 +169,7 @@ export function AccountSources() {
                     </div>
                     {isActive ? (
                       <span className="rounded-xl px-4 py-2 text-[10px] font-black uppercase bg-blue-100 text-blue-700 select-none">
-                        Selecionado
+                        Fonte local escolhida
                       </span>
                     ) : (
                       <button
@@ -172,7 +177,7 @@ export function AccountSources() {
                         onClick={() => setConnector(type)}
                         className="rounded-xl px-4 py-2 text-[10px] font-black uppercase bg-slate-900 text-white shadow-lg transition-all hover:bg-slate-700"
                       >
-                        Configurar
+                        Usar como fonte local
                       </button>
                     )}
                   </div>
@@ -214,8 +219,36 @@ export function AccountSources() {
       </div>
 
       <p className="text-xs font-medium text-slate-400">
-        Selecionar uma fonte não conclui a conexão. A publicação só deve ser liberada após validação dos campos mínimos, identidade e mapeamento.
+        Selecionar uma fonte não conecta CRM externo. Esta etapa apenas prepara o contrato local para as próximas revisões.
       </p>
+
+      <Card className="border border-slate-200 p-5">
+        <h4 className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-4">
+          Estado da etapa atual
+        </h4>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Fonte local</p>
+            <p className="mt-2 text-sm font-black text-slate-900">
+              {selectedConnector ? 'Configurada' : 'Não configurada'}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Contrato local da fonte</p>
+            <p className="mt-2 text-sm font-black text-slate-900">
+              {connectorLocalValidated ? 'Validado' : 'Pendente'}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Conexão real</p>
+            <p className="mt-2 text-sm font-black text-slate-900">Não implementada nesta etapa</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Sincronização real</p>
+            <p className="mt-2 text-sm font-black text-slate-900">Não implementada nesta etapa</p>
+          </div>
+        </div>
+      </Card>
 
       {/* Painel de contrato de leitura */}
       <Card className="border border-slate-200 p-0 overflow-hidden">
@@ -342,18 +375,18 @@ export function AccountSources() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Método de ingestão</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Método esperado para conexão real futura</p>
                   <p className="mt-2 text-base font-black text-slate-900">{getIngestMethod(selectedConnector as ConnectorType)}</p>
-                  <p className="mt-1 text-sm font-medium text-slate-500">Como o Canopi lê os dados em lote.</p>
+                  <p className="mt-1 text-sm font-medium text-slate-500">Referência para recorte futuro de conexão real.</p>
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-4">
                   <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Conexão real</p>
                   <p className="mt-2 flex items-center gap-2 text-base font-black text-slate-900">
                     <Clock className="h-4 w-4 text-amber-500" />
-                    Pendente
+                    Não implementada nesta etapa
                   </p>
-                  <p className="mt-1 text-sm font-medium text-slate-500">Sem OAuth ou backend real nesta etapa.</p>
+                  <p className="mt-1 text-sm font-medium text-slate-500">Sem OAuth, token, chamada de API ou backend real nesta etapa.</p>
                 </div>
               </div>
             </div>
@@ -384,15 +417,15 @@ export function AccountSources() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">
-                    Contrato local de leitura
+                    Contrato local da fonte
                   </p>
                   <p className="text-sm font-medium text-slate-700">
                     {connectorLocalValidated
-                      ? 'Contrato local validado. A origem, entidade e chave primária foram revisadas nesta sessão.'
+                      ? 'Contrato local da fonte validado. A origem, entidade e chave primária foram revisadas nesta sessão.'
                       : 'Revise os dados acima e confirme o contrato de leitura local antes de avançar.'}
                   </p>
                   <p className="text-xs font-medium text-slate-400 italic">
-                    Isto não executa OAuth nem conexão real com o sistema externo.
+                    Isto não executa OAuth, token, chamada de API ou sincronização real com o sistema externo.
                   </p>
                 </div>
                 <button
@@ -407,7 +440,7 @@ export function AccountSources() {
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                   }`}
                 >
-                  {connectorLocalValidated ? '✓ Contrato local validado' : 'Validar contrato local'}
+                  {connectorLocalValidated ? '✓ Contrato local da fonte validado' : 'Validar contrato local da fonte'}
                 </button>
               </div>
             </div>
