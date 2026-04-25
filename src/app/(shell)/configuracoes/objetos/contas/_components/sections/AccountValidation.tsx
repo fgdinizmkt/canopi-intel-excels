@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useContasConfig } from '../ContasConfigContext';
 import { AlertCircle, CheckCircle2, ShieldAlert, Zap, ArrowRight, Database } from 'lucide-react';
 
 export const AccountValidation = () => {
-  const { conta, blockers, canPublish, readinessScore } = useContasConfig();
+  const { blockers, canPublish, readinessScore, stepStatus } = useContasConfig();
+  const stepStatusMap = new Map(stepStatus.map((step) => [step.slug, step]));
 
   return (
     <div className="space-y-6">
@@ -61,9 +63,23 @@ export const AccountValidation = () => {
                   </div>
                   <div>
                     <span className="text-[10px] font-black text-slate-400 uppercase block mb-1">Ação Corretiva</span>
-                    <p className="text-xs font-bold text-slate-700 leading-relaxed flex items-center gap-1">
-                      <ArrowRight className="w-3 h-3" /> {blocker.action}
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs font-bold text-slate-700 leading-relaxed flex items-center gap-1">
+                        <ArrowRight className="w-3 h-3" /> {blocker.action}
+                      </p>
+                      {blocker.sectionSlug ? (
+                        <Link
+                          href={`/configuracoes/objetos/contas/${blocker.sectionSlug}`}
+                          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700"
+                        >
+                          Ir para {stepStatusMap.get(blocker.sectionSlug)?.label || blocker.section}
+                        </Link>
+                      ) : (
+                        <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Revisar em Validação & Publicação
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -81,9 +97,9 @@ export const AccountValidation = () => {
           <div>
             <p className="text-lg font-black leading-none mb-1">Publicação de Contas</p>
             <p className="text-xs text-slate-400 font-medium">
-              {canPublish 
-                ? 'Critérios de conformidade atendidos. Pronto para deploy.' 
-                : 'Corrija os bloqueadores críticos para habilitar o deploy.'}
+              {canPublish
+                ? 'Critérios de conformidade atendidos. Pronto para deploy.'
+                : 'Selecione uma fonte e valide o contrato local de leitura antes de publicar.'}
             </p>
           </div>
         </div>

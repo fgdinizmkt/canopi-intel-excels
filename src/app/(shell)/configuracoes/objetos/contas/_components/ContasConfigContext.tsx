@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { 
   type ConnectorType, 
   type FieldMapping,
@@ -8,15 +8,40 @@ import {
   CONTA_CANONICAL_FIELDS_MINIMUM
 } from '@/src/lib/contaConnectorsV2';
 
+// --- SESSION PERSISTENCE ---
+
+const SESSION_KEY = 'canopi_contas_v2_config';
+
+function loadSession(): { selectedConnector: ConnectorType | null; customConfig: Record<string, any> } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 // --- TYPES ---
 
 export interface AccountConfigBlocker {
   id: string;
   section: string;
+  sectionSlug: string;
   severity: 'hard' | 'soft';
   message: string;
   consequence: string;
   action: string;
+}
+
+export interface ContasConfigStepStatus {
+  slug: string;
+  label: string;
+  href: string;
+  status: 'locked' | 'pending' | 'configured' | 'blocked' | 'optional';
+  prerequisite: string;
+  impact: string;
+  blockers: AccountConfigBlocker[];
 }
 
 export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
@@ -26,13 +51,27 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
 
   // 1. CONECTOR_MISSING
   if (!selectedConnector) {
-    list.push({
-      id: 'CONECTOR_MISSING',
-      section: 'Fontes',
-      severity: 'hard',
-      message: 'Nenhum conector selecionado',
-      consequence: 'Bloqueia a ingestão de dados.',
+      list.push({
+        id: 'CONECTOR_MISSING',
+        section: 'Fontes',
+        sectionSlug: 'fontes-conectores',
+        severity: 'hard',
+        message: 'Nenhum conector selecionado',
+        consequence: 'Bloqueia a ingestão de dados.',
       action: 'Selecione uma fonte nativa ou CSV.'
+    });
+  }
+
+  // 1b. SOURCE_CONFIG_NOT_VALIDATED
+  if (selectedConnector && !state.connectorLocalValidated) {
+    list.push({
+      id: 'SOURCE_CONFIG_NOT_VALIDATED',
+      section: 'Fontes e Conectores',
+      sectionSlug: 'fontes-conectores',
+      severity: 'hard',
+      message: 'Contrato local de leitura não validado',
+      consequence: 'Fonte selecionada mas sem validação do contrato de ingestão nesta sessão.',
+      action: 'Selecione uma fonte e valide o contrato local de leitura antes de publicar.'
     });
   }
 
@@ -43,6 +82,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
       list.push({
         id: 'CONNECTOR_INCOMPLETE',
         section: 'Fontes',
+        sectionSlug: 'fontes-conectores',
         severity: 'hard',
         message: 'Configuração do conector incompleta',
         consequence: 'Pode causar erro na extração de campos obrigatórios.',
@@ -54,12 +94,13 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   // 3. LGPD_LEGAL_BASIS_MISSING
   const requiresLgpd = selectedConnector === 'csv_upload' || (preset?.lgpdRisk === 'high');
   if (requiresLgpd && !baseLegal) {
-    list.push({
-      id: 'LGPD_LEGAL_BASIS_MISSING',
-      section: 'Upload e LGPD',
-      severity: 'hard',
-      message: 'Base legal não definida',
-      consequence: 'Risco de desconformidade jurídica (LGPD).',
+      list.push({
+        id: 'LGPD_LEGAL_BASIS_MISSING',
+        section: 'Upload e LGPD',
+        sectionSlug: 'upload-lgpd',
+        severity: 'hard',
+        message: 'Base legal não definida',
+        consequence: 'Risco de desconformidade jurídica (LGPD).',
       action: 'Declare a base legal na seção de LGPD.'
     });
   }
@@ -67,12 +108,13 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   // 4. IDENTITY_CONFLICT
   const pk = conta.primaryKeys || [];
   if (selectedConnector && (pk.length === 0 || !pk[0])) {
-    list.push({
-      id: 'IDENTITY_CONFLICT',
-      section: 'Identidade',
-      severity: 'hard',
-      message: 'Nenhuma chave primária ativa',
-      consequence: 'Causará duplicidade crítica na base Alpha.',
+      list.push({
+        id: 'IDENTITY_CONFLICT',
+        section: 'Identidade',
+        sectionSlug: 'identidade-dedupe',
+        severity: 'hard',
+        message: 'Nenhuma chave primária ativa',
+        consequence: 'Causará duplicidade crítica na base Alpha.',
       action: 'Selecione ao menos um campo de identidade nativo.'
     });
   }
@@ -86,6 +128,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
       list.push({
         id: 'CANONICAL_MAPPING_INCOMPLETE',
         section: 'Camada Canônica',
+        sectionSlug: 'camada-canonica',
         severity: 'hard',
         message: `Mapeamento canônico incompleto: ${missingFields.length} campos faltantes`,
         consequence: 'Dutos de inteligência (ABM/ABX) ficarão offline.',
@@ -101,6 +144,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
       list.push({
         id: 'WRITEBACK_UNSAFE',
         section: 'Writeback',
+        sectionSlug: 'writeback',
         severity: 'hard',
         message: 'Configuração de Writeback insegura',
         consequence: 'Risco de corrupção de dados no CRM de origem.',
@@ -111,21 +155,18 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
 
   // 7. CUSTOM_CONNECTOR_INCOMPLETE
   if (selectedConnector === 'other_crm') {
-    const isCustomMissing = !customConfig.customName || 
-                            !customConfig.customNativeObject || 
-                            !customConfig.customPrimaryKey ||
-                            customConfig.customSecondaryKeys === undefined ||
-                            customConfig.customRequiredFields === undefined ||
-                            !customConfig.customConflictPolicy ||
-                            customConfig.customConfidence === undefined;
+    const isCustomMissing = !customConfig.customName ||
+                            !customConfig.customNativeObject ||
+                            !customConfig.customPrimaryKey;
     if (isCustomMissing) {
       list.push({
         id: 'CUSTOM_CONNECTOR_INCOMPLETE',
         section: 'Fontes',
+        sectionSlug: 'fontes-conectores',
         severity: 'hard',
-        message: 'Conector Customizado Incompleto',
-        consequence: 'Impossível mapear campos sem as definições básicas da fonte.',
-        action: 'Configure Nome, Objeto, PK, Secundárias, Obrigatórios, Confiança e Política.'
+        message: 'Conector customizado incompleto',
+        consequence: 'Impossível iniciar o setup sem nome da ferramenta, objeto de contas e chave primária.',
+        action: 'Informe: Nome da ferramenta, Objeto/entidade de contas e Chave primária nativa.'
       });
     }
   }
@@ -154,21 +195,26 @@ interface ContasConfigContextType {
   isSaving: boolean;
   save: () => Promise<void>;
   blockers: AccountConfigBlocker[];
+  stepStatus: ContasConfigStepStatus[];
   readinessScore: number;
   canPublish: boolean;
   baseLegal: string;
   setBaseLegal: (val: string) => void;
   customConfig: any;
+  connectorLocalValidated: boolean;
+  setConnectorLocalValidated: (val: boolean) => void;
 }
 
 const ContasConfigContext = createContext<ContasConfigContextType | undefined>(undefined);
 
 export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedConnector, setSelectedConnector] = useState<ConnectorType | null>(null);
+  const [selectedConnector, setSelectedConnector] = useState<ConnectorType | null>(() => {
+    return (loadSession()?.selectedConnector ?? null) as ConnectorType | null;
+  });
   const [baseLegal, setBaseLegal] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  
-  const [customConfig, setCustomConfig] = useState({
+
+  const DEFAULT_CUSTOM_CONFIG = {
     fieldMappings: [] as FieldMapping[],
     primaryKeys: [] as string[],
     writebackEnabled: false,
@@ -181,7 +227,13 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     customConflictPolicy: 'manual_review',
     customSupportsWriteback: false,
     customWritebackTargets: [] as string[],
-    customConfidence: 0
+    customConfidence: 0,
+    connectorLocalValidated: false,
+  };
+
+  const [customConfig, setCustomConfig] = useState(() => {
+    const session = loadSession();
+    return session?.customConfig ? { ...DEFAULT_CUSTOM_CONFIG, ...session.customConfig } : DEFAULT_CUSTOM_CONFIG;
   });
 
   const setConnector = (type: ConnectorType) => {
@@ -200,13 +252,23 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       customWritebackTargets: type === 'other_crm' ? [] : (preset?.writebackTargets || []),
       customConfidence: type === 'other_crm' ? 0 : (preset?.identity.confidenceScore || 0),
       writebackEnabled: false,
-      writebackTarget: type === 'other_crm' ? '' : (preset?.writebackTargets?.[0] || '')
+      writebackTarget: type === 'other_crm' ? '' : (preset?.writebackTargets?.[0] || ''),
+      connectorLocalValidated: false,
     });
   };
 
   const updateCustomConfig = (updates: any) => {
     setCustomConfig(prev => ({ ...prev, ...updates }));
   };
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ selectedConnector, customConfig }));
+    } catch {}
+  }, [selectedConnector, customConfig]);
+
+  const connectorLocalValidated = customConfig.connectorLocalValidated ?? false;
+  const setConnectorLocalValidated = (val: boolean) => updateCustomConfig({ connectorLocalValidated: val });
 
   const conta = useMemo(() => {
     const preset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
@@ -237,9 +299,10 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       baseLegal,
       conta,
       customConfig,
-      CONTA_CANONICAL_FIELDS_MINIMUM
+      CONTA_CANONICAL_FIELDS_MINIMUM,
+      connectorLocalValidated,
     });
-  }, [selectedConnector, baseLegal, conta, customConfig]);
+  }, [selectedConnector, baseLegal, conta, customConfig, connectorLocalValidated]);
 
   const readinessScore = useMemo(() => {
     const hardBlockers = blockers.filter(b => b.severity === 'hard').length;
@@ -250,6 +313,139 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const canPublish = useMemo(() => {
     return blockers.filter(b => b.severity === 'hard').length === 0;
   }, [blockers]);
+
+  const stepStatus = useMemo<ContasConfigStepStatus[]>(() => {
+    const blockerMap = new Map<string, AccountConfigBlocker[]>();
+
+    blockers.forEach((blocker) => {
+      const stepSlug = blocker.sectionSlug || 'validacao-publicacao';
+      const current = blockerMap.get(stepSlug) || [];
+      blockerMap.set(stepSlug, [...current, blocker]);
+    });
+
+    const hasConnector = Boolean(selectedConnector);
+    const activePrimaryKeys = (conta.primaryKeys || []).filter((key) => key.trim().length > 0);
+    const hasIdentity = hasConnector && activePrimaryKeys.length > 0;
+    const mappedCanonicalFields = conta.fieldMappings.map((mapping) => mapping.canonicalField);
+    const hasCanonicalMinimum =
+      hasConnector &&
+      CONTA_CANONICAL_FIELDS_MINIMUM.every((field) => mappedCanonicalFields.includes(field));
+    const requiresLgpd = selectedConnector === 'csv_upload' || (selectedConnector ? CONNECTOR_PRESETS[selectedConnector]?.lgpdRisk === 'high' : false);
+    const hasClassifiableMappings = hasCanonicalMinimum && conta.fieldMappings.some((mapping) => mapping.isClassification);
+    const canReviewWriteback = hasCanonicalMinimum && hasClassifiableMappings;
+
+    const getStepBlockers = (slug: string) => blockerMap.get(slug) || [];
+
+    return [
+      {
+        slug: 'visao-geral',
+        label: '1. Visão Geral',
+        href: '/configuracoes/objetos/contas/visao-geral',
+        status: 'configured',
+        prerequisite: 'Entrada livre',
+        impact: 'Contextualiza o papel do objeto Contas antes da configuração.',
+        blockers: [],
+      },
+      {
+        slug: 'fontes-conectores',
+        label: '2. Fontes e Conectores',
+        href: '/configuracoes/objetos/contas/fontes-conectores',
+        status: getStepBlockers('fontes-conectores').length > 0 ? 'blocked' : hasConnector ? 'configured' : 'pending',
+        prerequisite: 'Primeira etapa operacional.',
+        impact: 'Define a fonte de verdade e desbloqueia o restante do setup.',
+        blockers: getStepBlockers('fontes-conectores'),
+      },
+      {
+        slug: 'identidade-dedupe',
+        label: '3. Identidade e Dedupe',
+        href: '/configuracoes/objetos/contas/identidade-dedupe',
+        status: !hasConnector
+          ? 'locked'
+          : getStepBlockers('identidade-dedupe').length > 0
+            ? 'blocked'
+            : hasIdentity
+              ? 'configured'
+              : 'pending',
+        prerequisite: 'Conector definido em Fontes e Conectores.',
+        impact: 'Ativa chaves de identidade e evita duplicidade crítica.',
+        blockers: getStepBlockers('identidade-dedupe'),
+      },
+      {
+        slug: 'camada-canonica',
+        label: '4. Camada Canônica',
+        href: '/configuracoes/objetos/contas/camada-canonica',
+        status: !hasIdentity
+          ? 'locked'
+          : getStepBlockers('camada-canonica').length > 0
+            ? 'blocked'
+            : hasCanonicalMinimum
+              ? 'configured'
+              : 'pending',
+        prerequisite: 'Definir identidade mínima para validar o schema.',
+        impact: 'Consolida os campos canônicos necessários para ABM/ABX.',
+        blockers: getStepBlockers('camada-canonica'),
+      },
+      {
+        slug: 'classificacao-abm-abx',
+        label: '5. Classificação ABM / ABX',
+        href: '/configuracoes/objetos/contas/classificacao-abm-abx',
+        status: !hasCanonicalMinimum ? 'locked' : 'pending',
+        prerequisite: 'Completar a Camada Canônica mínima para revisar os campos de classificação.',
+        impact: hasClassifiableMappings
+          ? 'Os campos classificatórios já existem no schema, mas esta etapa ainda depende de configuração funcional futura.'
+          : 'Revisará os campos classificatórios que governam a inteligência da conta.',
+        blockers: [],
+      },
+      {
+        slug: 'writeback',
+        label: '6. Writeback',
+        href: '/configuracoes/objetos/contas/writeback',
+        status: !canReviewWriteback
+          ? 'locked'
+          : getStepBlockers('writeback').length > 0
+            ? 'blocked'
+            : conta.supportsWriteback
+              ? 'configured'
+              : 'optional',
+        prerequisite: 'Classificação disponível para revisão de retorno ao CRM.',
+        impact: 'Revisa o retorno de campos Canopi para a fonte quando aplicável.',
+        blockers: getStepBlockers('writeback'),
+      },
+      {
+        slug: 'upload-lgpd',
+        label: '7. Upload e LGPD',
+        href: '/configuracoes/objetos/contas/upload-lgpd',
+        status: !requiresLgpd
+          ? 'optional'
+          : getStepBlockers('upload-lgpd').length > 0
+            ? 'blocked'
+            : baseLegal
+              ? 'configured'
+              : 'pending',
+        prerequisite: requiresLgpd ? 'Obrigatório quando a origem exigir base legal.' : 'Só se aplica a fluxos com risco LGPD elevado.',
+        impact: 'Garante conformidade legal para cargas sensíveis ou upload controlado.',
+        blockers: getStepBlockers('upload-lgpd'),
+      },
+      {
+        slug: 'governanca-mapeamento',
+        label: '8. Governança de Mapeamento',
+        href: '/configuracoes/objetos/contas/governanca-mapeamento',
+        status: 'optional',
+        prerequisite: 'Etapa de revisão read-only após as configurações operacionais.',
+        impact: 'Consolida a leitura de auditoria e o histórico do setup sem desbloquear etapas adicionais.',
+        blockers: [],
+      },
+      {
+        slug: 'validacao-publicacao',
+        label: '9. Validação e Publicação',
+        href: '/configuracoes/objetos/contas/validacao-publicacao',
+        status: blockers.length > 0 ? 'blocked' : hasConnector ? 'configured' : 'pending',
+        prerequisite: 'Concluir as etapas aplicáveis e resolver bloqueadores críticos.',
+        impact: 'Consolida readiness, blockers e o próximo passo seguro.',
+        blockers,
+      },
+    ];
+  }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, selectedConnector]);
 
   const save = async () => {
     setIsSaving(true);
@@ -266,11 +462,14 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isSaving,
       save,
       blockers,
+      stepStatus,
       readinessScore,
       canPublish,
       baseLegal,
       setBaseLegal,
-      customConfig
+      customConfig,
+      connectorLocalValidated,
+      setConnectorLocalValidated,
     }}>
       {children}
     </ContasConfigContext.Provider>
