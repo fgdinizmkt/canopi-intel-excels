@@ -27,6 +27,7 @@ Nenhuma etapa pode ficar configurada apenas por preset, clique visual, card sele
 | 6 | Writeback | writebackPolicy | Governança |
 | 7 | Governança | governanceApproval | Validação/Publicação |
 | 8 | Validação/Publicação | publishableConfig | Publicação |
+| 9 | Conexões reais OAuth/Token | realConnectionContract | Sincronização real futura |
 
 ## 4. Diagnóstico atual
 
@@ -38,10 +39,11 @@ Problemas principais:
 
 - customConfig acumula responsabilidades demais;
 - Fontes e Conectores está carregando responsabilidades de Camada Canônica e Identidade/Dedupe;
-- hasIdentity não deve depender apenas de primaryKeys vindas de preset;
-- hasCanonicalMinimum não deve depender apenas de fieldMappings vindos de preset;
+- hasIdentity não deve depender apenas de primaryKeys vindas do preset;
+- hasCanonicalMinimum não deve depender apenas de fieldMappings vindos do preset;
 - botões sem consequência real devem ser removidos ou conectados a estado real;
-- a tabela grande de mapeamento não deve continuar em AccountSources.
+- a tabela grande de mapeamento não deve continuar em AccountSources;
+- conexão real via OAuth, token ou API não deve ser prometida como pronta enquanto não houver backend, callback, armazenamento seguro de tokens e política de refresh/revogação.
 
 ## 5. O que fica em Fontes
 
@@ -66,7 +68,8 @@ Não deve conter:
 - política detalhada de dedupe;
 - chaves secundárias de dedupe;
 - writeback policy;
-- campos que pareçam cadastro individual de conta.
+- campos que pareçam cadastro individual de conta;
+- promessa de OAuth simples sem backend real.
 
 ## 6. Para onde vão as responsabilidades
 
@@ -77,6 +80,8 @@ Camada Canônica recebe a tabela de mapeamento completo, campo da fonte, campo C
 Writeback recebe campos permitidos para retorno ao CRM, política por campo, owner de aprovação e risco aceito.
 
 Upload e LGPD recebe base legal, responsável pela carga, consentimento, rastreabilidade e evidência de origem.
+
+Conexões reais recebem OAuth, token/API, refresh token, callback, status de sync, escopos, revogação, segurança e armazenamento de credenciais. Essa responsabilidade não pertence ao Patch A.
 
 ## 7. Rota de patches
 
@@ -132,7 +137,53 @@ Saída: publicação só habilita sem blocker crítico.
 
 Aplicar protocolo de fechamento: Git controlado, build, typecheck, runtime, evidência visual externa, documentação operacional e registro do que ainda é local state.
 
-Saída: frente Contas V2 formalmente fechada.
+Saída: frente Contas V2 formalmente fechada no nível de configuração local/simulada.
+
+### Fase I — Lapidação técnica: Conexões reais OAuth/Token
+
+Objetivo: transformar a conexão pendente em conexão real, sem confundir MVP local com integração produtiva.
+
+Esta fase só deve começar depois da estabilização do setup local e dos gates por artefato.
+
+Escopo conceitual:
+
+- HubSpot: conexão OAuth 2.0 Authorization Code para app instalável multi-conta;
+- Salesforce: OAuth 2.0 Web Server Flow, preferencialmente com PKCE quando aplicável;
+- RD Station CRM: tratar inicialmente como Token/API, não como OAuth genérico;
+- RD Station Marketing: avaliar OAuth2 separadamente, se entrar no escopo;
+- Upload CSV: manter como caminho simples de ingestão para MVP e fallback operacional;
+- Outro CRM: tratar como setup semiassistido, com método variável: OAuth, token, API key, banco, CSV ou middleware.
+
+Artefato esperado:
+
+- realConnectionContract;
+- integrationStatus;
+- tokenStoragePolicy;
+- syncStatus;
+- scopeMap;
+- revokePolicy;
+- errorStateMap;
+- lastSyncAt;
+- nextSyncAt, quando houver sincronização recorrente.
+
+Regras:
+
+- não implementar OAuth no frontend puro;
+- não armazenar client_secret em client-side;
+- não armazenar token sensível em localStorage;
+- exigir backend/API route segura para callback e troca de código por token;
+- separar claramente conexão simulada, contrato local validado e conexão real ativa;
+- não chamar botão de “Conectar” se a ação não iniciar fluxo real;
+- usar “Preparar conexão”, “Validar contrato local” ou “Conexão real pendente” enquanto não houver backend.
+
+Critério de saída futuro:
+
+- pelo menos uma conexão real end-to-end validada em ambiente seguro;
+- tokens protegidos;
+- refresh/revogação tratados;
+- sync mínimo comprovado;
+- UI diferencia conectado, parcial, erro, expirado e pendente;
+- documentação operacional atualizada.
 
 ## 8. Gestão e delegação entre agentes
 
@@ -203,6 +254,9 @@ Todo patch deve:
 | UI parecer cadastro individual | Alta | Remover labels ambíguos e mover mapping |
 | Botão sem consequência | Alta | Conectar a estado real ou remover |
 | Uso indevido de logos oficiais | Média | Usar placeholder honesto até asset autorizado |
+| Prometer OAuth simples sem infraestrutura | Alta | Criar Fase I separada para conexão real |
+| Token ou segredo exposto no client | Alta | Usar backend/API route segura e armazenamento protegido |
+| RD CRM tratado como OAuth sem validação | Média | Classificar como Token/API até confirmação técnica |
 | Handoff depender de chat | Alta | Manter esta rota e logs atualizados |
 | Agentes concorrendo na mesma working tree | Alta | Um executor ativo por vez |
 | Agente visual travando em comandos simples | Média | Parar e trocar para executor terminal |
@@ -212,12 +266,43 @@ Todo patch deve:
 
 Não usar logo oficial de terceiro sem asset local autorizado. Até existir autorização, usar fallback textual premium e não chamar fallback de logo oficial.
 
-## 12. Próximo passo recomendado
+## 12. Decisão sobre OAuth/Token
+
+OAuth/Token é uma lapidação técnica futura, não pré-requisito para commitar a Fase A.
+
+Classificação atual por conector:
+
+| Conector | Método futuro provável | Status no setup atual |
+|---|---|---|
+| HubSpot | OAuth 2.0 Authorization Code | Conexão real pendente |
+| Salesforce | OAuth 2.0 Web Server Flow / PKCE quando aplicável | Conexão real pendente |
+| RD Station CRM | Token/API | Conexão real pendente |
+| RD Station Marketing | OAuth2 a avaliar | Fora do escopo imediato |
+| Upload CSV | Upload em lote | Caminho simples para MVP/fallback |
+| Outro CRM | OAuth, token, API, banco, CSV ou middleware | Setup semiassistido |
+
+Linguagem recomendada na UI enquanto não houver backend real:
+
+- “Contrato local validado”;
+- “Conexão real pendente”;
+- “OAuth futuro”;
+- “Token/API futuro”;
+- “Preparar conexão”.
+
+Evitar:
+
+- “Conectado” quando não houver token válido;
+- “Ativo” quando só houve clique local;
+- “OAuth simples” como promessa de baixa complexidade.
+
+## 13. Próximo passo recomendado
 
 Executar Fase A: separar responsabilidades de Fontes e Conectores.
 
 Não iniciar Cockpit completo enquanto Contas V2 estiver nesse estado intermediário.
 
-## 13. Regra de handoff
+Não iniciar OAuth/Token antes de fechar o setup local com gates e artefatos coerentes.
+
+## 14. Regra de handoff
 
 Se houver divergência entre memória de chat e este documento, usar este documento como ponto de partida e conferir o estado real do repositório antes de agir.
