@@ -203,6 +203,11 @@ interface ContasConfigContextType {
   customConfig: any;
   connectorLocalValidated: boolean;
   setConnectorLocalValidated: (val: boolean) => void;
+  canonicalMapping: FieldMapping[];
+  canonicalMappingReviewed: boolean;
+  updateCanonicalMappingField: (canonicalField: string, updates: Partial<FieldMapping>) => void;
+  setCanonicalMappingReviewed: (val: boolean) => void;
+  resetCanonicalMappingToPreset: () => void;
 }
 
 const ContasConfigContext = createContext<ContasConfigContextType | undefined>(undefined);
@@ -216,6 +221,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const DEFAULT_CUSTOM_CONFIG = {
     fieldMappings: [] as FieldMapping[],
+    canonicalMapping: [] as FieldMapping[],
+    canonicalMappingReviewed: false,
     primaryKeys: [] as string[],
     writebackEnabled: false,
     writebackTarget: '',
@@ -241,6 +248,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const preset = CONNECTOR_PRESETS[type];
     setCustomConfig({
       fieldMappings: preset?.fieldMappings || [],
+      canonicalMapping: preset?.fieldMappings || [],
+      canonicalMappingReviewed: false,
       primaryKeys: preset?.identity ? [preset.identity.nativePrimaryKey] : [],
       customName: type === 'other_crm' ? '' : (preset?.name || ''),
       customNativeObject: type === 'other_crm' ? '' : (preset?.nativeObject || ''),
@@ -270,6 +279,40 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const connectorLocalValidated = customConfig.connectorLocalValidated ?? false;
   const setConnectorLocalValidated = (val: boolean) => updateCustomConfig({ connectorLocalValidated: val });
 
+  const resolvedCanonicalMapping = useMemo(() => {
+    const presetMappings = selectedConnector ? (CONNECTOR_PRESETS[selectedConnector]?.fieldMappings || []) : [];
+    if (customConfig.canonicalMapping.length > 0) return customConfig.canonicalMapping;
+    if (customConfig.fieldMappings.length > 0) return customConfig.fieldMappings;
+    return presetMappings;
+  }, [customConfig.canonicalMapping, customConfig.fieldMappings, selectedConnector]);
+
+  const canonicalMappingReviewed = customConfig.canonicalMappingReviewed ?? false;
+
+  const updateCanonicalMappingField = (canonicalField: string, updates: Partial<FieldMapping>) => {
+    const nextMappings = resolvedCanonicalMapping.map((mapping: FieldMapping) =>
+      mapping.canonicalField === canonicalField ? { ...mapping, ...updates } : mapping
+    );
+    updateCustomConfig({
+      canonicalMapping: nextMappings,
+      fieldMappings: nextMappings,
+      canonicalMappingReviewed: false,
+    });
+  };
+
+  const setCanonicalMappingReviewed = (val: boolean) => {
+    updateCustomConfig({ canonicalMappingReviewed: val });
+  };
+
+  const resetCanonicalMappingToPreset = () => {
+    if (!selectedConnector) return;
+    const presetMappings = CONNECTOR_PRESETS[selectedConnector]?.fieldMappings || [];
+    updateCustomConfig({
+      canonicalMapping: presetMappings,
+      fieldMappings: presetMappings,
+      canonicalMappingReviewed: false,
+    });
+  };
+
   const conta = useMemo(() => {
     const preset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
     
@@ -284,14 +327,12 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       writebackTarget: customConfig.writebackTarget,
       confidenceScore: selectedConnector === 'other_crm' ? customConfig.customConfidence : (preset?.identity.confidenceScore || 0),
       customName: customConfig.customName || preset?.name || '',
-      fieldMappings: customConfig.fieldMappings.length > 0 
-        ? customConfig.fieldMappings 
-        : (preset?.fieldMappings || []),
+      fieldMappings: resolvedCanonicalMapping,
       primaryKeys: customConfig.primaryKeys.length > 0 
         ? customConfig.primaryKeys 
         : (preset?.identity ? [preset.identity.nativePrimaryKey] : []),
     };
-  }, [selectedConnector, customConfig]);
+  }, [selectedConnector, customConfig, resolvedCanonicalMapping]);
 
   const blockers = useMemo(() => {
     return getAccountConfigBlockers({
@@ -301,8 +342,9 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       customConfig,
       CONTA_CANONICAL_FIELDS_MINIMUM,
       connectorLocalValidated,
+      canonicalMappingReviewed,
     });
-  }, [selectedConnector, baseLegal, conta, customConfig, connectorLocalValidated]);
+  }, [selectedConnector, baseLegal, conta, customConfig, connectorLocalValidated, canonicalMappingReviewed]);
 
   const readinessScore = useMemo(() => {
     const hardBlockers = blockers.filter(b => b.severity === 'hard').length;
@@ -470,6 +512,11 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       customConfig,
       connectorLocalValidated,
       setConnectorLocalValidated,
+      canonicalMapping: resolvedCanonicalMapping,
+      canonicalMappingReviewed,
+      updateCanonicalMappingField,
+      setCanonicalMappingReviewed,
+      resetCanonicalMappingToPreset,
     }}>
       {children}
     </ContasConfigContext.Provider>
