@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: rota operacional criada antes de novos patches.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Próxima fase: Fase B — Camada Canônica real.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -95,7 +95,15 @@ Saída: rota documentada e próximo patch definido.
 
 Transformar Fontes em Conectar fonte de contas. Remover a tabela completa de mapeamento. Manter origem, objeto, PK nativa, método de ingestão e validação local.
 
-Saída: tela não parece cadastro individual; build, typecheck e screenshots aprovados.
+Status: concluída.
+
+Commit final: `219afa2` — `refactor(settings): separate account source setup responsibilities`.
+
+Resultado: Fontes passou a operar como contrato de leitura (Conectar fonte de contas), sem assumir responsabilidades de Camada Canônica/Identidade.
+
+Evidências: build aprovado, typecheck aprovado e validação visual aprovada (prints finais + DOM proof).
+
+Observação: Contas V2 ainda não está fechada; apenas o recorte da Fase A foi concluído.
 
 ### Fase B — Camada Canônica real
 
@@ -297,7 +305,7 @@ Evitar:
 
 ## 13. Próximo passo recomendado
 
-Executar Fase A: separar responsabilidades de Fontes e Conectores.
+Executar Fase B — Camada Canônica real.
 
 Não iniciar Cockpit completo enquanto Contas V2 estiver nesse estado intermediário.
 
