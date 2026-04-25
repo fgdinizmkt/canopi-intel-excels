@@ -2937,3 +2937,91 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 5.  **Aprovação Visual:** **Aprovado pelo usuário após validação visual direta** confirmando a rigidez geométrica absoluta (conectores "soldados" aos cards) e fluidez da camada de detalhes.
 
 **Status:** Recorte 57 (Fase Cockpit V2) concluído. Commit: `6a24f54`.
+
+---
+
+### Sessão: 2026-04-25 — Contas V2 / Fase A (Separação de Responsabilidades)
+**Agente:** Claude Code
+
+**Objetivo:** Transformar Fontes e Conectores em etapa exclusiva de contrato local de leitura, separando responsabilidades indevidas (mapeamento canônico, dedupe, writeback) que estavam no mesmo componente.
+
+**Ações:**
+1. **Remoção da tabela de mapeamento:** Eliminado bloco de 15+ linhas de campo nativo → campo canônico do `AccountSources.tsx`.
+2. **Simplificação do formulário other_crm:** Reduzido de 8+ campos para 3 essenciais (nome, entidade nativa, chave primária).
+3. **Resumo do contrato de leitura:** Adicionado bloco de 6 células read-only (fonte, entidade, PK, domínio, método, status de conexão real).
+4. **Fatos da fonte:** Bloco informativo derivado de `preset.instructions.factsAboutConnector`.
+5. **Próximas etapas:** Bloco amber apontando para Identidade/Dedupe e Camada Canônica.
+6. **Microajuste:** Badge "Selecionado" convertido de `<button>` para `<span>` não-interativo.
+7. **Fix A.2:** Card "Outro CRM" exibia nome do conector ativo; corrigido para sempre usar `CONNECTOR_PRESETS[type].name`.
+
+**Decisões:**
+- Mapeamento canônico fica exclusivamente em Camada Canônica.
+- Dedupe fica em Identidade e Dedupe.
+- Writeback fica em Writeback.
+- Fontes foca em: origem, objeto, PK, método de ingestão, validação local do contrato.
+
+**Commits:**
+- `219afa2` — `refactor(settings): separate account source setup responsibilities`
+
+**Status:** Fase A concluída. Build aprovado, lint aprovado, validação visual aprovada.
+
+---
+
+### Sessão: 2026-04-25 — Contas V2 / Fase B.1 (Revisão Local do Mapeamento Canônico)
+**Agente:** Claude Code
+
+**Objetivo:** Criar etapa real de revisão local do schema canônico em Camada Canônica, com artefato `canonicalMapping` derivado da fonte selecionada.
+
+**Ações:**
+1. **`canonicalMapping`:** Artefato de sessão criado a partir dos `fieldMappings` do preset selecionado.
+2. **`canonicalMappingReviewed`:** Flag booleana que destrava etapas posteriores quando `true`.
+3. **Ações reais:** Revisar campo, reabrir revisão, restaurar preset da fonte, marcar revisão da sessão.
+4. **Status traduzidos:** Todos os status de campo em português.
+5. **UI transparente:** Deixa explícito que a revisão é local/simulada, sem backend real.
+
+**Commits:**
+- `73ff047` — `feat(settings): add canonical account mapping review`
+
+**Status:** Fase B.1 concluída. Build aprovado, typecheck aprovado, validação visual aprovada (prints: `01-canonica-inicial-ajuste.png`, `02-canonica-revisada-ajuste.png`).
+
+---
+
+### Sessão: 2026-04-25 — Contas V2 / Recortes C1, C1.1, C1.2, C1.3 (Modelo de Conexão + Configuração Local + Refinamento)
+**Agente:** Claude Code
+
+**Objetivo:** Scaffoldar modelo estrutural de conexão real, tornar a configuração local editável e refinar a densidade visual até o estado final do recorte.
+
+**Ações — C1 (scaffold de modelo):**
+1. `accountConnectionModel` com status, credenciais, metadados, sync e escopos.
+2. `accountConnectorAdapters` com capacidades, limitações e próximos passos por provedor.
+3. Bloco informativo em Fontes mostrando método previsto, escopos, objetos esperados.
+4. Aviso em Validação Local reforçando ausência de conexão real.
+- Commit `27e8513` — `feat(settings): scaffold account connector connection model`
+
+**Ações — C1.1 (configuração local editável):**
+1. Interface `LocalSourceConfig` com 25+ campos organizados por bloco.
+2. `localSourceConfigByProvider` — persistência separada por provider via sessionStorage.
+3. Carregamento de defaults por preset/adapter ao selecionar fonte.
+4. Botões "Salvar configuração local" e "Restaurar preset da fonte" com consequência real.
+5. Contrato local volta a pendente ao editar após validação.
+- Commit `4097668` — `feat(settings): add editable local account source setup`
+
+**Ações — C1.2 (refinamento visual):**
+1. Cards de fonte compactos com badge de confiança e método previsto.
+2. Painel reorganizado em blocos A (essenciais), B (opcionais), C (observações), D (específico por fonte).
+3. Bloco de detalhes técnicos futuros como seção secundária informativa.
+- Commit `de567e2` — `refactor(settings): improve account source setup usability`
+
+**Ações — C1.3 (lapidação final):**
+1. Texto dos disclaimers reduzido (de 30 para ~10 palavras cada).
+2. Bloco B: border mais leve, label "Complementares, não obrigatórios", grid `xl:grid-cols-4`, padding `p-5→p-4`.
+3. Botão salvar: nota "Salva apenas este contrato local. Não publica nem conecta CRM." adicionada.
+4. Revisão/validação e detalhes técnicos: padding `p-3→p-2.5`, gaps `gap-3→gap-2`.
+5. Documentação C1.3 adicionada a `32-rota-desenvolvimento-contas-v2.md`.
+- Commit `03134ec` — `refactor(settings): polish account source setup density`
+
+**Limite confirmado em todos os recortes:**
+- Sem OAuth real, sem token real, sem API externa, sem sync real, sem backend de conexão.
+- Fontes opera exclusivamente como setup local/simulado do contrato de leitura.
+
+**Status:** C1.3 fechado. Build limpo, lint limpo, main sincronizada com origin/main. Working tree limpo. Próximo recorte: decisão sobre C2 (primeiro conector real) ou Fase B.2 (gates por canonicalMapping).
