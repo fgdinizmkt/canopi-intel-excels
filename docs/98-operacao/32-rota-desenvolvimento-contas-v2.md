@@ -80,6 +80,18 @@ Não deve conter:
 - Camada Canônica não significa CRM conectado;
 - ABM/ABX estão fora do escopo deste recorte.
 
+### 5.2 Prioridade operacional atual
+
+O plano maior de Configurações continua válido e não foi substituído. Neste momento, a prioridade operacional volta para Fontes e Conectores até esse módulo ficar realmente completo.
+
+- Fontes e Conectores C1 está funcional como setup local via CSV.
+- O módulo ainda não está completo porque faltam conexões reais com os CRMs.
+- O próximo trabalho deve acontecer em sub-recortes pequenos de Fontes e Conectores C2.
+- O primeiro CRM real provável para esse caminho é HubSpot.
+- A sequência futura deve começar por modelo técnico de conexão real e teste real de conexão.
+- Persistência segura, sync e writeback ficam para depois que leitura e conexão real estiverem estáveis.
+- As demais etapas do setup não devem ser priorizadas antes dessa frente ficar melhor definida.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
