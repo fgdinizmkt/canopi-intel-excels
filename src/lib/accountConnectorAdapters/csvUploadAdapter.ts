@@ -6,7 +6,7 @@ export const csvUploadAdapter: AccountConnectorAdapterDefinition = {
   authType: 'none',
   priorityObjectsForFirstTest: ['batch_record'],
   futureObjectsPlanned: [],
-  minimumExpectedFields: ['row_index', 'empresa', 'website', 'base_legal'],
+  minimumExpectedFields: ['row_index', 'account_name', 'domain', 'base_legal'],
   supportsCustomFields: true,
   requiredScopes: [],
   optionalScopes: [],

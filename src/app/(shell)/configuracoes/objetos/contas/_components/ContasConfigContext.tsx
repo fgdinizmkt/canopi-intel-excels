@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   type ConnectorType, 
   type FieldMapping,
@@ -12,6 +12,7 @@ import {
   buildInitialRealConnectionContract,
 } from '@/src/lib/accountConnectionModel';
 import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
+import type { CsvUploadMeta } from '@/src/lib/parseCsvLocal';
 
 // --- SESSION PERSISTENCE ---
 
@@ -97,7 +98,9 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   }
 
   // 3. LGPD_LEGAL_BASIS_MISSING
-  const requiresLgpd = selectedConnector === 'csv_upload' || (preset?.lgpdRisk === 'high');
+  const requiresLgpd = (selectedConnector
+    ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload'
+    : false) || (preset?.lgpdRisk === 'high');
   if (requiresLgpd && !baseLegal) {
       list.push({
         id: 'LGPD_LEGAL_BASIS_MISSING',
@@ -181,7 +184,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
 
 interface ContasConfigContextType {
   selectedConnector: ConnectorType | null;
-  setConnector: (type: ConnectorType) => void;
+  setConnector: (type: ConnectorType | null) => void;
   conta: {
     connectorType: ConnectorType | null;
     nativeObject: string;
@@ -199,6 +202,13 @@ interface ContasConfigContextType {
   updateCustomConfig: (updates: any) => void;
   isSaving: boolean;
   save: () => Promise<void>;
+  registerLocalSourceSaveHandler: (handler: (() => void) | null) => void;
+  canSaveLocalSourceSetup: boolean;
+  setCanSaveLocalSourceSetup: (val: boolean) => void;
+  canConcludeLocalSetup: boolean;
+  accountSourcesStepCompleted: boolean;
+  setAccountSourcesStepCompleted: (val: boolean) => void;
+  completeLocalSetup: () => void;
   blockers: AccountConfigBlocker[];
   stepStatus: ContasConfigStepStatus[];
   readinessScore: number;
@@ -208,6 +218,7 @@ interface ContasConfigContextType {
   customConfig: any;
   connectorLocalValidated: boolean;
   setConnectorLocalValidated: (val: boolean) => void;
+  csvUploadMeta: CsvUploadMeta | null;
   canonicalMapping: FieldMapping[];
   canonicalMappingReviewed: boolean;
   updateCanonicalMappingField: (canonicalField: string, updates: Partial<FieldMapping>) => void;
@@ -242,42 +253,115 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     customWritebackTargets: [] as string[],
     customConfidence: 0,
     connectorLocalValidated: false,
+    accountSourcesStepCompleted: false,
+    localSourceSavedAt: null as string | null,
+    localContractValidatedAt: null as string | null,
+    accountSourcesStepCompletedAt: null as string | null,
     localSourceConfig: undefined as Record<string, unknown> | undefined,
     localSourceConfigByProvider: {} as Record<string, unknown>,
+    inputMethodByProvider: {} as Record<string, 'csv_upload'>,
+    csvUploadMeta: null as CsvUploadMeta | null,
+    csvUploadMetaByProvider: {} as Record<string, CsvUploadMeta | null>,
+    connectorLocalValidatedByProvider: {} as Record<string, boolean>,
+    accountSourcesStepCompletedByProvider: {} as Record<string, boolean>,
+    localSourceSavedAtByProvider: {} as Record<string, string | null>,
+    localContractValidatedAtByProvider: {} as Record<string, string | null>,
+    accountSourcesStepCompletedAtByProvider: {} as Record<string, string | null>,
   };
 
   const [customConfig, setCustomConfig] = useState(() => {
     const session = loadSession();
     return session?.customConfig ? { ...DEFAULT_CUSTOM_CONFIG, ...session.customConfig } : DEFAULT_CUSTOM_CONFIG;
   });
+  const [localSourceSaveHandler, setLocalSourceSaveHandler] = useState<(() => void) | null>(null);
+  const [canSaveLocalSourceSetup, setCanSaveLocalSourceSetup] = useState(false);
 
-  const setConnector = (type: ConnectorType) => {
+  const setConnector = (type: ConnectorType | null) => {
     setSelectedConnector(type);
+    if (!type) {
+      setCustomConfig((prev: any) => ({
+        ...prev,
+        csvUploadMeta: null,
+        accountSourcesStepCompleted: false,
+        localSourceSavedAt: null,
+        localContractValidatedAt: null,
+        accountSourcesStepCompletedAt: null,
+        connectorLocalValidated: false,
+      }));
+      return;
+    }
+
     const preset = CONNECTOR_PRESETS[type];
-    setCustomConfig((prev: any) => ({
-      ...prev,
-      fieldMappings: preset?.fieldMappings || [],
-      canonicalMapping: preset?.fieldMappings || [],
-      canonicalMappingReviewed: false,
-      primaryKeys: preset?.identity ? [preset.identity.nativePrimaryKey] : [],
-      customName: type === 'other_crm' ? '' : (preset?.name || ''),
-      customNativeObject: type === 'other_crm' ? '' : (preset?.nativeObject || ''),
-      customPrimaryKey: type === 'other_crm' ? '' : (preset?.identity.nativePrimaryKey || ''),
-      customSecondaryKeys: type === 'other_crm' ? [] : (preset?.identity.nativeSecondaryKeys || []),
-      customRequiredFields: type === 'other_crm' ? [] : (preset?.requiredFields || []),
-      customConflictPolicy: type === 'other_crm' ? 'manual_review' : (preset?.conflictPolicy || 'manual_review'),
-      customSupportsWriteback: type === 'other_crm' ? false : (preset?.supportsWriteback || false),
-      customWritebackTargets: type === 'other_crm' ? [] : (preset?.writebackTargets || []),
-      customConfidence: type === 'other_crm' ? 0 : (preset?.identity.confidenceScore || 0),
-      writebackEnabled: false,
-      writebackTarget: type === 'other_crm' ? '' : (preset?.writebackTargets?.[0] || ''),
-      connectorLocalValidated: false,
-    }));
+    setCustomConfig((prev: any) => {
+      const inputMethodByProvider = {
+        ...(prev.inputMethodByProvider || {}),
+        [type]: (prev.inputMethodByProvider?.[type] || 'csv_upload'),
+      };
+      const connectorLocalValidatedByProvider = {
+        ...(prev.connectorLocalValidatedByProvider || {}),
+        [type]: prev.connectorLocalValidatedByProvider?.[type] ?? false,
+      };
+      const accountSourcesStepCompletedByProvider = {
+        ...(prev.accountSourcesStepCompletedByProvider || {}),
+        [type]: prev.accountSourcesStepCompletedByProvider?.[type] ?? false,
+      };
+      const localSourceSavedAtByProvider = {
+        ...(prev.localSourceSavedAtByProvider || {}),
+        [type]: prev.localSourceSavedAtByProvider?.[type] ?? null,
+      };
+      const localContractValidatedAtByProvider = {
+        ...(prev.localContractValidatedAtByProvider || {}),
+        [type]: prev.localContractValidatedAtByProvider?.[type] ?? null,
+      };
+      const accountSourcesStepCompletedAtByProvider = {
+        ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+        [type]: prev.accountSourcesStepCompletedAtByProvider?.[type] ?? null,
+      };
+      const csvUploadMetaByProvider = {
+        ...(prev.csvUploadMetaByProvider || {}),
+        [type]: prev.csvUploadMetaByProvider?.[type] ?? null,
+      };
+      return {
+        ...prev,
+        inputMethodByProvider,
+        csvUploadMetaByProvider,
+        connectorLocalValidatedByProvider,
+        accountSourcesStepCompletedByProvider,
+        localSourceSavedAtByProvider,
+        localContractValidatedAtByProvider,
+        accountSourcesStepCompletedAtByProvider,
+        csvUploadMeta: csvUploadMetaByProvider[type] ?? null,
+        accountSourcesStepCompleted: accountSourcesStepCompletedByProvider[type] ?? false,
+        localSourceSavedAt: localSourceSavedAtByProvider[type] ?? null,
+        localContractValidatedAt: localContractValidatedAtByProvider[type] ?? null,
+        accountSourcesStepCompletedAt: accountSourcesStepCompletedAtByProvider[type] ?? null,
+        fieldMappings: preset?.fieldMappings || [],
+        canonicalMapping: preset?.fieldMappings || [],
+        canonicalMappingReviewed: false,
+        primaryKeys: preset?.identity ? [preset.identity.nativePrimaryKey] : [],
+        customName: type === 'other_crm' ? '' : (preset?.name || ''),
+        customNativeObject: type === 'other_crm' ? '' : (preset?.nativeObject || ''),
+        customPrimaryKey: type === 'other_crm' ? '' : (preset?.identity.nativePrimaryKey || ''),
+        customSecondaryKeys: type === 'other_crm' ? [] : (preset?.identity.nativeSecondaryKeys || []),
+        customRequiredFields: type === 'other_crm' ? [] : (preset?.requiredFields || []),
+        customConflictPolicy: type === 'other_crm' ? 'manual_review' : (preset?.conflictPolicy || 'manual_review'),
+        customSupportsWriteback: type === 'other_crm' ? false : (preset?.supportsWriteback || false),
+        customWritebackTargets: type === 'other_crm' ? [] : (preset?.writebackTargets || []),
+        customConfidence: type === 'other_crm' ? 0 : (preset?.identity.confidenceScore || 0),
+        writebackEnabled: false,
+        writebackTarget: type === 'other_crm' ? '' : (preset?.writebackTargets?.[0] || ''),
+        connectorLocalValidated: connectorLocalValidatedByProvider[type] ?? false,
+      };
+    });
   };
 
-  const updateCustomConfig = (updates: any) => {
-    setCustomConfig(prev => ({ ...prev, ...updates }));
-  };
+  const updateCustomConfig = useCallback((updates: any) => {
+    setCustomConfig(prev => (typeof updates === 'function' ? updates(prev) : { ...prev, ...updates }));
+  }, []);
+
+  const registerLocalSourceSaveHandler = useCallback((handler: (() => void) | null) => {
+    setLocalSourceSaveHandler(() => handler);
+  }, []);
 
   useEffect(() => {
     try {
@@ -286,7 +370,64 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [selectedConnector, customConfig]);
 
   const connectorLocalValidated = customConfig.connectorLocalValidated ?? false;
-  const setConnectorLocalValidated = (val: boolean) => updateCustomConfig({ connectorLocalValidated: val });
+  const setConnectorLocalValidated = (val: boolean) => {
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      connectorLocalValidated: val,
+      connectorLocalValidatedByProvider: selectedConnector
+        ? {
+            ...(prev.connectorLocalValidatedByProvider || {}),
+            [selectedConnector]: val,
+          }
+        : prev.connectorLocalValidatedByProvider,
+    }));
+  };
+  const accountSourcesStepCompleted = customConfig.accountSourcesStepCompleted ?? false;
+  const setAccountSourcesStepCompleted = (val: boolean) => {
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      accountSourcesStepCompleted: val,
+      accountSourcesStepCompletedByProvider: selectedConnector
+        ? {
+            ...(prev.accountSourcesStepCompletedByProvider || {}),
+            [selectedConnector]: val,
+          }
+        : prev.accountSourcesStepCompletedByProvider,
+    }));
+  };
+  const completeLocalSetup = useCallback(() => {
+    const now = new Date().toISOString();
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      accountSourcesStepCompleted: true,
+      accountSourcesStepCompletedAt: now,
+      accountSourcesStepCompletedByProvider: selectedConnector
+        ? {
+            ...(prev.accountSourcesStepCompletedByProvider || {}),
+            [selectedConnector]: true,
+          }
+        : prev.accountSourcesStepCompletedByProvider,
+      accountSourcesStepCompletedAtByProvider: selectedConnector
+        ? {
+            ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+            [selectedConnector]: now,
+          }
+        : prev.accountSourcesStepCompletedAtByProvider,
+    }));
+  }, [selectedConnector, updateCustomConfig]);
+
+  useEffect(() => {
+    if (!selectedConnector) return;
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      connectorLocalValidated: prev.connectorLocalValidatedByProvider?.[selectedConnector] ?? false,
+      accountSourcesStepCompleted: prev.accountSourcesStepCompletedByProvider?.[selectedConnector] ?? false,
+      localSourceSavedAt: prev.localSourceSavedAtByProvider?.[selectedConnector] ?? null,
+      localContractValidatedAt: prev.localContractValidatedAtByProvider?.[selectedConnector] ?? null,
+      accountSourcesStepCompletedAt: prev.accountSourcesStepCompletedAtByProvider?.[selectedConnector] ?? null,
+      csvUploadMeta: prev.csvUploadMetaByProvider?.[selectedConnector] ?? null,
+    }));
+  }, [selectedConnector, updateCustomConfig]);
 
   const resolvedCanonicalMapping = useMemo(() => {
     const presetMappings = selectedConnector ? (CONNECTOR_PRESETS[selectedConnector]?.fieldMappings || []) : [];
@@ -364,6 +505,13 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const canPublish = useMemo(() => {
     return blockers.filter(b => b.severity === 'hard').length === 0;
   }, [blockers]);
+  const canConcludeLocalSetup = useMemo(() => {
+    if (!selectedConnector || !connectorLocalValidated || accountSourcesStepCompleted) return false;
+    if (customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload') {
+      return customConfig.csvUploadMeta?.validationResult?.isValid === true;
+    }
+    return true;
+  }, [accountSourcesStepCompleted, connectorLocalValidated, customConfig.csvUploadMeta, customConfig.inputMethodByProvider, selectedConnector]);
 
   const stepStatus = useMemo<ContasConfigStepStatus[]>(() => {
     const blockerMap = new Map<string, AccountConfigBlocker[]>();
@@ -381,7 +529,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const hasCanonicalMinimum =
       hasConnector &&
       CONTA_CANONICAL_FIELDS_MINIMUM.every((field) => mappedCanonicalFields.includes(field));
-    const requiresLgpd = selectedConnector === 'csv_upload' || (selectedConnector ? CONNECTOR_PRESETS[selectedConnector]?.lgpdRisk === 'high' : false);
+    const requiresLgpd = (selectedConnector ? CONNECTOR_PRESETS[selectedConnector]?.lgpdRisk === 'high' : false)
+      || (selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload' : false);
     const hasClassifiableMappings = hasCanonicalMinimum && conta.fieldMappings.some((mapping) => mapping.isClassification);
     const canReviewWriteback = hasCanonicalMinimum && hasClassifiableMappings;
 
@@ -496,7 +645,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         blockers,
       },
     ];
-  }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, selectedConnector]);
+  }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, customConfig.inputMethodByProvider, selectedConnector]);
 
   const realConnectionContract = useMemo<AccountRealConnectionContract | null>(() => {
     if (!selectedConnector) return null;
@@ -508,6 +657,15 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [selectedConnector, connectorLocalValidated]);
 
   const save = async () => {
+    if (localSourceSaveHandler) {
+      setIsSaving(true);
+      try {
+        localSourceSaveHandler();
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
     setIsSaving(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSaving(false);
@@ -521,6 +679,13 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       updateCustomConfig,
       isSaving,
       save,
+      registerLocalSourceSaveHandler,
+      canSaveLocalSourceSetup,
+      setCanSaveLocalSourceSetup,
+      canConcludeLocalSetup,
+      accountSourcesStepCompleted,
+      setAccountSourcesStepCompleted,
+      completeLocalSetup,
       blockers,
       stepStatus,
       readinessScore,
@@ -530,6 +695,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       customConfig,
       connectorLocalValidated,
       setConnectorLocalValidated,
+      csvUploadMeta: (customConfig.csvUploadMeta ?? null) as CsvUploadMeta | null,
       canonicalMapping: resolvedCanonicalMapping,
       canonicalMappingReviewed,
       updateCanonicalMappingField,

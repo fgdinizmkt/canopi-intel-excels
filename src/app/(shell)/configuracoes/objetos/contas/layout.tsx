@@ -10,7 +10,29 @@ import { Badge } from '@/src/components/ui';
 import { ContasConfigProvider, useContasConfig } from './_components/ContasConfigContext';
 
 function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
-  const { isSaving, canPublish, readinessScore, save } = useContasConfig();
+  const {
+    isSaving,
+    canSaveLocalSourceSetup,
+    canConcludeLocalSetup,
+    readinessScore,
+    save,
+    accountSourcesStepCompleted,
+    completeLocalSetup,
+    connectorLocalValidated,
+    selectedConnector,
+    customConfig,
+  } = useContasConfig();
+  const isCsv = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload' : false;
+  const topSaveLabel = !selectedConnector
+    ? 'Selecionar fonte'
+    : accountSourcesStepCompleted
+      ? 'Configuração concluída'
+      : connectorLocalValidated
+        ? 'Configuração salva'
+        : canSaveLocalSourceSetup
+          ? 'Salvar configuração'
+          : 'Configuração já salva';
+  const topSaveDisabled = isSaving || !selectedConnector || accountSourcesStepCompleted || !canSaveLocalSourceSetup;
   
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -46,18 +68,19 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
              </div>
              <button 
               onClick={save}
-              disabled={isSaving}
+              disabled={topSaveDisabled}
               className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-slate-200 hover:scale-105 active:scale-95 disabled:opacity-50"
              >
-                {isSaving ? 'Salvando...' : <><Save className="w-4 h-4" /> Salvar Alterações</>}
+                {isSaving ? 'Salvando...' : topSaveLabel === 'Selecionar fonte' ? topSaveLabel : topSaveLabel === 'Configuração concluída' ? topSaveLabel : topSaveLabel === 'Configuração salva' ? topSaveLabel : <><Save className="w-4 h-4" /> {topSaveLabel}</>}
              </button>
              <button 
-              disabled={!canPublish}
+              disabled={!canConcludeLocalSetup}
+              onClick={completeLocalSetup}
               className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 ${
-                canPublish ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
+                canConcludeLocalSetup ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
               }`}
              >
-                Concluir etapa local
+                {accountSourcesStepCompleted ? (isCsv ? 'Configuração concluída' : 'Etapa local registrada') : (isCsv ? 'Concluir configuração' : 'Concluir etapa local')}
              </button>
           </div>
         </div>
