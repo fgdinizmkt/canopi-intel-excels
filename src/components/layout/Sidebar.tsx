@@ -21,6 +21,7 @@ import {
   LogOut,
   Activity
 } from 'lucide-react';
+import { clearCanopiAuthClient } from '@/src/lib/canopiAuth';
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -52,8 +53,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    localStorage.removeItem('canopi_auth');
-    router.push('/login');
+    clearCanopiAuthClient();
+    window.location.assign('/logout');
   };
 
   const mainItems = [

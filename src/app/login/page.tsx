@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Mail, Lock, LogIn, ArrowRight, Github, Chrome, Apple, AlertCircle } from 'lucide-react';
+import { setCanopiAuthClient } from '@/src/lib/canopiAuth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function LoginPage() {
       }
 
       if (username === validUsername && password === validPassword) {
-        localStorage.setItem('canopi_auth', 'true');
+        setCanopiAuthClient(true);
         router.push('/');
       } else {
         setError(`Credenciais inválidas. Tente ${validUsername} / ${validPassword}`);
