@@ -92,6 +92,18 @@ Upload e LGPD recebe base legal, responsável pela carga, consentimento, rastrea
 
 Conexões reais recebem OAuth, token/API, refresh token, callback, status de sync, escopos, revogação, segurança e armazenamento de credenciais. Essa responsabilidade não pertence ao Patch A.
 
+## 6.1 Protocolo operacional local
+
+Para validar Contas V2 sem corromper o runtime local do Next:
+
+- a porta oficial de validação manual é `127.0.0.1:3053`;
+- antes de abrir a UI, rodar `npm run dev:check`;
+- para iniciar a interface limpa, rodar `npm run dev:clean`;
+- `next start` não deve ser usado para validação manual;
+- `npm run build` nunca deve rodar enquanto `next dev` estiver ativo;
+- se surgir `Cannot find module`, `_document.js`, `clientReferenceManifest` ou `routes-manifest`, reiniciar pelo fluxo limpo;
+- a validação local deve sempre partir de um runtime único e previsível.
+
 ## 7. Rota de patches
 
 ### Fase 0 — Congelamento operacional
@@ -285,6 +297,66 @@ Limites:
 Próximo passo:
 
 C2 continua sendo o primeiro recorte de conector real prioritário.
+
+### Recorte C2.1 — Upload CSV real no front (parsing local)
+
+Objetivo:
+
+tornar o conector CSV operacional no front-end com upload real de arquivo, parsing local no browser, preview e validação local mínima, sem backend, sem Supabase, sem OAuth, sem sync.
+
+Artefatos criados:
+
+- `src/lib/parseCsvLocal.ts`: funções puras `parseCsvText` e `validateCsvData` — RFC 4180 mínimo, sem dependência externa.
+- `CsvUploadMeta`: interface com `fileName`, `fileSizeBytes`, `headers`, `rowCount`, `previewRows` (máx. 5), `uploadedAt`, `validationResult`.
+
+Comportamento:
+
+- upload via `<input type="file" accept=".csv">`;
+- parsing com `FileReader.readAsText()` usando encoding configurado;
+- `customConfig.csvUploadMeta` persistido em sessionStorage (apenas meta + preview, nunca o CSV inteiro);
+- `canValidateLocally` para `csv_upload` exige `csvUploadMeta.validationResult.isValid === true` além dos campos de configuração;
+- alterar `csvDedupeKey`, `csvRequiredMinimumField`, `csvDelimiter`, `csvEncoding` ou `csvHeaderInFirstLine` invalida o CSV e requer novo upload;
+- `connectorLocalValidated` volta para `false` a qualquer nova mudança.
+
+Validações implementadas:
+
+- erros (bloqueiam validação): `INVALID_EXTENSION`, `EMPTY_FILE`, `NO_HEADERS`, `MISSING_REQUIRED_FIELD`, `MISSING_DEDUPE_KEY`;
+- avisos (não bloqueiam): `LARGE_FILE`, `ROWS_WITHOUT_DEDUPE_KEY`, `DUPLICATE_DEDUPE_KEYS`, `EMPTY_ROWS`.
+
+### Recorte C2.1.1 — Fluxo funcional real da etapa CSV
+
+Objetivo:
+
+transformar a tela Fontes e Conectores em uma página funcional com estados explícitos, evitando aparência de mockup.
+
+Fluxo operacional:
+
+- estado 1: fonte selecionada;
+- estado 2: contrato local editado;
+- estado 3: configuração local salva;
+- estado 4: CSV processado localmente;
+- estado 5: contrato local pronto para validação;
+- estado 6: contrato local validado;
+- estado 7: etapa local concluída.
+
+Diretriz de UI:
+
+- o painel "Próxima ação" concentra a ação principal da etapa;
+- salvar, validar e concluir exibem feedback persistente com timestamp local;
+- edição posterior volta o contrato para pendente;
+- a seção de revisão continua como espelho da ação principal, não como badge decorativo;
+- o fluxo continua sem OAuth/token/API/sync real e sem backend.
+
+Limites do recorte:
+
+- sem envio de dados ao backend;
+- sem Supabase;
+- sem OAuth/token/API/sync real;
+- arquivo CSV completo não é armazenado em sessionStorage.
+
+Próximo recorte após C2.1:
+
+C2.2 — ingestão real do CSV para Supabase (fora do escopo desta frente de setup local).
 
 ### Fase C — Identidade e Dedupe real
 
