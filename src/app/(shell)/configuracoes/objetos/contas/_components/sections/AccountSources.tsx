@@ -24,7 +24,15 @@ import type {
   AccountSchemaProperty,
   AccountSchemaSuggestedMapping,
 } from '@/src/lib/accountConnectionModel';
-import { parseCsvText, validateCsvData, type CsvParseProgress, type CsvUploadMeta } from '@/src/lib/parseCsvLocal';
+import {
+  analyzeCsvSchema,
+  parseCsvText,
+  validateCsvData,
+  type CsvParseProgress,
+  type CsvSchemaAnalysis,
+  type CsvSchemaQualityLevel,
+  type CsvUploadMeta,
+} from '@/src/lib/parseCsvLocal';
 
 interface LocalSourceConfig {
   sourceName: string;
@@ -282,6 +290,28 @@ function getHubspotSessionStateTone(state: HubspotSessionState): 'neutral' | 'in
       return 'danger';
     default:
       return 'neutral';
+  }
+}
+
+function getCsvSchemaQualityLabel(level: CsvSchemaQualityLevel): string {
+  switch (level) {
+    case 'alta':
+      return 'Alta';
+    case 'média':
+      return 'Média';
+    default:
+      return 'Baixa';
+  }
+}
+
+function getCsvSchemaTone(level: CsvSchemaQualityLevel): 'neutral' | 'info' | 'warning' | 'danger' | 'success' {
+  switch (level) {
+    case 'alta':
+      return 'success';
+    case 'média':
+      return 'warning';
+    default:
+      return 'danger';
   }
 }
 
@@ -828,6 +858,10 @@ export function AccountSources() {
             dedupeKey: draftConfig.csvDedupeKey || '',
           }
         );
+        const schemaAnalysis = analyzeCsvSchema(parsed, {
+          requiredMinimumField: draftConfig.csvRequiredMinimumField || '',
+          dedupeKey: draftConfig.csvDedupeKey || '',
+        });
 
         if (finished || runId !== csvProcessingRunIdRef.current) return;
         setCsvProcessingState({
@@ -847,6 +881,7 @@ export function AccountSources() {
           previewRows,
           uploadedAt: new Date().toISOString(),
           validationResult: validation,
+          schemaAnalysis,
         };
 
         updateCustomConfig((prev: any) => ({
@@ -1589,6 +1624,7 @@ export function AccountSources() {
   const csvHeaders = csvUploadMeta?.headers ?? [];
   const csvHasPreviewRows = csvPreviewRows.length > 0;
   const csvValidationErrors = csvUploadMeta?.validationResult?.errors ?? [];
+  const csvSchemaAnalysis: CsvSchemaAnalysis | null = csvUploadMeta?.schemaAnalysis ?? null;
   const csvHasValidationErrors = csvValidationErrors.length > 0;
   const csvProcessingErrorMessage = csvProcessingState?.phase === 'error' ? csvProcessingState.message : null;
   const csvPrimaryAction = sourceAction;
@@ -1906,6 +1942,164 @@ export function AccountSources() {
                       <span>{err.message}</span>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {csvSchemaAnalysis && (
+                <div className="space-y-4 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
+                  <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Read-only</span>
+                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Pré-mapeamento local</span>
+                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem sync</span>
+                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem importação</span>
+                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Não aplica Camada Canônica</span>
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-600">Schema local e pré-mapeamento CSV</p>
+                      <h4 className="text-xl font-black tracking-tight text-slate-900">Analise os headers detectados e a qualidade mínima da base</h4>
+                      <p className="max-w-3xl text-sm font-medium text-slate-600">
+                        Análise local dos headers do arquivo. Não aplica Camada Canônica, não importa dados e não cria mapeamento definitivo.
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-col gap-2">
+                      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                        getCsvSchemaTone(csvSchemaAnalysis.qualityLevel) === 'success'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : getCsvSchemaTone(csvSchemaAnalysis.qualityLevel) === 'warning'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-red-100 text-red-700'
+                      }`}>
+                        Qualidade {getCsvSchemaQualityLabel(csvSchemaAnalysis.qualityLevel)}
+                      </span>
+                      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                        getCsvSchemaTone(csvSchemaAnalysis.mappingConfidence) === 'success'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : getCsvSchemaTone(csvSchemaAnalysis.mappingConfidence) === 'warning'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-red-100 text-red-700'
+                      }`}>
+                        Confiança {getCsvSchemaQualityLabel(csvSchemaAnalysis.mappingConfidence)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                    <div className="rounded-xl border border-violet-100 bg-white p-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Headers detectados</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.totalHeaders.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div className="rounded-xl border border-violet-100 bg-white p-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.detectedRecommendedFields.length.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div className="rounded-xl border border-violet-100 bg-white p-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.missingRecommendedFields.length.toLocaleString('pt-BR')}</p>
+                    </div>
+                    <div className="rounded-xl border border-violet-100 bg-white p-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Confiança do pré-mapeamento</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">{getCsvSchemaQualityLabel(csvSchemaAnalysis.mappingConfidence)}</p>
+                    </div>
+                    <div className="rounded-xl border border-violet-100 bg-white p-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Qualidade da base</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.qualityScore}/100</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+                    <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white">
+                      <div className="border-b border-violet-50 bg-violet-50/60 px-4 py-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200">
+                          <thead className="bg-slate-50">
+                            <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                              <th className="px-4 py-3">Campo CSV</th>
+                              <th className="px-4 py-3">Campo sugerido Canopi</th>
+                              <th className="px-4 py-3">Confiança</th>
+                              <th className="px-4 py-3">Motivo</th>
+                              <th className="px-4 py-3">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 bg-white">
+                            {csvSchemaAnalysis.suggestedMappings.map((mapping) => (
+                              <tr key={`${mapping.canopiField}-${mapping.csvField || 'missing'}`} className="text-sm text-slate-700">
+                                <td className="px-4 py-3 font-semibold text-slate-900">{mapping.csvField || '—'}</td>
+                                <td className="px-4 py-3">
+                                  <div className="font-semibold text-slate-900">{mapping.canopiField}</div>
+                                  <div className="text-xs text-slate-500">{mapping.canopiLabel}</div>
+                                </td>
+                                <td className="px-4 py-3 capitalize">{getCsvSchemaQualityLabel(mapping.confidence)}</td>
+                                <td className="px-4 py-3 text-slate-600">{mapping.reason}</td>
+                                <td className="px-4 py-3">
+                                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                    mapping.status === 'encontrado'
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-amber-100 text-amber-700'
+                                  }`}>
+                                    {mapping.status === 'encontrado' ? 'Encontrado' : 'Ausente'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="rounded-2xl border border-violet-100 bg-white p-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos ausentes</p>
+                        <p className="mt-1 text-sm font-medium text-slate-600">Campos recomendados que ainda não apareceram no schema detectado.</p>
+                        <div className="mt-3 space-y-2">
+                          {csvSchemaAnalysis.missingRecommendedFields.length > 0 ? csvSchemaAnalysis.missingRecommendedFields.map((mapping) => (
+                            <div key={`${mapping.canopiField}-missing`} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                              <p className="text-sm font-black text-slate-900">{mapping.canopiField}</p>
+                              <p className="text-xs text-slate-600">{mapping.canopiLabel}</p>
+                            </div>
+                          )) : (
+                            <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+                              <p className="text-sm font-black text-emerald-800">Nenhuma lacuna nas recomendações iniciais.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-violet-100 bg-white p-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Avisos de qualidade</p>
+                        <p className="mt-1 text-sm font-medium text-slate-600">Leitura local da qualidade da base e do dedupe.</p>
+                        <div className="mt-3 space-y-2">
+                          {csvSchemaAnalysis.warnings.length > 0 ? csvSchemaAnalysis.warnings.map((warning) => (
+                            <div key={warning} className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+                              <p className="text-xs font-medium text-amber-800">{warning}</p>
+                            </div>
+                          )) : (
+                            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                              <p className="text-sm font-black text-slate-800">Nenhum aviso relevante detectado.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-violet-100 bg-white p-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos extras</p>
+                        <p className="mt-1 text-sm font-medium text-slate-600">Headers presentes no arquivo, mas não usados no pré-mapeamento local.</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {csvSchemaAnalysis.extraHeaders.length > 0 ? csvSchemaAnalysis.extraHeaders.map((header) => (
+                            <span key={header} className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                              {header}
+                            </span>
+                          )) : (
+                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                              Nenhum campo extra relevante
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

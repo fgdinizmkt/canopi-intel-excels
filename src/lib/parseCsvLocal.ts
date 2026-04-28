@@ -36,6 +36,289 @@ export interface CsvUploadMeta {
   previewRows: Record<string, string>[];
   uploadedAt: string;
   validationResult: CsvValidationResult | null;
+  schemaAnalysis?: CsvSchemaAnalysis | null;
+}
+
+export type CsvSchemaQualityLevel = 'alta' | 'média' | 'baixa';
+
+export interface CsvSchemaRecommendation {
+  csvField: string;
+  canopiField: string;
+  canopiLabel: string;
+  confidence: CsvSchemaQualityLevel;
+  reason: string;
+  status: 'encontrado' | 'ausente';
+}
+
+export interface CsvSchemaAnalysis {
+  totalHeaders: number;
+  detectedRecommendedFields: CsvSchemaRecommendation[];
+  missingRecommendedFields: CsvSchemaRecommendation[];
+  extraHeaders: string[];
+  suggestedMappings: CsvSchemaRecommendation[];
+  qualityScore: number;
+  qualityLevel: CsvSchemaQualityLevel;
+  mappingConfidence: CsvSchemaQualityLevel;
+  warnings: string[];
+}
+
+interface CsvSchemaFieldDefinition {
+  canopiField: string;
+  canopiLabel: string;
+  aliases: string[];
+}
+
+const CSV_SCHEMA_EXACT_ONLY_ALIASES = new Set(['id']);
+
+const CSV_SCHEMA_FIELD_DEFINITIONS: CsvSchemaFieldDefinition[] = [
+  {
+    canopiField: 'externalAccountId',
+    canopiLabel: 'ID externo da conta',
+    aliases: ['id', 'account_id', 'company_id', 'hs_object_id'],
+  },
+  {
+    canopiField: 'accountName',
+    canopiLabel: 'Nome da conta',
+    aliases: ['name', 'company', 'empresa', 'account_name', 'razao_social', 'razão_social'],
+  },
+  {
+    canopiField: 'accountDomain',
+    canopiLabel: 'Domínio da conta',
+    aliases: ['domain', 'website', 'site', 'dominio', 'domínio'],
+  },
+  {
+    canopiField: 'accountIndustry',
+    canopiLabel: 'Setor',
+    aliases: ['industry', 'setor', 'segmento', 'vertical'],
+  },
+  {
+    canopiField: 'accountCountry',
+    canopiLabel: 'País',
+    aliases: ['country', 'pais', 'país', 'country_code'],
+  },
+  {
+    canopiField: 'externalOwnerId',
+    canopiLabel: 'Owner externo',
+    aliases: ['owner', 'owner_id', 'hubspot_owner_id', 'responsavel', 'responsável'],
+  },
+  {
+    canopiField: 'externalCreatedAt',
+    canopiLabel: 'Criado em',
+    aliases: ['created_at', 'createdate', 'created_date', 'hs_createdate'],
+  },
+  {
+    canopiField: 'externalUpdatedAt',
+    canopiLabel: 'Atualizado em',
+    aliases: ['updated_at', 'lastmodifieddate', 'updated_date', 'hs_lastmodifieddate'],
+  },
+];
+
+function normalizeSchemaToken(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function scoreSchemaMatch(header: string, aliases: string[]): { confidence: CsvSchemaQualityLevel; reason: string; score: number } {
+  const normalizedHeader = normalizeSchemaToken(header);
+  let bestScore = 0;
+  let bestReason = 'Nenhuma correspondência forte.';
+
+  aliases.forEach((alias) => {
+    const normalizedAlias = normalizeSchemaToken(alias);
+    if (!normalizedHeader || !normalizedAlias) return;
+    if (normalizedHeader === 'id' && normalizedAlias !== 'id') return;
+
+    const headerTokens = new Set(normalizedHeader.split('_').filter(Boolean));
+    const aliasTokens = new Set(normalizedAlias.split('_').filter(Boolean));
+    const sharedTokens = [...headerTokens].filter((token) => aliasTokens.has(token)).length;
+    const sharedSpecificTokens = [...headerTokens].filter(
+      (token) => aliasTokens.has(token) && token.length > 3 && token !== 'id'
+    ).length;
+    const allowsSubstringMatch = normalizedAlias.length > 3;
+    const exactOnlyAlias = CSV_SCHEMA_EXACT_ONLY_ALIASES.has(normalizedAlias);
+
+    let score = 0;
+    if (normalizedHeader === normalizedAlias) {
+      score = 3;
+    } else if (
+      !exactOnlyAlias &&
+      allowsSubstringMatch &&
+      (normalizedHeader.includes(normalizedAlias) || normalizedAlias.includes(normalizedHeader))
+    ) {
+      score = 2;
+    } else if (!exactOnlyAlias && sharedSpecificTokens > 0) {
+      score = 1;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestReason = score === 3
+        ? `Correspondência forte com o cabeçalho "${header}".`
+        : score === 2
+          ? `Correspondência semântica com o cabeçalho "${header}".`
+          : `Inferência fraca a partir do cabeçalho "${header}".`;
+    }
+  });
+
+  const confidence: CsvSchemaQualityLevel = bestScore === 3 ? 'alta' : bestScore === 2 ? 'média' : bestScore === 1 ? 'baixa' : 'baixa';
+  return { confidence, reason: bestReason, score: bestScore };
+}
+
+function buildSchemaRecommendation(
+  definition: CsvSchemaFieldDefinition,
+  headers: string[]
+): CsvSchemaRecommendation {
+  let bestHeader = '';
+  let bestScore = 0;
+  let bestMatch = scoreSchemaMatch('', []);
+
+  headers.forEach((header) => {
+    const match = scoreSchemaMatch(header, definition.aliases);
+    if (match.score > bestScore) {
+      bestScore = match.score;
+      bestHeader = match.score > 0 ? header : bestHeader;
+      bestMatch = match;
+    }
+  });
+
+  if (bestScore > 0 && bestHeader) {
+    return {
+      csvField: bestHeader,
+      canopiField: definition.canopiField,
+      canopiLabel: definition.canopiLabel,
+      confidence: bestMatch.confidence,
+      reason: bestMatch.reason,
+      status: 'encontrado',
+    };
+  }
+
+  return {
+    csvField: '',
+    canopiField: definition.canopiField,
+    canopiLabel: definition.canopiLabel,
+    confidence: 'baixa',
+    reason: 'Nenhum cabeçalho compatível foi encontrado.',
+    status: 'ausente',
+  };
+}
+
+export function analyzeCsvSchema(
+  parsed: ParsedCsv,
+  options: {
+    requiredMinimumField: string;
+    dedupeKey: string;
+  }
+): CsvSchemaAnalysis {
+  const { requiredMinimumField, dedupeKey } = options;
+  const headers = parsed.headers ?? [];
+  const normalizedHeaders = headers.map((header) => normalizeSchemaToken(header));
+  const recommendations = CSV_SCHEMA_FIELD_DEFINITIONS.map((definition) => buildSchemaRecommendation(definition, headers));
+  const detectedRecommendedFields = recommendations.filter((mapping) => mapping.status === 'encontrado');
+  const missingRecommendedFields = recommendations.filter((mapping) => mapping.status === 'ausente');
+  const extraHeaders = headers.filter((header) => {
+    return !CSV_SCHEMA_FIELD_DEFINITIONS.some((definition) => scoreSchemaMatch(header, definition.aliases).score > 0);
+  });
+
+  const requiredHeader = normalizeSchemaToken(requiredMinimumField);
+  const dedupeHeader = normalizeSchemaToken(dedupeKey);
+  const hasRequiredField = requiredHeader.length > 0
+    ? normalizedHeaders.includes(requiredHeader)
+    : true;
+  const hasDedupeKey = dedupeHeader.length > 0
+    ? normalizedHeaders.includes(dedupeHeader)
+    : true;
+
+  const rowsWithoutDedupeKey = dedupeKey.trim().length > 0
+    ? parsed.rows.filter((row) => {
+      const value = row[dedupeKey.trim()];
+      return !value || value.trim() === '';
+    }).length
+    : 0;
+
+  const duplicateKeyCounts = new Map<string, number>();
+  if (dedupeKey.trim().length > 0) {
+    parsed.rows.forEach((row) => {
+      const value = (row[dedupeKey.trim()] || '').trim();
+      if (!value) return;
+      duplicateKeyCounts.set(value, (duplicateKeyCounts.get(value) || 0) + 1);
+    });
+  }
+  const duplicateDedupeKeys = [...duplicateKeyCounts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([value]) => value);
+
+  let qualityScore = 58;
+  if (headers.length > 0) qualityScore += Math.min(10, headers.length * 2);
+  qualityScore += Math.min(12, detectedRecommendedFields.length * 3);
+  if (hasRequiredField) qualityScore += 14; else qualityScore -= 26;
+  if (hasDedupeKey) qualityScore += 14; else qualityScore -= 22;
+  if (parsed.rows.length > 0 && rowsWithoutDedupeKey > 0) {
+    qualityScore -= Math.min(18, Math.round((rowsWithoutDedupeKey / Math.max(parsed.rows.length, 1)) * 30));
+  }
+  if (duplicateDedupeKeys.length > 0) {
+    qualityScore -= Math.min(16, duplicateDedupeKeys.length * 4);
+  }
+  if (missingRecommendedFields.length > 0) {
+    qualityScore -= Math.min(12, missingRecommendedFields.length * 2);
+  }
+  if (extraHeaders.length > headers.length / 2 && headers.length > 0) {
+    qualityScore -= 5;
+  }
+  if (headers.length === 0) {
+    qualityScore = 0;
+  }
+
+  qualityScore = Math.max(0, Math.min(100, qualityScore));
+
+  const qualityLevel: CsvSchemaQualityLevel = qualityScore >= 80 ? 'alta' : qualityScore >= 55 ? 'média' : 'baixa';
+  const mappingConfidence: CsvSchemaQualityLevel = detectedRecommendedFields.length >= 6 && qualityScore >= 80
+    ? 'alta'
+    : detectedRecommendedFields.length >= 3 || qualityScore >= 55
+      ? 'média'
+      : 'baixa';
+
+  const warnings: string[] = [];
+  if (headers.length === 0) {
+    warnings.push('Nenhum cabeçalho detectado para a análise local do CSV.');
+  }
+  if (!hasRequiredField && normalizeSchemaToken(requiredMinimumField).length > 0) {
+    warnings.push(`Campo obrigatório ausente: "${requiredMinimumField}".`);
+  }
+  if (!hasDedupeKey && normalizeSchemaToken(dedupeKey).length > 0) {
+    warnings.push(`Chave de dedupe ausente ou fraca: "${dedupeKey}".`);
+  }
+  if (rowsWithoutDedupeKey > 0) {
+    warnings.push(`${rowsWithoutDedupeKey} linha(s) sem valor na chave de dedupe "${dedupeKey}".`);
+  }
+  if (duplicateDedupeKeys.length > 0) {
+    warnings.push(`${duplicateDedupeKeys.length} valor(es) duplicado(s) na chave de dedupe "${dedupeKey}".`);
+  }
+  if (missingRecommendedFields.length > 0) {
+    warnings.push(`Campos recomendados ausentes: ${missingRecommendedFields.map((mapping) => mapping.canopiField).join(', ')}.`);
+  }
+  if (extraHeaders.length > 0) {
+    warnings.push(`${extraHeaders.length} cabeçalho(s) extra(s) não mapeado(s) nesta análise local.`);
+  }
+  if (qualityLevel === 'baixa') {
+    warnings.push('Qualidade mínima da base abaixo do ideal para seguir sem revisão.');
+  }
+
+  return {
+    totalHeaders: headers.length,
+    detectedRecommendedFields,
+    missingRecommendedFields,
+    extraHeaders,
+    suggestedMappings: recommendations,
+    qualityScore,
+    qualityLevel,
+    mappingConfidence,
+    warnings,
+  };
 }
 
 // RFC 4180 minimal: respects quoted fields containing the delimiter or newlines.
