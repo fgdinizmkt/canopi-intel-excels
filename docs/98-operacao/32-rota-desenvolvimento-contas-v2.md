@@ -127,6 +127,56 @@ Status: concluído e publicado em `origin/main`.
   - antes, auditar o próximo sub-recorte de Fontes e Conectores;
   - possíveis caminhos: persistência segura, teste com token real, leitura mínima controlada ou desenho de sync futuro.
 
+### Fechamento operacional do C2.2 — HubSpot preview read-only
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit: `8ec4914` — `feat(settings): add HubSpot companies read-only preview`
+- Escopo entregue:
+  - preview read-only de companies do HubSpot;
+  - API route server-side separada para preview;
+  - leitura limitada a até 10 companies;
+  - retorno sanitizado para o front;
+  - campos exibidos: empresa, domínio, setor, país, owner ID e atualizado em;
+  - token temporário mantido apenas em memória da sessão;
+  - token não persistido em `localStorage`, `sessionStorage`, `customConfig` ou Supabase;
+  - separação visual entre teste de conexão e preview;
+  - guardrails visuais: read-only, sem sync, sem importação, token não persistido;
+  - fluxo CSV preservado.
+- Validação real realizada:
+  - token válido HubSpot Private App usado localmente;
+  - conexão real validada;
+  - Hub ID retornado;
+  - escopo `crm.objects.companies.read` confirmado;
+  - preview carregou 10 companies reais;
+  - tabela sanitizada apareceu corretamente na UI.
+- Fora do escopo:
+  - Supabase;
+  - sync real;
+  - writeback;
+  - persistência segura de credenciais;
+  - importação definitiva de companies;
+  - Salesforce real;
+  - RD Station real;
+  - alteração em Auth;
+  - transformação do preview em base canônica.
+- Validações técnicas:
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` sem runtime ativo após limpeza;
+  - stage, commit e push controlados;
+  - `HEAD` local e `origin/main` sincronizados.
+- Ponta solta auditada:
+  - entrada acidental `Explain this codebase` não gerou alteração;
+  - nenhum arquivo novo;
+  - nenhum commit;
+  - nenhum push;
+  - runtime 3053 foi limpo antes do fechamento documental.
+- Próximo passo natural:
+  - não abrir C2.3 automaticamente;
+  - antes, auditar o próximo sub-recorte de Fontes e Conectores;
+  - possíveis caminhos: persistência segura de credenciais, modelo de schema/mapeamento HubSpot, preparação de sync futuro ou governança da transição preview → dados canônicos.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
