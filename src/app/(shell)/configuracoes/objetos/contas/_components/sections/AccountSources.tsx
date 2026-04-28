@@ -68,6 +68,7 @@ interface WorkflowAction {
 
 type CsvFlowState = 'no-file' | 'invalid' | 'dirty' | 'saved' | 'confirmed' | 'completed';
 type HubspotConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error';
+type HubspotPreviewStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface HubspotConnectionTestMeta {
   provider: 'hubspot';
@@ -75,6 +76,17 @@ interface HubspotConnectionTestMeta {
   hubId: string | null;
   scopes: string[];
   readAccessConfirmed: boolean;
+}
+
+interface HubspotCompanyPreview {
+  id: string;
+  name: string | null;
+  domain: string | null;
+  industry: string | null;
+  country: string | null;
+  ownerId: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 interface CsvProcessingState extends CsvParseProgress {
@@ -370,6 +382,10 @@ export function AccountSources() {
   const [hasUnsavedLocalEdit, setHasUnsavedLocalEdit] = React.useState(false);
   const [hubspotPrivateAppToken, setHubspotPrivateAppToken] = React.useState('');
   const [hubspotTesting, setHubspotTesting] = React.useState(false);
+  const [hubspotPreviewStatus, setHubspotPreviewStatus] = React.useState<HubspotPreviewStatus>('idle');
+  const [hubspotPreviewCompanies, setHubspotPreviewCompanies] = React.useState<HubspotCompanyPreview[]>([]);
+  const [hubspotPreviewLoadedAt, setHubspotPreviewLoadedAt] = React.useState<string | null>(null);
+  const [hubspotPreviewError, setHubspotPreviewError] = React.useState<string | null>(null);
 
   // CSV upload local state
   const [isCsvParsing, setIsCsvParsing] = React.useState(false);
@@ -389,6 +405,12 @@ export function AccountSources() {
       csvInputRef.current.value = '';
     }
   }, []);
+  const clearHubspotPreview = React.useCallback(() => {
+    setHubspotPreviewStatus('idle');
+    setHubspotPreviewCompanies([]);
+    setHubspotPreviewLoadedAt(null);
+    setHubspotPreviewError(null);
+  }, []);
   const openCsvPicker = React.useCallback(() => {
     clearCsvInputValue();
     csvInputRef.current?.click();
@@ -398,8 +420,13 @@ export function AccountSources() {
     if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') {
       setHubspotPrivateAppToken('');
       setHubspotTesting(false);
+      clearHubspotPreview();
+      return;
     }
-  }, [selectedConnector, selectedInputMethod]);
+    if (hubspotConnectionTestStatus !== 'success') {
+      clearHubspotPreview();
+    }
+  }, [clearHubspotPreview, hubspotConnectionTestStatus, selectedConnector, selectedInputMethod]);
 
   React.useEffect(() => {
     if (!selectedConnector) {
@@ -1010,7 +1037,6 @@ export function AccountSources() {
       setTestState('success', null, meta);
       setConnectorLocalValidated(true);
       setAccountSourcesStepCompleted(false);
-      setHubspotPrivateAppToken('');
 
       updateCustomConfig((prev: any) => ({
         ...prev,
@@ -1067,6 +1093,71 @@ export function AccountSources() {
       setHubspotTesting(false);
     }
   }, [hubspotPrivateAppToken, selectedConnector, selectedInputMethod, setAccountSourcesStepCompleted, setConnectorLocalValidated, updateCustomConfig]);
+
+  const loadHubspotPreview = React.useCallback(async () => {
+    if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') return;
+    if (hubspotConnectionTestStatus !== 'success') {
+      setHubspotPreviewStatus('error');
+      setHubspotPreviewError('Valide a conexão HubSpot antes de carregar o preview.');
+      setHubspotPreviewCompanies([]);
+      setHubspotPreviewLoadedAt(null);
+      return;
+    }
+
+    const token = hubspotPrivateAppToken.trim();
+    if (!token) {
+      setHubspotPreviewStatus('error');
+      setHubspotPreviewError('Informe o token da Private App para carregar o preview.');
+      setHubspotPreviewCompanies([]);
+      setHubspotPreviewLoadedAt(null);
+      return;
+    }
+
+    setHubspotPreviewStatus('loading');
+    setHubspotPreviewError(null);
+
+    try {
+      const response = await fetch('/api/account-connectors/hubspot/preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        cache: 'no-store',
+        body: JSON.stringify({ tokenKey: token }),
+      });
+
+      const payload = await response.json().catch(() => null) as
+        | {
+          status?: 'success' | 'error';
+          provider?: string;
+          loadedAt?: string;
+          count?: number;
+          companies?: HubspotCompanyPreview[];
+          error?: string;
+        }
+        | null;
+
+      if (!response.ok || payload?.status !== 'success') {
+        const message = payload?.error || 'Não foi possível carregar o preview de companies.';
+        setHubspotPreviewStatus('error');
+        setHubspotPreviewError(message);
+        setHubspotPreviewCompanies([]);
+        setHubspotPreviewLoadedAt(null);
+        return;
+      }
+
+      setHubspotPreviewCompanies(Array.isArray(payload?.companies) ? payload.companies.slice(0, 10) : []);
+      setHubspotPreviewLoadedAt(payload?.loadedAt || new Date().toISOString());
+      setHubspotPreviewStatus('success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível carregar o preview de companies.';
+      setHubspotPreviewStatus('error');
+      setHubspotPreviewError(message);
+      setHubspotPreviewCompanies([]);
+      setHubspotPreviewLoadedAt(null);
+    }
+  }, [hubspotConnectionTestStatus, hubspotPrivateAppToken, selectedConnector, selectedInputMethod]);
 
   const concludeLocalSetupFlow = React.useCallback(() => {
     if (!selectedConnector || !connectorLocalValidated || currentSourceCompleted) return;
@@ -1680,7 +1771,7 @@ export function AccountSources() {
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Orientação</p>
                   <p className="mt-1 text-sm font-medium text-slate-600">
-                    Informe um token temporário apenas para testar a leitura de companies. O token não é salvo em sessionStorage.
+                    Informe um token temporário apenas para testar a leitura de companies. O token não é salvo em sessionStorage nem localStorage.
                   </p>
                 </div>
               </div>
@@ -1744,7 +1835,7 @@ export function AccountSources() {
                       )}
                     </div>
                     <p className="text-xs font-medium text-slate-500">
-                      Teste em {formatActionTimestamp(hubspotConnectionTestMeta.testedAt)}. O token foi descartado da tela após o envio.
+                      Teste em {formatActionTimestamp(hubspotConnectionTestMeta.testedAt)}. O token permanece apenas em memória nesta sessão para permitir o preview read-only.
                     </p>
                   </div>
                 </div>
@@ -1762,6 +1853,112 @@ export function AccountSources() {
                 </div>
               )}
             </div>
+          </div>
+        </Card>
+      )}
+
+      {selectedConnector && activePreset && draftConfig && isHubspotApiInput && hubspotConnectionTestStatus === 'success' && (
+        <Card className="border border-sky-200 bg-sky-50/60 p-5">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Read-only</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Sem sync</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Sem importação</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Token não persistido</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Amostra até 10 companies</span>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-600">Preview read-only do HubSpot</p>
+              <h4 className="text-xl font-black tracking-tight text-slate-900">Carregue uma amostra de companies para validar a leitura</h4>
+              <p className="max-w-3xl text-sm font-medium text-slate-600">
+                Isso não inicia sync, não importa companies e não salva o token. O preview é apenas uma leitura controlada para preparar a próxima etapa técnica.
+              </p>
+            </div>
+
+            <div className="flex shrink-0 flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => void loadHubspotPreview()}
+                disabled={hubspotPreviewStatus === 'loading' || !hubspotPrivateAppToken.trim()}
+                className="rounded-xl bg-sky-700 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+              >
+                {hubspotPreviewStatus === 'loading' ? 'Carregando preview...' : 'Carregar preview de companies'}
+              </button>
+              <p className="text-[11px] font-medium text-slate-500">
+                {hubspotPreviewStatus === 'idle'
+                  ? 'Pronto para carregar uma amostra read-only.'
+                  : hubspotPreviewStatus === 'success'
+                    ? 'Preview carregado e validado na sessão atual.'
+                    : hubspotPreviewStatus === 'error'
+                      ? hubspotPreviewError || 'Revise o token e tente novamente.'
+                      : 'Lendo companies no servidor.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-sky-100 bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Leitura read-only</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {hubspotPreviewStatus === 'success'
+                    ? `Amostra validada em ${formatActionTimestamp(hubspotPreviewLoadedAt) || 'agora'} com ${hubspotPreviewCompanies.length} company(s).`
+                    : hubspotPreviewStatus === 'loading'
+                      ? 'Carregando a amostra de companies.'
+                      : hubspotPreviewStatus === 'error'
+                        ? 'Falha sanitizada na leitura read-only.'
+                        : 'Nenhuma amostra carregada ainda.'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Preview</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Companies</span>
+              </div>
+            </div>
+
+            {hubspotPreviewStatus === 'error' && (
+              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                <p className="text-sm font-black text-red-800">Não foi possível carregar o preview de companies.</p>
+                <p className="mt-1 text-sm text-red-700">{hubspotPreviewError || 'Revise o token e tente novamente.'}</p>
+              </div>
+            )}
+
+            {hubspotPreviewStatus === 'success' && (
+              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-slate-200">
+                    <thead className="bg-slate-50">
+                      <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                        <th className="px-4 py-3">Empresa</th>
+                        <th className="px-4 py-3">Domínio</th>
+                        <th className="px-4 py-3">Setor</th>
+                        <th className="px-4 py-3">País</th>
+                        <th className="px-4 py-3">Owner ID</th>
+                        <th className="px-4 py-3">Atualizado em</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 bg-white">
+                      {hubspotPreviewCompanies.length > 0 ? hubspotPreviewCompanies.map((company) => (
+                        <tr key={company.id} className="text-sm text-slate-700">
+                          <td className="px-4 py-3 font-semibold text-slate-900">{company.name || company.id}</td>
+                          <td className="px-4 py-3">{company.domain || '—'}</td>
+                          <td className="px-4 py-3">{company.industry || '—'}</td>
+                          <td className="px-4 py-3">{company.country || '—'}</td>
+                          <td className="px-4 py-3">{company.ownerId || '—'}</td>
+                          <td className="px-4 py-3">{company.updatedAt ? formatActionTimestamp(company.updatedAt) || company.updatedAt : '—'}</td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-sm font-medium text-slate-500">
+                            Nenhuma company retornada pelo preview read-only.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       )}
