@@ -689,13 +689,13 @@
 | Refinamento Accounts — Subetapas 1–4c | Concluído (2026-04-14) | 8 commits de refinamento progressivo (visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls). Commit final publicado: `8762ae4`. |
 | Contenção de Sistema de Tema | Concluído (2026-04-17) | 3 iterações de dark mode bidirecional falharam; decisão de abandonar escuro e travar plataforma em modo claro permanentemente. ThemeContext neutralizado (sempre isDark: false). Todas as classes dark: removidas do codebase. Seletor de tema removido de /usuario UI. Commit: `6943485`. |
 | Cockpit V2 Foundation Replacement | Concluído (2026-04-19) | Substituição da base legada pela nova fundação integrada ao shell real. Onion chart responsivo, painel contextual unificado e roteamento independente via Pages Router. |
-| Contas V2 — Fase A + B.1 + C1 a C1.3 | Concluído (2026-04-25) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, lapidação visual final. Commits: `219afa2` → `03134ec`. Sem OAuth/token/API real. |
+| Contas V2 — Fase A + B.1 + C1 a C1.3 + C2.1 a C2.4.1 | Concluído (2026-04-28) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, teste real HubSpot, preview read-only, schema discovery, hard reset de sessão e microcopy de método retomado. Commits: `219afa2` → `d8b54b5`. Sem OAuth/token durável/API real persistida/sync/writeback. |
 
 ---
 
 ## Próximo Passo
 
-- **Contas V2 — Próximo recorte:** Decisão sobre C2 (primeiro conector real prioritário). Candidatos: CSV upload real (mais simples, sem OAuth) ou HubSpot Private App Token (conexão real end-to-end).
+- **Contas V2 — Próximo recorte:** `C2.5` provável (não aberto): CSV schema validation e pré-mapeamento local. Manter a frente em Fontes e Conectores; não abrir novo recorte sem autorização explícita do Fábio.
 - **Contas V2 — Fase B.2 pendente:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers. Não altera OAuth nem Supabase.
 - **Cockpit V2:** Refinamento dos recortes analíticos e interativos sobre a nova fundação estabilizada.
 - **Pendência técnica Cockpit:** Monitorar performance do SVG foreignObject em densidades extremas de sinal.

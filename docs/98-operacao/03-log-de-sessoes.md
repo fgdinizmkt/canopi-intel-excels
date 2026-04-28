@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-04-28] — Contas V2 / C2.4.1 (Clareza de método HubSpot retomado da sessão)
+
+- **Natureza:** Sessão de fechamento operacional e ajuste de copy.
+- **Objetivo:** Eliminar a ambiguidade visual do HubSpot Private App quando a sessão é reidratada, deixando claro que o método foi retomado da sessão e que o reset volta à escolha do método.
+- **Contexto:**
+  - C2.4 já havia sido concluído com hard reset da sessão HubSpot.
+  - O método Private App podia reaparecer por reidratação da sessão sem explicitação visual de origem.
+  - O problema era de UX/copy, não de lógica de sessão.
+- **Decisão Técnica:**
+  - adicionar microcopy contextual no card `HubSpot real` do fluxo Private App;
+  - manter o hard reset inalterado;
+  - não tocar em CSV, token, preview, schema, API, Supabase, Auth, Salesforce/RD, Camada Canônica ou Dedupe.
+- **Commit:** `d8b54b5` — `fix(settings): clarify restored HubSpot input method`
+- **Validação:**
+  - push realizado com sucesso;
+  - `HEAD` local e `origin/main` sincronizados;
+  - working tree limpa;
+  - alteração funcional restrita a `AccountSources.tsx` com 3 inserções;
+  - C2.4.1 permanece como ajuste de clareza visual, sem nova capacidade funcional.
+- **Status:** ✅ Concluído e publicado.
+
 ## [2026-04-22] — Saneamento Absoluto Final do Repositório
 
 - **Natureza:** Sessão de limpeza técnica profunda e estabilização de build.

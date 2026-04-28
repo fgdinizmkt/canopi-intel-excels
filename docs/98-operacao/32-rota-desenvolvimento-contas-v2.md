@@ -328,12 +328,21 @@ Status: concluído e publicado em `origin/main`.
   - Ainda não há Supabase, sync ou persistência durável de credenciais.
   - A frente continua sendo Fontes e Conectores 100%.
 - Sequência futura registrada, sem abrir agora:
-  - `C2.4.1` provável: clareza de método HubSpot retomado da sessão.
-    - Objetivo futuro: quando HubSpot reidratar Private App da sessão, deixar claro que o método foi retomado da sessão e que resetar volta à escolha do método.
   - `C2.5` provável: CSV schema validation e pré-mapeamento local.
     - Objetivo futuro: após upload CSV, detectar headers/colunas, validar campos recomendados, apontar lacunas, sugerir pré-mapeamento e mostrar qualidade mínima da base.
-  - Não implementar `C2.4.1` nem `C2.5` neste fechamento.
+  - Não implementar `C2.5` neste fechamento.
   - Não avançar para outra frente antes de autorização explícita do Fábio.
+
+### Fechamento operacional do C2.4.1 — Clareza de método HubSpot retomado da sessão
+
+- **Status:** concluído e publicado em `origin/main`.
+- **Commit funcional:** `d8b54b5` — `fix(settings): clarify restored HubSpot input method`
+- **Problema resolvido:** ambiguidade visual quando o método HubSpot Private App era retomado da sessão.
+- **Solução:** microcopy no card `HubSpot real` explicando que o método foi retomado da sessão e que o reset volta à escolha do método.
+- **Arquivo alterado:** `src/app/(shell)/configuracoes/objetos/contas/_components/sections/AccountSources.tsx`
+- **Validação:** push publicado, `HEAD` e `origin/main` sincronizados, working tree limpo.
+- **Limites mantidos:** sem Supabase, sem sync, sem persistência real de credenciais, sem alteração em reset, token, CSV, API, Auth, Salesforce/RD, Camada Canônica ou Dedupe.
+- **Sequência futura provável:** `C2.5` — CSV schema validation e pré-mapeamento local, ainda não aberto.
 
 ## 6. Para onde vão as responsabilidades
 
