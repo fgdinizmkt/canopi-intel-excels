@@ -1977,6 +1977,9 @@ export function AccountSources() {
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
               <p className="mt-1 text-sm font-black text-slate-900">HubSpot real</p>
+              <p className="mt-1 text-[11px] font-medium text-slate-500">
+                Método Private App retomado desta sessão. Use o reset para voltar à escolha do método HubSpot.
+              </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
