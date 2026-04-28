@@ -74,6 +74,7 @@ type CsvFlowState = 'no-file' | 'invalid' | 'dirty' | 'saved' | 'confirmed' | 'c
 type HubspotConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error';
 type HubspotPreviewStatus = 'idle' | 'loading' | 'success' | 'error';
 type HubspotSchemaStatus = 'idle' | 'loading' | 'success' | 'error';
+type HubspotSessionState = 'clean' | 'testing' | 'validated' | 'incomplete' | 'error';
 
 interface HubspotConnectionTestMeta {
   provider: 'hubspot';
@@ -251,6 +252,36 @@ function getHubspotTestLabel(status: HubspotConnectionTestStatus): string {
       return 'Erro';
     default:
       return 'Não testado';
+  }
+}
+
+function getHubspotSessionStateLabel(state: HubspotSessionState): string {
+  switch (state) {
+    case 'testing':
+      return 'Testando';
+    case 'validated':
+      return 'Validada nesta sessão';
+    case 'incomplete':
+      return 'Teste validado, preview/schema pendentes';
+    case 'error':
+      return 'Erro';
+    default:
+      return 'Limpa';
+  }
+}
+
+function getHubspotSessionStateTone(state: HubspotSessionState): 'neutral' | 'info' | 'warning' | 'danger' | 'success' {
+  switch (state) {
+    case 'testing':
+      return 'info';
+    case 'validated':
+      return 'success';
+    case 'incomplete':
+      return 'warning';
+    case 'error':
+      return 'danger';
+    default:
+      return 'neutral';
   }
 }
 
@@ -443,6 +474,78 @@ export function AccountSources() {
     setHubspotSchemaSuggestedMappings([]);
     setHubspotMissingRecommendedFields([]);
   }, []);
+  const resetHubspotSession = React.useCallback(() => {
+    if (!selectedConnector || selectedConnector !== 'hubspot') return;
+    setHubspotPrivateAppToken('');
+    setHubspotTesting(false);
+    setInputMethodDraftForProvider('hubspot', null);
+    clearHubspotPreview();
+    clearHubspotSchema();
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      inputMethodByProvider: {
+        ...(prev.inputMethodByProvider || {}),
+        hubspot: 'not_selected',
+      },
+      connectionTestStatusByProvider: {
+        ...(prev.connectionTestStatusByProvider || {}),
+        hubspot: 'idle',
+      },
+      connectionTestMetaByProvider: {
+        ...(prev.connectionTestMetaByProvider || {}),
+        hubspot: null,
+      },
+      connectionTestErrorByProvider: {
+        ...(prev.connectionTestErrorByProvider || {}),
+        hubspot: null,
+      },
+      lastConnectionTestAtByProvider: {
+        ...(prev.lastConnectionTestAtByProvider || {}),
+        hubspot: null,
+      },
+      connectorLocalValidated: false,
+      connectorLocalValidatedByProvider: {
+        ...(prev.connectorLocalValidatedByProvider || {}),
+        hubspot: false,
+      },
+      localSourceSavedAt: null,
+      localSourceSavedAtByProvider: {
+        ...(prev.localSourceSavedAtByProvider || {}),
+        hubspot: null,
+      },
+      localContractValidatedAt: null,
+      localContractValidatedAtByProvider: {
+        ...(prev.localContractValidatedAtByProvider || {}),
+        hubspot: null,
+      },
+      accountSourcesStepCompleted: false,
+      accountSourcesStepCompletedByProvider: {
+        ...(prev.accountSourcesStepCompletedByProvider || {}),
+        hubspot: false,
+      },
+      accountSourcesStepCompletedAt: null,
+      accountSourcesStepCompletedAtByProvider: {
+        ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+        hubspot: null,
+      },
+      hubspotConnectionStepCompleted: false,
+      hubspotConnectionStepCompletedByProvider: {
+        ...(prev.hubspotConnectionStepCompletedByProvider || {}),
+        hubspot: false,
+      },
+      hubspotConnectionStepCompletedAt: null,
+      hubspotConnectionStepCompletedAtByProvider: {
+        ...(prev.hubspotConnectionStepCompletedAtByProvider || {}),
+        hubspot: null,
+      },
+    }));
+  }, [
+    clearHubspotPreview,
+    clearHubspotSchema,
+    selectedConnector,
+    setInputMethodDraftForProvider,
+    updateCustomConfig,
+  ]);
   const openCsvPicker = React.useCallback(() => {
     clearCsvInputValue();
     csvInputRef.current?.click();
@@ -1274,6 +1377,30 @@ export function AccountSources() {
   const hubspotConnectionTestMeta = selectedConnector ? connectionTestMetaByProvider[selectedConnector] ?? null : null;
   const hubspotConnectionTestError = selectedConnector ? connectionTestErrorByProvider[selectedConnector] ?? null : null;
   const hubspotLastConnectionTestAt = selectedConnector ? lastConnectionTestAtByProvider[selectedConnector] ?? null : null;
+  const hubspotSessionState = React.useMemo<HubspotSessionState>(() => {
+    if (selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') {
+      return 'clean';
+    }
+    if (hubspotConnectionTestStatus === 'testing') return 'testing';
+    if (hubspotConnectionTestStatus === 'error') return 'error';
+    if (hubspotConnectionTestStatus === 'success') {
+      if (hubspotPreviewStatus === 'success' || hubspotSchemaStatus === 'success' || hubspotConnectionStepCompleted) {
+        return 'validated';
+      }
+      return 'incomplete';
+    }
+    if (hubspotPreviewStatus !== 'idle' || hubspotSchemaStatus !== 'idle' || hubspotConnectionStepCompleted) {
+      return 'incomplete';
+    }
+    return 'clean';
+  }, [
+    hubspotConnectionStepCompleted,
+    hubspotConnectionTestStatus,
+    hubspotPreviewStatus,
+    hubspotSchemaStatus,
+    selectedConnector,
+    selectedInputMethod,
+  ]);
 
   const sourceAction = React.useMemo<WorkflowAction>(() => {
     if (!selectedConnector) {
@@ -1385,7 +1512,7 @@ export function AccountSources() {
       return {
         title: isCsvInput
           ? 'CSV confirmado para uso local.'
-          : (isHubspotApiInput ? 'Conexão HubSpot validada.' : 'Fonte confirmada para uso local.'),
+          : (isHubspotApiInput ? 'Conexão HubSpot validada nesta sessão.' : 'Fonte confirmada para uso local.'),
         description: 'A próxima ação é registrar a etapa desta fonte nesta sessão.',
         buttonLabel: isCsvInput || isHubspotApiInput ? 'Concluir configuração' : 'Concluir etapa local',
         tone: 'success' as const,
@@ -1397,7 +1524,7 @@ export function AccountSources() {
     return {
       title: isCsvInput
         ? 'Configuração concluída.'
-        : (isHubspotApiInput ? 'Conexão HubSpot validada e etapa registrada.' : 'Etapa local registrada.'),
+        : (isHubspotApiInput ? 'Conexão HubSpot validada nesta sessão e etapa registrada.' : 'Etapa local registrada.'),
       description: 'O setup local desta fonte já foi concluído nesta sessão.',
       buttonLabel: isCsvInput || isHubspotApiInput ? 'Configuração concluída' : 'Etapa local registrada',
       tone: 'success' as const,
@@ -1921,7 +2048,7 @@ export function AccountSources() {
                 <div className="mt-2 space-y-3">
                   <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
                     <ShieldCheck className="h-4 w-4" />
-                    Conexão HubSpot validada.
+                    Conexão HubSpot validada nesta sessão.
                   </p>
                   <div className="space-y-2 text-sm text-slate-700">
                     <p><span className="font-black">Hub ID:</span> {hubspotConnectionTestMeta.hubId || 'Não retornado'}</p>
@@ -1951,12 +2078,77 @@ export function AccountSources() {
                 </div>
               ) : (
                 <div className="mt-2 space-y-2">
-                  <p className="text-base font-black text-slate-900">Aguardando teste real.</p>
+                  <p className="text-base font-black text-slate-900">Aguardando teste real nesta sessão.</p>
                   <p className="text-sm text-slate-600">
                     O servidor ainda não validou o token. Após o teste, apenas metadados seguros permanecem na sessão.
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className={`mt-4 rounded-2xl border p-4 ${getHubspotSessionStateTone(hubspotSessionState) === 'success'
+            ? 'border-emerald-200 bg-emerald-50'
+            : getHubspotSessionStateTone(hubspotSessionState) === 'warning'
+              ? 'border-amber-200 bg-amber-50'
+              : getHubspotSessionStateTone(hubspotSessionState) === 'danger'
+                ? 'border-red-200 bg-red-50'
+                : getHubspotSessionStateTone(hubspotSessionState) === 'info'
+                  ? 'border-blue-200 bg-blue-50'
+                  : 'border-slate-200 bg-white'
+          }`}>
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Sessão HubSpot</p>
+                <h5 className="text-lg font-black tracking-tight text-slate-900">{getHubspotSessionStateLabel(hubspotSessionState)}</h5>
+                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                  Este é um reset completo da sessão HubSpot nesta tela. Ele remove o token temporário, o teste, o preview, o schema e a escolha do método, voltando o fluxo ao início. Nada é alterado no CRM externo.
+                </p>
+                <p className="text-xs font-semibold text-slate-500">
+                  Use quando quiser descartar esta sessão temporária e recomeçar a configuração HubSpot.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={resetHubspotSession}
+                className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
+              >
+                Resetar sessão HubSpot
+              </button>
+            </div>
+            <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Estado</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{getHubspotSessionStateLabel(hubspotSessionState)}</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{hubspotLastConnectionTestAt ? formatActionTimestamp(hubspotLastConnectionTestAt) : 'Nenhum teste nesta sessão'}</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Preview</p>
+                <p className="mt-1 text-sm font-black text-slate-900">
+                  {hubspotPreviewStatus === 'success'
+                    ? `Carregado (${hubspotPreviewCompanies.length.toLocaleString('pt-BR')})`
+                    : hubspotPreviewStatus === 'loading'
+                      ? 'Carregando'
+                      : hubspotPreviewStatus === 'error'
+                        ? 'Erro'
+                        : 'Não carregado'}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Schema</p>
+                <p className="mt-1 text-sm font-black text-slate-900">
+                  {hubspotSchemaStatus === 'success'
+                    ? `Detectado (${(hubspotSchemaTotalCount ?? hubspotSchemaProperties.length).toLocaleString('pt-BR')})`
+                    : hubspotSchemaStatus === 'loading'
+                      ? 'Detectando'
+                      : hubspotSchemaStatus === 'error'
+                        ? 'Erro'
+                        : 'Não detectado'}
+                </p>
+              </div>
             </div>
           </div>
         </Card>
