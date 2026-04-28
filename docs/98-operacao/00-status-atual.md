@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em 2026-04-14 (HEAD: `915a2ba` — Defensive fallback para dataset insuficiente/corrompido)
+ `main` — sincronizada em 2026-04-28 (HEAD: `9482643` — docs(ops): close CSV schema pre-mapping recorte)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
