@@ -177,6 +177,84 @@ Status: concluído e publicado em `origin/main`.
   - antes, auditar o próximo sub-recorte de Fontes e Conectores;
   - possíveis caminhos: persistência segura de credenciais, modelo de schema/mapeamento HubSpot, preparação de sync futuro ou governança da transição preview → dados canônicos.
 
+### Fechamento operacional do C2.3 — HubSpot schema discovery e pré-mapeamento
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit: `150e7bd` — `feat(settings): add HubSpot schema discovery mapping`
+- Escopo entregue:
+  - schema discovery read-only de companies do HubSpot;
+  - API route server-side separada para schema;
+  - chamada ao endpoint de properties de companies;
+  - token temporário recebido apenas por `POST`;
+  - token não persistido em `localStorage`, `sessionStorage`, `customConfig` ou Supabase;
+  - retorno sanitizado de metadados de properties;
+  - criação de tipos para schema discovery em `accountConnectionModel`;
+  - UI separada para “Schema e pré-mapeamento HubSpot”;
+  - exibição de properties detectadas;
+  - exibição separada de properties exibidas e total real;
+  - pré-mapeamento sugerido para campos de Contas;
+  - lacunas identificadas;
+  - guardrails visuais: read-only, pré-mapeamento, sem sync, sem importação, token não persistido, não aplica Camada Canônica;
+  - fluxo CSV preservado.
+- Campos/metadados tratados no discovery:
+  - `name`;
+  - `label`;
+  - `type`;
+  - `fieldType`;
+  - `description`;
+  - `groupName`;
+  - `hidden`;
+  - `calculated`;
+  - `readOnlyValue`;
+  - `readOnlyDefinition`;
+  - `hasUniqueValue`;
+  - `optionCount`;
+  - `referencedObjectType`.
+- Pré-mapeamentos sugeridos:
+  - `hs_object_id` → `externalAccountId`;
+  - `name` → `accountName`;
+  - `domain` → `accountDomain`;
+  - `industry` → `accountIndustry`;
+  - `country` → `accountCountry`;
+  - `hubspot_owner_id` → `externalOwnerId`;
+  - `createdate` / `hs_createdate` → `externalCreatedAt`;
+  - `lastmodifieddate` / `hs_lastmodifieddate` → `externalUpdatedAt`.
+- Validação realizada:
+  - conexão HubSpot validada com token real local;
+  - preview read-only de companies já validado no C2.2;
+  - schema discovery exibiu bloco de schema e pré-mapeamento;
+  - properties detectadas apareceram;
+  - pré-mapeamento sugerido apareceu;
+  - lacunas identificadas apareceram;
+  - o usuário não clicou em “Concluir etapa local”, corretamente;
+  - ajuste posterior separou “Properties detectadas” do total real e “Properties exibidas” do limite visual;
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` ficou sem runtime ativo após limpeza;
+  - stage, commit e push controlados;
+  - `HEAD` local e `origin/main` sincronizados.
+- Fora do escopo:
+  - Supabase;
+  - sync real;
+  - writeback;
+  - persistência segura de credenciais;
+  - importação definitiva de companies;
+  - aplicação de mapeamento canônico definitivo;
+  - revisão automática de Camada Canônica;
+  - conclusão automática de etapa local;
+  - Salesforce real;
+  - RD Station real;
+  - alteração em Auth;
+  - alteração no fluxo CSV.
+- Observação operacional:
+  - C2.3 prepara a leitura de schema e o pré-mapeamento, mas ainda não transforma preview nem properties em base canônica.
+  - O recorte continua sendo de Fontes e Conectores, não de Camada Canônica definitiva.
+- Próximo passo natural:
+  - não abrir C2.4 automaticamente;
+  - antes, auditar o próximo sub-recorte de Fontes e Conectores;
+  - possíveis caminhos: governança da transição pré-mapeamento → Camada Canônica, persistência segura de credenciais, persistência segura de configuração, ou desenho de sync futuro.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
