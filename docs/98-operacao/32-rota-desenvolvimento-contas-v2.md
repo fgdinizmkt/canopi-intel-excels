@@ -255,6 +255,86 @@ Status: concluído e publicado em `origin/main`.
   - antes, auditar o próximo sub-recorte de Fontes e Conectores;
   - possíveis caminhos: governança da transição pré-mapeamento → Camada Canônica, persistência segura de credenciais, persistência segura de configuração, ou desenho de sync futuro.
 
+### Fechamento operacional do C2.4 — Estado de sessão HubSpot e reset seguro
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit: `a75e62d` — `feat(settings): add HubSpot session reset state`
+- Escopo entregue:
+  - estado explícito de sessão HubSpot;
+  - estados: `clean`, `testing`, `validated`, `incomplete` e `error`;
+  - labels em português:
+    - `Limpa`;
+    - `Testando`;
+    - `Validada nesta sessão`;
+    - `Teste validado, preview/schema pendentes`;
+    - `Erro`;
+  - bloco visual “Sessão HubSpot” no fluxo Private App;
+  - resumo de último teste, preview e schema;
+  - botão “Resetar sessão HubSpot”;
+  - hard reset de sessão HubSpot;
+  - copy explicando que o reset remove token temporário, teste, preview, schema e escolha do método;
+  - aviso de que nada é alterado no CRM externo;
+  - reforço de que a conexão é validada nesta sessão, não integração permanente.
+- Comportamento do reset:
+  - limpa token temporário em memória;
+  - limpa status de teste;
+  - limpa metadados do teste;
+  - limpa erro de teste;
+  - limpa timestamp do último teste;
+  - limpa preview de companies;
+  - limpa erro do preview;
+  - limpa schema/properties;
+  - limpa erro de schema;
+  - limpa `suggestedMappings`;
+  - limpa `missingRecommendedFields`;
+  - limpa marcações locais HubSpot;
+  - limpa timestamps locais associados;
+  - volta `inputMethodByProvider.hubspot` para `not_selected`;
+  - não toca no CRM externo.
+- Validação realizada:
+  - validação visual manual feita pelo Fábio;
+  - bloco “Sessão HubSpot” apareceu corretamente;
+  - botão “Resetar sessão HubSpot” apareceu corretamente;
+  - copy do hard reset ficou clara;
+  - estado parcial foi ajustado de “Incompleta” para “Teste validado, preview/schema pendentes”;
+  - após conexão, preview e schema, sessão ficou verde e coerente;
+  - CSV continuou funcional visualmente;
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` ficou sem runtime ativo;
+  - stage, commit e push funcionais foram controlados;
+  - `HEAD` local e `origin/main` sincronizados em `a75e62d`.
+- Fora do escopo:
+  - Supabase;
+  - persistência segura de credenciais;
+  - armazenamento durável de token;
+  - OAuth;
+  - refresh token;
+  - sync real;
+  - writeback;
+  - importação definitiva de companies;
+  - aplicação de mapeamento canônico;
+  - Camada Canônica;
+  - Dedupe;
+  - Salesforce real;
+  - RD Station real;
+  - Auth;
+  - rotas de API;
+  - alteração no fluxo CSV.
+- Observação operacional:
+  - O C2.4 fecha o ciclo de sessão temporária HubSpot dentro de Fontes e Conectores.
+  - Ainda não transforma HubSpot em integração produtiva permanente.
+  - Ainda não há Supabase, sync ou persistência durável de credenciais.
+  - A frente continua sendo Fontes e Conectores 100%.
+- Sequência futura registrada, sem abrir agora:
+  - `C2.4.1` provável: clareza de método HubSpot retomado da sessão.
+    - Objetivo futuro: quando HubSpot reidratar Private App da sessão, deixar claro que o método foi retomado da sessão e que resetar volta à escolha do método.
+  - `C2.5` provável: CSV schema validation e pré-mapeamento local.
+    - Objetivo futuro: após upload CSV, detectar headers/colunas, validar campos recomendados, apontar lacunas, sugerir pré-mapeamento e mostrar qualidade mínima da base.
+  - Não implementar `C2.4.1` nem `C2.5` neste fechamento.
+  - Não avançar para outra frente antes de autorização explícita do Fábio.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
