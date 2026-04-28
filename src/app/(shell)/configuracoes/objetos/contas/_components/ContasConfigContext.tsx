@@ -54,6 +54,13 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   const { selectedConnector, baseLegal, conta, customConfig, CONTA_CANONICAL_FIELDS_MINIMUM } = state;
   const list: AccountConfigBlocker[] = [];
   const preset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
+  const rawInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? null : null;
+  const selectedInputMethod = selectedConnector === 'hubspot'
+    ? (rawInputMethod && rawInputMethod !== 'not_selected' ? rawInputMethod : null)
+    : (rawInputMethod ?? 'csv_upload');
+  const isHubspotMethodPending = selectedConnector === 'hubspot' && !selectedInputMethod;
+  const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
+  const hubspotConnectionTestStatus = selectedConnector ? customConfig.connectionTestStatusByProvider?.[selectedConnector] ?? 'idle' : 'idle';
 
   // 1. CONECTOR_MISSING
   if (!selectedConnector) {
@@ -69,7 +76,10 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   }
 
   // 1b. SOURCE_CONFIG_NOT_VALIDATED
-  if (selectedConnector && !state.connectorLocalValidated) {
+  if (selectedConnector && !isHubspotMethodPending && (
+    (isHubspotApiInput && hubspotConnectionTestStatus !== 'success') ||
+    (!isHubspotApiInput && !state.connectorLocalValidated)
+  )) {
     list.push({
       id: 'SOURCE_CONFIG_NOT_VALIDATED',
       section: 'Fontes e Conectores',
@@ -208,6 +218,8 @@ interface ContasConfigContextType {
   canConcludeLocalSetup: boolean;
   accountSourcesStepCompleted: boolean;
   setAccountSourcesStepCompleted: (val: boolean) => void;
+  hubspotConnectionStepCompleted: boolean;
+  setHubspotConnectionStepCompleted: (val: boolean) => void;
   completeLocalSetup: () => void;
   blockers: AccountConfigBlocker[];
   stepStatus: ContasConfigStepStatus[];
@@ -219,6 +231,8 @@ interface ContasConfigContextType {
   connectorLocalValidated: boolean;
   setConnectorLocalValidated: (val: boolean) => void;
   csvUploadMeta: CsvUploadMeta | null;
+  inputMethodDraftByProvider: Record<string, string | null>;
+  setInputMethodDraftForProvider: (provider: ConnectorType, method: string | null) => void;
   canonicalMapping: FieldMapping[];
   canonicalMappingReviewed: boolean;
   updateCanonicalMappingField: (canonicalField: string, updates: Partial<FieldMapping>) => void;
@@ -235,6 +249,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
   const [baseLegal, setBaseLegal] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [inputMethodDraftByProvider, setInputMethodDraftByProvider] = useState<Record<string, string | null>>({});
 
   const DEFAULT_CUSTOM_CONFIG = {
     fieldMappings: [] as FieldMapping[],
@@ -254,24 +269,54 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     customConfidence: 0,
     connectorLocalValidated: false,
     accountSourcesStepCompleted: false,
+    hubspotConnectionStepCompleted: false,
     localSourceSavedAt: null as string | null,
     localContractValidatedAt: null as string | null,
     accountSourcesStepCompletedAt: null as string | null,
+    hubspotConnectionStepCompletedAt: null as string | null,
     localSourceConfig: undefined as Record<string, unknown> | undefined,
     localSourceConfigByProvider: {} as Record<string, unknown>,
-    inputMethodByProvider: {} as Record<string, 'csv_upload'>,
+    inputMethodByProvider: {} as Record<string, string>,
     csvUploadMeta: null as CsvUploadMeta | null,
     csvUploadMetaByProvider: {} as Record<string, CsvUploadMeta | null>,
+    connectionTestStatusByProvider: {} as Record<string, 'idle' | 'testing' | 'success' | 'error'>,
+    connectionTestMetaByProvider: {} as Record<string, {
+      provider: string;
+      testedAt: string;
+      hubId: string | null;
+      scopes: string[];
+      readAccessConfirmed: boolean;
+    } | null>,
+    connectionTestErrorByProvider: {} as Record<string, string | null>,
+    lastConnectionTestAtByProvider: {} as Record<string, string | null>,
     connectorLocalValidatedByProvider: {} as Record<string, boolean>,
     accountSourcesStepCompletedByProvider: {} as Record<string, boolean>,
+    hubspotConnectionStepCompletedByProvider: {} as Record<string, boolean>,
     localSourceSavedAtByProvider: {} as Record<string, string | null>,
     localContractValidatedAtByProvider: {} as Record<string, string | null>,
     accountSourcesStepCompletedAtByProvider: {} as Record<string, string | null>,
+    hubspotConnectionStepCompletedAtByProvider: {} as Record<string, string | null>,
   };
 
   const [customConfig, setCustomConfig] = useState(() => {
     const session = loadSession();
-    return session?.customConfig ? { ...DEFAULT_CUSTOM_CONFIG, ...session.customConfig } : DEFAULT_CUSTOM_CONFIG;
+    const initialConfig = session?.customConfig ? { ...DEFAULT_CUSTOM_CONFIG, ...session.customConfig } : DEFAULT_CUSTOM_CONFIG;
+    const initialHubspotMethod = initialConfig.inputMethodByProvider?.hubspot;
+    const hasHubspotCompletion =
+      Boolean(initialConfig.hubspotConnectionStepCompletedByProvider?.hubspot)
+      || initialConfig.connectionTestStatusByProvider?.hubspot === 'success';
+
+    if (initialHubspotMethod === 'private_app_token' && !hasHubspotCompletion) {
+      return {
+        ...initialConfig,
+        inputMethodByProvider: {
+          ...(initialConfig.inputMethodByProvider || {}),
+          hubspot: 'not_selected',
+        },
+      };
+    }
+
+    return initialConfig;
   });
   const [localSourceSaveHandler, setLocalSourceSaveHandler] = useState<(() => void) | null>(null);
   const [canSaveLocalSourceSetup, setCanSaveLocalSourceSetup] = useState(false);
@@ -279,13 +324,23 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setConnector = (type: ConnectorType | null) => {
     setSelectedConnector(type);
     if (!type) {
+      setInputMethodDraftByProvider({});
+    } else {
+      setInputMethodDraftByProvider((prev) => ({
+        ...prev,
+        [type]: null,
+      }));
+    }
+    if (!type) {
       setCustomConfig((prev: any) => ({
         ...prev,
         csvUploadMeta: null,
         accountSourcesStepCompleted: false,
+        hubspotConnectionStepCompleted: false,
         localSourceSavedAt: null,
         localContractValidatedAt: null,
         accountSourcesStepCompletedAt: null,
+        hubspotConnectionStepCompletedAt: null,
         connectorLocalValidated: false,
       }));
       return;
@@ -295,7 +350,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setCustomConfig((prev: any) => {
       const inputMethodByProvider = {
         ...(prev.inputMethodByProvider || {}),
-        [type]: (prev.inputMethodByProvider?.[type] || 'csv_upload'),
+        [type]: prev.inputMethodByProvider?.[type] || (type === 'hubspot' ? 'not_selected' : 'csv_upload'),
       };
       const connectorLocalValidatedByProvider = {
         ...(prev.connectorLocalValidatedByProvider || {}),
@@ -304,6 +359,10 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const accountSourcesStepCompletedByProvider = {
         ...(prev.accountSourcesStepCompletedByProvider || {}),
         [type]: prev.accountSourcesStepCompletedByProvider?.[type] ?? false,
+      };
+      const hubspotConnectionStepCompletedByProvider = {
+        ...(prev.hubspotConnectionStepCompletedByProvider || {}),
+        [type]: prev.hubspotConnectionStepCompletedByProvider?.[type] ?? false,
       };
       const localSourceSavedAtByProvider = {
         ...(prev.localSourceSavedAtByProvider || {}),
@@ -317,6 +376,10 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         ...(prev.accountSourcesStepCompletedAtByProvider || {}),
         [type]: prev.accountSourcesStepCompletedAtByProvider?.[type] ?? null,
       };
+      const hubspotConnectionStepCompletedAtByProvider = {
+        ...(prev.hubspotConnectionStepCompletedAtByProvider || {}),
+        [type]: prev.hubspotConnectionStepCompletedAtByProvider?.[type] ?? null,
+      };
       const csvUploadMetaByProvider = {
         ...(prev.csvUploadMetaByProvider || {}),
         [type]: prev.csvUploadMetaByProvider?.[type] ?? null,
@@ -327,14 +390,18 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         csvUploadMetaByProvider,
         connectorLocalValidatedByProvider,
         accountSourcesStepCompletedByProvider,
+        hubspotConnectionStepCompletedByProvider,
         localSourceSavedAtByProvider,
         localContractValidatedAtByProvider,
         accountSourcesStepCompletedAtByProvider,
+        hubspotConnectionStepCompletedAtByProvider,
         csvUploadMeta: csvUploadMetaByProvider[type] ?? null,
         accountSourcesStepCompleted: accountSourcesStepCompletedByProvider[type] ?? false,
+        hubspotConnectionStepCompleted: hubspotConnectionStepCompletedByProvider[type] ?? false,
         localSourceSavedAt: localSourceSavedAtByProvider[type] ?? null,
         localContractValidatedAt: localContractValidatedAtByProvider[type] ?? null,
         accountSourcesStepCompletedAt: accountSourcesStepCompletedAtByProvider[type] ?? null,
+        hubspotConnectionStepCompletedAt: hubspotConnectionStepCompletedAtByProvider[type] ?? null,
         fieldMappings: preset?.fieldMappings || [],
         canonicalMapping: preset?.fieldMappings || [],
         canonicalMappingReviewed: false,
@@ -395,26 +462,66 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         : prev.accountSourcesStepCompletedByProvider,
     }));
   };
-  const completeLocalSetup = useCallback(() => {
-    const now = new Date().toISOString();
+  const hubspotConnectionStepCompleted = customConfig.hubspotConnectionStepCompleted ?? false;
+  const setInputMethodDraftForProvider = (provider: ConnectorType, method: string | null) => {
+    setInputMethodDraftByProvider((prev) => ({
+      ...prev,
+      [provider]: method,
+    }));
+  };
+  const setHubspotConnectionStepCompleted = (val: boolean) => {
     updateCustomConfig((prev: any) => ({
       ...prev,
-      accountSourcesStepCompleted: true,
-      accountSourcesStepCompletedAt: now,
-      accountSourcesStepCompletedByProvider: selectedConnector
+      hubspotConnectionStepCompleted: val,
+      hubspotConnectionStepCompletedByProvider: selectedConnector
         ? {
-            ...(prev.accountSourcesStepCompletedByProvider || {}),
-            [selectedConnector]: true,
+            ...(prev.hubspotConnectionStepCompletedByProvider || {}),
+            [selectedConnector]: val,
           }
-        : prev.accountSourcesStepCompletedByProvider,
-      accountSourcesStepCompletedAtByProvider: selectedConnector
-        ? {
-            ...(prev.accountSourcesStepCompletedAtByProvider || {}),
-            [selectedConnector]: now,
-          }
-        : prev.accountSourcesStepCompletedAtByProvider,
+        : prev.hubspotConnectionStepCompletedByProvider,
     }));
-  }, [selectedConnector, updateCustomConfig]);
+  };
+  const completeLocalSetup = useCallback(() => {
+    const now = new Date().toISOString();
+    const selectedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? 'csv_upload' : 'csv_upload';
+    const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      ...(isHubspotApiInput
+        ? {
+            hubspotConnectionStepCompleted: true,
+            hubspotConnectionStepCompletedAt: now,
+            hubspotConnectionStepCompletedByProvider: selectedConnector
+              ? {
+                  ...(prev.hubspotConnectionStepCompletedByProvider || {}),
+                  [selectedConnector]: true,
+                }
+              : prev.hubspotConnectionStepCompletedByProvider,
+            hubspotConnectionStepCompletedAtByProvider: selectedConnector
+              ? {
+                  ...(prev.hubspotConnectionStepCompletedAtByProvider || {}),
+                  [selectedConnector]: now,
+                }
+              : prev.hubspotConnectionStepCompletedAtByProvider,
+          }
+        : {
+            accountSourcesStepCompleted: true,
+            accountSourcesStepCompletedAt: now,
+            accountSourcesStepCompletedByProvider: selectedConnector
+              ? {
+                  ...(prev.accountSourcesStepCompletedByProvider || {}),
+                  [selectedConnector]: true,
+                }
+              : prev.accountSourcesStepCompletedByProvider,
+            accountSourcesStepCompletedAtByProvider: selectedConnector
+              ? {
+                  ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+                  [selectedConnector]: now,
+                }
+              : prev.accountSourcesStepCompletedAtByProvider,
+          }),
+    }));
+  }, [customConfig.inputMethodByProvider, selectedConnector, updateCustomConfig]);
 
   useEffect(() => {
     if (!selectedConnector) return;
@@ -422,9 +529,11 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       ...prev,
       connectorLocalValidated: prev.connectorLocalValidatedByProvider?.[selectedConnector] ?? false,
       accountSourcesStepCompleted: prev.accountSourcesStepCompletedByProvider?.[selectedConnector] ?? false,
+      hubspotConnectionStepCompleted: prev.hubspotConnectionStepCompletedByProvider?.[selectedConnector] ?? false,
       localSourceSavedAt: prev.localSourceSavedAtByProvider?.[selectedConnector] ?? null,
       localContractValidatedAt: prev.localContractValidatedAtByProvider?.[selectedConnector] ?? null,
       accountSourcesStepCompletedAt: prev.accountSourcesStepCompletedAtByProvider?.[selectedConnector] ?? null,
+      hubspotConnectionStepCompletedAt: prev.hubspotConnectionStepCompletedAtByProvider?.[selectedConnector] ?? null,
       csvUploadMeta: prev.csvUploadMetaByProvider?.[selectedConnector] ?? null,
     }));
   }, [selectedConnector, updateCustomConfig]);
@@ -506,12 +615,36 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return blockers.filter(b => b.severity === 'hard').length === 0;
   }, [blockers]);
   const canConcludeLocalSetup = useMemo(() => {
-    if (!selectedConnector || !connectorLocalValidated || accountSourcesStepCompleted) return false;
-    if (customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload') {
-      return customConfig.csvUploadMeta?.validationResult?.isValid === true;
+    if (!selectedConnector) return false;
+  const selectedInputMethod = selectedConnector === 'hubspot'
+    ? (customConfig.inputMethodByProvider?.[selectedConnector] && customConfig.inputMethodByProvider?.[selectedConnector] !== 'not_selected'
+      ? customConfig.inputMethodByProvider?.[selectedConnector]
+      : null)
+    : (customConfig.inputMethodByProvider?.[selectedConnector] ?? 'csv_upload');
+  const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
+  const isHubspotMethodPending = selectedConnector === 'hubspot' && !selectedInputMethod;
+    if (isHubspotApiInput) {
+      return customConfig.connectionTestStatusByProvider?.[selectedConnector] === 'success'
+        && !hubspotConnectionStepCompleted;
     }
-    return true;
-  }, [accountSourcesStepCompleted, connectorLocalValidated, customConfig.csvUploadMeta, customConfig.inputMethodByProvider, selectedConnector]);
+    if (isHubspotMethodPending) {
+      return false;
+    }
+    if (selectedInputMethod === 'csv_upload') {
+      return connectorLocalValidated
+        && customConfig.csvUploadMeta?.validationResult?.isValid === true
+        && !accountSourcesStepCompleted;
+    }
+    return connectorLocalValidated && !accountSourcesStepCompleted;
+  }, [
+    accountSourcesStepCompleted,
+    connectorLocalValidated,
+    customConfig.connectionTestStatusByProvider,
+    customConfig.csvUploadMeta,
+    customConfig.inputMethodByProvider,
+    hubspotConnectionStepCompleted,
+    selectedConnector,
+  ]);
 
   const stepStatus = useMemo<ContasConfigStepStatus[]>(() => {
     const blockerMap = new Map<string, AccountConfigBlocker[]>();
@@ -526,11 +659,17 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const activePrimaryKeys = (conta.primaryKeys || []).filter((key) => key.trim().length > 0);
     const hasIdentity = hasConnector && activePrimaryKeys.length > 0;
     const mappedCanonicalFields = conta.fieldMappings.map((mapping) => mapping.canonicalField);
+    const providerKey = selectedConnector;
     const hasCanonicalMinimum =
       hasConnector &&
       CONTA_CANONICAL_FIELDS_MINIMUM.every((field) => mappedCanonicalFields.includes(field));
-    const requiresLgpd = (selectedConnector ? CONNECTOR_PRESETS[selectedConnector]?.lgpdRisk === 'high' : false)
-      || (selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload' : false);
+    const selectedInputMethod = providerKey === 'hubspot'
+      ? (providerKey && customConfig.inputMethodByProvider?.[providerKey] && customConfig.inputMethodByProvider?.[providerKey] !== 'not_selected'
+        ? customConfig.inputMethodByProvider?.[providerKey]
+        : null)
+      : (providerKey ? (customConfig.inputMethodByProvider?.[providerKey] ?? 'csv_upload') : 'csv_upload');
+    const requiresLgpd = (providerKey ? CONNECTOR_PRESETS[providerKey]?.lgpdRisk === 'high' : false)
+      || (selectedInputMethod === 'csv_upload');
     const hasClassifiableMappings = hasCanonicalMinimum && conta.fieldMappings.some((mapping) => mapping.isClassification);
     const canReviewWriteback = hasCanonicalMinimum && hasClassifiableMappings;
 
@@ -550,7 +689,11 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         slug: 'fontes-conectores',
         label: '2. Fontes e Conectores',
         href: '/configuracoes/objetos/contas/fontes-conectores',
-        status: getStepBlockers('fontes-conectores').length > 0 ? 'blocked' : hasConnector ? 'configured' : 'pending',
+        status: !hasConnector
+          ? 'pending'
+          : (selectedConnector === 'hubspot' && !selectedInputMethod)
+            ? 'pending'
+            : getStepBlockers('fontes-conectores').length > 0 ? 'blocked' : 'configured',
         prerequisite: 'Primeira etapa operacional.',
         impact: 'Define a fonte de verdade e desbloqueia o restante do setup.',
         blockers: getStepBlockers('fontes-conectores'),
@@ -645,7 +788,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
         blockers,
       },
     ];
-  }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, customConfig.inputMethodByProvider, selectedConnector]);
+    }, [baseLegal, blockers, conta.fieldMappings, conta.primaryKeys, conta.supportsWriteback, customConfig.inputMethodByProvider, selectedConnector]);
 
   const realConnectionContract = useMemo<AccountRealConnectionContract | null>(() => {
     if (!selectedConnector) return null;
@@ -684,7 +827,9 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setCanSaveLocalSourceSetup,
       canConcludeLocalSetup,
       accountSourcesStepCompleted,
+      hubspotConnectionStepCompleted,
       setAccountSourcesStepCompleted,
+      setHubspotConnectionStepCompleted,
       completeLocalSetup,
       blockers,
       stepStatus,
@@ -696,6 +841,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
       connectorLocalValidated,
       setConnectorLocalValidated,
       csvUploadMeta: (customConfig.csvUploadMeta ?? null) as CsvUploadMeta | null,
+      inputMethodDraftByProvider,
+      setInputMethodDraftForProvider,
       canonicalMapping: resolvedCanonicalMapping,
       canonicalMappingReviewed,
       updateCanonicalMappingField,

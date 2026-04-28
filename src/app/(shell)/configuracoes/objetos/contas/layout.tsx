@@ -17,22 +17,47 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
     readinessScore,
     save,
     accountSourcesStepCompleted,
+    hubspotConnectionStepCompleted,
     completeLocalSetup,
     connectorLocalValidated,
     selectedConnector,
     customConfig,
+    inputMethodDraftByProvider,
   } = useContasConfig();
-  const isCsv = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload' : false;
+  const hubspotConnectionTestStatus = selectedConnector ? customConfig.connectionTestStatusByProvider?.[selectedConnector] ?? 'idle' : 'idle';
+  const storedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? null : null;
+  const hubspotDraftChoice = selectedConnector ? inputMethodDraftByProvider[selectedConnector] ?? null : null;
+  const hubspotHasRealEvidence = selectedConnector === 'hubspot'
+    && (hubspotConnectionTestStatus === 'success' || hubspotConnectionStepCompleted);
+  const hubspotHasCsvEvidence = Boolean(customConfig.csvUploadMeta) || connectorLocalValidated || accountSourcesStepCompleted;
+  const selectedInputMethod = React.useMemo(() => {
+    if (!selectedConnector) return null;
+    if (selectedConnector !== 'hubspot') {
+      return storedInputMethod ?? 'csv_upload';
+    }
+    if (hubspotDraftChoice) return hubspotDraftChoice;
+    if (storedInputMethod === 'private_app_token' && hubspotHasRealEvidence) return 'private_app_token';
+    if (storedInputMethod === 'csv_upload' && hubspotHasCsvEvidence) return 'csv_upload';
+    return null;
+  }, [hubspotDraftChoice, hubspotHasCsvEvidence, hubspotHasRealEvidence, selectedConnector, storedInputMethod]);
+  const isCsv = selectedInputMethod === 'csv_upload';
+  const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
+  const isHubspotMethodPending = selectedConnector === 'hubspot' && !selectedInputMethod;
+  const currentSourceCompleted = isHubspotApiInput ? hubspotConnectionStepCompleted : accountSourcesStepCompleted;
   const topSaveLabel = !selectedConnector
     ? 'Selecionar fonte'
-    : accountSourcesStepCompleted
-      ? 'Configuração concluída'
-      : connectorLocalValidated
-        ? 'Configuração salva'
-        : canSaveLocalSourceSetup
-          ? 'Salvar configuração'
-          : 'Configuração já salva';
-  const topSaveDisabled = isSaving || !selectedConnector || accountSourcesStepCompleted || !canSaveLocalSourceSetup;
+    : isHubspotMethodPending
+      ? 'Escolha o método'
+      : selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token' && hubspotConnectionTestStatus !== 'success'
+        ? 'Testar conexão'
+      : currentSourceCompleted
+        ? 'Configuração concluída'
+        : connectorLocalValidated
+          ? 'Configuração salva'
+          : canSaveLocalSourceSetup
+            ? 'Salvar configuração'
+            : 'Configuração já salva';
+  const topSaveDisabled = isSaving || !selectedConnector || currentSourceCompleted || isHubspotMethodPending || (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token' && hubspotConnectionTestStatus !== 'success') || !canSaveLocalSourceSetup;
   
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -71,7 +96,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
               disabled={topSaveDisabled}
               className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-slate-200 hover:scale-105 active:scale-95 disabled:opacity-50"
              >
-                {isSaving ? 'Salvando...' : topSaveLabel === 'Selecionar fonte' ? topSaveLabel : topSaveLabel === 'Configuração concluída' ? topSaveLabel : topSaveLabel === 'Configuração salva' ? topSaveLabel : <><Save className="w-4 h-4" /> {topSaveLabel}</>}
+                {isSaving ? 'Salvando...' : topSaveLabel === 'Selecionar fonte' || topSaveLabel === 'Escolha o método' || topSaveLabel === 'Configuração concluída' || topSaveLabel === 'Configuração salva' ? topSaveLabel : <><Save className="w-4 h-4" /> {topSaveLabel}</>}
              </button>
              <button 
               disabled={!canConcludeLocalSetup}
@@ -80,7 +105,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
                 canConcludeLocalSetup ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
               }`}
              >
-                {accountSourcesStepCompleted ? (isCsv ? 'Configuração concluída' : 'Etapa local registrada') : (isCsv ? 'Concluir configuração' : 'Concluir etapa local')}
+                {currentSourceCompleted ? (isCsv ? 'Configuração concluída' : 'Etapa local registrada') : (isCsv ? 'Concluir configuração' : 'Concluir etapa local')}
              </button>
           </div>
         </div>

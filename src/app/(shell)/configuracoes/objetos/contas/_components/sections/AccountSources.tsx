@@ -7,7 +7,10 @@ import {
   CheckCircle2,
   Clock,
   Info,
+  KeyRound,
+  Loader2,
   Zap,
+  ShieldCheck,
 } from 'lucide-react';
 import { Card, Badge } from '@/src/components/ui';
 import { useContasConfig } from '../ContasConfigContext';
@@ -64,6 +67,15 @@ interface WorkflowAction {
 }
 
 type CsvFlowState = 'no-file' | 'invalid' | 'dirty' | 'saved' | 'confirmed' | 'completed';
+type HubspotConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error';
+
+interface HubspotConnectionTestMeta {
+  provider: 'hubspot';
+  testedAt: string;
+  hubId: string | null;
+  scopes: string[];
+  readAccessConfirmed: boolean;
+}
 
 interface CsvProcessingState extends CsvParseProgress {
   fileName: string;
@@ -192,6 +204,28 @@ function getIngestMethod(type: ConnectorType): string {
   }
 }
 
+function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedInputMethod: string | null): string {
+  if (!selectedConnector) return 'Não definida';
+  if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
+  if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
+  if (selectedInputMethod === 'csv_upload') return 'CSV';
+  if (selectedInputMethod) return selectedInputMethod;
+  return selectedConnector === 'hubspot' ? 'Método pendente' : 'Não definida';
+}
+
+function getHubspotTestLabel(status: HubspotConnectionTestStatus): string {
+  switch (status) {
+    case 'testing':
+      return 'Testando';
+    case 'success':
+      return 'Validada';
+    case 'error':
+      return 'Erro';
+    default:
+      return 'Não testado';
+  }
+}
+
 function getIntegrationLabel(type: ConnectorType): string {
   switch (type) {
     case 'salesforce': return 'CRM nativo';
@@ -224,12 +258,14 @@ function Field({
   onChange,
   placeholder,
   textarea,
+  type = 'text',
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   textarea?: boolean;
+  type?: string;
 }) {
   return (
     <div className="space-y-2">
@@ -243,7 +279,7 @@ function Field({
         />
       ) : (
         <input
-          type="text"
+          type={type}
           value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
@@ -265,8 +301,11 @@ export function AccountSources() {
     setConnectorLocalValidated,
     registerLocalSourceSaveHandler,
     setAccountSourcesStepCompleted,
+    hubspotConnectionStepCompleted,
     completeLocalSetup,
     csvUploadMeta,
+    inputMethodDraftByProvider,
+    setInputMethodDraftForProvider,
     realConnectionContract,
     accountSourcesStepCompleted,
     setCanSaveLocalSourceSetup,
@@ -275,12 +314,53 @@ export function AccountSources() {
   const connectorTypes: Array<Exclude<ConnectorType, 'csv_upload'>> = ['salesforce', 'hubspot', 'rd_station', 'other_crm'];
   const activePreset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
   const activeAdapter = selectedConnector ? getAccountConnectorAdapter(selectedConnector) : null;
-  const selectedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? 'csv_upload' : null;
-  const isCsvInput = selectedInputMethod === 'csv_upload';
   const savedLocalConfigByProvider = React.useMemo(
     () => (customConfig.localSourceConfigByProvider || {}) as Partial<Record<ConnectorType, Partial<LocalSourceConfig>>>,
     [customConfig.localSourceConfigByProvider]
   );
+  const connectionTestStatusByProvider = React.useMemo(
+    () => (customConfig.connectionTestStatusByProvider || {}) as Record<string, HubspotConnectionTestStatus>,
+    [customConfig.connectionTestStatusByProvider]
+  );
+  const connectionTestMetaByProvider = React.useMemo(
+    () => (customConfig.connectionTestMetaByProvider || {}) as Record<string, HubspotConnectionTestMeta | null>,
+    [customConfig.connectionTestMetaByProvider]
+  );
+  const connectionTestErrorByProvider = React.useMemo(
+    () => (customConfig.connectionTestErrorByProvider || {}) as Record<string, string | null>,
+    [customConfig.connectionTestErrorByProvider]
+  );
+  const lastConnectionTestAtByProvider = React.useMemo(
+    () => (customConfig.lastConnectionTestAtByProvider || {}) as Record<string, string | null>,
+    [customConfig.lastConnectionTestAtByProvider]
+  );
+  const storedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? null : null;
+  const hubspotDraftChoice = selectedConnector ? inputMethodDraftByProvider[selectedConnector] ?? null : null;
+  const hubspotConnectionTestStatus = selectedConnector ? connectionTestStatusByProvider[selectedConnector] ?? 'idle' : 'idle';
+  const hubspotHasRealEvidence = selectedConnector === 'hubspot'
+    && (hubspotConnectionTestStatus === 'success' || hubspotConnectionStepCompleted);
+  const hubspotHasCsvEvidence = Boolean(csvUploadMeta) || connectorLocalValidated || accountSourcesStepCompleted;
+  const effectiveInputMethod = React.useMemo(() => {
+    if (!selectedConnector) return null;
+    if (selectedConnector !== 'hubspot') {
+      return storedInputMethod ?? 'csv_upload';
+    }
+    if (hubspotDraftChoice) return hubspotDraftChoice;
+    if (storedInputMethod === 'private_app_token' && hubspotHasRealEvidence) return 'private_app_token';
+    if (storedInputMethod === 'csv_upload' && hubspotHasCsvEvidence) return 'csv_upload';
+    return null;
+  }, [
+    hubspotDraftChoice,
+    hubspotHasCsvEvidence,
+    hubspotHasRealEvidence,
+    selectedConnector,
+    storedInputMethod,
+  ]);
+  const selectedInputMethod = effectiveInputMethod;
+  const isHubspotMethodPending = selectedConnector === 'hubspot' && !effectiveInputMethod;
+  const isCsvInput = selectedInputMethod === 'csv_upload';
+  const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
+  const currentSourceCompleted = isHubspotApiInput ? hubspotConnectionStepCompleted : accountSourcesStepCompleted;
   const rawSaved = selectedConnector ? savedLocalConfigByProvider[selectedConnector] : undefined;
   const savedLocalConfig = (rawSaved && (rawSaved as any)._savedFor === selectedConnector)
     ? rawSaved
@@ -288,6 +368,8 @@ export function AccountSources() {
 
   const [draftConfig, setDraftConfig] = React.useState<LocalSourceConfig | null>(null);
   const [hasUnsavedLocalEdit, setHasUnsavedLocalEdit] = React.useState(false);
+  const [hubspotPrivateAppToken, setHubspotPrivateAppToken] = React.useState('');
+  const [hubspotTesting, setHubspotTesting] = React.useState(false);
 
   // CSV upload local state
   const [isCsvParsing, setIsCsvParsing] = React.useState(false);
@@ -311,6 +393,13 @@ export function AccountSources() {
     clearCsvInputValue();
     csvInputRef.current?.click();
   }, [clearCsvInputValue]);
+
+  React.useEffect(() => {
+    if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') {
+      setHubspotPrivateAppToken('');
+      setHubspotTesting(false);
+    }
+  }, [selectedConnector, selectedInputMethod]);
 
   React.useEffect(() => {
     if (!selectedConnector) {
@@ -387,6 +476,18 @@ export function AccountSources() {
     }
   };
 
+  const setInputMethodForSelectedConnector = React.useCallback((method: string) => {
+    if (!selectedConnector) return;
+    setInputMethodDraftForProvider(selectedConnector, method);
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      inputMethodByProvider: {
+        ...(prev.inputMethodByProvider || {}),
+        [selectedConnector]: method,
+      },
+    }));
+  }, [selectedConnector, setInputMethodDraftForProvider, updateCustomConfig]);
+
   const hasDraftChanges = React.useMemo(() => {
     if (!selectedConnector || !draftConfig) return false;
     if (hasUnsavedLocalEdit) return true;
@@ -395,8 +496,8 @@ export function AccountSources() {
   }, [draftConfig, hasUnsavedLocalEdit, savedLocalConfig, selectedConnector]);
 
   React.useEffect(() => {
-    setCanSaveLocalSourceSetup(hasDraftChanges);
-  }, [hasDraftChanges, setCanSaveLocalSourceSetup]);
+    setCanSaveLocalSourceSetup(hasDraftChanges && !isHubspotMethodPending && !isHubspotApiInput);
+  }, [hasDraftChanges, isHubspotApiInput, isHubspotMethodPending, setCanSaveLocalSourceSetup]);
 
   const processCsvFile = React.useCallback(async (file: File) => {
     if (!selectedConnector || !isCsvInput || !draftConfig) return;
@@ -810,11 +911,173 @@ export function AccountSources() {
     }));
   }, [canValidateLocally, draftConfig, selectedConnector, updateCustomConfig]);
 
+  const testHubspotConnection = React.useCallback(async () => {
+    if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') return;
+    const token = hubspotPrivateAppToken.trim();
+    const now = new Date().toISOString();
+
+    const setTestState = (status: HubspotConnectionTestStatus, error: string | null, meta: HubspotConnectionTestMeta | null) => {
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectionTestStatusByProvider: {
+          ...(prev.connectionTestStatusByProvider || {}),
+          [selectedConnector]: status,
+        },
+        connectionTestMetaByProvider: {
+          ...(prev.connectionTestMetaByProvider || {}),
+          [selectedConnector]: meta,
+        },
+        connectionTestErrorByProvider: {
+          ...(prev.connectionTestErrorByProvider || {}),
+          [selectedConnector]: error,
+        },
+        lastConnectionTestAtByProvider: {
+          ...(prev.lastConnectionTestAtByProvider || {}),
+          [selectedConnector]: now,
+        },
+      }));
+    };
+
+    if (!token) {
+      setTestState('error', 'Informe um token de Private App para testar a conexão HubSpot.', null);
+      return;
+    }
+
+    setHubspotTesting(true);
+    setTestState('testing', null, null);
+
+    try {
+      const response = await fetch('/api/account-connectors/hubspot/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const payload = await response.json().catch(() => null) as
+        | {
+          status?: 'success' | 'error';
+          provider?: string;
+          testedAt?: string;
+          hubId?: string | null;
+          scopes?: string[];
+          readAccessConfirmed?: boolean;
+          error?: string;
+        }
+        | null;
+
+      if (!response.ok || payload?.status !== 'success') {
+        const message = payload?.error || 'Não foi possível validar a conexão HubSpot.';
+        setTestState('error', message, null);
+        setConnectorLocalValidated(false);
+        setAccountSourcesStepCompleted(false);
+        updateCustomConfig((prev: any) => ({
+          ...prev,
+          connectorLocalValidated: false,
+          connectorLocalValidatedByProvider: {
+            ...(prev.connectorLocalValidatedByProvider || {}),
+            [selectedConnector]: false,
+          },
+          accountSourcesStepCompleted: false,
+          accountSourcesStepCompletedByProvider: {
+            ...(prev.accountSourcesStepCompletedByProvider || {}),
+            [selectedConnector]: false,
+          },
+          accountSourcesStepCompletedAt: null,
+          accountSourcesStepCompletedAtByProvider: {
+            ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+            [selectedConnector]: null,
+          },
+          localContractValidatedAt: null,
+          localContractValidatedAtByProvider: {
+            ...(prev.localContractValidatedAtByProvider || {}),
+            [selectedConnector]: null,
+          },
+        }));
+        return;
+      }
+
+      const testedAt = payload?.testedAt || now;
+      const meta: HubspotConnectionTestMeta = {
+        provider: 'hubspot',
+        testedAt,
+        hubId: payload?.hubId ?? null,
+        scopes: Array.isArray(payload?.scopes) ? payload.scopes : [],
+        readAccessConfirmed: payload?.readAccessConfirmed === true,
+      };
+
+      setTestState('success', null, meta);
+      setConnectorLocalValidated(true);
+      setAccountSourcesStepCompleted(false);
+      setHubspotPrivateAppToken('');
+
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectorLocalValidated: true,
+        connectorLocalValidatedByProvider: {
+          ...(prev.connectorLocalValidatedByProvider || {}),
+          [selectedConnector]: true,
+        },
+        localContractValidatedAt: testedAt,
+        localContractValidatedAtByProvider: {
+          ...(prev.localContractValidatedAtByProvider || {}),
+          [selectedConnector]: testedAt,
+        },
+        accountSourcesStepCompleted: false,
+        accountSourcesStepCompletedByProvider: {
+          ...(prev.accountSourcesStepCompletedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompletedAt: null,
+        accountSourcesStepCompletedAtByProvider: {
+          ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível validar a conexão HubSpot.';
+      setTestState('error', message, null);
+      setConnectorLocalValidated(false);
+      setAccountSourcesStepCompleted(false);
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectorLocalValidated: false,
+        connectorLocalValidatedByProvider: {
+          ...(prev.connectorLocalValidatedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompleted: false,
+        accountSourcesStepCompletedByProvider: {
+          ...(prev.accountSourcesStepCompletedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompletedAt: null,
+        accountSourcesStepCompletedAtByProvider: {
+          ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+        localContractValidatedAt: null,
+        localContractValidatedAtByProvider: {
+          ...(prev.localContractValidatedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+      }));
+    } finally {
+      setHubspotTesting(false);
+    }
+  }, [hubspotPrivateAppToken, selectedConnector, selectedInputMethod, setAccountSourcesStepCompleted, setConnectorLocalValidated, updateCustomConfig]);
+
   const concludeLocalSetupFlow = React.useCallback(() => {
-    if (!selectedConnector || !connectorLocalValidated || accountSourcesStepCompleted) return;
+    if (!selectedConnector || !connectorLocalValidated || currentSourceCompleted) return;
     if (isCsvInput && csvUploadMeta?.validationResult?.isValid !== true) return;
+    if (isHubspotMethodPending) return;
     completeLocalSetup();
-  }, [accountSourcesStepCompleted, completeLocalSetup, connectorLocalValidated, csvUploadMeta?.validationResult?.isValid, isCsvInput, selectedConnector]);
+  }, [completeLocalSetup, connectorLocalValidated, csvUploadMeta?.validationResult?.isValid, currentSourceCompleted, isCsvInput, isHubspotMethodPending, selectedConnector]);
+
+  const hubspotConnectionTestMeta = selectedConnector ? connectionTestMetaByProvider[selectedConnector] ?? null : null;
+  const hubspotConnectionTestError = selectedConnector ? connectionTestErrorByProvider[selectedConnector] ?? null : null;
+  const hubspotLastConnectionTestAt = selectedConnector ? lastConnectionTestAtByProvider[selectedConnector] ?? null : null;
 
   const sourceAction = React.useMemo<WorkflowAction>(() => {
     if (!selectedConnector) {
@@ -825,6 +1088,17 @@ export function AccountSources() {
         tone: 'neutral' as const,
         disabled: true,
         reason: 'Sem fonte selecionada ainda.',
+      };
+    }
+
+    if (isHubspotMethodPending) {
+      return {
+        title: 'Escolha o método de entrada para continuar.',
+        description: 'HubSpot precisa de um método explícito: CSV local ou Private App / API Token.',
+        buttonLabel: 'Método pendente',
+        tone: 'info' as const,
+        disabled: true,
+        reason: 'Selecione CSV local ou Private App / API Token no bloco acima.',
       };
     }
 
@@ -861,6 +1135,30 @@ export function AccountSources() {
       };
     }
 
+    if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') {
+      if (hubspotConnectionTestStatus === 'testing') {
+        return {
+          title: 'Testando a conexão HubSpot.',
+          description: 'A Canopi está validando o token da Private App no servidor.',
+          buttonLabel: 'Teste em andamento',
+          tone: 'info' as const,
+          disabled: true,
+        };
+      }
+
+      return {
+        title: hubspotPrivateAppToken.trim()
+          ? 'Teste a conexão HubSpot para validar o acesso real.'
+          : 'Informe um token de Private App para testar a conexão HubSpot.',
+        description: 'O teste acontece no servidor. O token não é salvo e não aparece depois do envio.',
+        buttonLabel: hubspotTesting ? 'Testando...' : 'Testar conexão HubSpot',
+        tone: hubspotConnectionTestStatus === 'error' ? 'danger' as const : 'warning' as const,
+        onClick: testHubspotConnection,
+        disabled: hubspotTesting || !hubspotPrivateAppToken.trim(),
+        reason: hubspotConnectionTestError || undefined,
+      };
+    }
+
     if (hasDraftChanges) {
       return {
         title: 'Você tem alterações locais não salvas.',
@@ -887,11 +1185,13 @@ export function AccountSources() {
       };
     }
 
-    if (!accountSourcesStepCompleted) {
+    if (!currentSourceCompleted) {
       return {
-        title: isCsvInput ? 'CSV confirmado para uso local.' : 'Fonte confirmada para uso local.',
+        title: isCsvInput
+          ? 'CSV confirmado para uso local.'
+          : (isHubspotApiInput ? 'Conexão HubSpot validada.' : 'Fonte confirmada para uso local.'),
         description: 'A próxima ação é registrar a etapa desta fonte nesta sessão.',
-        buttonLabel: isCsvInput ? 'Concluir configuração' : 'Concluir etapa local',
+        buttonLabel: isCsvInput || isHubspotApiInput ? 'Concluir configuração' : 'Concluir etapa local',
         tone: 'success' as const,
         onClick: concludeLocalSetupFlow,
         disabled: false,
@@ -899,14 +1199,16 @@ export function AccountSources() {
     }
 
     return {
-      title: isCsvInput ? 'Configuração concluída.' : 'Etapa local registrada.',
+      title: isCsvInput
+        ? 'Configuração concluída.'
+        : (isHubspotApiInput ? 'Conexão HubSpot validada e etapa registrada.' : 'Etapa local registrada.'),
       description: 'O setup local desta fonte já foi concluído nesta sessão.',
-      buttonLabel: isCsvInput ? 'Configuração concluída' : 'Etapa local registrada',
+      buttonLabel: isCsvInput || isHubspotApiInput ? 'Configuração concluída' : 'Etapa local registrada',
       tone: 'success' as const,
       disabled: true,
     };
   }, [
-    accountSourcesStepCompleted,
+    currentSourceCompleted,
     connectorLocalValidated,
     csvUploadMeta,
     csvProcessingState,
@@ -914,14 +1216,23 @@ export function AccountSources() {
     openCsvPicker,
     saveLocalConfig,
     selectedConnector,
+    selectedInputMethod,
     concludeLocalSetupFlow,
     validateLocalContract,
     isCsvInput,
+    isHubspotMethodPending,
+    hubspotPrivateAppToken,
+    hubspotConnectionTestError,
+    hubspotConnectionTestStatus,
+    hubspotTesting,
+    isHubspotApiInput,
+    testHubspotConnection,
   ]);
 
   const lastSavedAt = formatActionTimestamp(customConfig.localSourceSavedAt ?? null);
   const lastValidatedAt = formatActionTimestamp(customConfig.localContractValidatedAt ?? null);
-  const stepCompletedAt = formatActionTimestamp(customConfig.accountSourcesStepCompletedAt ?? null);
+  const hubspotConnectionStepCompletedAt = formatActionTimestamp(customConfig.hubspotConnectionStepCompletedAt ?? null);
+  const stepCompletedAt = isHubspotApiInput ? hubspotConnectionStepCompletedAt : formatActionTimestamp(customConfig.accountSourcesStepCompletedAt ?? null);
 
   const csvFlowState = React.useMemo<CsvFlowState>(() => {
     if (!selectedConnector || !isCsvInput) return 'no-file';
@@ -1061,23 +1372,41 @@ export function AccountSources() {
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
-            <p className="mt-1 text-sm font-black text-slate-900">{isCsvInput ? 'CSV' : 'Não definido'}</p>
+            <p className="mt-1 text-sm font-black text-slate-900">{getInputMethodLabel(selectedConnector, selectedInputMethod)}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Arquivo</p>
-            <p className="mt-1 text-sm font-black text-slate-900">{csvUploadMeta?.fileName || 'Nenhum arquivo enviado'}</p>
+            <p className="mt-1 text-sm font-black text-slate-900">
+              {isCsvInput ? (csvUploadMeta?.fileName || 'Nenhum arquivo enviado') : 'Não aplicável neste método'}
+            </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Linhas</p>
-            <p className="mt-1 text-sm font-black text-slate-900">{csvRowCountLabel}</p>
+            <p className="mt-1 text-sm font-black text-slate-900">{isCsvInput ? csvRowCountLabel : '—'}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
-            <p className="mt-1 text-sm font-black text-slate-900">{csvStatusLabel}</p>
+            <p className="mt-1 text-sm font-black text-slate-900">
+              {isHubspotMethodPending
+                ? 'Método pendente'
+                : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
+            </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Conexão real</p>
-            <p className="mt-1 text-sm font-black text-slate-900">Não implementada</p>
+            <p className="mt-1 text-sm font-black text-slate-900">
+              {isHubspotMethodPending
+                ? 'Aguardando método'
+                : isHubspotApiInput
+                ? (hubspotConnectionTestStatus === 'success'
+                  ? 'HubSpot validada'
+                  : hubspotConnectionTestStatus === 'testing'
+                    ? 'Teste em andamento'
+                    : hubspotConnectionTestStatus === 'error'
+                      ? 'Falha no teste'
+                      : 'Pronta para teste')
+                : 'Não implementada'}
+            </p>
           </div>
         </div>
         <div className="mt-3 flex items-center justify-between gap-3">
@@ -1094,32 +1423,49 @@ export function AccountSources() {
         </div>
       </Card>
 
-      {selectedConnector && activePreset && (
+      {selectedConnector && activePreset && selectedConnector === 'hubspot' && (
         <Card className="border border-slate-200 p-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-            <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Como você quer configurar esta fonte agora?</p>
-              <h4 className="text-xl font-black tracking-tight text-slate-900">{activePreset?.name || 'Fonte selecionada'}</h4>
-              <p className="max-w-3xl text-sm font-medium text-slate-600">
-                Use um arquivo CSV exportado ou preparado para configurar esta fonte localmente. Conexão real continua fora deste recorte.
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Como deseja configurar o HubSpot?</p>
+            <h4 className="text-2xl font-black tracking-tight text-slate-900">Escolha um método de entrada</h4>
+            <p className="max-w-3xl text-sm font-medium text-slate-600">
+              Selecione CSV local para importar um arquivo exportado ou Private App / API Token para testar a conexão real no servidor.
+            </p>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setInputMethodForSelectedConnector('csv_upload')}
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                isCsvInput
+                  ? 'border-emerald-300 bg-emerald-50'
+                  : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50'
+              }`}
+            >
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-700">Usar CSV local</p>
+              <p className="mt-2 text-sm font-medium text-slate-600">
+                Importe um CSV exportado do HubSpot. Não conecta com a API.
               </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
-                CSV ativo
-              </span>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                API futura
-              </span>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Sync futuro
-              </span>
-            </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputMethodForSelectedConnector('private_app_token')}
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                isHubspotApiInput
+                  ? 'border-blue-300 bg-blue-50'
+                  : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+              }`}
+            >
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-blue-700">Conectar HubSpot via Private App</p>
+              <p className="mt-2 text-sm font-medium text-slate-600">
+                Teste uma conexão real usando token temporário. Não inicia sync.
+              </p>
+            </button>
           </div>
         </Card>
       )}
 
-      {selectedConnector && isCsvInput && draftConfig && (
+      {selectedConnector && activePreset && draftConfig && isCsvInput && !isHubspotMethodPending && (
         <Card className="relative overflow-hidden border border-slate-200 p-5 min-h-[680px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
@@ -1280,6 +1626,147 @@ export function AccountSources() {
 	        </Card>
 	      )}
 
+      {selectedConnector && activePreset && draftConfig && isHubspotApiInput && !isHubspotMethodPending && (
+        <Card className="relative overflow-hidden border border-blue-200 bg-blue-50/40 p-5 min-h-[540px]">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-500">Método de entrada</p>
+              <h4 className="text-2xl font-black tracking-tight text-slate-900">Testar conexão real do HubSpot</h4>
+              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+                A Canopi valida o token da Private App no servidor, sem salvar o segredo e sem iniciar sync real.
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
+                Conexão real C2.1
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Token temporário
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{activePreset?.name || 'HubSpot'}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+              <p className="mt-1 text-sm font-black text-slate-900">HubSpot real</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
+              <p className="mt-1 text-sm font-black text-slate-900">
+                {hubspotLastConnectionTestAt ? formatActionTimestamp(hubspotLastConnectionTestAt) : 'Nenhum teste realizado'}
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{getHubspotTestLabel(hubspotConnectionTestStatus)}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field
+                  label="Token da Private App"
+                  value={hubspotPrivateAppToken}
+                  onChange={setHubspotPrivateAppToken}
+                  placeholder="pat-nao-compartilhe-este-token"
+                  type="password"
+                />
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Orientação</p>
+                  <p className="mt-1 text-sm font-medium text-slate-600">
+                    Informe um token temporário apenas para testar a leitura de companies. O token não é salvo em sessionStorage.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void testHubspotConnection()}
+                  disabled={hubspotTesting || !hubspotPrivateAppToken.trim()}
+                  className="rounded-xl bg-slate-900 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                >
+                  {hubspotTesting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Testando conexão HubSpot
+                    </span>
+                  ) : (
+                    'Testar conexão HubSpot'
+                  )}
+                </button>
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
+                  <span className="inline-flex items-center gap-1">
+                    <KeyRound className="h-3.5 w-3.5" />
+                    Token não persistido
+                  </span>
+                </span>
+                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                  hubspotConnectionTestStatus === 'success'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : hubspotConnectionTestStatus === 'error'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {getHubspotTestLabel(hubspotConnectionTestStatus)}
+                </span>
+              </div>
+            </div>
+
+            <div className={`rounded-2xl border p-4 ${hubspotConnectionTestStatus === 'success' ? 'border-emerald-200 bg-emerald-50' : hubspotConnectionTestStatus === 'error' ? 'border-red-200 bg-red-50' : 'border-slate-200 bg-white'}`}>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
+              {hubspotConnectionTestStatus === 'success' && hubspotConnectionTestMeta ? (
+                <div className="mt-2 space-y-3">
+                  <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
+                    <ShieldCheck className="h-4 w-4" />
+                    Conexão HubSpot validada.
+                  </p>
+                  <div className="space-y-2 text-sm text-slate-700">
+                    <p><span className="font-black">Hub ID:</span> {hubspotConnectionTestMeta.hubId || 'Não retornado'}</p>
+                    <p><span className="font-black">Leitura mínima:</span> {hubspotConnectionTestMeta.readAccessConfirmed ? 'Confirmada' : 'Não confirmada'}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {hubspotConnectionTestMeta.scopes.length > 0 ? (
+                        hubspotConnectionTestMeta.scopes.map((scope) => (
+                          <span key={scope} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                            {scope}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Escopos não retornados
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-medium text-slate-500">
+                      Teste em {formatActionTimestamp(hubspotConnectionTestMeta.testedAt)}. O token foi descartado da tela após o envio.
+                    </p>
+                  </div>
+                </div>
+              ) : hubspotConnectionTestStatus === 'error' ? (
+                <div className="mt-2 space-y-2">
+                  <p className="text-base font-black text-red-800">Não foi possível validar a conexão HubSpot.</p>
+                  <p className="text-sm text-red-700">{hubspotConnectionTestError || 'Revise o token e tente novamente.'}</p>
+                </div>
+              ) : (
+                <div className="mt-2 space-y-2">
+                  <p className="text-base font-black text-slate-900">Aguardando teste real.</p>
+                  <p className="text-sm text-slate-600">
+                    O servidor ainda não validou o token. Após o teste, apenas metadados seguros permanecem na sessão.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {isCsvInput && (
       <Card className="border border-slate-200 p-0 overflow-hidden">
         <div className="border-b border-slate-100 bg-slate-50/80 px-5 py-4">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Configuração da fonte selecionada</p>
@@ -1298,7 +1785,7 @@ export function AccountSources() {
             </div>
           </div>
         ) : null}
-        {activePreset && selectedConnector && draftConfig && (
+        {activePreset && selectedConnector && draftConfig && isCsvInput && !isHubspotMethodPending && (
           <>
           <div className="space-y-6 px-5 py-5">
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
@@ -1381,10 +1868,10 @@ export function AccountSources() {
                       Fonte: {draftConfig.sourceName}
                     </span>
                     <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      Entrada: {isCsvInput ? 'CSV' : 'Não definida'}
+                      Entrada: {selectedConnector === 'hubspot' ? getInputMethodLabel(selectedConnector, selectedInputMethod) : 'CSV'}
                     </span>
                     <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      Status: {csvStatusLabel}
+                      Status: {isHubspotMethodPending ? 'Método pendente' : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
                     </span>
                   </div>
 
@@ -1449,34 +1936,46 @@ export function AccountSources() {
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.priorityTestObject}</p>
                 </div>
               </div>
-              <div className={`rounded-xl border p-3 ${connectorLocalValidated ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
+      <div className={`rounded-xl border p-3 ${(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Status da configuração</p>
                   <p className="text-sm font-medium text-slate-700">
-                    {connectorLocalValidated
-                      ? 'CSV confirmado para uso local. Se houver edição, o status volta para pendente.'
-                      : 'Revise os dados, salve a configuração local e confirme o uso do CSV.'}
+                    {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated)
+                      ? (isHubspotApiInput
+                        ? (currentSourceCompleted
+                          ? 'Conexão HubSpot validada e etapa concluída.'
+                          : 'Conexão HubSpot validada. Se houver edição, o status volta para pendente.')
+                        : 'CSV confirmado para uso local. Se houver edição, o status volta para pendente.')
+                      : (isHubspotApiInput
+                        ? 'Revise os dados, informe o token temporário e teste a conexão HubSpot.'
+                        : 'Revise os dados, salve a configuração local e confirme o uso do CSV.')}
                   </p>
                   <p className="text-[11px] font-medium text-slate-500">
-                    {connectorLocalValidated
-                      ? 'A confirmação ativa o próximo passo no bloco “O que fazer agora”.'
-                      : 'A confirmação continua disponível apenas no bloco principal acima.'}
+                    {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated)
+                      ? (isHubspotApiInput
+                        ? (currentSourceCompleted
+                          ? 'A etapa já foi registrada nesta sessão.'
+                          : 'A confirmação ativa o próximo passo no bloco “O que fazer agora”.')
+                        : 'A confirmação ativa o próximo passo no bloco “O que fazer agora”.')
+                      : (isHubspotApiInput
+                        ? 'O teste continua disponível apenas no bloco principal acima.'
+                        : 'A confirmação continua disponível apenas no bloco principal acima.')}
                   </p>
                 </div>
               </div>
-              {!connectorLocalValidated && hasDraftChanges && (
+              {!(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && hasDraftChanges && !isHubspotMethodPending && (
                 <p className="mt-2 text-[11px] font-medium text-slate-500">
                   Há edição local pendente. Salve a configuração para liberar a confirmação.
                 </p>
               )}
-              {!connectorLocalValidated && !hasDraftChanges && csvUploadMeta?.validationResult?.isValid === false && (
+              {!(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && !hasDraftChanges && isCsvInput && csvUploadMeta?.validationResult?.isValid === false && !isHubspotMethodPending && (
                 <p className="mt-2 text-[11px] font-medium text-slate-500">
                   Corrija o CSV antes de confirmar o uso desta fonte.
                 </p>
               )}
-              {connectorLocalValidated && lastValidatedAt && (
+              {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && (isHubspotApiInput ? (hubspotConnectionStepCompletedAt || hubspotLastConnectionTestAt) : lastValidatedAt) && !isHubspotMethodPending && (
                 <p className="mt-2 text-[11px] font-medium text-emerald-700">
-                  CSV confirmado em {lastValidatedAt}.
+                  {isHubspotApiInput ? 'Conexão HubSpot concluída em' : 'CSV confirmado em'} {isHubspotApiInput ? (hubspotConnectionStepCompletedAt || hubspotLastConnectionTestAt) : lastValidatedAt}.
                 </p>
               )}
             </div>
@@ -1491,11 +1990,12 @@ export function AccountSources() {
 	        </details>
 	      </>
 	      )}
-	      </Card>
+      </Card>
+      )}
 
-		      <div className="text-xs text-slate-400 font-medium">
+      <div className="text-xs text-slate-400 font-medium">
 	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Conexão real e sincronização contínua seguem para o recorte C2.</span>
-	      </div>
+      </div>
     </section>
   );
 }
