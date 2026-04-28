@@ -26,6 +26,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - C2.4.1 permanece como ajuste de clareza visual, sem nova capacidade funcional.
 - **Status:** ✅ Concluído e publicado.
 
+## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
+
+- **Natureza:** Sessão funcional + fechamento operacional.
+- **Objetivo:** Estruturar uma análise local de schema para o CSV, com headers detectados, qualidade da base, campos ausentes/extras e pré-mapeamento sugerido, preservando integralmente o fluxo CSV atual.
+- **Contexto:**
+  - O CSV já tinha upload, parse, preview e validação mínima.
+  - A frente precisava diferenciar análise local de schema de qualquer Camada Canônica definitiva.
+  - A heurística foi endurecida para evitar falsos positivos como `hubspot_owner_id -> externalAccountId` e `paid_media -> externalAccountId`.
+- **Decisão Técnica:**
+  - adicionar análise local de schema em `parseCsvLocal.ts`;
+  - persistir a análise em `csvUploadMeta.schemaAnalysis` durante o fluxo de upload;
+  - exibir bloco visual próprio de schema e pré-mapeamento em CSV;
+  - manter guardrails de read-only, sem sync, sem importação e sem Camada Canônica;
+  - não alterar HubSpot, Supabase, Auth, Salesforce/RD, writeback ou Dedupe avançado.
+- **Commit funcional:** `fa6fd34` — `feat(settings): add CSV schema validation pre-mapping`
+- **Validação:**
+  - CSV bom aprovado visualmente;
+  - CSV ruim aprovado visualmente;
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` sem runtime ativo;
+  - working tree limpa após os testes;
+  - `HEAD` local e `origin/main` sincronizados após o push funcional.
+- **Status:** ✅ Concluído e publicado.
+
 ## [2026-04-22] — Saneamento Absoluto Final do Repositório
 
 - **Natureza:** Sessão de limpeza técnica profunda e estabilização de build.

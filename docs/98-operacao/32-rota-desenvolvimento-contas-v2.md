@@ -327,11 +327,57 @@ Status: concluído e publicado em `origin/main`.
   - Ainda não transforma HubSpot em integração produtiva permanente.
   - Ainda não há Supabase, sync ou persistência durável de credenciais.
   - A frente continua sendo Fontes e Conectores 100%.
-- Sequência futura registrada, sem abrir agora:
-  - `C2.5` provável: CSV schema validation e pré-mapeamento local.
-    - Objetivo futuro: após upload CSV, detectar headers/colunas, validar campos recomendados, apontar lacunas, sugerir pré-mapeamento e mostrar qualidade mínima da base.
-  - Não implementar `C2.5` neste fechamento.
-  - Não avançar para outra frente antes de autorização explícita do Fábio.
+
+### Fechamento operacional do C2.5 — CSV schema validation e pré-mapeamento local
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit funcional: `fa6fd34` — `feat(settings): add CSV schema validation pre-mapping`
+- Escopo entregue:
+  - análise local de schema CSV;
+  - headers detectados;
+  - campos recomendados encontrados;
+  - campos recomendados ausentes;
+  - campos extras;
+  - pré-mapeamento local sugerido;
+  - qualidade da base;
+  - confiança do pré-mapeamento;
+  - avisos de qualidade;
+  - preservação integral do fluxo CSV atual.
+- Heurística protegida contra falsos positivos:
+  - `hubspot_owner_id` não mapeia para `externalAccountId`;
+  - `hubspot_owner_id` mapeia para `externalOwnerId`;
+  - `id` exato mapeia para `externalAccountId`;
+  - `paid_media` não mapeia para `externalAccountId`;
+  - `campaign_url` não mapeia para `accountDomain`.
+- Validação realizada:
+  - CSV bom aprovado visualmente;
+  - CSV ruim aprovado visualmente;
+  - bloco “Schema local e pré-mapeamento CSV” apareceu corretamente;
+  - guardrails visuais ficaram claros: read-only, pré-mapeamento local, sem sync, sem importação, não aplica Camada Canônica;
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` ficou sem runtime ativo;
+  - stage, commit e push controlados;
+  - `HEAD` local e `origin/main` sincronizados em `fa6fd34`.
+- Fora do escopo:
+  - Supabase;
+  - sync real;
+  - importação real;
+  - Camada Canônica definitiva;
+  - Dedupe avançado;
+  - writeback;
+  - alteração em HubSpot Private App;
+  - token/API/Auth;
+  - Salesforce real;
+  - RD Station real.
+- Observação operacional:
+  - C2.5 fecha o ciclo de análise local do CSV dentro de Fontes e Conectores.
+  - Ainda não transforma o CSV em base canônica ou syncável.
+  - A frente continua sendo Fontes e Conectores.
+- Próximo passo natural:
+  - não abrir novo recorte automaticamente;
+  - aguardar autorização explícita do Fábio para qualquer evolução futura.
 
 ### Fechamento operacional do C2.4.1 — Clareza de método HubSpot retomado da sessão
 
@@ -342,7 +388,7 @@ Status: concluído e publicado em `origin/main`.
 - **Arquivo alterado:** `src/app/(shell)/configuracoes/objetos/contas/_components/sections/AccountSources.tsx`
 - **Validação:** push publicado, `HEAD` e `origin/main` sincronizados, working tree limpo.
 - **Limites mantidos:** sem Supabase, sem sync, sem persistência real de credenciais, sem alteração em reset, token, CSV, API, Auth, Salesforce/RD, Camada Canônica ou Dedupe.
-- **Sequência futura provável:** `C2.5` — CSV schema validation e pré-mapeamento local, ainda não aberto.
+- **Sequência futura:** nenhuma recorte aberta automaticamente; novas evoluções dependem de autorização explícita do Fábio.
 
 ## 6. Para onde vão as responsabilidades
 
