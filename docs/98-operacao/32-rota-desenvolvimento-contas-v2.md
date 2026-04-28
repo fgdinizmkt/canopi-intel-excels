@@ -92,6 +92,41 @@ O plano maior de Configurações continua válido e não foi substituído. Neste
 - Persistência segura, sync e writeback ficam para depois que leitura e conexão real estiverem estáveis.
 - As demais etapas do setup não devem ser priorizadas antes dessa frente ficar melhor definida.
 
+### Fechamento operacional do C2.1 — HubSpot real
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit: `2871e53` — `feat(settings): add HubSpot real connection test flow`
+- Escopo entregue:
+  - teste real de conexão HubSpot via Private App / API Token;
+  - API route server-side para validação;
+  - token temporário sem persistência;
+  - resposta segura para o front;
+  - separação visual entre CSV local e Private App;
+  - método pendente para HubSpot antes da escolha explícita;
+  - fluxo CSV preservado;
+  - card de configuração local restrito ao modo CSV.
+- Fora do escopo:
+  - Supabase;
+  - sync real;
+  - writeback;
+  - persistência segura de credenciais;
+  - Salesforce real;
+  - RD Station real;
+  - importação real de companies;
+  - alteração em Auth.
+- Validações realizadas:
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - `npm run dev:check` sem runtime ativo;
+  - validação visual de HubSpot sem método, CSV local e Private App;
+  - stage, commit e push controlados;
+  - `HEAD` local e `origin/main` sincronizados.
+- Próximo passo natural:
+  - não abrir C2.2 automaticamente;
+  - antes, auditar o próximo sub-recorte de Fontes e Conectores;
+  - possíveis caminhos: persistência segura, teste com token real, leitura mínima controlada ou desenho de sync futuro.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
