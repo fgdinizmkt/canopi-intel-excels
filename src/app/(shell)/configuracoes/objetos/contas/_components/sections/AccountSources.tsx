@@ -20,6 +20,10 @@ import {
   type ConnectorType,
 } from '@/src/lib/contaConnectorsV2';
 import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
+import type {
+  AccountSchemaProperty,
+  AccountSchemaSuggestedMapping,
+} from '@/src/lib/accountConnectionModel';
 import { parseCsvText, validateCsvData, type CsvParseProgress, type CsvUploadMeta } from '@/src/lib/parseCsvLocal';
 
 interface LocalSourceConfig {
@@ -69,6 +73,7 @@ interface WorkflowAction {
 type CsvFlowState = 'no-file' | 'invalid' | 'dirty' | 'saved' | 'confirmed' | 'completed';
 type HubspotConnectionTestStatus = 'idle' | 'testing' | 'success' | 'error';
 type HubspotPreviewStatus = 'idle' | 'loading' | 'success' | 'error';
+type HubspotSchemaStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface HubspotConnectionTestMeta {
   provider: 'hubspot';
@@ -87,6 +92,17 @@ interface HubspotCompanyPreview {
   ownerId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+}
+
+interface HubspotSchemaDiscoveryPayload {
+  status?: 'success' | 'error';
+  provider?: string;
+  loadedAt?: string;
+  count?: number;
+  properties?: AccountSchemaProperty[];
+  suggestedMappings?: AccountSchemaSuggestedMapping[];
+  missingRecommendedFields?: AccountSchemaSuggestedMapping[];
+  error?: string;
 }
 
 interface CsvProcessingState extends CsvParseProgress {
@@ -386,6 +402,13 @@ export function AccountSources() {
   const [hubspotPreviewCompanies, setHubspotPreviewCompanies] = React.useState<HubspotCompanyPreview[]>([]);
   const [hubspotPreviewLoadedAt, setHubspotPreviewLoadedAt] = React.useState<string | null>(null);
   const [hubspotPreviewError, setHubspotPreviewError] = React.useState<string | null>(null);
+  const [hubspotSchemaStatus, setHubspotSchemaStatus] = React.useState<HubspotSchemaStatus>('idle');
+  const [hubspotSchemaProperties, setHubspotSchemaProperties] = React.useState<AccountSchemaProperty[]>([]);
+  const [hubspotSchemaTotalCount, setHubspotSchemaTotalCount] = React.useState<number | null>(null);
+  const [hubspotSchemaLoadedAt, setHubspotSchemaLoadedAt] = React.useState<string | null>(null);
+  const [hubspotSchemaError, setHubspotSchemaError] = React.useState<string | null>(null);
+  const [hubspotSchemaSuggestedMappings, setHubspotSchemaSuggestedMappings] = React.useState<AccountSchemaSuggestedMapping[]>([]);
+  const [hubspotMissingRecommendedFields, setHubspotMissingRecommendedFields] = React.useState<AccountSchemaSuggestedMapping[]>([]);
 
   // CSV upload local state
   const [isCsvParsing, setIsCsvParsing] = React.useState(false);
@@ -411,6 +434,15 @@ export function AccountSources() {
     setHubspotPreviewLoadedAt(null);
     setHubspotPreviewError(null);
   }, []);
+  const clearHubspotSchema = React.useCallback(() => {
+    setHubspotSchemaStatus('idle');
+    setHubspotSchemaProperties([]);
+    setHubspotSchemaTotalCount(null);
+    setHubspotSchemaLoadedAt(null);
+    setHubspotSchemaError(null);
+    setHubspotSchemaSuggestedMappings([]);
+    setHubspotMissingRecommendedFields([]);
+  }, []);
   const openCsvPicker = React.useCallback(() => {
     clearCsvInputValue();
     csvInputRef.current?.click();
@@ -421,12 +453,14 @@ export function AccountSources() {
       setHubspotPrivateAppToken('');
       setHubspotTesting(false);
       clearHubspotPreview();
+      clearHubspotSchema();
       return;
     }
     if (hubspotConnectionTestStatus !== 'success') {
       clearHubspotPreview();
+      clearHubspotSchema();
     }
-  }, [clearHubspotPreview, hubspotConnectionTestStatus, selectedConnector, selectedInputMethod]);
+  }, [clearHubspotPreview, clearHubspotSchema, hubspotConnectionTestStatus, selectedConnector, selectedInputMethod]);
 
   React.useEffect(() => {
     if (!selectedConnector) {
@@ -1156,6 +1190,77 @@ export function AccountSources() {
       setHubspotPreviewError(message);
       setHubspotPreviewCompanies([]);
       setHubspotPreviewLoadedAt(null);
+    }
+  }, [hubspotConnectionTestStatus, hubspotPrivateAppToken, selectedConnector, selectedInputMethod]);
+
+  const loadHubspotSchema = React.useCallback(async () => {
+    if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') return;
+    if (hubspotConnectionTestStatus !== 'success') {
+      setHubspotSchemaStatus('error');
+      setHubspotSchemaError('Valide a conexão HubSpot antes de detectar o schema de companies.');
+      setHubspotSchemaProperties([]);
+      setHubspotSchemaTotalCount(null);
+      setHubspotSchemaLoadedAt(null);
+      setHubspotSchemaSuggestedMappings([]);
+      setHubspotMissingRecommendedFields([]);
+      return;
+    }
+
+    const token = hubspotPrivateAppToken.trim();
+    if (!token) {
+      setHubspotSchemaStatus('error');
+      setHubspotSchemaError('Informe o token da Private App para detectar o schema de companies.');
+      setHubspotSchemaProperties([]);
+      setHubspotSchemaTotalCount(null);
+      setHubspotSchemaLoadedAt(null);
+      setHubspotSchemaSuggestedMappings([]);
+      setHubspotMissingRecommendedFields([]);
+      return;
+    }
+
+    setHubspotSchemaStatus('loading');
+    setHubspotSchemaError(null);
+
+    try {
+      const response = await fetch('/api/account-connectors/hubspot/schema', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        cache: 'no-store',
+        body: JSON.stringify({ tokenKey: token }),
+      });
+
+      const payload = await response.json().catch(() => null) as HubspotSchemaDiscoveryPayload | null;
+
+      if (!response.ok || payload?.status !== 'success') {
+        const message = payload?.error || 'Não foi possível detectar o schema de companies.';
+        setHubspotSchemaStatus('error');
+        setHubspotSchemaError(message);
+        setHubspotSchemaProperties([]);
+        setHubspotSchemaTotalCount(null);
+        setHubspotSchemaLoadedAt(null);
+        setHubspotSchemaSuggestedMappings([]);
+        setHubspotMissingRecommendedFields([]);
+        return;
+      }
+
+      setHubspotSchemaTotalCount(typeof payload?.count === 'number' ? payload.count : null);
+      setHubspotSchemaProperties(Array.isArray(payload?.properties) ? payload.properties.slice(0, 200) : []);
+      setHubspotSchemaLoadedAt(payload?.loadedAt || new Date().toISOString());
+      setHubspotSchemaSuggestedMappings(Array.isArray(payload?.suggestedMappings) ? payload.suggestedMappings : []);
+      setHubspotMissingRecommendedFields(Array.isArray(payload?.missingRecommendedFields) ? payload.missingRecommendedFields : []);
+      setHubspotSchemaStatus('success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível detectar o schema de companies.';
+      setHubspotSchemaStatus('error');
+      setHubspotSchemaError(message);
+      setHubspotSchemaProperties([]);
+      setHubspotSchemaTotalCount(null);
+      setHubspotSchemaLoadedAt(null);
+      setHubspotSchemaSuggestedMappings([]);
+      setHubspotMissingRecommendedFields([]);
     }
   }, [hubspotConnectionTestStatus, hubspotPrivateAppToken, selectedConnector, selectedInputMethod]);
 
@@ -1960,6 +2065,180 @@ export function AccountSources() {
               </div>
             )}
           </div>
+        </Card>
+      )}
+
+      {selectedConnector && activePreset && draftConfig && isHubspotApiInput && hubspotConnectionTestStatus === 'success' && (
+        <Card className="border border-violet-200 bg-violet-50/70 p-5">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Read-only</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Pré-mapeamento</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem sync</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem importação</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Token não persistido</span>
+                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Não aplica Camada Canônica</span>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-600">Schema e pré-mapeamento HubSpot</p>
+              <h4 className="text-xl font-black tracking-tight text-slate-900">Detecte os campos de companies e veja uma sugestão inicial para Contas</h4>
+              <p className="max-w-3xl text-sm font-medium text-slate-600">
+                Isso não aplica mapeamento canônico, não importa dados e não inicia sync. O objetivo é preparar a próxima etapa com metadados seguros do schema.
+              </p>
+            </div>
+
+            <div className="flex shrink-0 flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => void loadHubspotSchema()}
+                disabled={hubspotSchemaStatus === 'loading' || !hubspotPrivateAppToken.trim()}
+                className="rounded-xl bg-violet-700 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-violet-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+              >
+                {hubspotSchemaStatus === 'loading' ? 'Detectando schema...' : 'Detectar campos de companies'}
+              </button>
+              <p className="text-[11px] font-medium text-slate-500">
+                {hubspotSchemaStatus === 'idle'
+                  ? 'Pronto para detectar properties read-only.'
+                  : hubspotSchemaStatus === 'success'
+                    ? 'Schema detectado e pré-mapeamento carregado.'
+                    : hubspotSchemaStatus === 'error'
+                      ? hubspotSchemaError || 'Revise o token e tente novamente.'
+                      : 'Lendo properties de companies no servidor.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-violet-100 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Properties detectadas</p>
+              <p className="mt-1 text-sm font-black text-slate-900">
+                {(hubspotSchemaTotalCount ?? hubspotSchemaProperties.length).toLocaleString('pt-BR')}
+              </p>
+            </div>
+            <div className="rounded-xl border border-violet-100 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Properties exibidas</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaProperties.length.toLocaleString('pt-BR')}</p>
+            </div>
+            <div className="rounded-xl border border-violet-100 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaSuggestedMappings.length.toLocaleString('pt-BR')}</p>
+            </div>
+            <div className="rounded-xl border border-violet-100 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{hubspotMissingRecommendedFields.length.toLocaleString('pt-BR')}</p>
+            </div>
+            <div className="rounded-xl border border-violet-100 bg-white p-3 md:col-span-2 xl:col-span-4">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último carregamento</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaLoadedAt ? formatActionTimestamp(hubspotSchemaLoadedAt) || 'agora' : '—'}</p>
+            </div>
+          </div>
+
+          {hubspotSchemaStatus === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <p className="text-sm font-black text-red-800">Não foi possível detectar o schema de companies.</p>
+              <p className="mt-1 text-sm text-red-700">{hubspotSchemaError || 'Revise o token e tente novamente.'}</p>
+            </div>
+          )}
+
+          {hubspotSchemaStatus === 'success' && (
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
+                <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white">
+                  <div className="border-b border-violet-50 bg-violet-50/60 px-4 py-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200">
+                      <thead className="bg-slate-50">
+                        <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                          <th className="px-4 py-3">Campo HubSpot</th>
+                          <th className="px-4 py-3">Rótulo HubSpot</th>
+                          <th className="px-4 py-3">Tipo</th>
+                          <th className="px-4 py-3">Campo sugerido na Canopi</th>
+                          <th className="px-4 py-3">Confiança</th>
+                          <th className="px-4 py-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 bg-white">
+                        {[...hubspotSchemaSuggestedMappings, ...hubspotMissingRecommendedFields].map((mapping) => (
+                          <tr key={`${mapping.canopiField}-${mapping.hubspotField}`} className="text-sm text-slate-700">
+                            <td className="px-4 py-3 font-semibold text-slate-900">{mapping.hubspotField}</td>
+                            <td className="px-4 py-3">{mapping.hubspotLabel}</td>
+                            <td className="px-4 py-3">{mapping.status === 'encontrado' ? 'property' : 'property esperada'}</td>
+                            <td className="px-4 py-3 font-semibold text-slate-900">{mapping.canopiField}</td>
+                            <td className="px-4 py-3">{mapping.confidence}</td>
+                            <td className="px-4 py-3">
+                              <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                mapping.status === 'encontrado'
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : 'bg-amber-100 text-amber-700'
+                              }`}>
+                                {mapping.status === 'encontrado' ? 'Encontrado' : 'Ausente'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-violet-100 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos detectados</p>
+                    <p className="mt-1 text-sm font-medium text-slate-600">Lista compacta com os primeiros campos encontrados no schema read-only.</p>
+                    <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+                      <div className="max-h-[420px] overflow-auto">
+                        <table className="min-w-full divide-y divide-slate-200">
+                          <thead className="bg-slate-50">
+                            <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                              <th className="px-3 py-2">Nome</th>
+                              <th className="px-3 py-2">Rótulo</th>
+                              <th className="px-3 py-2">Tipo</th>
+                              <th className="px-3 py-2">Grupo</th>
+                              <th className="px-3 py-2">Oculta</th>
+                              <th className="px-3 py-2">Somente leitura</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 bg-white">
+                            {hubspotSchemaProperties.slice(0, 12).map((property) => (
+                              <tr key={property.name} className="text-xs text-slate-700">
+                                <td className="px-3 py-2 font-semibold text-slate-900">{property.name}</td>
+                                <td className="px-3 py-2">{property.label}</td>
+                                <td className="px-3 py-2">{property.type}</td>
+                                <td className="px-3 py-2">{property.groupName || '—'}</td>
+                                <td className="px-3 py-2">{property.hidden ? 'Sim' : 'Não'}</td>
+                                <td className="px-3 py-2">{property.readOnlyDefinition || property.readOnlyValue ? 'Sim' : 'Não'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-violet-100 bg-white p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Lacunas identificadas</p>
+                    <p className="mt-1 text-sm font-medium text-slate-600">Campos recomendados que ainda não apareceram no schema detectado.</p>
+                    <div className="mt-3 space-y-2">
+                      {hubspotMissingRecommendedFields.length > 0 ? hubspotMissingRecommendedFields.map((mapping) => (
+                        <div key={`${mapping.canopiField}-missing`} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                          <p className="text-sm font-black text-slate-900">{mapping.hubspotField}</p>
+                          <p className="text-xs text-slate-600">
+                            Sugestão Canopi: {mapping.canopiField} • {mapping.canopiLabel}
+                          </p>
+                        </div>
+                      )) : (
+                        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+                          <p className="text-sm font-black text-emerald-800">Nenhuma lacuna nas recomendações iniciais.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 

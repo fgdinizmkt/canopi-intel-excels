@@ -96,6 +96,40 @@ export interface AccountConnectorAdapterDefinition {
   nextRecommendedStep: string;
 }
 
+export interface AccountSchemaProperty {
+  name: string;
+  label: string;
+  type: string;
+  fieldType: string;
+  description: string | null;
+  groupName: string | null;
+  hidden: boolean;
+  calculated: boolean;
+  readOnlyValue: boolean;
+  readOnlyDefinition: boolean;
+  hasUniqueValue: boolean;
+  optionCount: number;
+  referencedObjectType: string | null;
+}
+
+export interface AccountSchemaSuggestedMapping {
+  hubspotField: string;
+  hubspotLabel: string;
+  canopiField: string;
+  canopiLabel: string;
+  confidence: 'alta' | 'média' | 'baixa';
+  status: 'encontrado' | 'ausente';
+}
+
+export interface AccountSchemaDiscoveryResult {
+  provider: AccountConnectorProvider;
+  loadedAt: string;
+  count: number;
+  properties: AccountSchemaProperty[];
+  suggestedMappings: AccountSchemaSuggestedMapping[];
+  missingRecommendedFields: AccountSchemaSuggestedMapping[];
+}
+
 interface BuildContractOptions {
   hasLocalSetup: boolean;
 }
