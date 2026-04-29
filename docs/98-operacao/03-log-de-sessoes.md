@@ -51,6 +51,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - `HEAD` local e `origin/main` sincronizados após o push funcional.
 - **Status:** ✅ Concluído e publicado.
 
+## [2026-04-29] — Contas V2 / C2.6 (Generalização multi-conector de Fontes e Conectores)
+
+- **Natureza:** Sessão funcional + fechamento operacional.
+- **Objetivo:** Generalizar a superfície de Fontes e Conectores para diferenciar com clareza conector funcional real, shell/preset local e capacidade ainda não implementada, sem transformar shells em integrações reais.
+- **Contexto:**
+  - o HubSpot já estava funcional com teste, preview, schema e reset seguro;
+  - o CSV local já estava funcional com schema e pré-mapeamento;
+  - a tela estava expondo texto de bastidor e conectores futuros que não deviam aparecer como produto;
+  - havia risco de crash por `selectedConnector` legado/inválido e adapter ausente.
+- **Decisão Técnica:**
+  - adicionar `surfaceKind` ao contrato de conector;
+  - criar `getAccountConnectorAdapterSafe` e blindagem para provider inválido/legado;
+  - sanitizar sessão e preservar fallback visual para fonte salva incompatível;
+  - reduzir a UI a conectores reais e shells/presets locais;
+  - remover da superfície visual conectores futuros e linguagem de bastidor não autorizada.
+- **Commit funcional:** `e14ae73` — `feat(settings): generalize account connector surface`
+- **Validação:**
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual aprovada em Fontes e Conectores;
+  - push funcional publicado;
+  - `HEAD` e `origin/main` sincronizados;
+  - working tree permaneceu com o bloco ABE/off-plan separado e fora do commit seletivo.
+- **Status:** ✅ Concluído e publicado.
+
 ## [2026-04-22] — Saneamento Absoluto Final do Repositório
 
 - **Natureza:** Sessão de limpeza técnica profunda e estabilização de build.

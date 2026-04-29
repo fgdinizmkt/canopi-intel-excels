@@ -390,6 +390,40 @@ Status: concluído e publicado em `origin/main`.
 - **Limites mantidos:** sem Supabase, sem sync, sem persistência real de credenciais, sem alteração em reset, token, CSV, API, Auth, Salesforce/RD, Camada Canônica ou Dedupe.
 - **Sequência futura:** nenhuma recorte aberta automaticamente; novas evoluções dependem de autorização explícita do Fábio.
 
+### Fechamento operacional do C2.6 — Generalização multi-conector de Fontes e Conectores
+
+Status: concluído e publicado em `origin/main`.
+
+- Commit funcional: `e14ae73` — `feat(settings): generalize account connector surface`
+- Escopo entregue:
+  - superfície multi-conector generalizada;
+  - HubSpot mantido como funcional real;
+  - CSV local preservado como fluxo funcional;
+  - Salesforce, RD Station CRM e Outro CRM tratados como shell/preset local;
+  - blindagem contra `selectedConnector` inválido/legado;
+  - `getAccountConnectorAdapterSafe`;
+  - fallback visual para fonte salva incompatível;
+  - remoção de conectores futuros não autorizados e linguagem de bastidor da UI;
+  - distinção visual entre conector real e preset/local.
+- Validações:
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual aprovada em Fontes e Conectores;
+  - push funcional publicado;
+  - `HEAD` e `origin/main` sincronizados.
+- Fora do escopo:
+  - Supabase;
+  - sync;
+  - writeback;
+  - OAuth novo;
+  - Salesforce real;
+  - RD Station real;
+  - novos conectores reais;
+  - abertura automática de B.2.
+- Próximo passo:
+  - não abrir novo recorte automaticamente;
+  - antes de avançar, decidir se Fontes e Conectores precisa de novo C2.x ou se o próximo movimento volta ao plano registrado.
+
 ## 6. Para onde vão as responsabilidades
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
