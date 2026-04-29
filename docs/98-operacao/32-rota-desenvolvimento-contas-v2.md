@@ -94,7 +94,7 @@ O plano maior de Configurações continua válido e não foi substituído. Neste
 
 ### Fechamento operacional do C2.1 — HubSpot real
 
-Status: concluído e publicado em `origin/main`.
+Status: concluído localmente, pendente de push.
 
 - Commit: `2871e53` — `feat(settings): add HubSpot real connection test flow`
 - Escopo entregue:
@@ -129,7 +129,7 @@ Status: concluído e publicado em `origin/main`.
 
 ### Fechamento operacional do C2.2 — HubSpot preview read-only
 
-Status: concluído e publicado em `origin/main`.
+Status: concluído localmente, pendente de push.
 
 - Commit: `8ec4914` — `feat(settings): add HubSpot companies read-only preview`
 - Escopo entregue:
@@ -423,6 +423,39 @@ Status: concluído e publicado em `origin/main`.
 - Próximo passo:
   - não abrir novo recorte automaticamente;
   - antes de avançar, decidir se Fontes e Conectores precisa de novo C2.x ou se o próximo movimento volta ao plano registrado.
+
+### Fechamento operacional do C2.7 — Salesforce real connection test flow
+
+Status: concluído e publicado em `origin/main`.
+
+- **Commit funcional:** `bf6ace9` — `feat(settings): add Salesforce connection test flow`
+- **Escopo entregue:**
+  - Salesforce deixou de ser apenas shell/preset local e ganhou teste real mínimo server-side;
+  - credenciais temporárias são enviadas apenas por `POST`, sem persistência durável;
+  - teste read-only com resposta sanitizada para falhas de rede, DNS, TLS, timeout ou erro inesperado;
+  - UI passou a mostrar `Teste real mínimo do Salesforce`;
+  - Ajuste mínimo de navegação em Configurações expôs acesso direto à tela real de Fontes e Conectores;
+  - HubSpot e CSV foram preservados;
+  - RD Station CRM e Outro CRM seguiram como shells/presets locais.
+- **Fora do escopo:**
+  - Supabase;
+  - sync;
+  - writeback;
+  - OAuth completo permanente;
+  - Camada Canônica;
+  - Validação/Publicação;
+  - B.2;
+  - novos conectores reais;
+  - alteração do bloco ABE/Cockpit.
+- **Validação:**
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual aprovada em browser autenticado;
+  - a navegação atual passou a expor diretamente `Fontes e Conectores`;
+  - working tree off-plan permaneceu fora do commit seletivo.
+- **Próximo passo:**
+  - não abrir novo recorte automaticamente;
+  - manter Fontes e Conectores como frente ativa até nova autorização explícita.
 
 ## 6. Para onde vão as responsabilidades
 

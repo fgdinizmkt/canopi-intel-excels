@@ -87,6 +87,11 @@ Configurações que precisam existir porque alimentam a experiência de Contas:
 
 - matching e dedupe
 
+Fechamentos recentes da frente Contas V2:
+
+- C2.6 concluído: superfície multi-conector generalizada, com HubSpot e CSV preservados e shells/presets locais mantidos.
+- C2.7 concluído localmente, pendente de push: Salesforce recebeu teste real mínimo server-side e a navegação de Configurações ganhou acesso direto para Fontes e Conectores.
+
 
 ### 2. Sinais
 Configurações de Sinais:

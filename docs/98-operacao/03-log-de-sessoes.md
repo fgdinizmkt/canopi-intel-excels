@@ -24,7 +24,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - working tree limpa;
   - alteração funcional restrita a `AccountSources.tsx` com 3 inserções;
   - C2.4.1 permanece como ajuste de clareza visual, sem nova capacidade funcional.
-- **Status:** ✅ Concluído e publicado.
+- **Status:** ✅ Concluído localmente, pendente de push.
 
 ## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
 
@@ -74,6 +74,32 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - push funcional publicado;
   - `HEAD` e `origin/main` sincronizados;
   - working tree permaneceu com o bloco ABE/off-plan separado e fora do commit seletivo.
+- **Status:** ✅ Concluído e publicado.
+
+## [2026-04-29] — Contas V2 / C2.7 (Salesforce real connection test flow)
+
+- **Natureza:** Sessão funcional + fechamento operacional.
+- **Objetivo:** Transformar Salesforce de shell/preset local em teste real mínimo de conexão, com resposta sanitizada e sem persistência durável de credenciais.
+- **Contexto:**
+  - a superfície de Fontes e Conectores já havia sido normalizada para acesso direto;
+  - HubSpot e CSV continuavam preservados;
+  - RD Station CRM e Outro CRM permaneceram como shells/presets locais;
+  - o recorte não podia tocar em B.2, Camada Canônica ou Validação/Publicação.
+- **Decisão Técnica:**
+  - adicionar teste server-side mínimo de Salesforce por `POST`;
+  - validar `URL da instância + token temporário` de forma read-only;
+  - sanitizar falhas de rede, DNS, TLS, timeout e erros inesperados;
+  - atualizar a UI para distinguir Salesforce como `Teste real mínimo`;
+  - manter o ajuste mínimo de navegação em Configurações para expor diretamente Fontes e Conectores;
+  - preservar HubSpot, CSV e os presets locais sem reabrir outros recortes.
+- **Commit funcional:** `bf6ace9` — `feat(settings): add Salesforce connection test flow`
+- **Validação:**
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual aprovada em browser autenticado;
+  - a superfície de Fontes e Conectores ficou acessível a partir da navegação atual;
+  - working tree off-plan permaneceu fora do commit seletivo;
+  - `HEAD` local avançou sobre `origin/main` após os commits funcional e documental locais.
 - **Status:** ✅ Concluído e publicado.
 
 ## [2026-04-22] — Saneamento Absoluto Final do Repositório
