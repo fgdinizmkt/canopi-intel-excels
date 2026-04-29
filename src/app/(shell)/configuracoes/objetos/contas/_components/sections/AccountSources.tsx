@@ -94,6 +94,16 @@ interface HubspotConnectionTestMeta {
   readAccessConfirmed: boolean;
 }
 
+interface SalesforceConnectionTestMeta {
+  provider: 'salesforce';
+  testedAt: string;
+  instanceUrl: string;
+  apiVersion: string;
+  accountLabel: string;
+  accountFieldsCount: number;
+  readAccessConfirmed: boolean;
+}
+
 interface HubspotCompanyPreview {
   id: string;
   name: string | null;
@@ -141,6 +151,21 @@ function formatActionTimestamp(value: string | null | undefined): string | null 
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return null;
   return ACTION_TIMESTAMP_FORMATTER.format(parsed);
+}
+
+function normalizeSalesforceInstanceUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  try {
+    const url = new URL(candidate);
+    const host = url.hostname.toLowerCase();
+    if (!host.endsWith('salesforce.com') && !host.endsWith('force.com')) return '';
+    return url.origin;
+  } catch {
+    return '';
+  }
 }
 
 function findNativeField(
@@ -245,9 +270,9 @@ function mergeWithDefaults(type: ConnectorType, saved: Partial<LocalSourceConfig
 function getAuthTypeLabel(authType: string): string {
   switch (authType) {
     case 'oauth2_authorization_code': return 'OAuth 2.0 (Authorization Code)';
+    case 'bearer_token': return 'Token temporário';
     case 'private_app_token': return 'Token de App Privado';
     case 'api_token': return 'Token de API';
-    case 'bearer_token': return 'Bearer Token';
     case 'basic_auth': return 'Basic Auth';
     case 'none': return 'Sem autenticação';
     default: return authType;
@@ -272,7 +297,7 @@ function getConnectionStatusLabel(status: string): string {
 
 function getIngestMethod(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'Shell/preset · API + OAuth 2.0';
+    case 'salesforce': return 'Teste real mínimo · Token temporário + URL da instância';
     case 'hubspot': return 'Funcional real · Private App API';
     case 'rd_station': return 'Shell/preset · API + Token';
     case 'other_crm': return 'Shell/preset · API, banco ou middleware';
@@ -285,6 +310,7 @@ function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedIn
   if (!selectedConnector) return 'Não definida';
   if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
   if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
+  if (selectedConnector === 'salesforce') return 'Conexão real mínima';
   if (selectedInputMethod === 'csv_upload') return 'CSV local';
   if (selectedInputMethod === 'native_setup') return 'Setup local guiado';
   if (selectedInputMethod) return selectedInputMethod;
@@ -424,7 +450,7 @@ function getCsvSchemaTone(level: CsvSchemaQualityLevel): 'neutral' | 'info' | 'w
 
 function getIntegrationLabel(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'Shell/preset';
+    case 'salesforce': return 'Teste real mínimo';
     case 'hubspot': return 'Funcional real';
     case 'rd_station': return 'Shell/preset';
     case 'other_crm': return 'Shell/preset';
@@ -579,6 +605,12 @@ export function AccountSources() {
   const [hubspotSchemaError, setHubspotSchemaError] = React.useState<string | null>(null);
   const [hubspotSchemaSuggestedMappings, setHubspotSchemaSuggestedMappings] = React.useState<AccountSchemaSuggestedMapping[]>([]);
   const [hubspotMissingRecommendedFields, setHubspotMissingRecommendedFields] = React.useState<AccountSchemaSuggestedMapping[]>([]);
+  const [salesforceInstanceUrl, setSalesforceInstanceUrl] = React.useState('');
+  const [salesforceAccessToken, setSalesforceAccessToken] = React.useState('');
+  const [salesforceTesting, setSalesforceTesting] = React.useState(false);
+  const [salesforceConnectionTestStatus, setSalesforceConnectionTestStatus] = React.useState<HubspotConnectionTestStatus>('idle');
+  const [salesforceConnectionTestError, setSalesforceConnectionTestError] = React.useState<string | null>(null);
+  const [salesforceConnectionTestMeta, setSalesforceConnectionTestMeta] = React.useState<SalesforceConnectionTestMeta | null>(null);
 
   // CSV upload local state
   const [isCsvParsing, setIsCsvParsing] = React.useState(false);
@@ -1378,6 +1410,189 @@ export function AccountSources() {
     }
   }, [hubspotPrivateAppToken, selectedConnector, selectedInputMethod, setAccountSourcesStepCompleted, setConnectorLocalValidated, updateCustomConfig]);
 
+  const testSalesforceConnection = React.useCallback(async () => {
+    if (!selectedConnector || selectedConnector !== 'salesforce') return;
+
+    const instanceUrl = normalizeSalesforceInstanceUrl(salesforceInstanceUrl);
+    const token = salesforceAccessToken.trim();
+    const now = new Date().toISOString();
+
+    if (!instanceUrl || !token) {
+      setSalesforceConnectionTestStatus('error');
+      setSalesforceConnectionTestError('Informe a URL da instância Salesforce e o token temporário para testar a conexão.');
+      setSalesforceConnectionTestMeta(null);
+      setSalesforceTesting(false);
+      setConnectorLocalValidated(false);
+      setAccountSourcesStepCompleted(false);
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectorLocalValidated: false,
+        connectorLocalValidatedByProvider: {
+          ...(prev.connectorLocalValidatedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompleted: false,
+        accountSourcesStepCompletedByProvider: {
+          ...(prev.accountSourcesStepCompletedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompletedAt: null,
+        accountSourcesStepCompletedAtByProvider: {
+          ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+        localContractValidatedAt: null,
+        localContractValidatedAtByProvider: {
+          ...(prev.localContractValidatedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+      }));
+      return;
+    }
+
+    setSalesforceTesting(true);
+    setSalesforceConnectionTestStatus('testing');
+    setSalesforceConnectionTestError(null);
+    setSalesforceConnectionTestMeta(null);
+
+    try {
+      const response = await fetch('/api/account-connectors/salesforce/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ instanceUrl, token, apiVersion: 'v60.0' }),
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | {
+          status?: 'success' | 'error';
+          provider?: string;
+          testedAt?: string;
+          instanceUrl?: string;
+          apiVersion?: string;
+          accountLabel?: string;
+          accountFieldsCount?: number;
+          readAccessConfirmed?: boolean;
+          error?: string;
+        }
+        | null;
+
+      if (!response.ok || payload?.status !== 'success') {
+        const message = payload?.error || 'Não foi possível validar a conexão Salesforce.';
+        setSalesforceConnectionTestStatus('error');
+        setSalesforceConnectionTestError(message);
+        setSalesforceConnectionTestMeta(null);
+        setConnectorLocalValidated(false);
+        setAccountSourcesStepCompleted(false);
+        updateCustomConfig((prev: any) => ({
+          ...prev,
+          connectorLocalValidated: false,
+          connectorLocalValidatedByProvider: {
+            ...(prev.connectorLocalValidatedByProvider || {}),
+            [selectedConnector]: false,
+          },
+          accountSourcesStepCompleted: false,
+          accountSourcesStepCompletedByProvider: {
+            ...(prev.accountSourcesStepCompletedByProvider || {}),
+            [selectedConnector]: false,
+          },
+          accountSourcesStepCompletedAt: null,
+          accountSourcesStepCompletedAtByProvider: {
+            ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+            [selectedConnector]: null,
+          },
+          localContractValidatedAt: null,
+          localContractValidatedAtByProvider: {
+            ...(prev.localContractValidatedAtByProvider || {}),
+            [selectedConnector]: null,
+          },
+        }));
+        return;
+      }
+
+      const testedAt = payload?.testedAt || now;
+      const meta: SalesforceConnectionTestMeta = {
+        provider: 'salesforce',
+        testedAt,
+        instanceUrl: payload?.instanceUrl || instanceUrl,
+        apiVersion: payload?.apiVersion || 'v60.0',
+        accountLabel: payload?.accountLabel || 'Account',
+        accountFieldsCount: typeof payload?.accountFieldsCount === 'number' ? payload.accountFieldsCount : 0,
+        readAccessConfirmed: payload?.readAccessConfirmed === true,
+      };
+
+      setSalesforceConnectionTestStatus('success');
+      setSalesforceConnectionTestError(null);
+      setSalesforceConnectionTestMeta(meta);
+      setConnectorLocalValidated(true);
+      setAccountSourcesStepCompleted(false);
+
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectorLocalValidated: true,
+        connectorLocalValidatedByProvider: {
+          ...(prev.connectorLocalValidatedByProvider || {}),
+          [selectedConnector]: true,
+        },
+        localContractValidatedAt: testedAt,
+        localContractValidatedAtByProvider: {
+          ...(prev.localContractValidatedAtByProvider || {}),
+          [selectedConnector]: testedAt,
+        },
+        accountSourcesStepCompleted: false,
+        accountSourcesStepCompletedByProvider: {
+          ...(prev.accountSourcesStepCompletedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompletedAt: null,
+        accountSourcesStepCompletedAtByProvider: {
+          ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+      }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Não foi possível validar a conexão Salesforce.';
+      setSalesforceConnectionTestStatus('error');
+      setSalesforceConnectionTestError(message);
+      setSalesforceConnectionTestMeta(null);
+      setConnectorLocalValidated(false);
+      setAccountSourcesStepCompleted(false);
+      updateCustomConfig((prev: any) => ({
+        ...prev,
+        connectorLocalValidated: false,
+        connectorLocalValidatedByProvider: {
+          ...(prev.connectorLocalValidatedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompleted: false,
+        accountSourcesStepCompletedByProvider: {
+          ...(prev.accountSourcesStepCompletedByProvider || {}),
+          [selectedConnector]: false,
+        },
+        accountSourcesStepCompletedAt: null,
+        accountSourcesStepCompletedAtByProvider: {
+          ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+        localContractValidatedAt: null,
+        localContractValidatedAtByProvider: {
+          ...(prev.localContractValidatedAtByProvider || {}),
+          [selectedConnector]: null,
+        },
+      }));
+    } finally {
+      setSalesforceTesting(false);
+    }
+  }, [
+    salesforceAccessToken,
+    salesforceInstanceUrl,
+    selectedConnector,
+    setAccountSourcesStepCompleted,
+    setConnectorLocalValidated,
+    updateCustomConfig,
+  ]);
+
   const loadHubspotPreview = React.useCallback(async () => {
     if (!selectedConnector || selectedConnector !== 'hubspot' || selectedInputMethod !== 'private_app_token') return;
     if (hubspotConnectionTestStatus !== 'success') {
@@ -1629,6 +1844,30 @@ export function AccountSources() {
       };
     }
 
+    if (selectedConnector === 'salesforce') {
+      if (salesforceTesting) {
+        return {
+          title: 'Testando a conexão Salesforce.',
+          description: 'A Canopi está validando a URL da instância e o token temporário no servidor.',
+          buttonLabel: 'Teste em andamento',
+          tone: 'info' as const,
+          disabled: true,
+        };
+      }
+
+      return {
+        title: salesforceInstanceUrl.trim() && salesforceAccessToken.trim()
+          ? 'Teste a conexão Salesforce para validar o acesso real mínimo.'
+          : 'Informe a URL da instância e o token temporário para testar a conexão Salesforce.',
+        description: 'O teste acontece no servidor em modo read-only. Nada é salvo, sincronizado ou escrito no CRM.',
+        buttonLabel: salesforceConnectionTestStatus === 'success' ? 'Testar novamente' : 'Testar conexão Salesforce',
+        tone: salesforceConnectionTestStatus === 'error' ? 'danger' as const : 'warning' as const,
+        onClick: testSalesforceConnection,
+        disabled: !salesforceInstanceUrl.trim() || !salesforceAccessToken.trim(),
+        reason: salesforceConnectionTestError || undefined,
+      };
+    }
+
     if (hasDraftChanges) {
       return {
         title: 'Você tem alterações locais não salvas.',
@@ -1697,6 +1936,12 @@ export function AccountSources() {
     hubspotTesting,
     isHubspotApiInput,
     testHubspotConnection,
+    salesforceAccessToken,
+    salesforceConnectionTestError,
+    salesforceConnectionTestStatus,
+    salesforceInstanceUrl,
+    salesforceTesting,
+    testSalesforceConnection,
   ]);
 
   const lastSavedAt = formatActionTimestamp(customConfig.localSourceSavedAt ?? null);
@@ -2058,7 +2303,22 @@ export function AccountSources() {
 
           <div className="mt-2 rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Conexão real</p>
-            <p className="mt-1 text-sm font-black text-slate-900">Não implementada</p>
+            <p className="mt-1 text-sm font-black text-slate-900">
+              {selectedConnector === 'salesforce'
+                ? (salesforceConnectionTestStatus === 'success'
+                  ? 'Teste mínimo validado nesta sessão'
+                  : salesforceConnectionTestStatus === 'testing'
+                    ? 'Teste em andamento'
+                    : 'Teste real mínimo disponível')
+                : selectedConnector === 'hubspot'
+                  ? 'Conexão real disponível no fluxo abaixo'
+                  : 'Não implementada'}
+            </p>
+            <p className="mt-1 text-xs font-medium text-slate-500">
+              {selectedConnector === 'salesforce'
+                ? 'Leitura segura no servidor com token temporário e URL da instância.'
+                : 'Sem sync, sem importação e sem writeback.'}
+            </p>
           </div>
 
           <div className="mt-4 min-h-[360px] space-y-4">
@@ -2320,8 +2580,149 @@ export function AccountSources() {
             </div>
 	          )}
 	        </div>
-	        </Card>
-	      )}
+      </Card>
+    )}
+
+      {selectedConnector && activePreset && draftConfig && selectedConnector === 'salesforce' && (
+        <Card className="relative overflow-hidden border border-slate-200 bg-slate-50/70 p-5 min-h-[520px]">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
+              <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste real mínimo do Salesforce</h4>
+              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+                A Canopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                Read-only
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                Token temporário
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                Sem sync
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                Sem writeback
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{activePreset?.name || 'Salesforce'}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+              <p className="mt-1 text-sm font-black text-slate-900">Conexão real mínima</p>
+              <p className="mt-1 text-[11px] font-medium text-slate-500">Leitura segura do Salesforce via token temporário e URL da instância.</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Instância</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{salesforceInstanceUrl || 'Nenhuma URL informada'}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{getHubspotTestLabel(salesforceConnectionTestStatus)}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field
+                  label="URL da instância Salesforce"
+                  value={salesforceInstanceUrl}
+                  onChange={setSalesforceInstanceUrl}
+                  placeholder="https://sua-instancia.my.salesforce.com"
+                />
+                <Field
+                  label="Token temporário"
+                  value={salesforceAccessToken}
+                  onChange={setSalesforceAccessToken}
+                  placeholder="00D...!"
+                  type="password"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void testSalesforceConnection()}
+                  disabled={salesforceTesting || !salesforceInstanceUrl.trim() || !salesforceAccessToken.trim()}
+                  className="rounded-xl bg-slate-900 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                >
+                  {salesforceTesting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Testando conexão Salesforce
+                    </span>
+                  ) : (
+                    'Testar conexão Salesforce'
+                  )}
+                </button>
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">
+                  <span className="inline-flex items-center gap-1">
+                    <KeyRound className="h-3.5 w-3.5" />
+                    Token não persistido
+                  </span>
+                </span>
+                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                  salesforceConnectionTestStatus === 'success'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : salesforceConnectionTestStatus === 'error'
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {getHubspotTestLabel(salesforceConnectionTestStatus)}
+                </span>
+              </div>
+            </div>
+
+            <div className={`rounded-2xl border p-4 ${
+              salesforceConnectionTestStatus === 'success'
+                ? 'border-emerald-200 bg-emerald-50'
+                : salesforceConnectionTestStatus === 'error'
+                  ? 'border-red-200 bg-red-50'
+                  : 'border-slate-200 bg-white'
+            }`}>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
+              {salesforceConnectionTestStatus === 'success' && salesforceConnectionTestMeta ? (
+                <div className="mt-2 space-y-3">
+                  <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
+                    <ShieldCheck className="h-4 w-4" />
+                    Conexão Salesforce validada nesta sessão.
+                  </p>
+                  <div className="space-y-2 text-sm text-slate-700">
+                    <p><span className="font-black">Instância:</span> {salesforceConnectionTestMeta.instanceUrl}</p>
+                    <p><span className="font-black">Objeto lido:</span> {salesforceConnectionTestMeta.accountLabel}</p>
+                    <p><span className="font-black">Campos detectados:</span> {salesforceConnectionTestMeta.accountFieldsCount.toLocaleString('pt-BR')}</p>
+                    <p><span className="font-black">Versão da API:</span> {salesforceConnectionTestMeta.apiVersion}</p>
+                    <p><span className="font-black">Leitura mínima:</span> {salesforceConnectionTestMeta.readAccessConfirmed ? 'Confirmada' : 'Não confirmada'}</p>
+                    <p className="text-xs font-medium text-slate-500">
+                      Teste em {formatActionTimestamp(salesforceConnectionTestMeta.testedAt)}. O token permanece apenas em memória nesta sessão para permitir a validação read-only.
+                    </p>
+                  </div>
+                </div>
+              ) : salesforceConnectionTestStatus === 'error' ? (
+                <div className="mt-2 space-y-2">
+                  <p className="text-base font-black text-red-800">Não foi possível validar a conexão Salesforce.</p>
+                  <p className="text-sm text-red-700">{salesforceConnectionTestError || 'Revise a URL da instância e o token temporário.'}</p>
+                </div>
+              ) : (
+                <div className="mt-2 space-y-2">
+                  <p className="text-base font-black text-slate-900">Aguardando teste real mínimo nesta sessão.</p>
+                  <p className="text-sm text-slate-600">
+                    O servidor ainda não validou a URL da instância e o token temporário. Após o teste, apenas metadados seguros permanecem na sessão.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {selectedConnector && activePreset && draftConfig && isHubspotApiInput && !isHubspotMethodPending && (
         <Card className="relative overflow-hidden border border-blue-200 bg-blue-50/40 p-5 min-h-[540px]">

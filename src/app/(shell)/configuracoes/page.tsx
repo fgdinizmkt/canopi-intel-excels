@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Settings, Database, Users, Zap, Link2, Layers, MapPin, Save, X, Plus, Edit2,
@@ -799,13 +800,13 @@ const ConfigStage1: React.FC = () => {
                 <button
                   onClick={() => {
                     if (entity.id === 'conta') {
-                      router.push('/configuracoes/objetos/contas');
+                      router.push('/configuracoes/objetos/contas/fontes-conectores');
                     } else {
                       setDrawer({ type: 'entity', id: entity.id });
                     }
                   }}
                   className="ml-4 p-2 hover:bg-slate-100 rounded-lg transition-all"
-                  title="Configurar Entidade"
+                  title={entity.id === 'conta' ? 'Abrir Fontes e Conectores' : 'Configurar Entidade'}
                 >
                   <Settings className="w-5 h-5 text-slate-400 group-hover:text-blue-600" />
                 </button>
@@ -2059,6 +2060,12 @@ const ConfigStage1: React.FC = () => {
                 <div className="h-64 flex flex-col items-center justify-center text-slate-400">
                   <Loader2 className="w-12 h-12 animate-spin mb-4" />
                   <p className="text-sm font-bold uppercase tracking-widest">Carregando Parametrização Real...</p>
+                  <Link
+                    href="/configuracoes/objetos/contas/fontes-conectores"
+                    className="mt-4 inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all"
+                  >
+                    Abrir Fontes e Conectores
+                  </Link>
                 </div>
               ) : (
                 <>
