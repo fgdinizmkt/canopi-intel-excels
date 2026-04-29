@@ -16,6 +16,17 @@ export const ACCOUNT_CONNECTOR_ADAPTERS: Record<AccountConnectorProvider, Accoun
   other_crm: genericCrmAdapter,
 };
 
+const ACCOUNT_CONNECTOR_PROVIDER_SET = new Set<AccountConnectorProvider>(Object.keys(ACCOUNT_CONNECTOR_ADAPTERS) as AccountConnectorProvider[]);
+
+export function isAccountConnectorProvider(provider: unknown): provider is AccountConnectorProvider {
+  return typeof provider === 'string' && ACCOUNT_CONNECTOR_PROVIDER_SET.has(provider as AccountConnectorProvider);
+}
+
 export function getAccountConnectorAdapter(provider: AccountConnectorProvider): AccountConnectorAdapterDefinition {
+  return ACCOUNT_CONNECTOR_ADAPTERS[provider];
+}
+
+export function getAccountConnectorAdapterSafe(provider: unknown): AccountConnectorAdapterDefinition | null {
+  if (!isAccountConnectorProvider(provider)) return null;
   return ACCOUNT_CONNECTOR_ADAPTERS[provider];
 }

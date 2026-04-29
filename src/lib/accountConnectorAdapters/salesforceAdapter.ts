@@ -3,6 +3,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 export const salesforceAdapter: AccountConnectorAdapterDefinition = {
   provider: 'salesforce',
   label: 'Salesforce',
+  surfaceKind: 'shell_preset',
   authType: 'oauth2_authorization_code',
   priorityObjectsForFirstTest: ['Account'],
   futureObjectsPlanned: ['Contact', 'Lead', 'Opportunity', 'User'],

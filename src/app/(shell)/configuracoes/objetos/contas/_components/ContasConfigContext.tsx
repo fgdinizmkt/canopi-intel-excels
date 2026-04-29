@@ -11,21 +11,59 @@ import {
   type AccountRealConnectionContract,
   buildInitialRealConnectionContract,
 } from '@/src/lib/accountConnectionModel';
-import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
+import {
+  getAccountConnectorAdapterSafe,
+  isAccountConnectorProvider,
+} from '@/src/lib/accountConnectorAdapters';
 import type { CsvUploadMeta } from '@/src/lib/parseCsvLocal';
 
 // --- SESSION PERSISTENCE ---
 
 const SESSION_KEY = 'canopi_contas_v2_config';
 
-function loadSession(): { selectedConnector: ConnectorType | null; customConfig: Record<string, any> } | null {
+interface LoadedSession {
+  selectedConnector: ConnectorType | null;
+  legacySelectedConnector: string | null;
+  customConfig: Record<string, any>;
+}
+
+function loadSession(): LoadedSession | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Record<string, any>;
+    const rawSelectedConnector = parsed?.selectedConnector;
+    const selectedConnector = isAccountConnectorProvider(rawSelectedConnector) ? rawSelectedConnector : null;
+
+    return {
+      selectedConnector,
+      legacySelectedConnector:
+        typeof rawSelectedConnector === 'string' && !isAccountConnectorProvider(rawSelectedConnector)
+          ? rawSelectedConnector
+          : null,
+      customConfig: parsed?.customConfig && typeof parsed.customConfig === 'object' ? parsed.customConfig : {},
+    };
   } catch {
     return null;
   }
+}
+
+function getDefaultInputMethodForProvider(provider: ConnectorType): string {
+  if (provider === 'hubspot') return 'not_selected';
+  if (provider === 'csv_upload') return 'csv_upload';
+  return 'native_setup';
+}
+
+function getResolvedInputMethodForProvider(provider: ConnectorType | null, rawInputMethod: string | null | undefined): string | null {
+  if (!provider) return null;
+  if (provider === 'hubspot') {
+    return rawInputMethod && rawInputMethod !== 'not_selected' ? rawInputMethod : null;
+  }
+  if (provider === 'csv_upload') {
+    return rawInputMethod ?? 'csv_upload';
+  }
+  return rawInputMethod && rawInputMethod !== 'csv_upload' ? rawInputMethod : 'native_setup';
 }
 
 // --- TYPES ---
@@ -55,9 +93,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   const list: AccountConfigBlocker[] = [];
   const preset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
   const rawInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? null : null;
-  const selectedInputMethod = selectedConnector === 'hubspot'
-    ? (rawInputMethod && rawInputMethod !== 'not_selected' ? rawInputMethod : null)
-    : (rawInputMethod ?? 'csv_upload');
+  const selectedInputMethod = getResolvedInputMethodForProvider(selectedConnector, rawInputMethod);
   const isHubspotMethodPending = selectedConnector === 'hubspot' && !selectedInputMethod;
   const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
   const hubspotConnectionTestStatus = selectedConnector ? customConfig.connectionTestStatusByProvider?.[selectedConnector] ?? 'idle' : 'idle';
@@ -108,9 +144,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
   }
 
   // 3. LGPD_LEGAL_BASIS_MISSING
-  const requiresLgpd = (selectedConnector
-    ? customConfig.inputMethodByProvider?.[selectedConnector] === 'csv_upload'
-    : false) || (preset?.lgpdRisk === 'high');
+  const requiresLgpd = (selectedInputMethod === 'csv_upload') || (preset?.lgpdRisk === 'high');
   if (requiresLgpd && !baseLegal) {
       list.push({
         id: 'LGPD_LEGAL_BASIS_MISSING',
@@ -194,6 +228,7 @@ export function getAccountConfigBlockers(state: any): AccountConfigBlocker[] {
 
 interface ContasConfigContextType {
   selectedConnector: ConnectorType | null;
+  legacySelectedConnector: string | null;
   setConnector: (type: ConnectorType | null) => void;
   conta: {
     connectorType: ConnectorType | null;
@@ -244,9 +279,13 @@ interface ContasConfigContextType {
 const ContasConfigContext = createContext<ContasConfigContextType | undefined>(undefined);
 
 export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedConnector, setSelectedConnector] = useState<ConnectorType | null>(() => {
-    return (loadSession()?.selectedConnector ?? null) as ConnectorType | null;
-  });
+  const initialSession = React.useMemo(() => loadSession(), []);
+  const [selectedConnector, setSelectedConnector] = useState<ConnectorType | null>(
+    () => initialSession?.selectedConnector ?? null
+  );
+  const [legacySelectedConnector, setLegacySelectedConnector] = useState<string | null>(
+    () => initialSession?.legacySelectedConnector ?? null
+  );
   const [baseLegal, setBaseLegal] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [inputMethodDraftByProvider, setInputMethodDraftByProvider] = useState<Record<string, string | null>>({});
@@ -299,8 +338,9 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const [customConfig, setCustomConfig] = useState(() => {
-    const session = loadSession();
-    const initialConfig = session?.customConfig ? { ...DEFAULT_CUSTOM_CONFIG, ...session.customConfig } : DEFAULT_CUSTOM_CONFIG;
+    const initialConfig = initialSession?.customConfig
+      ? { ...DEFAULT_CUSTOM_CONFIG, ...initialSession.customConfig }
+      : DEFAULT_CUSTOM_CONFIG;
     const initialHubspotMethod = initialConfig.inputMethodByProvider?.hubspot;
     const hasHubspotCompletion =
       Boolean(initialConfig.hubspotConnectionStepCompletedByProvider?.hubspot)
@@ -323,6 +363,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setConnector = (type: ConnectorType | null) => {
     setSelectedConnector(type);
+    setLegacySelectedConnector(null);
     if (!type) {
       setInputMethodDraftByProvider({});
     } else {
@@ -350,7 +391,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setCustomConfig((prev: any) => {
       const inputMethodByProvider = {
         ...(prev.inputMethodByProvider || {}),
-        [type]: prev.inputMethodByProvider?.[type] || (type === 'hubspot' ? 'not_selected' : 'csv_upload'),
+        [type]: prev.inputMethodByProvider?.[type] || getDefaultInputMethodForProvider(type),
       };
       const connectorLocalValidatedByProvider = {
         ...(prev.connectorLocalValidatedByProvider || {}),
@@ -483,7 +524,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
   const completeLocalSetup = useCallback(() => {
     const now = new Date().toISOString();
-    const selectedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? 'csv_upload' : 'csv_upload';
+    const selectedInputMethod = selectedConnector ? getResolvedInputMethodForProvider(selectedConnector, customConfig.inputMethodByProvider?.[selectedConnector]) : 'native_setup';
     const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
     updateCustomConfig((prev: any) => ({
       ...prev,
@@ -616,11 +657,10 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [blockers]);
   const canConcludeLocalSetup = useMemo(() => {
     if (!selectedConnector) return false;
-  const selectedInputMethod = selectedConnector === 'hubspot'
-    ? (customConfig.inputMethodByProvider?.[selectedConnector] && customConfig.inputMethodByProvider?.[selectedConnector] !== 'not_selected'
-      ? customConfig.inputMethodByProvider?.[selectedConnector]
-      : null)
-    : (customConfig.inputMethodByProvider?.[selectedConnector] ?? 'csv_upload');
+    const selectedInputMethod = getResolvedInputMethodForProvider(
+      selectedConnector,
+      selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] : null
+    );
   const isHubspotApiInput = selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token';
   const isHubspotMethodPending = selectedConnector === 'hubspot' && !selectedInputMethod;
     if (isHubspotApiInput) {
@@ -663,11 +703,10 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const hasCanonicalMinimum =
       hasConnector &&
       CONTA_CANONICAL_FIELDS_MINIMUM.every((field) => mappedCanonicalFields.includes(field));
-    const selectedInputMethod = providerKey === 'hubspot'
-      ? (providerKey && customConfig.inputMethodByProvider?.[providerKey] && customConfig.inputMethodByProvider?.[providerKey] !== 'not_selected'
-        ? customConfig.inputMethodByProvider?.[providerKey]
-        : null)
-      : (providerKey ? (customConfig.inputMethodByProvider?.[providerKey] ?? 'csv_upload') : 'csv_upload');
+    const selectedInputMethod = getResolvedInputMethodForProvider(
+      providerKey,
+      providerKey ? customConfig.inputMethodByProvider?.[providerKey] : null
+    ) ?? 'native_setup';
     const requiresLgpd = (providerKey ? CONNECTOR_PRESETS[providerKey]?.lgpdRisk === 'high' : false)
       || (selectedInputMethod === 'csv_upload');
     const hasClassifiableMappings = hasCanonicalMinimum && conta.fieldMappings.some((mapping) => mapping.isClassification);
@@ -793,7 +832,8 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const realConnectionContract = useMemo<AccountRealConnectionContract | null>(() => {
     if (!selectedConnector) return null;
 
-    const adapter = getAccountConnectorAdapter(selectedConnector);
+    const adapter = getAccountConnectorAdapterSafe(selectedConnector);
+    if (!adapter) return null;
     return buildInitialRealConnectionContract(adapter, {
       hasLocalSetup: connectorLocalValidated,
     });
@@ -817,6 +857,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
   return (
     <ContasConfigContext.Provider value={{
       selectedConnector,
+      legacySelectedConnector,
       setConnector,
       conta,
       updateCustomConfig,

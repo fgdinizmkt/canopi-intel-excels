@@ -3,6 +3,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 export const csvUploadAdapter: AccountConnectorAdapterDefinition = {
   provider: 'csv_upload',
   label: 'Upload CSV (Batch)',
+  surfaceKind: 'functional_real',
   authType: 'none',
   priorityObjectsForFirstTest: ['batch_record'],
   futureObjectsPlanned: [],

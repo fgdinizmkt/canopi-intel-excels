@@ -3,6 +3,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 export const rdStationAdapter: AccountConnectorAdapterDefinition = {
   provider: 'rd_station',
   label: 'RD Station CRM',
+  surfaceKind: 'shell_preset',
   authType: 'api_token',
   priorityObjectsForFirstTest: ['organizations'],
   futureObjectsPlanned: ['contacts', 'deals'],

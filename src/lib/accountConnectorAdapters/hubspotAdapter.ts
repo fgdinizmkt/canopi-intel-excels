@@ -3,6 +3,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 export const hubspotAdapter: AccountConnectorAdapterDefinition = {
   provider: 'hubspot',
   label: 'HubSpot',
+  surfaceKind: 'functional_real',
   authType: 'private_app_token',
   priorityObjectsForFirstTest: ['companies'],
   futureObjectsPlanned: ['contacts', 'deals', 'owners', 'pipelines', 'properties'],

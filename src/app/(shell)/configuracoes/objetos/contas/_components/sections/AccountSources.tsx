@@ -19,10 +19,12 @@ import {
   type ConnectorPreset,
   type ConnectorType,
 } from '@/src/lib/contaConnectorsV2';
-import { getAccountConnectorAdapter } from '@/src/lib/accountConnectorAdapters';
+import { getAccountConnectorAdapterSafe } from '@/src/lib/accountConnectorAdapters';
 import type {
   AccountSchemaProperty,
   AccountSchemaSuggestedMapping,
+  AccountConnectorSurfaceKind,
+  AccountRealConnectionContract,
 } from '@/src/lib/accountConnectionModel';
 import {
   analyzeCsvSchema,
@@ -152,7 +154,44 @@ function findNativeField(
 
 function buildDefaultLocalSourceConfig(type: ConnectorType): LocalSourceConfig {
   const preset = CONNECTOR_PRESETS[type];
-  const adapter = getAccountConnectorAdapter(type);
+  const adapter = getAccountConnectorAdapterSafe(type);
+  if (!adapter) {
+    return {
+      sourceName: preset.name,
+      primaryObject: preset.nativeObject || (type === 'other_crm' ? 'Organizations' : ''),
+      primaryKeyField: preset.identity.nativePrimaryKey || 'id',
+      accountNameField: findNativeField(preset, ['canonical_name', 'legal_name'], 'name'),
+      domainField: findNativeField(preset, ['primary_domain'], 'domain'),
+      ownerField: findNativeField(preset, ['account_owner'], 'owner_id'),
+      statusOrStageField: findNativeField(
+        preset,
+        ['account_status', 'lifecycle_stage', 'targeting_status', 'abx_stage', 'account_operating_mode'],
+        'status'
+      ),
+      lastUpdatedField: findNativeField(preset, ['updated_at'], type === 'hubspot' ? 'hs_lastmodifieddate' : 'updated_at'),
+      priorityTestObject: 'accounts',
+      localNotes: '',
+      expectedCustomFields: '',
+      taxIdField: findNativeField(preset, ['tax_id'], type === 'rd_station' ? 'legal_entity' : 'cnpj'),
+      segmentField: findNativeField(preset, ['segment'], 'segment'),
+      industryField: findNativeField(preset, ['industry'], 'industry'),
+      companySizeField: findNativeField(preset, ['company_size'], 'company_size'),
+      revenueField: findNativeField(preset, ['revenue'], 'annual_revenue'),
+      countryRegionField: findNativeField(preset, ['billing_country'], 'country'),
+      localDedupePolicy: preset.identity.recommendedDedupeStrategy || 'primary_only',
+      csvDelimiter: ',',
+      csvEncoding: 'UTF-8',
+      csvHeaderInFirstLine: true,
+      csvDedupeKey: 'domain',
+      csvRequiredMinimumField: 'account_name',
+      csvObservation: 'Importação CSV disponível para esta fonte. Não envia dados para backend nesta etapa.',
+      otherCrmName: type === 'other_crm' ? preset.name : '',
+      otherCrmNativeEntity: type === 'other_crm' ? preset.nativeObject : '',
+      otherCrmPrimaryKey: type === 'other_crm' ? preset.identity.nativePrimaryKey : '',
+      otherCrmFutureBaseUrl: '',
+      otherCrmFutureObservation: 'Endpoints e autenticação serão definidos conforme a fonte escolhida.',
+    };
+  }
   const customFieldCandidates = preset.fieldMappings
     .filter((mapping) => mapping.nativeField.includes('__c') || mapping.nativeField.toLowerCase().includes('custom'))
     .map((mapping) => mapping.nativeField);
@@ -195,7 +234,7 @@ function buildDefaultLocalSourceConfig(type: ConnectorType): LocalSourceConfig {
     otherCrmNativeEntity: type === 'other_crm' ? primaryObject : '',
     otherCrmPrimaryKey: type === 'other_crm' ? primaryKeyField : '',
     otherCrmFutureBaseUrl: '',
-    otherCrmFutureObservation: 'Endpoints e autenticação serão tratados em recorte futuro.',
+    otherCrmFutureObservation: 'Endpoints e autenticação serão definidos conforme a fonte escolhida.',
   };
 }
 
@@ -233,11 +272,12 @@ function getConnectionStatusLabel(status: string): string {
 
 function getIngestMethod(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'Método futuro previsto: API + OAuth 2.0';
-    case 'hubspot': return 'Método futuro previsto: Private App API';
-    case 'rd_station': return 'Método futuro previsto: API + Token';
-    case 'other_crm': return 'Método futuro previsto: API, banco ou middleware';
-    default: return 'Método de entrada disponível na fonte selecionada';
+    case 'salesforce': return 'Shell/preset · API + OAuth 2.0';
+    case 'hubspot': return 'Funcional real · Private App API';
+    case 'rd_station': return 'Shell/preset · API + Token';
+    case 'other_crm': return 'Shell/preset · API, banco ou middleware';
+    case 'csv_upload': return 'Funcional real · Upload local';
+    default: return 'Setup local guiado';
   }
 }
 
@@ -245,9 +285,76 @@ function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedIn
   if (!selectedConnector) return 'Não definida';
   if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
   if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
-  if (selectedInputMethod === 'csv_upload') return 'CSV';
+  if (selectedInputMethod === 'csv_upload') return 'CSV local';
+  if (selectedInputMethod === 'native_setup') return 'Setup local guiado';
   if (selectedInputMethod) return selectedInputMethod;
-  return selectedConnector === 'hubspot' ? 'Método pendente' : 'Não definida';
+  return selectedConnector === 'hubspot' ? 'Método pendente' : 'Setup local guiado';
+}
+
+function getDefaultInputMethodForProvider(provider: ConnectorType): string {
+  if (provider === 'hubspot') return 'not_selected';
+  if (provider === 'csv_upload') return 'csv_upload';
+  return 'native_setup';
+}
+
+function getConnectorSurfaceLabel(surfaceKind: AccountConnectorSurfaceKind): string {
+  switch (surfaceKind) {
+    case 'functional_real':
+      return 'Funcional real';
+    case 'shell_preset':
+      return 'Shell/preset';
+    case 'future_documented':
+      return 'A definir';
+    default:
+      return 'Conector';
+  }
+}
+
+function getConnectorSurfaceTone(surfaceKind: AccountConnectorSurfaceKind): 'neutral' | 'info' | 'warning' | 'danger' | 'success' {
+  switch (surfaceKind) {
+    case 'functional_real':
+      return 'success';
+    case 'shell_preset':
+      return 'warning';
+    case 'future_documented':
+      return 'neutral';
+    default:
+      return 'neutral';
+  }
+}
+
+function getMetadataStatusLabel(status: AccountRealConnectionContract['metadataStatus']): string {
+  switch (status) {
+    case 'ready_to_discover':
+      return 'Pronto para descobrir';
+    case 'discovering':
+      return 'Descobrindo';
+    case 'discovered':
+      return 'Descoberto';
+    case 'failed':
+      return 'Falha';
+    default:
+      return 'Não descoberto';
+  }
+}
+
+function getSyncStatusLabel(status: AccountRealConnectionContract['syncStatus']): string {
+  switch (status) {
+    case 'ready':
+      return 'Pronto';
+    case 'running':
+      return 'Em execução';
+    case 'succeeded':
+      return 'Concluído';
+    case 'failed':
+      return 'Falhou';
+    case 'stale':
+      return 'Desatualizado';
+    case 'not_available':
+      return 'Não disponível';
+    default:
+      return 'Não configurado';
+  }
 }
 
 function getHubspotTestLabel(status: HubspotConnectionTestStatus): string {
@@ -317,10 +424,11 @@ function getCsvSchemaTone(level: CsvSchemaQualityLevel): 'neutral' | 'info' | 'w
 
 function getIntegrationLabel(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'CRM nativo';
-    case 'hubspot': return 'CRM nativo';
-    case 'rd_station': return 'CRM operacional';
-    case 'other_crm': return 'Setup semiassistido';
+    case 'salesforce': return 'Shell/preset';
+    case 'hubspot': return 'Funcional real';
+    case 'rd_station': return 'Shell/preset';
+    case 'other_crm': return 'Shell/preset';
+    case 'csv_upload': return 'Funcional real';
     default: return 'Conector';
   }
 }
@@ -383,6 +491,7 @@ export function AccountSources() {
   const {
     conta,
     selectedConnector,
+    legacySelectedConnector,
     setConnector,
     updateCustomConfig,
     customConfig,
@@ -402,7 +511,7 @@ export function AccountSources() {
 
   const connectorTypes: Array<Exclude<ConnectorType, 'csv_upload'>> = ['salesforce', 'hubspot', 'rd_station', 'other_crm'];
   const activePreset = selectedConnector ? CONNECTOR_PRESETS[selectedConnector] : null;
-  const activeAdapter = selectedConnector ? getAccountConnectorAdapter(selectedConnector) : null;
+  const activeAdapter = getAccountConnectorAdapterSafe(selectedConnector);
   const savedLocalConfigByProvider = React.useMemo(
     () => (customConfig.localSourceConfigByProvider || {}) as Partial<Record<ConnectorType, Partial<LocalSourceConfig>>>,
     [customConfig.localSourceConfigByProvider]
@@ -432,7 +541,7 @@ export function AccountSources() {
   const effectiveInputMethod = React.useMemo(() => {
     if (!selectedConnector) return null;
     if (selectedConnector !== 'hubspot') {
-      return storedInputMethod ?? 'csv_upload';
+      return storedInputMethod && storedInputMethod !== 'csv_upload' ? storedInputMethod : 'native_setup';
     }
     if (hubspotDraftChoice) return hubspotDraftChoice;
     if (storedInputMethod === 'private_app_token' && hubspotHasRealEvidence) return 'private_app_token';
@@ -677,7 +786,10 @@ export function AccountSources() {
       ...prev,
       inputMethodByProvider: {
         ...(prev.inputMethodByProvider || {}),
-        [selectedConnector]: method,
+        [selectedConnector]:
+          selectedConnector === 'hubspot' && method === 'csv_upload'
+            ? (prev.inputMethodByProvider?.[selectedConnector] ?? 'not_selected')
+            : method,
       },
     }));
   }, [selectedConnector, setInputMethodDraftForProvider, updateCustomConfig]);
@@ -989,7 +1101,7 @@ export function AccountSources() {
       ...prev,
       inputMethodByProvider: {
         ...(prev.inputMethodByProvider || {}),
-        [selectedConnector]: selectedInputMethod || 'csv_upload',
+        [selectedConnector]: selectedInputMethod || getDefaultInputMethodForProvider(selectedConnector),
       },
       localSourceConfigByProvider: {
         ...(prev.localSourceConfigByProvider || {}),
@@ -1037,7 +1149,7 @@ export function AccountSources() {
       ...prev,
       inputMethodByProvider: {
         ...(prev.inputMethodByProvider || {}),
-        [selectedConnector]: selectedInputMethod || 'csv_upload',
+        [selectedConnector]: selectedInputMethod || getDefaultInputMethodForProvider(selectedConnector),
       },
       localSourceConfigByProvider: {
         ...(prev.localSourceConfigByProvider || {}),
@@ -1649,10 +1761,14 @@ export function AccountSources() {
 
       <div className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Escolha a origem das contas</h3>
+        <p className="max-w-3xl text-sm font-medium text-slate-500">
+          Cada conector expõe claramente sua camada de produto e o próximo passo local.
+        </p>
 
         <div className="grid gap-4 xl:grid-cols-3 md:grid-cols-2">
           {connectorTypes.map((type) => {
             const preset = CONNECTOR_PRESETS[type];
+            const adapter = getAccountConnectorAdapterSafe(type)!;
             const isActive = conta.connectorType === type;
             return (
               <Card
@@ -1702,8 +1818,11 @@ export function AccountSources() {
                     <Badge className={`border-none text-[8px] font-black ${preset.identity.confidenceScore > 90 ? 'bg-emerald-100 text-emerald-700' : preset.identity.confidenceScore > 75 ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700'}`}>
                       Confiança: {preset.identity.confidenceScore}%
                     </Badge>
-                    <span className="text-[9px] font-bold text-slate-400">{getIngestMethod(type).replace('Método futuro previsto: ', '')}</span>
+                    <Badge className={`border-none text-[8px] font-black ${getConnectorSurfaceTone(adapter.surfaceKind) === 'success' ? 'bg-emerald-100 text-emerald-700' : getConnectorSurfaceTone(adapter.surfaceKind) === 'warning' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                      {getConnectorSurfaceLabel(adapter.surfaceKind)}
+                    </Badge>
                   </div>
+                  <p className="mt-2 text-[9px] font-bold text-slate-400">{getIngestMethod(type)}</p>
 
                   <div className="mt-3 grid gap-2 text-xs">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5">
@@ -1724,6 +1843,11 @@ export function AccountSources() {
 
       <Card className="border border-slate-200 p-4">
         <h4 className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Fonte selecionada</h4>
+        {!selectedConnector && legacySelectedConnector && (
+          <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+            A fonte salva anteriormente não é compatível com o modelo atual. Selecione uma fonte novamente.
+          </div>
+        )}
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
           <div className="rounded-xl border border-slate-200 bg-white p-3">
             <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
@@ -1748,26 +1872,82 @@ export function AccountSources() {
             <p className="mt-1 text-sm font-black text-slate-900">
               {isHubspotMethodPending
                 ? 'Método pendente'
-                : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
+                : (isHubspotApiInput
+                  ? getHubspotTestLabel(hubspotConnectionTestStatus)
+                  : isCsvInput
+                    ? csvStatusLabel
+                    : (connectorLocalValidated
+                      ? 'Validada nesta sessão'
+                      : hasDraftChanges
+                        ? 'Rascunho local'
+                        : 'Pronta para validar'))}
             </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Conexão real</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Camada do conector</p>
             <p className="mt-1 text-sm font-black text-slate-900">
-              {isHubspotMethodPending
-                ? 'Aguardando método'
-                : isHubspotApiInput
-                ? (hubspotConnectionTestStatus === 'success'
-                  ? 'HubSpot validada'
-                  : hubspotConnectionTestStatus === 'testing'
-                    ? 'Teste em andamento'
-                    : hubspotConnectionTestStatus === 'error'
-                      ? 'Falha no teste'
-                      : 'Pronta para teste')
-                : 'Não implementada'}
+              {!selectedConnector
+                ? 'Não configurada'
+                : isHubspotMethodPending
+                  ? 'Aguardando método'
+                  : getConnectorSurfaceLabel(realConnectionContract?.surfaceKind || activeAdapter?.surfaceKind || 'functional_real')}
+            </p>
+            <p className="mt-1 text-[10px] font-bold text-slate-500">
+              {!selectedConnector
+                ? 'Auth: —'
+                : realConnectionContract
+                  ? `Auth: ${getAuthTypeLabel(realConnectionContract.authType)}`
+                  : activeAdapter
+                    ? `Auth: ${getAuthTypeLabel(activeAdapter.authType)}`
+                    : 'Auth: —'}
             </p>
           </div>
         </div>
+        {realConnectionContract && (
+          <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+                {getConnectorSurfaceLabel(realConnectionContract.surfaceKind)}
+              </Badge>
+              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+                {getAuthTypeLabel(realConnectionContract.authType)}
+              </Badge>
+              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+                Metadados: {getMetadataStatusLabel(realConnectionContract.metadataStatus)}
+              </Badge>
+              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+                Sync: {getSyncStatusLabel(realConnectionContract.syncStatus)}
+              </Badge>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Capacidades</p>
+                <p className="mt-1 text-sm font-black text-slate-900">
+                  {realConnectionContract.supportsMetadataDiscovery ? 'Descoberta de metadados' : 'Sem descoberta de metadados'}
+                </p>
+                <p className="mt-1 text-[10px] font-medium text-slate-500">
+                  {realConnectionContract.supportsIncrementalSync ? 'Sync incremental previsto' : 'Sem sync incremental'}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Escopos</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.requiredScopes.length}</p>
+                <p className="mt-1 text-[10px] font-medium text-slate-500">
+                  Obrigatórios: {realConnectionContract.requiredScopes.length} · Opcionais: {realConnectionContract.optionalScopes.length}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Cobertura</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.coverage}%</p>
+                <p className="mt-1 text-[10px] font-medium text-slate-500">Confiança operacional {realConnectionContract.dataConfidence}%</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Próxima ação</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.nextRecommendedStep || 'A definir'}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mt-3 flex items-center justify-between gap-3">
           <button
             type="button"
@@ -2859,7 +3039,7 @@ export function AccountSources() {
       )}
 
       <div className="text-xs text-slate-400 font-medium">
-	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Conexão real e sincronização contínua seguem para o recorte C2.</span>
+	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Conexão real e sincronização contínua seguem em evolução conforme a fonte selecionada.</span>
       </div>
     </section>
   );

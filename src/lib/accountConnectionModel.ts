@@ -2,6 +2,11 @@ import type { ConnectorType } from '@/src/lib/contaConnectorsV2';
 
 export type AccountConnectorProvider = ConnectorType;
 
+export type AccountConnectorSurfaceKind =
+  | 'functional_real'
+  | 'shell_preset'
+  | 'future_documented';
+
 export type AccountAuthType =
   | 'oauth2_authorization_code'
   | 'private_app_token'
@@ -51,6 +56,7 @@ export type AccountCredentialStatus =
 export interface AccountRealConnectionContract {
   provider: AccountConnectorProvider;
   providerLabel: string;
+  surfaceKind: AccountConnectorSurfaceKind;
   authType: AccountAuthType;
   connectionStatus: AccountConnectionStatus;
   credentialStatus: AccountCredentialStatus;
@@ -78,6 +84,7 @@ export interface AccountRealConnectionContract {
 export interface AccountConnectorAdapterDefinition {
   provider: AccountConnectorProvider;
   label: string;
+  surfaceKind: AccountConnectorSurfaceKind;
   authType: AccountAuthType;
   priorityObjectsForFirstTest: string[];
   futureObjectsPlanned: string[];
@@ -165,6 +172,7 @@ export function buildInitialRealConnectionContract(
   return {
     provider: adapter.provider,
     providerLabel: adapter.label,
+    surfaceKind: adapter.surfaceKind,
     authType: adapter.authType,
     connectionStatus,
     credentialStatus,

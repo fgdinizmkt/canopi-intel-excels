@@ -3,6 +3,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 export const genericCrmAdapter: AccountConnectorAdapterDefinition = {
   provider: 'other_crm',
   label: 'Outro CRM',
+  surfaceKind: 'shell_preset',
   authType: 'bearer_token',
   priorityObjectsForFirstTest: ['accounts_or_organizations'],
   futureObjectsPlanned: ['contacts', 'deals'],
