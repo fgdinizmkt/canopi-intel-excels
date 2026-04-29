@@ -9,14 +9,21 @@ Este projeto é a plataforma Canopi | intel excels.
 ## Guia Operacional Rápido (Protocolo Obrigatório)
 
 ### Especialidades e Agentes
-1. **Claude Code:** Auditoria técnica, refactor pesado e implementação de lógica/código.
-2. **Antigravity:** Direção visual (Premium), UX/UI, hierarquia e narrativa de dados.
-3. **ChatGPT:** Orquestração geral, corte de escopo e revisão crítica de coerência.
+1. **Codex:** Executor técnico-operacional padrão do fluxo local atual. Responsável por operar terminal/repo, checar Git, rodar validações, subir runtime local, aplicar ajustes controlados quando autorizados e reportar evidências objetivas.
+2. **Claude Code:** Auditoria técnica profunda, refactor pesado, implementação alternativa ou revisão comparativa quando explicitamente convocado.
+3. **Antigravity:** Direção visual (Premium), UX/UI, hierarquia e narrativa de dados.
+4. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, definição do próximo passo e controle de aderência ao plano documentado.
+
+### Avaliação operacional do Codex
+- **Status:** aprovado como executor técnico-operacional do fluxo local após teste prático.
+- **Pontos fortes:** leitura de Git, execução de comandos, validação de runtime, geração de patch de backup e separação de escopo.
+- **Limites:** não decide produto, não abre recorte, não commita sem aprovação, não faz push sem autorização e não substitui validação visual do usuário.
+- **Uso recomendado:** manter Codex quando ele já estiver com contexto local ativo; usar Claude Code apenas por decisão explícita ou necessidade real de auditoria/refactor pesado.
 
 ### Protocolo Diário
 - **Sync:** Validar `git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`. Só dar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
 - **Contexto:** Leitura obrigatória dos docs de governança (`docs/98-operacao/`), status atual e `docs/98-operacao/31-protocolo-fechamento-de-fase.md` antes de qualquer fechamento de fase, recorte ou módulo.
-- **Seleção:** Informar explicitamente qual agente assumirá a tarefa antes de agir.
+- **Seleção:** Informar explicitamente qual agente assumirá a tarefa antes de agir. Quando o fluxo local já estiver em andamento com Codex, mantê-lo como executor salvo decisão explícita em contrário.
 - **Aprovação:** Seguir o fluxo: *Executar → Build → Diff Stat → Diff Real → Aprovação Usuário → Commit*.
 - **Fechamento:** Nenhuma fase pode ser declarada fechada apenas com build, TSC, commit, tag ou preview. Fechamento exige evidência técnica, visual e operacional, conforme `docs/98-operacao/31-protocolo-fechamento-de-fase.md`.
 - **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
@@ -52,6 +59,7 @@ Este projeto é a plataforma Canopi | intel excels.
 - Reaproveitar componentes e padrões existentes sempre que fizer sentido.
 - Não fazer refactors amplos fora do escopo.
 - Alterar apenas os arquivos necessários.
+- Quando houver trabalho off-plan preservado na working tree, ele deve permanecer intocado até decisão explícita do usuário.
 
 ## Entrega
 Ao final de cada tarefa:
