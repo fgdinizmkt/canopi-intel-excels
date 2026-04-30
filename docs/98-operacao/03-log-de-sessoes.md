@@ -76,6 +76,17 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - working tree permaneceu com o bloco ABE/off-plan separado e fora do commit seletivo.
 - **Status:** ✅ Concluído e publicado.
 
+## [2026-04-30] — Estabilização operacional pós-C2.7 e quarentena ABE/Cockpit
+
+- **Natureza:** Sessão documental de estabilização e isolamento de trabalho off-plan.
+- **Objetivo:** Registrar que a `main` permanece limpa e sincronizada com `origin/main` após o C2.7, enquanto o bloco ABE/Cockpit off-plan foi preservado em branch local de quarentena para não contaminar novos recortes.
+- **Contexto:**
+  - `main` voltou a ficar limpa após a separação da sujeira off-plan;
+  - a branch local `wip-abe-cockpit-offplan-quarantine` foi criada para preservar o bloco ABE/Cockpit;
+  - o commit local de quarentena é `4ed11bd` — `chore(wip): quarantine ABE cockpit off-plan work`;
+  - nada foi descartado e nada foi publicado a partir da branch de quarentena.
+- **Status:** ✅ `main` estabilizada e sincronizada com `origin/main`; ABE/Cockpit off-plan preservado localmente em quarentena.
+
 ## [2026-04-29] — Contas V2 / C2.7 (Salesforce real connection test flow)
 
 - **Natureza:** Sessão funcional + fechamento operacional.
