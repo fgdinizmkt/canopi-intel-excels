@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada em `origin/main` (HEAD: `3a0350e` — docs(ops): close Salesforce connection test flow).
+ `main` — sincronizada com `origin/main` após a publicação do C2.7 Salesforce connection test flow. Referência operacional: C2.7 concluído e publicado.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
