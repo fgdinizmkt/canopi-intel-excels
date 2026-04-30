@@ -35,6 +35,7 @@ import {
   type CsvSchemaQualityLevel,
   type CsvUploadMeta,
 } from '@/src/lib/parseCsvLocal';
+import { SourceSnapshotSummary } from './SourceSnapshotSummary';
 
 interface LocalSourceConfig {
   sourceName: string;
@@ -3309,23 +3310,14 @@ export function AccountSources() {
                     )}
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      Fonte: {draftConfig.sourceName}
-                    </span>
-                    <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      Entrada: {selectedConnector === 'hubspot' ? getInputMethodLabel(selectedConnector, selectedInputMethod) : 'CSV'}
-                    </span>
-                    <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-                      Status: {isHubspotMethodPending ? 'Método pendente' : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 text-xs font-bold text-slate-500">
-                    {lastSavedAt && <p>Configuração local salva em {lastSavedAt}.</p>}
-                    {lastValidatedAt && <p>CSV confirmado em {lastValidatedAt}.</p>}
-                    {stepCompletedAt && <p>Configuração concluída em {stepCompletedAt}.</p>}
-                  </div>
+                  <SourceSnapshotSummary
+                    sourceName={draftConfig.sourceName}
+                    entryLabel={selectedConnector === 'hubspot' ? getInputMethodLabel(selectedConnector, selectedInputMethod) : 'CSV'}
+                    statusLabel={isHubspotMethodPending ? 'Método pendente' : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
+                    lastSavedNote={lastSavedAt ? `Configuração local salva em ${lastSavedAt}.` : null}
+                    lastValidatedNote={lastValidatedAt ? `CSV confirmado em ${lastValidatedAt}.` : null}
+                    stepCompletedNote={stepCompletedAt ? `Configuração concluída em ${stepCompletedAt}.` : null}
+                  />
                 </div>
 
                 <div className="flex shrink-0 flex-col gap-2 sm:flex-row xl:flex-col">
