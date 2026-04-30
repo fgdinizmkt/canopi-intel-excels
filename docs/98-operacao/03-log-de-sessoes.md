@@ -24,7 +24,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - working tree limpa;
   - alteração funcional restrita a `AccountSources.tsx` com 3 inserções;
   - C2.4.1 permanece como ajuste de clareza visual, sem nova capacidade funcional.
-- **Status:** ✅ Concluído localmente, pendente de push.
+- **Status:** ✅ Concluído e publicado.
 
 ## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
 
@@ -99,7 +99,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - validação visual aprovada em browser autenticado;
   - a superfície de Fontes e Conectores ficou acessível a partir da navegação atual;
   - working tree off-plan permaneceu fora do commit seletivo;
-  - `HEAD` local avançou sobre `origin/main` após os commits funcional e documental locais.
+  - `origin/main` foi atualizado com os commits funcional e documental do C2.7.
 - **Status:** ✅ Concluído e publicado.
 
 ## [2026-04-22] — Saneamento Absoluto Final do Repositório

@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — em avanço local sobre `origin/main`. Referência operacional: `bf6ace9` — feat(settings): add Salesforce connection test flow.
+ `main` — sincronizada em `origin/main` (HEAD: `3a0350e` — docs(ops): close Salesforce connection test flow).
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -689,7 +689,7 @@
 | Refinamento Accounts — Subetapas 1–4c | Concluído (2026-04-14) | 8 commits de refinamento progressivo (visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls). Commit final publicado: `8762ae4`. |
 | Contenção de Sistema de Tema | Concluído (2026-04-17) | 3 iterações de dark mode bidirecional falharam; decisão de abandonar escuro e travar plataforma em modo claro permanentemente. ThemeContext neutralizado (sempre isDark: false). Todas as classes dark: removidas do codebase. Seletor de tema removido de /usuario UI. Commit: `6943485`. |
 | Cockpit V2 Foundation Replacement | Concluído (2026-04-19) | Substituição da base legada pela nova fundação integrada ao shell real. Onion chart responsivo, painel contextual unificado e roteamento independente via Pages Router. |
-| Contas V2 — Fase A + B.1 + C1 a C1.3 + C2.1 a C2.7 | Concluído localmente, pendente de push (2026-04-29) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, teste real HubSpot, preview read-only, schema discovery, hard reset de sessão, microcopy de método retomado, schema validation local CSV, generalização multi-conector com blindagem de provider inválido/legado, teste real mínimo Salesforce e ajuste mínimo de navegação para acesso direto a Fontes e Conectores. Commits: `219afa2` → `bf6ace9`. Sem OAuth/token durável/API real persistida/sync/writeback. |
+| Contas V2 — Fase A + B.1 + C1 a C1.3 + C2.1 a C2.7 | Concluído e publicado (2026-04-29) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, teste real HubSpot, preview read-only, schema discovery, hard reset de sessão, microcopy de método retomado, schema validation local CSV, generalização multi-conector com blindagem de provider inválido/legado, teste real mínimo Salesforce e ajuste mínimo de navegação para acesso direto a Fontes e Conectores. Commits: `219afa2` → `3a0350e`. Sem OAuth/token durável/API real persistida/sync/writeback. |
 
 ---
 

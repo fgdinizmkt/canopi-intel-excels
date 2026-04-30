@@ -94,7 +94,7 @@ O plano maior de Configurações continua válido e não foi substituído. Neste
 
 ### Fechamento operacional do C2.1 — HubSpot real
 
-Status: concluído localmente, pendente de push.
+Status: concluído e publicado em `origin/main`.
 
 - Commit: `2871e53` — `feat(settings): add HubSpot real connection test flow`
 - Escopo entregue:
@@ -129,7 +129,7 @@ Status: concluído localmente, pendente de push.
 
 ### Fechamento operacional do C2.2 — HubSpot preview read-only
 
-Status: concluído localmente, pendente de push.
+Status: concluído e publicado em `origin/main`.
 
 - Commit: `8ec4914` — `feat(settings): add HubSpot companies read-only preview`
 - Escopo entregue:
