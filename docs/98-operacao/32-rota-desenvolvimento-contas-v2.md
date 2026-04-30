@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). Próxima fase: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -501,7 +501,7 @@ Resultado: Fontes passou a operar como contrato de leitura (Conectar fonte de co
 
 Evidências: build aprovado, typecheck aprovado e validação visual aprovada (prints finais + DOM proof).
 
-Observação: Contas V2 ainda não está fechada; apenas o recorte da Fase A foi concluído.
+Observação: Contas V2 ainda não estava fechada naquele momento; apenas o recorte da Fase A havia sido concluído.
 
 ### Fase B — Camada Canônica real
 
@@ -539,7 +539,28 @@ Evidências:
 
 Observação:
 
-Contas V2 ainda não está fechada; apenas o recorte B.1 foi concluído.
+Contas V2 ainda não estava fechada naquele momento; apenas o recorte B.1 havia sido concluído.
+
+### Fechamento operacional do C2.9 — Fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores
+
+- **Status:** concluído localmente.
+- **Commit funcional:** `2a65e6e` — `fix(settings): clarify connector source boundaries`
+- **Objetivo:** fechar Fontes e Conectores para a versão atual da Canopi sem inflar o escopo produtivo.
+- **Escopo entregue:**
+  - CSV passou a ser tratado como método local de entrada/carga, não como CRM/conector externo;
+  - HubSpot permaneceu como conexão real mínima com preview/schema read-only e reset;
+  - Salesforce permaneceu como teste real mínimo read-only;
+  - RD Station CRM e Outro CRM permaneceram como presets locais nesta versão;
+  - a copy foi ajustada para remover linguagem de roadmap/futuro/próximo passo;
+  - a superfície continuou sem prometer OAuth completo, persistência segura, sync, importação real ou writeback.
+- **Validação:**
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual autenticada foi aprovada;
+  - o recorte permaneceu restrito a Fontes e Conectores;
+  - ABE/Cockpit, B.2 e rotas API ficaram fora do fechamento.
+- **Limites mantidos:** OAuth completo, persistência segura durável, sync, importação real, writeback, RD real, Outro CRM real e Supabase seguem fora do escopo da versão atual.
+- **Status operacional:** Fontes e Conectores segue em fechamento CRM por CRM; HubSpot está validado como primeiro CRM completo da versão atual; Salesforce é o próximo CRM a ser fechado; próximos recortes dependem de autorização explícita.
 
 ### Fase B.2 — Integração da Camada Canônica com validação/blockers locais
 

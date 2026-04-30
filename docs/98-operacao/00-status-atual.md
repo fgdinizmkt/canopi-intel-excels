@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -689,13 +689,14 @@
 | Refinamento Accounts — Subetapas 1–4c | Concluído (2026-04-14) | 8 commits de refinamento progressivo (visual direction, ergonomia, shortcut contextualization, list readability, play simplification, volume & hygiene controls). Commit final publicado: `8762ae4`. |
 | Contenção de Sistema de Tema | Concluído (2026-04-17) | 3 iterações de dark mode bidirecional falharam; decisão de abandonar escuro e travar plataforma em modo claro permanentemente. ThemeContext neutralizado (sempre isDark: false). Todas as classes dark: removidas do codebase. Seletor de tema removido de /usuario UI. Commit: `6943485`. |
 | Cockpit V2 Foundation Replacement | Concluído (2026-04-19) | Substituição da base legada pela nova fundação integrada ao shell real. Onion chart responsivo, painel contextual unificado e roteamento independente via Pages Router. |
-| Contas V2 — Fase A + B.1 + C1 a C1.3 + C2.1 a C2.7 | Concluído e publicado (2026-04-29) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, teste real HubSpot, preview read-only, schema discovery, hard reset de sessão, microcopy de método retomado, schema validation local CSV, generalização multi-conector com blindagem de provider inválido/legado, teste real mínimo Salesforce e ajuste mínimo de navegação para acesso direto a Fontes e Conectores. Commits: `219afa2` → `3a0350e`. Sem OAuth/token durável/API real persistida/sync/writeback. |
+| Contas V2 — Fase A + B.1 + C1 a C1.3 + C2.1 a C2.9 | Em fechamento CRM por CRM; HubSpot validado para a versão atual (2026-04-30) | Separação de responsabilidades, contrato local editável, modelo de conexão real scaffolded, teste real HubSpot, preview read-only, schema discovery, hard reset de sessão, microcopy de método retomado, schema validation local CSV, taxonomia de CSV como método local de entrada/carga, generalização multi-conector com blindagem de provider inválido/legado, teste real mínimo Salesforce e ajuste mínimo de navegação para acesso direto a Fontes e Conectores. Commits: `219afa2` → `2a65e6e`. HubSpot validado; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Sem OAuth/token durável/API real persistida/sync/writeback. |
 
 ---
 
 ## Próximo Passo
 
 - **Contas V2 — Próximo recorte:** nenhum recorte aberto automaticamente. A frente segue em Fontes e Conectores até nova autorização explícita do Fábio.
+- **Contas V2 — C2.9:** fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores concluído localmente no commit `2a65e6e`. CSV passou a ser tratado como método local de entrada/carga; HubSpot foi validado como primeiro CRM completo da versão atual; Salesforce é o próximo CRM a ser fechado; RD Station CRM e Outro CRM seguem pendentes de fechamento individual; a frente continua em fechamento CRM por CRM; OAuth completo, persistência segura, sync, importação real, writeback, RD real, Outro CRM real, Supabase e B.2 seguem fora do escopo da versão atual.
 - **Contas V2 — Fase B.2 pendente:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers. Não altera OAuth nem Supabase.
 - **Cockpit V2:** Refinamento dos recortes analíticos e interativos sobre a nova fundação estabilizada.
 - **Pendência técnica Cockpit:** Monitorar performance do SVG foreignObject em densidades extremas de sinal.

@@ -87,6 +87,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - nada foi descartado e nada foi publicado a partir da branch de quarentena.
 - **Status:** ✅ `main` estabilizada e sincronizada com `origin/main`; ABE/Cockpit off-plan preservado localmente em quarentena.
 
+## [2026-04-30] — Contas V2 / C2.9 (Fechamento de linguagem, boundaries e taxonomia)
+
+- **Natureza:** Sessão funcional + fechamento operacional.
+- **Objetivo:** Validar HubSpot como primeiro CRM completo da versão atual, mantendo Fontes e Conectores em fechamento CRM por CRM, removendo linguagem de roadmap/futuro e separando taxonomia de CSV como método local de entrada/carga.
+- **Contexto:**
+  - o C2.8 havia sido auditoria sem alteração de arquivos;
+  - o C2.7 já estava concluído e publicado;
+  - a validação visual autenticada confirmou a superfície final de Fontes e Conectores;
+  - não havia push pendente para o recorte funcional do C2.9.
+- **Decisão Técnica:**
+  - reescrever copy e boundaries para eliminar linguagem de próximo passo/roadmap/futuro;
+  - tratar CSV como método local de entrada/carga, não como CRM/conector externo;
+  - manter HubSpot como conexão real mínima com preview/schema read-only e reset;
+  - manter Salesforce como teste real mínimo read-only;
+  - preservar RD Station CRM e Outro CRM como presets locais nesta versão;
+  - explicitar limites fora do escopo atual: OAuth completo, persistência segura, sync, importação real, writeback, RD real, Outro CRM real, Supabase e B.2.
+- **Commit funcional:** `2a65e6e` — `fix(settings): clarify connector source boundaries`
+- **Validação:**
+  - `npm run lint` passou;
+  - `npm run build:safe` passou;
+  - validação visual autenticada aprovada;
+  - HubSpot validado como primeiro CRM completo da versão atual;
+  - working tree permaneceu sem alterações de ABE/Cockpit e sem tocar em B.2.
+- **Status:** ✅ Concluído localmente; HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual; a frente continua em fechamento CRM por CRM.
+
 ## [2026-04-29] — Contas V2 / C2.7 (Salesforce real connection test flow)
 
 - **Natureza:** Sessão funcional + fechamento operacional.
