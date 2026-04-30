@@ -36,6 +36,7 @@ import {
   type CsvUploadMeta,
 } from '@/src/lib/parseCsvLocal';
 import { SourceSnapshotSummary } from './SourceSnapshotSummary';
+import { CsvSchemaAnalysisIntro } from './CsvSchemaAnalysisIntro';
 
 interface LocalSourceConfig {
   sourceName: string;
@@ -2389,20 +2390,18 @@ export function AccountSources() {
               {csvSchemaAnalysis && (
                 <div className="space-y-4 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap gap-2">
-                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Read-only</span>
-                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Pré-mapeamento local</span>
-                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem sync</span>
-                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem importação</span>
-                        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Não aplica Camada Canônica</span>
-                      </div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-600">Schema local e pré-mapeamento CSV</p>
-                      <h4 className="text-xl font-black tracking-tight text-slate-900">Analise os headers detectados e a qualidade mínima da base</h4>
-                      <p className="max-w-3xl text-sm font-medium text-slate-600">
-                        Análise local dos headers do arquivo. Não aplica Camada Canônica, não importa dados e não cria mapeamento definitivo.
-                      </p>
-                    </div>
+                    <CsvSchemaAnalysisIntro
+                      pills={[
+                        'Read-only',
+                        'Pré-mapeamento local',
+                        'Sem sync',
+                        'Sem importação',
+                        'Não aplica Camada Canônica',
+                      ]}
+                      sectionLabel="Schema local e pré-mapeamento CSV"
+                      title="Analise os headers detectados e a qualidade mínima da base"
+                      description="Análise local dos headers do arquivo. Não aplica Camada Canônica, não importa dados e não cria mapeamento definitivo."
+                    />
                     <div className="flex shrink-0 flex-col gap-2">
                       <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
                         getCsvSchemaTone(csvSchemaAnalysis.qualityLevel) === 'success'
