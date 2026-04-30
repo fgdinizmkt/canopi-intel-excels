@@ -18,9 +18,9 @@ export const hubspotAdapter: AccountConnectorAdapterDefinition = {
     supportsWebhooks: true,
   },
   limitations: [
-    'Token real ainda não solicitado ou armazenado.',
-    'Sem teste real de escopos e limites de API neste recorte.',
+    'Token real ainda não solicitado ou armazenado nesta versão.',
+    'Sem teste real de escopos e limites de API nesta versão.',
   ],
-  warning: 'HubSpot no C1 usa apenas contrato declarativo de conexão futura.',
-  nextRecommendedStep: 'Definir fluxo seguro de token e teste de acesso mínimo por escopo.',
+  warning: 'HubSpot nesta versão já expõe conexão real mínima, preview read-only e schema discovery.',
+  nextRecommendedStep: 'Conexão real mínima, preview read-only e schema discovery disponíveis nesta versão.',
 };

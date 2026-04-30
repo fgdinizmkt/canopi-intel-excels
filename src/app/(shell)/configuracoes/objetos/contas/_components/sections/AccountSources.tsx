@@ -301,7 +301,7 @@ function getIngestMethod(type: ConnectorType): string {
     case 'hubspot': return 'Funcional real · Private App API';
     case 'rd_station': return 'Shell/preset · API + Token';
     case 'other_crm': return 'Shell/preset · API, banco ou middleware';
-    case 'csv_upload': return 'Funcional real · Upload local';
+    case 'csv_upload': return 'Método local · Upload CSV';
     default: return 'Setup local guiado';
   }
 }
@@ -311,7 +311,7 @@ function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedIn
   if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
   if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
   if (selectedConnector === 'salesforce') return 'Conexão real mínima';
-  if (selectedInputMethod === 'csv_upload') return 'CSV local';
+  if (selectedInputMethod === 'csv_upload') return 'Entrada local';
   if (selectedInputMethod === 'native_setup') return 'Setup local guiado';
   if (selectedInputMethod) return selectedInputMethod;
   return selectedConnector === 'hubspot' ? 'Método pendente' : 'Setup local guiado';
@@ -454,7 +454,7 @@ function getIntegrationLabel(type: ConnectorType): string {
     case 'hubspot': return 'Funcional real';
     case 'rd_station': return 'Shell/preset';
     case 'other_crm': return 'Shell/preset';
-    case 'csv_upload': return 'Funcional real';
+    case 'csv_upload': return 'Método local';
     default: return 'Conector';
   }
 }
@@ -2007,7 +2007,7 @@ export function AccountSources() {
       <div className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Escolha a origem das contas</h3>
         <p className="max-w-3xl text-sm font-medium text-slate-500">
-          Cada conector expõe claramente sua camada de produto e o próximo passo local.
+          Cada opção expõe claramente sua camada de produto nesta versão.
         </p>
 
         <div className="grid gap-4 xl:grid-cols-3 md:grid-cols-2">
@@ -2045,8 +2045,8 @@ export function AccountSources() {
                       </div>
                     </div>
                     {isActive ? (
-                      <span className="rounded-lg px-2.5 py-1 text-[9px] font-black uppercase bg-blue-100 text-blue-700">
-                        Fonte local escolhida
+                        <span className="rounded-lg px-2.5 py-1 text-[9px] font-black uppercase bg-blue-100 text-blue-700">
+                        Fonte selecionada
                       </span>
                     ) : (
                       <button
@@ -2054,7 +2054,7 @@ export function AccountSources() {
                         onClick={() => setConnector(type)}
                         className="rounded-lg px-2.5 py-1 text-[9px] font-black uppercase bg-slate-900 text-white transition-all hover:bg-slate-700"
                       >
-                        Usar como fonte local
+                        Usar esta fonte
                       </button>
                     )}
                   </div>
@@ -2171,7 +2171,7 @@ export function AccountSources() {
                   {realConnectionContract.supportsMetadataDiscovery ? 'Descoberta de metadados' : 'Sem descoberta de metadados'}
                 </p>
                 <p className="mt-1 text-[10px] font-medium text-slate-500">
-                  {realConnectionContract.supportsIncrementalSync ? 'Sync incremental previsto' : 'Sem sync incremental'}
+                  {realConnectionContract.supportsIncrementalSync ? 'Sync incremental não disponível nesta versão' : 'Sem sync incremental'}
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
@@ -2187,8 +2187,8 @@ export function AccountSources() {
                 <p className="mt-1 text-[10px] font-medium text-slate-500">Confiança operacional {realConnectionContract.dataConfidence}%</p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Próxima ação</p>
-                <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.nextRecommendedStep || 'A definir'}</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Estado desta versão</p>
+                <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.nextRecommendedStep || 'Disponível nesta versão'}</p>
               </div>
             </div>
           </div>
@@ -2945,8 +2945,8 @@ export function AccountSources() {
               </div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-600">Preview read-only do HubSpot</p>
               <h4 className="text-xl font-black tracking-tight text-slate-900">Carregue uma amostra de companies para validar a leitura</h4>
-              <p className="max-w-3xl text-sm font-medium text-slate-600">
-                Isso não inicia sync, não importa companies e não salva o token. O preview é apenas uma leitura controlada para preparar a próxima etapa técnica.
+                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                Isso não inicia sync, não importa companies e não salva o token. O preview é apenas uma leitura controlada desta versão.
               </p>
             </div>
 
@@ -3052,8 +3052,8 @@ export function AccountSources() {
               </div>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-600">Schema e pré-mapeamento HubSpot</p>
               <h4 className="text-xl font-black tracking-tight text-slate-900">Detecte os campos de companies e veja uma sugestão inicial para Contas</h4>
-              <p className="max-w-3xl text-sm font-medium text-slate-600">
-                Isso não aplica mapeamento canônico, não importa dados e não inicia sync. O objetivo é preparar a próxima etapa com metadados seguros do schema.
+                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                Isso não aplica mapeamento canônico, não importa dados e não inicia sync. O objetivo é preparar esta versão com metadados seguros do schema.
               </p>
             </div>
 
@@ -3289,7 +3289,7 @@ export function AccountSources() {
                   <Field label="Nome do CRM" value={draftConfig.otherCrmName} onChange={(v) => updateDraft('otherCrmName', v)} />
                   <Field label="Entidade nativa" value={draftConfig.otherCrmNativeEntity} onChange={(v) => updateDraft('otherCrmNativeEntity', v)} />
                   <Field label="Chave primária" value={draftConfig.otherCrmPrimaryKey} onChange={(v) => updateDraft('otherCrmPrimaryKey', v)} />
-                  <Field label="URL base futura (opcional)" value={draftConfig.otherCrmFutureBaseUrl} onChange={(v) => updateDraft('otherCrmFutureBaseUrl', v)} placeholder="https://api.exemplo.com" />
+                  <Field label="URL base opcional" value={draftConfig.otherCrmFutureBaseUrl} onChange={(v) => updateDraft('otherCrmFutureBaseUrl', v)} placeholder="https://api.exemplo.com" />
                 </div>
                 <div className="mt-3">
                   <Field label="Observação do Outro CRM" value={draftConfig.otherCrmFutureObservation} onChange={(v) => updateDraft('otherCrmFutureObservation', v)} textarea />
@@ -3428,10 +3428,10 @@ export function AccountSources() {
 	        </div>
 	        <details className="rounded-xl border border-slate-200 bg-white p-4">
 	          <summary className="cursor-pointer text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
-	            Detalhes técnicos da conexão futura
+	            Detalhes desta versão
 	          </summary>
 	          <p className="mt-3 text-xs font-medium text-slate-500">
-	            Informativo. Não solicita credenciais e não executa conexão nesta etapa.
+	            Informativo. Não solicita credenciais e não executa conexão.
 	          </p>
 	        </details>
 	      </>
@@ -3440,7 +3440,7 @@ export function AccountSources() {
       )}
 
       <div className="text-xs text-slate-400 font-medium">
-	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Conexão real e sincronização contínua seguem em evolução conforme a fonte selecionada.</span>
+	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Os limites desta versão variam conforme a fonte selecionada.</span>
       </div>
     </section>
   );

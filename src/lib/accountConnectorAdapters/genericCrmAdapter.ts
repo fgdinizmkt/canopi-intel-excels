@@ -19,8 +19,8 @@ export const genericCrmAdapter: AccountConnectorAdapterDefinition = {
   },
   limitations: [
     'Depende de endpoint, paginação e autenticação definidos por provedor.',
-    'Sem contrato externo validado neste recorte C1.',
+    'Sem contrato externo validado nesta versão.',
   ],
-  warning: 'Outro CRM exige configuração técnica futura de adapter e credenciais reais.',
-  nextRecommendedStep: 'Definir contrato técnico do provedor (endpoints, auth, paginação e limites).',
+  warning: 'Outro CRM permanece como preset local nesta versão.',
+  nextRecommendedStep: 'Preset local disponível nesta versão.',
 };

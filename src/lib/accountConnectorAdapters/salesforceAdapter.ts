@@ -19,8 +19,8 @@ export const salesforceAdapter: AccountConnectorAdapterDefinition = {
   },
   limitations: [
     'Teste real mínimo disponível com token temporário e URL da instância.',
-    'Sem OAuth completo permanente, sync ou writeback nesta etapa.',
+    'Sem OAuth completo permanente, sync ou writeback nesta versão.',
   ],
-  warning: 'Salesforce já aceita teste real mínimo, sem persistência durável de credenciais.',
-  nextRecommendedStep: 'Evoluir o fluxo seguro para OAuth completo após o teste mínimo.',
+  warning: 'Salesforce nesta versão aceita teste real mínimo read-only.',
+  nextRecommendedStep: 'Teste real mínimo read-only disponível nesta versão.',
 };

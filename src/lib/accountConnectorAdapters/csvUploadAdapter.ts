@@ -2,7 +2,7 @@ import type { AccountConnectorAdapterDefinition } from '@/src/lib/accountConnect
 
 export const csvUploadAdapter: AccountConnectorAdapterDefinition = {
   provider: 'csv_upload',
-  label: 'Upload CSV (Batch)',
+  label: 'CSV local',
   surfaceKind: 'functional_real',
   authType: 'none',
   priorityObjectsForFirstTest: ['batch_record'],
@@ -19,8 +19,8 @@ export const csvUploadAdapter: AccountConnectorAdapterDefinition = {
   },
   limitations: [
     'Sem conexão contínua com CRM externo.',
-    'Ingestão manual/local sem sincronização incremental real.',
+    'Ingestão manual/local sem sincronização incremental nesta versão.',
   ],
-  warning: 'CSV permanece como caminho local/manual de ingestão, sem conexão real.',
-  nextRecommendedStep: 'Manter CSV como fallback e priorizar conector nativo para conexão real futura.',
+  warning: 'CSV é um método local de entrada nesta versão.',
+  nextRecommendedStep: 'Carga local disponível nesta versão.',
 };

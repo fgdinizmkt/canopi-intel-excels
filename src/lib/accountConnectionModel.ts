@@ -194,7 +194,7 @@ export function buildInitialRealConnectionContract(
     coverage: hasLocalSetup ? 35 : 15,
     warnings: [
       adapter.warning,
-      'Modelo declarativo de arquitetura futura. Nenhuma credencial real é usada neste recorte.',
+      'Modelo declarativo desta versão. Nenhuma credencial real é usada neste recorte.',
     ],
     blockers,
     nextRecommendedStep: adapter.nextRecommendedStep,
