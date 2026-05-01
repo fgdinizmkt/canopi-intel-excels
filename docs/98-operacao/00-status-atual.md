@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -87,6 +87,18 @@
 - Nenhum recorte implementou OAuth, token, API externa, sync real ou backend de conexão.
 - Fontes opera exclusivamente como setup local/simulado do contrato de leitura.
 - Próximos artefatos ainda pendentes: `identityRules` (Fase C), `canonicalMapping` integrado a gates (Fase B.2), `classificationRules` (Fase E).
+
+### MARCO: Salesforce S1/S2 — Auditoria do fluxo atual e congelamento funcional — 2026-05-01
+
+**Status: S1 publicado; S2 concluído como auditoria documental**
+
+- **S1 publicado:** a copy visual de Salesforce foi ajustada para `Teste com token temporário`, `Validação com token temporário` e `Testar acesso com token`, sem alterar comportamento.
+- **Auditoria S2 concluída:** Salesforce hoje é controlado por `AccountSources.tsx`, `salesforceAdapter.ts`, `accountConnectionModel.ts`, `src/app/api/account-connectors/salesforce/test/route.ts` e `contaConnectorsV2.ts`.
+- **Comportamento real existente:** teste server-side mínimo com `instanceUrl + Bearer token temporário`, usando `Account/describe` para leitura read-only do objeto `Account`.
+- **Limites atuais:** não existe preview próprio de Salesforce, não existe schema discovery próprio além do teste/describe mínimo e não existe reset próprio de sessão Salesforce.
+- **CSV:** continua como fluxo genérico compartilhado no módulo, não como implementação Salesforce dedicada.
+- **Diretriz operacional:** Salesforce permanece pendente/congelado para incrementos funcionais; qualquer próximo passo deve decidir primeiro se CSV local dedicado, reset visual ou apenas encerramento desta versão como teste mínimo são realmente necessários.
+- **Guardrails:** não chamar Salesforce de completo, não chamar Fontes e Conectores de fechado globalmente, não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real.
 
 ---
 

@@ -26,6 +26,24 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - C2.4.1 permanece como ajuste de clareza visual, sem nova capacidade funcional.
 - **Status:** ✅ Concluído e publicado.
 
+## [2026-05-01] — Contas V2 / Salesforce S1 e S2 (token temporário e auditoria de fronteira)
+
+- **Natureza:** S1 publicado como copy/modelagem visual mínima e S2 concluído como auditoria documental da fronteira Salesforce.
+- **Objetivo:** Registrar que Salesforce nesta versão possui apenas validação mínima com token temporário, sem ser declarado completo, e congelar os próximos incrementos até nova decisão de produto.
+- **Contexto:**
+  - O commit quebrado `44d62bc` permanece em quarentena local (`quarantine/salesforce-runtime-invariant-44d62bc`) e não pode voltar para `main`.
+  - O S1 ajustou apenas a copy visível da superfície Salesforce para `Teste com token temporário`, `Validação com token temporário` e `Testar acesso com token`.
+  - O S2 auditou o fluxo atual e confirmou que Salesforce é controlado por `AccountSources.tsx`, `salesforceAdapter.ts`, `accountConnectionModel.ts`, a rota `src/app/api/account-connectors/salesforce/test/route.ts` e `contaConnectorsV2.ts`.
+  - O teste real existente é server-side, com `instanceUrl + Bearer token temporário`, e faz leitura `Account/describe` em modo read-only.
+  - CSV permanece como fluxo genérico compartilhado no módulo; não há implementação Salesforce dedicada para CSV, preview próprio ou reset próprio de sessão.
+- **Decisão Operacional:**
+  - manter Salesforce pendente/congelado para incrementos funcionais;
+  - não declarar Salesforce como completo;
+  - não declarar Fontes e Conectores como fechado globalmente;
+  - não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real;
+  - decidir antes do próximo recorte se o produto realmente precisa de CSV local Salesforce dedicado, reset visual Salesforce ou se esta versão encerra apenas com o teste mínimo temporário.
+- **Status:** 🟡 Auditoria concluída, sem implementação adicional.
+
 ## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
 
 - **Natureza:** Sessão funcional + fechamento operacional.

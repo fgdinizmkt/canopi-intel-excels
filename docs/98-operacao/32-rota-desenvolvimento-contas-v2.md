@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Salesforce S1 foi publicado com copy de validação com token temporário e S2 encerrou a auditoria da fronteira Salesforce, congelando incrementos funcionais até nova decisão de produto. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -80,7 +80,16 @@ Não deve conter:
 - Camada Canônica não significa CRM conectado;
 - ABM/ABX estão fora do escopo deste recorte.
 
-### 5.2 Prioridade operacional atual
+### 5.2 Auditoria Salesforce S1/S2
+
+- **S1 publicado:** a copy visual de Salesforce agora deixa explícito `Teste com token temporário`, `Validação com token temporário` e `Testar acesso com token`.
+- **S2 concluído:** a revisão documental confirmou que Salesforce hoje depende de `AccountSources.tsx`, `salesforceAdapter.ts`, `accountConnectionModel.ts`, `src/app/api/account-connectors/salesforce/test/route.ts` e `contaConnectorsV2.ts`.
+- **Comportamento real existente:** teste server-side mínimo com `instanceUrl + Bearer token temporário`, leitura `Account/describe`, `read-only`.
+- **Limites atuais:** sem preview próprio, sem schema discovery próprio além do teste/describe mínimo, sem reset próprio de sessão e sem CSV Salesforce dedicado.
+- **Diretriz:** manter Salesforce congelado para incrementos funcionais até decisão de produto.
+- **Guardrails:** não chamar Salesforce de completo, não chamar Fontes e Conectores de fechado globalmente, não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real.
+
+### 5.3 Prioridade operacional atual
 
 O plano maior de Configurações continua válido e não foi substituído. Neste momento, a prioridade operacional volta para Fontes e Conectores até esse módulo ficar realmente completo.
 
