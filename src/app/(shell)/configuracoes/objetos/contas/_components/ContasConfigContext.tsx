@@ -63,6 +63,9 @@ function getResolvedInputMethodForProvider(provider: ConnectorType | null, rawIn
   if (provider === 'csv_upload') {
     return rawInputMethod ?? 'csv_upload';
   }
+  if (provider === 'salesforce' && rawInputMethod === 'csv_upload') {
+    return 'csv_upload';
+  }
   return rawInputMethod && rawInputMethod !== 'csv_upload' ? rawInputMethod : 'native_setup';
 }
 

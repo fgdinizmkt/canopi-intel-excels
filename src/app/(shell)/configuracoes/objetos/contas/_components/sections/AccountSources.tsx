@@ -12,7 +12,7 @@ import {
   Zap,
   ShieldCheck,
 } from 'lucide-react';
-import { Card, Badge } from '@/src/components/ui';
+import { Card, Badge, Modal } from '@/src/components/ui';
 import { useContasConfig } from '../ContasConfigContext';
 import {
   CONNECTOR_PRESETS,
@@ -130,6 +130,15 @@ interface HubspotSchemaDiscoveryPayload {
 
 interface CsvProcessingState extends CsvParseProgress {
   fileName: string;
+}
+
+interface ConfirmActionState {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  cancelLabel?: string;
+  tone?: 'danger' | 'warning';
+  onConfirm: () => void;
 }
 
 const WORKFLOW_STEPS = [
@@ -312,6 +321,8 @@ function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedIn
   if (!selectedConnector) return 'Não definida';
   if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
   if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
+  if (selectedConnector === 'salesforce' && !selectedInputMethod) return 'Método pendente';
+  if (selectedConnector === 'salesforce' && selectedInputMethod === 'csv_upload') return 'CSV local';
   if (selectedConnector === 'salesforce') return 'Validação com token temporário';
   if (selectedInputMethod === 'csv_upload') return 'Entrada local';
   if (selectedInputMethod === 'native_setup') return 'Setup local guiado';
@@ -562,12 +573,17 @@ export function AccountSources() {
   );
   const storedInputMethod = selectedConnector ? customConfig.inputMethodByProvider?.[selectedConnector] ?? null : null;
   const hubspotDraftChoice = selectedConnector ? inputMethodDraftByProvider[selectedConnector] ?? null : null;
+  const salesforceDraftChoice = selectedConnector === 'salesforce' ? inputMethodDraftByProvider['salesforce'] ?? null : null;
   const hubspotConnectionTestStatus = selectedConnector ? connectionTestStatusByProvider[selectedConnector] ?? 'idle' : 'idle';
   const hubspotHasRealEvidence = selectedConnector === 'hubspot'
     && (hubspotConnectionTestStatus === 'success' || hubspotConnectionStepCompleted);
   const hubspotHasCsvEvidence = Boolean(csvUploadMeta) || connectorLocalValidated || accountSourcesStepCompleted;
   const effectiveInputMethod = React.useMemo(() => {
     if (!selectedConnector) return null;
+    if (selectedConnector === 'salesforce') {
+      if (salesforceDraftChoice) return salesforceDraftChoice;
+      return null;
+    }
     if (selectedConnector !== 'hubspot') {
       return storedInputMethod && storedInputMethod !== 'csv_upload' ? storedInputMethod : 'native_setup';
     }
@@ -579,6 +595,7 @@ export function AccountSources() {
     hubspotDraftChoice,
     hubspotHasCsvEvidence,
     hubspotHasRealEvidence,
+    salesforceDraftChoice,
     selectedConnector,
     storedInputMethod,
   ]);
@@ -613,6 +630,15 @@ export function AccountSources() {
   const [salesforceConnectionTestStatus, setSalesforceConnectionTestStatus] = React.useState<HubspotConnectionTestStatus>('idle');
   const [salesforceConnectionTestError, setSalesforceConnectionTestError] = React.useState<string | null>(null);
   const [salesforceConnectionTestMeta, setSalesforceConnectionTestMeta] = React.useState<SalesforceConnectionTestMeta | null>(null);
+  const [pendingConfirmAction, setPendingConfirmAction] = React.useState<ConfirmActionState | null>(null);
+  const hasRestoredLocalState = Boolean(
+    savedLocalConfig
+    || csvUploadMeta
+    || connectorLocalValidated
+    || accountSourcesStepCompleted
+    || salesforceConnectionTestMeta
+    || salesforceConnectionTestStatus !== 'idle'
+  );
 
   // CSV upload local state
   const [isCsvParsing, setIsCsvParsing] = React.useState(false);
@@ -749,6 +775,16 @@ export function AccountSources() {
       clearCsvInputValue();
       return;
     }
+    if (selectedConnector === 'salesforce' && !effectiveInputMethod) {
+      setDraftConfig(null);
+      setHasUnsavedLocalEdit(false);
+      clearCsvProcessingTimeout();
+      csvReaderRef.current?.abort();
+      csvReaderRef.current = null;
+      setCsvProcessingState(null);
+      clearCsvInputValue();
+      return;
+    }
     setDraftConfig(mergeWithDefaults(selectedConnector, savedLocalConfig));
     setHasUnsavedLocalEdit(!savedLocalConfig);
     clearCsvProcessingTimeout();
@@ -756,7 +792,7 @@ export function AccountSources() {
     csvReaderRef.current = null;
     setCsvProcessingState(null);
     clearCsvInputValue();
-  }, [clearCsvInputValue, clearCsvProcessingTimeout, selectedConnector, savedLocalConfig]);
+  }, [clearCsvInputValue, clearCsvProcessingTimeout, effectiveInputMethod, selectedConnector, savedLocalConfig]);
 
   const CSV_REVALIDATION_FIELDS: (keyof LocalSourceConfig)[] = [
     'csvDedupeKey', 'csvRequiredMinimumField', 'csvDelimiter', 'csvEncoding', 'csvHeaderInFirstLine',
@@ -1158,7 +1194,7 @@ export function AccountSources() {
       localSourceSavedAt: now,
       localSourceSavedAtByProvider: {
         ...(prev.localSourceSavedAtByProvider || {}),
-        [selectedConnector]: now,
+        [selectedConnector]: null,
       },
       localContractValidatedAt: wasDirty ? null : prev.localContractValidatedAt ?? null,
       localContractValidatedAtByProvider: {
@@ -1227,6 +1263,82 @@ export function AccountSources() {
     if (csvInputRef.current) csvInputRef.current.value = '';
     setHasUnsavedLocalEdit(false);
   }, [selectedConnector, selectedInputMethod, updateCustomConfig]);
+
+  const resetSelectedConnectorLocalState = React.useCallback(() => {
+    if (!selectedConnector || selectedConnector !== 'salesforce') return;
+    const defaults = buildDefaultLocalSourceConfig(selectedConnector);
+    const now = new Date().toISOString();
+    csvReaderRef.current?.abort();
+    csvReaderRef.current = null;
+    clearCsvProcessingTimeout();
+    clearCsvInputValue();
+    setCsvProcessingState(null);
+    setSalesforceInstanceUrl('');
+    setSalesforceAccessToken('');
+    setSalesforceTesting(false);
+    setSalesforceConnectionTestStatus('idle');
+    setSalesforceConnectionTestError(null);
+    setSalesforceConnectionTestMeta(null);
+    setInputMethodDraftForProvider(selectedConnector, 'native_setup');
+    setDraftConfig(defaults);
+    setHasUnsavedLocalEdit(false);
+    setConnectorLocalValidated(false);
+    setAccountSourcesStepCompleted(false);
+    updateCustomConfig((prev: any) => ({
+      ...prev,
+      inputMethodByProvider: {
+        ...(prev.inputMethodByProvider || {}),
+        [selectedConnector]: 'native_setup',
+      },
+      localSourceConfigByProvider: {
+        ...(prev.localSourceConfigByProvider || {}),
+        [selectedConnector]: null,
+      },
+      localSourceSavedAtByProvider: {
+        ...(prev.localSourceSavedAtByProvider || {}),
+        [selectedConnector]: null,
+      },
+      csvUploadMeta: null,
+      csvUploadMetaByProvider: {
+        ...(prev.csvUploadMetaByProvider || {}),
+        [selectedConnector]: null,
+      },
+      connectorLocalValidated: false,
+      connectorLocalValidatedByProvider: {
+        ...(prev.connectorLocalValidatedByProvider || {}),
+        [selectedConnector]: false,
+      },
+      localContractValidatedAt: null,
+      localContractValidatedAtByProvider: {
+        ...(prev.localContractValidatedAtByProvider || {}),
+        [selectedConnector]: null,
+      },
+      accountSourcesStepCompleted: false,
+      accountSourcesStepCompletedByProvider: {
+        ...(prev.accountSourcesStepCompletedByProvider || {}),
+        [selectedConnector]: false,
+      },
+      accountSourcesStepCompletedAt: null,
+      accountSourcesStepCompletedAtByProvider: {
+        ...(prev.accountSourcesStepCompletedAtByProvider || {}),
+        [selectedConnector]: null,
+      },
+    }));
+  }, [
+    clearCsvInputValue,
+    clearCsvProcessingTimeout,
+    selectedConnector,
+    setAccountSourcesStepCompleted,
+    setConnectorLocalValidated,
+    setDraftConfig,
+    setHasUnsavedLocalEdit,
+    setInputMethodDraftForProvider,
+    updateCustomConfig,
+  ]);
+
+  const promptConfirmAction = React.useCallback((action: ConfirmActionState) => {
+    setPendingConfirmAction(action);
+  }, []);
 
   const validateLocalContract = React.useCallback(() => {
     if (!selectedConnector || !draftConfig || !canValidateLocally) return;
@@ -2218,6 +2330,22 @@ export function AccountSources() {
               Selecione CSV local para importar um arquivo exportado ou Private App / API Token para testar a conexão real no servidor.
             </p>
           </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Configuração da fonte</p>
+              <p className="text-sm font-medium text-slate-600">
+                Limpa CSV, confirmação, metadados e teste temporário apenas desta fonte.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={resetSelectedConnectorLocalState}
+              className="rounded-xl border border-slate-300 bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700"
+            >
+              Recomeçar configuração
+            </button>
+          </div>
+
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <button
               type="button"
@@ -2251,6 +2379,85 @@ export function AccountSources() {
         </Card>
       )}
 
+      {selectedConnector && activePreset && selectedConnector === 'salesforce' && !selectedInputMethod && (
+        <Card className="border border-slate-200 p-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Configuração da fonte</p>
+              <h4 className="text-2xl font-black tracking-tight text-slate-900">{activePreset?.name || 'Salesforce'}</h4>
+              <p className="max-w-3xl text-sm font-medium text-slate-600">
+                Escolha o método de entrada antes de abrir o fluxo principal desta fonte. O CSV local e o token temporário continuam disponíveis, mas um por vez.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => promptConfirmAction({
+                title: 'Recomeçar configuração desta fonte?',
+                description: 'Esta ação vai limpar arquivos enviados, confirmações, metadados, validações locais e dados temporários desta fonte. As demais fontes não serão alteradas.',
+                confirmLabel: 'Recomeçar configuração',
+                onConfirm: resetSelectedConnectorLocalState,
+                tone: 'danger',
+              })}
+              className="shrink-0 rounded-xl bg-slate-900 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700"
+            >
+              Recomeçar configuração
+            </button>
+          </div>
+
+          {hasRestoredLocalState && (
+            <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-blue-700">Configuração local restaurada</p>
+              <p className="mt-1 text-sm font-medium text-slate-600">
+                Esta fonte possui dados locais salvos nesta sessão. Você pode continuar ou recomeçar a configuração.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setInputMethodForSelectedConnector('csv_upload')}
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                selectedInputMethod === 'csv_upload'
+                  ? 'border-emerald-300 bg-emerald-50'
+                  : 'border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50'
+              }`}
+            >
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-700">Usar CSV local</p>
+              <p className="mt-2 text-sm font-medium text-slate-600">
+                Importe um CSV exportado do Salesforce. Não usa Bulk API.
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputMethodForSelectedConnector('native_setup')}
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                selectedInputMethod !== 'csv_upload'
+                  ? 'border-sky-300 bg-sky-50'
+                  : 'border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50'
+              }`}
+            >
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-sky-700">Teste com token temporário</p>
+              <p className="mt-2 text-sm font-medium text-slate-600">
+                Valide a URL da instância e o token temporário no servidor.
+              </p>
+            </button>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Método atual</p>
+            <p className="mt-1 text-sm font-black text-slate-900">{getInputMethodLabel(selectedConnector, selectedInputMethod)}</p>
+            <p className="mt-1 text-xs font-medium text-slate-500">
+              {!selectedInputMethod
+                ? 'Escolha um método de entrada para continuar com Salesforce.'
+                : selectedInputMethod === 'csv_upload'
+                  ? 'O fluxo principal do CSV fica logo abaixo, com upload, preview e pré-mapeamento.'
+                  : 'O fluxo principal do token fica logo abaixo, com URL da instância e validação read-only.'}
+            </p>
+          </div>
+        </Card>
+      )}
+
       {selectedConnector && activePreset && draftConfig && isCsvInput && !isHubspotMethodPending && (
         <Card className="relative overflow-hidden border border-slate-200 p-5 min-h-[680px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -2260,6 +2467,11 @@ export function AccountSources() {
               <p className="text-sm font-medium text-slate-600 max-w-3xl">
                 A Canopi vai ler o arquivo apenas no navegador. Nada será enviado para backend nesta etapa.
               </p>
+              {selectedConnector === 'salesforce' && (
+                <p className="text-xs font-medium text-slate-500">
+                  CSV exportado do Salesforce para o objeto Account. Campos esperados: Id, Name, Website, OwnerId e equivalentes. Não usa Bulk API, sync, writeback, OAuth, Connected App ou External Client App.
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -2579,17 +2791,17 @@ export function AccountSources() {
               </div>
             </div>
 	          )}
-	        </div>
-      </Card>
-    )}
+          </div>
+        </Card>
+      )}
 
-      {selectedConnector && activePreset && draftConfig && selectedConnector === 'salesforce' && (
-        <Card className="relative overflow-hidden border border-slate-200 bg-slate-50/70 p-5 min-h-[520px]">
+      {selectedConnector && activePreset && selectedConnector === 'salesforce' && selectedInputMethod !== 'csv_upload' && selectedInputMethod && (
+        <Card className="relative overflow-hidden border border-slate-200 bg-slate-50/70 p-5 min-h-[420px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método ativo</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste com token temporário do Salesforce</h4>
-              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+              <p className="max-w-3xl text-sm font-medium text-slate-600">
                 A Canopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
               </p>
             </div>
@@ -2616,8 +2828,12 @@ export function AccountSources() {
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
-              <p className="mt-1 text-sm font-black text-slate-900">Validação com token temporário</p>
-              <p className="mt-1 text-[11px] font-medium text-slate-500">Leitura segura do Salesforce via token temporário e URL da instância.</p>
+              <p className="mt-1 text-sm font-black text-slate-900">{getInputMethodLabel(selectedConnector, selectedInputMethod)}</p>
+              <p className="mt-1 text-[11px] font-medium text-slate-500">
+                {selectedInputMethod === 'csv_upload'
+                  ? 'CSV exportado do Salesforce. Objeto Account.'
+                  : 'Leitura segura do Salesforce via token temporário e URL da instância.'}
+              </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Instância</p>
@@ -2625,7 +2841,9 @@ export function AccountSources() {
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
-              <p className="mt-1 text-sm font-black text-slate-900">{getHubspotTestLabel(salesforceConnectionTestStatus)}</p>
+              <p className="mt-1 text-sm font-black text-slate-900">
+                {getHubspotTestLabel(salesforceConnectionTestStatus)}
+              </p>
             </div>
           </div>
 
@@ -2681,45 +2899,47 @@ export function AccountSources() {
               </div>
             </div>
 
-            <div className={`rounded-2xl border p-4 ${
-              salesforceConnectionTestStatus === 'success'
-                ? 'border-emerald-200 bg-emerald-50'
-                : salesforceConnectionTestStatus === 'error'
-                  ? 'border-red-200 bg-red-50'
-                  : 'border-slate-200 bg-white'
-            }`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
-              {salesforceConnectionTestStatus === 'success' && salesforceConnectionTestMeta ? (
-                <div className="mt-2 space-y-3">
-                  <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
-                    <ShieldCheck className="h-4 w-4" />
-                    Validação Salesforce concluída nesta sessão.
-                  </p>
-                  <div className="space-y-2 text-sm text-slate-700">
-                    <p><span className="font-black">Instância:</span> {salesforceConnectionTestMeta.instanceUrl}</p>
-                    <p><span className="font-black">Objeto lido:</span> {salesforceConnectionTestMeta.accountLabel}</p>
-                    <p><span className="font-black">Campos detectados:</span> {salesforceConnectionTestMeta.accountFieldsCount.toLocaleString('pt-BR')}</p>
-                    <p><span className="font-black">Versão da API:</span> {salesforceConnectionTestMeta.apiVersion}</p>
-                    <p><span className="font-black">Leitura mínima:</span> {salesforceConnectionTestMeta.readAccessConfirmed ? 'Confirmada' : 'Não confirmada'}</p>
-                    <p className="text-xs font-medium text-slate-500">
-                      Teste em {formatActionTimestamp(salesforceConnectionTestMeta.testedAt)}. O token permanece apenas em memória nesta sessão para permitir a validação read-only.
+            {selectedInputMethod !== 'csv_upload' && (
+              <div className={`rounded-2xl border p-4 ${
+                salesforceConnectionTestStatus === 'success'
+                  ? 'border-emerald-200 bg-emerald-50'
+                  : salesforceConnectionTestStatus === 'error'
+                    ? 'border-red-200 bg-red-50'
+                    : 'border-slate-200 bg-white'
+              }`}>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
+                {salesforceConnectionTestStatus === 'success' && salesforceConnectionTestMeta ? (
+                  <div className="mt-2 space-y-3">
+                    <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
+                      <ShieldCheck className="h-4 w-4" />
+                      Validação Salesforce concluída nesta sessão.
+                    </p>
+                    <div className="space-y-2 text-sm text-slate-700">
+                      <p><span className="font-black">Instância:</span> {salesforceConnectionTestMeta.instanceUrl}</p>
+                      <p><span className="font-black">Objeto lido:</span> {salesforceConnectionTestMeta.accountLabel}</p>
+                      <p><span className="font-black">Campos detectados:</span> {salesforceConnectionTestMeta.accountFieldsCount.toLocaleString('pt-BR')}</p>
+                      <p><span className="font-black">Versão da API:</span> {salesforceConnectionTestMeta.apiVersion}</p>
+                      <p><span className="font-black">Leitura mínima:</span> {salesforceConnectionTestMeta.readAccessConfirmed ? 'Confirmada' : 'Não confirmada'}</p>
+                      <p className="text-xs font-medium text-slate-500">
+                        Teste em {formatActionTimestamp(salesforceConnectionTestMeta.testedAt)}. O token permanece apenas em memória nesta sessão para permitir a validação read-only.
+                      </p>
+                    </div>
+                  </div>
+                ) : salesforceConnectionTestStatus === 'error' ? (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-base font-black text-red-800">Não foi possível validar o acesso Salesforce.</p>
+                    <p className="text-sm text-red-700">{salesforceConnectionTestError || 'Revise a URL da instância e o token temporário.'}</p>
+                  </div>
+                ) : (
+                  <div className="mt-2 space-y-2">
+                    <p className="text-base font-black text-slate-900">Aguardando teste com token temporário nesta sessão.</p>
+                    <p className="text-sm text-slate-600">
+                      O servidor ainda não validou a URL da instância e o token temporário. Após o teste, apenas metadados seguros permanecem na sessão.
                     </p>
                   </div>
-                </div>
-              ) : salesforceConnectionTestStatus === 'error' ? (
-                <div className="mt-2 space-y-2">
-                  <p className="text-base font-black text-red-800">Não foi possível validar o acesso Salesforce.</p>
-                  <p className="text-sm text-red-700">{salesforceConnectionTestError || 'Revise a URL da instância e o token temporário.'}</p>
-                </div>
-              ) : (
-                <div className="mt-2 space-y-2">
-                  <p className="text-base font-black text-slate-900">Aguardando teste com token temporário nesta sessão.</p>
-                  <p className="text-sm text-slate-600">
-                    O servidor ainda não validou a URL da instância e o token temporário. Após o teste, apenas metadados seguros permanecem na sessão.
-                  </p>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </Card>
       )}
@@ -2888,10 +3108,16 @@ export function AccountSources() {
               </div>
               <button
                 type="button"
-                onClick={resetHubspotSession}
+                onClick={() => promptConfirmAction({
+                  title: 'Recomeçar configuração desta fonte?',
+                  description: 'Esta ação vai limpar o token temporário, o preview, o schema e os dados locais desta fonte nesta sessão. As demais fontes não serão alteradas.',
+                  confirmLabel: 'Recomeçar configuração',
+                  onConfirm: resetHubspotSession,
+                  tone: 'warning',
+                })}
                 className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
               >
-                Resetar sessão HubSpot
+                Recomeçar configuração
               </button>
             </div>
             <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
@@ -3311,7 +3537,11 @@ export function AccountSources() {
 
                   <SourceSnapshotSummary
                     sourceName={draftConfig.sourceName}
-                    entryLabel={selectedConnector === 'hubspot' ? getInputMethodLabel(selectedConnector, selectedInputMethod) : 'CSV'}
+                    entryLabel={selectedConnector === 'hubspot'
+                      ? getInputMethodLabel(selectedConnector, selectedInputMethod)
+                      : selectedConnector === 'salesforce'
+                        ? 'CSV local'
+                        : 'CSV'}
                     statusLabel={isHubspotMethodPending ? 'Método pendente' : (isHubspotApiInput ? getHubspotTestLabel(hubspotConnectionTestStatus) : csvStatusLabel)}
                     lastSavedNote={lastSavedAt ? `Configuração local salva em ${lastSavedAt}.` : null}
                     lastValidatedNote={lastValidatedAt ? `CSV confirmado em ${lastValidatedAt}.` : null}
@@ -3343,7 +3573,13 @@ export function AccountSources() {
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3">
               <button
                 type="button"
-                onClick={restorePreset}
+                onClick={() => promptConfirmAction({
+                  title: 'Recomeçar configuração desta fonte?',
+                  description: 'Esta ação vai restaurar o padrão da fonte e limpar arquivos enviados, confirmações, metadados e validações locais desta sessão. As demais fontes não serão alteradas.',
+                  confirmLabel: 'Recomeçar configuração',
+                  onConfirm: restorePreset,
+                  tone: 'warning',
+                })}
                 className="rounded-full border border-slate-300 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
               >
                 Restaurar padrão
@@ -3433,6 +3669,44 @@ export function AccountSources() {
       <div className="text-xs text-slate-400 font-medium">
 	        <span className="inline-flex items-center gap-2"><Clock className="h-3.5 w-3.5" />Os limites desta versão variam conforme a fonte selecionada.</span>
       </div>
+
+      {pendingConfirmAction && (
+        <Modal
+          isOpen={Boolean(pendingConfirmAction)}
+          onClose={() => setPendingConfirmAction(null)}
+          title={pendingConfirmAction.title}
+          size="md"
+        >
+          <div className="space-y-6">
+            <p className="text-sm font-medium text-slate-600">
+              {pendingConfirmAction.description}
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingConfirmAction(null)}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
+              >
+                {pendingConfirmAction.cancelLabel || 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  pendingConfirmAction.onConfirm();
+                  setPendingConfirmAction(null);
+                }}
+                className={`rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-all ${
+                  pendingConfirmAction.tone === 'warning'
+                    ? 'bg-amber-600 hover:bg-amber-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                {pendingConfirmAction.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </section>
   );
 }
