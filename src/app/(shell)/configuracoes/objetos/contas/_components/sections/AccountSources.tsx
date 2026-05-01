@@ -299,7 +299,7 @@ function getConnectionStatusLabel(status: string): string {
 
 function getIngestMethod(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'Teste real mínimo · Token temporário + URL da instância';
+    case 'salesforce': return 'Teste com token temporário · Token temporário + URL da instância';
     case 'hubspot': return 'Funcional real · Private App API';
     case 'rd_station': return 'Shell/preset · API + Token';
     case 'other_crm': return 'Shell/preset · API, banco ou middleware';
@@ -312,7 +312,7 @@ function getInputMethodLabel(selectedConnector: ConnectorType | null, selectedIn
   if (!selectedConnector) return 'Não definida';
   if (selectedConnector === 'hubspot' && !selectedInputMethod) return 'Método pendente';
   if (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token') return 'HubSpot real';
-  if (selectedConnector === 'salesforce') return 'Conexão real mínima';
+  if (selectedConnector === 'salesforce') return 'Validação com token temporário';
   if (selectedInputMethod === 'csv_upload') return 'Entrada local';
   if (selectedInputMethod === 'native_setup') return 'Setup local guiado';
   if (selectedInputMethod) return selectedInputMethod;
@@ -452,7 +452,7 @@ function getCsvSchemaTone(level: CsvSchemaQualityLevel): 'neutral' | 'info' | 'w
 
 function getIntegrationLabel(type: ConnectorType): string {
   switch (type) {
-    case 'salesforce': return 'Teste real mínimo';
+    case 'salesforce': return 'Teste com token temporário';
     case 'hubspot': return 'Funcional real';
     case 'rd_station': return 'Shell/preset';
     case 'other_crm': return 'Shell/preset';
@@ -2588,7 +2588,7 @@ export function AccountSources() {
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
-              <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste real mínimo do Salesforce</h4>
+              <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste com token temporário do Salesforce</h4>
               <p className="text-sm font-medium text-slate-600 max-w-3xl">
                 A Canopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
               </p>
@@ -2616,7 +2616,7 @@ export function AccountSources() {
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
               <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
-              <p className="mt-1 text-sm font-black text-slate-900">Conexão real mínima</p>
+              <p className="mt-1 text-sm font-black text-slate-900">Validação com token temporário</p>
               <p className="mt-1 text-[11px] font-medium text-slate-500">Leitura segura do Salesforce via token temporário e URL da instância.</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
@@ -2657,10 +2657,10 @@ export function AccountSources() {
                   {salesforceTesting ? (
                     <span className="inline-flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Testando conexão Salesforce
+                      Testando acesso com token
                     </span>
                   ) : (
-                    'Testar conexão Salesforce'
+                    'Testar acesso com token'
                   )}
                 </button>
                 <span className="rounded-full bg-sky-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">
@@ -2693,7 +2693,7 @@ export function AccountSources() {
                 <div className="mt-2 space-y-3">
                   <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
                     <ShieldCheck className="h-4 w-4" />
-                    Conexão Salesforce validada nesta sessão.
+                    Validação Salesforce concluída nesta sessão.
                   </p>
                   <div className="space-y-2 text-sm text-slate-700">
                     <p><span className="font-black">Instância:</span> {salesforceConnectionTestMeta.instanceUrl}</p>
@@ -2708,12 +2708,12 @@ export function AccountSources() {
                 </div>
               ) : salesforceConnectionTestStatus === 'error' ? (
                 <div className="mt-2 space-y-2">
-                  <p className="text-base font-black text-red-800">Não foi possível validar a conexão Salesforce.</p>
+                  <p className="text-base font-black text-red-800">Não foi possível validar o acesso Salesforce.</p>
                   <p className="text-sm text-red-700">{salesforceConnectionTestError || 'Revise a URL da instância e o token temporário.'}</p>
                 </div>
               ) : (
                 <div className="mt-2 space-y-2">
-                  <p className="text-base font-black text-slate-900">Aguardando teste real mínimo nesta sessão.</p>
+                  <p className="text-base font-black text-slate-900">Aguardando teste com token temporário nesta sessão.</p>
                   <p className="text-sm text-slate-600">
                     O servidor ainda não validou a URL da instância e o token temporário. Após o teste, apenas metadados seguros permanecem na sessão.
                   </p>
