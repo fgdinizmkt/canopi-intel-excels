@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Salesforce S1 foi publicado com copy de validação com token temporário e S2 encerrou a auditoria da fronteira Salesforce, congelando incrementos funcionais até nova decisão de produto. RD Station teve tentativa local de copy/modelagem visual revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece congelada para novos incrementos até recorte menor. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. A régua operacional de “100%” agora significa fechamento por CRM individual: cada fonte precisa ter todas as formas relevantes de conexão/entrada funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 foi publicado com copy de validação com token temporário e S2 encerrou a auditoria da fronteira Salesforce, congelando incrementos funcionais até nova decisão de produto. RD Station teve tentativa local de copy/modelagem visual revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece congelada para novos incrementos até recorte menor. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -97,6 +97,18 @@ Não deve conter:
 - **Reversão:** os três arquivos do recorte foram restaurados antes de commit e os cliques dos CRMs voltaram a funcionar.
 - **Diretriz:** qualquer novo passo em RD Station deve começar por um recorte menor e mais seguro, com diagnóstico do card e dos eventos de clique antes de outra mudança de copy.
 - **Guardrails:** não criar rota API RD, não criar token real, não criar sync/writeback/importação real, não mexer em HubSpot/Salesforce/Outro CRM no mesmo recorte.
+
+### 5.5 Matriz de completude CRM 100%
+
+| CRM | Private App/API Token ou equivalente | CSV local | Preview / Schema / Reset | Status |
+|---|---|---|---|---|
+| HubSpot | funcional/validado | funcional/validado | funcional/validado | mais próximo de fechado |
+| Salesforce | existe teste mínimo com token temporário | pendente | pendentes | incompleto |
+| RD Station CRM | pendente | pendente | pendentes | incompleto |
+| Outro CRM | pendente | pendente | pendentes | incompleto |
+
+- **Leitura correta:** “100%” não é fechamento global do módulo; é fechamento individual por CRM, com validação visual e funcional do conjunto relevante de entradas/conexões de cada fonte.
+- **Guardrails:** não considerar RD Station fechado, não considerar Salesforce fechado, não considerar Fontes e Conectores fechado globalmente, não prometer sync/writeback/importação real.
 
 ### 5.3 Prioridade operacional atual
 

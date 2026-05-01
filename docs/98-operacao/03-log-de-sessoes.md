@@ -61,6 +61,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - manter fora do escopo qualquer rota API, token real, sync, writeback ou importação real.
 - **Status:** 🟡 Tentativa local revertida; RD Station permanece pendente no estado publicado anterior.
 
+## [2026-05-01] — Contas V2 / Critério de fechamento CRM 100% consolidado
+
+- **Natureza:** Consolidação documental da régua operacional de fechamento por CRM.
+- **Objetivo:** Registrar que “100%” na frente de Fontes e Conectores significa fechamento por CRM individual, não por módulo global.
+- **Contexto:**
+  - HubSpot é o CRM mais próximo de fechado na versão atual;
+  - Salesforce permanece incompleto com teste mínimo por token temporário;
+  - RD Station CRM continua como preset local/shell pendente;
+  - Outro CRM permanece pendente;
+  - a tentativa RD R2A foi revertida por regressão funcional e não representa fechamento.
+- **Decisão Operacional:**
+  - um CRM só é fechado quando todas as formas relevantes de conexão/entrada daquela fonte estiverem funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser;
+  - não declarar Fontes e Conectores como fechado globalmente;
+  - não tratar rollback como conclusão;
+  - seguir com micro-recortes menores e validados por browser para qualquer CRM ainda pendente.
+- **Status:** 🟢 Definição consolidada; HubSpot mais próximo de fechado, Salesforce/RD Station/Outro CRM seguem pendentes.
+
 ## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
 
 - **Natureza:** Sessão funcional + fechamento operacional.

@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. RD Station CRM teve uma tentativa de copy/modelagem visual local (R2A) revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece pendente de fechamento individual. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. A régua atual de “100%” passou a significar: todas as formas relevantes de conexão/entrada daquela fonte precisam estar funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. RD Station CRM teve uma tentativa de copy/modelagem visual local (R2A) revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece pendente de fechamento individual. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -110,6 +110,17 @@
 - **Reversão:** os três arquivos do recorte foram restaurados antes de commit, recuperando os cliques dos CRMs e deixando RD Station no estado publicado anterior.
 - **Diretriz pós-reversão:** novas alterações em RD Station devem começar por um recorte menor e mais seguro, com diagnóstico do componente/card e dos eventos de clique antes de qualquer novo ajuste de copy.
 - **Guardrails:** não criar rota API RD, não criar token real, não criar sync/writeback/importação real, não mexer em HubSpot/Salesforce/Outro CRM no mesmo recorte.
+
+### MARCO: Critério de fechamento CRM 100% — 2026-05-01
+
+**Status: Definição operacional consolidada**
+
+- **Definição correta:** um CRM só é considerado fechado quando todas as formas relevantes de conexão/entrada daquela fonte estiverem funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser.
+- **HubSpot:** mais próximo de fechado na versão atual, com Private App/API Token, CSV local, preview read-only, schema discovery e reset funcionando.
+- **Salesforce:** incompleto; possui apenas teste mínimo com token temporário, sem CSV dedicado, sem preview/schema/reset próprios.
+- **RD Station CRM:** incompleto; permanece como preset local/shell, sem fechamento.
+- **Outro CRM:** incompleto; permanece pendente.
+- **Guardrails:** não declarar Fontes e Conectores como fechado globalmente, não confundir tentativa revertida com fechamento, não prometer sync/writeback/importação real para nenhum CRM nesta frente.
 
 ---
 
