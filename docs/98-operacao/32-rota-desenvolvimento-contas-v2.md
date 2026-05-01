@@ -1,6 +1,6 @@
 # Rota de Desenvolvimento — Contas V2
 
-Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Salesforce S1 foi publicado com copy de validação com token temporário e S2 encerrou a auditoria da fronteira Salesforce, congelando incrementos funcionais até nova decisão de produto. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
+Status: Fase A concluída e sincronizada em `origin/main` (commit `219afa2`). Fase B.1 concluída e sincronizada em `origin/main` (commit `73ff047`). C2.9 concluído localmente (commit `2a65e6e`) com HubSpot validado como primeiro CRM completo da versão atual; Salesforce, RD Station CRM e Outro CRM seguem em fechamento individual. Salesforce S1 foi publicado com copy de validação com token temporário e S2 encerrou a auditoria da fronteira Salesforce, congelando incrementos funcionais até nova decisão de produto. RD Station teve tentativa local de copy/modelagem visual revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece congelada para novos incrementos até recorte menor. Próxima fase formal: Fase B.2 — Integração da Camada Canônica com validação/blockers locais.
 Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
@@ -88,6 +88,15 @@ Não deve conter:
 - **Limites atuais:** sem preview próprio, sem schema discovery próprio além do teste/describe mínimo, sem reset próprio de sessão e sem CSV Salesforce dedicado.
 - **Diretriz:** manter Salesforce congelado para incrementos funcionais até decisão de produto.
 - **Guardrails:** não chamar Salesforce de completo, não chamar Fontes e Conectores de fechado globalmente, não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real.
+
+### 5.4 RD Station R2A/R2B — tentativa revertida e congelamento de novos incrementos
+
+- **R1 auditado:** RD Station CRM foi confirmado como preset local/shell, sem API real, sem token real, sem preview/schema/reset próprios e sem CSV dedicado.
+- **R2A tentado localmente:** a copy/modelagem visual foi ajustada para reduzir linguagem de API/token e enfatizar preset local sem conexão externa.
+- **Regressão funcional:** a validação visual mostrou quebra de interatividade, com os cards de CRM sem clique.
+- **Reversão:** os três arquivos do recorte foram restaurados antes de commit e os cliques dos CRMs voltaram a funcionar.
+- **Diretriz:** qualquer novo passo em RD Station deve começar por um recorte menor e mais seguro, com diagnóstico do card e dos eventos de clique antes de outra mudança de copy.
+- **Guardrails:** não criar rota API RD, não criar token real, não criar sync/writeback/importação real, não mexer em HubSpot/Salesforce/Outro CRM no mesmo recorte.
 
 ### 5.3 Prioridade operacional atual
 

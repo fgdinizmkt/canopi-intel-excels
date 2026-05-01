@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. RD Station CRM teve uma tentativa de copy/modelagem visual local (R2A) revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece pendente de fechamento individual. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -99,6 +99,17 @@
 - **CSV:** continua como fluxo genérico compartilhado no módulo, não como implementação Salesforce dedicada.
 - **Diretriz operacional:** Salesforce permanece pendente/congelado para incrementos funcionais; qualquer próximo passo deve decidir primeiro se CSV local dedicado, reset visual ou apenas encerramento desta versão como teste mínimo são realmente necessários.
 - **Guardrails:** não chamar Salesforce de completo, não chamar Fontes e Conectores de fechado globalmente, não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real.
+
+### MARCO: RD Station R2A/R2B — tentativa de copy/modelagem revertida e congelamento operacional — 2026-05-01
+
+**Status: Revertido antes de commit; RD Station voltou ao estado publicado anterior**
+
+- **R1 auditado:** RD Station CRM foi confirmado como preset local/shell, sem API real, sem token real, sem preview/schema/reset próprios e sem CSV dedicado.
+- **R2A tentado localmente:** a copy/modelagem visual foi ajustada para reduzir linguagem de API/token e apontar RD Station como preset local sem conexão externa.
+- **Regressão funcional encontrada:** a validação visual mostrou quebra de interatividade, com os cards de CRM deixando de responder ao clique.
+- **Reversão:** os três arquivos do recorte foram restaurados antes de commit, recuperando os cliques dos CRMs e deixando RD Station no estado publicado anterior.
+- **Diretriz pós-reversão:** novas alterações em RD Station devem começar por um recorte menor e mais seguro, com diagnóstico do componente/card e dos eventos de clique antes de qualquer novo ajuste de copy.
+- **Guardrails:** não criar rota API RD, não criar token real, não criar sync/writeback/importação real, não mexer em HubSpot/Salesforce/Outro CRM no mesmo recorte.
 
 ---
 

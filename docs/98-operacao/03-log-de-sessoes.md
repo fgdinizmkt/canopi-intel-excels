@@ -44,6 +44,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - decidir antes do próximo recorte se o produto realmente precisa de CSV local Salesforce dedicado, reset visual Salesforce ou se esta versão encerra apenas com o teste mínimo temporário.
 - **Status:** 🟡 Auditoria concluída, sem implementação adicional.
 
+## [2026-05-01] — Contas V2 / RD Station R1, R2A e R2B (preset local e reversão por regressão funcional)
+
+- **Natureza:** Auditoria de estado atual, tentativa local revertida e congelamento operacional.
+- **Objetivo:** Confirmar que RD Station CRM continua como preset local/shell nesta versão e registrar a tentativa de copy/modelagem visual que precisou ser revertida por regressão funcional nos cliques dos cards.
+- **Contexto:**
+  - R1 já havia auditado RD Station CRM como preset local, sem API real, sem token real, sem preview/schema/reset próprios e sem CSV dedicado;
+  - a tentativa R2A mudou a copy/modelagem visual para reduzir linguagem de API/token e enfatizar preset local sem conexão externa;
+  - a validação visual revelou regressão: os cards de CRM ficaram sem interatividade;
+  - a reversão foi feita antes de commit, restaurando o estado publicado anterior e recuperando os cliques.
+- **Decisão Operacional:**
+  - congelar novos incrementos de RD Station até existir um recorte menor;
+  - primeiro diagnosticar o componente/card e os eventos de clique;
+  - só depois alterar um texto observável por vez;
+  - validar sempre em runtime limpo com hard refresh e clique em todos os CRMs;
+  - manter fora do escopo qualquer rota API, token real, sync, writeback ou importação real.
+- **Status:** 🟡 Tentativa local revertida; RD Station permanece pendente no estado publicado anterior.
+
 ## [2026-04-28] — Contas V2 / C2.5 (CSV schema validation e pré-mapeamento local)
 
 - **Natureza:** Sessão funcional + fechamento operacional.
