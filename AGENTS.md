@@ -9,16 +9,29 @@ Este projeto é a plataforma Canopi | intel excels.
 ## Guia Operacional Rápido (Protocolo Obrigatório)
 
 ### Especialidades e Agentes
-1. **Codex:** Executor técnico-operacional padrão do fluxo local atual. Responsável por operar terminal/repo, checar Git, rodar validações, subir runtime local, aplicar ajustes controlados quando autorizados e reportar evidências objetivas.
-2. **Claude Code:** Auditoria técnica profunda, refactor pesado, implementação alternativa ou revisão comparativa quando explicitamente convocado.
-3. **Antigravity:** Direção visual (Premium), UX/UI, hierarquia e narrativa de dados.
-4. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, definição do próximo passo e controle de aderência ao plano documentado.
+1. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, escolha explícita do agente adequado antes de cada recorte, controle de aderência ao plano documentado, definição do próximo passo.
+2. **Claude Code:** Executor principal para refactor estrutural, reorganização de componentes grandes, arquitetura de renderização, separação de subcomponentes, correção de condicionais complexas, implementação técnica quando o problema exige reestruturação real.
+3. **Antigravity:** Executor/parceiro principal de UX/UI visual. Hierarquia de interface, consistência estética Premium, leitura de prints, ajuste fino de layout, espaçamento, clareza de botões, composição visual, validação perceptiva no browser.
+4. **Codex:** Auditor técnico-operacional, validador de diff/build/runtime/Git. Executor apenas de ajustes pequenos, cirúrgicos e bem delimitados.
 
 ### Avaliação operacional do Codex
-- **Status:** aprovado como executor técnico-operacional do fluxo local após teste prático.
+- **Status:** aprovado como auditor técnico-operacional e executor de ajustes pequenos, mas não como agente principal para recortes estruturais de UX/UI ou componentes grandes.
 - **Pontos fortes:** leitura de Git, execução de comandos, validação de runtime, geração de patch de backup e separação de escopo.
-- **Limites:** não decide produto, não abre recorte, não commita sem aprovação, não faz push sem autorização e não substitui validação visual do usuário.
-- **Uso recomendado:** manter Codex quando ele já estiver com contexto local ativo; usar Claude Code apenas por decisão explícita ou necessidade real de auditoria/refactor pesado.
+- **Limites:** não decide produto, não abre recorte, não commita sem aprovação, não faz push sem autorização, não substitui validação visual do usuário e não executa refactors estruturais.
+- **Uso recomendado:** manter Codex para auditoria técnica, validação de build/lint/Git e ajustes cirúrgicos bem delimitados. Escalar para Claude Code quando houver reestruturação de componente, reorganização de JSX grande ou renderização condicional complexa.
+
+### Matriz definitiva de uso
+- **Arquitetura de componente, JSX grande, renderização condicional, estado espalhado ou refactor:** Claude Code.
+- **UX/UI, hierarquia visual, clareza de fluxo, layout, consistência de tela, leitura por print ou ajuste fino:** Antigravity.
+- **Problema pequeno, técnico, local e sem reestruturação:** Codex pode executar.
+- **Validação técnica, build, lint, runtime, diff, status Git, smoke e commit após aprovação:** Codex.
+- **Se houver mais de duas rodadas de patch no mesmo arquivo sem resolver a causa real:** interromper Codex como executor e escalar para Claude Code ou Antigravity.
+- **Para recortes complexos de UI:** Claude Code reorganiza a estrutura → Antigravity lapida UX/UI no browser → Codex audita diff/build/Git → Fábio valida visualmente → só então commit.
+
+### Regras de seleção e escalonamento
+- Informar explicitamente qual agente assumirá a tarefa antes de agir.
+- Quando um agente entrar em loop de patches ou o tipo de problema mudar, reavaliar a matriz de agentes antes de continuar.
+- Se a solução de um problema não caiu em duas rodadas de mudanças, a causa raiz provavelmente é estrutural: escalar para Claude Code.
 
 ### Protocolo Diário
 - **Sync:** Validar `git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`. Só dar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
