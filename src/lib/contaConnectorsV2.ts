@@ -140,7 +140,7 @@ export const SALESFORCE_PRESET: ConnectorPreset = {
     ],
     whatMustExist: [
       'Salesforce API enabled',
-      'Connected App com OAuth 2.0',
+      'External Client App com OAuth 2.0',
       'Permissions: crm.objects.accounts.read',
     ],
     publishBlockers: [

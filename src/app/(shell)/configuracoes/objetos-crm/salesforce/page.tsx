@@ -1,14 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ChevronLeft,
-  FileJson,
-  KeyRound,
-  Network,
-  ShieldCheck,
-} from 'lucide-react';
+import { ChevronLeft, ShieldCheck } from 'lucide-react';
 import { Badge, Card } from '@/src/components/ui';
+import { SalesforceMethodSelector } from './_components/SalesforceMethodSelector';
 
 export default function SalesforceDedicatedPage() {
   return (
@@ -69,35 +64,7 @@ export default function SalesforceDedicatedPage() {
 
       <section className="space-y-4">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Métodos de conexão</p>
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <Card className="rounded-3xl border border-slate-200 p-6">
-            <div className="flex items-center gap-2">
-              <Network className="h-4 w-4 text-blue-700" />
-              <h3 className="text-base font-black text-slate-900">OAuth / Connected App</h3>
-            </div>
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">
-              Método recomendado para conexão real futura com política de autorização por aplicativo.
-            </p>
-          </Card>
-          <Card className="rounded-3xl border border-slate-200 p-6">
-            <div className="flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-blue-700" />
-              <h3 className="text-base font-black text-slate-900">Token temporário</h3>
-            </div>
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">
-              Validação controlada de acesso e leitura para verificar objeto, campos e permissão da fonte.
-            </p>
-          </Card>
-          <Card className="rounded-3xl border border-slate-200 p-6">
-            <div className="flex items-center gap-2">
-              <FileJson className="h-4 w-4 text-blue-700" />
-              <h3 className="text-base font-black text-slate-900">CSV exportado</h3>
-            </div>
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">
-              Alternativa de entrada local para a fonte Salesforce, sem criar conector global separado.
-            </p>
-          </Card>
-        </div>
+        <SalesforceMethodSelector />
       </section>
 
       <section className="space-y-4">
