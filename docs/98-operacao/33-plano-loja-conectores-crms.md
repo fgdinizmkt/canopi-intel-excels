@@ -1,7 +1,8 @@
 # Plano Operacional — Loja de Conectores e CRMs
 
 ## 1) Estado atual
-- `main` limpa e sincronizada no ponto de partida desta frente.
+- `main` limpa e sincronizada no commit `d2afafa`.
+- Salesforce 2C.1 foi fechado como visualização read-only dos metadados de `Account` após teste com token temporário.
 - Patch local anterior descartado com `git restore`.
 - Fontes e Conectores permanece na arquitetura antiga.
 - `AccountSources.tsx` concentra responsabilidades em excesso.
@@ -110,6 +111,11 @@ Escopo de execução inicial:
 - validar alternância de método;
 - validar que nenhum fluxo aparece na loja;
 - validar que estado antigo não vaza para o novo fluxo.
+
+Estado consolidado desta trilha:
+- Salesforce 2C.1 fechado em `d2afafa`.
+- A página dedicada passou a exibir os metadados read-only de `Account` após teste com token temporário.
+- O escopo continua sendo uma trilha CRM por CRM; o fechamento 2C.1 não equivale a conector produtivo completo.
 
 Regra de progressão:
 - Não avançar para outro CRM antes de Salesforce estar testado e aprovado.
@@ -254,15 +260,19 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 ## 13) Status do plano
 | Fase | Status | Próxima ação | Gate |
 |---|---|---|---|
-| Fase 0 | em andamento | Consolidar e aprovar este plano operacional | Aprovação explícita do Fábio para iniciar implementação |
-| Fase 1 | pendente | Desenhar loja de conectores sem fluxos inline | Loja sem fluxo inline e validação visual |
-| Fase 2 | pendente | Criar rota dedicada Salesforce | Navegação e isolamento de estado por rota |
+| Fase 0 | concluída | Manter a memória operacional sincronizada | Aprovação explícita do Fábio consolidada |
+| Fase 1 | concluída | Loja funcional com logos publicada | Loja sem fluxo inline e validação visual |
+| Fase 2 | em andamento | Consolidar o recorte Salesforce 2C.1 e seguir a trilha CRM por CRM | Navegação e isolamento de estado por rota |
 | Fase 3 | pendente | Implementar token temporário Salesforce | Teste local validado e hard refresh ok |
 | Fase 4 | pendente | Implementar CSV exportado Salesforce | CSV restrito à página Salesforce |
 | Fase 5 | pendente | Inserir placeholders OAuth/Bulk API | Sinalização clara de escopo futuro |
 | Fase 6 | pendente | Executar validação ponta a ponta Salesforce | Fluxo estável, sem vazamento de estado antigo |
 | Fase 7 | pendente | Registrar fechamento Salesforce na operação | Evidência técnica + visual + operacional |
 | Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |
+
+## 15) Memória operacional e espelho externo
+- A atualização da memória operacional deve ser refletida no repositório local, em `origin/main` e na pasta oficial do Google Drive do projeto.
+- Quando o ambiente não tiver acesso direto ao Google Drive, o bloco canônico deve ser preparado para aplicação manual ou por ferramenta conectada, sem fingir sincronização.
 
 ## 14) Princípio Transversal — Classificação de Conectores por Natureza Operacional
 

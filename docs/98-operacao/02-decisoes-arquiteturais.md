@@ -1161,3 +1161,22 @@ Recortes 53–56 implementam operacionalização em leitura: transformação de 
 
 **Decisão de Nomenclatura:**
 Recortes 53–56 não formam "Fase F". Caracterizados como **"Camada de Priorização Derivada"** — operacionalização de leitura sobre base Fase E, sem persistência nova, apenas transformação determinística de dados em ação.
+
+### 20. Salesforce 2C.1 como fronteira read-only de metadados de Account
+
+**Decisão:** Salesforce 2C.1 fecha a leitura read-only dos metadados de `Account` após teste bem-sucedido com token temporário. O recorte não transforma Salesforce em conector produtivo completo.
+
+**Implicação:**
+- não existe OAuth real nesta etapa;
+- não existe CSV real nesta etapa;
+- não existe persistência de token;
+- não existe `localStorage`, cookies, sessão, banco, sync ou writeback;
+- não existe leitura de registros reais;
+- a superfície permanece restrita à visualização dos metadados do objeto `Account` na página dedicada.
+
+**Memória operacional:** atualização obrigatória em três destinos de memória:
+- repositório local;
+- `origin/main` no GitHub;
+- pasta oficial do Google Drive do projeto, via ferramenta conectada ou atualização manual quando houver acesso.
+
+**Commits:** `d2afafa` — `feat(settings): show Salesforce Account metadata fields`

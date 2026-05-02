@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` após o C2.7 Salesforce connection test flow. C2.9 concluído localmente no commit `2a65e6e`, com HubSpot validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores em fechamento CRM por CRM. A régua atual de “100%” passou a significar: todas as formas relevantes de conexão/entrada daquela fonte precisam estar funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 foi publicado com copy de validação com token temporário e S2 registrou a auditoria do fluxo atual, congelando incrementos funcionais até decisão de produto. RD Station CRM teve uma tentativa de copy/modelagem visual local (R2A) revertida antes de commit por regressão funcional nos cliques dos cards; a frente voltou ao estado publicado anterior e permanece pendente de fechamento individual. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` no commit `d2afafa`, que fechou Salesforce 2C.1 como visualização read-only dos metadados de `Account` após teste com token temporário. HubSpot segue validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores continua em fechamento CRM por CRM. A régua atual de “100%” segue significando: todas as formas relevantes de conexão/entrada daquela fonte precisam estar funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 e S2 permanecem como histórico anterior; o novo marco 2C.1 confirma apenas leitura de metadados sem transformar Salesforce em conector produtivo completo. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -99,6 +99,17 @@
 - **CSV:** continua como fluxo genérico compartilhado no módulo, não como implementação Salesforce dedicada.
 - **Diretriz operacional:** Salesforce permanece pendente/congelado para incrementos funcionais; qualquer próximo passo deve decidir primeiro se CSV local dedicado, reset visual ou apenas encerramento desta versão como teste mínimo são realmente necessários.
 - **Guardrails:** não chamar Salesforce de completo, não chamar Fontes e Conectores de fechado globalmente, não prometer OAuth produtivo, Connected App, External Client App, sync, writeback, Bulk API ou importação real.
+
+### MARCO: Salesforce 2C.1 — Metadados de Account read-only após token temporário — 2026-05-02
+
+**Status: Concluído e publicado em origin/main**
+
+- **Commit:** `d2afafa` — `feat(settings): show Salesforce Account metadata fields`
+- **Objetivo:** mostrar os campos de metadados do objeto `Account` de forma read-only após teste bem-sucedido com token temporário.
+- **Escopo real:** visualização read-only dos metadados de `Account` no Salesforce dedicado, sem OAuth real, sem CSV real, sem persistência de token, sem `localStorage`, sem cookies, sem banco, sem sessão, sem contexto global, sem sync, sem writeback e sem leitura de registros reais.
+- **Garantias:** o recorte não transforma Salesforce em conector produtivo completo; ele apenas confirma a fronteira local de leitura do objeto `Account`.
+- **Validações:** `npm run lint` OK; `npm run build:safe` OK; `HEAD = origin/main = d2afafa`; working tree limpa.
+- **Memória operacional:** o espelho local/GitHub já está fechado; o espelho para o Google Drive oficial deve ser aplicado pelo ritual de atualização de memória quando houver acesso conectado ou atualização manual.
 
 ### MARCO: RD Station R2A/R2B — tentativa de copy/modelagem revertida e congelamento operacional — 2026-05-01
 

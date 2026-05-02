@@ -16,8 +16,9 @@ Toda implementação segue esta sequência, sem exceção:
 7. Parar antes do commit.
 8. Aguardar aprovação explícita do usuário.
 9. Só então commitar.
-10. Só então atualizar a memória operacional.
-11. Só então fazer commit documental, se necessário.
+10. Só então atualizar a memória operacional local e remota em `origin/main`.
+11. Só então preparar o espelho canônico para a pasta oficial do Google Drive quando houver acesso conectado ou atualização manual.
+12. Só então fazer commit documental, se necessário.
 
 ## Checklist obrigatório de conferência
 
@@ -42,6 +43,7 @@ Ao final da implementação, confirmar explicitamente:
   - `card aqui`
   - `preservado` sem evidência no diff
 - Se o diff for grande, dividir por blocos lógicos, mas continuar mostrando o código real alterado.
+- A memória operacional do projeto não termina em `origin/main`: quando houver atualização de estado relevante, o espelho canônico também deve ser preparado para o Google Drive oficial do projeto, sem inventar sincronização se o acesso não estiver disponível.
 
 ## Violação de processo
 

@@ -5,6 +5,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-02] — Contas V2 / Salesforce 2C.1 (metadados de Account read-only)
+
+- **Natureza:** Sessão funcional + documental.
+- **Objetivo:** registrar o fechamento read-only da visualização de metadados do objeto `Account` no Salesforce dedicado após teste com token temporário.
+- **Contexto:**
+  - o commit `d2afafa` foi publicado em `origin/main`;
+  - `HEAD = origin/main = d2afafa`;
+  - a working tree está limpa;
+  - `npm run lint` e `npm run build:safe` passaram;
+  - o recorte confirma leitura de metadados sem reabrir OAuth real, CSV real, persistência de token, `localStorage`, cookies, banco, sessão, contexto global, sync, writeback ou leitura de registros reais.
+- **Decisão Operacional:**
+  - tratar Salesforce 2C.1 como fechamento read-only, não como conector produtivo completo;
+  - manter a régua de CRM por CRM;
+  - espelhar a memória operacional no repositório local, em `origin/main` e na pasta oficial do Google Drive quando houver acesso conectado ou atualização manual.
+- **Status:** ✅ Concluído e publicado em `origin/main`.
+
 ## [2026-04-28] — Contas V2 / C2.4.1 (Clareza de método HubSpot retomado da sessão)
 
 - **Natureza:** Sessão de fechamento operacional e ajuste de copy.

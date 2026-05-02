@@ -10,7 +10,7 @@ Antes de fechar qualquer fase, é obrigatório comprovar:
 - runtime sem erro nas rotas afetadas;
 - validação visual auditável quando houver UI;
 - validação funcional mínima dos fluxos afetados;
-- documentação operacional atualizada;
+- documentação operacional atualizada no repositório local, em `origin/main` e espelhada na pasta oficial do Google Drive do projeto;
 - registro claro do que ainda é local state, simulação ou front-end sem backend real.
 
 Se houver UI, onboarding, configuração, demonstração ou material de venda, deve existir evidência visual em screenshots, HTML, ZIP ou relatório equivalente.
