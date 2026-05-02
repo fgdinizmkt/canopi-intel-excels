@@ -19,6 +19,16 @@ interface MethodDefinition {
   };
 }
 
+interface AccountField {
+  name: string;
+  label: string;
+  type: string;
+  isRequired: boolean;
+  isUpdateable: boolean;
+  isCreateable?: boolean;
+  isCustom?: boolean;
+}
+
 interface TestSuccessResult {
   status: 'success';
   provider: string;
@@ -28,6 +38,7 @@ interface TestSuccessResult {
   accountLabel: string;
   accountFieldsCount: number;
   readAccessConfirmed: boolean;
+  accountFields?: AccountField[];
 }
 
 const METHODS: MethodDefinition[] = [
@@ -105,7 +116,7 @@ export function SalesforceMethodSelector() {
 
   const [instanceUrl, setInstanceUrl] = useState('');
   const [token, setToken] = useState('');
-  const [apiVersion, setApiVersion] = useState('v60.0');
+  const [apiVersion, setApiVersion] = useState('v66.0');
   const [testStatus, setTestStatus] = useState<TestStatus>('idle');
   const [result, setResult] = useState<TestSuccessResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -146,7 +157,7 @@ export function SalesforceMethodSelector() {
   function handleClear() {
     setInstanceUrl('');
     setToken('');
-    setApiVersion('v60.0');
+    setApiVersion('v66.0');
     setTestStatus('idle');
     setResult(null);
     setErrorMessage(null);
@@ -272,7 +283,7 @@ export function SalesforceMethodSelector() {
                   type="text"
                   value={apiVersion}
                   onChange={(e) => setApiVersion(e.target.value)}
-                  placeholder="v60.0"
+                  placeholder="v66.0"
                   disabled={testStatus === 'loading'}
                   className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200 disabled:opacity-50"
                 />
@@ -325,27 +336,111 @@ export function SalesforceMethodSelector() {
             </div>
 
             {testStatus === 'success' && result && (
-              <div className="space-y-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-                <p className="text-sm font-black text-emerald-900">Leitura do Account validada</p>
-                <dl className="space-y-1">
-                  {(
-                    [
-                      ['Instância validada', result.instanceUrl],
-                      ['API version', result.apiVersion],
-                      ['Objeto', result.accountLabel],
-                      ['Campos disponíveis', String(result.accountFieldsCount)],
-                      ['Leitura confirmada', 'Sim'],
-                      ['Testado em', formatTestedAt(result.testedAt)],
-                    ] as [string, string][]
-                  ).map(([label, value]) => (
-                    <div key={label} className="flex items-baseline gap-2">
-                      <dt className="shrink-0 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                        {label}:
-                      </dt>
-                      <dd className="break-all text-sm font-medium text-emerald-900">{value}</dd>
+              <div className="space-y-4">
+                <div className="space-y-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                  <p className="text-sm font-black text-emerald-900">Leitura do Account validada</p>
+                  <dl className="space-y-1">
+                    {(
+                      [
+                        ['Instância validada', result.instanceUrl],
+                        ['API version', result.apiVersion],
+                        ['Objeto', result.accountLabel],
+                        ['Campos disponíveis', String(result.accountFieldsCount)],
+                        ['Leitura confirmada', 'Sim'],
+                        ['Testado em', formatTestedAt(result.testedAt)],
+                      ] as [string, string][]
+                    ).map(([label, value]) => (
+                      <div key={label} className="flex items-baseline gap-2">
+                        <dt className="shrink-0 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                          {label}:
+                        </dt>
+                        <dd className="break-all text-sm font-medium text-emerald-900">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+
+                {Array.isArray(result.accountFields) && result.accountFields.length > 0 && (
+                  <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div>
+                      <p className="text-sm font-black text-slate-900">Campos detectados em Account</p>
+                      <p className="mt-1 text-[11px] font-medium text-slate-600 leading-relaxed">
+                        Esta visualização mostra apenas metadados do objeto Account. Nenhum registro real é lido, salvo ou sincronizado.
+                      </p>
                     </div>
-                  ))}
-                </dl>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-300 bg-slate-100">
+                            <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Nome
+                            </th>
+                            <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Label
+                            </th>
+                            <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Tipo
+                            </th>
+                            <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Obrigatório
+                            </th>
+                            <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Editável
+                            </th>
+                            <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-wider text-slate-700">
+                              Customizado
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {result.accountFields.map((field, idx) => (
+                            <tr
+                              key={field.name}
+                              className={`border-b border-slate-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}
+                            >
+                              <td className="px-3 py-2 text-sm font-mono text-slate-900">{field.name}</td>
+                              <td className="px-3 py-2 text-sm text-slate-800">{field.label}</td>
+                              <td className="px-3 py-2 text-sm text-slate-700">
+                                <Badge className="border-none bg-slate-200 text-slate-700 text-[10px] font-bold uppercase px-2 py-1">
+                                  {field.type}
+                                </Badge>
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {field.isRequired ? (
+                                  <Badge className="border-none bg-red-100 text-red-700 text-[10px] font-bold uppercase px-2 py-1">
+                                    Obrigatório
+                                  </Badge>
+                                ) : (
+                                  <span className="text-[10px] text-slate-500">Opcional</span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {field.isUpdateable ? (
+                                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-600" title="Editável" />
+                                ) : (
+                                  <span className="inline-block h-2 w-2 rounded-full bg-slate-300" title="Somente leitura" />
+                                )}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {field.isCustom && (
+                                  <Badge className="border-none bg-blue-100 text-blue-700 text-[10px] font-bold uppercase px-2 py-1">
+                                    Custom
+                                  </Badge>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {Array.isArray(result.accountFields) && result.accountFields.length === 0 && (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm text-slate-600">Nenhum campo foi retornado para visualização.</p>
+                  </div>
+                )}
               </div>
             )}
 
