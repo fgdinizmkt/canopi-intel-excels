@@ -9,10 +9,95 @@ Este projeto é a plataforma Canopi | intel excels.
 ## Guia Operacional Rápido (Protocolo Obrigatório)
 
 ### Especialidades e Agentes
-1. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, escolha explícita do agente adequado antes de cada recorte, controle de aderência ao plano documentado, definição do próximo passo.
-2. **Claude Code:** Executor principal para refactor estrutural, reorganização de componentes grandes, arquitetura de renderização, separação de subcomponentes, correção de condicionais complexas, implementação técnica quando o problema exige reestruturação real.
-3. **Antigravity:** Executor/parceiro principal de UX/UI visual. Hierarquia de interface, consistência estética Premium, leitura de prints, ajuste fino de layout, espaçamento, clareza de botões, composição visual, validação perceptiva no browser.
-4. **Codex:** Auditor técnico-operacional, validador de diff/build/runtime/Git. Executor apenas de ajustes pequenos, cirúrgicos e bem delimitados.
+1. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, escolha explícita do agente e do modelo adequado antes de cada recorte, controle de aderência ao plano documentado, definição do próximo passo.
+2. **Claude Code:** Executor técnico principal para código no repo local. Deve operar com modelo escolhido conforme complexidade: Haiku para tarefas mecânicas e Sonnet para arquitetura, fluxo novo, backend, autenticação, integrações, Salesforce real, metadados, mapping, segurança ou debugging ambíguo.
+3. **Antigravity:** Executor/parceiro principal de UX/UI visual e validação no browser. Deve operar com Gemini leve/Flash para checks simples e microajustes, e Gemini Pro/High para análise visual complexa, jornada, layout, experiência renderizada ou tarefas com muito contexto visual.
+4. **Codex:** Auditor técnico-operacional, validador de diff/build/runtime/Git. Executor apenas de ajustes pequenos, cirúrgicos e bem delimitados. Pode ser usado seletivamente para comparar implementação, revisar diff complexo ou gerar/refatorar blocos grandes quando explicitamente solicitado.
+
+### Regra obrigatória de escolha de agente e modelo
+Antes de qualquer prompt para agente externo, declarar no topo:
+
+- **Agente recomendado**
+- **Modelo recomendado**
+- **Motivo da escolha**
+- **Condição de troca**, quando aplicável
+
+Exemplo obrigatório:
+
+```text
+Agente recomendado: Claude Code
+Modelo recomendado: Haiku 4.5
+Motivo: tarefa mecânica de Git/validação, sem decisão de arquitetura.
+Condição de troca: escalar para Sonnet 4.6 se surgir erro ambíguo, refactor ou risco de regressão.
+```
+
+### Matriz de modelos por agente
+
+#### Claude Code + Haiku 4.5
+Usar para:
+- `git status`, `git diff`, `git log`, `git rev-parse`, commit e push;
+- lint, build, `dev:check`, runtime e validação de rota;
+- copy simples, ajuste visual pequeno, troca de classe, microcorreção de JSX;
+- componente simples já totalmente especificado;
+- tarefas mecânicas, bem delimitadas e de baixo risco.
+
+Não usar para:
+- decisões arquiteturais;
+- API/backend;
+- autenticação, token, OAuth;
+- integração Salesforce real;
+- metadados, mapping, segurança;
+- debugging ambíguo ou refactor maior.
+
+#### Claude Code + Sonnet 4.6
+Usar para:
+- arquitetura de produto/código;
+- criação de fluxo novo;
+- API/backend;
+- autenticação, token, OAuth;
+- integração Salesforce real;
+- leitura de metadados, mapping, writeback e segurança;
+- refactor estrutural;
+- debugging ambíguo;
+- mudanças com risco de regressão.
+
+Regra de custo:
+- não usar Sonnet para tarefas mecânicas como commit, push, validação simples, ajuste de copy ou “clicar em botão e aparecer texto”, salvo se o contexto técnico tornar a tarefa arriscada.
+
+#### Antigravity + Gemini leve/Flash
+Usar para:
+- checks simples de UI no navegador;
+- validação rápida de tela/rota;
+- microajustes visuais;
+- comparação rápida entre print e tela renderizada;
+- tarefas pequenas sem risco estrutural.
+
+#### Antigravity + Gemini Pro/High
+Usar para:
+- análise visual de interface;
+- validação de UX/UI real no browser;
+- fluxos com navegação e interação;
+- comparação entre tela esperada e tela renderizada;
+- problemas de layout/responsividade;
+- tarefas com muito contexto visual;
+- análise de jornada inteira dentro da aplicação;
+- revisão de experiência de produto + front.
+
+#### Codex
+Usar seletivamente para:
+- auditoria técnica operacional;
+- validação de diff/build/runtime/Git;
+- ajustes pequenos, técnicos e localizados;
+- comparar implementação;
+- gerar/refatorar blocos grandes de código quando autorizado;
+- revisar diff complexo;
+- acelerar execução quando Claude Code ou Antigravity estiverem limitados.
+
+Não usar Codex como agente principal para:
+- UX/UI visual estrutural;
+- decisões de produto;
+- arquitetura complexa;
+- refactor sensível sem especificação fechada.
 
 ### Avaliação operacional do Codex
 - **Status:** aprovado como auditor técnico-operacional e executor de ajustes pequenos, mas não como agente principal para recortes estruturais de UX/UI ou componentes grandes.
@@ -21,22 +106,25 @@ Este projeto é a plataforma Canopi | intel excels.
 - **Uso recomendado:** manter Codex para auditoria técnica, validação de build/lint/Git e ajustes cirúrgicos bem delimitados. Escalar para Claude Code quando houver reestruturação de componente, reorganização de JSX grande ou renderização condicional complexa.
 
 ### Matriz definitiva de uso
-- **Arquitetura de componente, JSX grande, renderização condicional, estado espalhado ou refactor:** Claude Code.
-- **UX/UI, hierarquia visual, clareza de fluxo, layout, consistência de tela, leitura por print ou ajuste fino:** Antigravity.
+- **Terminal, Git, commit, push, lint, build, `dev:check`, runtime e validação mecânica:** Claude Code + Haiku 4.5 ou Codex como auditor técnico-operacional.
+- **Copy simples, ajuste visual pequeno, troca de classe ou componente simples já especificado:** Claude Code + Haiku 4.5.
+- **Arquitetura de componente, JSX grande, renderização condicional, estado espalhado, API/backend, autenticação, Salesforce real, metadados, mapping, segurança ou refactor:** Claude Code + Sonnet 4.6.
+- **UX/UI, hierarquia visual, clareza de fluxo, layout, consistência de tela, leitura por print, validação no browser ou ajuste fino:** Antigravity + Gemini conforme complexidade.
 - **Problema pequeno, técnico, local e sem reestruturação:** Codex pode executar.
-- **Validação técnica, build, lint, runtime, diff, status Git, smoke e commit após aprovação:** Codex.
-- **Se houver mais de duas rodadas de patch no mesmo arquivo sem resolver a causa real:** interromper Codex como executor e escalar para Claude Code ou Antigravity.
-- **Para recortes complexos de UI:** Claude Code reorganiza a estrutura → Antigravity lapida UX/UI no browser → Codex audita diff/build/Git → Fábio valida visualmente → só então commit.
+- **Validação técnica, build, lint, runtime, diff, status Git, smoke e commit após aprovação:** Codex ou Claude Code + Haiku 4.5.
+- **Se houver mais de duas rodadas de patch no mesmo arquivo sem resolver a causa real:** interromper o agente executor e escalar para Claude Code + Sonnet 4.6 ou Antigravity + Gemini Pro/High, conforme a natureza do problema.
+- **Para recortes complexos de UI:** Claude Code + Sonnet 4.6 reorganiza a estrutura → Antigravity + Gemini Pro/High lapida UX/UI no browser → Codex ou Claude Code + Haiku 4.5 audita diff/build/Git → Fábio valida visualmente → só então commit.
 
 ### Regras de seleção e escalonamento
-- Informar explicitamente qual agente assumirá a tarefa antes de agir.
+- Informar explicitamente qual agente e qual modelo assumirão a tarefa antes de agir.
 - Quando um agente entrar em loop de patches ou o tipo de problema mudar, reavaliar a matriz de agentes antes de continuar.
-- Se a solução de um problema não caiu em duas rodadas de mudanças, a causa raiz provavelmente é estrutural: escalar para Claude Code.
+- Se a solução de um problema não caiu em duas rodadas de mudanças, a causa raiz provavelmente é estrutural: escalar para Claude Code + Sonnet 4.6 ou Antigravity + Gemini Pro/High.
+- Se a tarefa for apenas operacional e bem delimitada, preferir o modelo mais leve adequado.
 
 ### Protocolo Diário
 - **Sync:** Validar `git status`, `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`. Só dar `git pull --ff-only origin main` se a working tree estiver limpa e o local estiver atrás do remoto.
 - **Contexto:** Leitura obrigatória dos docs de governança (`docs/98-operacao/`), status atual e `docs/98-operacao/31-protocolo-fechamento-de-fase.md` antes de qualquer fechamento de fase, recorte ou módulo.
-- **Seleção:** Informar explicitamente qual agente assumirá a tarefa antes de agir. Quando o fluxo local já estiver em andamento com Codex, mantê-lo como executor salvo decisão explícita em contrário.
+- **Seleção:** Informar explicitamente qual agente e qual modelo assumirão a tarefa antes de agir. Quando o fluxo local já estiver em andamento com um agente, mantê-lo apenas se ele ainda for o canal adequado pela matriz de agente/modelo.
 - **Aprovação:** Seguir o fluxo: *Executar → Build → Diff Stat → Diff Real → Aprovação Usuário → Commit*.
 - **Fechamento:** Nenhuma fase pode ser declarada fechada apenas com build, TSC, commit, tag ou preview. Fechamento exige evidência técnica, visual e operacional, conforme `docs/98-operacao/31-protocolo-fechamento-de-fase.md`.
 - **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
