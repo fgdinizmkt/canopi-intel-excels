@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileJson, KeyRound, Network } from 'lucide-react';
+import { CheckCircle2, Circle, FileJson, KeyRound, Loader2, Network, XCircle } from 'lucide-react';
 import { Card, Badge } from '@/src/components/ui';
 
 type SalesforceMethod = 'oauth' | 'token' | 'csv';
+type TestStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface MethodDefinition {
   id: SalesforceMethod;
@@ -16,6 +17,17 @@ interface MethodDefinition {
   panel: {
     lines: string[];
   };
+}
+
+interface TestSuccessResult {
+  status: 'success';
+  provider: string;
+  testedAt: string;
+  instanceUrl: string;
+  apiVersion: string;
+  accountLabel: string;
+  accountFieldsCount: number;
+  readAccessConfirmed: boolean;
 }
 
 const METHODS: MethodDefinition[] = [
@@ -41,13 +53,7 @@ const METHODS: MethodDefinition[] = [
     badge: 'Validação',
     badgeVariant: 'amber',
     icon: <KeyRound className="h-4 w-4" />,
-    panel: {
-      lines: [
-        'Validação controlada de leitura.',
-        'Será usado apenas para testar acesso à instância e leitura de metadados do objeto Account.',
-        'Nenhum token deve ser persistido nesta etapa.',
-      ],
-    },
+    panel: { lines: [] },
   },
   {
     id: 'csv',
@@ -72,10 +78,79 @@ const BADGE_CLASSES: Record<MethodDefinition['badgeVariant'], string> = {
   slate: 'border-none bg-slate-100 text-slate-600',
 };
 
+const CHECKLIST_ITEMS = [
+  'Instância acessível',
+  'API habilitada',
+  'Objeto Account encontrado',
+  'Metadados lidos',
+  'Campos disponíveis',
+];
+
+function formatTestedAt(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
 export function SalesforceMethodSelector() {
   const [selected, setSelected] = useState<SalesforceMethod>('oauth');
 
+  const [instanceUrl, setInstanceUrl] = useState('');
+  const [token, setToken] = useState('');
+  const [apiVersion, setApiVersion] = useState('v60.0');
+  const [testStatus, setTestStatus] = useState<TestStatus>('idle');
+  const [result, setResult] = useState<TestSuccessResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const activeMethod = METHODS.find((m) => m.id === selected)!;
+
+  async function handleTest() {
+    if (!instanceUrl.trim() || !token.trim()) {
+      setErrorMessage('Informe a URL da sua instância Salesforce e um token temporário válido para testar a leitura do Account.');
+      return;
+    }
+
+    setTestStatus('loading');
+    setResult(null);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instanceUrl, token, apiVersion }),
+      });
+      const data = (await res.json()) as { status: string; error?: string } & Partial<TestSuccessResult>;
+
+      if (data.status === 'success') {
+        setResult(data as TestSuccessResult);
+        setTestStatus('success');
+      } else {
+        setErrorMessage(data.error ?? 'Não foi possível validar a conexão.');
+        setTestStatus('error');
+      }
+    } catch {
+      setErrorMessage('Não foi possível alcançar o servidor.');
+      setTestStatus('error');
+    }
+  }
+
+  function handleClear() {
+    setInstanceUrl('');
+    setToken('');
+    setApiVersion('v60.0');
+    setTestStatus('idle');
+    setResult(null);
+    setErrorMessage(null);
+  }
 
   return (
     <div className="space-y-4">
@@ -155,22 +230,156 @@ export function SalesforceMethodSelector() {
             {activeMethod.title}
           </p>
         </div>
-        <ul className="mt-4 space-y-2">
-          {activeMethod.panel.lines.map((line) => (
-            <li
-              key={line}
-              className={`text-sm font-medium leading-relaxed ${
-                selected === 'oauth'
-                  ? 'text-blue-800'
-                  : selected === 'token'
-                  ? 'text-amber-900'
-                  : 'text-slate-700'
-              }`}
+
+        {selected === 'token' ? (
+          <div className="mt-5 space-y-5">
+            <p className="text-sm font-medium text-amber-900">
+              Use um token temporário apenas para validar leitura do objeto Account. Nada será salvo.
+            </p>
+
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-amber-700">
+                  Instance URL
+                </label>
+                <input
+                  type="text"
+                  value={instanceUrl}
+                  onChange={(e) => setInstanceUrl(e.target.value)}
+                  placeholder="https://sua-instancia.my.salesforce.com"
+                  disabled={testStatus === 'loading'}
+                  className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200 disabled:opacity-50"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-amber-700">
+                  Access Token temporário
+                </label>
+                <input
+                  type="password"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  placeholder="Cole o access token aqui"
+                  disabled={testStatus === 'loading'}
+                  className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200 disabled:opacity-50"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-amber-700">
+                  API Version
+                </label>
+                <input
+                  type="text"
+                  value={apiVersion}
+                  onChange={(e) => setApiVersion(e.target.value)}
+                  placeholder="v60.0"
+                  disabled={testStatus === 'loading'}
+                  className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200 disabled:opacity-50"
+                />
+              </div>
+            </div>
+
+            {testStatus === 'idle' && errorMessage && (
+              <p className="text-sm font-medium text-red-700">{errorMessage}</p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleTest}
+              disabled={testStatus === 'loading'}
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {line}
-            </li>
-          ))}
-        </ul>
+              {testStatus === 'loading' && <Loader2 className="h-4 w-4 animate-spin" />}
+              {testStatus === 'loading' ? 'Validando leitura do Account...' : 'Testar leitura do Account'}
+            </button>
+
+            <div className="space-y-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Validações</p>
+              <ul className="space-y-1.5">
+                {CHECKLIST_ITEMS.map((item) => {
+                  let icon: React.ReactNode;
+                  let textClass: string;
+
+                  if (testStatus === 'idle') {
+                    icon = <Circle className="h-4 w-4 shrink-0 text-amber-300" />;
+                    textClass = 'text-amber-700';
+                  } else if (testStatus === 'loading') {
+                    icon = <Loader2 className="h-4 w-4 shrink-0 animate-spin text-amber-500" />;
+                    textClass = 'text-amber-800';
+                  } else if (testStatus === 'success') {
+                    icon = <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />;
+                    textClass = 'text-emerald-800';
+                  } else {
+                    icon = <XCircle className="h-4 w-4 shrink-0 text-red-500" />;
+                    textClass = 'text-red-700';
+                  }
+
+                  return (
+                    <li key={item} className="flex items-center gap-2">
+                      {icon}
+                      <span className={`text-sm font-medium ${textClass}`}>{item}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {testStatus === 'success' && result && (
+              <div className="space-y-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                <p className="text-sm font-black text-emerald-900">Leitura do Account validada</p>
+                <dl className="space-y-1">
+                  {(
+                    [
+                      ['Instância validada', result.instanceUrl],
+                      ['API version', result.apiVersion],
+                      ['Objeto', result.accountLabel],
+                      ['Campos disponíveis', String(result.accountFieldsCount)],
+                      ['Leitura confirmada', 'Sim'],
+                      ['Testado em', formatTestedAt(result.testedAt)],
+                    ] as [string, string][]
+                  ).map(([label, value]) => (
+                    <div key={label} className="flex items-baseline gap-2">
+                      <dt className="shrink-0 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                        {label}:
+                      </dt>
+                      <dd className="break-all text-sm font-medium text-emerald-900">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
+            {testStatus === 'error' && errorMessage && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                <p className="text-sm font-black text-red-900">Não foi possível validar a conexão</p>
+                <p className="mt-1 text-sm font-medium text-red-800">{errorMessage}</p>
+              </div>
+            )}
+
+            {(testStatus === 'success' || testStatus === 'error') && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="text-xs font-medium text-amber-600 underline underline-offset-2 hover:text-amber-800"
+              >
+                Limpar dados do teste
+              </button>
+            )}
+          </div>
+        ) : (
+          <ul className="mt-4 space-y-2">
+            {activeMethod.panel.lines.map((line) => (
+              <li
+                key={line}
+                className={`text-sm font-medium leading-relaxed ${
+                  selected === 'oauth' ? 'text-blue-800' : 'text-slate-700'
+                }`}
+              >
+                {line}
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
     </div>
   );
