@@ -264,7 +264,19 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 | Fase 7 | pendente | Registrar fechamento Salesforce na operação | Evidência técnica + visual + operacional |
 | Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |
 
-## 14) Regras operacionais
+## 14) Princípio Transversal — Classificação de Conectores por Natureza Operacional
+
+**Não classificar conectores apenas pelo nome da ferramenta.**
+
+Cada conector deve ser mapeado pela **natureza operacional** (CRM, infraestrutura, mensuração, mídia, automação, dados técnicos), não apenas pelo nome. Salesforce, por exemplo, oferece múltiplas naturezas: CRM (Accounts, Leads) + infraestrutura (My Domain, Experience Cloud) + dados técnicos (metadados, permissões).
+
+**Decisão documentada em:** `docs/98-operacao/02-decisoes-arquiteturais.md` — Decisão 19
+
+**Implicação para Loja de CRMs:** Esta frente cobre natureza "CRM / Dados". Frente futura "Canais e Infraestrutura" cobrirá as demais naturezas (domínios, tracking, publicação).
+
+---
+
+## 15) Regras operacionais
 - ChatGPT orquestra e define corte de escopo.
 - Codex audita Git/diff/build/status e pode documentar com aprovação.
 - Claude Code implementa somente com escopo fechado.

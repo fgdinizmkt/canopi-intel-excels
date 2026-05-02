@@ -643,6 +643,85 @@ No Recorte 39, expandimos o padrão E6 para incluir três novos campos narrativo
 
 ---
 
+### 19. Classificação Transversal de Conectores — Natureza Operacional, Não Apenas Nome da Ferramenta
+
+**Decisão:** Nenhum conector deve ser classificado apenas pelo nome da ferramenta. A Canopi classifica cada conexão pela **natureza operacional** do que ela permite ler, validar, publicar, medir, governar ou operar.
+
+**Contexto do Problema:**
+Durante a implementação do Salesforce (Fases 2A–2B.2), tornou-se claro que uma ferramenta como Salesforce não é "apenas um CRM". Salesforce oferece CRM (Accounts, Leads), infraestrutura (My Domain, Experience Cloud), autenticação OAuth, metadados técnicos, e dados. Ao classificar automaticamente todos os conectores como "CRM local", perdemos a oportunidade de organizar a Canopi por **camadas operacionais**, não por nomes de tools.
+
+**Classificações Possíveis:**
+Cada conector deve ser mapeado para uma ou mais destas naturezas:
+- **CRM / Dados:** Gestão de contatos, contas, leads, oportunidades, propriedades
+- **Canais / Publicação / Infraestrutura:** Domínios, URLs, landing pages, sites, portais, blogs
+- **Mensuração / Tracking:** Eventos, sessões, conversões, page views, tracking code
+- **Mídia / Aquisição:** Publicidade paga, retargeting, budget allocation, ROI
+- **Automação / Operação:** Workflows, listas, automações, orquestração
+- **Dados Técnicos / Governança:** Metadados, permissões, objetos, campos, limites de API
+
+**Exemplos de Classificação Real:**
+
+| Tool | CRM | Infraestrutura | Mensuração | Mídia | Automação | Dados Técnicos |
+|---|---|---|---|---|---|---|
+| **Salesforce** | Accounts, Contacts, Leads, Opportunities | My Domain, Experience Cloud, Sites | — | — | — | Metadados, Permissões, Campos |
+| **HubSpot** | Contatos, Empresas, Deals | Domínios, Landing Pages, CMS, Portal | Tracking Code, Forms | — | Workflows, Listas | — |
+| **RD Station CRM** | Contatos, Leads | — | — | Integração com RD Station Marketing | Automações | — |
+| **Pipedrive** | Empresas, Contatos, Deals | — | — | — | Automações | — |
+| **ClickUp** | — (não CRM) | — | — | — | Tasks, Workflows | — |
+| **Google Analytics 4** | — | — | Eventos, Sessões, Conversões | Integração com Ads | — | — |
+| **Google Tag Manager** | — | — | Tags, Triggers, Data Layer | — | — | — |
+| **Google Ads** | — | — | — | Campaigns, Budgets, Conversions | — | — |
+
+**Regra Operacional — Ficha de Avaliação Pré-Implementação:**
+
+Antes de implementar um novo conector, preencher:
+- ✓ Documentação oficial consultada (quais produtos/módulos oferece)
+- ✓ Natureza operacional mapeada (quais classificações se aplicam)
+- ✓ Dados que podem ser lidos (objetos, campos, permissões)
+- ✓ Ações que podem ser executadas (escrita, sincronização, webhooks)
+- ✓ Dados que podem ser gravados (writeback, atualização de campos)
+- ✓ Riscos operacionais (limites de API, quota, rate limiting, compliance)
+- ✓ Permissões/escopos necessários (OAuth scopes, bearer tokens, IP allowlisting)
+- ✓ Limites técnicos (histórico de dados, retenção, archive)
+- ✓ Impacto em negócio (como afeta ABM/ABX, campanhas, canais, receita, governança)
+
+**Nova Frente Futura — Configurações > Canais e Infraestrutura:**
+
+Baseado nesta classificação, abre-se uma frente complementar à Loja de Conectores CRM:
+
+**Escopo futuro:**
+- Domínios e URLs (Salesforce My Domain, HubSpot custom domain, AWS Route53)
+- DNS / SSL / Redirects (gerenciamento de certificados)
+- Tracking e scripts (GA4, GTM, Facebook Pixel, TikTok Pixel)
+- Formulários e conversões (HubSpot forms, Salesforce Web-to-Lead, custom forms)
+- Email sending domain (SPF, DKIM, DMARC validation)
+- Publicação de landing pages, blog, site e portal (CMS, website builder)
+
+**Nome sugerido para frente:** "Canais e Infraestrutura" (complementar a "Loja de CRMs")
+
+**Relação com CRM — Não Substitui, Conversa Com:**
+
+Esta frente **não substitui** a Loja de CRMs. É uma **camada paralela** que:
+- Conversa com CRM (conectores CRM podem usar domínios configurados aqui)
+- Conversa com campanhas (landing pages, formulários, tracking)
+- Conversa com performance orgânica (GA4, GTM, mensurações)
+- Conversa com mídia paga (Google Ads, Facebook Ads, pixels de conversão)
+- Conversa com ABM/ABX (pontos de contato, jornada, touchpoints)
+- Conversa com governança (conformidade, compliance, auditoria de dados)
+
+**Implicação Arquitetural:**
+- Configurações > Objetos & CRM > Hub de CRM e Dados (só CRM + canônico)
+- Configurações > Canais e Infraestrutura (futuro — domínios, tracking, publicação)
+
+**Benefício:**
+Organização por natureza operacional (não por nome da tool) permite escalabilidade, reutilização de componentes de UI (editor de domínios, seletor de tracking pixels, etc.) e clareza sobre "o que Canopi sabe fazer" (não limitado a nome de ferramentas conhecidas).
+
+**Commits que ilustram a decisão:**
+- Fases 2A–2B.2 (Salesforce): Consolidação da primeira trilha CRM com múltiplas naturezas operacionais
+- Este documento: Formalização do princípio transversal
+
+---
+
 ## Decisões ainda em aberto
 
 | Questão | Estado | Observação |
