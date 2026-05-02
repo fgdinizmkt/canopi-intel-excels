@@ -140,6 +140,97 @@ Regra de progressão:
 - governança;
 - validação/publicação.
 
+## Decisão arquitetural — CRM local + Canopi global
+### 1. Problema identificado
+- O fluxo atual ainda parte de Configurações > Objetos & CRM > Entidades > Conta > Fontes e Conectores.
+- Isso faz parecer que a fonte/CRM pertence à entidade Conta.
+- A arquitetura correta deve colocar a Loja de Conectores antes da configuração detalhada das entidades.
+- Conta, Contato, Oportunidade e Campanha são destinos canônicos e também podem aparecer como objetos mapeados de cada CRM.
+
+### 2. Decisão conceitual
+- A Loja de Conectores passa a ser a entrada primária para CRMs/fontes.
+- Cada CRM terá uma página dedicada.
+- Dentro de cada CRM ficam as configurações locais daquela fonte:
+  - conexão;
+  - método de entrada;
+  - objetos disponíveis;
+  - mapping da fonte para Canopi;
+  - matching/dedupe aplicado à fonte;
+  - pipeline local;
+  - writeback local;
+  - governança local;
+  - validação local.
+- A Canopi mantém uma camada global separada para consolidar regras entre fontes:
+  - modelo canônico;
+  - dedupe global entre fontes;
+  - survivorship;
+  - pipeline consolidado;
+  - writeback global;
+  - governança global;
+  - publicação/auditoria.
+
+### 3. Writeback
+- Writeback não é só global nem só local.
+- Existe writeback global, que define política:
+  - quais campos podem voltar;
+  - quais campos são bloqueados;
+  - se pode criar/atualizar registros;
+  - se pode sobrescrever dados;
+  - aprovação/manual vs automático;
+  - regras de segurança e auditoria.
+- Existe writeback local por CRM, que define execução:
+  - como Salesforce recebe dados;
+  - como HubSpot recebe dados;
+  - como Pipedrive recebe dados;
+  - quais objetos/campos recebem retorno;
+  - quais permissões/tokens são necessários;
+  - quais limitações técnicas existem em cada conector.
+
+### 4. Caminho-alvo de navegação
+Registrar o caminho recomendado:
+
+Configurações
+→ Objetos & CRM
+→ Hub de CRM e Dados
+→ Loja de Conectores
+→ CRM selecionado, por exemplo Salesforce
+→ Conexão
+→ Objetos
+→ Mapping
+→ Matching local
+→ Pipeline local
+→ Writeback local
+→ Governança local
+→ Validação local
+
+E, em paralelo no Hub de CRM e Dados:
+
+Hub de CRM e Dados
+→ Camada Canônica Global
+→ Modelo Conta/Contato/Oportunidade/Campanha
+→ Dedupe global entre fontes
+→ Survivorship
+→ Pipeline consolidado
+→ Writeback global
+→ Governança global
+→ Publicação/Auditoria
+
+### 5. O que NÃO fazer na Fase 1
+- Não reorganizar todo o hub agora.
+- Não mover entidades agora.
+- Não reestruturar rotas globais agora.
+- Não misturar esse redesenho com o commit da loja, exceto pela documentação.
+- Fechar Fase 1 como loja funcional com logos.
+- Abrir fase posterior para redesenhar Hub de CRM e Dados.
+
+### 6. Próxima fase sugerida
+Fase 1B — Redesenho do Hub de CRM e Dados
+
+Objetivo:
+Reposicionar a Loja de Conectores como entrada primária e separar claramente:
+- configuração local por CRM;
+- camada canônica global da Canopi.
+
 ## 11) Ordem de implementação
 - Fase 0: documentação e plano.
 - Fase 1: loja de conectores sem fluxos inline.
