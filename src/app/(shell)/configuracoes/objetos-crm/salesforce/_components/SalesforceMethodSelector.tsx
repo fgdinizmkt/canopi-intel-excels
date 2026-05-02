@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Circle, FileJson, KeyRound, Loader2, Network, XCircle } from 'lucide-react';
 import { Card, Badge } from '@/src/components/ui';
+import { SalesforceCsvPreparation } from './SalesforceCsvPreparation';
 
 type SalesforceMethod = 'oauth' | 'token' | 'csv';
 type TestStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -40,6 +41,7 @@ interface TestSuccessResult {
   readAccessConfirmed: boolean;
   accountFields?: AccountField[];
 }
+
 
 const METHODS: MethodDefinition[] = [
   {
@@ -461,6 +463,8 @@ export function SalesforceMethodSelector() {
               </button>
             )}
           </div>
+        ) : selected === 'csv' ? (
+          <SalesforceCsvPreparation />
         ) : (
           <ul className="mt-4 space-y-2">
             {activeMethod.panel.lines.map((line) => (
