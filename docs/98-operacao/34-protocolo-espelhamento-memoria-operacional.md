@@ -18,27 +18,25 @@ Data: 2026-05-02
 
 Último fechamento funcional publicado:
 
-- `d2afafa` — `feat(settings): show Salesforce Account metadata fields`
+- `46fae8f` — `feat(settings): add Salesforce CSV preparation flow`
 
 Status confirmado:
 
-- `HEAD = origin/main = d2afafa`
+- `HEAD = origin/main = 46fae8f`
 - `main` sem ahead/behind
 - working tree limpa após o push
 - `npm run lint` OK
 - `npm run build:safe` OK
-- apenas 2 arquivos entraram no fechamento Salesforce 2C.1:
+- apenas 2 arquivos entraram no fechamento Salesforce 2C.2:
   - `src/app/(shell)/configuracoes/objetos-crm/salesforce/_components/SalesforceMethodSelector.tsx`
-  - `src/app/api/account-connectors/salesforce/test/route.ts`
+  - `src/app/(shell)/configuracoes/objetos-crm/salesforce/_components/SalesforceCsvPreparation.tsx`
 
-Leitura funcional do Salesforce 2C.1:
+Leitura funcional do Salesforce 2C.2:
 
-- a API continua chamando apenas `Account/describe`;
-- a Canopi mostra visualização read-only de metadados do objeto `Account` após teste bem-sucedido com token temporário;
-- nenhum registro real é lido;
-- nenhum token é persistido;
+- a Canopi mantém a visualização read-only de metadados de `Account` do 2C.1;
+- a Canopi adiciona preparação local de CSV exportado com gate de campos obrigatórios;
+- não existe persistência local ou remota para esse fluxo CSV;
 - não existe OAuth produtivo;
-- não existe CSV Salesforce dedicado;
 - não existe sync;
 - não existe writeback;
 - não existe importação real.
@@ -223,7 +221,7 @@ git status -sb
 git rev-parse --short HEAD
 git rev-parse --short origin/main
 
-4. Confirme que o commit d2afafa está presente no histórico local:
+4. Confirme que o commit 46fae8f está presente no histórico local:
 
 git log --oneline -10
 
@@ -248,7 +246,7 @@ Arquivos prioritários:
 - origin/main
 - se working tree está limpa
 - se main está sem ahead/behind
-- se o commit d2afafa está localmente presente
+- se o commit 46fae8f está localmente presente
 - quais arquivos foram espelhados no Drive
 - data/hora da atualização do Drive
 - se houve algum arquivo no Drive que não pôde ser atualizado
@@ -258,6 +256,6 @@ Arquivos prioritários:
 
 ## Status deste protocolo
 
-Criado para impedir divergência entre narrativa, código e memória operacional após o fechamento do Salesforce 2C.1.
+Criado para impedir divergência entre narrativa, código e memória operacional após os fechamentos Salesforce 2C.1 e 2C.2.
 
 A partir deste ponto, atualização do Google Drive deixa de ser opcional em fechamentos relevantes e passa a compor o processo formal de atualização de memória da Canopi.

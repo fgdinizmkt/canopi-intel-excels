@@ -1,8 +1,8 @@
 # Plano Operacional — Loja de Conectores e CRMs
 
 ## 1) Estado atual
-- `main` limpa e sincronizada no commit `d2afafa`.
-- Salesforce 2C.1 foi fechado como visualização read-only dos metadados de `Account` após teste com token temporário.
+- `main` limpa e sincronizada no commit `46fae8f`.
+- Salesforce 2C.1 e 2C.2 foram fechados na trilha dedicada (metadados read-only + preparação local CSV).
 - Patch local anterior descartado com `git restore`.
 - Fontes e Conectores permanece na arquitetura antiga.
 - `AccountSources.tsx` concentra responsabilidades em excesso.
@@ -114,8 +114,9 @@ Escopo de execução inicial:
 
 Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
-- A página dedicada passou a exibir os metadados read-only de `Account` após teste com token temporário.
-- O escopo continua sendo uma trilha CRM por CRM; o fechamento 2C.1 não equivale a conector produtivo completo.
+- Salesforce 2C.2 fechado em `46fae8f`.
+- A página dedicada passou a exibir metadados read-only de `Account` após teste com token temporário e também o fluxo de preparação local CSV exportado com gate de obrigatórios.
+- O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1 e 2C.2 não equivalem a conector produtivo completo.
 
 Regra de progressão:
 - Não avançar para outro CRM antes de Salesforce estar testado e aprovado.
@@ -262,12 +263,12 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 |---|---|---|---|
 | Fase 0 | concluída | Manter a memória operacional sincronizada | Aprovação explícita do Fábio consolidada |
 | Fase 1 | concluída | Loja funcional com logos publicada | Loja sem fluxo inline e validação visual |
-| Fase 2 | em andamento | Consolidar o recorte Salesforce 2C.1 e seguir a trilha CRM por CRM | Navegação e isolamento de estado por rota |
-| Fase 3 | pendente | Implementar token temporário Salesforce | Teste local validado e hard refresh ok |
-| Fase 4 | pendente | Implementar CSV exportado Salesforce | CSV restrito à página Salesforce |
-| Fase 5 | pendente | Inserir placeholders OAuth/Bulk API | Sinalização clara de escopo futuro |
-| Fase 6 | pendente | Executar validação ponta a ponta Salesforce | Fluxo estável, sem vazamento de estado antigo |
-| Fase 7 | pendente | Registrar fechamento Salesforce na operação | Evidência técnica + visual + operacional |
+| Fase 2 | concluída | Rota dedicada Salesforce consolidada | Navegação e isolamento de estado por rota |
+| Fase 3 | concluída | Token temporário Salesforce implementado e validado | Teste local validado e hard refresh ok |
+| Fase 4 | concluída | CSV exportado Salesforce implementado na página dedicada | CSV restrito à página Salesforce |
+| Fase 5 | em andamento | Inserir placeholders OAuth/Bulk API | Sinalização clara de escopo futuro |
+| Fase 6 | em andamento | Executar validação ponta a ponta Salesforce | Fluxo estável, sem vazamento de estado antigo |
+| Fase 7 | concluída (2C.2) | Fechamento operacional de Salesforce 2C.2 registrado | Evidência técnica + visual + operacional |
 | Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |
 
 ## 15) Memória operacional e espelho externo

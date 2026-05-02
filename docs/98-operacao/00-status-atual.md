@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` — sincronizada com `origin/main` no commit `d2afafa`, que fechou Salesforce 2C.1 como visualização read-only dos metadados de `Account` após teste com token temporário. HubSpot segue validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores continua em fechamento CRM por CRM. A régua atual de “100%” segue significando: todas as formas relevantes de conexão/entrada daquela fonte precisam estar funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 e S2 permanecem como histórico anterior; o novo marco 2C.1 confirma apenas leitura de metadados sem transformar Salesforce em conector produtivo completo. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+ `main` — sincronizada com `origin/main` no commit `46fae8f`, que fechou Salesforce 2C.2 como fluxo de preparação local de CSV exportado dentro da página dedicada de Salesforce. HubSpot segue validado como primeiro CRM completo da versão atual e a frente de Fontes e Conectores continua em fechamento CRM por CRM. A régua atual de “100%” segue significando: todas as formas relevantes de conexão/entrada daquela fonte precisam estar funcionais, testáveis, visualmente claras e validadas pelo Fábio no browser. Salesforce S1 e S2 permanecem como histórico anterior; os marcos 2C.1 e 2C.2 confirmam leitura de metadados + preparação local CSV, sem transformar Salesforce em conector produtivo completo. Referência operacional: `main` limpa; ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -110,6 +110,27 @@
 - **Garantias:** o recorte não transforma Salesforce em conector produtivo completo; ele apenas confirma a fronteira local de leitura do objeto `Account`.
 - **Validações:** `npm run lint` OK; `npm run build:safe` OK; `HEAD = origin/main = d2afafa`; working tree limpa.
 - **Memória operacional:** o espelho local/GitHub já está fechado; o espelho para o Google Drive oficial deve ser aplicado pelo ritual de atualização de memória quando houver acesso conectado ou atualização manual.
+
+### MARCO: Salesforce 2C.2 — Preparação local de CSV exportado — 2026-05-02
+
+**Status: Concluído e publicado em origin/main**
+
+- **Commit:** `46fae8f` — `feat(settings): add Salesforce CSV preparation flow`
+- **Objetivo:** concluir o fluxo local de preparação de CSV exportado do Salesforce na página dedicada de Configurações.
+- **Escopo real publicado:**
+  - componente dedicado `SalesforceCsvPreparation.tsx` integrado em `SalesforceMethodSelector.tsx`;
+  - requisitos do CSV, download de exemplo, upload local, parsing client-side e detecção de delimitador;
+  - validações de extensão, tamanho, cabeçalho e headers duplicados;
+  - leitura de colunas com exemplos, ajuste local por coluna (`Usar sugestão`, `Trocar campo`, `Ignorar coluna`);
+  - contadores de reconhecidas, alternativas locais, não reconhecidas e ignoradas;
+  - gate de obrigatórios para confirmação local:
+    - Nome da conta: `Account Name` ou `Nome da conta para preview`;
+    - Identificação/desambiguação: `Account Id`, `Domínio`, `Website` ou `Documento local`;
+  - bloqueio amigável da confirmação enquanto obrigatórios estiverem pendentes;
+  - confirmação para esta sessão e resumo final do ajuste local.
+- **Garantias e limites:** sem persistência; sem `localStorage`; sem `sessionStorage`; sem cookies; sem banco; sem rota API nova; sem sync; sem writeback; sem dedupe; sem matching real; sem criação/atualização de registros; sem alteração em outros CRMs.
+- **Validações:** `npm run lint` OK; `npm run build:safe` OK; `HEAD = origin/main = 46fae8f`; working tree limpa.
+- **Memória operacional:** fechamento técnico + visual aprovado pelo Fábio; pendente apenas o espelhamento no Google Drive quando aplicável.
 
 ### MARCO: RD Station R2A/R2B — tentativa de copy/modelagem revertida e congelamento operacional — 2026-05-01
 

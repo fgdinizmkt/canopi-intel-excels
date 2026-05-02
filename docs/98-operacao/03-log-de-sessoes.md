@@ -5,6 +5,37 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-02] — Contas V2 / Salesforce 2C.2 (preparação local de CSV exportado)
+
+- **Natureza:** Sessão funcional + documental.
+- **Objetivo:** concluir e publicar o fluxo de preparação local de CSV exportado do Salesforce na página dedicada de Configurações.
+- **Contexto:**
+  - o commit `46fae8f` foi publicado em `origin/main`;
+  - `HEAD = origin/main = 46fae8f`;
+  - a working tree ficou limpa após commit/push;
+  - `npm run lint` e `npm run build:safe` passaram;
+  - validação visual explícita aprovada pelo Fábio.
+- **Escopo publicado:**
+  - novo componente `SalesforceCsvPreparation.tsx` integrado no `SalesforceMethodSelector.tsx`;
+  - requisitos do CSV, download de exemplo, upload local, parsing client-side e detecção de delimitador;
+  - validações de extensão, tamanho, cabeçalho e headers duplicados;
+  - leitura de colunas com exemplos e ajuste local por coluna (`Usar sugestão`, `Trocar campo`, `Ignorar coluna`);
+  - contadores de reconhecidas, alternativas locais, não reconhecidas e ignoradas;
+  - gate de obrigatórios para confirmação local:
+    - Nome da conta: `Account Name` ou `Nome da conta para preview`;
+    - Identificação/desambiguação: `Account Id`, `Domínio`, `Website` ou `Documento local`;
+  - bloqueio amigável da confirmação quando obrigatórios ficam pendentes;
+  - confirmação para esta sessão e resumo final da preparação local.
+- **Guardrails mantidos:**
+  - sem persistência;
+  - sem `localStorage`, `sessionStorage`, cookies ou banco;
+  - sem rota API nova;
+  - sem sync/writeback/dedupe/matching real;
+  - sem criação/atualização de registros;
+  - sem alteração em outros CRMs.
+- **Commit:** `46fae8f` — `feat(settings): add Salesforce CSV preparation flow`
+- **Status:** ✅ Concluído e publicado em `origin/main`.
+
 ## [2026-05-02] — Contas V2 / Salesforce 2C.1 (metadados de Account read-only)
 
 - **Natureza:** Sessão funcional + documental.
