@@ -274,9 +274,6 @@ export default function ContasHubPage() {
             <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase hover:bg-blue-50 transition-all shadow-xl">
                Ver Documentação V2
             </button>
-            <button className="px-8 py-4 bg-slate-800 text-slate-400 rounded-2xl font-black text-xs uppercase cursor-not-allowed">
-               Advanced Debugger
-            </button>
          </div>
       </div>
     </div>

@@ -800,13 +800,13 @@ const ConfigStage1: React.FC = () => {
                 <button
                   onClick={() => {
                     if (entity.id === 'conta') {
-                      router.push('/configuracoes/objetos/contas/fontes-conectores');
+                      router.push('/configuracoes/objetos-crm');
                     } else {
                       setDrawer({ type: 'entity', id: entity.id });
                     }
                   }}
                   className="ml-4 p-2 hover:bg-slate-100 rounded-lg transition-all"
-                  title={entity.id === 'conta' ? 'Abrir Fontes e Conectores' : 'Configurar Entidade'}
+                  title={entity.id === 'conta' ? 'Abrir Hub de CRM e Dados' : 'Configurar Entidade'}
                 >
                   <Settings className="w-5 h-5 text-slate-400 group-hover:text-blue-600" />
                 </button>
@@ -2017,11 +2017,13 @@ const ConfigStage1: React.FC = () => {
                 <Settings className="w-4 h-4 text-indigo-600" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-900 leading-none">Canopi Setup</p>
-                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">v2.4.0 • Enterprise</p>
+                <p className="text-[10px] font-black text-slate-900 leading-none">Configurações</p>
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Parâmetros da operação</p>
               </div>
             </div>
-            <p className="text-[9px] text-slate-400 leading-relaxed font-medium">Camada operacional estável e documentada conforme roadmap oficial.</p>
+            <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
+              Ajuste entidades, fontes e regras operacionais conforme o contexto da sua operação.
+            </p>
           </div>
         </aside>
 
@@ -2061,10 +2063,10 @@ const ConfigStage1: React.FC = () => {
                   <Loader2 className="w-12 h-12 animate-spin mb-4" />
                   <p className="text-sm font-bold uppercase tracking-widest">Carregando Parametrização Real...</p>
                   <Link
-                    href="/configuracoes/objetos/contas/fontes-conectores"
+                    href="/configuracoes/objetos-crm"
                     className="mt-4 inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all"
                   >
-                    Abrir Fontes e Conectores
+                    Abrir Hub de CRM e Dados
                   </Link>
                 </div>
               ) : (

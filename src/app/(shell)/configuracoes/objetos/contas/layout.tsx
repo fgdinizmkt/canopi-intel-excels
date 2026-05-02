@@ -68,14 +68,13 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
             <Link href="/configuracoes" className="p-2 hover:bg-slate-100 rounded-xl transition-all">
               <ChevronLeft className="w-5 h-5 text-slate-400" />
             </Link>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Configurações de CONTAS</h1>
-                <Badge className="bg-blue-100 text-blue-700 font-black">V2 ARCHITECTURE</Badge>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Configurações de CONTAS</h1>
+                </div>
+                <p className="text-xs font-bold text-slate-400 mt-0.5">OBJETOS & CRM / ENTIDADES / CONTAS</p>
               </div>
-              <p className="text-xs font-bold text-slate-400 mt-0.5">OBJETOS & CRM / ENTIDADES / CONTAS</p>
             </div>
-          </div>
           <div className="flex items-center gap-3">
              <div className="mr-6 text-right hidden xl:block">
                 <p className="text-[10px] font-black text-slate-400 uppercase">Prontidão do setup local</p>
@@ -119,18 +118,6 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
          <div className="max-w-[1600px] mx-auto flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
             <div className="flex items-center gap-8">
                <span>Canopi © 2026</span>
-               <span>v2.7.2-Final-Hardened</span>
-               <span>Branch: feature/hardened-accounts-v2</span>
-            </div>
-            <div className="flex items-center gap-4">
-               <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  <span>Architecture Validated</span>
-               </div>
-               <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  <span>Rastreability Active</span>
-               </div>
             </div>
          </div>
       </footer>
