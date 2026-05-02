@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Card } from '@/src/components/ui';
 
 type ConnectorKind = 'salesforce' | 'hubspot' | 'rd-station-crm' | 'pipedrive' | 'clickup' | 'outro-crm';
@@ -14,6 +15,7 @@ interface ConnectorStoreCard {
   requisitos: string[];
   ctaLabel: string;
   ctaEnabled: boolean;
+  ctaHref?: string;
   destaque?: boolean;
   logoSrc?: string;
   logoAlt?: string;
@@ -29,7 +31,8 @@ const CONNECTORS_STORE_CARDS: ConnectorStoreCard[] = [
     objetosSuportados: ['Account'],
     requisitos: ['Acesso API ativo', 'Credencial valida para teste de conexao'],
     ctaLabel: 'Configurar conector',
-    ctaEnabled: false,
+    ctaEnabled: true,
+    ctaHref: '/configuracoes/objetos-crm/salesforce',
     destaque: true,
     logoSrc: '/integrations/logos/Salesforce_logo.png',
     logoAlt: 'Logo Salesforce',
@@ -196,17 +199,22 @@ export function ConnectorsStore() {
               </div>
 
               <div className="mt-6 border-t border-slate-100 pt-4">
-                <button
-                  type="button"
-                  disabled={!connector.ctaEnabled}
-                  className={`w-full rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
-                    connector.ctaEnabled
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'cursor-default border border-slate-200 bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {connector.ctaLabel}
-                </button>
+                {connector.ctaHref ? (
+                  <Link
+                    href={connector.ctaHref}
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-blue-700"
+                  >
+                    {connector.ctaLabel}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full cursor-default rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-500 transition-all"
+                  >
+                    {connector.ctaLabel}
+                  </button>
+                )}
               </div>
             </Card>
           );
