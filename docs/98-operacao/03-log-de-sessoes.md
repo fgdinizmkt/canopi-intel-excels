@@ -5,6 +5,22 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C3.0 (preview read-only de Accounts via OAuth)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** adicionar um preview read-only de registros reais de `Account` via OAuth persistido, sem sync, sem persistência de registros e sem alterar o escopo do Salesforce Setup Read-only.
+- **Commit local:** `61f2799` — `feat(settings): add Salesforce Accounts read-only preview`
+- **O que foi materializado:**
+  - nova rota `GET /api/account-connectors/salesforce/oauth/accounts?limit=10`;
+  - helper `fetchAccountsPreview()` no service OAuth, reutilizando conexão persistida, decrypt/refresh e consulta SOQL read-only;
+  - limite padrão 10 e máximo 25;
+  - whitelist de campos: `Id`, `Name`, `Website`, `Industry`, `Type`, `OwnerId`, `CreatedDate`, `LastModifiedDate`;
+  - bloco visual discreto no painel OAuth com botão `Carregar Accounts`, tabela compacta, contagem de registros e guardrails visíveis.
+- **Validação manual:** Fábio validou no browser o carregamento de Accounts reais.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** sem sync real, sem Supabase, sem writeback, sem Bulk API, sem importação real, sem persistência dos registros.
+- **Relação com o marco atual:** C3.0 amplia a capacidade read-only do Salesforce sem reabrir o fechamento operacional do Setup Read-only.
+
 ## [2026-05-02] — Salesforce 2C.4 sessão 6 (alinhamento de modos, CSV por entidade, copy produto)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.

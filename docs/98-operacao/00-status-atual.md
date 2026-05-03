@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**: OAuth produtivo preservado, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**; o recorte C3.0 adicionou preview read-only de Accounts via OAuth no commit `61f2799`, mantendo o estado funcional já fechado: OAuth produtivo, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -11,6 +11,7 @@ Fechado neste marco (Setup Read-only):
 - Token temporário como validação pontual
 - Writeback visível como não habilitado
 - Bulk API/sync visível como futuro
+- Preview read-only de Accounts via OAuth (C3.0) concluído localmente em `61f2799`
 
 Não fechado neste marco:
 - sync real
@@ -31,6 +32,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Test Data Pack
 - Salesforce Connector completo
 - Base de Teste Completa por CRM (pós-configurações)
+- Salesforce Accounts read-only preview (C3.0) já validado localmente; aguarda push e espelho operacional
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
