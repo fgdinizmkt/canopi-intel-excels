@@ -10,7 +10,9 @@
     "build": "next build",
     "build:safe": "node scripts/build-safe.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:drive-memory": "node scripts/sync-drive-memory.mjs",
+    "sync:drive-memory:dry": "node scripts/sync-drive-memory.mjs --dry-run"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
