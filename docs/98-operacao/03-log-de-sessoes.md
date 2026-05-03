@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-02] — Salesforce 2C.4 (Discovery read-only multiobjeto + mapeamento pré-sync)
+
+- **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
+- **Objetivo:** evoluir o OAuth produtivo já fechado (2C.3) para uma camada read-only de discovery multiobjeto e mapeamento pré-sync, cobrindo Account, Contact e Opportunity.
+- **Commit local:** `daf9e4b` — `feat(settings): add Salesforce read-only discovery pre-sync mapping`
+- **O que foi materializado:**
+  - função genérica `fetchObjectDescribe()` no service OAuth, reutilizando a lógica de `fetchAccountDescribe()` e tratando cada objeto independentemente;
+  - função `fetchMultiObjectDiscovery()` que executa Account, Contact e Opportunity em paralelo (falha de um não quebra os outros);
+  - tipos públicos `SalesforceObjectDiscovery`, `SalesforceFieldMeta`, `SalesforceObjectStatus`;
+  - listas de campos recomendados por objeto (Account: 10, Contact: 12, Opportunity: 11) com detecção de presença/ausência via describe real;
+  - rota POST `/api/account-connectors/salesforce/oauth/discovery` — segura, sem exposição de tokens, retorno normalizado;
+  - componente `SalesforceDiscovery` (client) com estados: idle → loading → resultados por objeto | erro;
+  - per-objeto: status badge, contagem de campos, campos recomendados presentes, campos recomendados ausentes, lista completa expansível;
+  - aviso explícito em UI: "Nenhum registro será importado nesta etapa. Este mapeamento prepara um sync futuro, mas ainda não sincroniza dados.";
+  - seção "Objetos neste recorte" na page.tsx atualizada para Account/Contact/Opportunity visíveis + Lead/Campaign com risco visual.
+- **O que ficou fora do escopo:** Lead (intencional), persistência de mapeamento (não havia caminho simples sem nova migration — UI read-only pronta para sync futuro), sync real, Bulk API, writeback.
+- **Persistência de mapeamento:** não implementada — exigiria nova tabela/migration. UI está pronta. Registrado como próxima etapa.
+- **Próximo passo natural:** primeiro sync read-only controlado de Accounts (recorte dedicado futuro).
+
+---
+
 ## [2026-05-02] — Salesforce 2C.3 (OAuth produtivo via External Client App)
 
 - **Natureza:** Sessão funcional + fechamento operacional.

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ChevronLeft, ShieldCheck } from 'lucide-react';
 import { Badge, Card } from '@/src/components/ui';
 import { SalesforceMethodSelector } from './_components/SalesforceMethodSelector';
+import { SalesforceDiscovery } from './_components/SalesforceDiscovery';
 
 export default function SalesforceDedicatedPage() {
   return (
@@ -68,9 +69,9 @@ export default function SalesforceDedicatedPage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {([
               ['Token temporário', 'Funcional read-only', 'emerald'],
-              ['Metadados Account', 'Funcional', 'emerald'],
-              ['CSV exportado', 'Preparação local', 'blue'],
               ['OAuth / External Client App', 'OAuth produtivo', 'emerald'],
+              ['Discovery multiobjeto', 'Account · Contact · Opportunity', 'emerald'],
+              ['CSV exportado', 'Preparação local', 'blue'],
               ['Bulk API / sync', 'Futuro', 'amber'],
               ['Writeback', 'Não disponível nesta versão', 'slate'],
             ] as [string, string, 'emerald' | 'blue' | 'amber' | 'slate'][]).map(([label, status, tone]) => (
@@ -104,34 +105,41 @@ export default function SalesforceDedicatedPage() {
       </section>
 
       <section className="space-y-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Objetos e metadados</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Discovery e mapeamento pré-sync</p>
+        <SalesforceDiscovery />
+      </section>
+
+      <section className="space-y-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Objetos neste recorte</p>
         <Card className="rounded-3xl border border-slate-200 p-6">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-2">
-              <h3 className="text-base font-black text-slate-900">Account como primeiro objeto</h3>
+              <h3 className="text-base font-black text-slate-900">Account · Contact · Opportunity</h3>
               <p className="text-sm font-medium leading-relaxed text-slate-600">
-                Contact, Lead, Opportunity e Campaign ficam como próximos objetos mapeáveis desta fonte.
+                Discovery read-only de metadados. Lead foi excluído intencionalmente deste recorte. Campaign fica para recorte futuro.
               </p>
             </div>
             <Badge className="border-none bg-blue-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
-              Prioridade inicial
+              Pré-sync
             </Badge>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            {['Contact', 'Lead', 'Opportunity', 'Campaign'].map((obj) => (
+            {['Account', 'Contact', 'Opportunity'].map((obj) => (
               <span
                 key={obj}
-                className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600"
+                className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700"
               >
                 {obj}
               </span>
             ))}
-          </div>
-          <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Leitura de metadados</p>
-            <p className="mt-1 text-sm font-medium leading-relaxed text-slate-700">
-              A descoberta de metadados deve ler campos, URLs e relacionamentos do objeto para apoiar o mapeamento Salesforce para Canopi.
-            </p>
+            {['Lead', 'Campaign'].map((obj) => (
+              <span
+                key={obj}
+                className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-400 line-through"
+              >
+                {obj}
+              </span>
+            ))}
           </div>
         </Card>
       </section>
@@ -144,14 +152,15 @@ export default function SalesforceDedicatedPage() {
             <p className="text-sm font-black text-emerald-900">Guardrails ativos nesta página dedicada</p>
           </div>
           <ul className="mt-4 space-y-2 text-sm font-medium text-emerald-900">
-            <li>• Sem sync neste recorte</li>
+            <li>• Sem sync neste recorte — discovery prepara, não importa</li>
             <li>• Sem writeback neste recorte</li>
             <li>• Sem leitura massiva de registros neste recorte</li>
             <li>• Sem exposição de tokens em UI, query string, logs ou armazenamento client-side</li>
             <li>• Sem criação ou atualização de registros no CRM</li>
+            <li>• Lead excluído intencionalmente deste recorte</li>
           </ul>
           <p className="mt-4 text-xs font-medium text-emerald-800">
-            Sync, Bulk API e writeback serão tratados em recortes próprios.
+            Sync, Bulk API e writeback serão tratados em recortes próprios. Próximo passo natural: primeiro sync read-only controlado de Accounts.
           </p>
         </Card>
       </section>

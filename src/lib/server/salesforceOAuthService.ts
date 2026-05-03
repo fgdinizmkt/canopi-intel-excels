@@ -76,6 +76,51 @@ type SalesforceDescribeResponse = {
   fields?: Array<{ name?: string }>;
 };
 
+type SalesforceDescribeField = {
+  name?: string;
+  label?: string;
+  type?: string;
+  nillable?: boolean;
+  updateable?: boolean;
+  createable?: boolean;
+  calculated?: boolean;
+};
+
+type SalesforceDescribeFullResponse = {
+  label?: string;
+  fields?: SalesforceDescribeField[];
+};
+
+export type SalesforceObjectStatus = 'available' | 'unavailable' | 'no_permission' | 'error';
+
+export interface SalesforceFieldMeta {
+  name: string;
+  label: string;
+  type: string;
+  nillable: boolean;
+  updateable: boolean;
+  createable: boolean;
+  calculated: boolean;
+}
+
+export interface SalesforceObjectDiscovery {
+  objectApiName: string;
+  label: string;
+  status: SalesforceObjectStatus;
+  readable: boolean;
+  fieldCount: number;
+  fields: SalesforceFieldMeta[];
+  recommendedFields: SalesforceFieldMeta[];
+  missingRecommendedFields: string[];
+  message?: string;
+}
+
+const RECOMMENDED_FIELDS: Record<string, string[]> = {
+  Account: ['Id', 'Name', 'Website', 'Industry', 'Type', 'AnnualRevenue', 'NumberOfEmployees', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Contact: ['Id', 'AccountId', 'FirstName', 'LastName', 'Name', 'Email', 'Phone', 'Title', 'Department', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Opportunity: ['Id', 'AccountId', 'Name', 'StageName', 'Amount', 'CloseDate', 'Probability', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+};
+
 type ConnectionRow = {
   provider: string;
   status: OAuthConnectionStatus;
@@ -575,6 +620,104 @@ export async function validateConnectionHealth(): Promise<OAuthSafeStatus> {
     const fresh = await getOAuthConnection();
     return toSafeStatus(config, fresh);
   }
+}
+
+export async function fetchObjectDescribe(
+  instanceUrl: string,
+  accessToken: string,
+  objectApiName: string,
+  apiVersion = DEFAULT_API_VERSION,
+): Promise<SalesforceObjectDiscovery> {
+  const recommended = RECOMMENDED_FIELDS[objectApiName] || [];
+  const empty = (status: SalesforceObjectStatus, message: string): SalesforceObjectDiscovery => ({
+    objectApiName,
+    label: objectApiName,
+    status,
+    readable: false,
+    fieldCount: 0,
+    fields: [],
+    recommendedFields: [],
+    missingRecommendedFields: recommended,
+    message,
+  });
+
+  try {
+    const res = await fetch(
+      `${instanceUrl}/services/data/${apiVersion}/sobjects/${objectApiName}/describe`,
+      {
+        method: 'GET',
+        headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+        cache: 'no-store',
+      },
+    );
+
+    if (res.status === 401 || res.status === 403) {
+      return empty('no_permission', 'Sem permissão de leitura para este objeto.');
+    }
+    if (res.status === 404) {
+      return empty('unavailable', 'Objeto não encontrado nesta organização.');
+    }
+    if (!res.ok) {
+      return empty('unavailable', 'Objeto indisponível no momento.');
+    }
+
+    const payload = (await res.json()) as SalesforceDescribeFullResponse;
+    const rawFields = Array.isArray(payload.fields) ? payload.fields : [];
+
+    const fields: SalesforceFieldMeta[] = rawFields
+      .filter((f) => Boolean(f.name))
+      .map((f) => ({
+        name: f.name!,
+        label: f.label || f.name!,
+        type: f.type || 'unknown',
+        nillable: f.nillable ?? true,
+        updateable: f.updateable ?? false,
+        createable: f.createable ?? false,
+        calculated: f.calculated ?? false,
+      }));
+
+    const fieldNameSet = new Set(fields.map((f) => f.name));
+    const recommendedFields = fields.filter((f) => recommended.includes(f.name));
+    const missingRecommendedFields = recommended.filter((name) => !fieldNameSet.has(name));
+
+    return {
+      objectApiName,
+      label: payload.label || objectApiName,
+      status: 'available',
+      readable: true,
+      fieldCount: fields.length,
+      fields,
+      recommendedFields,
+      missingRecommendedFields,
+    };
+  } catch {
+    return empty('error', 'Erro inesperado ao consultar metadados.');
+  }
+}
+
+export async function fetchMultiObjectDiscovery(
+  instanceUrl: string,
+  accessToken: string,
+  apiVersion = DEFAULT_API_VERSION,
+): Promise<SalesforceObjectDiscovery[]> {
+  const objects = ['Account', 'Contact', 'Opportunity'];
+  const results = await Promise.allSettled(
+    objects.map((obj) => fetchObjectDescribe(instanceUrl, accessToken, obj, apiVersion)),
+  );
+  return results.map((r, i) => {
+    if (r.status === 'fulfilled') return r.value;
+    return {
+      objectApiName: objects[i],
+      label: objects[i],
+      status: 'error' as SalesforceObjectStatus,
+      readable: false,
+      fieldCount: 0,
+      fields: [],
+      recommendedFields: [],
+      missingRecommendedFields: RECOMMENDED_FIELDS[objects[i]] || [],
+      message: 'Erro inesperado.',
+    };
+  });
 }
 
 export async function revokeAndDisconnect(): Promise<void> {

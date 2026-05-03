@@ -116,8 +116,12 @@ Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
 - Salesforce 2C.2 fechado em `46fae8f`.
 - Salesforce 2C.3 fechado em `bc3dd69`.
-- A página dedicada passou a cobrir: metadados read-only de `Account` (token temporário), preparação local de CSV exportado (com gate de obrigatórios) e conexão OAuth produtiva com persistência segura e health check read-only via `Account/describe`.
-- O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.3 não equivalem a conector produtivo completo.
+- Salesforce 2C.4 implementado localmente (`daf9e4b`), pendente de validação operacional (browser, push, sync Drive).
+- A página dedicada agora cobre: metadados read-only de `Account` (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, e discovery read-only multiobjeto (Account, Contact, Opportunity) com mapeamento pré-sync.
+- **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem importação, sem Bulk API, sem writeback, sem Lead neste recorte.
+- Persistência de mapeamento pré-sync: pendente (requer nova migration). UI pronta.
+- Próximo passo natural: primeiro sync read-only controlado de Accounts (recorte dedicado futuro).
+- O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.4 não equivalem a conector produtivo completo.
 
 Regra de progressão:
 - Não avançar para outro CRM antes de Salesforce estar testado e aprovado.
