@@ -1,13 +1,36 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` em `5a41865` (Local = `origin/main` = Google Drive). **Estado Salesforce estabilizado e fechado operacionalmente**: OAuth produtivo preservado, Account/describe validado, discovery read-only multiobjeto preservado (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade preservado como entrada local e Token temporário preservado como validação pontual. A UI “Frankenstein” introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` em `42b339e` (Local = `origin/main`). **Salesforce Setup Read-only fechado operacionalmente**: OAuth produtivo preservado, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
 
-Salesforce continua **não sendo conector produtivo completo**: sem sync real, sem Bulk API, sem writeback real e sem importação real.
+Fechado neste marco (Setup Read-only):
+- OAuth produtivo e conexão persistida
+- validação read-only via Account/describe
+- discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign)
+- CSV por entidade como entrada local (sem consulta live)
+- Token temporário como validação pontual
+- Writeback visível como não habilitado
+- Bulk API/sync visível como futuro
+
+Não fechado neste marco:
+- sync real
+- leitura real/massiva de registros
+- Bulk API
+- writeback real
+- importação real
+- criação/atualização de registros no Salesforce
+- persistência de mapeamento
+- auditoria de sync/writeback
+- Salesforce Connector completo
 
 Pendências futuras (fora do escopo atual):
-- abrir recortes próprios para sync read-only controlado, Bulk API e writeback;
-- criar “Base de Teste Completa por CRM” (pós-configurações) para validar leitura/interpretação/vínculos com dados robustos.
+- Salesforce Sync Read-only
+- Salesforce Mapping persistente
+- Salesforce Bulk API
+- Salesforce Writeback seguro
+- Salesforce Test Data Pack
+- Salesforce Connector completo
+- Base de Teste Completa por CRM (pós-configurações)
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

@@ -68,6 +68,16 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Correção de nomenclatura: “Salesforce Setup Read-only fechado operacionalmente”
+
+- **Natureza:** Ajuste documental (sem alterações em código).
+- **Motivo:** “Salesforce fechado” é impreciso enquanto Bulk API/sync e writeback seguem não habilitados.
+- **Correção:** padronizar o marco como **Salesforce Setup Read-only fechado operacionalmente**.
+- **Fechado neste marco:** OAuth produtivo, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account/Contact/Opportunity/Lead/Campaign), CSV por entidade como entrada local, token temporário como validação pontual, e visibilidade explícita de Bulk API/sync (futuro) e writeback (não habilitado).
+- **Não fechado:** sync real, leitura real/massiva de registros, Bulk API, writeback real, importação real, criação/atualização de registros, persistência de mapeamento e auditoria de sync/writeback; não declarar “Salesforce Connector completo”.
+
+---
+
 ## [2026-05-02] — Salesforce 2C.4 (Discovery read-only multiobjeto + mapeamento pré-sync)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.

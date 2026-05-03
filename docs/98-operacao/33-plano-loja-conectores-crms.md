@@ -115,10 +115,10 @@ Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
 - Salesforce 2C.2 fechado em `46fae8f`.
 - Salesforce 2C.3 fechado em `bc3dd69`.
-- Salesforce 2C.4 evoluiu localmente e o estado atual estabilizado está em `b64f4da` (pendente de validação operacional, push e sync Drive).
-- A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, e discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign) com mapeamento pré-sync.
-- **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem importação, sem Bulk API e sem writeback real.
-- Persistência de mapeamento pré-sync: pendente (requer nova migration). UI pronta.
+- Marco atual: **Salesforce Setup Read-only fechado operacionalmente** em `42b339e`.
+- A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura e discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign) com mapeamento pré-sync (somente leitura).
+- **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem Bulk API, sem writeback real e sem importação real.
+- Persistência de mapeamento pré-sync: pendente (recorte próprio futuro).
 - Próximo passo natural: primeiro sync read-only controlado de Accounts (recorte dedicado futuro).
 - O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.4 não equivalem a conector produtivo completo.
 
@@ -157,6 +157,14 @@ Guardrails desta frente:
 - não substitui as configurações dos conectores;
 - não antecipa sync real;
 - não antecipa writeback.
+
+## 9.2) Próximos marcos Salesforce (pós Setup Read-only)
+- Salesforce Sync Read-only
+- Salesforce Mapping persistente
+- Salesforce Bulk API
+- Salesforce Writeback seguro
+- Salesforce Test Data Pack
+- Salesforce Connector completo
 
 ## 10) Escopo por camada
 ### O que fica dentro de cada página de CRM
