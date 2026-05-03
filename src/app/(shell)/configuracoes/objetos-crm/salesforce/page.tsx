@@ -30,7 +30,7 @@ export default function SalesforceDedicatedPage() {
           <div>
             <h2 className="text-4xl font-black tracking-tighter text-slate-900">Salesforce</h2>
             <p className="text-sm font-medium text-slate-600">
-              OAuth = fonte viva · Token = validação efêmera · CSV = entrada local · Discovery = metadados somente leitura
+              OAuth = fonte viva · Token = validação pontual · CSV = entrada local · Discovery = metadados somente leitura
             </p>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function SalesforceDedicatedPage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {([
               ['OAuth · Fonte viva', 'Produtivo + discovery read-only', 'emerald'],
-              ['Token temporário · Efêmero', 'Valida Account · nada salvo', 'amber'],
+              ['Token temporário · Validação pontual', 'Valida Account · nada salvo', 'amber'],
               ['CSV · Entrada local', 'Preparação local · sem conexão live', 'blue'],
               ['Discovery multiobjeto', '5 objetos · somente metadados', 'emerald'],
               ['Bulk API / sync', 'Futuro', 'slate'],
@@ -93,7 +93,7 @@ export default function SalesforceDedicatedPage() {
             ))}
           </div>
           <p className="mt-4 text-sm font-medium text-slate-600">
-            OAuth = conexão viva com discovery de metadados · Token = validação efêmera de Account sem persistência · CSV = análise local de arquivo exportado sem consulta live.
+            OAuth = conexão viva com discovery de metadados · Token = validação pontual de Account sem persistência · CSV = análise local de arquivo exportado sem consulta live.
           </p>
         </Card>
       </section>
@@ -104,7 +104,7 @@ export default function SalesforceDedicatedPage() {
       </section>
 
       <section className="space-y-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Objetos neste recorte</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Objetos suportados</p>
         <Card className="rounded-3xl border border-slate-200 p-6">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-2">
@@ -116,7 +116,7 @@ export default function SalesforceDedicatedPage() {
               </p>
             </div>
             <Badge className="border-none bg-blue-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
-              Pré-sync
+              Somente leitura
             </Badge>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">

@@ -99,7 +99,7 @@ const METHODS: MethodDefinition[] = [
     id: 'token',
     title: 'Validação pontual',
     description: 'Use para validar acesso pontual. Nada será salvo.',
-    badge: 'Efêmero',
+    badge: 'Validação pontual',
     badgeVariant: 'amber',
     icon: <KeyRound className="h-4 w-4" />,
     panel: { lines: [] },
