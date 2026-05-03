@@ -1,7 +1,16 @@
 # Status atual do projeto
 
 ## Branch principal
- `main` local em `daf9e4b` (ahead 1 em relação a `origin/main`). Pré-2C.4, local e origin estavam alinhados em `d94bcf8`. O recorte **Salesforce 2C.4** foi implementado localmente e ainda está **pendente de validação manual no browser, push e sync Google Drive** antes do fechamento operacional. O recorte adiciona discovery read-only multiobjeto (Account, Contact, Opportunity) com mapeamento pré-sync. Salesforce continua **não sendo conector produtivo completo** — sem sync real, sem importação, sem Bulk API, sem writeback. Lead excluído intencionalmente. Próximo passo natural após fechamento de 2C.4: primeiro sync read-only controlado de Accounts. Referência operacional: ABE/Cockpit off-plan preservado localmente na branch `wip-abe-cockpit-offplan-quarantine`.
+`main` local em `b64f4da` (ahead 9 em relação a `origin/main`). **Estado Salesforce estabilizado localmente**: OAuth produtivo preservado, Account/describe validado, discovery read-only multiobjeto preservado (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade preservado como entrada local e Token temporário preservado como validação pontual. A UI “Frankenstein” introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+
+Salesforce continua **não sendo conector produtivo completo**: sem sync real, sem Bulk API, sem writeback real e sem importação real.
+
+Pendências operacionais deste estado local:
+- validação final do estado local (runtime limpo) conforme protocolo;
+- push para `origin/main`;
+- `dry-run` do espelhamento no Google Drive;
+- sync do Google Drive;
+- confirmação final Local = GitHub = Google Drive.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

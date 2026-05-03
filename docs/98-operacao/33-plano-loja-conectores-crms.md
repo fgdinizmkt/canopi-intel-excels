@@ -1,9 +1,8 @@
 # Plano Operacional — Loja de Conectores e CRMs
 
 ## 1) Estado atual
-- `main` limpa e sincronizada no commit `bc3dd69`.
+- `main` local em `b64f4da` (ahead em relação a `origin/main`), pendente de validação final no browser, push e sync Google Drive.
 - Salesforce 2C.1, 2C.2 e 2C.3 foram fechados na trilha dedicada (metadados read-only + preparação local CSV + OAuth produtivo).
-- Patch local anterior descartado com `git restore`.
 - Fontes e Conectores permanece na arquitetura antiga.
 - `AccountSources.tsx` concentra responsabilidades em excesso.
 
@@ -116,9 +115,9 @@ Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
 - Salesforce 2C.2 fechado em `46fae8f`.
 - Salesforce 2C.3 fechado em `bc3dd69`.
-- Salesforce 2C.4 implementado localmente (`daf9e4b`), pendente de validação operacional (browser, push, sync Drive).
-- A página dedicada agora cobre: metadados read-only de `Account` (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, e discovery read-only multiobjeto (Account, Contact, Opportunity) com mapeamento pré-sync.
-- **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem importação, sem Bulk API, sem writeback, sem Lead neste recorte.
+- Salesforce 2C.4 evoluiu localmente e o estado atual estabilizado está em `b64f4da` (pendente de validação operacional, push e sync Drive).
+- A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, e discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign) com mapeamento pré-sync.
+- **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem importação, sem Bulk API e sem writeback real.
 - Persistência de mapeamento pré-sync: pendente (requer nova migration). UI pronta.
 - Próximo passo natural: primeiro sync read-only controlado de Accounts (recorte dedicado futuro).
 - O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.4 não equivalem a conector produtivo completo.

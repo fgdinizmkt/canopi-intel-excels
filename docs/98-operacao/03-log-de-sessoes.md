@@ -37,6 +37,26 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce (estabilização de UI e reversões de UX instável)
+
+- **Natureza:** Estabilização local — pendente de validação final no browser, push e sync Google Drive.
+- **Objetivo:** restaurar estabilidade da página dedicada do Salesforce após dois commits que introduziram UI instável/“Frankenstein”.
+- **Commits relevantes:**
+  - Revertidos: `6297de5` (`fix(settings): simplify Salesforce setup and add CSV governance`) e `b4beff7` (`feat(settings): redesign Salesforce setup wizard UX`)
+  - Reverts: `bfff113` e `c02c02a`
+  - Estabilização final: `b64f4da` (`fix(settings): restore Salesforce setup stability`)
+- **Estado preservado (sem mexer em backend OAuth):**
+  - OAuth produtivo preservado (conecta, persiste, valida, desconecta/reconecta; tokens não expostos);
+  - Account/describe validado;
+  - discovery read-only multiobjeto preservado: Account, Contact, Opportunity, Lead, Campaign;
+  - CSV por entidade preservado como entrada local (sem consulta live);
+  - Token temporário preservado como validação pontual;
+  - Writeback permanece visível como **não habilitado** (sem implementação real).
+- **Guardrails mantidos:** sem sync real, sem Bulk API, sem writeback real, sem importação real.
+- **Infra local:** `dev:clean` confirmado; `npm run lint` e `npm run build` passaram no estado `b64f4da`.
+
+---
+
 ## [2026-05-02] — Salesforce 2C.4 (Discovery read-only multiobjeto + mapeamento pré-sync)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
