@@ -112,6 +112,7 @@ interface PreparedAccountsPreviewRow {
   label: string;
   gaps: string[];
   isValid: boolean;
+  record: AccountsPreviewRecord;
 }
 
 interface PreparedAccountsPreviewSummary {
@@ -120,6 +121,31 @@ interface PreparedAccountsPreviewSummary {
   validCount: number;
   rowsWithGapsCount: number;
   rows: PreparedAccountsPreviewRow[];
+}
+
+interface LocalPreSyncContractRow {
+  Id: string | null;
+  Name: string | null;
+  Website: string | null;
+  Industry: string | null;
+  Type: string | null;
+  OwnerId: string | null;
+  status: 'válido' | 'com lacunas';
+  gaps: string[];
+}
+
+interface LocalPreSyncContract {
+  createdAt: string;
+  source: 'Salesforce OAuth';
+  objectApiName: 'Account';
+  mode: 'read-only';
+  previewLimit: number;
+  totalLoaded: number;
+  totalSelected: number;
+  totalValid: number;
+  totalWithGaps: number;
+  fieldsConsidered: string[];
+  records: LocalPreSyncContractRow[];
 }
 
 function formatTestedAt(iso: string): string {
@@ -151,6 +177,31 @@ function getAccountPreviewRowGaps(record: AccountsPreviewRecord): string[] {
   if (!record.Website?.trim()) gaps.push('sem Website');
   if (!record.Industry?.trim()) gaps.push('sem Industry');
   return gaps;
+}
+
+function buildLocalPreSyncContract(summary: PreparedAccountsPreviewSummary, preview: AccountsPreviewResult): LocalPreSyncContract {
+  return {
+    createdAt: new Date().toISOString(),
+    source: 'Salesforce OAuth',
+    objectApiName: 'Account',
+    mode: 'read-only',
+    previewLimit: preview.limit,
+    totalLoaded: preview.records.length,
+    totalSelected: summary.selectedCount,
+    totalValid: summary.validCount,
+    totalWithGaps: summary.rowsWithGapsCount,
+    fieldsConsidered: ['Id', 'Name', 'Website', 'Industry', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+    records: summary.rows.map((row) => ({
+      Id: row.record.Id,
+      Name: row.record.Name,
+      Website: row.record.Website,
+      Industry: row.record.Industry,
+      Type: row.record.Type,
+      OwnerId: row.record.OwnerId,
+      status: row.isValid ? 'válido' : 'com lacunas',
+      gaps: row.gaps,
+    })),
+  };
 }
 const METHODS: MethodDefinition[] = [
   {
@@ -234,6 +285,13 @@ export function SalesforceMethodSelector() {
   const [accountsPreviewError, setAccountsPreviewError] = useState<string | null>(null);
   const [selectedAccountPreviewKeys, setSelectedAccountPreviewKeys] = useState<string[]>([]);
   const [preparedAccountsPreviewSelection, setPreparedAccountsPreviewSelection] = useState<PreparedAccountsPreviewSummary | null>(null);
+  const [localPreSyncContract, setLocalPreSyncContract] = useState<LocalPreSyncContract | null>(null);
+  const [selectionFeedback, setSelectionFeedback] = useState<string | null>(null);
+  const [contractFeedback, setContractFeedback] = useState<string | null>(null);
+  const [contractJustGenerated, setContractJustGenerated] = useState(false);
+  const [prepareButtonBusy, setPrepareButtonBusy] = useState(false);
+  const [contractButtonGenerated, setContractButtonGenerated] = useState(false);
+  const contractCardRef = useRef<HTMLDivElement | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
   const [oauthConfigForm, setOauthConfigForm] = useState({
@@ -459,6 +517,10 @@ export function SalesforceMethodSelector() {
     setOauthNotice(null);
     setSelectedAccountPreviewKeys([]);
     setPreparedAccountsPreviewSelection(null);
+    setLocalPreSyncContract(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setContractJustGenerated(false);
 
     try {
       const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
@@ -484,6 +546,12 @@ export function SalesforceMethodSelector() {
 
   function toggleAccountPreviewRowSelection(rowKey: string) {
     setPreparedAccountsPreviewSelection(null);
+    setLocalPreSyncContract(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setContractJustGenerated(false);
+    setContractButtonGenerated(false);
+    setPrepareButtonBusy(false);
     setSelectedAccountPreviewKeys((current) =>
       current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
     );
@@ -491,14 +559,42 @@ export function SalesforceMethodSelector() {
 
   function handleToggleSelectAllAccountPreviewRows() {
     setPreparedAccountsPreviewSelection(null);
+    setLocalPreSyncContract(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setContractJustGenerated(false);
+    setContractButtonGenerated(false);
+    setPrepareButtonBusy(false);
     setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
   }
 
   function handlePrepareAccountPreviewSelection() {
-    setPreparedAccountsPreviewSelection({
+    setPrepareButtonBusy(true);
+    const nextSelection = {
       ...liveAccountPreviewSummary,
       preparedAt: new Date().toISOString(),
-    });
+    };
+    window.setTimeout(() => {
+      setPreparedAccountsPreviewSelection(nextSelection);
+      setLocalPreSyncContract(null);
+      setSelectionFeedback('Seleção preparada. Contrato local liberado.');
+      setContractFeedback(null);
+      setContractJustGenerated(false);
+      setContractButtonGenerated(false);
+      setPrepareButtonBusy(false);
+    }, 120);
+  }
+
+  function handleGenerateLocalPreSyncContract() {
+    if (!preparedAccountsPreviewSelection || !accountsPreview) return;
+    const nextContract = buildLocalPreSyncContract(preparedAccountsPreviewSelection, accountsPreview);
+    setLocalPreSyncContract(nextContract);
+    setContractFeedback('Contrato local gerado nesta sessão.');
+    setContractJustGenerated(true);
+    setContractButtonGenerated(true);
+    setTimeout(() => {
+      contractCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   }
 
   async function handleOAuthDisconnect() {
@@ -547,6 +643,7 @@ export function SalesforceMethodSelector() {
           label: getAccountPreviewRowLabel(record, index),
           gaps,
           isValid: gaps.length === 0,
+          record,
         };
       }),
     [accountsPreview]
@@ -568,6 +665,10 @@ export function SalesforceMethodSelector() {
     }),
     [selectedAccountPreviewRows]
   );
+  const selectedRowsCount = preparedAccountsPreviewSelection?.selectedCount ?? selectedAccountPreviewRows.length;
+  const canGenerateLocalContract = Boolean(preparedAccountsPreviewSelection);
+  const isPrepareSuccess = Boolean(preparedAccountsPreviewSelection) && !prepareButtonBusy;
+  const isGenerateSuccess = contractButtonGenerated || Boolean(localPreSyncContract);
   const accountPreviewColumns = [
     ['Id', 'Id'],
     ['Nome', 'Name'],
@@ -1238,13 +1339,27 @@ export function SalesforceMethodSelector() {
                       API {accountsPreview.apiVersion}
                     </span>
                     <span className="rounded-lg bg-blue-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-800">
-                      {selectedAccountPreviewRows.length} selecionados
+                      {selectedRowsCount} selecionados
                     </span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-500">
                     {accountsPreview.done ? 'Resultado completo para o limite solicitado.' : 'Resultado parcial para o limite solicitado.'} Última leitura:{' '}
                     {formatTestedAt(accountsPreview.testedAt)}
                   </p>
+
+                  {selectionFeedback && (
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                      <p className="text-sm font-black text-emerald-900">Seleção preparada</p>
+                      <p className="mt-1 text-sm font-medium text-emerald-800">{selectionFeedback}</p>
+                    </div>
+                  )}
+
+                  {contractFeedback && (
+                    <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+                      <p className="text-sm font-black text-blue-900">Contrato local gerado</p>
+                      <p className="mt-1 text-sm font-medium text-blue-800">{contractFeedback}</p>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap items-center gap-2">
                     <button
@@ -1259,10 +1374,40 @@ export function SalesforceMethodSelector() {
                       type="button"
                       onClick={handlePrepareAccountPreviewSelection}
                       disabled={selectedAccountPreviewRows.length === 0}
-                      className="rounded-xl bg-blue-600 px-3 py-2 text-xs font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      className={`rounded-xl px-3 py-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                        prepareButtonBusy
+                          ? 'bg-slate-500 text-white'
+                          : isPrepareSuccess
+                          ? 'border border-emerald-300 bg-emerald-600 text-white hover:bg-emerald-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
                     >
-                      Preparar seleção
+                      {prepareButtonBusy
+                        ? 'Preparando...'
+                        : isPrepareSuccess
+                        ? 'Seleção preparada'
+                        : 'Preparar seleção'}
                     </button>
+                    <button
+                      type="button"
+                      onClick={handleGenerateLocalPreSyncContract}
+                      disabled={!canGenerateLocalContract}
+                      title={!canGenerateLocalContract ? 'Prepare a seleção para liberar o contrato.' : undefined}
+                      className={`rounded-xl px-3 py-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                        isGenerateSuccess
+                          ? 'border border-emerald-300 bg-emerald-600 text-white hover:bg-emerald-700'
+                          : canGenerateLocalContract
+                          ? 'border border-blue-300 bg-white text-blue-700 hover:bg-blue-50'
+                          : 'border border-slate-200 bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {isGenerateSuccess ? 'Contrato gerado' : 'Gerar contrato local'}
+                    </button>
+                    {!canGenerateLocalContract && (
+                      <p className="w-full text-xs font-medium text-slate-500">
+                        Prepare a seleção para liberar o contrato.
+                      </p>
+                    )}
                   </div>
 
                   <div className="overflow-x-auto rounded-2xl border border-slate-200">
@@ -1400,6 +1545,114 @@ export function SalesforceMethodSelector() {
                       <p className="mt-4 text-sm font-medium text-blue-800">
                         Selecione os Accounts carregados e clique em “Preparar seleção” para registrar o resumo local desta sessão.
                       </p>
+                    )}
+
+                  {localPreSyncContract && (
+                    <div
+                      ref={contractCardRef}
+                      className={`mt-4 rounded-2xl border p-4 transition-all ${
+                        contractJustGenerated ? 'border-blue-300 bg-blue-50 shadow-sm shadow-blue-100' : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="space-y-1">
+                            <p className="text-sm font-black text-slate-900">Contrato local de pré-sync read-only</p>
+                            <p className="text-sm font-medium text-slate-600">
+                              Contrato local desta sessão. Nenhuma gravação, importação ou sincronização é executada.
+                            </p>
+                          </div>
+                        <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                          {selectedRowsCount} selecionados
+                        </span>
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                          {([
+                            ['Criado em', formatTestedAt(localPreSyncContract.createdAt)],
+                            ['Origem', localPreSyncContract.source],
+                            ['Objeto', localPreSyncContract.objectApiName],
+                            ['Modo', localPreSyncContract.mode],
+                            ['Limite usado', String(localPreSyncContract.previewLimit)],
+                            ['Total carregados', String(localPreSyncContract.totalLoaded)],
+                            ['Total selecionados', String(localPreSyncContract.totalSelected)],
+                            ['Total válidos', String(localPreSyncContract.totalValid)],
+                            ['Total com lacunas', String(localPreSyncContract.totalWithGaps)],
+                          ] as [string, string][]).map(([label, value]) => (
+                            <div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
+                              <p className="mt-1 text-sm font-medium text-slate-900 break-all">{value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Campos considerados</p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {localPreSyncContract.fieldsConsidered.map((field) => (
+                              <Badge key={field} className="border-none bg-white text-slate-700 text-[10px] font-black uppercase px-2 py-1">
+                                {field}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-slate-200 bg-slate-100">
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Registro</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Id</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Name</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Website</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Industry</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Type</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">OwnerId</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Status</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Lacunas</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {localPreSyncContract.records.map((row, index) => (
+                                <tr key={`${row.Id || row.Name || index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                                  <td className="px-3 py-2 text-sm font-medium text-slate-900">Account {index + 1}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.Id || '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.Name || '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.Website || '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.Industry || '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.Type || '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.OwnerId || '—'}</td>
+                                  <td className="px-3 py-2 text-sm">
+                                    {row.status === 'válido' ? (
+                                      <Badge className="border-none bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1">
+                                        Válido
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="border-none bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-2 py-1">
+                                        Com lacunas
+                                      </Badge>
+                                    )}
+                                  </td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">{row.gaps.length > 0 ? row.gaps.join(', ') : '—'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails do contrato local</p>
+                          <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
+                            <li>• Contrato local desta sessão.</li>
+                            <li>• Não importa registros.</li>
+                            <li>• Não grava no Supabase.</li>
+                            <li>• Não executa sync real.</li>
+                            <li>• Não altera camada canônica.</li>
+                            <li>• Não faz dedupe real.</li>
+                            <li>• Não faz writeback.</li>
+                            <li>• Não usa Bulk API.</li>
+                          </ul>
+                        </div>
+                      </div>
                     )}
 
                     <div className="mt-4 rounded-xl border border-blue-100 bg-blue-100/50 px-3 py-2">
