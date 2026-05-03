@@ -119,11 +119,12 @@ Estado consolidado desta trilha:
 - Salesforce C3.1 fechado localmente em `e407cbc` com seleção controlada de Accounts para pré-sync read-only.
 - Salesforce C3.2 fechado localmente em `8bf34c2` com contrato local de pré-sync read-only de Accounts.
 - Salesforce C3.3 fechado localmente em `d665137` com dry-run read-only local de Accounts.
+- Salesforce C4.0 fechado localmente em `d8bbe2f` com preview read-only multi-entidade (Account, Contact, Opportunity, Lead, Campaign).
 - Marco atual: **Salesforce Setup Read-only fechado operacionalmente**.
-- A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, preview read-only de Accounts via OAuth, seleção controlada local para pré-sync read-only, contrato local de pré-sync read-only e discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign) com mapeamento pré-sync (somente leitura).
+- A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, preview read-only de Accounts via OAuth, seleção controlada local para pré-sync read-only, contrato local de pré-sync read-only, dry-run read-only local de Accounts e preview read-only multi-entidade com discovery read-only e tabelas por entidade.
 - **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem Bulk API, sem writeback real e sem importação real.
 - Persistência de mapeamento pré-sync: pendente (recorte próprio futuro).
-- Próximo passo natural: C4.0 — Preview read-only multi-entidade Salesforce; depois primeiro sync read-only controlado de Accounts (recorte dedicado futuro), seguido dos marcos de Sync Read-only, Mapping persistente, Bulk API, Writeback seguro, Test Data Pack e Connector completo.
+- Próximo passo natural: recorte posterior de preparação para sync read-only multi-entidade Salesforce; depois marcos de Sync Read-only, Mapping persistente, Bulk API, Writeback seguro, Test Data Pack e Connector completo.
 - O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.4 não equivalem a conector produtivo completo.
 
 Regra de progressão:
@@ -163,6 +164,7 @@ Guardrails desta frente:
 - não antecipa writeback.
 
 ## 9.2) Próximos marcos Salesforce (pós Setup Read-only)
+- Salesforce Preparação para sync read-only multi-entidade
 - Salesforce Sync Read-only
 - Salesforce Mapping persistente
 - Salesforce Bulk API

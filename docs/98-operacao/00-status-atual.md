@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**; os recortes C3.0, C3.1, C3.2 e C3.3 adicionaram preview read-only de Accounts via OAuth no commit `61f2799`, seleção controlada local para pré-sync read-only no commit `e407cbc`, contrato local de pré-sync read-only no commit `8bf34c2` e dry-run read-only local de Accounts no commit `d665137`, mantendo o estado funcional já fechado: OAuth produtivo, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**; os recortes C3.0, C3.1, C3.2, C3.3 e C4.0 adicionaram preview read-only de Accounts via OAuth no commit `61f2799`, seleção controlada local para pré-sync read-only no commit `e407cbc`, contrato local de pré-sync read-only no commit `8bf34c2`, dry-run read-only local de Accounts no commit `d665137` e preview read-only multi-entidade no commit `d8bbe2f`, mantendo o estado funcional já fechado: OAuth produtivo, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -15,6 +15,7 @@ Fechado neste marco (Setup Read-only):
 - Seleção controlada local de Accounts para pré-sync read-only (C3.1) concluída localmente em `e407cbc`
 - Contrato local de pré-sync read-only de Accounts (C3.2) concluído localmente em `8bf34c2`
 - Dry-run read-only local de Accounts (C3.3) concluído localmente em `d665137`
+- Preview read-only multi-entidade Salesforce (C4.0) concluído localmente em `d8bbe2f`
 
 Não fechado neste marco:
 - sync real
@@ -34,12 +35,13 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Writeback seguro
 - Salesforce Test Data Pack
 - Salesforce Connector completo
-- C4.0 — Preview read-only multi-entidade Salesforce
+- C4.1 — Preparação local para sync read-only multi-entidade Salesforce
 - Base de Teste Completa por CRM (pós-configurações)
-- Salesforce Accounts read-only preview (C3.0) já validado localmente; aguarda push e espelho operacional
-- Salesforce Accounts pre-sync selection (C3.1) já validado localmente; aguarda push e espelho operacional
-- Salesforce Accounts pre-sync contract (C3.2) já validado localmente; aguarda push e espelho operacional
-- Salesforce Accounts read-only sync dry-run (C3.3) já validado localmente; aguarda push e espelho operacional
+- Salesforce Accounts read-only preview (C3.0) já validado localmente; espelhado operacionalmente
+- Salesforce Accounts pre-sync selection (C3.1) já validado localmente; espelhado operacionalmente
+- Salesforce Accounts pre-sync contract (C3.2) já validado localmente; espelhado operacionalmente
+- Salesforce Accounts read-only sync dry-run (C3.3) já validado localmente; espelhado operacionalmente
+- Salesforce multi-entity read-only preview (C4.0) já validado localmente; espelhado operacionalmente
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

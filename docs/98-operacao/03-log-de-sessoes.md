@@ -5,6 +5,25 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C4.0 (preview read-only multi-entidade Salesforce)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** adicionar um preview read-only multi-entidade de registros reais via OAuth persistido, sem sync, sem persistência de registros e sem ampliar o Salesforce para conector completo.
+- **Commit local:** `d8bbe2f` — `feat(settings): add Salesforce multi-entity read-only preview`
+- **O que foi materializado:**
+  - nova rota `GET /api/account-connectors/salesforce/oauth/preview?objects=Account,Contact,Opportunity,Lead,Campaign&limit=5`;
+  - helper `fetchObjectsPreview()` com allowlist por objeto e limite default 5 / máximo 10;
+  - `queryObjectPreview()` consultando `Account`, `Contact`, `Opportunity`, `Lead` e `Campaign` via SOQL read-only;
+  - falha parcial por entidade sem derrubar o preview inteiro;
+  - refresh de token corrigido no fluxo do preview multi-entidade;
+  - card visual `Preview read-only multi-entidade` com tabelas por entidade.
+- **Validação manual:** Fábio validou no browser o carregamento de Account, Contact, Opportunity, Lead e Campaign no preview multi-entidade.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** leitura via OAuth persistido; sem sync real; sem Supabase; sem importação; sem writeback; sem Bulk API; sem persistência; sem seleção multi-entidade; sem contrato multi-entidade; sem dry-run multi-entidade.
+- **Relação com o marco atual:** C4.0 amplia a leitura read-only de Salesforce para múltiplas entidades sem reabrir o fechamento operacional do Setup Read-only; o próximo recorte deve ser tratado cautelosamente como preparação posterior para sync read-only multi-entidade, não como conector completo.
+
+---
+
 ## [2026-05-03] — Salesforce C3.3 (dry-run read-only local de Accounts)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
