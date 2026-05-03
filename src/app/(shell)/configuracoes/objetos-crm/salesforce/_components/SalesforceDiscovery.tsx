@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, Loader2, ShieldCheck, XCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+  ShieldCheck,
+  XCircle,
+} from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type SalesforceObjectStatus = 'available' | 'unavailable' | 'no_permission' | 'error';
@@ -34,85 +42,134 @@ type DiscoveryState =
   | { phase: 'done'; discoveries: SalesforceObjectDiscovery[] }
   | { phase: 'error'; message: string };
 
-function StatusBadge({ status }: { status: SalesforceObjectStatus }) {
-  const map: Record<SalesforceObjectStatus, { label: string; className: string }> = {
-    available: { label: 'Disponível', className: 'bg-emerald-100 text-emerald-800' },
-    unavailable: { label: 'Indisponível', className: 'bg-slate-200 text-slate-700' },
-    no_permission: { label: 'Sem permissão', className: 'bg-amber-100 text-amber-800' },
-    error: { label: 'Erro', className: 'bg-red-100 text-red-700' },
-  };
-  const { label, className } = map[status];
+const STATUS_CONFIG: Record<
+  SalesforceObjectStatus,
+  { label: string; badgeCls: string; iconCls: string }
+> = {
+  available: {
+    label: 'Disponível',
+    badgeCls: 'bg-emerald-100 text-emerald-800',
+    iconCls: 'text-emerald-600',
+  },
+  unavailable: {
+    label: 'Indisponível',
+    badgeCls: 'bg-slate-100 text-slate-600',
+    iconCls: 'text-slate-400',
+  },
+  no_permission: {
+    label: 'Sem permissão',
+    badgeCls: 'bg-amber-100 text-amber-700',
+    iconCls: 'text-amber-500',
+  },
+  error: {
+    label: 'Erro',
+    badgeCls: 'bg-red-100 text-red-700',
+    iconCls: 'text-red-500',
+  },
+};
+
+function StatusIcon({ status, className }: { status: SalesforceObjectStatus; className?: string }) {
+  const cls = `h-4 w-4 shrink-0 ${STATUS_CONFIG[status].iconCls} ${className ?? ''}`;
+  if (status === 'available') return <CheckCircle2 className={cls} />;
+  if (status === 'no_permission') return <AlertCircle className={cls} />;
+  return <XCircle className={cls} />;
+}
+
+function coverageBar(present: number, total: number) {
+  if (total === 0) return null;
+  const pct = Math.round((present / total) * 100);
+  const color = pct === 100 ? 'bg-emerald-500' : pct >= 70 ? 'bg-blue-500' : 'bg-amber-400';
   return (
-    <span className={`inline-flex rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${className}`}>
-      {label}
-    </span>
+    <div className="flex items-center gap-2">
+      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-[10px] font-bold text-slate-500">
+        {present}/{total}
+      </span>
+    </div>
   );
 }
 
-function ObjectCard({ discovery }: { discovery: SalesforceObjectDiscovery }) {
+function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
   const [expanded, setExpanded] = useState(false);
-
-  const statusIcon = {
-    available: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
-    unavailable: <XCircle className="h-4 w-4 text-slate-400" />,
-    no_permission: <AlertCircle className="h-4 w-4 text-amber-500" />,
-    error: <XCircle className="h-4 w-4 text-red-500" />,
-  }[discovery.status];
+  const [showAllFields, setShowAllFields] = useState(false);
+  const cfg = STATUS_CONFIG[discovery.status];
+  const recTotal = discovery.recommendedFields.length + discovery.missingRecommendedFields.length;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white">
-      <div className="flex items-center justify-between gap-4 p-4">
-        <div className="flex items-center gap-3">
-          {statusIcon}
-          <div>
-            <p className="text-sm font-black text-slate-900">
-              {discovery.label}
-              <span className="ml-2 font-mono text-[10px] font-medium text-slate-400">
-                {discovery.objectApiName}
-              </span>
-            </p>
-            {discovery.readable && (
-              <p className="mt-0.5 text-xs font-medium text-slate-500">
-                {discovery.fieldCount} campos · {discovery.recommendedFields.length} recomendados presentes
-                {discovery.missingRecommendedFields.length > 0 && (
-                  <span className="ml-1 text-amber-600">
-                    · {discovery.missingRecommendedFields.length} ausentes
-                  </span>
-                )}
-              </p>
-            )}
-            {discovery.message && (
-              <p className="mt-0.5 text-xs font-medium text-slate-500">{discovery.message}</p>
-            )}
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+      {/* Header row */}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <StatusIcon status={discovery.status} />
+
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="min-w-0">
+            <span className="text-sm font-bold text-slate-900">{discovery.label}</span>
+            <span className="ml-2 font-mono text-[10px] text-slate-400">{discovery.objectApiName}</span>
           </div>
+
+          {discovery.readable && (
+            <div className="hidden items-center gap-4 sm:flex">
+              <span className="text-xs text-slate-400">
+                <span className="font-bold text-slate-700">{discovery.fieldCount}</span> campos
+              </span>
+              {coverageBar(discovery.recommendedFields.length, recTotal)}
+            </div>
+          )}
+
+          {!discovery.readable && discovery.message && (
+            <span className="truncate text-xs text-slate-400">{discovery.message}</span>
+          )}
         </div>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={discovery.status} />
+
+        <div className="flex shrink-0 items-center gap-2">
+          <span
+            className={`rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${cfg.badgeCls}`}
+          >
+            {cfg.label}
+          </span>
           {discovery.readable && (
             <button
               onClick={() => setExpanded((v) => !v)}
-              className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-colors hover:text-slate-700"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800"
             >
-              {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-              {expanded ? 'Recolher' : 'Campos'}
+              {expanded ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+              {expanded ? 'Recolher' : 'Detalhar'}
             </button>
           )}
         </div>
       </div>
 
+      {/* Mobile field summary */}
+      {discovery.readable && (
+        <div className="flex items-center gap-4 border-t border-slate-50 px-4 py-2 sm:hidden">
+          <span className="text-xs text-slate-400">
+            <span className="font-bold text-slate-700">{discovery.fieldCount}</span> campos
+          </span>
+          {coverageBar(discovery.recommendedFields.length, recTotal)}
+        </div>
+      )}
+
+      {/* Expandable detail */}
       {expanded && discovery.readable && (
-        <div className="border-t border-slate-100 p-4 space-y-4">
+        <div className="border-t border-slate-100 px-4 py-4 space-y-4">
+          {/* Recommended present */}
           {discovery.recommendedFields.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                Campos recomendados presentes
+              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                ✓ Recomendados presentes ({discovery.recommendedFields.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {discovery.recommendedFields.map((f) => (
                   <span
                     key={f.name}
                     title={`${f.label} · ${f.type}`}
-                    className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 font-mono text-[10px] font-bold text-emerald-800"
+                    className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800"
                   >
                     {f.name}
                   </span>
@@ -121,16 +178,17 @@ function ObjectCard({ discovery }: { discovery: SalesforceObjectDiscovery }) {
             </div>
           )}
 
+          {/* Missing recommended */}
           {discovery.missingRecommendedFields.length > 0 && (
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">
-                Campos recomendados ausentes / não mapeáveis
+              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-amber-600">
+                ✗ Ausentes / não mapeáveis ({discovery.missingRecommendedFields.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {discovery.missingRecommendedFields.map((name) => (
                   <span
                     key={name}
-                    className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 font-mono text-[10px] font-bold text-amber-700 line-through"
+                    className="rounded-md border border-amber-100 bg-amber-50 px-2 py-0.5 font-mono text-[10px] font-medium text-amber-600 line-through decoration-amber-400"
                   >
                     {name}
                   </span>
@@ -139,26 +197,63 @@ function ObjectCard({ discovery }: { discovery: SalesforceObjectDiscovery }) {
             </div>
           )}
 
+          {/* All fields toggle */}
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-              Todos os campos disponíveis ({discovery.fieldCount})
-            </p>
-            <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <div className="flex flex-wrap gap-1">
-                {discovery.fields.map((f) => (
-                  <span
-                    key={f.name}
-                    title={`${f.label} · ${f.type}`}
-                    className="rounded px-1.5 py-0.5 font-mono text-[9px] font-medium text-slate-500"
-                  >
-                    {f.name}
-                  </span>
-                ))}
+            <button
+              onClick={() => setShowAllFields((v) => !v)}
+              className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-slate-600"
+            >
+              {showAllFields ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+              Todos os {discovery.fieldCount} campos disponíveis
+            </button>
+
+            {showAllFields && (
+              <div className="mt-2 max-h-44 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50 p-3">
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {discovery.fields.map((f) => (
+                    <span
+                      key={f.name}
+                      title={`${f.label} · ${f.type}`}
+                      className="font-mono text-[9px] text-slate-500"
+                    >
+                      {f.name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function DiscoverySummary({ discoveries }: { discoveries: SalesforceObjectDiscovery[] }) {
+  const available = discoveries.filter((d) => d.status === 'available').length;
+  const noPermission = discoveries.filter((d) => d.status === 'no_permission').length;
+  const unavailable = discoveries.filter(
+    (d) => d.status === 'unavailable' || d.status === 'error',
+  ).length;
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
+        <p className="text-xl font-black text-emerald-700">{available}</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Disponíveis</p>
+      </div>
+      <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-center">
+        <p className="text-xl font-black text-amber-600">{noPermission}</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Sem permissão</p>
+      </div>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center">
+        <p className="text-xl font-black text-slate-500">{unavailable}</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Indisponíveis</p>
+      </div>
     </div>
   );
 }
@@ -193,11 +288,12 @@ export function SalesforceDiscovery() {
 
   return (
     <Card className="rounded-3xl border border-slate-200 p-6 space-y-5">
+      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h3 className="text-base font-black text-slate-900">Discovery read-only · Pré-sync</h3>
-          <p className="text-sm font-medium text-slate-600">
-            Lê metadados de Account, Contact e Opportunity via describe. Nenhum registro é importado.
+          <h3 className="text-base font-black text-slate-900">Discovery de objetos · Pré-sync</h3>
+          <p className="text-sm font-medium text-slate-500">
+            Lê metadados de Account, Contact, Opportunity, Lead e Campaign via describe.
           </p>
         </div>
         <button
@@ -210,9 +306,10 @@ export function SalesforceDiscovery() {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 flex items-start gap-2">
+      {/* Guardrail banner */}
+      <div className="flex items-start gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-        <div className="space-y-0.5">
+        <div>
           <p className="text-xs font-black text-blue-900">
             Nenhum registro será importado nesta etapa.
           </p>
@@ -222,10 +319,20 @@ export function SalesforceDiscovery() {
         </div>
       </div>
 
+      {/* States */}
       {state.phase === 'idle' && (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center">
+        <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-10 text-center">
           <p className="text-sm font-medium text-slate-400">
-            Clique em &quot;Executar discovery&quot; para consultar os objetos disponíveis na sua organização Salesforce.
+            Clique em &ldquo;Executar discovery&rdquo; para mapear os objetos disponíveis na sua organização.
+          </p>
+        </div>
+      )}
+
+      {state.phase === 'loading' && (
+        <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-10 text-center">
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-slate-400" />
+          <p className="mt-3 text-sm font-medium text-slate-400">
+            Consultando metadados via Salesforce describe...
           </p>
         </div>
       )}
@@ -238,15 +345,17 @@ export function SalesforceDiscovery() {
       )}
 
       {state.phase === 'done' && (
-        <div className="space-y-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-            Objetos detectados
-          </p>
-          {state.discoveries.map((d) => (
-            <ObjectCard key={d.objectApiName} discovery={d} />
-          ))}
-          <p className="pt-1 text-[10px] font-medium text-slate-400">
-            Lead foi excluído intencionalmente deste recorte. Sync não disponível nesta versão.
+        <div className="space-y-4">
+          <DiscoverySummary discoveries={state.discoveries} />
+
+          <div className="space-y-2">
+            {state.discoveries.map((d) => (
+              <ObjectRow key={d.objectApiName} discovery={d} />
+            ))}
+          </div>
+
+          <p className="text-[10px] font-medium text-slate-400">
+            Discovery read-only · Sync não disponível nesta versão.
           </p>
         </div>
       )}

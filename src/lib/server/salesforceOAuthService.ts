@@ -119,6 +119,8 @@ const RECOMMENDED_FIELDS: Record<string, string[]> = {
   Account: ['Id', 'Name', 'Website', 'Industry', 'Type', 'AnnualRevenue', 'NumberOfEmployees', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Contact: ['Id', 'AccountId', 'FirstName', 'LastName', 'Name', 'Email', 'Phone', 'Title', 'Department', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Opportunity: ['Id', 'AccountId', 'Name', 'StageName', 'Amount', 'CloseDate', 'Probability', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Lead: ['Id', 'Company', 'FirstName', 'LastName', 'Name', 'Email', 'Phone', 'Title', 'Status', 'LeadSource', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Campaign: ['Id', 'Name', 'Type', 'Status', 'StartDate', 'EndDate', 'BudgetedCost', 'ActualCost', 'ExpectedRevenue', 'IsActive', 'CreatedDate', 'LastModifiedDate'],
 };
 
 type ConnectionRow = {
@@ -700,7 +702,7 @@ export async function fetchMultiObjectDiscovery(
   accessToken: string,
   apiVersion = DEFAULT_API_VERSION,
 ): Promise<SalesforceObjectDiscovery[]> {
-  const objects = ['Account', 'Contact', 'Opportunity'];
+  const objects = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
   const results = await Promise.allSettled(
     objects.map((obj) => fetchObjectDescribe(instanceUrl, accessToken, obj, apiVersion)),
   );
