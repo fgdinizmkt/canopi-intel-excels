@@ -5,6 +5,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C3.1 (seleção controlada de Accounts para pré-sync read-only)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** adicionar uma camada local de seleção controlada sobre os Accounts carregados no preview read-only, preparando visualmente uma futura etapa de sync read-only sem persistir nada.
+- **Commit local:** `e407cbc` — `feat(settings): add Salesforce Accounts pre-sync selection`
+- **O que foi materializado:**
+  - checkbox por linha na tabela de Accounts do preview;
+  - seleção múltipla e “selecionar todos os registros carregados”;
+  - contador de selecionados;
+  - botão `Preparar seleção`;
+  - resumo local `Seleção preparada para pré-sync read-only` com válidos para pré-sync read-only e registros com lacunas;
+  - lacunas avaliadas por registro: sem Id, sem Name, sem Website, sem Industry.
+- **Validação manual:** Fábio validou no browser o carregamento, a seleção, a seleção múltipla, o preparo da seleção e o resumo local.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** seleção local da sessão; sem sync real; sem Supabase; sem importação; sem writeback; sem Bulk API; sem persistência; sem alteração de camada canônica.
+- **Relação com o marco atual:** C3.1 prepara visualmente a seleção read-only para um futuro sync read-only de Accounts sem reabrir o fechamento operacional do Setup Read-only.
+
 ## [2026-05-03] — Salesforce C3.0 (preview read-only de Accounts via OAuth)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
