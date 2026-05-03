@@ -6,6 +6,7 @@ import { CheckCircle2, Circle, FileJson, KeyRound, Loader2, Network, XCircle } f
 import { Card, Badge } from '@/src/components/ui';
 import { SalesforceCsvPreparation } from './SalesforceCsvPreparation';
 import { SalesforceDiscovery } from './SalesforceDiscovery';
+import { SalesforceMultiEntityPreview } from './SalesforceMultiEntityPreview';
 
 type SalesforceMethod = 'oauth' | 'token' | 'csv';
 type TestStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -1935,6 +1936,8 @@ export function SalesforceMethodSelector() {
                 </div>
               )}
             </Card>
+
+            <SalesforceMultiEntityPreview oauthConnected={oauthConnected} />
           </div>
         )}
 

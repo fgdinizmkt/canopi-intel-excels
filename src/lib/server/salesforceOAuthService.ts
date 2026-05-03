@@ -872,6 +872,207 @@ export async function fetchAccountsPreview(limitInput = DEFAULT_ACCOUNTS_PREVIEW
   }
 }
 
+// ─── Multi-entity preview ───────────────────────────────────────────────────
+
+export const PREVIEW_ALLOWLIST: Record<string, string[]> = {
+  Account: ['Id', 'Name', 'Website', 'Industry', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Contact: ['Id', 'AccountId', 'Name', 'Email', 'Title', 'Department', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Opportunity: ['Id', 'AccountId', 'Name', 'StageName', 'Amount', 'CloseDate', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Lead: ['Id', 'Company', 'Name', 'Email', 'Status', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  Campaign: ['Id', 'Name', 'Type', 'Status', 'StartDate', 'EndDate', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+};
+
+const DEFAULT_OBJECTS_PREVIEW_LIMIT = 5;
+const MAX_OBJECTS_PREVIEW_LIMIT = 10;
+
+export type SalesforceObjectPreviewValue = string | number | boolean | null;
+
+export interface SalesforceObjectPreviewResult {
+  objectApiName: string;
+  label: string;
+  limit: number;
+  totalSize: number;
+  fields: string[];
+  records: Record<string, SalesforceObjectPreviewValue>[];
+  status: 'success' | 'error';
+  error: string | null;
+  testedAt: string;
+  needsRefresh?: boolean;
+}
+
+export function normalizeObjectsPreviewLimit(rawLimit: number | string | null | undefined): number {
+  const parsed = typeof rawLimit === 'string' ? Number(rawLimit) : rawLimit;
+  if (!Number.isFinite(parsed as number)) return DEFAULT_OBJECTS_PREVIEW_LIMIT;
+  const limit = Math.trunc(Number(parsed));
+  if (limit <= 0) return DEFAULT_OBJECTS_PREVIEW_LIMIT;
+  return Math.min(limit, MAX_OBJECTS_PREVIEW_LIMIT);
+}
+
+async function queryObjectPreview(
+  instanceUrl: string,
+  accessToken: string,
+  objectApiName: string,
+  apiVersion: string,
+  limit: number,
+): Promise<SalesforceObjectPreviewResult> {
+  const fields = PREVIEW_ALLOWLIST[objectApiName] || [];
+  if (!fields.length) {
+    return {
+      objectApiName,
+      label: objectApiName,
+      limit,
+      totalSize: 0,
+      fields: [],
+      records: [],
+      status: 'error',
+      error: 'Objeto não está na lista permitida de preview.',
+      testedAt: new Date().toISOString(),
+      needsRefresh: false,
+    };
+  }
+
+  const soql = `SELECT ${fields.join(', ')} FROM ${objectApiName} ORDER BY LastModifiedDate DESC LIMIT ${limit}`;
+  const queryUrl = new URL(`${instanceUrl}/services/data/${apiVersion}/query`);
+  queryUrl.searchParams.set('q', soql);
+
+  try {
+    const res = await fetch(queryUrl.toString(), {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store',
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      return {
+        objectApiName,
+        label: objectApiName,
+        limit,
+        totalSize: 0,
+        fields,
+        records: [],
+        status: 'error',
+        error: 'Sem permissão de leitura para este objeto.',
+        testedAt: new Date().toISOString(),
+        needsRefresh: true,
+      };
+    }
+
+    if (!res.ok) {
+      return {
+        objectApiName,
+        label: objectApiName,
+        limit,
+        totalSize: 0,
+        fields,
+      records: [],
+      status: 'error',
+      error: 'Não foi possível carregar o preview deste objeto.',
+      testedAt: new Date().toISOString(),
+      needsRefresh: false,
+    };
+    }
+
+    const payload = (await res.json().catch(() => null)) as {
+      totalSize?: number;
+      done?: boolean;
+      records?: Array<Record<string, unknown>>;
+    } | null;
+
+    const records = Array.isArray(payload?.records)
+      ? payload.records.map((raw) => {
+          const record: Record<string, SalesforceObjectPreviewValue> = {};
+          for (const field of fields) {
+            const v = raw[field];
+            if (v === null || v === undefined) {
+              record[field] = null;
+            } else if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+              record[field] = v;
+            } else {
+              record[field] = String(v);
+            }
+          }
+          return record;
+        })
+      : [];
+
+    return {
+      objectApiName,
+      label: objectApiName,
+      limit,
+      totalSize: typeof payload?.totalSize === 'number' ? payload.totalSize : records.length,
+      fields,
+      records,
+      status: 'success',
+      error: null,
+      testedAt: new Date().toISOString(),
+    };
+  } catch {
+    return {
+      objectApiName,
+      label: objectApiName,
+      limit,
+      totalSize: 0,
+      fields,
+      records: [],
+      status: 'error',
+      error: 'Erro inesperado ao carregar preview deste objeto.',
+      testedAt: new Date().toISOString(),
+      needsRefresh: false,
+    };
+  }
+}
+
+export async function fetchObjectsPreview(
+  objectApiNames: string[],
+  limitInput: number | string | null | undefined = DEFAULT_OBJECTS_PREVIEW_LIMIT,
+): Promise<SalesforceObjectPreviewResult[]> {
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  const allowedObjects = objectApiNames.filter((o) => Boolean(PREVIEW_ALLOWLIST[o]));
+  if (!allowedObjects.length) throw new Error('NO_ALLOWED_OBJECTS');
+
+  const limit = normalizeObjectsPreviewLimit(limitInput);
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  const runAll = (token: string, url: string) =>
+    Promise.all(allowedObjects.map((obj) => queryObjectPreview(url, token, obj, apiVersion, limit)));
+
+  const firstPass = await runAll(accessToken, instanceUrl);
+  const shouldRefresh = firstPass.some((result) => result.needsRefresh === true);
+
+  if (shouldRefresh && refreshToken) {
+    const refreshed = await refreshAccessToken(refreshToken, config);
+    accessToken = refreshed.access_token?.trim() || '';
+    if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+    if (refreshed.instance_url?.trim()) instanceUrl = refreshed.instance_url.trim();
+
+    await updateOAuthConnectionPatch({
+      status: 'connected',
+      instance_url: instanceUrl,
+      access_token_encrypted: encryptToken(accessToken),
+      access_token_issued_at: refreshed.issued_at
+        ? new Date(Number(refreshed.issued_at)).toISOString()
+        : new Date().toISOString(),
+      scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+      last_health_check_at: new Date().toISOString(),
+      error_message: null,
+    });
+
+    return await runAll(accessToken, instanceUrl);
+  }
+
+  return firstPass;
+}
+
+// ─── Revoke ──────────────────────────────────────────────────────────────────
+
 export async function revokeAndDisconnect(): Promise<void> {
   const cfg = await getOAuthConfigStatus();
   const row = await getOAuthConnection();
