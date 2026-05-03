@@ -1,4 +1,4 @@
-const BASE_URL = process.env.CSS_CHECK_BASE_URL || 'http://127.0.0.1:3053';
+const BASE_URL = process.env.CSS_CHECK_BASE_URL || 'http://localhost:3053';
 
 function fail(message) {
   console.error(`ERRO: ${message}`);

@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
 const DEV_PORT = 3053;
-const DEV_HOST = '127.0.0.1';
+const DEV_HOST = 'localhost';
 
 function run(command, args, options = {}) {
   return spawnSync(command, args, { encoding: 'utf8', maxBuffer: 1024 * 1024 * 4, ...options });
