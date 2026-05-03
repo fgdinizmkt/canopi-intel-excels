@@ -5,6 +5,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C3.2 (contrato local de pré-sync read-only de Accounts)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** transformar a seleção preparada no C3.1 em um contrato local de pré-sync read-only, somente visual e em estado local da sessão.
+- **Commit local:** `8bf34c2` — `feat(settings): add Salesforce Accounts pre-sync contract`
+- **O que foi materializado:**
+  - contrato local com timestamp de criação, origem `Salesforce OAuth`, objeto `Account`, modo `read-only` e limite usado no preview;
+  - totais de carregados, selecionados, válidos e com lacunas;
+  - campos considerados: `Id`, `Name`, `Website`, `Industry`, `Type`, `OwnerId`, `CreatedDate`, `LastModifiedDate`;
+  - lista dos registros selecionados com `Id`, `Name`, `Website`, `Industry`, `Type`, `OwnerId`, status e lacunas;
+  - card `Contrato local de pré-sync read-only` com resumo e tabela compacta;
+  - UX refinada com feedback visual nos botões, estado de sucesso, scroll suave e destaque do contrato.
+- **Validação manual:** Fábio validou no browser o carregamento, a seleção, o preparo da seleção, a geração do contrato local, o scroll e o destaque.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** contrato local desta sessão; sem sync real; sem Supabase; sem importação; sem writeback; sem Bulk API; sem persistência; sem alteração de camada canônica.
+- **Relação com o marco atual:** C3.2 consolida visualmente o contrato local de Accounts sem reabrir o fechamento operacional do Setup Read-only.
+
 ## [2026-05-03] — Salesforce C3.1 (seleção controlada de Accounts para pré-sync read-only)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
