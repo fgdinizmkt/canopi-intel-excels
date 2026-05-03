@@ -41,10 +41,10 @@ interface EntityConfig {
   label: string;
   sfFields: Record<string, string>;
   altFields: Record<string, string>;
-  requiredOr: Array<{ label: string; mode: 'any' | 'all'; fields: string[] }>;
-  recommendedLabels: string[];
-  linkage?: { label: string; fieldsAny: string[]; required: boolean };
+  requiredGroupA: { title: string; fields: string[] };
+  requiredGroupB: { title: string; fields: string[] };
   targetFieldGroups: { group: string; fields: string[] }[];
+  recommendedLabels: string[];
   primaryIdKey: string;
   primaryNameKey: string;
   altNameKey?: string;
@@ -83,7 +83,14 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       country: 'País',
       region: 'Região',
     },
-    requiredOr: [{ label: 'Nome da conta', mode: 'any', fields: ['Account Name', 'Nome da conta para preview'] }],
+    requiredGroupA: {
+      title: 'Nome da conta',
+      fields: ['Account Name', 'Nome da conta para preview'],
+    },
+    requiredGroupB: {
+      title: 'Identificação ou desambiguação',
+      fields: ['Account Id', 'Domínio', 'Website', 'Documento local'],
+    },
     targetFieldGroups: [
       {
         group: 'Salesforce Account',
@@ -94,7 +101,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
         fields: ['Nome da conta para preview', 'Domínio', 'Owner local', 'Estágio local', 'Documento local', 'Segmento local', 'Tamanho da empresa', 'Receita estimada local', 'País', 'Região'],
       },
     ],
-    recommendedLabels: ['Website', 'Industry', 'Account Type', 'Receita anual', 'Funcionários'],
+    recommendedLabels: ['Industry', 'Owner', 'Account Type', 'Billing City', 'Billing State', 'Billing Country', 'Segmento local', 'Estágio local', 'Receita estimada local'],
     primaryIdKey: 'id',
     primaryNameKey: 'name',
     altNameKey: 'account_name',
@@ -126,11 +133,14 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       contact_email: 'Email local',
       contact_name: 'Nome local',
     },
-    requiredOr: [
-      { label: 'Nome do contato', mode: 'any', fields: ['Full Name'] },
-      { label: 'Nome do contato (First + Last)', mode: 'all', fields: ['First Name', 'Last Name'] },
-    ],
-    linkage: { label: 'Vínculo com Account', fieldsAny: ['Account Id', 'Account Name', 'Nome da conta para preview'], required: false },
+    requiredGroupA: {
+      title: 'Nome do contato',
+      fields: ['Full Name', 'Last Name', 'Nome local'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Contact Id', 'Email', 'Email local'],
+    },
     targetFieldGroups: [
       {
         group: 'Salesforce Contact',
@@ -138,7 +148,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       },
       { group: 'Canopi local', fields: ['Email local', 'Nome local'] },
     ],
-    recommendedLabels: ['Email', 'Phone', 'Title', 'Department'],
+    recommendedLabels: ['Email', 'Phone', 'Title', 'Account Id'],
     primaryIdKey: 'id',
     primaryNameKey: 'name',
     altNameKey: 'lastname',
@@ -166,15 +176,21 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       lastmodifieddate: 'Last Modified Date',
     },
     altFields: {},
-    requiredOr: [{ label: 'Nome da oportunidade', mode: 'any', fields: ['Opportunity Name'] }],
-    linkage: { label: 'Vínculo com Account', fieldsAny: ['Account Id', 'Account Name', 'Nome da conta para preview'], required: false },
+    requiredGroupA: {
+      title: 'Nome da oportunidade',
+      fields: ['Opportunity Name'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Opportunity Id', 'Account Id'],
+    },
     targetFieldGroups: [
       {
         group: 'Salesforce Opportunity',
         fields: ['Opportunity Id', 'Opportunity Name', 'Account Id', 'Stage', 'Amount', 'Close Date', 'Probability', 'Type', 'Owner', 'Created Date', 'Last Modified Date'],
       },
     ],
-    recommendedLabels: ['Stage', 'Amount', 'Close Date', 'Probability'],
+    recommendedLabels: ['Stage', 'Amount', 'Close Date', 'Account Id', 'Probability'],
     primaryIdKey: 'id',
     primaryNameKey: 'name',
     exampleCsv: [
@@ -203,14 +219,21 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       lastmodifieddate: 'Last Modified Date',
     },
     altFields: {},
-    requiredOr: [{ label: 'Company + LastName', mode: 'all', fields: ['Company', 'Last Name'] }],
+    requiredGroupA: {
+      title: 'Nome ou empresa',
+      fields: ['Full Name', 'Last Name', 'Company'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Lead Id', 'Email'],
+    },
     targetFieldGroups: [
       {
         group: 'Salesforce Lead',
         fields: ['Lead Id', 'First Name', 'Last Name', 'Full Name', 'Company', 'Email', 'Phone', 'Title', 'Status', 'Lead Source', 'Owner', 'Created Date', 'Last Modified Date'],
       },
     ],
-    recommendedLabels: ['Email', 'Phone', 'Title', 'Status', 'Lead Source'],
+    recommendedLabels: ['Company', 'Email', 'Status', 'Lead Source', 'Phone'],
     primaryIdKey: 'id',
     primaryNameKey: 'name',
     altNameKey: 'company',
@@ -240,14 +263,21 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       lastmodifieddate: 'Last Modified Date',
     },
     altFields: {},
-    requiredOr: [{ label: 'Nome da campanha', mode: 'any', fields: ['Campaign Name'] }],
+    requiredGroupA: {
+      title: 'Nome da campanha',
+      fields: ['Campaign Name'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Campaign Id'],
+    },
     targetFieldGroups: [
       {
         group: 'Salesforce Campaign',
         fields: ['Campaign Id', 'Campaign Name', 'Type', 'Status', 'Start Date', 'End Date', 'Budgeted Cost', 'Actual Cost', 'Expected Revenue', 'Is Active', 'Owner', 'Created Date', 'Last Modified Date'],
       },
     ],
-    recommendedLabels: ['Type', 'Status', 'Start Date', 'End Date', 'Budgeted Cost', 'Actual Cost', 'Expected Revenue'],
+    recommendedLabels: ['Type', 'Status', 'Start Date', 'End Date', 'Is Active'],
     primaryIdKey: 'id',
     primaryNameKey: 'name',
     exampleCsv: [
@@ -462,11 +492,10 @@ export function SalesforceCsvPreparation() {
     () => new Set(Object.values(entityConfig.altFields)),
     [entityConfig],
   );
-  const allRequiredLabels = React.useMemo(() => {
-    const items: string[] = [];
-    for (const rule of entityConfig.requiredOr) items.push(...rule.fields);
-    return new Set(items);
-  }, [entityConfig]);
+  const allRequiredLabels = React.useMemo(
+    () => new Set([...entityConfig.requiredGroupA.fields, ...entityConfig.requiredGroupB.fields]),
+    [entityConfig],
+  );
 
   function handleEntityChange(newEntity: CrmEntity) {
     setEntity(newEntity);
@@ -491,37 +520,19 @@ export function SalesforceCsvPreparation() {
     return { recognized, alternative, unrecognized, ignored };
   }, [analysis, adjustments, sfFieldLabelSet, altFieldLabelSet]);
 
-  const governance = React.useMemo(() => {
-    if (!analysis) return { requiredMet: false, missingRequired: [] as string[], linkageOk: true, linkageMissing: [] as string[] };
-
-    const effective = new Set<string>();
+  const requiredGroups = React.useMemo(() => {
+    if (!analysis) return { groupA: false, groupB: false, allMet: false };
+    const groupASet = new Set(entityConfig.requiredGroupA.fields);
+    const groupBSet = new Set(entityConfig.requiredGroupB.fields);
+    let groupA = false;
+    let groupB = false;
     for (const col of analysis.columnReadings) {
       const adj = adjustments[col.header] ?? { action: 'suggest', overrideField: '' };
       const label = getEffectiveLabel(col, adj);
-      if (label && label !== '—') effective.add(label);
+      if (groupASet.has(label)) groupA = true;
+      if (groupBSet.has(label)) groupB = true;
     }
-
-    const missingRequired: string[] = [];
-    const requiredMet = entityConfig.requiredOr.some((rule) => {
-      if (rule.mode === 'any') return rule.fields.some((f) => effective.has(f));
-      return rule.fields.every((f) => effective.has(f));
-    });
-
-    if (!requiredMet) {
-      // For reporting, show union of fields from the first rule as a hint.
-      const first = entityConfig.requiredOr[0];
-      if (first) missingRequired.push(...first.fields);
-    }
-
-    let linkageOk = true;
-    let linkageMissing: string[] = [];
-    if (entityConfig.linkage) {
-      const ok = entityConfig.linkage.fieldsAny.some((f) => effective.has(f));
-      linkageOk = ok || !entityConfig.linkage.required;
-      if (!ok) linkageMissing = [...entityConfig.linkage.fieldsAny];
-    }
-
-    return { requiredMet, missingRequired, linkageOk, linkageMissing };
+    return { groupA, groupB, allMet: groupA && groupB };
   }, [analysis, adjustments, entityConfig]);
 
   const confirmationSummary = React.useMemo(() => {
@@ -541,7 +552,7 @@ export function SalesforceCsvPreparation() {
   }, [analysis, adjustments]);
 
   const phase = confirmed ? 4 : analysis ? 3 : 2;
-  const canConfirm = governance.requiredMet && blockingErrors.length === 0;
+  const canConfirm = requiredGroups.allMet && blockingErrors.length === 0;
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -668,37 +679,44 @@ export function SalesforceCsvPreparation() {
         })}
       </div>
 
-      {/* ── BLOCO 1: Contrato mínimo ── */}
+      {/* ── BLOCO 1: Requisitos ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-5">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">2. Contrato mínimo da entidade</p>
-          <p className="mt-1 text-sm font-black text-slate-900">Contrato mínimo da entidade</p>
-          <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
-            A Canopi valida requisitos mínimos antes de permitir a preparação local.
-          </p>
-        </div>
+        <p className="text-sm font-black text-slate-900">
+          Requisitos do CSV Salesforce {entityConfig.label}
+        </p>
 
         {/* Obrigatórios */}
         <div className="space-y-3">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Campos obrigatórios
+            Obrigatórios para confirmação local
           </p>
-          <div className="space-y-2">
-            {entityConfig.requiredOr.map((rule) => (
-              <div key={rule.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-                <p className="text-xs font-black text-slate-800">{rule.label}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {rule.fields.map((f) => (
-                    <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
-                      {f}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[11px] font-medium text-slate-500">
-                  {rule.mode === 'any' ? 'Pelo menos um desses campos deve estar presente e não ignorado.' : 'Todos esses campos devem estar presentes e não ignorados.'}
-                </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupA.title}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {entityConfig.requiredGroupA.fields.map((f) => (
+                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
+                    {f}
+                  </span>
+                ))}
               </div>
-            ))}
+              <p className="text-[11px] font-medium text-slate-500">
+                Pelo menos um desses campos deve estar presente e não ignorado.
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupB.title}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {entityConfig.requiredGroupB.fields.map((f) => (
+                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
+                    {f}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[11px] font-medium text-slate-500">
+                Pelo menos um desses campos garante identificação na leitura local.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -717,38 +735,6 @@ export function SalesforceCsvPreparation() {
           <p className="text-[11px] font-medium leading-relaxed text-slate-500">
             Campos adicionais enriquecem a leitura local sem serem obrigatórios para confirmar.
           </p>
-        </div>
-
-        {entityConfig.linkage && (
-          <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Vínculo necessário
-            </p>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-              <p className="text-xs font-black text-slate-800">{entityConfig.linkage.label}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {entityConfig.linkage.fieldsAny.map((f) => (
-                  <span key={f} className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-slate-600">
-                    {f}
-                  </span>
-                ))}
-              </div>
-              <p className="text-[11px] font-medium text-slate-500">
-                {entityConfig.linkage.required ? 'Obrigatório nesta versão.' : 'Recomendado nesta versão; a Canopi alerta quando estiver ausente.'}
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-            Regra de bloqueio
-          </p>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-sm font-medium text-slate-700">
-              A confirmação local só fica disponível quando os campos obrigatórios estiverem reconhecidos ou ajustados na leitura local.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -826,7 +812,7 @@ export function SalesforceCsvPreparation() {
                       {analysis.compatibility}
                     </span>
                   </div>
-                  {governance.requiredMet ? (
+                  {requiredGroups.allMet ? (
                     <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-100 px-3 py-2 text-[10px] font-black text-emerald-800">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Campos obrigatórios atendidos
@@ -1069,7 +1055,7 @@ export function SalesforceCsvPreparation() {
           {/* BLOCO 6: Gate de campos obrigatórios + botão confirmar */}
           {!confirmed && (
             <div className="space-y-3">
-              {!governance.requiredMet && (
+              {!requiredGroups.allMet && (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-4">
                   <div className="flex items-start gap-2">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
@@ -1078,23 +1064,49 @@ export function SalesforceCsvPreparation() {
                         Antes de confirmar, ajuste os campos obrigatórios
                       </p>
                       <p className="mt-0.5 text-[11px] font-medium text-amber-800">
-                        Para confirmar a preparação local, a Canopi precisa reconhecer os campos obrigatórios do contrato mínimo da entidade.
+                        Para confirmar a preparação local, a Canopi precisa identificar pelo menos o {entityConfig.requiredGroupA.title.toLowerCase()} e a {entityConfig.requiredGroupB.title.toLowerCase()}.
                       </p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="rounded-xl border border-amber-200 bg-white px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
-                        <p className="text-sm font-black text-slate-800">Campos obrigatórios</p>
-                        <span className="ml-auto text-[10px] font-black uppercase tracking-widest text-amber-700">
-                          Pendente
-                        </span>
+                    {([
+                      {
+                        key: 'groupA',
+                        label: entityConfig.requiredGroupA.title,
+                        met: requiredGroups.groupA,
+                        resolve: `Selecione uma coluna como ${entityConfig.requiredGroupA.fields.slice(0, 2).join(' ou ')}.`,
+                      },
+                      {
+                        key: 'groupB',
+                        label: entityConfig.requiredGroupB.title,
+                        met: requiredGroups.groupB,
+                        resolve: `Selecione uma coluna como ${entityConfig.requiredGroupB.fields.slice(0, 2).join(', ')} ou similar.`,
+                      },
+                    ] as { key: string; label: string; met: boolean; resolve: string }[]).map(({ key, label, met, resolve }) => (
+                      <div
+                        key={key}
+                        className={`rounded-xl border px-4 py-3 ${met ? 'border-emerald-200 bg-white' : 'border-amber-200 bg-white'}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {met ? (
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 shrink-0 text-amber-500" />
+                          )}
+                          <p className={`text-sm font-black ${met ? 'text-emerald-900' : 'text-slate-800'}`}>
+                            {label}
+                          </p>
+                          <span className={`ml-auto text-[10px] font-black uppercase tracking-widest ${met ? 'text-emerald-700' : 'text-amber-700'}`}>
+                            {met ? 'Atendido' : 'Pendente'}
+                          </span>
+                        </div>
+                        {!met && (
+                          <p className="mt-1.5 pl-6 text-[11px] font-medium text-amber-800">
+                            {resolve}
+                          </p>
+                        )}
                       </div>
-                      <p className="mt-1.5 pl-6 text-[11px] font-medium text-amber-800">
-                        Ajuste uma coluna para atender: {entityConfig.requiredOr.map((r) => r.label).join(' ou ')}.
-                      </p>
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}

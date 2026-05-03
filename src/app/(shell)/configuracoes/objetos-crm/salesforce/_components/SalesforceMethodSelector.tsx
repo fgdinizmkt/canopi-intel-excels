@@ -421,10 +421,52 @@ export function SalesforceMethodSelector() {
     if (!lastValidationPulseAt) return false;
     return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
   }, [lastValidationPulseAt]);
+  const wizardStep = useMemo(() => {
+    if (selected === 'oauth') {
+      if (oauthConnected) return 3;
+      if (oauthConfigured) return 2;
+      return 1;
+    }
+    if (selected === 'csv') return 2;
+    return 2;
+  }, [oauthConnected, oauthConfigured, selected]);
+
   return (
     <div className="space-y-4">
+      <Card className="rounded-3xl border border-slate-200 bg-white p-5">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Setup guiado</p>
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-5">
+          {(
+            [
+              ['1', 'Escolher origem'],
+              ['2', 'Validar acesso ou arquivo'],
+              ['3', 'Ler metadados / preparar colunas'],
+              ['4', 'Revisar mapeamento'],
+              ['5', 'Pronto para próxima etapa'],
+            ] as [string, string][]
+          ).map(([n, label], idx) => {
+            const active = idx + 1 <= wizardStep;
+            return (
+              <div
+                key={n}
+                className={`rounded-2xl border p-3 ${active ? 'border-blue-200 bg-blue-50' : 'border-slate-200 bg-slate-50'}`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex h-6 w-6 items-center justify-center rounded-xl text-[10px] font-black ${
+                    active ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {n}
+                  </span>
+                  <p className={`text-xs font-black ${active ? 'text-slate-900' : 'text-slate-600'}`}>{label}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {METHODS.filter((m) => m.id !== 'token').map((method) => {
+        {METHODS.map((method) => {
           const isActive = method.id === selected;
           const isPrimary = method.id === 'oauth';
           return (
@@ -474,19 +516,6 @@ export function SalesforceMethodSelector() {
             </button>
           );
         })}
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-          <p className="text-sm font-black text-slate-900">Teste técnico</p>
-          <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
-            Use token temporário para um teste pontual de leitura Account/describe. Nada será salvo.
-          </p>
-          <button
-            type="button"
-            onClick={() => setSelected('token')}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            Teste com token temporário
-          </button>
-        </div>
       </div>
 
       <Card
