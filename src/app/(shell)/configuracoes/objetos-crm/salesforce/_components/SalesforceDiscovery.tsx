@@ -290,7 +290,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                 })}
               </div>
               <p className="mt-1.5 text-[10px] font-medium text-slate-400">
-                Edição e persistência do mapeamento entram no próximo recorte.
+                Mapeamento editável será disponibilizado em versão futura.
               </p>
             </div>
           )}

@@ -97,9 +97,9 @@ const METHODS: MethodDefinition[] = [
   },
   {
     id: 'token',
-    title: 'Token temporário',
-    description: 'Validação controlada de acesso e leitura para verificar objeto, campos e permissão da fonte.',
-    badge: 'Validação',
+    title: 'Validação pontual',
+    description: 'Use para validar acesso pontual. Nada será salvo.',
+    badge: 'Efêmero',
     badgeVariant: 'amber',
     icon: <KeyRound className="h-4 w-4" />,
     panel: { lines: [] },
@@ -427,21 +427,30 @@ export function SalesforceMethodSelector() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {METHODS.map((method) => {
           const isActive = method.id === selected;
+          const isSecondary = method.id === 'token';
           return (
             <button
               key={method.id}
               type="button"
               onClick={() => setSelected(method.id)}
-              className={`group w-full rounded-3xl border p-6 text-left transition-all ${
-                isActive
+              className={`group w-full rounded-3xl border text-left transition-all ${
+                isSecondary ? 'p-4' : 'p-6'
+              } ${
+                isActive && !isSecondary
                   ? 'border-blue-300 bg-blue-50 shadow-md shadow-blue-100'
+                  : isActive && isSecondary
+                  ? 'border-slate-300 bg-slate-100'
+                  : isSecondary
+                  ? 'border-slate-100 bg-slate-50 hover:border-slate-200'
                   : 'border-slate-200 bg-white hover:border-blue-200 hover:shadow-sm'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div
-                  className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'
+                  className={`mt-0.5 flex shrink-0 items-center justify-center rounded-xl transition-colors ${
+                    isSecondary ? 'h-6 w-6' : 'h-8 w-8'
+                  } ${
+                    isActive ? 'bg-blue-100 text-blue-700' : isSecondary ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'
                   }`}
                 >
                   {method.icon}
@@ -453,13 +462,15 @@ export function SalesforceMethodSelector() {
                 </Badge>
               </div>
               <h3
-                className={`mt-4 text-base font-black transition-colors ${
-                  isActive ? 'text-blue-900' : 'text-slate-900 group-hover:text-blue-800'
+                className={`transition-colors ${
+                  isSecondary ? 'mt-3 text-sm font-bold' : 'mt-4 text-base font-black'
+                } ${
+                  isActive ? 'text-blue-900' : isSecondary ? 'text-slate-500' : 'text-slate-900 group-hover:text-blue-800'
                 }`}
               >
                 {method.title}
               </h3>
-              <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+              <p className={`mt-1.5 leading-relaxed ${isSecondary ? 'text-xs font-medium text-slate-400' : 'mt-2 text-sm font-medium text-slate-600'}`}>
                 {method.description}
               </p>
             </button>

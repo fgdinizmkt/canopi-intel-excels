@@ -5,6 +5,7 @@ import { AlertCircle, CheckCircle2, Download, X } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+type CrmEntity = 'Account' | 'Contact' | 'Opportunity' | 'Lead' | 'Campaign';
 type ColumnRecognitionType = 'salesforce' | 'alternative' | 'unrecognized';
 type ColumnAction = 'suggest' | 'override' | 'ignore';
 
@@ -36,72 +37,260 @@ interface CsvAnalysis {
   unrecognizedCount: number;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+interface EntityConfig {
+  label: string;
+  sfFields: Record<string, string>;
+  altFields: Record<string, string>;
+  requiredGroupA: { title: string; fields: string[] };
+  requiredGroupB: { title: string; fields: string[] };
+  targetFieldGroups: { group: string; fields: string[] }[];
+  recommendedLabels: string[];
+  primaryIdKey: string;
+  primaryNameKey: string;
+  altNameKey?: string;
+  exampleCsv: string;
+  filename: string;
+}
 
-const SALESFORCE_FIELDS: Record<string, string> = {
-  id: 'Account Id',
-  name: 'Account Name',
-  type: 'Account Type',
-  industry: 'Industry',
-  website: 'Website',
-  phone: 'Phone',
-  ownerid: 'Owner',
-  createddate: 'Created Date',
-  lastmodifieddate: 'Last Modified Date',
-  billingcity: 'Billing City',
-  billingstate: 'Billing State',
-  billingcountry: 'Billing Country',
+// ─── Entity Configs ───────────────────────────────────────────────────────────
+
+const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
+  Account: {
+    label: 'Account',
+    sfFields: {
+      id: 'Account Id',
+      name: 'Account Name',
+      type: 'Account Type',
+      industry: 'Industry',
+      website: 'Website',
+      phone: 'Phone',
+      ownerid: 'Owner',
+      createddate: 'Created Date',
+      lastmodifieddate: 'Last Modified Date',
+      billingcity: 'Billing City',
+      billingstate: 'Billing State',
+      billingcountry: 'Billing Country',
+    },
+    altFields: {
+      account_name: 'Nome da conta para preview',
+      domain: 'Domínio',
+      owner_name: 'Owner local',
+      lifecycle_stage: 'Estágio local',
+      cnpj: 'Documento local',
+      segment: 'Segmento local',
+      company_size: 'Tamanho da empresa',
+      annual_revenue_brl: 'Receita estimada local',
+      country: 'País',
+      region: 'Região',
+    },
+    requiredGroupA: {
+      title: 'Nome da conta',
+      fields: ['Account Name', 'Nome da conta para preview'],
+    },
+    requiredGroupB: {
+      title: 'Identificação ou desambiguação',
+      fields: ['Account Id', 'Domínio', 'Website', 'Documento local'],
+    },
+    targetFieldGroups: [
+      {
+        group: 'Salesforce Account',
+        fields: ['Account Id', 'Account Name', 'Account Type', 'Industry', 'Website', 'Phone', 'Owner', 'Created Date', 'Last Modified Date', 'Billing City', 'Billing State', 'Billing Country'],
+      },
+      {
+        group: 'Canopi local',
+        fields: ['Nome da conta para preview', 'Domínio', 'Owner local', 'Estágio local', 'Documento local', 'Segmento local', 'Tamanho da empresa', 'Receita estimada local', 'País', 'Região'],
+      },
+    ],
+    recommendedLabels: ['Industry', 'Owner', 'Account Type', 'Billing City', 'Billing State', 'Billing Country', 'Segmento local', 'Estágio local', 'Receita estimada local'],
+    primaryIdKey: 'id',
+    primaryNameKey: 'name',
+    altNameKey: 'account_name',
+    exampleCsv: [
+      'Id,Name,Type,Industry,Website,Phone,OwnerId,CreatedDate,LastModifiedDate,BillingCity,BillingState,BillingCountry',
+      '001Axxxxxxxxxxxxxxxxx,Acme Corp,Customer,Technology,https://acmecorp.com,+55 11 90000-0001,005Axxxxxxxxxxxxxxxxx,2024-01-15T10:00:00Z,2024-03-22T14:30:00Z,São Paulo,SP,Brazil',
+      '001Bxxxxxxxxxxxxxxxxx,Global Industries,Prospect,Manufacturing,https://globalind.com,+55 11 90000-0002,005Bxxxxxxxxxxxxxxxxx,2024-02-01T09:00:00Z,2024-04-10T11:00:00Z,Rio de Janeiro,RJ,Brazil',
+      '001Cxxxxxxxxxxxxxxxxx,TechStart Ltda,Partner,Software,https://techstart.com.br,+55 11 90000-0003,005Cxxxxxxxxxxxxxxxxx,2024-03-05T08:00:00Z,2024-04-30T16:00:00Z,Curitiba,PR,Brazil',
+    ].join('\n'),
+    filename: 'canopi_salesforce_account_exemplo.csv',
+  },
+  Contact: {
+    label: 'Contact',
+    sfFields: {
+      id: 'Contact Id',
+      firstname: 'First Name',
+      lastname: 'Last Name',
+      name: 'Full Name',
+      email: 'Email',
+      phone: 'Phone',
+      title: 'Title',
+      department: 'Department',
+      accountid: 'Account Id',
+      ownerid: 'Owner',
+      createddate: 'Created Date',
+      lastmodifieddate: 'Last Modified Date',
+    },
+    altFields: {
+      contact_email: 'Email local',
+      contact_name: 'Nome local',
+    },
+    requiredGroupA: {
+      title: 'Nome do contato',
+      fields: ['Full Name', 'Last Name', 'Nome local'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Contact Id', 'Email', 'Email local'],
+    },
+    targetFieldGroups: [
+      {
+        group: 'Salesforce Contact',
+        fields: ['Contact Id', 'First Name', 'Last Name', 'Full Name', 'Email', 'Phone', 'Title', 'Department', 'Account Id', 'Owner', 'Created Date', 'Last Modified Date'],
+      },
+      { group: 'Canopi local', fields: ['Email local', 'Nome local'] },
+    ],
+    recommendedLabels: ['Email', 'Phone', 'Title', 'Account Id'],
+    primaryIdKey: 'id',
+    primaryNameKey: 'name',
+    altNameKey: 'lastname',
+    exampleCsv: [
+      'Id,FirstName,LastName,Email,Phone,Title,Department,AccountId,OwnerId,CreatedDate,LastModifiedDate',
+      '003Axxxxxxxxxxxxxxxxx,João,Silva,joao.silva@acmecorp.com,+55 11 90000-0001,CEO,Executive,001Axxxxxxxxxxxxxxxxx,005Axxxxxxxxxxxxxxxxx,2024-01-15T10:00:00Z,2024-03-22T14:30:00Z',
+      '003Bxxxxxxxxxxxxxxxxx,Maria,Santos,maria.santos@globalind.com,+55 21 90000-0002,Diretora,Sales,001Bxxxxxxxxxxxxxxxxx,005Bxxxxxxxxxxxxxxxxx,2024-02-01T09:00:00Z,2024-04-10T11:00:00Z',
+      '003Cxxxxxxxxxxxxxxxxx,Pedro,Lima,pedro.lima@techstart.com.br,+55 41 90000-0003,CTO,Engineering,001Cxxxxxxxxxxxxxxxxx,005Cxxxxxxxxxxxxxxxxx,2024-03-05T08:00:00Z,2024-04-30T16:00:00Z',
+    ].join('\n'),
+    filename: 'canopi_salesforce_contact_exemplo.csv',
+  },
+  Opportunity: {
+    label: 'Opportunity',
+    sfFields: {
+      id: 'Opportunity Id',
+      name: 'Opportunity Name',
+      accountid: 'Account Id',
+      stagename: 'Stage',
+      amount: 'Amount',
+      closedate: 'Close Date',
+      probability: 'Probability',
+      type: 'Type',
+      ownerid: 'Owner',
+      createddate: 'Created Date',
+      lastmodifieddate: 'Last Modified Date',
+    },
+    altFields: {},
+    requiredGroupA: {
+      title: 'Nome da oportunidade',
+      fields: ['Opportunity Name'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Opportunity Id', 'Account Id'],
+    },
+    targetFieldGroups: [
+      {
+        group: 'Salesforce Opportunity',
+        fields: ['Opportunity Id', 'Opportunity Name', 'Account Id', 'Stage', 'Amount', 'Close Date', 'Probability', 'Type', 'Owner', 'Created Date', 'Last Modified Date'],
+      },
+    ],
+    recommendedLabels: ['Stage', 'Amount', 'Close Date', 'Account Id', 'Probability'],
+    primaryIdKey: 'id',
+    primaryNameKey: 'name',
+    exampleCsv: [
+      'Id,Name,AccountId,StageName,Amount,CloseDate,Probability,Type,OwnerId,CreatedDate,LastModifiedDate',
+      '006Axxxxxxxxxxxxxxxxx,Renovação Acme 2025,001Axxxxxxxxxxxxxxxxx,Negotiation/Review,150000,2025-06-30,70,Existing Business,005Axxxxxxxxxxxxxxxxx,2024-11-01T09:00:00Z,2025-01-15T14:00:00Z',
+      '006Bxxxxxxxxxxxxxxxxx,Expansão Global Industries,001Bxxxxxxxxxxxxxxxxx,Proposal/Price Quote,80000,2025-05-31,40,New Business,005Bxxxxxxxxxxxxxxxxx,2024-12-01T10:00:00Z,2025-02-20T11:00:00Z',
+      '006Cxxxxxxxxxxxxxxxxx,TechStart Plataforma,001Cxxxxxxxxxxxxxxxxx,Value Proposition,45000,2025-04-30,60,New Business,005Cxxxxxxxxxxxxxxxxx,2025-01-10T08:00:00Z,2025-03-05T09:00:00Z',
+    ].join('\n'),
+    filename: 'canopi_salesforce_opportunity_exemplo.csv',
+  },
+  Lead: {
+    label: 'Lead',
+    sfFields: {
+      id: 'Lead Id',
+      firstname: 'First Name',
+      lastname: 'Last Name',
+      name: 'Full Name',
+      company: 'Company',
+      email: 'Email',
+      phone: 'Phone',
+      title: 'Title',
+      status: 'Status',
+      leadsource: 'Lead Source',
+      ownerid: 'Owner',
+      createddate: 'Created Date',
+      lastmodifieddate: 'Last Modified Date',
+    },
+    altFields: {},
+    requiredGroupA: {
+      title: 'Nome ou empresa',
+      fields: ['Full Name', 'Last Name', 'Company'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Lead Id', 'Email'],
+    },
+    targetFieldGroups: [
+      {
+        group: 'Salesforce Lead',
+        fields: ['Lead Id', 'First Name', 'Last Name', 'Full Name', 'Company', 'Email', 'Phone', 'Title', 'Status', 'Lead Source', 'Owner', 'Created Date', 'Last Modified Date'],
+      },
+    ],
+    recommendedLabels: ['Company', 'Email', 'Status', 'Lead Source', 'Phone'],
+    primaryIdKey: 'id',
+    primaryNameKey: 'name',
+    altNameKey: 'company',
+    exampleCsv: [
+      'Id,FirstName,LastName,Company,Email,Phone,Title,Status,LeadSource,OwnerId,CreatedDate,LastModifiedDate',
+      '00QAxxxxxxxxxxxxxxxxx,Maria,Santos,Global Industries,maria.santos@globalind.com,+55 21 90000-0001,Diretora,Working,Web,005Axxxxxxxxxxxxxxxxx,2024-02-10T08:00:00Z,2024-04-15T10:00:00Z',
+      '00QBxxxxxxxxxxxxxxxxx,Carlos,Pereira,TechStart Ltda,carlos.pereira@techstart.com.br,+55 41 90000-0002,CTO,New,Phone,005Bxxxxxxxxxxxxxxxxx,2024-03-01T09:00:00Z,2024-05-20T14:00:00Z',
+      '00QCxxxxxxxxxxxxxxxxx,Ana,Lima,Inovação SA,ana.lima@inovacao.com.br,+55 11 90000-0003,VP Sales,Contacted,Email,005Cxxxxxxxxxxxxxxxxx,2024-03-15T10:00:00Z,2024-06-01T11:00:00Z',
+    ].join('\n'),
+    filename: 'canopi_salesforce_lead_exemplo.csv',
+  },
+  Campaign: {
+    label: 'Campaign',
+    sfFields: {
+      id: 'Campaign Id',
+      name: 'Campaign Name',
+      type: 'Type',
+      status: 'Status',
+      startdate: 'Start Date',
+      enddate: 'End Date',
+      budgetedcost: 'Budgeted Cost',
+      actualcost: 'Actual Cost',
+      expectedrevenue: 'Expected Revenue',
+      isactive: 'Is Active',
+      ownerid: 'Owner',
+      createddate: 'Created Date',
+      lastmodifieddate: 'Last Modified Date',
+    },
+    altFields: {},
+    requiredGroupA: {
+      title: 'Nome da campanha',
+      fields: ['Campaign Name'],
+    },
+    requiredGroupB: {
+      title: 'Identificação',
+      fields: ['Campaign Id'],
+    },
+    targetFieldGroups: [
+      {
+        group: 'Salesforce Campaign',
+        fields: ['Campaign Id', 'Campaign Name', 'Type', 'Status', 'Start Date', 'End Date', 'Budgeted Cost', 'Actual Cost', 'Expected Revenue', 'Is Active', 'Owner', 'Created Date', 'Last Modified Date'],
+      },
+    ],
+    recommendedLabels: ['Type', 'Status', 'Start Date', 'End Date', 'Is Active'],
+    primaryIdKey: 'id',
+    primaryNameKey: 'name',
+    exampleCsv: [
+      'Id,Name,Type,Status,StartDate,EndDate,BudgetedCost,ActualCost,ExpectedRevenue,IsActive,OwnerId,CreatedDate,LastModifiedDate',
+      '701Axxxxxxxxxxxxxxxxx,Q1 2025 Outbound,Email,Active,2025-01-01,2025-03-31,50000,35000,120000,true,005Axxxxxxxxxxxxxxxxx,2024-12-15T10:00:00Z,2025-03-31T18:00:00Z',
+      '701Bxxxxxxxxxxxxxxxxx,Webinar Produto Março,Webinar,Completed,2025-03-10,2025-03-10,8000,7500,25000,false,005Bxxxxxxxxxxxxxxxxx,2025-01-20T09:00:00Z,2025-04-01T10:00:00Z',
+      '701Cxxxxxxxxxxxxxxxxx,Newsletter Abril,Email,Active,2025-04-01,2025-04-30,5000,1200,15000,true,005Cxxxxxxxxxxxxxxxxx,2025-03-01T08:00:00Z,2025-04-15T14:00:00Z',
+    ].join('\n'),
+    filename: 'canopi_salesforce_campaign_exemplo.csv',
+  },
 };
 
-const ALTERNATIVE_FIELDS: Record<string, string> = {
-  account_name: 'Nome da conta para preview',
-  domain: 'Domínio',
-  owner_name: 'Owner local',
-  lifecycle_stage: 'Estágio local',
-  updated_at: 'Atualização local',
-  cnpj: 'Documento local',
-  segment: 'Segmento local',
-  company_size: 'Tamanho da empresa',
-  annual_revenue_brl: 'Receita estimada local',
-  country: 'País',
-  region: 'Região',
-  source_system: 'Sistema de origem',
-  intent_score: 'Score de intenção',
-  priority_tier: 'Tier de prioridade',
-  open_opportunity_value_brl: 'Valor de oportunidade local',
-  last_signal_type: 'Tipo do último sinal',
-  last_signal_date: 'Data do último sinal',
-  local_notes: 'Notas locais',
-};
-
-const SALESFORCE_FIELD_LABELS = new Set(Object.values(SALESFORCE_FIELDS));
-const ALTERNATIVE_FIELD_LABELS = new Set(Object.values(ALTERNATIVE_FIELDS));
-
-// Grupo A — Nome da conta
-const REQUIRED_GROUP_A_LABELS = new Set(['Account Name', 'Nome da conta para preview']);
-// Grupo B — Identificação ou desambiguação
-const REQUIRED_GROUP_B_LABELS = new Set(['Account Id', 'Domínio', 'Website', 'Documento local']);
-// Union para badge "Obrigatório" na tabela
-const ALL_REQUIRED_LABELS = new Set([...REQUIRED_GROUP_A_LABELS, ...REQUIRED_GROUP_B_LABELS]);
-
-const TARGET_FIELD_GROUPS: { group: string; fields: string[] }[] = [
-  { group: 'Salesforce Account', fields: Object.values(SALESFORCE_FIELDS) },
-  { group: 'Canopi local', fields: Object.values(ALTERNATIVE_FIELDS) },
-];
-
-const RECOMMENDED_FIELDS = [
-  'Industry', 'Owner', 'Type',
-  'BillingCity', 'BillingState', 'BillingCountry',
-  'Segmento local', 'Estágio local', 'Receita estimada local',
-];
-
-const EXAMPLE_CSV = [
-  'Id,Name,Type,Industry,Website,Phone,OwnerId,CreatedDate,LastModifiedDate,BillingCity,BillingState,BillingCountry',
-  '001Axxxxxxxxxxxxxxxxx,Acme Corp,Customer,Technology,https://acmecorp.com,+55 11 90000-0001,005Axxxxxxxxxxxxxxxxx,2024-01-15T10:00:00Z,2024-03-22T14:30:00Z,São Paulo,SP,Brazil',
-  '001Bxxxxxxxxxxxxxxxxx,Global Industries,Prospect,Manufacturing,https://globalind.com,+55 11 90000-0002,005Bxxxxxxxxxxxxxxxxx,2024-02-01T09:00:00Z,2024-04-10T11:00:00Z,Rio de Janeiro,RJ,Brazil',
-  '001Cxxxxxxxxxxxxxxxxx,TechStart Ltda,Partner,Software,https://techstart.com.br,+55 11 90000-0003,005Cxxxxxxxxxxxxxxxxx,2024-03-05T08:00:00Z,2024-04-30T16:00:00Z,Curitiba,PR,Brazil',
-].join('\n');
-
+const ENTITIES: CrmEntity[] = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 const STEPS = ['Requisitos', 'Upload', 'Leitura', 'Confirmar'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -141,23 +330,26 @@ function splitCsvField(line: string, delimiter: string): string[] {
   return fields;
 }
 
-function classifyColumn(header: string): {
-  recognitionType: ColumnRecognitionType;
-  canopiLabel: string;
-  observation: string;
-} {
+function classifyColumn(
+  header: string,
+  entityConfig: EntityConfig,
+): { recognitionType: ColumnRecognitionType; canopiLabel: string; observation: string } {
   const key = header.toLowerCase().trim();
-  if (SALESFORCE_FIELDS[key]) {
-    let observation = 'Campo padrão do Salesforce Account.';
-    if (key === 'id') observation = 'Chave padrão Salesforce Account.';
-    else if (key === 'name') observation = 'Nome padrão da conta Salesforce.';
-    return { recognitionType: 'salesforce', canopiLabel: SALESFORCE_FIELDS[key], observation };
+  if (entityConfig.sfFields[key]) {
+    const observation =
+      key === entityConfig.primaryIdKey
+        ? `Chave padrão do Salesforce ${entityConfig.label}.`
+        : key === entityConfig.primaryNameKey
+        ? `Nome padrão do ${entityConfig.label} Salesforce.`
+        : `Campo padrão do Salesforce ${entityConfig.label}.`;
+    return { recognitionType: 'salesforce', canopiLabel: entityConfig.sfFields[key], observation };
   }
-  if (ALTERNATIVE_FIELDS[key]) {
-    const observation = key === 'account_name'
-      ? 'Alternativa local para leitura visual. Não cria mapeamento canônico.'
-      : 'Campo local aceito para preview.';
-    return { recognitionType: 'alternative', canopiLabel: ALTERNATIVE_FIELDS[key], observation };
+  if (entityConfig.altFields[key]) {
+    return {
+      recognitionType: 'alternative',
+      canopiLabel: entityConfig.altFields[key],
+      observation: 'Campo local aceito para preview.',
+    };
   }
   return {
     recognitionType: 'unrecognized',
@@ -176,6 +368,7 @@ function parseCsvAndAnalyze(
   text: string,
   fileSizeBytes: number,
   fileName: string,
+  entityConfig: EntityConfig,
 ): { analysis: CsvAnalysis | null; blockingErrors: string[] } {
   const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
   const nonEmpty = lines.filter((l) => l.trim() !== '');
@@ -209,7 +402,7 @@ function parseCsvAndAnalyze(
   }
 
   const columnReadings: CsvColumnReading[] = headers.map((header) => {
-    const classification = classifyColumn(header);
+    const classification = classifyColumn(header, entityConfig);
     const exampleValues = previewRows
       .map((row) => row[header] ?? '')
       .filter((v) => v.trim() !== '')
@@ -217,21 +410,24 @@ function parseCsvAndAnalyze(
     return { header, ...classification, exampleValues };
   });
 
-  const hasId = headers.some((h) => h.toLowerCase() === 'id');
-  const hasName = headers.some((h) => h.toLowerCase() === 'name');
-  const hasAccountName = headers.some((h) => h.toLowerCase() === 'account_name');
+  const lowerHeaders = headers.map((h) => h.toLowerCase());
+  const hasId = lowerHeaders.includes(entityConfig.primaryIdKey);
+  const hasName = lowerHeaders.includes(entityConfig.primaryNameKey);
+  const hasAltName = entityConfig.altNameKey ? lowerHeaders.includes(entityConfig.altNameKey) : false;
   const compatibility: CsvAnalysis['compatibility'] =
-    hasId && hasName ? 'alta' : (hasId || hasName || hasAccountName) ? 'parcial' : 'baixa';
+    hasId && hasName ? 'alta' : hasId || hasName || hasAltName ? 'parcial' : 'baixa';
 
   const warnings: string[] = [];
   if (!hasId && !hasName) {
-    warnings.push('CSV lido, mas não parece seguir o formato padrão de exportação Account do Salesforce.');
+    warnings.push(`CSV lido, mas não parece seguir o formato padrão de exportação ${entityConfig.label} do Salesforce.`);
   } else {
-    if (!hasId) warnings.push('Coluna "Id" não encontrada. O identificador único é necessário para distinguir registros.');
-    if (!hasName && !hasAccountName) warnings.push('Coluna "Name" não encontrada. O nome da conta não estará visível no preview.');
-    if (hasAccountName && !hasName) warnings.push('"account_name" reconhecida como alternativa local para leitura visual. Não representa mapeamento canônico.');
+    if (!hasId)
+      warnings.push(`Coluna de ID não encontrada. O identificador único é necessário para distinguir registros ${entityConfig.label}.`);
+    if (!hasName && !hasAltName)
+      warnings.push(`Coluna de nome não encontrada. O nome do ${entityConfig.label} não estará visível no preview.`);
   }
-  if (inconsistentRows > 0) warnings.push(`${inconsistentRows} linha(s) com número de colunas diferente do cabeçalho.`);
+  if (inconsistentRows > 0)
+    warnings.push(`${inconsistentRows} linha(s) com número de colunas diferente do cabeçalho.`);
   if (rowCount === 0) warnings.push('Nenhuma linha de dados encontrada após o cabeçalho.');
 
   const recognizedCount = columnReadings.filter((c) => c.recognitionType === 'salesforce').length;
@@ -253,12 +449,17 @@ function getEffectiveLabel(col: CsvColumnReading, adj: ColumnAdjustment): string
   return col.canopiLabel;
 }
 
-function getEffectiveType(col: CsvColumnReading, adj: ColumnAdjustment): ColumnRecognitionType | 'ignored' {
+function getEffectiveType(
+  col: CsvColumnReading,
+  adj: ColumnAdjustment,
+  sfFieldLabelSet: Set<string>,
+  altFieldLabelSet: Set<string>,
+): ColumnRecognitionType | 'ignored' {
   if (adj.action === 'ignore') return 'ignored';
   if (adj.action === 'override') {
     if (!adj.overrideField) return 'unrecognized';
-    if (SALESFORCE_FIELD_LABELS.has(adj.overrideField)) return 'salesforce';
-    if (ALTERNATIVE_FIELD_LABELS.has(adj.overrideField)) return 'alternative';
+    if (sfFieldLabelSet.has(adj.overrideField)) return 'salesforce';
+    if (altFieldLabelSet.has(adj.overrideField)) return 'alternative';
     return 'unrecognized';
   }
   return col.recognitionType;
@@ -275,39 +476,64 @@ function buildInitialAdjustments(columnReadings: CsvColumnReading[]): Record<str
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SalesforceCsvPreparation() {
+  const [entity, setEntity] = useState<CrmEntity>('Account');
   const [analysis, setAnalysis] = useState<CsvAnalysis | null>(null);
   const [blockingErrors, setBlockingErrors] = useState<string[]>([]);
   const [adjustments, setAdjustments] = useState<Record<string, ColumnAdjustment>>({});
   const [confirmed, setConfirmed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const entityConfig = ENTITY_CONFIGS[entity];
+  const sfFieldLabelSet = React.useMemo(
+    () => new Set(Object.values(entityConfig.sfFields)),
+    [entityConfig],
+  );
+  const altFieldLabelSet = React.useMemo(
+    () => new Set(Object.values(entityConfig.altFields)),
+    [entityConfig],
+  );
+  const allRequiredLabels = React.useMemo(
+    () => new Set([...entityConfig.requiredGroupA.fields, ...entityConfig.requiredGroupB.fields]),
+    [entityConfig],
+  );
+
+  function handleEntityChange(newEntity: CrmEntity) {
+    setEntity(newEntity);
+    setAnalysis(null);
+    setBlockingErrors([]);
+    setConfirmed(false);
+    setAdjustments({});
+    if (inputRef.current) inputRef.current.value = '';
+  }
+
   const derivedCounters = React.useMemo(() => {
     if (!analysis) return { recognized: 0, alternative: 0, unrecognized: 0, ignored: 0 };
     let recognized = 0, alternative = 0, unrecognized = 0, ignored = 0;
     for (const col of analysis.columnReadings) {
       const adj = adjustments[col.header] ?? { action: 'suggest', overrideField: '' };
-      const eff = getEffectiveType(col, adj);
+      const eff = getEffectiveType(col, adj, sfFieldLabelSet, altFieldLabelSet);
       if (eff === 'salesforce') recognized++;
       else if (eff === 'alternative') alternative++;
       else if (eff === 'unrecognized') unrecognized++;
       else ignored++;
     }
     return { recognized, alternative, unrecognized, ignored };
-  }, [analysis, adjustments]);
+  }, [analysis, adjustments, sfFieldLabelSet, altFieldLabelSet]);
 
-  // Two required groups computed live from user adjustments
   const requiredGroups = React.useMemo(() => {
     if (!analysis) return { groupA: false, groupB: false, allMet: false };
+    const groupASet = new Set(entityConfig.requiredGroupA.fields);
+    const groupBSet = new Set(entityConfig.requiredGroupB.fields);
     let groupA = false;
     let groupB = false;
     for (const col of analysis.columnReadings) {
       const adj = adjustments[col.header] ?? { action: 'suggest', overrideField: '' };
       const label = getEffectiveLabel(col, adj);
-      if (REQUIRED_GROUP_A_LABELS.has(label)) groupA = true;
-      if (REQUIRED_GROUP_B_LABELS.has(label)) groupB = true;
+      if (groupASet.has(label)) groupA = true;
+      if (groupBSet.has(label)) groupB = true;
     }
     return { groupA, groupB, allMet: groupA && groupB };
-  }, [analysis, adjustments]);
+  }, [analysis, adjustments, entityConfig]);
 
   const confirmationSummary = React.useMemo(() => {
     if (!analysis) return null;
@@ -350,7 +576,7 @@ export function SalesforceCsvPreparation() {
       try {
         const text = event.target?.result as string;
         if (!text.trim()) { setBlockingErrors(['O arquivo está vazio.']); return; }
-        const result = parseCsvAndAnalyze(text, file.size, file.name);
+        const result = parseCsvAndAnalyze(text, file.size, file.name, entityConfig);
         if (result.blockingErrors.length > 0) { setBlockingErrors(result.blockingErrors); return; }
         if (result.analysis) {
           setAnalysis(result.analysis);
@@ -376,11 +602,11 @@ export function SalesforceCsvPreparation() {
   }
 
   function downloadExample() {
-    const blob = new Blob([EXAMPLE_CSV], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([entityConfig.exampleCsv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'canopi_salesforce_account_exemplo.csv';
+    a.download = entityConfig.filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -389,6 +615,27 @@ export function SalesforceCsvPreparation() {
 
   return (
     <div className="mt-5 space-y-6">
+
+      {/* ── Seletor de entidade ── */}
+      <div className="space-y-2">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Entidade Salesforce</p>
+        <div className="flex flex-wrap gap-2">
+          {ENTITIES.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => handleEntityChange(e)}
+              className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors ${
+                entity === e
+                  ? 'border-slate-900 bg-slate-900 text-white'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-800'
+              }`}
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* ── Stepper ── */}
       <div className="flex items-center">
@@ -422,7 +669,9 @@ export function SalesforceCsvPreparation() {
 
       {/* ── BLOCO 1: Requisitos ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-5">
-        <p className="text-sm font-black text-slate-900">Requisitos do CSV Salesforce Account</p>
+        <p className="text-sm font-black text-slate-900">
+          Requisitos do CSV Salesforce {entityConfig.label}
+        </p>
 
         {/* Obrigatórios */}
         <div className="space-y-3">
@@ -431,9 +680,9 @@ export function SalesforceCsvPreparation() {
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-              <p className="text-xs font-black text-slate-800">Nome da conta</p>
+              <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupA.title}</p>
               <div className="flex flex-wrap gap-1.5">
-                {['Account Name', 'Nome da conta para preview'].map((f) => (
+                {entityConfig.requiredGroupA.fields.map((f) => (
                   <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
                     {f}
                   </span>
@@ -444,16 +693,16 @@ export function SalesforceCsvPreparation() {
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-              <p className="text-xs font-black text-slate-800">Identificação ou desambiguação</p>
+              <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupB.title}</p>
               <div className="flex flex-wrap gap-1.5">
-                {['Account Id', 'Domínio', 'Website', 'Documento local'].map((f) => (
+                {entityConfig.requiredGroupB.fields.map((f) => (
                   <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
                     {f}
                   </span>
                 ))}
               </div>
               <p className="text-[11px] font-medium text-slate-500">
-                Pelo menos um desses campos garante identificação ou desambiguação na leitura local.
+                Pelo menos um desses campos garante identificação na leitura local.
               </p>
             </div>
           </div>
@@ -465,7 +714,7 @@ export function SalesforceCsvPreparation() {
             Recomendados para melhor leitura
           </p>
           <div className="flex flex-wrap gap-1.5">
-            {RECOMMENDED_FIELDS.map((f) => (
+            {entityConfig.recommendedLabels.map((f) => (
               <span key={f} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-600">
                 {f}
               </span>
@@ -491,7 +740,7 @@ export function SalesforceCsvPreparation() {
             className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-100"
           >
             <Download className="h-3.5 w-3.5" />
-            Baixar CSV exemplo
+            Baixar CSV exemplo ({entityConfig.label})
           </button>
           <span className="text-[11px] text-slate-500">Apenas .csv · Máximo 5 MB · leitura local para preview</span>
         </div>
@@ -549,14 +798,6 @@ export function SalesforceCsvPreparation() {
                       analysis.compatibility === 'parcial' ? 'text-amber-800' : 'text-red-800'
                     }`}>
                       {analysis.compatibility}
-                    </span>
-                  </div>
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
-                      Campos obrigatórios:
-                    </span>
-                    <span className={`text-sm font-black ${requiredGroups.allMet ? 'text-emerald-800' : 'text-amber-800'}`}>
-                      {requiredGroups.allMet ? 'atendidos' : 'pendentes'}
                     </span>
                   </div>
                   {requiredGroups.allMet ? (
@@ -647,10 +888,10 @@ export function SalesforceCsvPreparation() {
                 <tbody>
                   {analysis.columnReadings.map((col, idx) => {
                     const adj = adjustments[col.header] ?? { action: 'suggest', overrideField: '' };
-                    const effType = getEffectiveType(col, adj);
+                    const effType = getEffectiveType(col, adj, sfFieldLabelSet, altFieldLabelSet);
                     const effLabel = getEffectiveLabel(col, adj);
                     const isIgnored = adj.action === 'ignore';
-                    const isRequired = !isIgnored && ALL_REQUIRED_LABELS.has(effLabel);
+                    const isRequired = !isIgnored && allRequiredLabels.has(effLabel);
 
                     return (
                       <tr
@@ -680,7 +921,7 @@ export function SalesforceCsvPreparation() {
                               className="w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                             >
                               <option value="">Selecionar campo...</option>
-                              {TARGET_FIELD_GROUPS.map((group) => (
+                              {entityConfig.targetFieldGroups.map((group) => (
                                 <optgroup key={group.group} label={group.group}>
                                   {group.fields.map((field) => (
                                     <option key={field} value={field}>{field}</option>
@@ -802,7 +1043,6 @@ export function SalesforceCsvPreparation() {
           {/* BLOCO 6: Gate de campos obrigatórios + botão confirmar */}
           {!confirmed && (
             <div className="space-y-3">
-              {/* Alerta amigável quando requisitos pendentes */}
               {!requiredGroups.allMet && (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 space-y-4">
                   <div className="flex items-start gap-2">
@@ -812,7 +1052,7 @@ export function SalesforceCsvPreparation() {
                         Antes de confirmar, ajuste os campos obrigatórios
                       </p>
                       <p className="mt-0.5 text-[11px] font-medium text-amber-800">
-                        Para confirmar a preparação local, a Canopi precisa identificar pelo menos o nome da conta e uma chave de identificação ou desambiguação.
+                        Para confirmar a preparação local, a Canopi precisa identificar pelo menos o {entityConfig.requiredGroupA.title.toLowerCase()} e a {entityConfig.requiredGroupB.title.toLowerCase()}.
                       </p>
                     </div>
                   </div>
@@ -820,15 +1060,15 @@ export function SalesforceCsvPreparation() {
                     {([
                       {
                         key: 'groupA',
-                        label: 'Nome da conta',
+                        label: entityConfig.requiredGroupA.title,
                         met: requiredGroups.groupA,
-                        resolve: 'Selecione uma coluna como Account Name ou Nome da conta para preview.',
+                        resolve: `Selecione uma coluna como ${entityConfig.requiredGroupA.fields.slice(0, 2).join(' ou ')}.`,
                       },
                       {
                         key: 'groupB',
-                        label: 'Identificação da conta',
+                        label: entityConfig.requiredGroupB.title,
                         met: requiredGroups.groupB,
-                        resolve: 'Selecione uma coluna como Account Id, Domínio, Website ou Documento local.',
+                        resolve: `Selecione uma coluna como ${entityConfig.requiredGroupB.fields.slice(0, 2).join(', ')} ou similar.`,
                       },
                     ] as { key: string; label: string; met: boolean; resolve: string }[]).map(({ key, label, met, resolve }) => (
                       <div
@@ -879,70 +1119,48 @@ export function SalesforceCsvPreparation() {
 
           {/* BLOCO 7: Resumo pós-confirmação */}
           {confirmed && confirmationSummary && (
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-black text-emerald-900">CSV confirmado para esta sessão</p>
-                    <p className="text-[11px] font-medium leading-relaxed text-emerald-800">
-                      A Canopi concluiu a preparação local para esta sessão. Sem persistência e sem atualização no Salesforce.
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-emerald-200 pt-4 sm:grid-cols-4">
-                  {([
-                    ['Arquivo', analysis.fileName],
-                    ['Linhas', String(analysis.rowCount)],
-                    ['Compatibilidade', analysis.compatibility],
-                    ['Nome da conta', 'Atendido'],
-                    ['Identificação da conta', 'Atendida'],
-                    ['Colunas usadas', String(confirmationSummary.used.length)],
-                    ['Colunas ignoradas', String(confirmationSummary.ignored.length)],
-                    ['Reconhecidas', String(derivedCounters.recognized)],
-                    ['Alternativas locais', String(derivedCounters.alternative)],
-                    ...(derivedCounters.unrecognized > 0 ? ([['Não reconhecidas', String(derivedCounters.unrecognized)]] as [string, string][]) : []),
-                  ] as [string, string][]).map(([label, value]) => (
-                    <div key={label}>
-                      <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">{label}</p>
-                      <p className="mt-0.5 truncate text-sm font-bold text-emerald-900">{value}</p>
-                    </div>
-                  ))}
-                </div>
-                {confirmationSummary.ignored.length > 0 && (
-                  <div className="rounded-xl border border-emerald-200 bg-white/60 px-4 py-3">
-                    <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-emerald-700">
-                      Colunas ignoradas nesta preparação
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {confirmationSummary.ignored.map((col) => (
-                        <span key={col} className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600">
-                          {col}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  Próximos recortes previstos
-                </p>
-                <div className="space-y-2">
-                  {([
-                    ['2C.3', 'Requisitos avançados e arquivo exemplo'],
-                    ['2C.4', 'Mapeamento local de colunas'],
-                    ['2C.5', 'Revisão final da preparação local'],
-                  ] as [string, string][]).map(([step, label]) => (
-                    <div key={step} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5 opacity-50">
-                      <span className="w-8 shrink-0 text-[10px] font-black text-slate-500">{step}</span>
-                      <span className="flex-1 text-sm font-medium text-slate-600">{label}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Previsto</span>
-                    </div>
-                  ))}
+            <div className="rounded-2xl border border-emerald-300 bg-emerald-50 p-5 space-y-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                <div className="space-y-1">
+                  <p className="text-sm font-black text-emerald-900">CSV confirmado para esta sessão</p>
+                  <p className="text-[11px] font-medium leading-relaxed text-emerald-800">
+                    Preparação local concluída para {entityConfig.label}. Sem persistência e sem atualização no Salesforce.
+                  </p>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2 border-t border-emerald-200 pt-4 sm:grid-cols-4">
+                {([
+                  ['Entidade', entityConfig.label],
+                  ['Arquivo', analysis.fileName],
+                  ['Linhas', String(analysis.rowCount)],
+                  ['Compatibilidade', analysis.compatibility],
+                  ['Colunas usadas', String(confirmationSummary.used.length)],
+                  ['Colunas ignoradas', String(confirmationSummary.ignored.length)],
+                  ['Reconhecidas', String(derivedCounters.recognized)],
+                  ...(derivedCounters.alternative > 0 ? ([['Alternativas locais', String(derivedCounters.alternative)]] as [string, string][]) : []),
+                  ...(derivedCounters.unrecognized > 0 ? ([['Não reconhecidas', String(derivedCounters.unrecognized)]] as [string, string][]) : []),
+                ] as [string, string][]).map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">{label}</p>
+                    <p className="mt-0.5 truncate text-sm font-bold text-emerald-900">{value}</p>
+                  </div>
+                ))}
+              </div>
+              {confirmationSummary.ignored.length > 0 && (
+                <div className="rounded-xl border border-emerald-200 bg-white/60 px-4 py-3">
+                  <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                    Colunas ignoradas nesta preparação
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {confirmationSummary.ignored.map((col) => (
+                      <span key={col} className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600">
+                        {col}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

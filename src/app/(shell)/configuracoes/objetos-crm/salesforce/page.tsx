@@ -140,14 +140,14 @@ export default function SalesforceDedicatedPage() {
             <p className="text-sm font-black text-emerald-900">Guardrails ativos nesta página dedicada</p>
           </div>
           <ul className="mt-4 space-y-2 text-sm font-medium text-emerald-900">
-            <li>• Sem sync neste recorte — discovery prepara, não importa</li>
-            <li>• Sem writeback neste recorte</li>
-            <li>• Sem leitura massiva de registros neste recorte</li>
+            <li>• Discovery prepara o mapeamento · Sync não disponível nesta versão</li>
+            <li>• Sem writeback disponível nesta versão</li>
+            <li>• Sem leitura massiva de registros</li>
             <li>• Sem exposição de tokens em UI, query string, logs ou armazenamento client-side</li>
             <li>• Sem criação ou atualização de registros no CRM</li>
           </ul>
           <p className="mt-4 text-xs font-medium text-emerald-800">
-            Sync, Bulk API e writeback serão tratados em recortes próprios. Próximo passo natural: primeiro sync read-only controlado de Accounts.
+            Sync, Bulk API e writeback entram em versões futuras.
           </p>
         </Card>
       </section>

@@ -5,6 +5,20 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-02] — Salesforce 2C.4 sessão 6 (alinhamento de modos, CSV por entidade, copy produto)
+
+- **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
+- **Objetivo:** alinhar os três modos Salesforce (OAuth/CSV/Token) com a intenção de produto; parametrizar CSV por entidade; limpar copy de desenvolvimento da UI.
+- **Commit local:** pendente (a ser criado ao final desta sessão)
+- **O que foi implementado:**
+  - `SalesforceCsvPreparation` completamente refatorado com seletor de entidade (Account/Contact/Opportunity/Lead/Campaign); cada entidade tem `sfFields`, `altFields`, `requiredGroupA/B`, `recommendedLabels`, `exampleCsv` e `filename` próprios; `parseCsvAndAnalyze` e `classifyColumn` parametrizados por `EntityConfig`; `sfFieldLabelSet`/`altFieldLabelSet`/`allRequiredLabels` memoizados; seção "Próximos recortes previstos" removida (dev copy).
+  - `SalesforceMethodSelector` — Token reposicionado como modo secundário: título "Validação pontual", badge "Efêmero", descrição "Use para validar acesso pontual. Nada será salvo.", card visualmente recuado (padding reduzido, texto menor, cores apagadas).
+  - `SalesforceDiscovery` — copy "Edição e persistência do mapeamento entram no próximo recorte." substituído por "Mapeamento editável será disponibilizado em versão futura."
+  - `page.tsx` — três guardrails atualizados de "neste recorte" para linguagem de produto; rodapé do card de limites simplificado.
+- **O que ficou fora:** edição real do mapeamento, sync, writeback, importação — todos sem escopo nesta versão.
+
+---
+
 ## [2026-05-03] — Salesforce 2C.4 continuação (reorganização UX modos + mapeamento Canopi)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
