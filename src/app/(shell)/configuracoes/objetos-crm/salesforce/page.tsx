@@ -36,12 +36,12 @@ export default function SalesforceDedicatedPage() {
             </div>
           </div>
           <Badge className="w-fit border-none bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
-            Setup guiado
+            Fonte CRM
           </Badge>
         </div>
 
         <Card className="rounded-3xl border border-slate-200 p-5">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">OAuth</p>
               <p className="mt-1 text-sm font-black text-slate-900">Conectado / Desconectado</p>
@@ -61,6 +61,11 @@ export default function SalesforceDedicatedPage() {
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronização</p>
               <p className="mt-1 text-sm font-black text-slate-900">Ainda não habilitada</p>
               <p className="mt-1 text-xs font-medium text-slate-500">Esta página prepara acesso e mapeamentos</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Writeback</p>
+              <p className="mt-1 text-sm font-black text-slate-900">Não habilitado</p>
+              <p className="mt-1 text-xs font-medium text-slate-500">Sem criação/atualização de registros</p>
             </div>
           </div>
         </Card>
@@ -82,6 +87,7 @@ export default function SalesforceDedicatedPage() {
             <li>• Nenhum registro será importado agora</li>
             <li>• Sincronização ainda não habilitada</li>
             <li>• Writeback ainda não habilitado</li>
+            <li>• Bulk API ainda não habilitada</li>
             <li>• Campos detectados são somente leitura</li>
             <li>• Mapeamento editável ainda não disponível</li>
             <li>• Tokens e segredos não são exibidos na interface</li>
