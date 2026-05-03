@@ -57,6 +57,17 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Planejamento: Base de Teste Completa por CRM (frente futura)
+
+- **Natureza:** Planejamento operacional (sem implementação).
+- **Decisão:** registrar a frente futura “Base de Teste Completa por CRM” para ser executada **depois** do fechamento das configurações de todos os CRMs.
+- **Objetivo:** criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Canopi consegue ler, interpretar, relacionar e organizar os dados corretamente.
+- **Salesforce Test Data Pack v1 (previsto):** Accounts, Contacts, Opportunities, Leads, Campaigns; Campaign Members (se aplicável); Tasks/Activities (se fizer sentido para validar histórico e follow-up).
+- **Entregáveis previstos:** CSVs por entidade, ordem de importação, dicionário de campos, regras de vínculo, cenários bons/ruins, checklists (leitura vs inferência), critérios de “pronto para sync real”.
+- **Guardrails:** não antecipa sync real; não antecipa writeback; não substitui configuração de conectores.
+
+---
+
 ## [2026-05-02] — Salesforce 2C.4 (Discovery read-only multiobjeto + mapeamento pré-sync)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.

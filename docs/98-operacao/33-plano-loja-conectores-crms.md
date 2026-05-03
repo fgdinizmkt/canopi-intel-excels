@@ -132,6 +132,32 @@ Regra de progressão:
 - ClickUp;
 - Outro CRM.
 
+## 9.1) Frente futura (pós-configurações): Base de Teste Completa por CRM
+**Não iniciar agora.** Esta frente só entra depois de todas as configurações de CRMs estarem fechadas.
+
+Objetivo:
+Criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Canopi consegue **ler, interpretar, relacionar e organizar** os dados corretamente antes de qualquer sync real.
+
+Entregáveis previstos (por CRM):
+- CSVs por entidade;
+- ordem correta de importação (quando aplicável);
+- dicionário de campos (origem → significado);
+- regras de vínculo entre entidades;
+- cenários bons e ruins (dados sujos, duplicidade, campos ausentes, vínculos inválidos);
+- checklist do que a Canopi deve ler (fatos);
+- checklist do que a Canopi deve inferir (hipóteses explícitas);
+- critérios para declarar “pronto para sync real” (read-only controlado primeiro).
+
+Salesforce Test Data Pack v1 (previsto):
+- Accounts, Contacts, Opportunities, Leads, Campaigns;
+- Campaign Members (se aplicável no modelo);
+- Tasks/Activities (se fizer sentido para validar histórico, ações e follow-up).
+
+Guardrails desta frente:
+- não substitui as configurações dos conectores;
+- não antecipa sync real;
+- não antecipa writeback.
+
 ## 10) Escopo por camada
 ### O que fica dentro de cada página de CRM
 - método da fonte;

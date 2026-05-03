@@ -1,16 +1,13 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local em `b64f4da` (ahead 9 em relação a `origin/main`). **Estado Salesforce estabilizado localmente**: OAuth produtivo preservado, Account/describe validado, discovery read-only multiobjeto preservado (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade preservado como entrada local e Token temporário preservado como validação pontual. A UI “Frankenstein” introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` em `5a41865` (Local = `origin/main` = Google Drive). **Estado Salesforce estabilizado e fechado operacionalmente**: OAuth produtivo preservado, Account/describe validado, discovery read-only multiobjeto preservado (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade preservado como entrada local e Token temporário preservado como validação pontual. A UI “Frankenstein” introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
 
 Salesforce continua **não sendo conector produtivo completo**: sem sync real, sem Bulk API, sem writeback real e sem importação real.
 
-Pendências operacionais deste estado local:
-- validação final do estado local (runtime limpo) conforme protocolo;
-- push para `origin/main`;
-- `dry-run` do espelhamento no Google Drive;
-- sync do Google Drive;
-- confirmação final Local = GitHub = Google Drive.
+Pendências futuras (fora do escopo atual):
+- abrir recortes próprios para sync read-only controlado, Bulk API e writeback;
+- criar “Base de Teste Completa por CRM” (pós-configurações) para validar leitura/interpretação/vínculos com dados robustos.
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
