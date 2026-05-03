@@ -94,6 +94,24 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - `.env.local` não entrou no commit.
 - **Status:** ✅ Concluído e publicado em `origin/main`.
 
+## [2026-05-03] — Salesforce (Redesign UI/UX do Setup Guiado)
+
+- **Natureza:** Sessão de UX/UI (sem alteração de backend).
+- **Objetivo:** redesenhar a página dedicada de Salesforce como ferramenta real de configuração de fonte CRM com hierarquia clara:
+  - OAuth como caminho principal;
+  - CSV por entidade como alternativa local;
+  - Token temporário como teste pontual, sem protagonismo.
+- **O que foi alterado (UI/UX):**
+  - topo da página com mensagem executiva e faixa compacta de status (sem redundância);
+  - trilha visual de setup guiado (wizard) orientando o fluxo do usuário;
+  - cards de origem com hierarquia explícita (OAuth recomendado, CSV alternativo, token teste pontual);
+  - painel OAuth reorganizado para leitura rápida: status da conexão, o que permite e discovery/mapeamento;
+  - painel CSV com seletor de entidade mais forte e linguagem explícita de entrada local.
+- **Guardrails mantidos:**
+  - nenhuma mudança em OAuth start/callback, rotas API, service Salesforce, criptografia, Supabase, RLS ou migrations;
+  - sem sync, sem Bulk API, sem writeback, sem importação real e sem leitura massiva.
+- **Operacional:** `dev:clean` confirmado como `rm -rf .next && next dev -H 0.0.0.0 -p 3053`.
+
 ## [2026-05-02] — Contas V2 / Salesforce 2C.2 (preparação local de CSV exportado)
 
 - **Natureza:** Sessão funcional + documental.

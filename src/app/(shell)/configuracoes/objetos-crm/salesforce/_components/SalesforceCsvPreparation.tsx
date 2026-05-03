@@ -615,10 +615,19 @@ export function SalesforceCsvPreparation() {
 
   return (
     <div className="mt-5 space-y-6">
+      <div className="rounded-3xl border border-slate-200 bg-white p-5">
+        <p className="text-sm font-black text-slate-900">CSV por entidade</p>
+        <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+          CSV é entrada local. Não consulta o Salesforce ao vivo. Use uma entidade por vez para preparar colunas e revisar requisitos antes da sincronização.
+        </p>
+      </div>
 
       {/* ── Seletor de entidade ── */}
-      <div className="space-y-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Entidade Salesforce</p>
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 space-y-3">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">1. Escolher entidade</p>
+          <p className="mt-1 text-sm font-black text-slate-900">Selecione uma entidade por vez</p>
+        </div>
         <div className="flex flex-wrap gap-2">
           {ENTITIES.map((e) => (
             <button
@@ -635,6 +644,9 @@ export function SalesforceCsvPreparation() {
             </button>
           ))}
         </div>
+        <p className="text-xs font-medium text-slate-500">
+          Requisitos, CSV exemplo e validações mudam conforme a entidade selecionada.
+        </p>
       </div>
 
       {/* ── Stepper ── */}
