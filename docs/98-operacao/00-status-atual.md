@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` em `42b339e` (Local = `origin/main`). **Salesforce Setup Read-only fechado operacionalmente**: OAuth produtivo preservado, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**: OAuth produtivo preservado, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida

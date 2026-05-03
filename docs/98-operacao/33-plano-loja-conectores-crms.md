@@ -115,7 +115,7 @@ Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
 - Salesforce 2C.2 fechado em `46fae8f`.
 - Salesforce 2C.3 fechado em `bc3dd69`.
-- Marco atual: **Salesforce Setup Read-only fechado operacionalmente** em `42b339e`.
+- Marco atual: **Salesforce Setup Read-only fechado operacionalmente**.
 - A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura e discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign) com mapeamento pré-sync (somente leitura).
 - **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem Bulk API, sem writeback real e sem importação real.
 - Persistência de mapeamento pré-sync: pendente (recorte próprio futuro).
