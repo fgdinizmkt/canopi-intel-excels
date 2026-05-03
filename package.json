@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p 3053",
-    "dev:clean": "rm -rf .next && next dev -H 0.0.0.0 -p 3053",
+    "dev:clean": "node scripts/dev-clean.mjs",
     "dev:check": "node scripts/dev-check.mjs",
     "build": "next build",
     "build:safe": "node scripts/build-safe.mjs",
     "start": "next start",
     "lint": "next lint",
+    "check:css": "node scripts/check-css.mjs",
     "sync:drive-memory": "node scripts/sync-drive-memory.mjs",
     "sync:drive-memory:dry": "node scripts/sync-drive-memory.mjs --dry-run"
   },

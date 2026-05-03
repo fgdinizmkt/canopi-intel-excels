@@ -4,6 +4,7 @@ import path from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
 const DEV_PORT = 3053;
+const DEV_HOST = '127.0.0.1';
 
 function run(command, args, options = {}) {
   return spawnSync(command, args, { encoding: 'utf8', maxBuffer: 1024 * 1024 * 4, ...options });
@@ -117,7 +118,21 @@ function hasUnsafeRuntime(report = null) {
   return runtime.processes.length > 0 || runtime.listeners.length > 0;
 }
 
-function killNextRuntime() {
+function isPortListening(port) {
+  const result = run('lsof', ['-tiTCP:' + port, '-sTCP:LISTEN', '-n', '-P']);
+  return result.status === 0 && Boolean(result.stdout.trim());
+}
+
+async function waitForPortToClose(port, timeoutMs = 8000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (!isPortListening(port)) return;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+  throw new Error(`Porta ${port} ainda está ocupada após ${timeoutMs}ms`);
+}
+
+async function killNextRuntime() {
   const patterns = [
     'next dev',
     'next start',
@@ -142,6 +157,9 @@ function killNextRuntime() {
         });
     }
   });
+
+  // Ensure the official dev port is actually free before any cache cleanup.
+  await waitForPortToClose(DEV_PORT).catch(() => {});
 }
 
 async function removeNextCache() {
@@ -149,13 +167,9 @@ async function removeNextCache() {
 }
 
 function startDevServer() {
-  const child = spawn('npm', ['run', 'dev'], {
+  const child = spawn('npx', ['next', 'dev', '-H', DEV_HOST, '-p', String(DEV_PORT)], {
     stdio: 'inherit',
-    env: {
-      ...process.env,
-      HOST: '0.0.0.0',
-      PORT: String(DEV_PORT),
-    },
+    env: { ...process.env },
   });
 
   const stop = (signal) => {
@@ -176,6 +190,7 @@ function startDevServer() {
 
 export {
   DEV_PORT,
+  DEV_HOST,
   getNextListeners,
   getNextProcesses,
   hasUnsafeRuntime,

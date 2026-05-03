@@ -1,7 +1,7 @@
 import { killNextRuntime, removeNextCache, startDevServer } from './next-env.mjs';
 
 async function main() {
-  killNextRuntime();
+  await killNextRuntime();
   await removeNextCache();
   startDevServer();
 }
