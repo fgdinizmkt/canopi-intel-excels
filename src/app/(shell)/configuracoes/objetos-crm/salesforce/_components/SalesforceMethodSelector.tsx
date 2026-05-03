@@ -107,7 +107,51 @@ interface AccountsPreviewApiResponse {
   error?: string;
 }
 
+interface PreparedAccountsPreviewRow {
+  key: string;
+  label: string;
+  gaps: string[];
+  isValid: boolean;
+}
 
+interface PreparedAccountsPreviewSummary {
+  preparedAt: string;
+  selectedCount: number;
+  validCount: number;
+  rowsWithGapsCount: number;
+  rows: PreparedAccountsPreviewRow[];
+}
+
+function formatTestedAt(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
+function getAccountPreviewRowKey(record: AccountsPreviewRecord, index: number): string {
+  return record.Id?.trim() || `${record.Name?.trim() || 'account'}-${index}`;
+}
+
+function getAccountPreviewRowLabel(record: AccountsPreviewRecord, index: number): string {
+  return record.Name?.trim() || record.Id?.trim() || `Account ${index + 1}`;
+}
+
+function getAccountPreviewRowGaps(record: AccountsPreviewRecord): string[] {
+  const gaps: string[] = [];
+  if (!record.Id?.trim()) gaps.push('sem Id');
+  if (!record.Name?.trim()) gaps.push('sem Name');
+  if (!record.Website?.trim()) gaps.push('sem Website');
+  if (!record.Industry?.trim()) gaps.push('sem Industry');
+  return gaps;
+}
 const METHODS: MethodDefinition[] = [
   {
     id: 'oauth',
@@ -164,20 +208,6 @@ const CHECKLIST_ITEMS = [
   'Campos disponíveis',
 ];
 
-function formatTestedAt(iso: string): string {
-  try {
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(iso));
-  } catch {
-    return iso;
-  }
-}
-
 export function SalesforceMethodSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -202,6 +232,8 @@ export function SalesforceMethodSelector() {
   const [accountsPreview, setAccountsPreview] = useState<AccountsPreviewResult | null>(null);
   const [accountsPreviewLoading, setAccountsPreviewLoading] = useState(false);
   const [accountsPreviewError, setAccountsPreviewError] = useState<string | null>(null);
+  const [selectedAccountPreviewKeys, setSelectedAccountPreviewKeys] = useState<string[]>([]);
+  const [preparedAccountsPreviewSelection, setPreparedAccountsPreviewSelection] = useState<PreparedAccountsPreviewSummary | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
   const [oauthConfigForm, setOauthConfigForm] = useState({
@@ -425,6 +457,8 @@ export function SalesforceMethodSelector() {
     setAccountsPreviewLoading(true);
     setAccountsPreviewError(null);
     setOauthNotice(null);
+    setSelectedAccountPreviewKeys([]);
+    setPreparedAccountsPreviewSelection(null);
 
     try {
       const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
@@ -446,6 +480,25 @@ export function SalesforceMethodSelector() {
     } finally {
       setAccountsPreviewLoading(false);
     }
+  }
+
+  function toggleAccountPreviewRowSelection(rowKey: string) {
+    setPreparedAccountsPreviewSelection(null);
+    setSelectedAccountPreviewKeys((current) =>
+      current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
+    );
+  }
+
+  function handleToggleSelectAllAccountPreviewRows() {
+    setPreparedAccountsPreviewSelection(null);
+    setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
+  }
+
+  function handlePrepareAccountPreviewSelection() {
+    setPreparedAccountsPreviewSelection({
+      ...liveAccountPreviewSummary,
+      preparedAt: new Date().toISOString(),
+    });
   }
 
   async function handleOAuthDisconnect() {
@@ -485,6 +538,36 @@ export function SalesforceMethodSelector() {
     if (!lastValidationPulseAt) return false;
     return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
   }, [lastValidationPulseAt]);
+  const accountPreviewRows = useMemo(
+    () =>
+      (accountsPreview?.records || []).map((record, index) => {
+        const gaps = getAccountPreviewRowGaps(record);
+        return {
+          key: getAccountPreviewRowKey(record, index),
+          label: getAccountPreviewRowLabel(record, index),
+          gaps,
+          isValid: gaps.length === 0,
+        };
+      }),
+    [accountsPreview]
+  );
+  const selectedAccountPreviewRowSet = useMemo(() => new Set(selectedAccountPreviewKeys), [selectedAccountPreviewKeys]);
+  const selectedAccountPreviewRows = useMemo(
+    () => accountPreviewRows.filter((row) => selectedAccountPreviewRowSet.has(row.key)),
+    [accountPreviewRows, selectedAccountPreviewRowSet]
+  );
+  const allAccountPreviewRowsSelected =
+    accountPreviewRows.length > 0 && accountPreviewRows.every((row) => selectedAccountPreviewRowSet.has(row.key));
+  const liveAccountPreviewSummary = useMemo<PreparedAccountsPreviewSummary>(
+    () => ({
+      preparedAt: new Date().toISOString(),
+      selectedCount: selectedAccountPreviewRows.length,
+      validCount: selectedAccountPreviewRows.filter((row) => row.isValid).length,
+      rowsWithGapsCount: selectedAccountPreviewRows.filter((row) => row.gaps.length > 0).length,
+      rows: selectedAccountPreviewRows,
+    }),
+    [selectedAccountPreviewRows]
+  );
   const accountPreviewColumns = [
     ['Id', 'Id'],
     ['Nome', 'Name'],
@@ -1154,15 +1237,48 @@ export function SalesforceMethodSelector() {
                     <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
                       API {accountsPreview.apiVersion}
                     </span>
+                    <span className="rounded-lg bg-blue-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-800">
+                      {selectedAccountPreviewRows.length} selecionados
+                    </span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-500">
                     {accountsPreview.done ? 'Resultado completo para o limite solicitado.' : 'Resultado parcial para o limite solicitado.'} Última leitura:{' '}
                     {formatTestedAt(accountsPreview.testedAt)}
                   </p>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleToggleSelectAllAccountPreviewRows}
+                      disabled={accountPreviewRows.length === 0}
+                      className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {allAccountPreviewRowsSelected ? 'Desselecionar todos os registros carregados' : 'Selecionar todos os registros carregados'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrepareAccountPreviewSelection}
+                      disabled={selectedAccountPreviewRows.length === 0}
+                      className="rounded-xl bg-blue-600 px-3 py-2 text-xs font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Preparar seleção
+                    </button>
+                  </div>
+
                   <div className="overflow-x-auto rounded-2xl border border-slate-200">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-slate-200 bg-slate-100">
+                          <th className="w-12 px-3 py-2 text-center text-[10px] font-black uppercase tracking-wider text-slate-700">
+                            <input
+                              type="checkbox"
+                              aria-label="Selecionar todos os registros carregados"
+                              checked={allAccountPreviewRowsSelected}
+                              onChange={handleToggleSelectAllAccountPreviewRows}
+                              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                              disabled={accountPreviewRows.length === 0}
+                            />
+                          </th>
                           {accountPreviewColumns.map(([label]) => (
                             <th
                               key={label}
@@ -1174,20 +1290,130 @@ export function SalesforceMethodSelector() {
                         </tr>
                       </thead>
                       <tbody>
-                        {accountsPreview.records.map((record, index) => (
-                          <tr key={record.Id || `${record.Name || 'account'}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                            {accountPreviewColumns.map(([, fieldName]) => (
-                              <td key={`${record.Id || index}-${fieldName}`} className="whitespace-nowrap px-3 py-2 text-sm text-slate-700">
-                                <span className="block max-w-[220px] truncate">
-                                  {record[fieldName as keyof AccountsPreviewRecord] || '—'}
-                                </span>
+                        {accountsPreview.records.map((record, index) => {
+                          const rowKey = getAccountPreviewRowKey(record, index);
+                          const rowLabel = getAccountPreviewRowLabel(record, index);
+
+                          return (
+                            <tr key={rowKey} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                              <td className="px-3 py-2 text-center align-top">
+                                <input
+                                  type="checkbox"
+                                  aria-label={`Selecionar ${rowLabel}`}
+                                  checked={selectedAccountPreviewRowSet.has(rowKey)}
+                                  onChange={() => toggleAccountPreviewRowSelection(rowKey)}
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
                               </td>
-                            ))}
-                          </tr>
-                        ))}
+                              {accountPreviewColumns.map(([, fieldName]) => (
+                                <td key={`${rowKey}-${fieldName}`} className="whitespace-nowrap px-3 py-2 text-sm text-slate-700">
+                                  <span className="block max-w-[220px] truncate">
+                                    {record[fieldName as keyof AccountsPreviewRecord] || '—'}
+                                  </span>
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
+
+                  <Card className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="text-sm font-black text-blue-900">Seleção preparada para pré-sync read-only</p>
+                        <p className="text-sm font-medium text-blue-800">
+                          Seleção local desta sessão. Não importa registros, não grava no Supabase e não executa sync real.
+                        </p>
+                      </div>
+                      <span className="rounded-lg bg-blue-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-800">
+                        {selectedAccountPreviewRows.length} selecionados
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                      <div className="rounded-xl border border-blue-100 bg-white p-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Válidos para pré-sync read-only</p>
+                        <p className="mt-1 text-2xl font-black text-blue-900">
+                          {preparedAccountsPreviewSelection?.validCount ?? liveAccountPreviewSummary.validCount}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-blue-700">Registros com Id, Name, Website e Industry completos.</p>
+                      </div>
+                      <div className="rounded-xl border border-blue-100 bg-white p-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Registros com lacunas</p>
+                        <p className="mt-1 text-2xl font-black text-blue-900">
+                          {preparedAccountsPreviewSelection?.rowsWithGapsCount ?? liveAccountPreviewSummary.rowsWithGapsCount}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-blue-700">Lacunas simples: sem Id, sem Name, sem Website, sem Industry.</p>
+                      </div>
+                      <div className="rounded-xl border border-blue-100 bg-white p-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Preparação local</p>
+                        <p className="mt-1 text-2xl font-black text-blue-900">
+                          {preparedAccountsPreviewSelection ? 'Consolidada' : 'Pendente'}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-blue-700">
+                          {preparedAccountsPreviewSelection
+                            ? `Preparada em ${formatTestedAt(preparedAccountsPreviewSelection.preparedAt)}`
+                            : 'Clique em “Preparar seleção” para consolidar o resumo nesta sessão.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {preparedAccountsPreviewSelection ? (
+                      <div className="mt-4 space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Resumo preparado</p>
+                        <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-blue-100 bg-blue-50">
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Registro</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Status</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Lacunas</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {preparedAccountsPreviewSelection.rows.map((row, rowIndex) => (
+                                <tr key={row.key} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-blue-50/40'}>
+                                  <td className="px-3 py-2 text-sm font-medium text-blue-900">{row.label}</td>
+                                  <td className="px-3 py-2 text-sm">
+                                    {row.isValid ? (
+                                      <Badge className="border-none bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1">
+                                        Válido
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="border-none bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-2 py-1">
+                                        Com lacunas
+                                      </Badge>
+                                    )}
+                                  </td>
+                                  <td className="px-3 py-2 text-sm text-blue-800">
+                                    {row.gaps.length > 0 ? row.gaps.join(', ') : '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-4 text-sm font-medium text-blue-800">
+                        Selecione os Accounts carregados e clique em “Preparar seleção” para registrar o resumo local desta sessão.
+                      </p>
+                    )}
+
+                    <div className="mt-4 rounded-xl border border-blue-100 bg-blue-100/50 px-3 py-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-blue-800">Guardrails da seleção</p>
+                      <ul className="mt-2 space-y-1 text-xs font-medium text-blue-800">
+                        <li>• Seleção local desta sessão.</li>
+                        <li>• Não importa registros.</li>
+                        <li>• Não grava no Supabase.</li>
+                        <li>• Não altera camada canônica.</li>
+                        <li>• Não faz writeback.</li>
+                        <li>• Não usa Bulk API.</li>
+                      </ul>
+                    </div>
+                  </Card>
                 </div>
               )}
             </Card>
