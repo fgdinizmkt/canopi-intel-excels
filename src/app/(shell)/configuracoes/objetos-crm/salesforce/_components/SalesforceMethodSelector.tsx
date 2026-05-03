@@ -148,6 +148,29 @@ interface LocalPreSyncContract {
   records: LocalPreSyncContractRow[];
 }
 
+type LocalPreSyncDryRunRecordStatus = 'apto para sync read-only futuro' | 'com alertas' | 'bloqueado para sync';
+
+interface LocalPreSyncDryRunRow {
+  key: string;
+  label: string;
+  status: LocalPreSyncDryRunRecordStatus;
+  reasons: string[];
+  record: LocalPreSyncContractRow;
+}
+
+interface LocalPreSyncDryRun {
+  createdAt: string;
+  source: 'Salesforce OAuth';
+  objectApiName: 'Account';
+  mode: 'dry-run read-only';
+  contractTotal: number;
+  aptoCount: number;
+  alertCount: number;
+  blockedCount: number;
+  fieldsEvaluated: string[];
+  rows: LocalPreSyncDryRunRow[];
+}
+
 function formatTestedAt(iso: string): string {
   try {
     return new Intl.DateTimeFormat('pt-BR', {
@@ -201,6 +224,49 @@ function buildLocalPreSyncContract(summary: PreparedAccountsPreviewSummary, prev
       status: row.isValid ? 'válido' : 'com lacunas',
       gaps: row.gaps,
     })),
+  };
+}
+
+function getLocalPreSyncDryRunReasons(row: LocalPreSyncContractRow): string[] {
+  const reasons: string[] = [];
+  if (!row.Id?.trim()) reasons.push('sem Id');
+  if (!row.Name?.trim()) reasons.push('sem Name');
+  if (!row.Website?.trim()) reasons.push('sem Website');
+  if (!row.Industry?.trim()) reasons.push('sem Industry');
+  return reasons;
+}
+
+function classifyLocalPreSyncDryRunRow(row: LocalPreSyncContractRow, index: number): LocalPreSyncDryRunRow {
+  const reasons = getLocalPreSyncDryRunReasons(row);
+  const isBlocked = reasons.includes('sem Id') || reasons.includes('sem Name');
+  const isAlert = !isBlocked && (reasons.includes('sem Website') || reasons.includes('sem Industry'));
+
+  return {
+    key: `${row.Id || row.Name || 'account'}-${index}`,
+    label: row.Name?.trim() || row.Id?.trim() || `Account ${index + 1}`,
+    status: isBlocked ? 'bloqueado para sync' : isAlert ? 'com alertas' : 'apto para sync read-only futuro',
+    reasons:
+      isBlocked || isAlert
+        ? reasons
+        : ['pronto para o dry-run read-only futuro'],
+    record: row,
+  };
+}
+
+function buildLocalPreSyncDryRun(contract: LocalPreSyncContract): LocalPreSyncDryRun {
+  const rows = contract.records.map(classifyLocalPreSyncDryRunRow);
+
+  return {
+    createdAt: new Date().toISOString(),
+    source: contract.source,
+    objectApiName: contract.objectApiName,
+    mode: 'dry-run read-only',
+    contractTotal: contract.records.length,
+    aptoCount: rows.filter((row) => row.status === 'apto para sync read-only futuro').length,
+    alertCount: rows.filter((row) => row.status === 'com alertas').length,
+    blockedCount: rows.filter((row) => row.status === 'bloqueado para sync').length,
+    fieldsEvaluated: contract.fieldsConsidered,
+    rows,
   };
 }
 const METHODS: MethodDefinition[] = [
@@ -286,12 +352,17 @@ export function SalesforceMethodSelector() {
   const [selectedAccountPreviewKeys, setSelectedAccountPreviewKeys] = useState<string[]>([]);
   const [preparedAccountsPreviewSelection, setPreparedAccountsPreviewSelection] = useState<PreparedAccountsPreviewSummary | null>(null);
   const [localPreSyncContract, setLocalPreSyncContract] = useState<LocalPreSyncContract | null>(null);
+  const [localPreSyncDryRun, setLocalPreSyncDryRun] = useState<LocalPreSyncDryRun | null>(null);
   const [selectionFeedback, setSelectionFeedback] = useState<string | null>(null);
   const [contractFeedback, setContractFeedback] = useState<string | null>(null);
+  const [dryRunFeedback, setDryRunFeedback] = useState<string | null>(null);
   const [contractJustGenerated, setContractJustGenerated] = useState(false);
+  const [dryRunJustCompleted, setDryRunJustCompleted] = useState(false);
   const [prepareButtonBusy, setPrepareButtonBusy] = useState(false);
   const [contractButtonGenerated, setContractButtonGenerated] = useState(false);
+  const [dryRunButtonBusy, setDryRunButtonBusy] = useState(false);
   const contractCardRef = useRef<HTMLDivElement | null>(null);
+  const dryRunCardRef = useRef<HTMLDivElement | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
   const [oauthConfigForm, setOauthConfigForm] = useState({
@@ -518,9 +589,14 @@ export function SalesforceMethodSelector() {
     setSelectedAccountPreviewKeys([]);
     setPreparedAccountsPreviewSelection(null);
     setLocalPreSyncContract(null);
+    setLocalPreSyncDryRun(null);
     setSelectionFeedback(null);
     setContractFeedback(null);
+    setDryRunFeedback(null);
     setContractJustGenerated(false);
+    setDryRunJustCompleted(false);
+    setContractButtonGenerated(false);
+    setDryRunButtonBusy(false);
 
     try {
       const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
@@ -547,10 +623,14 @@ export function SalesforceMethodSelector() {
   function toggleAccountPreviewRowSelection(rowKey: string) {
     setPreparedAccountsPreviewSelection(null);
     setLocalPreSyncContract(null);
+    setLocalPreSyncDryRun(null);
     setSelectionFeedback(null);
     setContractFeedback(null);
+    setDryRunFeedback(null);
     setContractJustGenerated(false);
+    setDryRunJustCompleted(false);
     setContractButtonGenerated(false);
+    setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
     setSelectedAccountPreviewKeys((current) =>
       current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
@@ -560,16 +640,24 @@ export function SalesforceMethodSelector() {
   function handleToggleSelectAllAccountPreviewRows() {
     setPreparedAccountsPreviewSelection(null);
     setLocalPreSyncContract(null);
+    setLocalPreSyncDryRun(null);
     setSelectionFeedback(null);
     setContractFeedback(null);
+    setDryRunFeedback(null);
     setContractJustGenerated(false);
+    setDryRunJustCompleted(false);
     setContractButtonGenerated(false);
+    setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
     setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
   }
 
   function handlePrepareAccountPreviewSelection() {
     setPrepareButtonBusy(true);
+    setLocalPreSyncDryRun(null);
+    setDryRunFeedback(null);
+    setDryRunJustCompleted(false);
+    setDryRunButtonBusy(false);
     const nextSelection = {
       ...liveAccountPreviewSummary,
       preparedAt: new Date().toISOString(),
@@ -587,6 +675,10 @@ export function SalesforceMethodSelector() {
 
   function handleGenerateLocalPreSyncContract() {
     if (!preparedAccountsPreviewSelection || !accountsPreview) return;
+    setLocalPreSyncDryRun(null);
+    setDryRunFeedback(null);
+    setDryRunJustCompleted(false);
+    setDryRunButtonBusy(false);
     const nextContract = buildLocalPreSyncContract(preparedAccountsPreviewSelection, accountsPreview);
     setLocalPreSyncContract(nextContract);
     setContractFeedback('Contrato local gerado nesta sessão.');
@@ -595,6 +687,25 @@ export function SalesforceMethodSelector() {
     setTimeout(() => {
       contractCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
+  }
+
+  function handleExecuteLocalDryRun() {
+    if (!localPreSyncContract) return;
+
+    setDryRunButtonBusy(true);
+    setDryRunFeedback(null);
+    setLocalPreSyncDryRun(null);
+
+    window.setTimeout(() => {
+      const nextDryRun = buildLocalPreSyncDryRun(localPreSyncContract);
+      setLocalPreSyncDryRun(nextDryRun);
+      setDryRunFeedback('Dry-run read-only concluído nesta sessão.');
+      setDryRunJustCompleted(true);
+      setDryRunButtonBusy(false);
+      setTimeout(() => {
+        dryRunCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    }, 120);
   }
 
   async function handleOAuthDisconnect() {
@@ -669,6 +780,8 @@ export function SalesforceMethodSelector() {
   const canGenerateLocalContract = Boolean(preparedAccountsPreviewSelection);
   const isPrepareSuccess = Boolean(preparedAccountsPreviewSelection) && !prepareButtonBusy;
   const isGenerateSuccess = contractButtonGenerated || Boolean(localPreSyncContract);
+  const canExecuteLocalDryRun = Boolean(localPreSyncContract);
+  const isDryRunSuccess = dryRunJustCompleted || Boolean(localPreSyncDryRun);
   const accountPreviewColumns = [
     ['Id', 'Id'],
     ['Nome', 'Name'],
@@ -1655,9 +1768,161 @@ export function SalesforceMethodSelector() {
                       </div>
                     )}
 
-                    <div className="mt-4 rounded-xl border border-blue-100 bg-blue-100/50 px-3 py-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-blue-800">Guardrails da seleção</p>
-                      <ul className="mt-2 space-y-1 text-xs font-medium text-blue-800">
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleExecuteLocalDryRun}
+                      disabled={!canExecuteLocalDryRun || dryRunButtonBusy}
+                      title={!canExecuteLocalDryRun ? 'Prepare o contrato local para liberar o dry-run.' : undefined}
+                      className={`rounded-xl px-3 py-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                        dryRunButtonBusy
+                          ? 'bg-slate-500 text-white'
+                          : isDryRunSuccess
+                          ? 'border border-emerald-300 bg-emerald-600 text-white hover:bg-emerald-700'
+                          : canExecuteLocalDryRun
+                          ? 'border border-blue-300 bg-white text-blue-700 hover:bg-blue-50'
+                          : 'border border-slate-200 bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {dryRunButtonBusy
+                        ? 'Executando dry-run...'
+                        : isDryRunSuccess
+                        ? 'Dry-run concluído'
+                        : 'Executar dry-run read-only'}
+                    </button>
+                    {!canExecuteLocalDryRun && (
+                      <p className="w-full text-xs font-medium text-slate-500">
+                        Prepare o contrato local para liberar o dry-run.
+                      </p>
+                    )}
+                  </div>
+
+                  {dryRunFeedback && (
+                    <div
+                      className={`mt-4 rounded-2xl border px-4 py-3 transition-all ${
+                        dryRunJustCompleted ? 'border-emerald-200 bg-emerald-50 shadow-sm shadow-emerald-100' : 'border-blue-200 bg-blue-50'
+                      }`}
+                    >
+                      <p className={`text-sm font-black ${dryRunJustCompleted ? 'text-emerald-900' : 'text-blue-900'}`}>
+                        Dry-run read-only de Accounts
+                      </p>
+                      <p className={`mt-1 text-sm font-medium ${dryRunJustCompleted ? 'text-emerald-800' : 'text-blue-800'}`}>
+                        {dryRunFeedback}
+                      </p>
+                    </div>
+                  )}
+
+                  {localPreSyncDryRun && (
+                    <div
+                      ref={dryRunCardRef}
+                      className={`mt-4 rounded-2xl border p-4 transition-all ${
+                        dryRunJustCompleted ? 'border-emerald-300 bg-emerald-50 shadow-sm shadow-emerald-100' : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="text-sm font-black text-slate-900">Dry-run read-only de Accounts</p>
+                          <p className="text-sm font-medium text-slate-600">
+                            Simulação local desta sessão. Nenhuma leitura adicional, gravação ou sincronização é executada.
+                          </p>
+                        </div>
+                        <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                          {localPreSyncDryRun.contractTotal} registros
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+                        {([
+                          ['Criado em', formatTestedAt(localPreSyncDryRun.createdAt)],
+                          ['Origem', localPreSyncDryRun.source],
+                          ['Objeto', localPreSyncDryRun.objectApiName],
+                          ['Modo', localPreSyncDryRun.mode],
+                          ['Total no contrato', String(localPreSyncDryRun.contractTotal)],
+                          ['Aptos para sync read-only futuro', String(localPreSyncDryRun.aptoCount)],
+                          ['Com alertas', String(localPreSyncDryRun.alertCount)],
+                          ['Bloqueados', String(localPreSyncDryRun.blockedCount)],
+                        ] as [string, string][]).map(([label, value]) => (
+                          <div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
+                            <p className="mt-1 text-sm font-medium text-slate-900 break-all">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Campos avaliados</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {localPreSyncDryRun.fieldsEvaluated.map((field) => (
+                            <Badge key={field} className="border-none bg-white text-slate-700 text-[10px] font-black uppercase px-2 py-1">
+                              {field}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-slate-200 bg-slate-100">
+                              <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Registro</th>
+                              <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Status</th>
+                              <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Motivos</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {localPreSyncDryRun.rows.map((row, index) => (
+                              <tr key={row.key} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                                <td className="px-3 py-2 text-sm font-medium text-slate-900">
+                                  <div className="space-y-1">
+                                    <p>{row.label}</p>
+                                    <p className="text-[11px] font-mono text-slate-500">
+                                      {row.record.Id || '—'} · {row.record.Name || '—'}
+                                    </p>
+                                  </div>
+                                </td>
+                                <td className="px-3 py-2 text-sm">
+                                  {row.status === 'apto para sync read-only futuro' ? (
+                                    <Badge className="border-none bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1">
+                                      Apto para sync read-only futuro
+                                    </Badge>
+                                  ) : row.status === 'com alertas' ? (
+                                    <Badge className="border-none bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-2 py-1">
+                                      Com alertas
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="border-none bg-red-100 text-red-700 text-[10px] font-black uppercase px-2 py-1">
+                                      Bloqueado para sync
+                                    </Badge>
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-sm text-slate-700">
+                                  {row.reasons.length > 0 ? row.reasons.join(', ') : '—'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails do dry-run</p>
+                        <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
+                          <li>• Dry-run local desta sessão.</li>
+                          <li>• Não importa registros.</li>
+                          <li>• Não grava no Supabase.</li>
+                          <li>• Não executa sync real.</li>
+                          <li>• Não altera camada canônica.</li>
+                          <li>• Não faz dedupe real.</li>
+                          <li>• Não faz writeback.</li>
+                          <li>• Não usa Bulk API.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-4 rounded-xl border border-blue-100 bg-blue-100/50 px-3 py-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-800">Guardrails da seleção</p>
+                    <ul className="mt-2 space-y-1 text-xs font-medium text-blue-800">
                         <li>• Seleção local desta sessão.</li>
                         <li>• Não importa registros.</li>
                         <li>• Não grava no Supabase.</li>
