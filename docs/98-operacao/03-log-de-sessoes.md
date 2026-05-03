@@ -5,6 +5,24 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce 2C.4 continuação (reorganização UX modos + mapeamento Canopi)
+
+- **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
+- **Objetivo:** reorganizar a experiência para separar corretamente OAuth (fonte viva), Token (efêmero) e CSV (local); mover discovery para dentro do painel OAuth; adicionar mapeamento Canopi sugerido por objeto.
+- **Commits locais:** `e8c6d37` (5 objetos + UX) e commit desta sessão (reorganização)
+- **O que foi implementado:**
+  - Discovery movido do bloco standalone global para dentro do painel OAuth do `SalesforceMethodSelector`
+  - Título contextual: "Discovery via OAuth conectado"
+  - Bloco "Sobre este modo" adicionado em todos os três painéis (OAuth, Token, CSV)
+  - `CANOPI_MAPPING` por objeto (Account, Contact, Opportunity, Lead, Campaign) em `SalesforceDiscovery`
+  - Seção "Mapeamento Canopi sugerido" read-only por objeto, com indicação de campos mapeáveis vs ausentes
+  - CTA: "Edição e persistência do mapeamento entram no próximo recorte."
+  - Copy da página atualizado: header, status cards e seção de objetos refletem separação de modos
+  - `SalesforceDiscovery` passa a aceitar props `title` e `description`
+- **O que ficou fora:** edição real do mapeamento (sem caminho de persistência), sync, writeback, importação.
+
+---
+
 ## [2026-05-02] — Salesforce 2C.4 (Discovery read-only multiobjeto + mapeamento pré-sync)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.

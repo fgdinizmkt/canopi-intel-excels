@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Circle, FileJson, KeyRound, Loader2, Network, XCircle } from 'lucide-react';
 import { Card, Badge } from '@/src/components/ui';
 import { SalesforceCsvPreparation } from './SalesforceCsvPreparation';
+import { SalesforceDiscovery } from './SalesforceDiscovery';
 
 type SalesforceMethod = 'oauth' | 'token' | 'csv';
 type TestStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -895,6 +896,15 @@ export function SalesforceMethodSelector() {
                   )}
                 </div>
 
+                <div className="rounded-2xl border border-slate-100 bg-white p-4 space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Sobre este modo
+                  </p>
+                  <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                    <span className="font-bold text-slate-800">OAuth / Fonte viva</span> — Conexão persistida com token criptografado. Valida acesso read-only ao Salesforce via Account/describe. Permite discovery de metadados de múltiplos objetos. Sem sync, sem writeback, sem importação real.
+                  </p>
+                </div>
+
                 {showConfigForm && (
                   <div className="rounded-2xl border border-slate-200 bg-white p-4">
                     <p className="text-sm font-black text-slate-900">Configurar External Client App</p>
@@ -994,6 +1004,33 @@ export function SalesforceMethodSelector() {
                 )}
               </div>
             )}
+
+            <SalesforceDiscovery
+              title="Discovery via OAuth conectado"
+              description="Campos detectados são somente leitura. Nenhum registro será importado nesta etapa."
+            />
+          </div>
+        )}
+
+        {selected === 'token' && (
+          <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Sobre este modo
+            </p>
+            <p className="text-xs font-medium text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-800">Token temporário / Validação efêmera</span> — Valida acesso read-only ao objeto Account apenas. Nada é salvo, nenhuma conexão é persistida. Ao trocar de aba ou recarregar a página, o token e o resultado são descartados.
+            </p>
+          </div>
+        )}
+
+        {selected === 'csv' && (
+          <div className="mt-4 rounded-2xl border border-slate-100 bg-white p-4 space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Sobre este modo
+            </p>
+            <p className="text-xs font-medium text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-800">CSV exportado / Entrada local</span> — Análise local de arquivo exportado do Salesforce. Não consulta o Salesforce ao vivo. Sem conexão OAuth, sem token, sem metadados via describe. Foco em upload, preview de colunas e validação local.
+            </p>
           </div>
         )}
       </Card>

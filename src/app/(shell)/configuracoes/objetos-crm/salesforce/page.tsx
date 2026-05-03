@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { ChevronLeft, ShieldCheck } from 'lucide-react';
 import { Badge, Card } from '@/src/components/ui';
 import { SalesforceMethodSelector } from './_components/SalesforceMethodSelector';
-import { SalesforceDiscovery } from './_components/SalesforceDiscovery';
 
 export default function SalesforceDedicatedPage() {
   return (
@@ -31,7 +30,7 @@ export default function SalesforceDedicatedPage() {
           <div>
             <h2 className="text-4xl font-black tracking-tighter text-slate-900">Salesforce</h2>
             <p className="text-sm font-medium text-slate-600">
-              Configure a fonte Salesforce para leitura de contas, metadados e mapeamento local.
+              OAuth = fonte viva · Token = validação efêmera · CSV = entrada local · Discovery = metadados somente leitura
             </p>
           </div>
         </div>
@@ -68,11 +67,11 @@ export default function SalesforceDedicatedPage() {
         <Card className="rounded-3xl border border-slate-200 p-6">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {([
-              ['Token temporário', 'Funcional read-only', 'emerald'],
-              ['OAuth / External Client App', 'OAuth produtivo', 'emerald'],
-              ['Discovery multiobjeto', 'Account · Contact · Opp · Lead · Campaign', 'emerald'],
-              ['CSV exportado', 'Preparação local', 'blue'],
-              ['Bulk API / sync', 'Futuro', 'amber'],
+              ['OAuth · Fonte viva', 'Produtivo + discovery read-only', 'emerald'],
+              ['Token temporário · Efêmero', 'Valida Account · nada salvo', 'amber'],
+              ['CSV · Entrada local', 'Preparação local · sem conexão live', 'blue'],
+              ['Discovery multiobjeto', '5 objetos · somente metadados', 'emerald'],
+              ['Bulk API / sync', 'Futuro', 'slate'],
               ['Writeback', 'Não disponível nesta versão', 'slate'],
             ] as [string, string, 'emerald' | 'blue' | 'amber' | 'slate'][]).map(([label, status, tone]) => (
               <div key={label} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
@@ -94,7 +93,7 @@ export default function SalesforceDedicatedPage() {
             ))}
           </div>
           <p className="mt-4 text-sm font-medium text-slate-600">
-            Este conector já permite validação read-only via token temporário, preparação local por CSV e conexão OAuth produtiva quando configurada.
+            OAuth = conexão viva com discovery de metadados · Token = validação efêmera de Account sem persistência · CSV = análise local de arquivo exportado sem consulta live.
           </p>
         </Card>
       </section>
@@ -102,11 +101,6 @@ export default function SalesforceDedicatedPage() {
       <section className="space-y-4">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Métodos de conexão</p>
         <SalesforceMethodSelector />
-      </section>
-
-      <section className="space-y-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Discovery e mapeamento pré-sync</p>
-        <SalesforceDiscovery />
       </section>
 
       <section className="space-y-4">
@@ -118,7 +112,7 @@ export default function SalesforceDedicatedPage() {
                 Account · Contact · Opportunity · Lead · Campaign
               </h3>
               <p className="text-sm font-medium leading-relaxed text-slate-600">
-                Discovery read-only de metadados. Disponibilidade e permissões dependem da organização Salesforce.
+                Discovery read-only via OAuth. Disponibilidade e permissões dependem da organização Salesforce. Discovery fica dentro do painel OAuth.
               </p>
             </div>
             <Badge className="border-none bg-blue-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">

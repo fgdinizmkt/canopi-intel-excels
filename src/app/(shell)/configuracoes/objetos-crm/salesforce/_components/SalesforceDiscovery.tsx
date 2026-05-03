@@ -42,6 +42,58 @@ type DiscoveryState =
   | { phase: 'done'; discoveries: SalesforceObjectDiscovery[] }
   | { phase: 'error'; message: string };
 
+const CANOPI_MAPPING: Record<string, Array<{ canopiAttr: string; sfField: string }>> = {
+  Account: [
+    { canopiAttr: 'Nome da conta', sfField: 'Name' },
+    { canopiAttr: 'Site', sfField: 'Website' },
+    { canopiAttr: 'Setor', sfField: 'Industry' },
+    { canopiAttr: 'Tipo', sfField: 'Type' },
+    { canopiAttr: 'Receita anual', sfField: 'AnnualRevenue' },
+    { canopiAttr: 'Funcionários', sfField: 'NumberOfEmployees' },
+    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+  ],
+  Contact: [
+    { canopiAttr: 'Nome', sfField: 'Name' },
+    { canopiAttr: 'Email', sfField: 'Email' },
+    { canopiAttr: 'Telefone', sfField: 'Phone' },
+    { canopiAttr: 'Cargo', sfField: 'Title' },
+    { canopiAttr: 'Departamento', sfField: 'Department' },
+    { canopiAttr: 'Conta relacionada', sfField: 'AccountId' },
+    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+  ],
+  Opportunity: [
+    { canopiAttr: 'Nome da oportunidade', sfField: 'Name' },
+    { canopiAttr: 'Conta relacionada', sfField: 'AccountId' },
+    { canopiAttr: 'Estágio', sfField: 'StageName' },
+    { canopiAttr: 'Valor', sfField: 'Amount' },
+    { canopiAttr: 'Fechamento', sfField: 'CloseDate' },
+    { canopiAttr: 'Probabilidade', sfField: 'Probability' },
+    { canopiAttr: 'Tipo', sfField: 'Type' },
+    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+  ],
+  Lead: [
+    { canopiAttr: 'Nome', sfField: 'Name' },
+    { canopiAttr: 'Empresa', sfField: 'Company' },
+    { canopiAttr: 'Email', sfField: 'Email' },
+    { canopiAttr: 'Telefone', sfField: 'Phone' },
+    { canopiAttr: 'Cargo', sfField: 'Title' },
+    { canopiAttr: 'Status', sfField: 'Status' },
+    { canopiAttr: 'Origem', sfField: 'LeadSource' },
+    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+  ],
+  Campaign: [
+    { canopiAttr: 'Nome da campanha', sfField: 'Name' },
+    { canopiAttr: 'Tipo', sfField: 'Type' },
+    { canopiAttr: 'Status', sfField: 'Status' },
+    { canopiAttr: 'Início', sfField: 'StartDate' },
+    { canopiAttr: 'Fim', sfField: 'EndDate' },
+    { canopiAttr: 'Orçamento', sfField: 'BudgetedCost' },
+    { canopiAttr: 'Custo real', sfField: 'ActualCost' },
+    { canopiAttr: 'Receita esperada', sfField: 'ExpectedRevenue' },
+    { canopiAttr: 'Ativa', sfField: 'IsActive' },
+  ],
+};
+
 const STATUS_CONFIG: Record<
   SalesforceObjectStatus,
   { label: string; badgeCls: string; iconCls: string }
@@ -96,6 +148,8 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
   const [showAllFields, setShowAllFields] = useState(false);
   const cfg = STATUS_CONFIG[discovery.status];
   const recTotal = discovery.recommendedFields.length + discovery.missingRecommendedFields.length;
+  const fieldNameSet = new Set(discovery.fields.map((f) => f.name));
+  const canopiMap = CANOPI_MAPPING[discovery.objectApiName] ?? [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -197,6 +251,50 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
             </div>
           )}
 
+          {/* Canopi mapping suggestions */}
+          {canopiMap.length > 0 && (
+            <div>
+              <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Mapeamento Canopi sugerido
+              </p>
+              <p className="mb-2 text-[10px] font-medium text-slate-400">
+                Campos detectados via Salesforce describe · somente leitura na Canopi
+              </p>
+              <div className="rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
+                {canopiMap.map(({ canopiAttr, sfField }) => {
+                  const exists = fieldNameSet.has(sfField);
+                  return (
+                    <div
+                      key={sfField}
+                      className="flex items-center justify-between gap-3 px-3 py-1.5 border-b border-slate-100 last:border-0"
+                    >
+                      <span className="text-xs font-medium text-slate-700">{canopiAttr}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span
+                          className={`font-mono text-[10px] font-bold ${
+                            exists ? 'text-emerald-700' : 'text-slate-400 line-through'
+                          }`}
+                        >
+                          {sfField}
+                        </span>
+                        <span
+                          className={`text-[9px] font-black uppercase ${
+                            exists ? 'text-emerald-500' : 'text-slate-400'
+                          }`}
+                        >
+                          {exists ? '✓' : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-1.5 text-[10px] font-medium text-slate-400">
+                Edição e persistência do mapeamento entram no próximo recorte.
+              </p>
+            </div>
+          )}
+
           {/* All fields toggle */}
           <div>
             <button
@@ -258,7 +356,13 @@ function DiscoverySummary({ discoveries }: { discoveries: SalesforceObjectDiscov
   );
 }
 
-export function SalesforceDiscovery() {
+export function SalesforceDiscovery({
+  title = 'Discovery de objetos · Pré-sync',
+  description = 'Lê metadados de Account, Contact, Opportunity, Lead e Campaign via describe.',
+}: {
+  title?: string;
+  description?: string;
+} = {}) {
   const [state, setState] = useState<DiscoveryState>({ phase: 'idle' });
 
   async function runDiscovery() {
@@ -291,10 +395,8 @@ export function SalesforceDiscovery() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h3 className="text-base font-black text-slate-900">Discovery de objetos · Pré-sync</h3>
-          <p className="text-sm font-medium text-slate-500">
-            Lê metadados de Account, Contact, Opportunity, Lead e Campaign via describe.
-          </p>
+          <h3 className="text-base font-black text-slate-900">{title}</h3>
+          <p className="text-sm font-medium text-slate-500">{description}</p>
         </div>
         <button
           onClick={runDiscovery}
