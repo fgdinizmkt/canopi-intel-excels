@@ -115,6 +115,28 @@ export interface SalesforceObjectDiscovery {
   message?: string;
 }
 
+export interface SalesforceAccountPreviewRecord {
+  Id: string | null;
+  Name: string | null;
+  Website: string | null;
+  Industry: string | null;
+  Type: string | null;
+  OwnerId: string | null;
+  CreatedDate: string | null;
+  LastModifiedDate: string | null;
+}
+
+export interface SalesforceAccountPreviewResult {
+  records: SalesforceAccountPreviewRecord[];
+  totalSize: number;
+  done: boolean;
+  limit: number;
+  apiVersion: string;
+  instanceUrl: string;
+  accountLabel: string;
+  testedAt: string;
+}
+
 const RECOMMENDED_FIELDS: Record<string, string[]> = {
   Account: ['Id', 'Name', 'Website', 'Industry', 'Type', 'AnnualRevenue', 'NumberOfEmployees', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Contact: ['Id', 'AccountId', 'FirstName', 'LastName', 'Name', 'Email', 'Phone', 'Title', 'Department', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
@@ -122,6 +144,20 @@ const RECOMMENDED_FIELDS: Record<string, string[]> = {
   Lead: ['Id', 'Company', 'FirstName', 'LastName', 'Name', 'Email', 'Phone', 'Title', 'Status', 'LeadSource', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Campaign: ['Id', 'Name', 'Type', 'Status', 'StartDate', 'EndDate', 'BudgetedCost', 'ActualCost', 'ExpectedRevenue', 'IsActive', 'CreatedDate', 'LastModifiedDate'],
 };
+
+const ACCOUNT_PREVIEW_FIELDS = [
+  'Id',
+  'Name',
+  'Website',
+  'Industry',
+  'Type',
+  'OwnerId',
+  'CreatedDate',
+  'LastModifiedDate',
+];
+
+const DEFAULT_ACCOUNTS_PREVIEW_LIMIT = 10;
+const MAX_ACCOUNTS_PREVIEW_LIMIT = 25;
 
 type ConnectionRow = {
   provider: string;
@@ -173,6 +209,14 @@ function parseScopes(raw: string | undefined): string[] {
 function normalizeScopes(raw: string[] | null | undefined): string[] {
   if (!raw || raw.length === 0) return [...DEFAULT_SCOPES];
   return raw.map((v) => v.trim()).filter(Boolean);
+}
+
+function normalizeAccountsPreviewLimit(rawLimit: number | string | null | undefined): number {
+  const parsed = typeof rawLimit === 'string' ? Number(rawLimit) : rawLimit;
+  if (!Number.isFinite(parsed as number)) return DEFAULT_ACCOUNTS_PREVIEW_LIMIT;
+  const limit = Math.trunc(Number(parsed));
+  if (limit <= 0) return DEFAULT_ACCOUNTS_PREVIEW_LIMIT;
+  return Math.min(limit, MAX_ACCOUNTS_PREVIEW_LIMIT);
 }
 
 function parseIdentityUrl(identityUrl: string | undefined): { orgId: string | null; userId: string | null } {
@@ -720,6 +764,112 @@ export async function fetchMultiObjectDiscovery(
       message: 'Erro inesperado.',
     };
   });
+}
+
+async function queryAccountsPreview(
+  instanceUrl: string,
+  accessToken: string,
+  apiVersion: string,
+  limit: number,
+): Promise<SalesforceAccountPreviewResult> {
+  const fields = ACCOUNT_PREVIEW_FIELDS.join(', ');
+  const soql = `SELECT ${fields} FROM Account ORDER BY LastModifiedDate DESC LIMIT ${limit}`;
+  const queryUrl = new URL(`${instanceUrl}/services/data/${apiVersion}/query`);
+  queryUrl.searchParams.set('q', soql);
+
+  const res = await fetch(queryUrl.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    const err = new Error('ACCOUNT_QUERY_UNAUTHORIZED');
+    (err as Error & { status?: number }).status = res.status;
+    throw err;
+  }
+
+  if (!res.ok) {
+    const err = new Error('ACCOUNT_QUERY_FAILED');
+    (err as Error & { status?: number }).status = res.status;
+    throw err;
+  }
+
+  const payload = (await res.json().catch(() => null)) as {
+    totalSize?: number;
+    done?: boolean;
+    records?: Array<Record<string, unknown>>;
+  } | null;
+
+  const records = Array.isArray(payload?.records)
+    ? payload.records.map((record) => ({
+        Id: typeof record.Id === 'string' ? record.Id : null,
+        Name: typeof record.Name === 'string' ? record.Name : null,
+        Website: typeof record.Website === 'string' ? record.Website : null,
+        Industry: typeof record.Industry === 'string' ? record.Industry : null,
+        Type: typeof record.Type === 'string' ? record.Type : null,
+        OwnerId: typeof record.OwnerId === 'string' ? record.OwnerId : null,
+        CreatedDate: typeof record.CreatedDate === 'string' ? record.CreatedDate : null,
+        LastModifiedDate: typeof record.LastModifiedDate === 'string' ? record.LastModifiedDate : null,
+      }))
+    : [];
+
+  return {
+    records,
+    totalSize: typeof payload?.totalSize === 'number' ? payload.totalSize : records.length,
+    done: payload?.done === true,
+    limit,
+    apiVersion,
+    instanceUrl,
+    accountLabel: 'Account',
+    testedAt: new Date().toISOString(),
+  };
+}
+
+export async function fetchAccountsPreview(limitInput = DEFAULT_ACCOUNTS_PREVIEW_LIMIT): Promise<SalesforceAccountPreviewResult> {
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  const limit = normalizeAccountsPreviewLimit(limitInput);
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  try {
+    return await queryAccountsPreview(instanceUrl, accessToken, apiVersion, limit);
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status;
+    if ((status === 401 || status === 403) && refreshToken) {
+      const refreshed = await refreshAccessToken(refreshToken, config);
+      accessToken = refreshed.access_token?.trim() || '';
+      if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+
+      if (refreshed.instance_url?.trim()) {
+        instanceUrl = refreshed.instance_url.trim();
+      }
+
+      await updateOAuthConnectionPatch({
+        status: 'connected',
+        instance_url: instanceUrl,
+        access_token_encrypted: encryptToken(accessToken),
+        access_token_issued_at: refreshed.issued_at ? new Date(Number(refreshed.issued_at)).toISOString() : new Date().toISOString(),
+        scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+        last_health_check_at: new Date().toISOString(),
+        error_message: null,
+      });
+
+      return await queryAccountsPreview(instanceUrl, accessToken, apiVersion, limit);
+    }
+
+    throw error;
+  }
 }
 
 export async function revokeAndDisconnect(): Promise<void> {

@@ -78,6 +78,35 @@ interface OAuthConfigResult {
   updatedAt: string | null;
 }
 
+interface AccountsPreviewRecord {
+  Id: string | null;
+  Name: string | null;
+  Website: string | null;
+  Industry: string | null;
+  Type: string | null;
+  OwnerId: string | null;
+  CreatedDate: string | null;
+  LastModifiedDate: string | null;
+}
+
+interface AccountsPreviewResult {
+  records: AccountsPreviewRecord[];
+  totalSize: number;
+  done: boolean;
+  limit: number;
+  apiVersion: string;
+  instanceUrl: string;
+  accountLabel: string;
+  testedAt: string;
+}
+
+interface AccountsPreviewApiResponse {
+  status: string;
+  provider: string;
+  preview?: AccountsPreviewResult;
+  error?: string;
+}
+
 
 const METHODS: MethodDefinition[] = [
   {
@@ -170,6 +199,9 @@ export function SalesforceMethodSelector() {
   const [oauthConfigError, setOauthConfigError] = useState<string | null>(null);
   const [showOAuthConfigForm, setShowOAuthConfigForm] = useState(false);
   const [lastValidationPulseAt, setLastValidationPulseAt] = useState<string | null>(null);
+  const [accountsPreview, setAccountsPreview] = useState<AccountsPreviewResult | null>(null);
+  const [accountsPreviewLoading, setAccountsPreviewLoading] = useState(false);
+  const [accountsPreviewError, setAccountsPreviewError] = useState<string | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
   const [oauthConfigForm, setOauthConfigForm] = useState({
@@ -384,6 +416,38 @@ export function SalesforceMethodSelector() {
     }
   }
 
+  async function handleLoadAccountsPreview() {
+    if (!oauthConnected) {
+      setAccountsPreviewError('Conecte o Salesforce via OAuth para carregar o preview read-only de Accounts.');
+      return;
+    }
+
+    setAccountsPreviewLoading(true);
+    setAccountsPreviewError(null);
+    setOauthNotice(null);
+
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as AccountsPreviewApiResponse;
+
+      if (!res.ok || data.status !== 'success' || !data.preview) {
+        setAccountsPreview(null);
+        setAccountsPreviewError(data.error || 'Não foi possível carregar o preview read-only de Accounts.');
+        return;
+      }
+
+      setAccountsPreview(data.preview);
+    } catch {
+      setAccountsPreview(null);
+      setAccountsPreviewError('Não foi possível carregar o preview read-only de Accounts.');
+    } finally {
+      setAccountsPreviewLoading(false);
+    }
+  }
+
   async function handleOAuthDisconnect() {
     setOauthActionLoading('disconnect');
     setOauthNotice(null);
@@ -421,6 +485,16 @@ export function SalesforceMethodSelector() {
     if (!lastValidationPulseAt) return false;
     return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
   }, [lastValidationPulseAt]);
+  const accountPreviewColumns = [
+    ['Id', 'Id'],
+    ['Nome', 'Name'],
+    ['Website', 'Website'],
+    ['Industry', 'Industry'],
+    ['Type', 'Type'],
+    ['Owner', 'OwnerId'],
+    ['Criado em', 'CreatedDate'],
+    ['Atualizado em', 'LastModifiedDate'],
+  ] as const;
 
   return (
     <div className="space-y-4">
@@ -1020,6 +1094,103 @@ export function SalesforceMethodSelector() {
               title="Discovery via OAuth conectado"
               description="Campos detectados são somente leitura. Nenhum registro será importado nesta etapa."
             />
+
+            <Card className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="text-sm font-black text-slate-900">Preview read-only de Accounts</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    Carrega uma amostra pequena e somente leitura de registros reais de Accounts via OAuth já persistido.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLoadAccountsPreview}
+                  disabled={!oauthConnected || accountsPreviewLoading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {accountsPreviewLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {accountsPreviewLoading ? 'Carregando Accounts...' : 'Carregar Accounts'}
+                </button>
+              </div>
+
+              <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails</p>
+                <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
+                  <li>• Somente leitura.</li>
+                  <li>• Não importa registros para a Canopi.</li>
+                  <li>• Não grava no Supabase.</li>
+                  <li>• Não executa sync real.</li>
+                  <li>• Não faz writeback.</li>
+                  <li>• Não usa Bulk API.</li>
+                </ul>
+              </div>
+
+              {!oauthConnected && (
+                <p className="mt-4 text-sm font-medium text-amber-800">
+                  Conecte o Salesforce via OAuth para habilitar o preview read-only de Accounts.
+                </p>
+              )}
+
+              {accountsPreviewError && (
+                <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm font-black text-red-900">Não foi possível carregar Accounts</p>
+                  <p className="mt-1 text-sm font-medium text-red-800">{accountsPreviewError}</p>
+                </div>
+              )}
+
+              {accountsPreview && (
+                <div className="mt-4 space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-lg bg-emerald-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-800">
+                      {accountsPreview.records.length} registros carregados
+                    </span>
+                    <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                      total {accountsPreview.totalSize}
+                    </span>
+                    <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                      limite {accountsPreview.limit}
+                    </span>
+                    <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+                      API {accountsPreview.apiVersion}
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-medium text-slate-500">
+                    {accountsPreview.done ? 'Resultado completo para o limite solicitado.' : 'Resultado parcial para o limite solicitado.'} Última leitura:{' '}
+                    {formatTestedAt(accountsPreview.testedAt)}
+                  </p>
+                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200 bg-slate-100">
+                          {accountPreviewColumns.map(([label]) => (
+                            <th
+                              key={label}
+                              className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700"
+                            >
+                              {label}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {accountsPreview.records.map((record, index) => (
+                          <tr key={record.Id || `${record.Name || 'account'}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                            {accountPreviewColumns.map(([, fieldName]) => (
+                              <td key={`${record.Id || index}-${fieldName}`} className="whitespace-nowrap px-3 py-2 text-sm text-slate-700">
+                                <span className="block max-w-[220px] truncate">
+                                  {record[fieldName as keyof AccountsPreviewRecord] || '—'}
+                                </span>
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </Card>
           </div>
         )}
 
