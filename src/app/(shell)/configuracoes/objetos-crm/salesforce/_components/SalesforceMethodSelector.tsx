@@ -82,40 +82,40 @@ interface OAuthConfigResult {
 const METHODS: MethodDefinition[] = [
   {
     id: 'oauth',
-    title: 'OAuth / Fonte viva',
-    description: 'Conecte o Salesforce com OAuth para validar acesso, ler metadados e preparar o mapeamento.',
-    badge: 'Recomendado',
+    title: 'OAuth / External Client App',
+    description: 'Conexão OAuth produtiva via External Client App para validação read-only controlada.',
+    badge: 'OAuth',
     badgeVariant: 'blue',
     icon: <Network className="h-4 w-4" />,
     panel: {
       lines: [
-        'Conexão persistida',
-        'Discovery multiobjeto',
-        'Melhor caminho para sync futuro',
+        'Conexão OAuth produtiva com External Client App.',
+        'Validação read-only inicial via Account/describe com persistência segura de credenciais.',
+        'Sem sync, sem writeback e sem importação real nesta etapa.',
       ],
     },
   },
   {
     id: 'token',
-    title: 'Token temporário',
-    description: 'Teste rapidamente uma leitura Account/describe. Nada será salvo.',
-    badge: 'Teste pontual',
+    title: 'Validação pontual',
+    description: 'Use para validar acesso pontual. Nada será salvo.',
+    badge: 'Efêmero',
     badgeVariant: 'amber',
     icon: <KeyRound className="h-4 w-4" />,
     panel: { lines: [] },
   },
   {
     id: 'csv',
-    title: 'CSV por entidade',
-    description: 'Use arquivos CSV exportados por entidade para preparação local, sem conexão live.',
-    badge: 'Alternativo',
+    title: 'CSV exportado',
+    description: 'Alternativa de entrada local para a fonte Salesforce, sem criar conector global separado.',
+    badge: 'Local',
     badgeVariant: 'slate',
     icon: <FileJson className="h-4 w-4" />,
     panel: {
       lines: [
-        'Uma entidade por vez',
-        'Upload e preview local',
-        'Sem consulta ao Salesforce',
+        'Entrada local a partir de exportação do Salesforce.',
+        'Serve como alternativa de análise local sem criar conector global separado.',
+        'Não deve reativar CSV fora da página dedicada do CRM.',
       ],
     },
   },
@@ -421,71 +421,36 @@ export function SalesforceMethodSelector() {
     if (!lastValidationPulseAt) return false;
     return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
   }, [lastValidationPulseAt]);
-  const wizardStep = useMemo(() => {
-    if (selected === 'oauth') {
-      if (oauthConnected) return 3;
-      if (oauthConfigured) return 2;
-      return 1;
-    }
-    if (selected === 'csv') return 2;
-    return 2;
-  }, [oauthConnected, oauthConfigured, selected]);
 
   return (
     <div className="space-y-4">
-      <Card className="rounded-3xl border border-slate-200 bg-white p-5">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Setup guiado</p>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-5">
-          {(
-            [
-              ['1', 'Escolher origem'],
-              ['2', 'Validar acesso ou arquivo'],
-              ['3', 'Ler metadados / preparar colunas'],
-              ['4', 'Revisar mapeamento'],
-              ['5', 'Pronto para próxima etapa'],
-            ] as [string, string][]
-          ).map(([n, label], idx) => {
-            const active = idx + 1 <= wizardStep;
-            return (
-              <div
-                key={n}
-                className={`rounded-2xl border p-3 ${active ? 'border-blue-200 bg-blue-50' : 'border-slate-200 bg-slate-50'}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex h-6 w-6 items-center justify-center rounded-xl text-[10px] font-black ${
-                    active ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
-                  }`}>
-                    {n}
-                  </span>
-                  <p className={`text-xs font-black ${active ? 'text-slate-900' : 'text-slate-600'}`}>{label}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {METHODS.map((method) => {
           const isActive = method.id === selected;
-          const isPrimary = method.id === 'oauth';
+          const isSecondary = method.id === 'token';
           return (
             <button
               key={method.id}
               type="button"
               onClick={() => setSelected(method.id)}
-              className={`group w-full rounded-3xl border p-6 text-left transition-all ${isPrimary ? 'lg:col-span-2' : ''} ${
-                isActive
+              className={`group w-full rounded-3xl border text-left transition-all ${
+                isSecondary ? 'p-4' : 'p-6'
+              } ${
+                isActive && !isSecondary
                   ? 'border-blue-300 bg-blue-50 shadow-md shadow-blue-100'
+                  : isActive && isSecondary
+                  ? 'border-slate-300 bg-slate-100'
+                  : isSecondary
+                  ? 'border-slate-100 bg-slate-50 hover:border-slate-200'
                   : 'border-slate-200 bg-white hover:border-blue-200 hover:shadow-sm'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div
                   className={`mt-0.5 flex shrink-0 items-center justify-center rounded-xl transition-colors ${
-                    'h-8 w-8'
+                    isSecondary ? 'h-6 w-6' : 'h-8 w-8'
                   } ${
-                    isActive ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'
+                    isActive ? 'bg-blue-100 text-blue-700' : isSecondary ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'
                   }`}
                 >
                   {method.icon}
@@ -498,21 +463,16 @@ export function SalesforceMethodSelector() {
               </div>
               <h3
                 className={`transition-colors ${
-                  'mt-4 text-base font-black'
+                  isSecondary ? 'mt-3 text-sm font-bold' : 'mt-4 text-base font-black'
                 } ${
-                  isActive ? 'text-blue-900' : 'text-slate-900 group-hover:text-blue-800'
+                  isActive ? 'text-blue-900' : isSecondary ? 'text-slate-500' : 'text-slate-900 group-hover:text-blue-800'
                 }`}
               >
                 {method.title}
               </h3>
-              <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">{method.description}</p>
-              {method.panel.lines.length > 0 && (
-                <ul className="mt-4 space-y-1 text-xs font-medium text-slate-600">
-                  {method.panel.lines.map((line) => (
-                    <li key={line}>• {line}</li>
-                  ))}
-                </ul>
-              )}
+              <p className={`mt-1.5 leading-relaxed ${isSecondary ? 'text-xs font-medium text-slate-400' : 'mt-2 text-sm font-medium text-slate-600'}`}>
+                {method.description}
+              </p>
             </button>
           );
         })}
@@ -555,7 +515,7 @@ export function SalesforceMethodSelector() {
         {selected === 'token' ? (
           <div className="mt-5 space-y-5">
             <p className="text-sm font-medium text-amber-900">
-              Teste pontual de leitura Account/describe. Nenhuma credencial será salva.
+              Use um token temporário apenas para validar leitura do objeto Account. Nada será salvo.
             </p>
 
             <div className="space-y-3">
@@ -1069,7 +1029,7 @@ export function SalesforceMethodSelector() {
               Sobre este modo
             </p>
             <p className="text-xs font-medium text-slate-600 leading-relaxed">
-              <span className="font-bold text-slate-800">Token temporário / Teste pontual</span> — Valida acesso read-only ao objeto Account apenas. Nada é salvo, nenhuma conexão é persistida.
+              <span className="font-bold text-slate-800">Token temporário / Validação efêmera</span> — Valida acesso read-only ao objeto Account apenas. Nada é salvo, nenhuma conexão é persistida. Ao trocar de aba ou recarregar a página, o token e o resultado são descartados.
             </p>
           </div>
         )}
@@ -1080,7 +1040,7 @@ export function SalesforceMethodSelector() {
               Sobre este modo
             </p>
             <p className="text-xs font-medium text-slate-600 leading-relaxed">
-              <span className="font-bold text-slate-800">CSV por entidade / Entrada local</span> — Análise local de arquivo exportado do Salesforce. Não consulta o Salesforce ao vivo. Foco em upload, preview de colunas e validação local.
+              <span className="font-bold text-slate-800">CSV exportado / Entrada local</span> — Análise local de arquivo exportado do Salesforce. Não consulta o Salesforce ao vivo. Sem conexão OAuth, sem token, sem metadados via describe. Foco em upload, preview de colunas e validação local.
             </p>
           </div>
         )}
