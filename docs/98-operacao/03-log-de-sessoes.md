@@ -5,6 +5,26 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C3.3 (dry-run read-only local de Accounts)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** transformar o contrato local de pré-sync read-only em um dry-run read-only local de Accounts, com classificação em memória da sessão e sem qualquer gravação.
+- **Commit local:** `d665137` — `feat(settings): add Salesforce Accounts read-only sync dry-run`
+- **O que foi materializado:**
+  - botão `Executar dry-run read-only` habilitado apenas quando o contrato local já está preparado;
+  - card `Dry-run read-only de Accounts` com timestamp, origem `Salesforce OAuth`, objeto `Account` e modo `dry-run read-only`;
+  - classificação por registro:
+    - sem Id ou sem Name = bloqueado;
+    - sem Website ou sem Industry = alerta;
+    - com Id e Name = apto, mesmo com alerta;
+  - contadores de aptos, alertas e bloqueados;
+  - tabela com status e motivos por registro;
+  - feedback visual no botão, scroll suave e destaque discreto do card.
+- **Validação manual:** Fábio validou no browser o dry-run read-only local de Accounts.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** dry-run local desta sessão; sem sync real; sem Supabase; sem importação; sem writeback; sem Bulk API; sem persistência; sem alteração de camada canônica.
+- **Relação com o marco atual:** C3.3 reforça a camada técnica/local de segurança antes do próximo recorte, recomendado como C4.0 — preview read-only multi-entidade Salesforce.
+
 ## [2026-05-03] — Salesforce C3.2 (contrato local de pré-sync read-only de Accounts)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
