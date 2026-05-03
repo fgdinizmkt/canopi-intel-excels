@@ -5,6 +5,42 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-02] — Salesforce 2C.3 (OAuth produtivo via External Client App)
+
+- **Natureza:** Sessão funcional + fechamento operacional.
+- **Objetivo:** materializar conexão OAuth produtiva do Salesforce na página dedicada de Configurações, com persistência segura e validação read-only.
+- **Commit publicado:** `bc3dd69` — `feat(settings): add productive Salesforce OAuth connector`
+- **Status confirmado:** `HEAD = origin/main = bc3dd69`, working tree limpa após push, `npm run lint` OK, `npm run build:safe` OK.
+- **O que foi materializado:**
+  - configuração da External Client App pela UI (Client ID, Client Secret, Redirect URI e Login URL) com persistência server-side;
+  - Client Secret criptografado e nunca exibido após salvar;
+  - fluxo OAuth completo (start + callback) com `state` em cookie HttpOnly e validação anti-CSRF;
+  - persistência de tokens (access/refresh) criptografados;
+  - health check via Account/describe (read-only) com atualização de status e última validação;
+  - status seguro de conexão (conectado/desconectado/erro) e UX do painel OAuth consolidada;
+  - redirect de retorno do callback corrigido para não vazar `0.0.0.0` em ambiente local.
+- **Validação manual pelo Fábio (browser):**
+  - conexão OAuth concluída;
+  - Account/describe validado;
+  - 70 campos de Account detectados;
+  - API version `v66.0`;
+  - persistência após refresh/restart validada;
+  - validar conexão com feedback visual validado;
+  - desconectar e reconectar validados;
+  - redirect permanecendo em `localhost`.
+- **Guardrails e limites (fora do escopo e mantidos):**
+  - sem sync;
+  - sem Bulk API;
+  - sem writeback;
+  - sem importação real;
+  - sem leitura massiva de registros;
+  - sem criação/atualização de registros no CRM.
+- **Supabase / segurança:**
+  - RLS configurado para `service_role` gerenciar `connector_oauth_configs` e `connector_oauth_connections`;
+  - `anon` negado para essas tabelas;
+  - `.env.local` não entrou no commit.
+- **Status:** ✅ Concluído e publicado em `origin/main`.
+
 ## [2026-05-02] — Contas V2 / Salesforce 2C.2 (preparação local de CSV exportado)
 
 - **Natureza:** Sessão funcional + documental.

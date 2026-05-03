@@ -1,8 +1,8 @@
 # Plano Operacional — Loja de Conectores e CRMs
 
 ## 1) Estado atual
-- `main` limpa e sincronizada no commit `46fae8f`.
-- Salesforce 2C.1 e 2C.2 foram fechados na trilha dedicada (metadados read-only + preparação local CSV).
+- `main` limpa e sincronizada no commit `bc3dd69`.
+- Salesforce 2C.1, 2C.2 e 2C.3 foram fechados na trilha dedicada (metadados read-only + preparação local CSV + OAuth produtivo).
 - Patch local anterior descartado com `git restore`.
 - Fontes e Conectores permanece na arquitetura antiga.
 - `AccountSources.tsx` concentra responsabilidades em excesso.
@@ -69,7 +69,7 @@ Cada conector deve conter:
 
 ## 7) Métodos por conector
 ### Salesforce
-- OAuth / Connected App;
+- OAuth / External Client App;
 - Token temporário;
 - CSV exportado do Salesforce;
 - Bulk API 2.0 (futuro).
@@ -115,8 +115,9 @@ Escopo de execução inicial:
 Estado consolidado desta trilha:
 - Salesforce 2C.1 fechado em `d2afafa`.
 - Salesforce 2C.2 fechado em `46fae8f`.
-- A página dedicada passou a exibir metadados read-only de `Account` após teste com token temporário e também o fluxo de preparação local CSV exportado com gate de obrigatórios.
-- O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1 e 2C.2 não equivalem a conector produtivo completo.
+- Salesforce 2C.3 fechado em `bc3dd69`.
+- A página dedicada passou a cobrir: metadados read-only de `Account` (token temporário), preparação local de CSV exportado (com gate de obrigatórios) e conexão OAuth produtiva com persistência segura e health check read-only via `Account/describe`.
+- O escopo continua sendo uma trilha CRM por CRM; os fechamentos 2C.1–2C.3 não equivalem a conector produtivo completo.
 
 Regra de progressão:
 - Não avançar para outro CRM antes de Salesforce estar testado e aprovado.
@@ -266,7 +267,7 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 | Fase 2 | concluída | Rota dedicada Salesforce consolidada | Navegação e isolamento de estado por rota |
 | Fase 3 | concluída | Token temporário Salesforce implementado e validado | Teste local validado e hard refresh ok |
 | Fase 4 | concluída | CSV exportado Salesforce implementado na página dedicada | CSV restrito à página Salesforce |
-| Fase 5 | em andamento | Inserir placeholders OAuth/Bulk API | Sinalização clara de escopo futuro |
+| Fase 5 | concluída (2C.3) | OAuth Salesforce produtivo publicado | Persistência segura + validação visual + lint/build:safe |
 | Fase 6 | em andamento | Executar validação ponta a ponta Salesforce | Fluxo estável, sem vazamento de estado antigo |
 | Fase 7 | concluída (2C.2) | Fechamento operacional de Salesforce 2C.2 registrado | Evidência técnica + visual + operacional |
 | Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |

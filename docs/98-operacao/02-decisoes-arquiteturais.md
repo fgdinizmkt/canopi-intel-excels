@@ -99,6 +99,19 @@ Registrar decisões técnicas e de produto já tomadas e consolidadas, para evit
 
 ---
 
+### 9. Conectores OAuth: configuração e tokens ficam no server, com criptografia e RLS
+**Decisão:** credenciais e tokens de conectores OAuth não podem ser armazenados no client (sem `localStorage`, `sessionStorage` ou cookies acessíveis por JS). Configuração OAuth (Client ID, Client Secret, Redirect URI, Login URL) e tokens (access/refresh) ficam persistidos no server com criptografia e RLS restrito a `service_role`.
+
+**Implicação:**
+- UI pode salvar configuração sem depender de `.env.local` para Client ID/Secret, mas segredos não voltam para o client depois do salvamento.
+- `state` do OAuth é guardado em cookie HttpOnly (SameSite=Lax) e validado no callback.
+- O status exposto para a UI é sanitizado (nunca expõe Client Secret, access token ou refresh token).
+- Tabelas de OAuth no Supabase devem ter RLS habilitado com policies explícitas: `service_role` pode gerenciar tudo; `anon` é negado.
+
+**Guardrails:** sem sync, sem Bulk API, sem writeback, sem importação real e sem leitura massiva; a validação inicial é read-only via `Account/describe`.
+
+**Commits:** `bc3dd69` (Salesforce OAuth produtivo).
+
 ### 8.1 Responsabilidade Explícita em Camadas de Migração (Recorte 25)
 **Decisão refinada:** Migração Supabase estabelece separação clara de responsabilidades entre contexto, repositório e página.
 

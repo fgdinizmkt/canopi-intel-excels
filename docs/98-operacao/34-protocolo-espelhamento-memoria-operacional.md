@@ -18,18 +18,24 @@ Data: 2026-05-02
 
 Último fechamento funcional publicado:
 
-- `46fae8f` — `feat(settings): add Salesforce CSV preparation flow`
+- `bc3dd69` — `feat(settings): add productive Salesforce OAuth connector`
 
 Status confirmado:
 
-- `HEAD = origin/main = 46fae8f`
+- `HEAD = origin/main = bc3dd69`
 - `main` sem ahead/behind
 - working tree limpa após o push
 - `npm run lint` OK
 - `npm run build:safe` OK
-- apenas 2 arquivos entraram no fechamento Salesforce 2C.2:
+- arquivos principais do fechamento Salesforce OAuth:
   - `src/app/(shell)/configuracoes/objetos-crm/salesforce/_components/SalesforceMethodSelector.tsx`
-  - `src/app/(shell)/configuracoes/objetos-crm/salesforce/_components/SalesforceCsvPreparation.tsx`
+  - `src/app/(shell)/configuracoes/objetos-crm/salesforce/page.tsx`
+  - `src/app/api/account-connectors/salesforce/oauth/*`
+  - `src/lib/server/salesforceOAuthService.ts`
+  - `src/lib/server/oauthTokenCrypto.ts`
+  - `src/lib/server/supabaseAdmin.ts`
+  - `supabase/migrations/20260502143000_salesforce_oauth_connections.sql`
+  - `supabase/migrations/20260502152000_salesforce_oauth_configs.sql`
 
 Leitura funcional do Salesforce 2C.2:
 
@@ -40,6 +46,14 @@ Leitura funcional do Salesforce 2C.2:
 - não existe sync;
 - não existe writeback;
 - não existe importação real.
+
+Leitura funcional do Salesforce OAuth:
+
+- existe conexão OAuth produtiva via External Client App;
+- configuração OAuth pode ser salva pela UI;
+- Client Secret e tokens ficam no server, criptografados e nunca expostos na UI;
+- health check read-only via `Account/describe` com persistência de status;
+- não existe sync, writeback, importação real ou leitura massiva.
 
 ---
 
