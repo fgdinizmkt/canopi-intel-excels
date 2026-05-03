@@ -63,6 +63,42 @@ export default function SalesforceDedicatedPage() {
       </section>
 
       <section className="space-y-4">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Estado atual do conector Salesforce</p>
+        <Card className="rounded-3xl border border-slate-200 p-6">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {([
+              ['Token temporário', 'Funcional read-only', 'emerald'],
+              ['Metadados Account', 'Funcional', 'emerald'],
+              ['CSV exportado', 'Preparação local', 'blue'],
+              ['OAuth / External Client App', 'OAuth produtivo', 'emerald'],
+              ['Bulk API / sync', 'Futuro', 'amber'],
+              ['Writeback', 'Não disponível nesta versão', 'slate'],
+            ] as [string, string, 'emerald' | 'blue' | 'amber' | 'slate'][]).map(([label, status, tone]) => (
+              <div key={label} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <p className="text-sm font-bold text-slate-800">{label}</p>
+                <span
+                  className={`mt-2 inline-flex rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                    tone === 'emerald'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : tone === 'blue'
+                      ? 'bg-blue-100 text-blue-800'
+                      : tone === 'amber'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  {status}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-sm font-medium text-slate-600">
+            Este conector já permite validação read-only via token temporário, preparação local por CSV e conexão OAuth produtiva quando configurada.
+          </p>
+        </Card>
+      </section>
+
+      <section className="space-y-4">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Métodos de conexão</p>
         <SalesforceMethodSelector />
       </section>
@@ -101,39 +137,22 @@ export default function SalesforceDedicatedPage() {
       </section>
 
       <section className="space-y-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Próximas configurações locais</p>
-        <Card className="rounded-3xl border border-slate-200 p-6">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {[
-              'Mapping Salesforce → Canopi',
-              'Matching local',
-              'Pipeline local',
-              'Writeback local',
-              'Governança local',
-              'Validação local',
-            ].map((item) => (
-              <div key={item} className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                <p className="text-sm font-bold text-slate-800">{item}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </section>
-
-      <section className="space-y-4">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Segurança desta configuração</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Limites desta versão</p>
         <Card className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-700" />
-            <p className="text-sm font-black text-emerald-900">Controles ativos nesta página dedicada</p>
+            <p className="text-sm font-black text-emerald-900">Guardrails ativos nesta página dedicada</p>
           </div>
           <ul className="mt-4 space-y-2 text-sm font-medium text-emerald-900">
-            <li>• Sem persistência de token</li>
-            <li>• Sem sincronização automática</li>
-            <li>• Sem writeback</li>
-            <li>• Sem alteração no CRM</li>
-            <li>• Página apenas prepara a configuração dedicada</li>
+            <li>• Sem sync neste recorte</li>
+            <li>• Sem writeback neste recorte</li>
+            <li>• Sem leitura massiva de registros neste recorte</li>
+            <li>• Sem exposição de tokens em UI, query string, logs ou armazenamento client-side</li>
+            <li>• Sem criação ou atualização de registros no CRM</li>
           </ul>
+          <p className="mt-4 text-xs font-medium text-emerald-800">
+            Sync, Bulk API e writeback serão tratados em recortes próprios.
+          </p>
         </Card>
       </section>
     </div>

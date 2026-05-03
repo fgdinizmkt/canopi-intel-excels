@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Circle, FileJson, KeyRound, Loader2, Network, XCircle } from 'lucide-react';
 import { Card, Badge } from '@/src/components/ui';
 import { SalesforceCsvPreparation } from './SalesforceCsvPreparation';
@@ -42,20 +43,54 @@ interface TestSuccessResult {
   accountFields?: AccountField[];
 }
 
+type OAuthPanelStatus = 'requires_configuration' | 'disconnected' | 'connected' | 'error';
+
+interface OAuthStatusResult {
+  configured: boolean;
+  connected: boolean;
+  status: OAuthPanelStatus;
+  instanceUrl?: string | null;
+  orgId?: string | null;
+  userId?: string | null;
+  scopes?: string[];
+  lastHealthCheckAt?: string | null;
+  accountLabel?: string | null;
+  accountFieldsCount?: number | null;
+  apiVersion?: string;
+  error?: string | null;
+  configChecklist?: {
+    clientId: boolean;
+    clientSecret: boolean;
+    redirectUri: boolean;
+    loginUrl: boolean;
+  };
+}
+
+interface OAuthConfigResult {
+  configured: boolean;
+  clientIdConfigured: boolean;
+  clientSecretConfigured: boolean;
+  loginUrl: string;
+  redirectUri: string;
+  scopes: string[];
+  callbackUrl: string;
+  updatedAt: string | null;
+}
+
 
 const METHODS: MethodDefinition[] = [
   {
     id: 'oauth',
     title: 'OAuth / External Client App',
-    description: 'Método recomendado para conexão real futura com política de autorização por aplicativo.',
-    badge: 'Recomendado',
+    description: 'Conexão OAuth produtiva via External Client App para validação read-only controlada.',
+    badge: 'OAuth',
     badgeVariant: 'blue',
     icon: <Network className="h-4 w-4" />,
     panel: {
       lines: [
-        'Método recomendado para conexão real futura.',
-        'Use uma External Client App no Salesforce para controlar autorização, escopos e acesso via OAuth 2.0.',
-        'Connected Apps existentes podem ser tratados como compatibilidade, mas novas configurações devem priorizar External Client App.',
+        'Conexão OAuth produtiva com External Client App.',
+        'Validação read-only inicial via Account/describe com persistência segura de credenciais.',
+        'Sem sync, sem writeback e sem importação real nesta etapa.',
       ],
     },
   },
@@ -114,6 +149,8 @@ function formatTestedAt(iso: string): string {
 }
 
 export function SalesforceMethodSelector() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [selected, setSelected] = useState<SalesforceMethod>('oauth');
 
   const [instanceUrl, setInstanceUrl] = useState('');
@@ -122,8 +159,112 @@ export function SalesforceMethodSelector() {
   const [testStatus, setTestStatus] = useState<TestStatus>('idle');
   const [result, setResult] = useState<TestSuccessResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [oauthStatus, setOauthStatus] = useState<OAuthStatusResult | null>(null);
+  const [oauthLoading, setOauthLoading] = useState(true);
+  const [oauthActionLoading, setOauthActionLoading] = useState<'connect' | 'health' | 'disconnect' | null>(null);
+  const [oauthNotice, setOauthNotice] = useState<string | null>(null);
+  const [oauthConfig, setOauthConfig] = useState<OAuthConfigResult | null>(null);
+  const [oauthConfigLoading, setOauthConfigLoading] = useState(true);
+  const [oauthConfigSaving, setOauthConfigSaving] = useState(false);
+  const [oauthConfigError, setOauthConfigError] = useState<string | null>(null);
+  const [showOAuthConfigForm, setShowOAuthConfigForm] = useState(false);
+  const [lastValidationPulseAt, setLastValidationPulseAt] = useState<string | null>(null);
+  const prevOAuthConfiguredRef = useRef(false);
+  const prevOAuthConnectedRef = useRef(false);
+  const [oauthConfigForm, setOauthConfigForm] = useState({
+    clientId: '',
+    clientSecret: '',
+    redirectUri: 'http://localhost:3053/api/account-connectors/salesforce/oauth/callback',
+    loginUrl: 'https://login.salesforce.com',
+  });
 
   const activeMethod = METHODS.find((m) => m.id === selected)!;
+  const oauthFlowStatus = searchParams?.get('salesforceOAuthStatus');
+
+  const loadOAuthStatus = useCallback(async () => {
+    setOauthLoading(true);
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/status', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as OAuthStatusResult;
+      setOauthStatus(data);
+    } catch {
+      setOauthStatus({
+        configured: false,
+        connected: false,
+        status: 'error',
+        error: 'Não foi possível carregar o estado OAuth.',
+      });
+    } finally {
+      setOauthLoading(false);
+    }
+  }, []);
+
+  const loadOAuthConfig = useCallback(async () => {
+    setOauthConfigLoading(true);
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/config', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as OAuthConfigResult;
+      setOauthConfig(data);
+      setOauthConfigForm((prev) => ({
+        ...prev,
+        redirectUri: data.redirectUri || prev.redirectUri,
+        loginUrl: data.loginUrl || prev.loginUrl,
+      }));
+    } catch {
+      setOauthConfigError('Não foi possível carregar a configuração OAuth.');
+    } finally {
+      setOauthConfigLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadOAuthStatus();
+    loadOAuthConfig();
+  }, [loadOAuthStatus, loadOAuthConfig]);
+
+  useEffect(() => {
+    if (!oauthFlowStatus) return;
+
+    const notices: Record<string, string> = {
+      success: 'Conexão OAuth concluída com sucesso.',
+      config_missing: 'Configuração OAuth pendente. Salve a External Client App para habilitar a conexão.',
+      authorization_denied: 'Autorização OAuth não concluída no Salesforce.',
+      invalid_state: 'Validação de segurança OAuth falhou (state inválido).',
+      missing_code: 'Callback OAuth sem código de autorização.',
+      callback_error: 'Não foi possível concluir o callback OAuth.',
+    };
+
+    setOauthNotice(notices[oauthFlowStatus] || 'Fluxo OAuth retornou com status não mapeado.');
+    loadOAuthStatus();
+
+    const next = new URL(window.location.href);
+    next.searchParams.delete('salesforceOAuthStatus');
+    router.replace(`${next.pathname}${next.search}`);
+  }, [oauthFlowStatus, loadOAuthStatus, router]);
+
+  useEffect(() => {
+    if (!oauthStatus?.configured) {
+      setShowOAuthConfigForm(true);
+      prevOAuthConfiguredRef.current = false;
+      prevOAuthConnectedRef.current = false;
+      return;
+    }
+
+    if (oauthStatus.connected && !prevOAuthConnectedRef.current) {
+      setShowOAuthConfigForm(false);
+    } else if (!oauthStatus.connected && !prevOAuthConfiguredRef.current) {
+      setShowOAuthConfigForm(false);
+    }
+
+    prevOAuthConfiguredRef.current = oauthStatus.configured;
+    prevOAuthConnectedRef.current = oauthStatus.connected;
+  }, [oauthStatus]);
 
   async function handleTest() {
     if (!instanceUrl.trim() || !token.trim()) {
@@ -164,6 +305,121 @@ export function SalesforceMethodSelector() {
     setResult(null);
     setErrorMessage(null);
   }
+
+  function handleOAuthConnect() {
+    setOauthActionLoading('connect');
+    window.location.href = '/api/account-connectors/salesforce/oauth/start';
+  }
+
+  async function handleOAuthConfigSave() {
+    setOauthConfigSaving(true);
+    setOauthConfigError(null);
+    setOauthNotice(null);
+
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: oauthConfigForm.clientId,
+          clientSecret: oauthConfigForm.clientSecret,
+          redirectUri: oauthConfigForm.redirectUri,
+          loginUrl: oauthConfigForm.loginUrl,
+          scopes: ['api', 'refresh_token'],
+        }),
+      });
+
+      const data = (await res.json()) as { status?: string; error?: string; config?: OAuthConfigResult };
+      if (!res.ok || data.status === 'error') {
+        setOauthConfigError(data.error || 'Não foi possível salvar a configuração OAuth.');
+        return;
+      }
+
+      if (data.config) {
+        setOauthConfig(data.config);
+      }
+
+      setOauthConfigForm((prev) => ({ ...prev, clientSecret: '' }));
+      setOauthNotice('Configuração OAuth salva.');
+      await loadOAuthStatus();
+      await loadOAuthConfig();
+    } catch {
+      setOauthConfigError('Não foi possível salvar a configuração OAuth.');
+    } finally {
+      setOauthConfigSaving(false);
+    }
+  }
+
+  async function handleCopyCallbackUrl() {
+    try {
+      const text = oauthConfigForm.redirectUri.trim();
+      await navigator.clipboard.writeText(text);
+      setOauthNotice('Callback URL copiada.');
+    } catch {
+      setOauthNotice('Não foi possível copiar a callback URL.');
+    }
+  }
+
+  async function handleOAuthHealthCheck() {
+    setOauthActionLoading('health');
+    setOauthNotice(null);
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/health', {
+        method: 'POST',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as OAuthStatusResult & { error?: string };
+      setOauthStatus(data);
+      if (res.ok) {
+        setLastValidationPulseAt(new Date().toISOString());
+        setOauthNotice('Conexão validada com sucesso agora.');
+      } else {
+        setOauthNotice(data.error || 'Não foi possível validar a conexão OAuth.');
+      }
+    } catch {
+      setOauthNotice('Não foi possível validar a conexão OAuth.');
+    } finally {
+      setOauthActionLoading(null);
+    }
+  }
+
+  async function handleOAuthDisconnect() {
+    setOauthActionLoading('disconnect');
+    setOauthNotice(null);
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/disconnect', {
+        method: 'POST',
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setOauthNotice(data.error || 'Não foi possível desconectar OAuth.');
+      } else {
+        setOauthNotice('Conexão OAuth removida com sucesso.');
+      }
+      await loadOAuthStatus();
+    } catch {
+      setOauthNotice('Não foi possível desconectar OAuth.');
+    } finally {
+      setOauthActionLoading(null);
+    }
+  }
+
+  const oauthStatusTone = useMemo(() => {
+    if (!oauthStatus) return 'slate';
+    if (oauthStatus.status === 'connected') return 'emerald';
+    if (oauthStatus.status === 'requires_configuration') return 'amber';
+    if (oauthStatus.status === 'error') return 'red';
+    return 'slate';
+  }, [oauthStatus]);
+
+  const oauthConfigured = Boolean(oauthStatus?.configured);
+  const oauthConnected = Boolean(oauthStatus?.connected);
+  const showConfigForm = !oauthConfigured || showOAuthConfigForm;
+  const isValidationRecent = useMemo(() => {
+    if (!lastValidationPulseAt) return false;
+    return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
+  }, [lastValidationPulseAt]);
 
   return (
     <div className="space-y-4">
@@ -466,18 +722,279 @@ export function SalesforceMethodSelector() {
         ) : selected === 'csv' ? (
           <SalesforceCsvPreparation />
         ) : (
-          <ul className="mt-4 space-y-2">
-            {activeMethod.panel.lines.map((line) => (
-              <li
-                key={line}
-                className={`text-sm font-medium leading-relaxed ${
-                  selected === 'oauth' ? 'text-blue-800' : 'text-slate-700'
-                }`}
-              >
-                {line}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-5 space-y-4">
+            <div className={`rounded-2xl border p-4 ${
+              oauthStatusTone === 'emerald' ? 'border-emerald-200 bg-emerald-50' :
+              oauthStatusTone === 'amber' ? 'border-amber-200 bg-amber-50' :
+              oauthStatusTone === 'red' ? 'border-red-200 bg-red-50' :
+              'border-slate-200 bg-slate-50'
+            }`}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className={`text-sm font-black ${
+                    oauthStatusTone === 'emerald' ? 'text-emerald-900' :
+                    oauthStatusTone === 'amber' ? 'text-amber-900' :
+                    oauthStatusTone === 'red' ? 'text-red-900' : 'text-slate-900'
+                  }`}>
+                    OAuth / External Client App
+                  </p>
+                  <p className={`mt-1 text-[11px] font-medium leading-relaxed ${
+                    oauthStatusTone === 'emerald' ? 'text-emerald-800' :
+                    oauthStatusTone === 'amber' ? 'text-amber-800' :
+                    oauthStatusTone === 'red' ? 'text-red-800' : 'text-slate-700'
+                  }`}>
+                    {oauthLoading
+                      ? 'Carregando estado OAuth...'
+                      : oauthStatus?.status === 'connected'
+                      ? 'Conexão OAuth ativa com validação read-only de Account.'
+                      : oauthStatus?.status === 'requires_configuration'
+                      ? 'Para conectar o Salesforce via OAuth, salve a configuração da External Client App abaixo.'
+                      : oauthStatus?.status === 'error'
+                      ? 'OAuth configurado com erro operacional. Execute validação ou reconexão.'
+                      : 'OAuth disponível para iniciar conexão Salesforce via OAuth.'}
+                  </p>
+                </div>
+                <Badge className={`border-none px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                  oauthStatusTone === 'emerald' ? 'bg-emerald-100 text-emerald-700' :
+                  oauthStatusTone === 'amber' ? 'bg-amber-100 text-amber-700' :
+                  oauthStatusTone === 'red' ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-700'
+                }`}>
+                  {oauthLoading
+                    ? 'Carregando'
+                    : oauthStatus?.status === 'connected'
+                    ? 'Conectado'
+                    : oauthStatus?.status === 'requires_configuration'
+                    ? 'Configuração pendente'
+                    : oauthStatus?.status === 'error'
+                    ? 'Erro'
+                    : 'Desconectado'}
+                </Badge>
+              </div>
+            </div>
+
+            {!oauthLoading && (
+              <div className="space-y-4">
+                {oauthConnected && (
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                    <p className="text-sm font-black text-emerald-900">Salesforce conectado via OAuth</p>
+                    <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2">
+                      {([
+                        ['Instance URL', oauthStatus?.instanceUrl || '—'],
+                        ['Org ID', oauthStatus?.orgId || '—'],
+                        ['User ID', oauthStatus?.userId || '—'],
+                        ['Escopos autorizados', oauthStatus?.scopes?.length ? oauthStatus.scopes.join(', ') : '—'],
+                        ['Status da conexão', oauthStatus?.status || 'connected'],
+                        ['Objeto Account validado', oauthStatus?.accountLabel || '—'],
+                        ['Campos Account disponíveis', String(oauthStatus?.accountFieldsCount ?? 0)],
+                        ['API version usada', oauthStatus?.apiVersion || 'v66.0'],
+                      ] as [string, string][]).map(([label, value]) => (
+                        <div key={label}>
+                          <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">{label}</p>
+                          <p className="text-sm font-medium text-emerald-900 break-all">{value}</p>
+                        </div>
+                      ))}
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">Última validação</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-medium text-emerald-900 break-all">
+                            {oauthStatus?.lastHealthCheckAt ? formatTestedAt(oauthStatus.lastHealthCheckAt) : '—'}
+                          </p>
+                          {isValidationRecent && (
+                            <span className="rounded-md bg-emerald-200 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-800">
+                              Atualizado agora
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {!oauthConnected && oauthConfigured && (
+                  <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                    <p className="text-sm font-black text-blue-900">Configuração OAuth salva</p>
+                    <p className="mt-1 text-sm font-medium text-blue-800">
+                      A configuração da External Client App está pronta para iniciar a conexão OAuth.
+                    </p>
+                  </div>
+                )}
+
+                {oauthNotice && (
+                  <div className={`rounded-2xl border px-4 py-3 ${
+                    oauthNotice.toLowerCase().includes('não foi possível') ||
+                    oauthNotice.toLowerCase().includes('falhou') ||
+                    oauthNotice.toLowerCase().includes('erro')
+                      ? 'border-red-200 bg-red-50'
+                      : 'border-blue-200 bg-blue-50'
+                  }`}>
+                    <p className={`text-sm font-medium ${
+                      oauthNotice.toLowerCase().includes('não foi possível') ||
+                      oauthNotice.toLowerCase().includes('falhou') ||
+                      oauthNotice.toLowerCase().includes('erro')
+                        ? 'text-red-800'
+                        : 'text-blue-800'
+                    }`}>{oauthNotice}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {oauthConnected ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleOAuthHealthCheck}
+                        disabled={oauthActionLoading !== null}
+                        className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {oauthActionLoading === 'health' && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {oauthActionLoading === 'health' ? 'Validando...' : 'Validar conexão'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleOAuthDisconnect}
+                        disabled={oauthActionLoading !== null}
+                        className="inline-flex items-center gap-2 rounded-xl border border-red-300 bg-white px-4 py-2.5 text-sm font-black text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {oauthActionLoading === 'disconnect' && <Loader2 className="h-4 w-4 animate-spin" />}
+                        Desconectar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowOAuthConfigForm((prev) => !prev)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition-colors hover:bg-slate-50"
+                      >
+                        {showConfigForm ? 'Fechar edição da configuração' : 'Editar configuração OAuth'}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleOAuthConnect}
+                        disabled={oauthActionLoading !== null || !oauthConfigured}
+                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {oauthActionLoading === 'connect' && <Loader2 className="h-4 w-4 animate-spin" />}
+                        Conectar Salesforce via OAuth
+                      </button>
+                      {oauthConfigured && (
+                        <button
+                          type="button"
+                          onClick={() => setShowOAuthConfigForm((prev) => !prev)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition-colors hover:bg-slate-50"
+                        >
+                          {showConfigForm ? 'Fechar edição da configuração' : 'Editar configuração OAuth'}
+                        </button>
+                      )}
+                      {!oauthConfigured && (
+                        <p className="w-full text-xs font-medium text-amber-800">
+                          Salve a configuração OAuth para habilitar a conexão.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {showConfigForm && (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-black text-slate-900">Configurar External Client App</p>
+                    <p className="mt-1 text-sm font-medium text-slate-600">
+                      Configure a conexão Salesforce via OAuth. O Client Secret fica criptografado e nunca é exibido após o salvamento.
+                    </p>
+
+                    <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Client ID</label>
+                        <input
+                          type="text"
+                          value={oauthConfigForm.clientId}
+                          onChange={(e) => setOauthConfigForm((prev) => ({ ...prev, clientId: e.target.value }))}
+                          placeholder={oauthConfig?.clientIdConfigured ? 'Client ID já configurado (preencha para atualizar)' : 'Cole o Client ID da External Client App'}
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                        />
+                        {oauthConfig?.clientIdConfigured && !oauthConfigForm.clientId.trim() && (
+                          <p className="text-[11px] font-medium text-slate-500">Client ID configurado.</p>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Client Secret</label>
+                        <input
+                          type="password"
+                          value={oauthConfigForm.clientSecret}
+                          onChange={(e) => setOauthConfigForm((prev) => ({ ...prev, clientSecret: e.target.value }))}
+                          placeholder={oauthConfig?.clientSecretConfigured ? 'Já configurado (preencha apenas para trocar)' : 'Cole o Client Secret'}
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                        />
+                      </div>
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Redirect URI</label>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <input
+                            type="text"
+                            value={oauthConfigForm.redirectUri}
+                            onChange={(e) => setOauthConfigForm((prev) => ({ ...prev, redirectUri: e.target.value }))}
+                            className="min-w-[280px] flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleCopyCallbackUrl}
+                            className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black uppercase tracking-widest text-slate-700 hover:bg-slate-50"
+                          >
+                            Copiar callback URL
+                          </button>
+                        </div>
+                        <p className="text-[11px] font-medium text-slate-500">
+                          Use exatamente esta URL como Callback URL na External Client App do Salesforce.
+                        </p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Login URL</label>
+                        <input
+                          type="text"
+                          value={oauthConfigForm.loginUrl}
+                          onChange={(e) => setOauthConfigForm((prev) => ({ ...prev, loginUrl: e.target.value }))}
+                          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Escopos</label>
+                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                          <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-700">api</span>
+                          <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-700">refresh_token</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">External Client App</p>
+                      <p className="mt-1 text-xs font-medium text-slate-700">
+                        OAuth habilitado, Callback URL igual ao Redirect URI e escopos <span className="font-mono">api</span> e <span className="font-mono">refresh_token</span>.
+                      </p>
+                    </div>
+
+                    {oauthConfigError && (
+                      <p className="mt-3 text-sm font-medium text-red-700">{oauthConfigError}</p>
+                    )}
+
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleOAuthConfigSave}
+                        disabled={oauthConfigSaving || oauthConfigLoading}
+                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {oauthConfigSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+                        Salvar configuração OAuth
+                      </button>
+                      {oauthConfig?.configured && (
+                        <span className="text-xs font-medium text-emerald-700">Configuração OAuth salva</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </Card>
     </div>
