@@ -5,6 +5,27 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C4.2 (contrato local multi-entidade)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** transformar a preparação local multi-entidade em um contrato local multi-entidade, sem executar sync, sem persistir dados e sem ampliar o Salesforce para conector completo.
+- **Commit local:** `fbb765b` — `feat(settings): add Salesforce multi-entity local contract`
+- **O que foi materializado:**
+  - contrato local com `createdAt`, `source: Salesforce OAuth`, `mode: local multi-entity contract`;
+  - `entitiesInScope` e `referenceSamples` com os `AccountIds` carregados no preview;
+  - `summary` global com totais, válidos, alertas e bloqueados;
+  - entidades com `selectedRecords`;
+  - por registro: `id`, `displayName`, `eligibilityStatus`, `eligibilityAlerts` e `fieldValues`;
+  - botão `Gerar contrato local` com estado `Atualizar contrato` após geração;
+  - contrato invalidado ao mudar seleção e resetado ao recarregar o preview;
+  - scroll suave até o painel do contrato.
+- **Validação manual:** Fábio validou no browser o painel `Contrato local multi-entidade`, os totais, as entidades em escopo, os registros selecionados, a invalidação ao alterar seleção e o reset ao recarregar o preview.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** sem nova rota; sem alteração em service; sem Supabase; sem persistência; sem sync real; sem importação; sem writeback; sem Bulk API; sem dry-run multi-entidade.
+- **Relação com o marco atual:** C4.2 prepara o terreno para C4.3, que deve ser dry-run multi-entidade, ainda sem sync real e sem persistência; Salesforce ainda não é conector completo.
+
+---
+
 ## [2026-05-03] — Salesforce C4.1 (preparação local para sync read-only multi-entidade)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
