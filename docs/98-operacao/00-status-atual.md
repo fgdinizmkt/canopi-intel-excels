@@ -21,6 +21,7 @@ Fechado neste marco (Setup Read-only):
 - Dry-run read-only multi-entidade Salesforce (C4.3) concluído localmente em `51d8feb`
 - Persistência de contrato multi-entidade Salesforce (C4.4) concluído localmente em `f6643cd`
 - Mapeamento canônico Salesforce Account -> Canopi (C4.5) concluído localmente em `7b55192`
+- Preview read-only de sincronização de Account Salesforce (C4.6) concluído localmente em `30b9907`
 
 Não fechado neste marco:
 - sync real
@@ -31,12 +32,23 @@ Não fechado neste marco:
 - criação/atualização de registros no Salesforce
 - persistência de mapeamento para demais entidades Salesforce
 - uso de mapeamento em sync real
+- persistência de sincronização (gravação real em accounts)
 - auditoria de sync/writeback
 - Salesforce Connector completo
 
+## Decisões Estratégicas de UX (Maio 2026)
+
+### 1. Conectores CRM: Experiência Técnica vs. Produto Final
+- **Estado Atual:** A interface de Salesforce/CRM Connectors é uma experiência operacional, técnica e assistida.
+- **Propósito Atual:** Validar OAuth, preview, contrato, dry-run, mapeamento, preview read-only e guardrails de segurança.
+- **UX de Produto SaaS:** A interface atual NÃO representa o fluxo final para o usuário B2B.
+- **Visão Futura:** O produto final terá um fluxo guiado e simplificado: Conectar CRM -> Selecionar objeto -> Confirmar mapeamento sugerido -> Ver resumo de impacto -> Aprovar sincronização.
+- **Detalhes Técnicos:** Contratos, payloads, dry-run, logs, mapeamentos e auditorias devem ficar recolhidos em modo avançado, "ver detalhes" ou trilha de auditoria.
+- **Ação:** Manter a densidade técnica atual para garantir robustez e explicabilidade durante a fase de engenharia, sem iniciar redesign estético neste marco.
+
 Pendências futuras (fora do escopo atual):
-- Salesforce Sync Read-only
-- Salesforce Mapping persistente
+- Salesforce sync persistente de Accounts (gravação controlada em Canopi, sem writeback)
+- Mapeamento persistente para demais entidades Salesforce
 - Salesforce Bulk API
 - Salesforce Writeback seguro
 - Salesforce Test Data Pack
@@ -52,6 +64,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce multi-entity read-only dry-run (C4.3) concluído localmente em `51d8feb`
 - Salesforce sync contract persistence (C4.4) concluído localmente em `f6643cd`
 - Salesforce Account canonical mapping (C4.5) concluído localmente em `7b55192`
+- Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

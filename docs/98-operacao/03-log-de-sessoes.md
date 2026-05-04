@@ -5,6 +5,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-04] — Salesforce C4.6 (preview read-only de sincronização)
+
+- **Natureza:** Implementação técnica do preview de impacto concluída; validada visualmente no browser.
+- **Objetivo:** Criar uma prévia read-only do impacto da sincronização de Account Salesforce → Canopi, usando o `canonical_mapping` salvo no C4.5.
+- **Commit local:** `30b9907` — `feat(settings): add Salesforce Account sync preview`
+- **O que foi materializado:**
+  - **Service:** Adicionada `generateAccountSyncPreview`. Recupera o contrato `mapped`, aplica o mapeamento aos registros selecionados em memória e compara com a base local da Canopi.
+  - **Rota API:** Nova rota `POST /api/account-connectors/salesforce/oauth/sync-preview` para simulação puramente funcional.
+  - **UI (Sync Preview Panel):** Painel de preview de sincronização exibido após o mapeamento.
+    - Sumário de impacto: Criar, Atualizar, Sem Alteração, Avisos.
+    - Tabela comparativa: Campos Salesforce Traduzidos vs. Estado Atual Canopi.
+    - Badges de ação por linha (CRIAR, ATUALIZAR, SEM ALTERAÇÃO, AVISO).
+    - Avisos visuais para campos obrigatórios ausentes no Salesforce.
+  - **Decisão de UX:** Registrada a decisão de manter a interface atual como técnica/interna, visando simplificação em etapas futuras de produto.
+- **Validação manual:** Fábio validou visualmente o painel de preview no browser, com tabela de impacto, ações previstas, avisos e guardrails read-only.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (Exit code 0).
+- **Limites confirmados:**
+  - **Sem sync real** (nenhum registro gravado em `accounts`).
+  - **Sem alteração de status** (contrato permanece como `mapped`).
+  - **Sem alteração de schema** (nenhuma migration ou nova tabela).
+  - **Sem writeback ou Bulk API**.
+- **Próximo passo sugerido:** Avaliar a entrada na sincronização persistente (C4.7) ou expandir o mapeamento para demais entidades.
+
+---
+
 ## [2026-05-04] — Salesforce C4.5 (mapeamento canônico de Account)
 
 - **Natureza:** Implementação backend + UI de mapeamento concluída; validada visualmente no browser e persistência confirmada em Supabase.
