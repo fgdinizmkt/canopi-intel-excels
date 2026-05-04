@@ -127,6 +127,30 @@ type SyncContractState =
   | { phase: 'done'; contractId: string; estimatedRecordsCanSync: number }
   | { phase: 'error'; message: string };
 
+// ─── Mapeamento Canônico (C4.5) ────────────────────────────────────────────────
+
+interface CanonicalFieldMap {
+  source_external_id: string;
+  nome: string;
+  dominio: string;
+  segmento: string;
+  tipo: string;
+}
+
+interface AccountSamplePreview {
+  source_external_id: string | null;
+  nome: string | null;
+  dominio: string | null;
+  segmento: string | null;
+  tipo: string | null;
+}
+
+type CanonicalMappingState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; updatedAt: string }
+  | { phase: 'error'; message: string };
+
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 
 const STATUS_STYLES: Record<EligibilityStatus, { row: string; badge: string; label: string }> = {
@@ -797,6 +821,262 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
   );
 }
 
+// ─── AccountMappingPanel (C4.5) ────────────────────────────────────────────────
+
+const SALESFORCE_ACCOUNT_FIELDS = ['Id', 'Name', 'Website', 'Industry', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'];
+
+const CANONICAL_FIELDS: { key: keyof CanonicalFieldMap; label: string; required: boolean }[] = [
+  { key: 'source_external_id', label: 'ID Externo (Salesforce)', required: true },
+  { key: 'nome', label: 'Nome da Conta', required: true },
+  { key: 'dominio', label: 'Domínio / Website', required: true },
+  { key: 'segmento', label: 'Segmento / Indústria', required: false },
+  { key: 'tipo', label: 'Tipo de Conta', required: false },
+];
+
+const DEFAULT_FIELD_MAP: CanonicalFieldMap = {
+  source_external_id: 'Id',
+  nome: 'Name',
+  dominio: 'Website',
+  segmento: 'Industry',
+  tipo: 'Type',
+};
+
+function buildSamplePreview(
+  accountRecords: Record<string, PreviewValue>[],
+  fieldMap: CanonicalFieldMap,
+): AccountSamplePreview | null {
+  if (!accountRecords.length) return null;
+  const first = accountRecords[0];
+  return {
+    source_external_id: first[fieldMap.source_external_id] != null ? String(first[fieldMap.source_external_id]) : null,
+    nome: first[fieldMap.nome] != null ? String(first[fieldMap.nome]) : null,
+    dominio: first[fieldMap.dominio] != null ? String(first[fieldMap.dominio]) : null,
+    segmento: first[fieldMap.segmento] != null ? String(first[fieldMap.segmento]) : null,
+    tipo: first[fieldMap.tipo] != null ? String(first[fieldMap.tipo]) : null,
+  };
+}
+
+interface AccountMappingPanelProps {
+  contractId: string;
+  accountRecords: Record<string, PreviewValue>[];
+  mappingState: CanonicalMappingState;
+  onSaveMapping: (fieldMap: CanonicalFieldMap) => void;
+}
+
+function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveMapping }: AccountMappingPanelProps) {
+  const [fieldMap, setFieldMap] = useState<CanonicalFieldMap>({ ...DEFAULT_FIELD_MAP });
+  const isSaving = mappingState.phase === 'loading';
+  const isSaved = mappingState.phase === 'done';
+
+  const samplePreview = useMemo(
+    () => buildSamplePreview(accountRecords, fieldMap),
+    [accountRecords, fieldMap],
+  );
+
+  const missingRequired = CANONICAL_FIELDS
+    .filter((f) => f.required && !fieldMap[f.key])
+    .map((f) => f.label);
+
+  function handleFieldChange(canonicalKey: keyof CanonicalFieldMap, salesforceField: string) {
+    setFieldMap((prev) => ({ ...prev, [canonicalKey]: salesforceField }));
+  }
+
+  return (
+    <div className="rounded-2xl border-2 border-violet-700 bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="space-y-0.5">
+          <p className="text-sm font-black text-slate-900">Mapeamento canônico de Account</p>
+          <p className="text-xs font-medium text-slate-600">
+            Este mapeamento prepara o contrato para uma futura etapa de sync read-only.
+            Nenhum dado foi gravado em Contas.
+          </p>
+        </div>
+        <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-violet-800">
+          Account only
+        </span>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Contrato de referência</p>
+        <p className="mt-1 text-[10px] font-medium text-slate-600">
+          ID: <span className="font-black text-slate-800">{contractId}</span>
+        </p>
+        <p className="text-[10px] font-medium text-slate-600">Status atual: <span className="font-black">pending</span></p>
+        <p className="text-[10px] font-medium text-slate-600">
+          O mapeamento salvo irá atualizar este contrato para o status{' '}
+          <span className="font-black text-violet-700">mapped</span>.
+        </p>
+      </div>
+
+      {/* Tabela de mapeamento */}
+      <div className="mt-5">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          Configurar mapeamento de campos
+        </p>
+        <p className="mt-1 text-[10px] font-medium text-slate-500">
+          Selecione qual campo do Salesforce corresponde a cada campo canônico da Canopi.
+        </p>
+
+        <div className="mt-3 overflow-x-auto rounded-xl border border-slate-100">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  Campo canônico (Canopi)
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  Obrigatório
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  Campo Salesforce (origem)
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {CANONICAL_FIELDS.map((cf) => (
+                <tr key={cf.key} className="border-b border-slate-50 last:border-0">
+                  <td className="px-4 py-2">
+                    <span className="text-xs font-black text-slate-800">{cf.label}</span>
+                    <span className="ml-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">
+                      {cf.key}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2">
+                    {cf.required ? (
+                      <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[9px] font-black text-violet-700">sim</span>
+                    ) : (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-medium text-slate-500">opcional</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    <select
+                      value={fieldMap[cf.key]}
+                      onChange={(e) => handleFieldChange(cf.key, e.target.value)}
+                      disabled={isSaved}
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <option value="">— selecionar —</option>
+                      {SALESFORCE_ACCOUNT_FIELDS.map((f) => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Preview de 1 linha */}
+      {samplePreview && (
+        <div className="mt-5">
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            Preview: como esta conta ficaria após o mapeamento
+          </p>
+          <p className="mt-0.5 text-[10px] font-medium text-slate-500">
+            Simulação visual apenas. Nenhum dado foi gravado em Contas.
+          </p>
+          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {CANONICAL_FIELDS.map((cf) => {
+              const value = samplePreview[cf.key];
+              return (
+                <div key={cf.key} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{cf.label}</p>
+                  <p className={`mt-0.5 text-xs font-medium ${value ? 'text-slate-800' : 'text-slate-400'}`}>
+                    {value || '—'}
+                  </p>
+                  <p className="text-[9px] text-slate-400">← {fieldMap[cf.key] || 'não mapeado'}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Regras de Dedupe */}
+      <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Regras de deduplicação (não editável neste recorte)</p>
+        <ul className="mt-2 space-y-1 text-[10px] font-medium text-slate-600">
+          <li className="flex items-start gap-1.5">
+            <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+            Prioridade 1: Salesforce Id (<code className="rounded bg-slate-200 px-1 text-[9px]">source_external_id</code>)
+            — se já existir no banco.
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
+            Prioridade 2: Domínio / Website — match por{' '}
+            <code className="rounded bg-slate-200 px-1 text-[9px]">Website</code>.
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+            O ID interno da Canopi será preservado — nunca sobrescrito pelo Salesforce.
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+            Campos estratégicos da Canopi não serão sobrescritos por Salesforce:{' '}
+            <code className="rounded bg-slate-200 px-1 text-[9px]">tipoEstrategico</code>,{' '}
+            <code className="rounded bg-slate-200 px-1 text-[9px]">playAtivo</code>,{' '}
+            <code className="rounded bg-slate-200 px-1 text-[9px]">scoring</code>.
+          </li>
+        </ul>
+      </div>
+
+      {/* Botão de salvar */}
+      {!isSaved && (
+        <div className="mt-5">
+          {missingRequired.length > 0 && (
+            <p className="mb-2 text-[10px] font-medium text-amber-700">
+              Campos obrigatórios sem mapeamento: {missingRequired.join(', ')}.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => onSaveMapping(fieldMap)}
+            disabled={isSaving || missingRequired.length > 0}
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-violet-700 enabled:text-white enabled:hover:bg-violet-800"
+          >
+            {isSaving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            )}
+            {isSaving ? 'Salvando mapeamento...' : 'Salvar mapeamento de Account'}
+          </button>
+        </div>
+      )}
+
+      {mappingState.phase === 'error' && (
+        <p className="mt-3 text-xs font-medium text-red-700">{mappingState.message}</p>
+      )}
+
+      {isSaved && (
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />
+            <p className="text-xs font-black text-emerald-800">Mapeamento salvo com sucesso.</p>
+          </div>
+          <p className="mt-1 text-[10px] font-medium text-emerald-700">
+            Status do contrato atualizado para <span className="font-black">mapped</span>.
+          </p>
+          <p className="text-[10px] font-medium text-emerald-700">
+            Salvo em: {mappingState.updatedAt ? new Date(mappingState.updatedAt).toLocaleString('pt-BR') : '—'}
+          </p>
+          <p className="mt-1 text-[10px] font-medium text-emerald-600">
+            Nenhum registro foi sincronizado. O contrato aguarda a próxima etapa de sync read-only.
+          </p>
+        </div>
+      )}
+
+      <p className="mt-4 text-[10px] font-medium text-slate-400">
+        Limites: nenhuma conta foi criada, atualizada ou sincronizada.
+        Este mapeamento registra apenas a intenção de tradução de campos para uso futuro no sync read-only.
+        Apenas Account está no escopo deste recorte.
+      </p>
+    </div>
+  );
+}
+
 interface SalesforceMultiEntityPreviewProps {
   oauthConnected: boolean;
 }
@@ -807,8 +1087,10 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const [contract, setContract] = useState<SalesforceMultiEntityContract | null>(null);
   const [dryRunState, setDryRunState] = useState<DryRunState>({ phase: 'idle' });
   const [syncContractState, setSyncContractState] = useState<SyncContractState>({ phase: 'idle' });
+  const [canonicalMappingState, setCanonicalMappingState] = useState<CanonicalMappingState>({ phase: 'idle' });
   const contractPanelRef = useRef<HTMLDivElement>(null);
   const dryRunPanelRef = useRef<HTMLDivElement>(null);
+  const mappingPanelRef = useRef<HTMLDivElement>(null);
 
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
@@ -835,6 +1117,37 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     }
   }
 
+  async function handleSaveCanonicalMapping(fieldMap: CanonicalFieldMap) {
+    if (syncContractState.phase !== 'done') return;
+    setCanonicalMappingState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/sync-contract', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contractId: syncContractState.contractId,
+          mapping: { fieldMap },
+        }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as {
+        status: string;
+        syncContract?: { updatedAt: string };
+        error?: string;
+      };
+      if (!res.ok || data.status !== 'success' || !data.syncContract) {
+        setCanonicalMappingState({ phase: 'error', message: data.error ?? 'Não foi possível salvar o mapeamento.' });
+        return;
+      }
+      setCanonicalMappingState({ phase: 'done', updatedAt: data.syncContract.updatedAt });
+      setTimeout(() => {
+        mappingPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    } catch {
+      setCanonicalMappingState({ phase: 'error', message: 'Não foi possível salvar o mapeamento.' });
+    }
+  }
+
   async function handleLoad() {
     if (!oauthConnected) return;
     setState({ phase: 'loading' });
@@ -842,6 +1155,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     setContract(null);
     setDryRunState({ phase: 'idle' });
     setSyncContractState({ phase: 'idle' });
+    setCanonicalMappingState({ phase: 'idle' });
 
     try {
       const objects = ENTITY_ORDER.join(',');
@@ -1208,6 +1522,22 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
                 result={dryRunState.result}
                 syncContractState={syncContractState}
                 onSaveSyncContract={handleSaveSyncContract}
+              />
+            </div>
+          )}
+
+          {/* Painel de mapeamento canônico (C4.5) */}
+          {syncContractState.phase === 'done' && (
+            <div ref={mappingPanelRef} className="scroll-mt-4">
+              <AccountMappingPanel
+                contractId={syncContractState.contractId}
+                accountRecords={
+                  state.phase === 'done'
+                    ? (state.results.find((r) => r.objectApiName === 'Account' && r.status === 'success')?.records ?? [])
+                    : []
+                }
+                mappingState={canonicalMappingState}
+                onSaveMapping={handleSaveCanonicalMapping}
               />
             </div>
           )}

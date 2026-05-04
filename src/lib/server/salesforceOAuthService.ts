@@ -1327,6 +1327,194 @@ export async function saveSalesforceSyncContract(
   };
 }
 
+// ─── Canonical Mapping (C4.5) ─────────────────────────────────────────────────
+
+export interface SalesforceAccountCanonicalFieldMap {
+  source_external_id: string;
+  nome: string;
+  dominio: string;
+  segmento: string;
+  tipo: string;
+  [key: string]: string;
+}
+
+export interface SalesforceAccountDedupeRule {
+  priority: string[];
+  domainSourceField: string;
+  preserveCanopiId: boolean;
+  neverOverwrite: string[];
+}
+
+export interface SalesforceAccountCanonicalMapping {
+  entity: 'Account';
+  sourceObjectApiName: 'Account';
+  fieldMap: SalesforceAccountCanonicalFieldMap;
+  dedupeRule: SalesforceAccountDedupeRule;
+  sourceExternalIdField: string;
+  canonicalDedupeField: string;
+  updatedAt: string;
+}
+
+export interface SyncContractFullResult {
+  id: string;
+  provider: string;
+  status: SyncContractStatus;
+  createdAt: string;
+  contractJson: unknown;
+  dryRunSummary: unknown;
+  estimatedRecordsCanSync: number;
+}
+
+export interface AccountMappingSavedResult {
+  id: string;
+  provider: string;
+  status: SyncContractStatus;
+  mappedEntity: 'Account';
+  updatedAt: string;
+}
+
+export const DEFAULT_ACCOUNT_FIELD_MAP: SalesforceAccountCanonicalFieldMap = {
+  source_external_id: 'Id',
+  nome: 'Name',
+  dominio: 'Website',
+  segmento: 'Industry',
+  tipo: 'Type',
+};
+
+export const DEFAULT_ACCOUNT_DEDUPE_RULE: SalesforceAccountDedupeRule = {
+  priority: ['source_external_id', 'domain_match'],
+  domainSourceField: 'Website',
+  preserveCanopiId: true,
+  neverOverwrite: ['id', 'tipoEstrategico', 'playAtivo', 'scoring'],
+};
+
+export async function getLatestPendingSalesforceSyncContract(): Promise<SyncContractFullResult | null> {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, created_at, contract_json, dry_run_summary')
+    .eq('provider', SALESFORCE_PROVIDER)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!data) return null;
+
+  const row = data as {
+    id: string;
+    provider: string;
+    status: string;
+    created_at: string;
+    contract_json: unknown;
+    dry_run_summary: unknown;
+  };
+
+  const dryRun = row.dry_run_summary as { estimatedRecordsCanSync?: number } | null;
+  const estimatedRecordsCanSync =
+    typeof dryRun?.estimatedRecordsCanSync === 'number' ? dryRun.estimatedRecordsCanSync : 0;
+
+  return {
+    id: row.id,
+    provider: row.provider,
+    status: row.status as SyncContractStatus,
+    createdAt: row.created_at,
+    contractJson: row.contract_json,
+    dryRunSummary: row.dry_run_summary,
+    estimatedRecordsCanSync,
+  };
+}
+
+export async function saveSalesforceAccountCanonicalMapping(
+  contractId: string,
+  mapping: Partial<SalesforceAccountCanonicalMapping>,
+): Promise<AccountMappingSavedResult> {
+  if (!contractId || typeof contractId !== 'string' || !contractId.trim()) {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  if (typeof mapping !== 'object' || mapping === null) {
+    throw new Error('MAPPING_INVALID');
+  }
+
+  if (!mapping.fieldMap || typeof mapping.fieldMap !== 'object') {
+    throw new Error('MAPPING_FIELD_MAP_REQUIRED');
+  }
+
+  const requiredCanonicalFields = ['source_external_id', 'nome', 'dominio'];
+  for (const field of requiredCanonicalFields) {
+    if (!mapping.fieldMap[field] || typeof mapping.fieldMap[field] !== 'string') {
+      throw new Error(`MAPPING_MISSING_FIELD_${field.toUpperCase()}`);
+    }
+  }
+
+  const supabase = getSupabaseAdminClient();
+
+  // Busca contrato existente para mesclar contract_json
+  const { data: existing, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, contract_json, status')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!existing) throw new Error('CONTRACT_NOT_FOUND');
+
+  const existingRow = existing as { id: string; contract_json: unknown; status: string };
+  if (existingRow.status === 'synced' || existingRow.status === 'cancelled') {
+    throw new Error('CONTRACT_STATUS_IMMUTABLE');
+  }
+
+  const canonicalMapping: SalesforceAccountCanonicalMapping = {
+    entity: 'Account',
+    sourceObjectApiName: 'Account',
+    fieldMap: {
+      ...DEFAULT_ACCOUNT_FIELD_MAP,
+      ...(mapping.fieldMap ?? {}),
+    },
+    dedupeRule: {
+      ...DEFAULT_ACCOUNT_DEDUPE_RULE,
+      ...(mapping.dedupeRule ?? {}),
+    },
+    sourceExternalIdField: mapping.sourceExternalIdField ?? 'Id',
+    canonicalDedupeField: mapping.canonicalDedupeField ?? 'dominio',
+    updatedAt: new Date().toISOString(),
+  };
+
+  const existingContractJson =
+    typeof existingRow.contract_json === 'object' && existingRow.contract_json !== null
+      ? (existingRow.contract_json as Record<string, unknown>)
+      : {};
+
+  const updatedContractJson = {
+    ...existingContractJson,
+    canonical_mapping: canonicalMapping,
+  };
+
+  const nowIso = new Date().toISOString();
+
+  const { error: updateError } = await supabase
+    .from('salesforce_sync_contracts')
+    .update({
+      status: 'mapped',
+      contract_json: updatedContractJson,
+      updated_at: nowIso,
+    })
+    .eq('id', contractId);
+
+  if (updateError) throw new Error('SAVE_MAPPING_FAILED');
+
+  return {
+    id: contractId,
+    provider: SALESFORCE_PROVIDER,
+    status: 'mapped',
+    mappedEntity: 'Account',
+    updatedAt: nowIso,
+  };
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {
