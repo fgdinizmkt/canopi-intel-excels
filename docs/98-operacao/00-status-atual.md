@@ -804,6 +804,12 @@ Pendências futuras (fora do escopo atual):
 
 ---
 
+## Matriz Operacional de Agentes e Modelos
+
+Registrada em `docs/98-operacao/35-matriz-agentes-modelos.md` a régua de decisão para orquestração de agentes (ChatGPT, Codex, Claude Code, Antigravity) e modelos conforme tipo, risco e escopo de cada recorte. Inclui protocolo de auditoria, regra-mãe (um recorte = um agente + um modelo), sincronização entre agentes e histórico de decisões.
+
+---
+
 ## Próximo Passo
 
 - **Contas V2 — Próximo recorte:** nenhum recorte aberto automaticamente. A frente segue em Fontes e Conectores até nova autorização explícita do Fábio.

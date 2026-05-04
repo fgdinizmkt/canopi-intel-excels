@@ -3564,3 +3564,28 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - `51d8feb` — `feat(settings): add Salesforce multi-entity read-only dry-run`
 
 **Status:** Salesforce C4.3 concluído. Setup Read-only fechado operacionalmente com preview, seleção, contrato e dry-run multi-entidade validados.
+
+---
+
+### Sessão: 2026-05-04 — Matriz Operacional de Agentes e Modelos
+**Agente:** Claude Code
+**Modelo:** Haiku 4.5
+
+**Objetivo:** Registrar régua de decisão para orquestração de agentes (ChatGPT, Codex, Claude Code, Antigravity) e modelos conforme tipo, risco e escopo de cada recorte.
+
+**Ações:**
+1. **Novo documento:** `docs/98-operacao/35-matriz-agentes-modelos.md` criado
+2. **Conteúdo:**
+   - 11 combinações de agente × modelo com responsabilidades claras
+   - Guia "quando usar" para cada combinação
+   - Regra-mãe: um recorte = um agente + um modelo
+   - Protocolo de auditoria antes de alterar arquivos
+   - Sincronização entre agentes (nenhum altera mesmos arquivos em paralelo)
+   - Ciclo de vida de recorte (definição → implementação → auditoria → revisão → publicação → documentação)
+   - Mapeamento de casos de uso comuns
+   - Histórico de decisões (exemplo: C4.3)
+3. **Referências adicionadas:**
+   - `00-status-atual.md`: seção nova "Matriz Operacional de Agentes e Modelos"
+   - `03-log-de-sessoes.md`: esta sessão
+
+**Status:** Documentação operacional criada e referências adicionadas. Pronto para commit operacional.

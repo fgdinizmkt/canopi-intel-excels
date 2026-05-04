@@ -268,6 +268,14 @@ Arquivos prioritários:
 
 ---
 
+## Complemento: Matriz Operacional de Agentes e Modelos
+
+Ver `docs/98-operacao/35-matriz-agentes-modelos.md` para régua de decisão de orquestração de agentes (ChatGPT, Codex, Claude Code, Antigravity) e modelos conforme tipo, risco e escopo de cada recorte.
+
+Referência: Este protocolo de espelhamento é **parte constitucional** da matriz operacional. Qualquer recorte que altere `docs/98-operacao/*` deve respeitar o ciclo de sincronização local → GitHub → Drive.
+
+---
+
 ## Status deste protocolo
 
 Criado para impedir divergência entre narrativa, código e memória operacional após os fechamentos Salesforce 2C.1 e 2C.2.
