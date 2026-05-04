@@ -3519,3 +3519,48 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - Fontes opera exclusivamente como setup local/simulado do contrato de leitura.
 
 **Status:** C1.3 fechado. Build limpo, lint limpo, main sincronizada com origin/main. Working tree limpo. Próximo recorte: decisão sobre C2 (primeiro conector real) ou Fase B.2 (gates por canonicalMapping).
+
+---
+
+### Sessão: 2026-05-03 — Salesforce C4.3 (Dry-run read-only multi-entidade)
+**Agente:** Claude Sonnet 4.6
+
+**Objetivo:** Implementar validação read-only de registros reais no Salesforce para múltiplas entidades em contrato local, detectando status de permissão e disponibilidade sem criar/atualizar dados.
+
+**Ações:**
+
+1. **Extensão do serviço (`salesforceOAuthService.ts`):**
+   - Tipos `DryRunRecord`, `DryRunEntityResult`, `DryRunSummary`, `DryRunResult`, `DryRunContractInput`
+   - Função `queryRecordExists(instanceUrl, accessToken, objectApiName, id, apiVersion)`: SOQL SELECT Id read-only
+   - Função `dryRunMultiEntityContract(contract)`: orquestra leitura por entidade, detecção de 401/403 para refresh, Promise.allSettled para falha parcial
+   - Suporte a 50 registros por entidade com aggregate de estatísticas (validCount, missingCount, permissionErrorCount, otherErrorCount)
+   - Token refresh reuse pattern (idêntico a C4.1)
+
+2. **Nova rota POST `/api/account-connectors/salesforce/oauth/dry-run`:**
+   - Recebe `{ contract: SalesforceMultiEntityContract }`
+   - Valida contrato, filtra allowlist de objetos, limita 50 registros por entidade
+   - Chama service `dryRunMultiEntityContract()`
+   - Retorna `{ status: 'success'|'error', provider: 'salesforce', dryRunAt, executionTimeMs, results[], summary{} }`
+   - Sanitiza erros sem expor tokens/stack traces
+
+3. **Componente `SalesforceMultiEntityPreview.tsx` (C4.3):**
+   - Tipos `DryRunRecordStatus`, `DryRunRecord`, `DryRunEntityResult`, `DryRunResult`, `DryRunState`
+   - `DryRunPanel` renderiza resultados com verification counts por status
+   - `handleDryRun` async: POST /dry-run, spinlock + feedback, sincronização de scroll
+   - Botão "Executar dry-run read-only" visível quando contrato gerado
+   - Botão "Confirmar para sync" desabilitado (bloqueio para recorte futuro)
+   - State reset: qualquer mudança em selection invalida contract + dryRunState
+
+4. **Validação:**
+   - Lint OK
+   - Build:safe OK
+   - Visual: aprovado por Fábio com teste em browser (Fábio + Canopi)
+   - 50 record limit, per-entity partial failure, token refresh pattern reuso
+
+5. **Pequena correção de tipo:**
+   - Rota: duplicado `status` field ao spread result. Fix: `const { status: _s, ...rest } = result; return { status: 'success', ...rest }`
+
+**Commits:**
+- `51d8feb` — `feat(settings): add Salesforce multi-entity read-only dry-run`
+
+**Status:** Salesforce C4.3 concluído. Setup Read-only fechado operacionalmente com preview, seleção, contrato e dry-run multi-entidade validados.

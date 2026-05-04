@@ -18,6 +18,7 @@ Fechado neste marco (Setup Read-only):
 - Preview read-only multi-entidade Salesforce (C4.0) concluído localmente em `d8bbe2f`
 - Preparação local para sync read-only multi-entidade Salesforce (C4.1) concluída localmente em `e735ccb`
 - Contrato local multi-entidade Salesforce (C4.2) concluído localmente em `fbb765b`
+- Dry-run read-only multi-entidade Salesforce (C4.3) concluído localmente em `51d8feb`
 
 Não fechado neste marco:
 - sync real
@@ -37,7 +38,6 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Writeback seguro
 - Salesforce Test Data Pack
 - Salesforce Connector completo
-- C4.3 — Dry-run read-only multi-entidade Salesforce
 - Base de Teste Completa por CRM (pós-configurações)
 - Salesforce Accounts read-only preview (C3.0) já validado localmente; espelhado operacionalmente
 - Salesforce Accounts pre-sync selection (C3.1) já validado localmente; espelhado operacionalmente
@@ -46,6 +46,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce multi-entity read-only preview (C4.0) já validado localmente; espelhado operacionalmente
 - Salesforce multi-entity sync preparation (C4.1) já validado localmente; espelhado operacionalmente
 - Salesforce multi-entity local contract (C4.2) já validado localmente; espelhado operacionalmente
+- Salesforce multi-entity read-only dry-run (C4.3) concluído localmente em `51d8feb`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

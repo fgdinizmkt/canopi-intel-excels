@@ -122,6 +122,7 @@ Estado consolidado desta trilha:
 - Salesforce C4.0 fechado localmente em `d8bbe2f` com preview read-only multi-entidade (Account, Contact, Opportunity, Lead, Campaign).
 - Salesforce C4.1 fechado localmente em `e735ccb` com preparação local para sync read-only multi-entidade.
 - Salesforce C4.2 fechado localmente em `fbb765b` com contrato local multi-entidade.
+- Salesforce C4.3 fechado localmente em `51d8feb` com dry-run read-only multi-entidade.
 - Marco atual: **Salesforce Setup Read-only fechado operacionalmente**.
 - A página dedicada cobre: metadados read-only (token temporário), preparação local de CSV exportado, conexão OAuth produtiva com persistência segura, preview read-only de Accounts via OAuth, seleção controlada local para pré-sync read-only, contrato local de pré-sync read-only, dry-run read-only local de Accounts, preview read-only multi-entidade com discovery read-only e tabelas por entidade, preparação local para sync read-only multi-entidade e contrato local multi-entidade.
 - **Salesforce ainda não é conector produtivo completo.** Sem sync real, sem Bulk API, sem writeback real e sem importação real.
@@ -313,8 +314,8 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 | Fase 3 | concluída | Token temporário Salesforce implementado e validado | Teste local validado e hard refresh ok |
 | Fase 4 | concluída | CSV exportado Salesforce implementado na página dedicada | CSV restrito à página Salesforce |
 | Fase 5 | concluída (2C.3) | OAuth Salesforce produtivo publicado | Persistência segura + validação visual + lint/build:safe |
-| Fase 6 | em andamento | Executar validação ponta a ponta Salesforce | Fluxo estável, sem vazamento de estado antigo |
-| Fase 7 | concluída (2C.2) | Fechamento operacional de Salesforce 2C.2 registrado | Evidência técnica + visual + operacional |
+| Fase 6 | concluída | Validação ponta a ponta Salesforce completa (C4.0–C4.3) | Setup Read-only fechado operacionalmente |
+| Fase 7 | concluída | Fechamento operacional Salesforce C4.3 registrado | Dry-run multi-entidade + commit 51d8feb |
 | Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |
 
 ## 15) Memória operacional e espelho externo
