@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { AlertTriangle, CheckCircle2, CheckSquare, Loader2, MinusSquare, Square, XCircle } from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type PreviewValue = string | number | boolean | null;
@@ -32,16 +32,28 @@ type PreviewState =
   | { phase: 'done'; results: ObjectPreviewResult[]; requestedAt: string }
   | { phase: 'error'; message: string };
 
+type EligibilityStatus = 'valid' | 'alert' | 'blocked';
+
+interface EligibilityResult {
+  status: EligibilityStatus;
+  alerts: string[];
+}
+
+type SelectionMap = Record<string, string[]>;
+
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
+
+const STATUS_STYLES: Record<EligibilityStatus, { row: string; badge: string; label: string }> = {
+  valid: { row: 'bg-emerald-50/40', badge: 'bg-emerald-100 text-emerald-800', label: 'Válido' },
+  alert: { row: 'bg-amber-50/40', badge: 'bg-amber-100 text-amber-700', label: 'Alertas' },
+  blocked: { row: 'bg-red-50/40', badge: 'bg-red-100 text-red-700', label: 'Bloqueado' },
+};
 
 function formatDate(iso: string): string {
   try {
     return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
     }).format(new Date(iso));
   } catch {
     return iso;
@@ -64,8 +76,103 @@ function formatCellValue(value: PreviewValue): string {
   return str;
 }
 
-function EntityCard({ result }: { result: ObjectPreviewResult }) {
+function getStr(record: Record<string, PreviewValue>, field: string): string {
+  const v = record[field];
+  if (v === null || v === undefined) return '';
+  return String(v).trim();
+}
+
+function assessEligibility(
+  objectApiName: string,
+  record: Record<string, PreviewValue>,
+  accountIds: Set<string>,
+): EligibilityResult {
+  const id = getStr(record, 'Id');
+  const name = getStr(record, 'Name');
+
+  switch (objectApiName) {
+    case 'Account': {
+      if (!id || !name) return { status: 'blocked', alerts: ['Id ou Name ausente.'] };
+      const alerts: string[] = [];
+      if (!getStr(record, 'Website')) alerts.push('Website ausente.');
+      if (!getStr(record, 'Industry')) alerts.push('Industry ausente.');
+      return { status: alerts.length ? 'alert' : 'valid', alerts };
+    }
+    case 'Contact': {
+      const email = getStr(record, 'Email');
+      const accountId = getStr(record, 'AccountId');
+      if (!id || !name || !email) return { status: 'blocked', alerts: ['Id, Name ou Email ausente.'] };
+      const alerts: string[] = [];
+      if (!accountId) {
+        alerts.push('AccountId ausente.');
+      } else if (!accountIds.has(accountId)) {
+        alerts.push('AccountId não encontrado na amostra de Accounts carregada.');
+      }
+      return { status: alerts.length ? 'alert' : 'valid', alerts };
+    }
+    case 'Opportunity': {
+      const stageName = getStr(record, 'StageName');
+      const accountId = getStr(record, 'AccountId');
+      if (!id || !name || !stageName) return { status: 'blocked', alerts: ['Id, Name ou StageName ausente.'] };
+      const alerts: string[] = [];
+      if (!accountId) {
+        alerts.push('AccountId ausente.');
+      } else if (!accountIds.has(accountId)) {
+        alerts.push('AccountId não encontrado na amostra de Accounts carregada.');
+      }
+      return { status: alerts.length ? 'alert' : 'valid', alerts };
+    }
+    case 'Lead': {
+      if (!id || !name) return { status: 'blocked', alerts: ['Id ou Name ausente.'] };
+      const alerts: string[] = [];
+      if (!getStr(record, 'Email')) alerts.push('Email ausente.');
+      return { status: alerts.length ? 'alert' : 'valid', alerts };
+    }
+    case 'Campaign': {
+      if (!id || !name) return { status: 'blocked', alerts: ['Id ou Name ausente.'] };
+      const alerts: string[] = [];
+      if (!getStr(record, 'Status')) alerts.push('Status ausente.');
+      return { status: alerts.length ? 'alert' : 'valid', alerts };
+    }
+    default:
+      return { status: 'valid', alerts: [] };
+  }
+}
+
+interface EntityCardProps {
+  result: ObjectPreviewResult;
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  onSelectAll: () => void;
+  onClearAll: () => void;
+  accountIds: Set<string>;
+}
+
+function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, accountIds }: EntityCardProps) {
   const success = result.status === 'success';
+  const selectionSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+
+  const eligibilityMap = useMemo(() => {
+    const map = new Map<string, EligibilityResult>();
+    for (const record of result.records) {
+      const id = getStr(record, 'Id');
+      if (id) map.set(id, assessEligibility(result.objectApiName, record, accountIds));
+    }
+    return map;
+  }, [result.records, result.objectApiName, accountIds]);
+
+  const summary = useMemo(() => {
+    let valid = 0, alert = 0, blocked = 0;
+    for (const elig of eligibilityMap.values()) {
+      if (elig.status === 'valid') valid++;
+      else if (elig.status === 'alert') alert++;
+      else blocked++;
+    }
+    return { loaded: result.records.length, selected: selectedIds.length, valid, alert, blocked };
+  }, [eligibilityMap, result.records.length, selectedIds.length]);
+
+  const allSelected = result.records.length > 0 && selectedIds.length === result.records.length;
+  const someSelected = selectedIds.length > 0 && !allSelected;
 
   return (
     <div className={`rounded-2xl border p-4 ${success ? 'border-slate-200 bg-white' : 'border-red-200 bg-red-50'}`}>
@@ -104,46 +211,134 @@ function EntityCard({ result }: { result: ObjectPreviewResult }) {
       )}
 
       {success && result.records.length > 0 && (
-        <div className="mt-3 overflow-x-auto rounded-xl border border-slate-100">
-          <table className="w-full min-w-max text-left">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
-                {result.fields.map((f) => (
-                  <th
-                    key={f}
-                    className="whitespace-nowrap px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500"
-                  >
-                    {f}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {result.records.map((record, i) => (
-                <tr
-                  key={i}
-                  className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50"
+        <>
+          {/* Entity summary + action buttons */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-medium text-slate-500">
+              <span>{summary.loaded} carregados</span>
+              <span>·</span>
+              <span className="font-black text-slate-700">{summary.selected} selecionados</span>
+              <span>·</span>
+              <span className="text-emerald-700">{summary.valid} válidos</span>
+              {summary.alert > 0 && (
+                <><span>·</span><span className="text-amber-600">{summary.alert} com alertas</span></>
+              )}
+              {summary.blocked > 0 && (
+                <><span>·</span><span className="text-red-600">{summary.blocked} bloqueados</span></>
+              )}
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              {selectedIds.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onClearAll}
+                  className="flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
                 >
-                  {result.fields.map((f) => (
-                    <td
-                      key={f}
-                      className="max-w-[200px] truncate whitespace-nowrap px-3 py-2 text-xs font-medium text-slate-700"
-                      title={formatCellValue(record[f])}
+                  <MinusSquare className="h-3 w-3" />
+                  Limpar seleção
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Records table */}
+          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-100">
+            <table className="w-full min-w-max text-left">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50">
+                  <th className="w-8 px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={allSelected ? onClearAll : onSelectAll}
+                      aria-label="selecionar todos"
+                      className="rounded-md p-0.5 transition-colors hover:bg-slate-100"
                     >
-                      {formatCellValue(record[f])}
-                    </td>
+                      {allSelected ? (
+                        <CheckSquare className="h-4 w-4 text-slate-800" />
+                      ) : someSelected ? (
+                        <MinusSquare className="h-4 w-4 text-blue-700" />
+                      ) : (
+                        <Square className="h-4 w-4 text-slate-500" />
+                      )}
+                    </button>
+                  </th>
+                  <th className="whitespace-nowrap px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                    Status
+                  </th>
+                  {result.fields.map((f) => (
+                    <th
+                      key={f}
+                      className="whitespace-nowrap px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500"
+                    >
+                      {f}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {result.records.map((record, i) => {
+                  const id = getStr(record, 'Id');
+                  const isSelected = id ? selectionSet.has(id) : false;
+                  const elig = id
+                    ? (eligibilityMap.get(id) ?? { status: 'valid' as EligibilityStatus, alerts: [] })
+                    : { status: 'blocked' as EligibilityStatus, alerts: ['Id ausente.'] };
+                  const styles = STATUS_STYLES[elig.status];
 
-      {success && (
-        <p className="mt-2 text-[10px] font-medium text-slate-400">
-          Consultado em {formatDate(result.testedAt)}
-        </p>
+                  return (
+                    <tr
+                      key={i}
+                      className={`border-b border-slate-50 last:border-0 transition-colors hover:brightness-95 ${isSelected ? 'ring-1 ring-inset ring-slate-300' : ''} ${styles.row}`}
+                    >
+                      <td className="px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={() => id && onToggle(id)}
+                          disabled={!id}
+                          aria-label={isSelected ? 'desselecionar' : 'selecionar'}
+                          className="rounded-md p-0.5 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed"
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="h-4 w-4 text-slate-800" />
+                          ) : (
+                            <Square className="h-4 w-4 text-slate-500" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-col gap-0.5">
+                          <span
+                            className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${styles.badge}`}
+                          >
+                            {styles.label}
+                          </span>
+                          {elig.alerts.map((alert, ai) => (
+                            <span key={ai} className="flex items-center gap-0.5 text-[9px] font-medium text-amber-700">
+                              <AlertTriangle className="h-2.5 w-2.5 shrink-0" />
+                              {alert}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      {result.fields.map((f) => (
+                        <td
+                          key={f}
+                          className="max-w-[200px] truncate whitespace-nowrap px-3 py-2 text-xs font-medium text-slate-700"
+                          title={formatCellValue(record[f])}
+                        >
+                          {formatCellValue(record[f])}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-2 text-[10px] font-medium text-slate-400">
+            Consultado em {formatDate(result.testedAt)}
+          </p>
+        </>
       )}
     </div>
   );
@@ -155,10 +350,12 @@ interface SalesforceMultiEntityPreviewProps {
 
 export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMultiEntityPreviewProps) {
   const [state, setState] = useState<PreviewState>({ phase: 'idle' });
+  const [selectionMap, setSelectionMap] = useState<SelectionMap>({});
 
   async function handleLoad() {
     if (!oauthConnected) return;
     setState({ phase: 'loading' });
+    setSelectionMap({});
 
     try {
       const objects = ENTITY_ORDER.join(',');
@@ -182,13 +379,59 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     }
   }
 
+  function handleToggle(objectApiName: string, id: string) {
+    setSelectionMap((prev) => {
+      const current = prev[objectApiName] ?? [];
+      const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
+      return { ...prev, [objectApiName]: next };
+    });
+  }
+
+  function handleSelectAll(objectApiName: string, records: Record<string, PreviewValue>[]) {
+    const ids = records.map((r) => getStr(r, 'Id')).filter(Boolean);
+    setSelectionMap((prev) => ({ ...prev, [objectApiName]: ids }));
+  }
+
+  function handleClearAll(objectApiName: string) {
+    setSelectionMap((prev) => ({ ...prev, [objectApiName]: [] }));
+  }
+
+  const accountIds = useMemo<Set<string>>(() => {
+    if (state.phase !== 'done') return new Set();
+    const accountResult = state.results.find((r) => r.objectApiName === 'Account' && r.status === 'success');
+    if (!accountResult) return new Set();
+    return new Set(accountResult.records.map((r) => getStr(r, 'Id')).filter(Boolean));
+  }, [state]);
+
+  const globalSummary = useMemo(() => {
+    if (state.phase !== 'done') return null;
+
+    let totalSelected = 0, totalValid = 0, totalAlert = 0, totalBlocked = 0;
+    const entitiesWithSelection: string[] = [];
+
+    for (const result of state.results) {
+      if (result.status !== 'success') continue;
+      const selectedIds = selectionMap[result.objectApiName] ?? [];
+      if (selectedIds.length > 0) entitiesWithSelection.push(result.objectApiName);
+      totalSelected += selectedIds.length;
+      for (const record of result.records) {
+        const elig = assessEligibility(result.objectApiName, record, accountIds);
+        if (elig.status === 'valid') totalValid++;
+        else if (elig.status === 'alert') totalAlert++;
+        else totalBlocked++;
+      }
+    }
+
+    return { totalSelected, totalValid, totalAlert, totalBlocked, entitiesWithSelection };
+  }, [state, selectionMap, accountIds]);
+
   return (
     <Card className="rounded-2xl border border-slate-200 bg-white p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-sm font-black text-slate-900">Preview read-only multi-entidade</p>
           <p className="text-sm font-medium text-slate-600">
-            Amostra pequena e somente leitura de registros reais de Account, Contact, Opportunity, Lead e Campaign via OAuth persistido.
+            Accounts, Contacts, Opportunities, Leads e Campaigns carregados neste preview somente leitura via OAuth persistido.
           </p>
         </div>
         <button
@@ -202,17 +445,14 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
         </button>
       </div>
 
+      {/* Guardrails */}
       <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Limites desta etapa</p>
         <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
-          <li>• Somente leitura.</li>
-          <li>• Não importa registros para a Canopi.</li>
-          <li>• Não grava no Supabase.</li>
-          <li>• Não executa sync real.</li>
-          <li>• Não altera camada canônica.</li>
-          <li>• Não faz dedupe real.</li>
-          <li>• Não faz writeback.</li>
-          <li>• Não usa Bulk API.</li>
+          <li>• Esta etapa apenas prepara registros para análise local.</li>
+          <li>• Nada é importado, salvo ou sincronizado.</li>
+          <li>• Contact e Opportunity são avaliados contra os Accounts carregados neste preview.</li>
+          <li>• Lead e Campaign seguem independentes nesta versão.</li>
         </ul>
       </div>
 
@@ -238,8 +478,48 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
               Consultado em {formatDate(state.requestedAt)}
             </p>
           </div>
+
+          {/* Global summary */}
+          {globalSummary && (
+            <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
+              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
+                <span>
+                  <span className="font-black text-slate-800">{globalSummary.totalSelected}</span> selecionados
+                </span>
+                <span>
+                  <span className="font-black text-emerald-700">{globalSummary.totalValid}</span> válidos
+                </span>
+                {globalSummary.totalAlert > 0 && (
+                  <span>
+                    <span className="font-black text-amber-600">{globalSummary.totalAlert}</span> com alertas
+                  </span>
+                )}
+                {globalSummary.totalBlocked > 0 && (
+                  <span>
+                    <span className="font-black text-red-600">{globalSummary.totalBlocked}</span> bloqueados
+                  </span>
+                )}
+                {globalSummary.entitiesWithSelection.length > 0 && (
+                  <span className="text-slate-500">
+                    Entidades: {globalSummary.entitiesWithSelection.join(', ')}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Entity cards */}
           {state.results.map((result) => (
-            <EntityCard key={result.objectApiName} result={result} />
+            <EntityCard
+              key={result.objectApiName}
+              result={result}
+              selectedIds={selectionMap[result.objectApiName] ?? []}
+              onToggle={(id) => handleToggle(result.objectApiName, id)}
+              onSelectAll={() => handleSelectAll(result.objectApiName, result.records)}
+              onClearAll={() => handleClearAll(result.objectApiName)}
+              accountIds={accountIds}
+            />
           ))}
         </div>
       )}
