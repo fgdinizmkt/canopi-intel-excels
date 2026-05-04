@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
-import { AlertTriangle, CheckCircle2, CheckSquare, ClipboardList, Loader2, MinusSquare, ShieldCheck, Square, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle2, CheckSquare, ClipboardList, Eye, Loader2, MinusSquare, ShieldCheck, Square, XCircle, Zap } from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type PreviewValue = string | number | boolean | null;
@@ -30,6 +30,12 @@ type PreviewState =
   | { phase: 'idle' }
   | { phase: 'loading' }
   | { phase: 'done'; results: ObjectPreviewResult[]; requestedAt: string }
+  | { phase: 'error'; message: string };
+
+type SyncPreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: any }
   | { phase: 'error'; message: string };
 
 type EligibilityStatus = 'valid' | 'alert' | 'blocked';
@@ -1091,6 +1097,9 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const contractPanelRef = useRef<HTMLDivElement>(null);
   const dryRunPanelRef = useRef<HTMLDivElement>(null);
   const mappingPanelRef = useRef<HTMLDivElement>(null);
+  const syncPreviewPanelRef = useRef<HTMLDivElement>(null);
+
+  const [syncPreviewState, setSyncPreviewState] = useState<SyncPreviewState>({ phase: 'idle' });
 
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
@@ -1145,6 +1154,30 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
       }, 80);
     } catch {
       setCanonicalMappingState({ phase: 'error', message: 'Não foi possível salvar o mapeamento.' });
+    }
+  }
+
+  async function handleLoadSyncPreview() {
+    if (syncContractState.phase !== 'done') return;
+    setSyncPreviewState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/sync-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId: syncContractState.contractId }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; preview?: any; error?: string };
+      if (!res.ok || data.status !== 'success' || !data.preview) {
+        setSyncPreviewState({ phase: 'error', message: data.error ?? 'Não foi possível carregar o preview.' });
+        return;
+      }
+      setSyncPreviewState({ phase: 'done', result: data.preview });
+      setTimeout(() => {
+        syncPreviewPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } catch {
+      setSyncPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview.' });
     }
   }
 
@@ -1541,8 +1574,207 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
               />
             </div>
           )}
+
+          {/* Botão de preview de sync (C4.6) */}
+          {canonicalMappingState.phase === 'done' && syncPreviewState.phase === 'idle' && (
+            <div className="flex justify-center py-4">
+              <button
+                type="button"
+                onClick={handleLoadSyncPreview}
+                className="inline-flex items-center gap-2 rounded-xl bg-violet-700 px-6 py-3 text-sm font-black text-white hover:bg-violet-800 transition-all hover:scale-105 shadow-lg shadow-violet-200"
+              >
+                <Eye className="h-4 w-4" />
+                Visualizar impacto da sincronização
+              </button>
+            </div>
+          )}
+
+          {/* Painel de preview de sincronização (C4.6) */}
+          {syncPreviewState.phase === 'loading' && (
+            <div className="flex flex-col items-center justify-center py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-violet-700" />
+              <p className="mt-3 text-sm font-bold text-slate-700">Gerando preview de sincronização...</p>
+              <p className="text-[10px] font-medium text-slate-500">Comparando dados do Salesforce com sua base local Canopi</p>
+            </div>
+          )}
+
+          {syncPreviewState.phase === 'error' && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-red-700" />
+                <p className="text-sm font-black text-red-800">Erro ao gerar preview</p>
+              </div>
+              <p className="mt-1 text-xs font-medium text-red-700">{syncPreviewState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadSyncPreview}
+                className="mt-3 text-xs font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {syncPreviewState.phase === 'done' && (
+            <div ref={syncPreviewPanelRef} className="scroll-mt-4">
+              <SyncPreviewPanel result={syncPreviewState.result} />
+            </div>
+          )}
         </div>
       )}
     </Card>
+  );
+}
+
+// ─── SyncPreviewPanel (C4.6) ──────────────────────────────────────────────────
+
+function SyncPreviewPanel({ result }: { result: any }) {
+  const { summary, items } = result;
+
+  return (
+    <div className="rounded-2xl border-2 border-slate-900 bg-white p-5 shadow-xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-0.5">
+          <p className="text-base font-black text-slate-900">Prévia de Sincronização de Contas</p>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="h-3 w-3" />
+              Read-Only
+            </span>
+            <p className="text-xs font-medium text-slate-600">
+              Impacto simulado baseado no mapeamento canônico salvo.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
+            <p className="text-[10px] font-black text-emerald-600">{summary.toCreate}</p>
+            <p className="text-[8px] font-bold uppercase text-slate-400">Criar</p>
+          </div>
+          <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
+            <p className="text-[10px] font-black text-blue-600">{summary.toUpdate}</p>
+            <p className="text-[8px] font-bold uppercase text-slate-400">Atualizar</p>
+          </div>
+          <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
+            <p className="text-[10px] font-black text-slate-600">{summary.noChange}</p>
+            <p className="text-[8px] font-bold uppercase text-slate-400">Iguais</p>
+          </div>
+          {summary.warnings > 0 && (
+            <div className="flex flex-col items-center rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 min-w-[60px]">
+              <p className="text-[10px] font-black text-amber-600">{summary.warnings}</p>
+              <p className="text-[8px] font-bold uppercase text-amber-500">Avisos</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-100 shadow-sm">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-slate-100 bg-slate-50/50">
+              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                Conta Salesforce
+              </th>
+              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                Campos Traduzidos (Preview)
+              </th>
+              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                Estado na Canopi
+              </th>
+              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                Ação Prevista
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {items.map((item: any, idx: number) => (
+              <tr key={item.sourceExternalId + idx} className="hover:bg-slate-50/30 transition-colors">
+                <td className="px-4 py-3">
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] font-black text-slate-900">{item.sourceDisplayName}</p>
+                    <p className="text-[9px] font-medium text-slate-400 font-mono">SF ID: {item.sourceExternalId}</p>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <span className="font-bold text-slate-400 w-12 shrink-0">Nome:</span>
+                      <span className="font-medium text-slate-700">{item.canonicalFields.nome || '—'}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <span className="font-bold text-slate-400 w-12 shrink-0">Domínio:</span>
+                      <span className="font-medium text-slate-700">{item.canonicalFields.dominio || '—'}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <span className="font-bold text-slate-400 w-12 shrink-0">Seg:</span>
+                      <span className="font-medium text-slate-700 truncate max-w-[120px]">{item.canonicalFields.segmento || '—'}</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  {item.currentCanopiValue ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <span className="font-bold text-slate-400">Atual:</span>
+                        <span className="font-medium text-slate-600 italic">{item.currentCanopiValue.nome}</span>
+                      </div>
+                      <p className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded inline-block">
+                        Match por {item.currentCanopiValue.dominio === item.canonicalFields.dominio ? 'Domínio' : 'ID Externo'}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] font-medium text-slate-400 italic">Novo registro</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col gap-1.5">
+                    {item.actionPreview === 'create' && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black text-emerald-700 w-fit">
+                        <Zap className="h-3 w-3" /> CRIAR
+                      </span>
+                    )}
+                    {item.actionPreview === 'update' && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700 w-fit">
+                        <ArrowRight className="h-3 w-3" /> ATUALIZAR
+                      </span>
+                    )}
+                    {item.actionPreview === 'no_change' && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-600 w-fit">
+                        <CheckCircle2 className="h-3 w-3" /> SEM ALTERAÇÃO
+                      </span>
+                    )}
+                    {item.actionPreview === 'warning' && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-black text-amber-700 w-fit">
+                        <AlertTriangle className="h-3 w-3" /> AVISO
+                      </span>
+                    )}
+
+                    {item.warnings.map((w: string, i: number) => (
+                      <p key={i} className="text-[9px] font-medium text-amber-600 leading-tight">
+                        ⚠ {w}
+                      </p>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-6 flex flex-col items-center border-t border-slate-100 pt-6">
+        <div className="flex items-center gap-2 text-violet-700 bg-violet-50 px-4 py-2 rounded-xl">
+          <ShieldCheck className="h-4 w-4" />
+          <p className="text-xs font-black">Sincronização Read-Only</p>
+        </div>
+        <p className="mt-3 max-w-md text-center text-[11px] font-medium text-slate-500">
+          Nenhum dado foi gravado na sua base de Contas da Canopi.
+          Este painel apenas simula a tradução dos campos e o impacto que o sync teria se fosse executado agora.
+        </p>
+        <p className="mt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          O sync persistente ainda não está habilitado.
+        </p>
+      </div>
+    </div>
   );
 }

@@ -1373,6 +1373,38 @@ export interface AccountMappingSavedResult {
   updatedAt: string;
 }
 
+export interface SalesforceSyncPreviewItem {
+  sourceExternalId: string;
+  sourceDisplayName: string;
+  canonicalFields: {
+    nome: string;
+    dominio: string;
+    segmento: string;
+    tipo: string;
+  };
+  currentCanopiValue?: {
+    nome?: string;
+    dominio?: string;
+    segmento?: string;
+    tipoEstrategico?: string;
+  };
+  actionPreview: 'create' | 'update' | 'no_change' | 'warning';
+  warnings: string[];
+}
+
+export interface SalesforceSyncPreviewResult {
+  contractId: string;
+  entity: 'Account';
+  items: SalesforceSyncPreviewItem[];
+  summary: {
+    total: number;
+    toCreate: number;
+    toUpdate: number;
+    noChange: number;
+    warnings: number;
+  };
+}
+
 export const DEFAULT_ACCOUNT_FIELD_MAP: SalesforceAccountCanonicalFieldMap = {
   source_external_id: 'Id',
   nome: 'Name',
@@ -1395,6 +1427,44 @@ export async function getLatestPendingSalesforceSyncContract(): Promise<SyncCont
     .select('id, provider, status, created_at, contract_json, dry_run_summary')
     .eq('provider', SALESFORCE_PROVIDER)
     .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!data) return null;
+
+  const row = data as {
+    id: string;
+    provider: string;
+    status: string;
+    created_at: string;
+    contract_json: unknown;
+    dry_run_summary: unknown;
+  };
+
+  const dryRun = row.dry_run_summary as { estimatedRecordsCanSync?: number } | null;
+  const estimatedRecordsCanSync =
+    typeof dryRun?.estimatedRecordsCanSync === 'number' ? dryRun.estimatedRecordsCanSync : 0;
+
+  return {
+    id: row.id,
+    provider: row.provider,
+    status: row.status as SyncContractStatus,
+    createdAt: row.created_at,
+    contractJson: row.contract_json,
+    dryRunSummary: row.dry_run_summary,
+    estimatedRecordsCanSync,
+  };
+}
+
+export async function getLatestMappedSalesforceSyncContract(): Promise<SyncContractFullResult | null> {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, created_at, contract_json, dry_run_summary')
+    .eq('provider', SALESFORCE_PROVIDER)
+    .eq('status', 'mapped')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -1512,6 +1582,117 @@ export async function saveSalesforceAccountCanonicalMapping(
     status: 'mapped',
     mappedEntity: 'Account',
     updatedAt: nowIso,
+  };
+}
+
+export async function generateAccountSyncPreview(contractId: string): Promise<SalesforceSyncPreviewResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+  if (row.status !== 'mapped') {
+    throw new Error('CONTRACT_NOT_MAPPED');
+  }
+
+  const contractJson = row.contract_json;
+  const mapping = contractJson?.canonical_mapping as SalesforceAccountCanonicalMapping | undefined;
+
+  if (!mapping || mapping.entity !== 'Account') {
+    throw new Error('ACCOUNT_MAPPING_NOT_FOUND');
+  }
+
+  // Localiza a entidade Account no contrato
+  const accountEntity = contractJson?.entities?.find((e: any) => e.objectApiName === 'Account');
+  const sfAccounts = (accountEntity?.selectedRecords ?? []) as any[];
+
+  if (sfAccounts.length === 0) {
+    throw new Error('NO_ACCOUNTS_IN_CONTRACT');
+  }
+
+  // Busca contas locais para comparação (somente leitura)
+  const { getAccounts } = await import('../accountsRepository');
+  const currentAccounts = await getAccounts();
+
+  const previewItems: SalesforceSyncPreviewItem[] = [];
+  const fieldMap = mapping.fieldMap;
+
+  for (const sfAcc of sfAccounts) {
+    const sourceExternalId = String(sfAcc[fieldMap.source_external_id] ?? '');
+    const proposedNome = String(sfAcc[fieldMap.nome] ?? '');
+    const proposedDominio = String(sfAcc[fieldMap.dominio] ?? '');
+    const proposedSegmento = String(sfAcc[fieldMap.segmento] ?? '');
+    const proposedTipo = String(sfAcc[fieldMap.tipo] ?? '');
+
+    const warnings: string[] = [];
+    if (!proposedNome) warnings.push('Nome ausente no Salesforce');
+    if (!proposedDominio) warnings.push('Domínio/Website ausente no Salesforce');
+
+    // Tenta encontrar match local por ID externo ou Domínio
+    const match = currentAccounts.find(
+      (a) => a.id === sourceExternalId || (proposedDominio && a.dominio === proposedDominio),
+    );
+
+    let actionPreview: SalesforceSyncPreviewItem['actionPreview'] = 'create';
+    let currentCanopiValue: SalesforceSyncPreviewItem['currentCanopiValue'] | undefined;
+
+    if (match) {
+      currentCanopiValue = {
+        nome: match.nome,
+        dominio: match.dominio,
+        segmento: match.segmento,
+        tipoEstrategico: match.tipoEstrategico,
+      };
+
+      const hasChanges =
+        match.nome !== proposedNome ||
+        (proposedDominio && match.dominio !== proposedDominio) ||
+        (proposedSegmento && match.segmento !== proposedSegmento);
+
+      actionPreview = hasChanges ? 'update' : 'no_change';
+    }
+
+    if (warnings.length > 0 && actionPreview === 'create') {
+      actionPreview = 'warning';
+    }
+
+    previewItems.push({
+      sourceExternalId,
+      sourceDisplayName: proposedNome || 'Conta sem nome',
+      canonicalFields: {
+        nome: proposedNome,
+        dominio: proposedDominio,
+        segmento: proposedSegmento,
+        tipo: proposedTipo,
+      },
+      currentCanopiValue,
+      actionPreview,
+      warnings,
+    });
+  }
+
+  return {
+    contractId,
+    entity: 'Account',
+    items: previewItems,
+    summary: {
+      total: previewItems.length,
+      toCreate: previewItems.filter((i) => i.actionPreview === 'create').length,
+      toUpdate: previewItems.filter((i) => i.actionPreview === 'update').length,
+      noChange: previewItems.filter((i) => i.actionPreview === 'no_change').length,
+      warnings: previewItems.filter((i) => i.actionPreview === 'warning').length,
+    },
   };
 }
 
