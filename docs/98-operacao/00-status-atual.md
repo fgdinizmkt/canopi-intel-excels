@@ -20,6 +20,7 @@ Fechado neste marco (Setup Read-only):
 - Contrato local multi-entidade Salesforce (C4.2) concluído localmente em `fbb765b`
 - Dry-run read-only multi-entidade Salesforce (C4.3) concluído localmente em `51d8feb`
 - Persistência de contrato multi-entidade Salesforce (C4.4) concluído localmente em `f6643cd`
+- Mapeamento canônico Salesforce Account -> Canopi (C4.5) concluído localmente em `7b55192`
 
 Não fechado neste marco:
 - sync real
@@ -28,7 +29,8 @@ Não fechado neste marco:
 - writeback real
 - importação real
 - criação/atualização de registros no Salesforce
-- persistência de mapeamento
+- persistência de mapeamento para demais entidades Salesforce
+- uso de mapeamento em sync real
 - auditoria de sync/writeback
 - Salesforce Connector completo
 
@@ -49,6 +51,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce multi-entity local contract (C4.2) já validado localmente; espelhado operacionalmente
 - Salesforce multi-entity read-only dry-run (C4.3) concluído localmente em `51d8feb`
 - Salesforce sync contract persistence (C4.4) concluído localmente em `f6643cd`
+- Salesforce Account canonical mapping (C4.5) concluído localmente em `7b55192`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)

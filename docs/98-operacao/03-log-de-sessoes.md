@@ -5,6 +5,32 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-04] — Salesforce C4.5 (mapeamento canônico de Account)
+
+- **Natureza:** Implementação backend + UI de mapeamento concluída; validada visualmente no browser e persistência confirmada em Supabase.
+- **Objetivo:** Permitir mapear campos de Account do Salesforce para campos canônicos da Canopi, evoluindo o contrato de `pending` para `mapped`.
+- **Commit local:** `7b55192` — `feat(settings): add Salesforce Account canonical mapping`
+- **O que foi materializado:**
+  - **Service:** Adicionadas `getLatestPendingSalesforceSyncContract` e `saveSalesforceAccountCanonicalMapping`. Esta última mescla o `canonical_mapping` no `contract_json` e atualiza o status.
+  - **Rota API:** Rota `POST /api/account-connectors/salesforce/oauth/sync-contract` evoluída para suportar `GET` (busca contrato pendente) e `PATCH` (salva mapeamento).
+  - **UI (Mapping Panel):** Novo componente `AccountMappingPanel` integrado após o Dry-run.
+    - Exibição de campos Salesforce detectados no contrato.
+    - Seleção de campos canônicos Canopi (`source_external_id`, `nome`, `dominio`, `segmento`, `tipo`).
+    - Preview em tempo real de uma linha simulada (sem gravação).
+    - Explicação visual das regras de deduplicação e proteção de campos estratégicos da Canopi.
+  - **Evolução de Status:** O contrato no Supabase transita de `pending` -> `mapped` após o salvamento bem-sucedido.
+- **Validação manual:** Fábio aprovou a UI de mapeamento, o preview de linha e a persistência do mapeamento no Supabase (status `mapped` confirmado).
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (Build Exit 0).
+- **Limites confirmados:** 
+  - Mapeamento restrito a **Account** neste recorte.
+  - **Sem sync real** (nenhum registro gravado em `accounts`).
+  - **Sem alteração de schema** (nenhuma migration ou nova tabela).
+  - **Sem writeback ou Bulk API**.
+  - **Sem alteração em outros CRMs**.
+- **Próximo passo sugerido:** Iniciar o primeiro sync read-only controlado de Accounts (C4.6), utilizando o mapeamento agora persistido.
+
+---
+
 ## [2026-05-04] — Salesforce C4.4 (persistência de contrato multi-entidade)
 
 - **Natureza:** Implementação backend + persistência em Supabase concluída; contrato validado em DEV e documentado operacionalmente.
