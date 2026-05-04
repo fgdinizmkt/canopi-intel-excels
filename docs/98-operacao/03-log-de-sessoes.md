@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-04] — Salesforce C4.4 (persistência de contrato multi-entidade)
+
+- **Natureza:** Implementação backend + persistência em Supabase concluída; contrato validado em DEV e documentado operacionalmente.
+- **Objetivo:** Persistir o contrato de sync multi-entidade aprovado na tabela `salesforce_sync_contracts` com status inicial `pending`, sem executar sync, sem importar registros e sem tocar camada canônica.
+- **Commit local:** `f6643cd` — `feat(settings): add Salesforce sync contract persistence`
+- **O que foi materializado:**
+  - Migration Supabase: `supabase/migrations/20260504120000_salesforce_sync_contracts.sql`
+  - Tabela: `public.salesforce_sync_contracts` com campos `id` (UUID), `provider` (TEXT), `status` (TEXT: pending/mapped/synced/cancelled), `contract_json` (JSONB), `dry_run_summary` (JSONB), `created_by`, `source_connection_id`, `notes`, `created_at`, `updated_at`
+  - Índices: `provider`, `status`, `created_at DESC`
+  - RLS: service_role ALL, anon DENY, authenticated DENY (somente back-end pode ler/escrever)
+  - Rota backend: `POST /api/account-connectors/salesforce/oauth/sync-contract` com validação de `contract` e `dryRunSummary.estimatedRecordsCanSync > 0`
+  - Service: `saveSalesforceSyncContract(contract, dryRunSummary)` com insert em Supabase e retorno de `{ id, provider, status, createdAt, estimatedRecordsCanSync }`
+  - UI: Botão `Salvar contrato para sync` com estados `loading`, `error`, `done`; sucesso exibe mensagem "Nenhum registro foi sincronizado. O contrato aguarda mapeamento canônico para qualquer gravação futura"
+  - Estado local: `SyncContractState` union type reseta ao mudar seleção, recarregar preview ou clicar "Carregar"
+  - Confirmação: contrato salvo em Supabase DEV com ID `95204fbf-756b-4d88-8679-c183021af2ea`, status `pending`
+- **Validação manual:** Migration aplicada manualmente em Supabase DEV; contrato persistido e validado; sem alteração de Accounts/Contacts/Campaigns/Leads/Opportunities; sem sync real; sem importação.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (53 pages geradas).
+- **Limites confirmados:** persistência de intent apenas; sem sync real; sem Bulk API; sem writeback; sem importação; sem alteração canônica; sem mapeamento persistido; próximo passo será mapeamento canônico ou encerramento desta versão.
+- **Relação com o marco atual:** C4.4 completa a camada de persistência de contrato local para multi-entidade; Salesforce Setup Read-only permanece fechado operacionalmente; próximo passo é condicional a aprovação de mapeamento persistido.
+
+---
+
 ## [2026-05-03] — Salesforce C4.2 (contrato local multi-entidade)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.

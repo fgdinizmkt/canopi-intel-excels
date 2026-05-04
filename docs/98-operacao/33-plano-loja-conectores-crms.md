@@ -316,7 +316,8 @@ Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 | Fase 5 | concluída (2C.3) | OAuth Salesforce produtivo publicado | Persistência segura + validação visual + lint/build:safe |
 | Fase 6 | concluída | Validação ponta a ponta Salesforce completa (C4.0–C4.3) | Setup Read-only fechado operacionalmente |
 | Fase 7 | concluída | Fechamento operacional Salesforce C4.3 registrado | Dry-run multi-entidade + commit 51d8feb |
-| Fase 8 | pendente | Abrir trilha do próximo CRM | Salesforce aprovado formalmente |
+| Fase 8 | concluída (C4.4) | Persistência de contrato multi-entidade registrada | Salesforce sync contract + commit f6643cd; pronto para mapeamento |
+| Fase 9 | pendente | Abrir trilha do próximo CRM ou mapeamento persistido | Decisão: Salesforce fechado ou continua com mapping |
 
 ## 15) Memória operacional e espelho externo
 - A atualização da memória operacional deve ser refletida no repositório local, em `origin/main` e na pasta oficial do Google Drive do projeto.
