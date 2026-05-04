@@ -1071,6 +1071,194 @@ export async function fetchObjectsPreview(
   return firstPass;
 }
 
+// ─── Dry-run ─────────────────────────────────────────────────────────────────
+
+const DRY_RUN_MAX_RECORDS_PER_ENTITY = 50;
+
+export interface DryRunRecord {
+  id: string;
+  displayName: string;
+  status: 'valid' | 'missing' | 'permission-error' | 'other-error';
+  reason?: string;
+}
+
+export interface DryRunEntityResult {
+  objectApiName: string;
+  label: string;
+  selectedCount: number;
+  validCount: number;
+  missingCount: number;
+  permissionErrorCount: number;
+  otherErrorCount: number;
+  records: DryRunRecord[];
+}
+
+export interface DryRunSummary {
+  totalChecked: number;
+  totalValid: number;
+  totalMissing: number;
+  totalPermissionError: number;
+  totalOtherError: number;
+  estimatedRecordsCanSync: number;
+  estimatedRecordsWillFail: number;
+}
+
+export interface DryRunResult {
+  status: 'success' | 'error';
+  dryRunAt: string;
+  executionTimeMs: number;
+  results: DryRunEntityResult[];
+  summary: DryRunSummary;
+}
+
+export interface DryRunContractInput {
+  source: string;
+  mode: string;
+  entities: {
+    objectApiName: string;
+    label?: string;
+    selectedRecords: {
+      id: string;
+      displayName?: string;
+    }[];
+  }[];
+}
+
+async function queryRecordExists(
+  instanceUrl: string,
+  accessToken: string,
+  objectApiName: string,
+  id: string,
+  apiVersion: string,
+): Promise<{ status: DryRunRecord['status']; needsRefresh: boolean }> {
+  const soql = `SELECT Id FROM ${objectApiName} WHERE Id = '${id.replace(/'/g, '')}' LIMIT 1`;
+  const queryUrl = new URL(`${instanceUrl}/services/data/${apiVersion}/query`);
+  queryUrl.searchParams.set('q', soql);
+
+  try {
+    const res = await fetch(queryUrl.toString(), {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store',
+    });
+
+    if (res.status === 401 || res.status === 403) {
+      return { status: 'permission-error', needsRefresh: true };
+    }
+
+    if (!res.ok) {
+      return { status: 'other-error', needsRefresh: false };
+    }
+
+    const payload = (await res.json().catch(() => null)) as { totalSize?: number; records?: unknown[] } | null;
+    const count = typeof payload?.totalSize === 'number' ? payload.totalSize : (Array.isArray(payload?.records) ? payload.records.length : 0);
+    return { status: count > 0 ? 'valid' : 'missing', needsRefresh: false };
+  } catch {
+    return { status: 'other-error', needsRefresh: false };
+  }
+}
+
+export async function dryRunMultiEntityContract(contract: DryRunContractInput): Promise<DryRunResult> {
+  const startMs = Date.now();
+  const dryRunAt = new Date().toISOString();
+
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  const validEntities = contract.entities.filter((e) => Boolean(PREVIEW_ALLOWLIST[e.objectApiName]));
+
+  async function runForEntity(
+    entity: DryRunContractInput['entities'][number],
+    token: string,
+    url: string,
+  ) {
+    const limited = entity.selectedRecords.slice(0, DRY_RUN_MAX_RECORDS_PER_ENTITY);
+    const records = await Promise.all(
+      limited.map(async (rec) => {
+        const r = await queryRecordExists(url, token, entity.objectApiName, rec.id, apiVersion);
+        return { id: rec.id, displayName: rec.displayName ?? rec.id, ...r };
+      }),
+    );
+    return { entity, records };
+  }
+
+  const firstPass = await Promise.all(validEntities.map((e) => runForEntity(e, accessToken, instanceUrl)));
+  const shouldRefresh = firstPass.some((p) => p.records.some((r) => r.needsRefresh));
+
+  let finalPass = firstPass;
+  if (shouldRefresh && refreshToken) {
+    const refreshed = await refreshAccessToken(refreshToken, config);
+    accessToken = refreshed.access_token?.trim() || '';
+    if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+    if (refreshed.instance_url?.trim()) instanceUrl = refreshed.instance_url.trim();
+
+    await updateOAuthConnectionPatch({
+      status: 'connected',
+      instance_url: instanceUrl,
+      access_token_encrypted: encryptToken(accessToken),
+      access_token_issued_at: refreshed.issued_at
+        ? new Date(Number(refreshed.issued_at)).toISOString()
+        : new Date().toISOString(),
+      scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+      last_health_check_at: new Date().toISOString(),
+      error_message: null,
+    });
+
+    finalPass = await Promise.all(validEntities.map((e) => runForEntity(e, accessToken, instanceUrl)));
+  }
+
+  const results: DryRunEntityResult[] = finalPass.map(({ entity, records }) => {
+    let valid = 0, missing = 0, permErr = 0, other = 0;
+    const mapped: DryRunRecord[] = records.map((r) => {
+      if (r.status === 'valid') valid++;
+      else if (r.status === 'missing') missing++;
+      else if (r.status === 'permission-error') permErr++;
+      else other++;
+      return { id: r.id, displayName: r.displayName, status: r.status };
+    });
+    return {
+      objectApiName: entity.objectApiName,
+      label: entity.label ?? entity.objectApiName,
+      selectedCount: mapped.length,
+      validCount: valid,
+      missingCount: missing,
+      permissionErrorCount: permErr,
+      otherErrorCount: other,
+      records: mapped,
+    };
+  });
+
+  const totalValid = results.reduce((s, e) => s + e.validCount, 0);
+  const totalMissing = results.reduce((s, e) => s + e.missingCount, 0);
+  const totalPermErr = results.reduce((s, e) => s + e.permissionErrorCount, 0);
+  const totalOther = results.reduce((s, e) => s + e.otherErrorCount, 0);
+  const totalChecked = results.reduce((s, e) => s + e.selectedCount, 0);
+
+  return {
+    status: 'success',
+    dryRunAt,
+    executionTimeMs: Date.now() - startMs,
+    results,
+    summary: {
+      totalChecked,
+      totalValid,
+      totalMissing,
+      totalPermissionError: totalPermErr,
+      totalOtherError: totalOther,
+      estimatedRecordsCanSync: totalValid,
+      estimatedRecordsWillFail: totalMissing + totalPermErr + totalOther,
+    },
+  };
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {

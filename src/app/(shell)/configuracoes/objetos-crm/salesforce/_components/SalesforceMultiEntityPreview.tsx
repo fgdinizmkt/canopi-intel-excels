@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
-import { AlertTriangle, CheckCircle2, CheckSquare, ClipboardList, Loader2, MinusSquare, Square, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, CheckSquare, ClipboardList, Loader2, MinusSquare, ShieldCheck, Square, XCircle } from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type PreviewValue = string | number | boolean | null;
@@ -78,6 +78,48 @@ interface SalesforceMultiEntityContract {
   summary: ContractSummary;
   entities: ContractEntity[];
 }
+
+type DryRunRecordStatus = 'valid' | 'missing' | 'permission-error' | 'other-error';
+
+interface DryRunRecord {
+  id: string;
+  displayName: string;
+  status: DryRunRecordStatus;
+  reason?: string;
+}
+
+interface DryRunEntityResult {
+  objectApiName: string;
+  label: string;
+  selectedCount: number;
+  validCount: number;
+  missingCount: number;
+  permissionErrorCount: number;
+  otherErrorCount: number;
+  records: DryRunRecord[];
+}
+
+interface DryRunResult {
+  status: 'success' | 'error';
+  dryRunAt: string;
+  executionTimeMs: number;
+  results: DryRunEntityResult[];
+  summary: {
+    totalChecked: number;
+    totalValid: number;
+    totalMissing: number;
+    totalPermissionError: number;
+    totalOtherError: number;
+    estimatedRecordsCanSync: number;
+    estimatedRecordsWillFail: number;
+  };
+}
+
+type DryRunState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: DryRunResult }
+  | { phase: 'error'; message: string };
 
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 
@@ -177,7 +219,159 @@ function assessEligibility(
   }
 }
 
-function ContractPanel({ contract }: { contract: SalesforceMultiEntityContract }) {
+const DRY_RUN_STATUS_STYLES: Record<DryRunRecordStatus, { badge: string; label: string }> = {
+  valid: { badge: 'bg-emerald-100 text-emerald-800', label: 'Válido' },
+  missing: { badge: 'bg-slate-100 text-slate-600', label: 'Ausente' },
+  'permission-error': { badge: 'bg-red-100 text-red-700', label: 'Sem permissão' },
+  'other-error': { badge: 'bg-amber-100 text-amber-700', label: 'Erro' },
+};
+
+function DryRunPanel({ result }: { result: DryRunResult }) {
+  return (
+    <div className="rounded-2xl border-2 border-blue-700 bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 shrink-0 text-blue-700" />
+          <p className="text-sm font-black text-slate-900">Resultado do dry-run read-only</p>
+        </div>
+        <div className="flex flex-col items-end gap-0.5">
+          <p className="text-[10px] font-medium text-slate-400">
+            {formatDate(result.dryRunAt)} · {result.executionTimeMs}ms
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-1 text-xs font-medium text-slate-600">
+        Esta validação consultou o Salesforce em modo somente leitura.
+        Nenhum registro foi importado, salvo ou sincronizado.
+        O resultado indica quais registros parecem aptos para uma futura etapa de sync.
+      </p>
+
+      {/* Global summary */}
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="rounded-xl bg-slate-50 px-3 py-2 text-center">
+          <p className="text-lg font-black text-slate-900">{result.summary.totalChecked}</p>
+          <p className="text-[10px] font-medium text-slate-500">verificados</p>
+        </div>
+        <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center">
+          <p className="text-lg font-black text-emerald-800">{result.summary.totalValid}</p>
+          <p className="text-[10px] font-medium text-emerald-600">aptos para sync</p>
+        </div>
+        {result.summary.totalMissing > 0 && (
+          <div className="rounded-xl bg-slate-100 px-3 py-2 text-center">
+            <p className="text-lg font-black text-slate-700">{result.summary.totalMissing}</p>
+            <p className="text-[10px] font-medium text-slate-500">ausentes</p>
+          </div>
+        )}
+        {result.summary.totalPermissionError > 0 && (
+          <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
+            <p className="text-lg font-black text-red-800">{result.summary.totalPermissionError}</p>
+            <p className="text-[10px] font-medium text-red-600">sem permissão</p>
+          </div>
+        )}
+        {result.summary.totalOtherError > 0 && (
+          <div className="rounded-xl bg-amber-50 px-3 py-2 text-center">
+            <p className="text-lg font-black text-amber-800">{result.summary.totalOtherError}</p>
+            <p className="text-[10px] font-medium text-amber-600">outros erros</p>
+          </div>
+        )}
+      </div>
+
+      {/* Estimated can sync */}
+      <div className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-center">
+        <p className="text-[10px] font-medium text-blue-700">
+          Estimativa de registros aptos para sync:{' '}
+          <span className="font-black">{result.summary.estimatedRecordsCanSync}</span>
+          {result.summary.estimatedRecordsWillFail > 0 && (
+            <> · falhariam: <span className="font-black">{result.summary.estimatedRecordsWillFail}</span></>
+          )}
+        </p>
+      </div>
+
+      {/* Per-entity breakdown */}
+      <div className="mt-4 space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
+        {result.results.map((entity) => (
+          <div key={entity.objectApiName} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black text-slate-800">{entity.objectApiName}</span>
+              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+                {entity.selectedCount} verificados
+              </span>
+              {entity.validCount > 0 && (
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                  {entity.validCount} aptos
+                </span>
+              )}
+              {entity.missingCount > 0 && (
+                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+                  {entity.missingCount} ausentes
+                </span>
+              )}
+              {entity.permissionErrorCount > 0 && (
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700">
+                  {entity.permissionErrorCount} sem permissão
+                </span>
+              )}
+              {entity.otherErrorCount > 0 && (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                  {entity.otherErrorCount} erros
+                </span>
+              )}
+            </div>
+
+            <ul className="mt-2 space-y-1">
+              {entity.records.map((rec) => {
+                const styles = DRY_RUN_STATUS_STYLES[rec.status];
+                return (
+                  <li
+                    key={rec.id}
+                    className="flex flex-wrap items-center gap-1.5 rounded-lg px-2 py-1 text-[10px]"
+                  >
+                    <span className={`shrink-0 rounded-full px-1.5 py-0.5 font-black uppercase tracking-wider ${styles.badge}`}>
+                      {styles.label}
+                    </span>
+                    <span className="font-medium text-slate-700">{rec.displayName}</span>
+                    {rec.reason && (
+                      <span className="text-slate-500">{rec.reason}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {/* Confirm for sync — disabled, future recorte */}
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
+          disabled
+          className="inline-flex items-center gap-2 rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-black text-slate-400 cursor-not-allowed"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          Confirmar para sync
+        </button>
+        <p className="text-[10px] font-medium text-slate-400">Disponível apenas em recorte futuro.</p>
+      </div>
+
+      <p className="mt-3 text-[10px] font-medium text-slate-400">
+        Limites desta etapa: nenhum dado foi alterado, importado, sincronizado ou persistido.
+      </p>
+    </div>
+  );
+}
+
+interface ContractPanelProps {
+  contract: SalesforceMultiEntityContract;
+  onGenerateContract: () => void;
+  onDryRun: () => void;
+  dryRunLoading: boolean;
+  hasOnlyBlocked: boolean;
+}
+
+function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, hasOnlyBlocked }: ContractPanelProps) {
   const CONTRACT_STATUS_STYLES = STATUS_STYLES;
 
   return (
@@ -195,6 +389,32 @@ function ContractPanel({ contract }: { contract: SalesforceMultiEntityContract }
         Nada é salvo, importado ou sincronizado.
         A validação final ainda acontecerá em um dry-run posterior.
       </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={onGenerateContract}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-2.5 py-1.5 text-[10px] font-black text-white transition-colors hover:bg-slate-900"
+        >
+          <ClipboardList className="h-3 w-3" />
+          Atualizar contrato
+        </button>
+        <button
+          type="button"
+          onClick={onDryRun}
+          disabled={dryRunLoading || contract.summary.estimatedRecordsToProcess === 0}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-2.5 py-1.5 text-[10px] font-black text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {dryRunLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+          {dryRunLoading ? 'Validando...' : 'Executar dry-run read-only'}
+        </button>
+      </div>
+
+      {contract.summary.estimatedRecordsToProcess === 0 && (
+        <p className="mt-2 text-[10px] font-medium text-slate-500">
+          Nenhum registro apto no contrato — selecione registros válidos ou com alertas.
+        </p>
+      )}
 
       {/* Global summary */}
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -303,6 +523,11 @@ function ContractPanel({ contract }: { contract: SalesforceMultiEntityContract }
         Limites desta etapa: nenhum dado foi gravado, importado, sincronizado ou persistido.
         Contact e Opportunity têm AccountId avaliado apenas contra a amostra de Accounts carregada no preview.
       </p>
+      {hasOnlyBlocked && (
+        <p className="mt-2 text-[10px] font-medium text-amber-600">
+          Todos os registros selecionados estão bloqueados — selecione pelo menos um válido ou com alertas para gerar o contrato.
+        </p>
+      )}
     </div>
   );
 }
@@ -520,13 +745,16 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const [state, setState] = useState<PreviewState>({ phase: 'idle' });
   const [selectionMap, setSelectionMap] = useState<SelectionMap>({});
   const [contract, setContract] = useState<SalesforceMultiEntityContract | null>(null);
+  const [dryRunState, setDryRunState] = useState<DryRunState>({ phase: 'idle' });
   const contractPanelRef = useRef<HTMLDivElement>(null);
+  const dryRunPanelRef = useRef<HTMLDivElement>(null);
 
   async function handleLoad() {
     if (!oauthConnected) return;
     setState({ phase: 'loading' });
     setSelectionMap({});
     setContract(null);
+    setDryRunState({ phase: 'idle' });
 
     try {
       const objects = ENTITY_ORDER.join(',');
@@ -550,8 +778,36 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     }
   }
 
+  async function handleDryRun() {
+    if (!contract) return;
+    setDryRunState({ phase: 'loading' });
+
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/dry-run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contract }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as DryRunResult & { error?: string };
+
+      if (!res.ok || data.status === 'error') {
+        setDryRunState({ phase: 'error', message: (data as unknown as { error?: string }).error ?? 'Não foi possível executar o dry-run.' });
+        return;
+      }
+
+      setDryRunState({ phase: 'done', result: data });
+      setTimeout(() => {
+        dryRunPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    } catch {
+      setDryRunState({ phase: 'error', message: 'Não foi possível executar o dry-run.' });
+    }
+  }
+
   function handleToggle(objectApiName: string, id: string) {
     setContract(null);
+    setDryRunState({ phase: 'idle' });
     setSelectionMap((prev) => {
       const current = prev[objectApiName] ?? [];
       const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
@@ -561,12 +817,14 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
 
   function handleSelectAll(objectApiName: string, records: Record<string, PreviewValue>[]) {
     setContract(null);
+    setDryRunState({ phase: 'idle' });
     const ids = records.map((r) => getStr(r, 'Id')).filter(Boolean);
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: ids }));
   }
 
   function handleClearAll(objectApiName: string) {
     setContract(null);
+    setDryRunState({ phase: 'idle' });
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: [] }));
   }
 
@@ -741,22 +999,10 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
             </p>
           </div>
 
-          {/* Global summary + generate contract button */}
+          {/* Global summary */}
           {globalSummary && (
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
-                <button
-                  type="button"
-                  onClick={handleGenerateContract}
-                  disabled={!hasAnySelection}
-                  title={hasOnlyBlocked ? 'Todos os registros selecionados estão bloqueados.' : undefined}
-                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-slate-800 enabled:text-white enabled:hover:bg-slate-900"
-                >
-                  <ClipboardList className="h-3 w-3" />
-                  {contract ? 'Atualizar contrato' : 'Gerar contrato local'}
-                </button>
-              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
                 <span>
                   <span className="font-black text-slate-800">{globalSummary.totalSelected}</span> selecionados
@@ -801,10 +1047,74 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
             />
           ))}
 
+          {/* Contextual action area */}
+          {state.phase === 'done' && hasAnySelection && !contract && (
+            <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="space-y-0.5">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Seleção pronta para contrato</p>
+                  <p className="text-xs font-medium text-slate-600">
+                    Revise a seleção e gere o contrato local para validar em modo read-only.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-medium text-slate-600">
+                    <span>
+                      <span className="font-black text-slate-800">{globalSummary?.totalSelected ?? 0}</span> selecionados
+                    </span>
+                    <span>
+                      <span className="font-black text-emerald-700">{globalSummary?.totalValid ?? 0}</span> válidos
+                    </span>
+                    {(globalSummary?.totalAlert ?? 0) > 0 && (
+                      <span>
+                        <span className="font-black text-amber-600">{globalSummary?.totalAlert ?? 0}</span> com alertas
+                      </span>
+                    )}
+                    {(globalSummary?.totalBlocked ?? 0) > 0 && (
+                      <span>
+                        <span className="font-black text-red-600">{globalSummary?.totalBlocked ?? 0}</span> bloqueados
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleGenerateContract}
+                    disabled={!hasAnySelection}
+                    title={hasOnlyBlocked ? 'Todos os registros selecionados estão bloqueados.' : undefined}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-slate-800 enabled:text-white enabled:hover:bg-slate-900"
+                  >
+                    <ClipboardList className="h-3 w-3" />
+                    Gerar contrato local
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Contract panel */}
           {contract && (
             <div ref={contractPanelRef} className="scroll-mt-4">
-              <ContractPanel contract={contract} />
+              <ContractPanel
+                contract={contract}
+                onGenerateContract={handleGenerateContract}
+                onDryRun={handleDryRun}
+                dryRunLoading={dryRunState.phase === 'loading'}
+                hasOnlyBlocked={hasOnlyBlocked}
+              />
+            </div>
+          )}
+
+          {/* Dry-run error */}
+          {dryRunState.phase === 'error' && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+              <p className="text-xs font-bold text-red-700">{dryRunState.message}</p>
+            </div>
+          )}
+
+          {/* Dry-run result panel */}
+          {dryRunState.phase === 'done' && (
+            <div ref={dryRunPanelRef} className="scroll-mt-4">
+              <DryRunPanel result={dryRunState.result} />
             </div>
           )}
         </div>
