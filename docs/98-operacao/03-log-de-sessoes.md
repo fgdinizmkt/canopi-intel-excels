@@ -5,6 +5,28 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-03] — Salesforce C4.1 (preparação local para sync read-only multi-entidade)
+
+- **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
+- **Objetivo:** transformar o preview multi-entidade em uma camada local de preparação para sync read-only, sem executar sync, sem persistir dados e sem ampliar o Salesforce para conector completo.
+- **Commit local:** `e735ccb` — `feat(settings): add Salesforce multi-entity sync preparation`
+- **O que foi materializado:**
+  - seleção local por entidade no preview multi-entidade;
+  - elegibilidade local por registro;
+  - sumário por entidade e sumário global;
+  - validação de vínculos contra os Accounts carregados no preview:
+    - `Contact.AccountId`
+    - `Opportunity.AccountId`
+    - `Lead` independente por enquanto
+    - `Campaign` independente por enquanto;
+  - feedback visual mais claro para seleção contextual.
+- **Validação manual:** Fábio validou no browser a seleção por linha, o checkbox do cabeçalho, a limpeza contextual e a remoção do botão redundante `Todos`.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK.
+- **Limites confirmados:** sem nova rota; sem alteração em service; sem Supabase; sem persistência; sem sync real; sem importação; sem writeback; sem Bulk API; sem contrato multi-entidade; sem dry-run multi-entidade.
+- **Relação com o marco atual:** C4.1 prepara o terreno para um recorte posterior de contrato/dry-run/sync read-only multi-entidade, mas ainda não executa sync; Salesforce ainda não é conector completo.
+
+---
+
 ## [2026-05-03] — Salesforce C4.0 (preview read-only multi-entidade Salesforce)
 
 - **Natureza:** Implementação local concluída e validada visualmente; pendente apenas o push e o espelho operacional se aplicável.
