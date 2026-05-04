@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { AlertTriangle, CheckCircle2, CheckSquare, Loader2, MinusSquare, Square, XCircle } from 'lucide-react';
+import React, { useState, useMemo, useRef } from 'react';
+import { AlertTriangle, CheckCircle2, CheckSquare, ClipboardList, Loader2, MinusSquare, Square, XCircle } from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type PreviewValue = string | number | boolean | null;
@@ -40,6 +40,44 @@ interface EligibilityResult {
 }
 
 type SelectionMap = Record<string, string[]>;
+
+interface ContractRecord {
+  id: string;
+  displayName: string;
+  eligibilityStatus: EligibilityStatus;
+  eligibilityAlerts: string[];
+  fieldValues: Record<string, PreviewValue>;
+}
+
+interface ContractEntity {
+  objectApiName: string;
+  label: string;
+  selectedCount: number;
+  validCount: number;
+  alertCount: number;
+  blockedCount: number;
+  selectedRecords: ContractRecord[];
+}
+
+interface ContractSummary {
+  totalSelected: number;
+  totalValid: number;
+  totalAlert: number;
+  totalBlocked: number;
+  estimatedRecordsToProcess: number;
+}
+
+interface SalesforceMultiEntityContract {
+  createdAt: string;
+  source: 'salesforce-oauth';
+  mode: 'local-multi-entity-contract';
+  entitiesInScope: string[];
+  referenceSamples: {
+    accountIds: string[];
+  };
+  summary: ContractSummary;
+  entities: ContractEntity[];
+}
 
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 
@@ -137,6 +175,136 @@ function assessEligibility(
     default:
       return { status: 'valid', alerts: [] };
   }
+}
+
+function ContractPanel({ contract }: { contract: SalesforceMultiEntityContract }) {
+  const CONTRACT_STATUS_STYLES = STATUS_STYLES;
+
+  return (
+    <div className="rounded-2xl border-2 border-slate-800 bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <ClipboardList className="h-4 w-4 shrink-0 text-slate-800" />
+          <p className="text-sm font-black text-slate-900">Contrato local multi-entidade</p>
+        </div>
+        <p className="text-[10px] font-medium text-slate-400">Gerado em {formatDate(contract.createdAt)}</p>
+      </div>
+
+      <p className="mt-1 text-xs font-medium text-slate-600">
+        Este contrato organiza a seleção desta sessão para uma futura simulação de sync read-only.
+        Nada é salvo, importado ou sincronizado.
+        A validação final ainda acontecerá em um dry-run posterior.
+      </p>
+
+      {/* Global summary */}
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="rounded-xl bg-slate-50 px-3 py-2 text-center">
+          <p className="text-lg font-black text-slate-900">{contract.summary.totalSelected}</p>
+          <p className="text-[10px] font-medium text-slate-500">selecionados</p>
+        </div>
+        <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center">
+          <p className="text-lg font-black text-emerald-800">{contract.summary.totalValid}</p>
+          <p className="text-[10px] font-medium text-emerald-600">válidos</p>
+        </div>
+        {contract.summary.totalAlert > 0 && (
+          <div className="rounded-xl bg-amber-50 px-3 py-2 text-center">
+            <p className="text-lg font-black text-amber-800">{contract.summary.totalAlert}</p>
+            <p className="text-[10px] font-medium text-amber-600">com alertas</p>
+          </div>
+        )}
+        {contract.summary.totalBlocked > 0 && (
+          <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
+            <p className="text-lg font-black text-red-800">{contract.summary.totalBlocked}</p>
+            <p className="text-[10px] font-medium text-red-600">bloqueados</p>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-2 rounded-xl bg-slate-50 px-3 py-2 text-center">
+        <p className="text-[10px] font-medium text-slate-500">
+          Estimativa de registros processáveis:{' '}
+          <span className="font-black text-slate-800">{contract.summary.estimatedRecordsToProcess}</span>
+        </p>
+      </div>
+
+      {/* Scope metadata */}
+      <div className="mt-4 flex flex-wrap gap-2 text-[10px]">
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+          Fonte: Salesforce OAuth
+        </span>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+          Modo: contrato local
+        </span>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+          {contract.entitiesInScope.length} entidade{contract.entitiesInScope.length !== 1 ? 's' : ''} em escopo
+        </span>
+        {contract.referenceSamples.accountIds.length > 0 && (
+          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+            {contract.referenceSamples.accountIds.length} Account{contract.referenceSamples.accountIds.length !== 1 ? 's' : ''} na amostra
+          </span>
+        )}
+      </div>
+
+      {/* Per-entity breakdown */}
+      <div className="mt-4 space-y-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
+        {contract.entities.map((entity) => (
+          <div key={entity.objectApiName} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black text-slate-800">{entity.objectApiName}</span>
+              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+                {entity.selectedCount} selecionados
+              </span>
+              {entity.validCount > 0 && (
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                  {entity.validCount} válidos
+                </span>
+              )}
+              {entity.alertCount > 0 && (
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                  {entity.alertCount} com alertas
+                </span>
+              )}
+              {entity.blockedCount > 0 && (
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700">
+                  {entity.blockedCount} bloqueados
+                </span>
+              )}
+            </div>
+
+            {/* Compact record list */}
+            <ul className="mt-2 space-y-1">
+              {entity.selectedRecords.map((rec) => {
+                const styles = CONTRACT_STATUS_STYLES[rec.eligibilityStatus];
+                return (
+                  <li
+                    key={rec.id}
+                    className={`flex flex-wrap items-start gap-1.5 rounded-lg px-2 py-1 text-[10px] ${styles.row}`}
+                  >
+                    <span className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 font-black uppercase tracking-wider ${styles.badge}`}>
+                      {styles.label}
+                    </span>
+                    <span className="font-medium text-slate-700">{rec.displayName}</span>
+                    {rec.eligibilityAlerts.map((alert, ai) => (
+                      <span key={ai} className="flex items-center gap-0.5 text-amber-700">
+                        <AlertTriangle className="h-2.5 w-2.5 shrink-0" />
+                        {alert}
+                      </span>
+                    ))}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-4 text-[10px] font-medium text-slate-400">
+        Limites desta etapa: nenhum dado foi gravado, importado, sincronizado ou persistido.
+        Contact e Opportunity têm AccountId avaliado apenas contra a amostra de Accounts carregada no preview.
+      </p>
+    </div>
+  );
 }
 
 interface EntityCardProps {
@@ -351,11 +519,14 @@ interface SalesforceMultiEntityPreviewProps {
 export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMultiEntityPreviewProps) {
   const [state, setState] = useState<PreviewState>({ phase: 'idle' });
   const [selectionMap, setSelectionMap] = useState<SelectionMap>({});
+  const [contract, setContract] = useState<SalesforceMultiEntityContract | null>(null);
+  const contractPanelRef = useRef<HTMLDivElement>(null);
 
   async function handleLoad() {
     if (!oauthConnected) return;
     setState({ phase: 'loading' });
     setSelectionMap({});
+    setContract(null);
 
     try {
       const objects = ENTITY_ORDER.join(',');
@@ -380,6 +551,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   }
 
   function handleToggle(objectApiName: string, id: string) {
+    setContract(null);
     setSelectionMap((prev) => {
       const current = prev[objectApiName] ?? [];
       const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
@@ -388,11 +560,13 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   }
 
   function handleSelectAll(objectApiName: string, records: Record<string, PreviewValue>[]) {
+    setContract(null);
     const ids = records.map((r) => getStr(r, 'Id')).filter(Boolean);
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: ids }));
   }
 
   function handleClearAll(objectApiName: string) {
+    setContract(null);
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: [] }));
   }
 
@@ -425,6 +599,94 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     return { totalSelected, totalValid, totalAlert, totalBlocked, entitiesWithSelection };
   }, [state, selectionMap, accountIds]);
 
+  const hasAnySelection = useMemo(() => {
+    return Object.values(selectionMap).some((ids) => ids.length > 0);
+  }, [selectionMap]);
+
+  const hasOnlyBlocked = useMemo(() => {
+    if (state.phase !== 'done') return false;
+    for (const result of state.results) {
+      if (result.status !== 'success') continue;
+      const selectedIds = selectionMap[result.objectApiName] ?? [];
+      for (const record of result.records) {
+        const id = getStr(record, 'Id');
+        if (!id || !selectedIds.includes(id)) continue;
+        const elig = assessEligibility(result.objectApiName, record, accountIds);
+        if (elig.status !== 'blocked') return false;
+      }
+    }
+    return hasAnySelection;
+  }, [state, selectionMap, accountIds, hasAnySelection]);
+
+  function handleGenerateContract() {
+    if (state.phase !== 'done' || !hasAnySelection) return;
+
+    const entities: ContractEntity[] = [];
+
+    for (const result of state.results) {
+      if (result.status !== 'success') continue;
+      const selectedIds = selectionMap[result.objectApiName] ?? [];
+      if (selectedIds.length === 0) continue;
+      const selectedSet = new Set(selectedIds);
+      const selectedRecords: ContractRecord[] = [];
+      let valid = 0, alert = 0, blocked = 0;
+
+      for (const record of result.records) {
+        const id = getStr(record, 'Id');
+        if (!id || !selectedSet.has(id)) continue;
+        const elig = assessEligibility(result.objectApiName, record, accountIds);
+        selectedRecords.push({
+          id,
+          displayName: getStr(record, 'Name') || id,
+          eligibilityStatus: elig.status,
+          eligibilityAlerts: elig.alerts,
+          fieldValues: { ...record },
+        });
+        if (elig.status === 'valid') valid++;
+        else if (elig.status === 'alert') alert++;
+        else blocked++;
+      }
+
+      entities.push({
+        objectApiName: result.objectApiName,
+        label: result.label || result.objectApiName,
+        selectedCount: selectedRecords.length,
+        validCount: valid,
+        alertCount: alert,
+        blockedCount: blocked,
+        selectedRecords,
+      });
+    }
+
+    const totalSelected = entities.reduce((s, e) => s + e.selectedCount, 0);
+    const totalValid = entities.reduce((s, e) => s + e.validCount, 0);
+    const totalAlert = entities.reduce((s, e) => s + e.alertCount, 0);
+    const totalBlocked = entities.reduce((s, e) => s + e.blockedCount, 0);
+
+    const newContract: SalesforceMultiEntityContract = {
+      createdAt: new Date().toISOString(),
+      source: 'salesforce-oauth',
+      mode: 'local-multi-entity-contract',
+      entitiesInScope: entities.map((e) => e.objectApiName),
+      referenceSamples: {
+        accountIds: Array.from(accountIds),
+      },
+      summary: {
+        totalSelected,
+        totalValid,
+        totalAlert,
+        totalBlocked,
+        estimatedRecordsToProcess: totalValid,
+      },
+      entities,
+    };
+
+    setContract(newContract);
+    setTimeout(() => {
+      contractPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
   return (
     <Card className="rounded-2xl border border-slate-200 bg-white p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -445,7 +707,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
         </button>
       </div>
 
-      {/* Guardrails */}
+      {/* Limites desta etapa */}
       <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Limites desta etapa</p>
         <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
@@ -479,10 +741,22 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
             </p>
           </div>
 
-          {/* Global summary */}
+          {/* Global summary + generate contract button */}
           {globalSummary && (
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
+                <button
+                  type="button"
+                  onClick={handleGenerateContract}
+                  disabled={!hasAnySelection}
+                  title={hasOnlyBlocked ? 'Todos os registros selecionados estão bloqueados.' : undefined}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-slate-800 enabled:text-white enabled:hover:bg-slate-900"
+                >
+                  <ClipboardList className="h-3 w-3" />
+                  {contract ? 'Atualizar contrato' : 'Gerar contrato local'}
+                </button>
+              </div>
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
                 <span>
                   <span className="font-black text-slate-800">{globalSummary.totalSelected}</span> selecionados
@@ -506,6 +780,11 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
                   </span>
                 )}
               </div>
+              {hasOnlyBlocked && (
+                <p className="mt-1 text-[10px] font-medium text-amber-600">
+                  Todos os registros selecionados estão bloqueados — selecione pelo menos um válido ou com alertas para gerar o contrato.
+                </p>
+              )}
             </div>
           )}
 
@@ -521,6 +800,13 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
               accountIds={accountIds}
             />
           ))}
+
+          {/* Contract panel */}
+          {contract && (
+            <div ref={contractPanelRef} className="scroll-mt-4">
+              <ContractPanel contract={contract} />
+            </div>
+          )}
         </div>
       )}
     </Card>
