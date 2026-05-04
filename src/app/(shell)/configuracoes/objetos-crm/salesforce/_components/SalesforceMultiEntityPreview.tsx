@@ -121,6 +121,12 @@ type DryRunState =
   | { phase: 'done'; result: DryRunResult }
   | { phase: 'error'; message: string };
 
+type SyncContractState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contractId: string; estimatedRecordsCanSync: number }
+  | { phase: 'error'; message: string };
+
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 
 const STATUS_STYLES: Record<EligibilityStatus, { row: string; badge: string; label: string }> = {
@@ -226,7 +232,17 @@ const DRY_RUN_STATUS_STYLES: Record<DryRunRecordStatus, { badge: string; label: 
   'other-error': { badge: 'bg-amber-100 text-amber-700', label: 'Erro' },
 };
 
-function DryRunPanel({ result }: { result: DryRunResult }) {
+interface DryRunPanelProps {
+  result: DryRunResult;
+  syncContractState: SyncContractState;
+  onSaveSyncContract: () => void;
+}
+
+function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPanelProps) {
+  const canSave = result.summary.estimatedRecordsCanSync > 0;
+  const isSaving = syncContractState.phase === 'loading';
+  const isSaved = syncContractState.phase === 'done';
+
   return (
     <div className="rounded-2xl border-2 border-blue-700 bg-white p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -343,21 +359,65 @@ function DryRunPanel({ result }: { result: DryRunResult }) {
         ))}
       </div>
 
-      {/* Confirm for sync — disabled, future recorte */}
-      <div className="mt-4 flex items-center gap-3">
-        <button
-          type="button"
-          disabled
-          className="inline-flex items-center gap-2 rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-black text-slate-400 cursor-not-allowed"
-        >
-          <CheckCircle2 className="h-4 w-4" />
-          Confirmar para sync
-        </button>
-        <p className="text-[10px] font-medium text-slate-400">Disponível apenas em recorte futuro.</p>
+      {/* Save sync contract */}
+      <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Salvar intenção de sync</p>
+        <p className="mt-1 text-[10px] font-medium text-slate-600">
+          Este passo salva a intenção de sync para revisão futura.
+          Nenhum registro é importado, atualizado ou sincronizado.
+          O status <span className="font-black text-slate-700">pending</span> indica que o contrato aguarda
+          mapeamento canônico antes de qualquer gravação.
+        </p>
+
+        {!isSaved && (
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={onSaveSyncContract}
+              disabled={!canSave || isSaving}
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-blue-700 enabled:text-white enabled:hover:bg-blue-800"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              {isSaving ? 'Salvando...' : 'Salvar contrato para sync'}
+            </button>
+            {!canSave && (
+              <p className="text-[10px] font-medium text-slate-400">
+                Disponível apenas quando há registros aptos para sync.
+              </p>
+            )}
+          </div>
+        )}
+
+        {syncContractState.phase === 'error' && (
+          <p className="mt-2 text-xs font-medium text-red-700">{syncContractState.message}</p>
+        )}
+
+        {isSaved && (
+          <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />
+              <p className="text-xs font-black text-emerald-800">Contrato salvo com sucesso</p>
+            </div>
+            <p className="mt-1 text-[10px] font-medium text-emerald-700">
+              ID: <span className="font-black">{syncContractState.contractId}</span>
+            </p>
+            <p className="text-[10px] font-medium text-emerald-700">
+              Status: <span className="font-black">pending</span> ·{' '}
+              {syncContractState.estimatedRecordsCanSync} registro{syncContractState.estimatedRecordsCanSync !== 1 ? 's' : ''} aptos registrados
+            </p>
+            <p className="mt-1 text-[10px] font-medium text-emerald-600">
+              Nenhum registro foi sincronizado. O contrato aguarda mapeamento canônico para qualquer gravação futura.
+            </p>
+          </div>
+        )}
       </div>
 
       <p className="mt-3 text-[10px] font-medium text-slate-400">
-        Limites desta etapa: nenhum dado foi alterado, importado, sincronizado ou persistido.
+        Limites desta etapa: nenhum dado foi alterado, importado, sincronizado ou gravado nas tabelas canônicas.
       </p>
     </div>
   );
@@ -746,8 +806,34 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const [selectionMap, setSelectionMap] = useState<SelectionMap>({});
   const [contract, setContract] = useState<SalesforceMultiEntityContract | null>(null);
   const [dryRunState, setDryRunState] = useState<DryRunState>({ phase: 'idle' });
+  const [syncContractState, setSyncContractState] = useState<SyncContractState>({ phase: 'idle' });
   const contractPanelRef = useRef<HTMLDivElement>(null);
   const dryRunPanelRef = useRef<HTMLDivElement>(null);
+
+  async function handleSaveSyncContract() {
+    if (dryRunState.phase !== 'done' || !contract) return;
+    setSyncContractState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/sync-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contract, dryRunSummary: dryRunState.result.summary }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; syncContract?: { id: string; estimatedRecordsCanSync: number }; error?: string };
+      if (!res.ok || data.status !== 'success' || !data.syncContract) {
+        setSyncContractState({ phase: 'error', message: data.error ?? 'Não foi possível salvar o contrato.' });
+        return;
+      }
+      setSyncContractState({
+        phase: 'done',
+        contractId: data.syncContract.id,
+        estimatedRecordsCanSync: data.syncContract.estimatedRecordsCanSync,
+      });
+    } catch {
+      setSyncContractState({ phase: 'error', message: 'Não foi possível salvar o contrato.' });
+    }
+  }
 
   async function handleLoad() {
     if (!oauthConnected) return;
@@ -755,6 +841,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
     setSelectionMap({});
     setContract(null);
     setDryRunState({ phase: 'idle' });
+    setSyncContractState({ phase: 'idle' });
 
     try {
       const objects = ENTITY_ORDER.join(',');
@@ -808,6 +895,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   function handleToggle(objectApiName: string, id: string) {
     setContract(null);
     setDryRunState({ phase: 'idle' });
+    setSyncContractState({ phase: 'idle' });
     setSelectionMap((prev) => {
       const current = prev[objectApiName] ?? [];
       const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
@@ -818,6 +906,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   function handleSelectAll(objectApiName: string, records: Record<string, PreviewValue>[]) {
     setContract(null);
     setDryRunState({ phase: 'idle' });
+    setSyncContractState({ phase: 'idle' });
     const ids = records.map((r) => getStr(r, 'Id')).filter(Boolean);
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: ids }));
   }
@@ -825,6 +914,7 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   function handleClearAll(objectApiName: string) {
     setContract(null);
     setDryRunState({ phase: 'idle' });
+    setSyncContractState({ phase: 'idle' });
     setSelectionMap((prev) => ({ ...prev, [objectApiName]: [] }));
   }
 
@@ -1114,7 +1204,11 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
           {/* Dry-run result panel */}
           {dryRunState.phase === 'done' && (
             <div ref={dryRunPanelRef} className="scroll-mt-4">
-              <DryRunPanel result={dryRunState.result} />
+              <DryRunPanel
+                result={dryRunState.result}
+                syncContractState={syncContractState}
+                onSaveSyncContract={handleSaveSyncContract}
+              />
             </div>
           )}
         </div>

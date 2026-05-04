@@ -1259,6 +1259,74 @@ export async function dryRunMultiEntityContract(contract: DryRunContractInput): 
   };
 }
 
+// ─── Sync Contract ───────────────────────────────────────────────────────────
+
+export type SyncContractStatus = 'pending' | 'mapped' | 'synced' | 'cancelled';
+
+export interface SyncContractSavedResult {
+  id: string;
+  provider: string;
+  status: SyncContractStatus;
+  createdAt: string;
+  estimatedRecordsCanSync: number;
+}
+
+export async function saveSalesforceSyncContract(
+  contractJson: unknown,
+  dryRunSummaryJson: unknown,
+): Promise<SyncContractSavedResult> {
+  if (
+    typeof contractJson !== 'object' ||
+    contractJson === null ||
+    !('entities' in contractJson) ||
+    !Array.isArray((contractJson as { entities: unknown }).entities) ||
+    (contractJson as { entities: unknown[] }).entities.length === 0
+  ) {
+    throw new Error('CONTRACT_EMPTY');
+  }
+
+  if (
+    typeof dryRunSummaryJson !== 'object' ||
+    dryRunSummaryJson === null ||
+    !('estimatedRecordsCanSync' in dryRunSummaryJson)
+  ) {
+    throw new Error('DRY_RUN_SUMMARY_INVALID');
+  }
+
+  const estimatedRecordsCanSync =
+    typeof (dryRunSummaryJson as { estimatedRecordsCanSync: unknown }).estimatedRecordsCanSync === 'number'
+      ? (dryRunSummaryJson as { estimatedRecordsCanSync: number }).estimatedRecordsCanSync
+      : 0;
+
+  if (estimatedRecordsCanSync <= 0) {
+    throw new Error('NO_RECORDS_CAN_SYNC');
+  }
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .insert({
+      provider: SALESFORCE_PROVIDER,
+      status: 'pending',
+      contract_json: contractJson,
+      dry_run_summary: dryRunSummaryJson,
+    })
+    .select('id, provider, status, created_at')
+    .single();
+
+  if (error || !data) throw new Error('SAVE_SYNC_CONTRACT_FAILED');
+
+  const row = data as { id: string; provider: string; status: string; created_at: string };
+
+  return {
+    id: row.id,
+    provider: row.provider,
+    status: row.status as SyncContractStatus,
+    createdAt: row.created_at,
+    estimatedRecordsCanSync,
+  };
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {
