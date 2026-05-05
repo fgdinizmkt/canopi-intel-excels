@@ -31,9 +31,7 @@ Não fechado neste marco:
 - importação real
 - criação/atualização de registros no Salesforce
 - persistência de mapeamento para demais entidades Salesforce
-- uso de mapeamento em sync real
-- persistência de sincronização (gravação real em accounts)
-- auditoria de sync/writeback
+- uso de mapeamento em sync real para demais entidades Salesforce
 - Salesforce Connector completo
 
 ## Decisões Estratégicas de UX (Maio 2026)
@@ -65,9 +63,29 @@ Pendências futuras (fora do escopo atual):
 - Salesforce sync contract persistence (C4.4) concluído localmente em `f6643cd`
 - Salesforce Account canonical mapping (C4.5) concluído localmente em `7b55192`
 - Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
+- Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
+
+---
+
+### MARCO: Salesforce C4.7 — Sync persistente controlado de Accounts — 2026-05-05
+
+**Status: Concluído e Saneado (Commit `0ed2a26`)**
+
+- **Natureza:** Primeira escrita controlada de dados do Salesforce na tabela `accounts` da Canopi.
+- **Escopo Técnico:**
+  - **Repository Layer:** Implementado `syncAccountFromCRM` com whitelist absoluta de campos (nome, domínio, vertical, segmento, porte, localizacao, owner, etapa).
+  - **Proteção Estratégica:** Blindagem contra sobrescrita de inteligência (scoring, tipoEstrategico, histórico).
+  - **Dedupe Robusto:** Implementada leitura *fresh* direta do Supabase Admin para match por domínio normalizado. O sourceExternalId permanece apenas no sync_summary_log e nunca é usado como id interno da Canopi.
+  - **Log de Execução:** Registro de `sync_summary_log` persistido no JSONB do contrato.
+- **Incidente de Percurso (Saneado):**
+  - Durante validação em **DEV**, um clique acidental na UI gerou 5 contas duplicadas.
+  - **Causa:** O dedupe inicial usava `getAccounts()`, que recai em mocks quando o volume é baixo (< 20), falhando em encontrar contas recém-criadas.
+  - **Correção:** O motor de sync foi atualizado para realizar uma consulta administrativa direta e limpa no Supabase antes de cada decisão de escrita.
+  - **Saneamento:** As contas duplicadas foram removidas manualmente em DEV; o total foi restabelecido para 8; execuções subsequentes confirmaram `updatedCount: 5` e `createdCount: 0`.
+- **UX:** Mantida a interface técnica/assistida (SyncExecutePanel com logs de registros ignorados e resumo de impacto).
 
 ---
 

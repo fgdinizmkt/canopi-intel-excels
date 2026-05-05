@@ -5,6 +5,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-05] — Salesforce C4.7 (sync persistente controlado)
+
+- **Natureza:** Implementação técnica da primeira escrita controlada concluída; incidente de duplicação saneado em DEV.
+- **Objetivo:** Executar sync persistente de Account Salesforce → Canopi com whitelist absoluta e guardrails de segurança estratégica.
+- **Commit local:** `0ed2a26` — `feat(settings): add controlled Salesforce Account sync execution`
+- **O que foi materializado:**
+  - **Repository (`syncAccountFromCRM`):** Método central para escrita segura com whitelist estrita (nome, dominio, vertical, segmento, porte, localizacao, owner, etapa). Blindagem total de campos estratégicos (scoring, tipoEstrategico, etc).
+  - **Service (`executeAccountSync`):** Motor de orquestração que lê exclusivamente do contrato `mapped`, aplica o mapeamento e persiste no Supabase.
+  - **Dedupe Robusto:** Identificação de match por domínio normalizado, com leitura administrativa *fresh* direta do Supabase antes de cada escrita. O sourceExternalId fica restrito ao log de execução e não é usado como id interno da Canopi.
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/sync-execute` para disparo controlado via back-end.
+  - **UI (`SyncExecutePanel`):** Painel de execução com resumo de impacto, logs de registros ignorados por falta de dados mínimos e confirmação de transição de status para `synced`.
+- **Relato de Incidente (DEV):**
+  - Durante os testes em DEV, uma execução acidental posterior gerou 5 contas duplicadas.
+  - **Causa:** O dedupe utilizava `getAccounts()`, que recai em mocks se o volume é baixo, falhando em ver os registros criados segundos antes.
+  - **Correção:** Implementada consulta direta via Supabase Admin no motor de sync, garantindo que o dedupe sempre enxergue a base real e atualizada.
+  - **Saneamento:** Base DEV limpa manualmente, total de contas restabelecido para 8.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (Exit 0).
+- **Limites confirmados:**
+  - **Sem writeback** para o Salesforce.
+  - **Sem Bulk API**.
+  - **UX Técnica:** Mantida a interface assistida para controle de engenharia.
+- **Próximo passo sugerido:** Expandir o sync persistente para Contact e Opportunity (C4.8).
+
+---
+
 ## [2026-05-04] — Salesforce C4.6 (preview read-only de sincronização)
 
 - **Natureza:** Implementação técnica do preview de impacto concluída; validada visualmente no browser.
