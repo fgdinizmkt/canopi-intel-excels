@@ -1629,19 +1629,22 @@ export async function generateAccountSyncPreview(contractId: string): Promise<Sa
   const fieldMap = mapping.fieldMap;
 
   for (const sfAcc of sfAccounts) {
-    const sourceExternalId = String(sfAcc[fieldMap.source_external_id] ?? '');
-    const proposedNome = String(sfAcc[fieldMap.nome] ?? '');
-    const proposedDominio = String(sfAcc[fieldMap.dominio] ?? '');
-    const proposedSegmento = String(sfAcc[fieldMap.segmento] ?? '');
-    const proposedTipo = String(sfAcc[fieldMap.tipo] ?? '');
+    // Lê campos do topo do registro e, se ausentes, de fieldValues (estrutura ContractRecord)
+    const sourceExternalId = readSfField(sfAcc, fieldMap.source_external_id)
+      || String(sfAcc['id'] ?? '');
+    const proposedNome = (readSfField(sfAcc, fieldMap.nome)
+      || String(sfAcc['displayName'] ?? '')).trim();
+    const proposedDominio = normalizeDomain(readSfField(sfAcc, fieldMap.dominio));
+    const proposedSegmento = readSfField(sfAcc, fieldMap.segmento).trim();
+    const proposedTipo = readSfField(sfAcc, fieldMap.tipo).trim();
 
     const warnings: string[] = [];
     if (!proposedNome) warnings.push('Nome ausente no Salesforce');
     if (!proposedDominio) warnings.push('Domínio/Website ausente no Salesforce');
 
-    // Tenta encontrar match local por ID externo ou Domínio
+    // Match por domínio — ambos os lados normalizados
     const match = currentAccounts.find(
-      (a) => a.id === sourceExternalId || (proposedDominio && a.dominio === proposedDominio),
+      (a) => Boolean(proposedDominio && normalizeDomain(a.dominio) === proposedDominio),
     );
 
     let actionPreview: SalesforceSyncPreviewItem['actionPreview'] = 'create';
@@ -1657,7 +1660,7 @@ export async function generateAccountSyncPreview(contractId: string): Promise<Sa
 
       const hasChanges =
         match.nome !== proposedNome ||
-        (proposedDominio && match.dominio !== proposedDominio) ||
+        (proposedDominio && normalizeDomain(match.dominio) !== proposedDominio) ||
         (proposedSegmento && match.segmento !== proposedSegmento);
 
       actionPreview = hasChanges ? 'update' : 'no_change';
@@ -1693,6 +1696,334 @@ export async function generateAccountSyncPreview(contractId: string): Promise<Sa
       noChange: previewItems.filter((i) => i.actionPreview === 'no_change').length,
       warnings: previewItems.filter((i) => i.actionPreview === 'warning').length,
     },
+  };
+}
+
+// ─── Domain normalization ─────────────────────────────────────────────────────
+
+function normalizeDomain(raw: string | null | undefined): string {
+  const s = (raw ?? '').trim();
+  if (!s) return '';
+  try {
+    // Aceita URLs com ou sem protocolo
+    const withProto = /^https?:\/\//i.test(s) ? s : `https://${s}`;
+    const url = new URL(withProto);
+    // Descarta path, query e hash — mantém apenas hostname em lowercase sem www.
+    return url.hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
+  } catch {
+    // Fallback defensivo: strip manual sem URL parser
+    return s
+      .toLowerCase()
+      .replace(/^https?:\/\//, '')
+      .replace(/^www\./, '')
+      .split('/')[0]
+      .split('?')[0]
+      .split('#')[0]
+      .replace(/\.$/, '')
+      .trim();
+  }
+}
+
+// ─── Sync Execution (C4.7) ───────────────────────────────────────────────────
+
+export type SyncOutcome = 'synced' | 'partial_with_skips' | 'no_op_all_skipped' | 'failed_with_errors';
+
+function computeSyncOutcome(
+  createdCount: number,
+  updatedCount: number,
+  skippedCount: number,
+  errorCount: number,
+): SyncOutcome {
+  if (errorCount > 0) return 'failed_with_errors';
+  const processed = createdCount + updatedCount;
+  if (processed === 0) return 'no_op_all_skipped';
+  if (skippedCount > 0) return 'partial_with_skips';
+  return 'synced';
+}
+
+/** Lê um campo do registro Salesforce — primeiro no topo, depois em fieldValues. */
+function readSfField(sfAcc: Record<string, unknown>, fieldName: string): string {
+  const top = sfAcc[fieldName];
+  if (top !== undefined && top !== null && top !== '') return String(top);
+  const fv = sfAcc['fieldValues'];
+  if (fv && typeof fv === 'object') {
+    const nested = (fv as Record<string, unknown>)[fieldName];
+    if (nested !== undefined && nested !== null && nested !== '') return String(nested);
+  }
+  return '';
+}
+
+export interface SyncExecutionSkippedRecord {
+  sourceExternalId: string;
+  displayName: string;
+  reason: string;
+}
+
+export interface SyncExecutionRecordPair {
+  sourceExternalId: string;
+  canopiId: string;
+  dominio: string;
+  nome: string;
+}
+
+export interface SyncExecutionResult {
+  contractId: string;
+  entity: 'Account';
+  startedAt: string;
+  finishedAt: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  errorCount: number;
+  outcome: SyncOutcome;
+  /** Pares de IDs/dados para registros criados — sourceExternalId nunca vira id Canopi */
+  createdRecords: SyncExecutionRecordPair[];
+  /** Pares de IDs/dados para registros atualizados */
+  updatedRecords: SyncExecutionRecordPair[];
+  /** Registros ignorados com motivo */
+  skippedRecords: SyncExecutionSkippedRecord[];
+  warnings: string[];
+  statusTransitioned: boolean;
+}
+
+/**
+ * Executa sync persistente controlado de Accounts Salesforce → Canopi.
+ *
+ * Guardrails absolutos:
+ * - Nunca aceita payload bruto do front-end.
+ * - Lê exclusivamente do contrato salvo no banco (status=mapped).
+ * - Grava apenas via syncAccountFromCRM (whitelist estrita no repository).
+ * - Nunca sobrescreve campos estratégicos, scoring ou inteligência Canopi.
+ * - Registra sync_summary_log no JSONB do contrato (não cria nova tabela).
+ * - Transita status para 'synced' apenas após execução completa sem erro fatal.
+ * - Contas sem nome ou domínio são ignoradas com rastreabilidade no log.
+ */
+export async function executeAccountSync(contractId: string): Promise<SyncExecutionResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const startedAt = new Date().toISOString();
+  const supabase = getSupabaseAdminClient();
+
+  // ── 1. Busca contrato mapped ──────────────────────────────────────────────
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+
+  if (row.status !== 'mapped') {
+    throw new Error('CONTRACT_NOT_MAPPED');
+  }
+
+  const contractJson = row.contract_json;
+  const mapping = contractJson?.canonical_mapping as SalesforceAccountCanonicalMapping | undefined;
+
+  if (!mapping || mapping.entity !== 'Account') {
+    throw new Error('ACCOUNT_MAPPING_NOT_FOUND');
+  }
+
+  // ── 2. Extrai registros selecionados do contrato ──────────────────────────
+  const accountEntity = contractJson?.entities?.find((e: any) => e.objectApiName === 'Account');
+  const sfAccounts = (accountEntity?.selectedRecords ?? []) as any[];
+
+  if (sfAccounts.length === 0) {
+    throw new Error('NO_ACCOUNTS_IN_CONTRACT');
+  }
+
+  // ── 3. Leitura fresh direta do admin client — sem fallback para mock ────────
+  // getAccounts() tem fallback para contasMock quando rows < 20, tornando o
+  // dedupe por domínio não confiável. O sync persistente exige fonte canônica.
+  const { syncAccountFromCRM } = await import('../accountsRepository');
+  const { data: freshRows } = await supabase
+    .from('accounts')
+    .select('id, nome, dominio, segmento');
+
+  // Índice: domínio normalizado → lista de canopiIds (detecta ambiguidade se >1)
+  const domainIndex = new Map<string, string[]>();
+  for (const row of freshRows ?? []) {
+    const norm = normalizeDomain((row as { dominio?: string }).dominio ?? '');
+    if (!norm) continue;
+    const existing = domainIndex.get(norm) ?? [];
+    existing.push((row as { id: string }).id);
+    domainIndex.set(norm, existing);
+  }
+
+  const fieldMap = mapping.fieldMap;
+
+  let createdCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+  let errorCount = 0;
+  const createdRecords: SyncExecutionRecordPair[] = [];
+  const updatedRecords: SyncExecutionRecordPair[] = [];
+  const skippedRecords: SyncExecutionSkippedRecord[] = [];
+  const warnings: string[] = [];
+
+  // ── 4. Itera e executa sync conta a conta ────────────────────────────────
+  for (const sfAcc of sfAccounts) {
+    // Lê campos do topo do registro e, se ausentes, de fieldValues (estrutura ContractRecord)
+    const sourceExternalId = readSfField(sfAcc, fieldMap.source_external_id)
+      || String(sfAcc['id'] ?? '');
+    const proposedNome = (readSfField(sfAcc, fieldMap.nome)
+      || String(sfAcc['displayName'] ?? '')).trim();
+    const proposedDominio = normalizeDomain(readSfField(sfAcc, fieldMap.dominio));
+    const proposedSegmento = readSfField(sfAcc, fieldMap.segmento).trim();
+    const displayName = proposedNome || sourceExternalId || 'Conta sem nome';
+
+    // Regra de segurança: domínio vazio sem match seguro → ignorar com rastreabilidade
+    if (!proposedDominio && !sourceExternalId) {
+      skippedRecords.push({
+        sourceExternalId,
+        displayName,
+        reason: 'Domínio e ID externo ausentes. Não é possível fazer match ou criar com segurança.',
+      });
+      skippedCount++;
+      continue;
+    }
+
+    // Dedupe por domínio normalizado via índice fresh do admin client
+    const matchIds = proposedDominio ? (domainIndex.get(proposedDominio) ?? []) : [];
+
+    if (matchIds.length > 1) {
+      // Ambiguidade: mais de uma conta com o mesmo domínio — não toca em nenhuma
+      skippedRecords.push({
+        sourceExternalId,
+        displayName,
+        reason: 'Domínio duplicado na base Canopi. Sync ignorado para evitar ambiguidade.',
+      });
+      skippedCount++;
+    } else if (matchIds.length === 1) {
+      // ── UPDATE seletivo — apenas campos CRM-safe, domínio já normalizado ──
+      const matchId = matchIds[0];
+      const result = await syncAccountFromCRM(
+        {
+          id: matchId,
+          nome: proposedNome || undefined,
+          dominio: proposedDominio || undefined,
+          segmento: proposedSegmento || undefined,
+        },
+        'update',
+      );
+
+      if (result.action === 'updated') {
+        updatedCount++;
+        updatedRecords.push({ sourceExternalId, canopiId: matchId, dominio: proposedDominio, nome: proposedNome });
+      } else if (result.action === 'skipped') {
+        skippedRecords.push({
+          sourceExternalId,
+          displayName,
+          reason: result.reason ?? 'Sem campos a atualizar.',
+        });
+        skippedCount++;
+      } else if (result.action === 'error') {
+        warnings.push(`Erro ao atualizar "${displayName}": ${result.error}`);
+        errorCount++;
+      }
+    } else {
+      // ── CREATE — apenas se dados mínimos presentes ─────────────────────
+      if (!proposedNome || !proposedDominio) {
+        skippedRecords.push({
+          sourceExternalId,
+          displayName,
+          reason: 'Nome ou domínio ausentes. Conta não criada por falta de dados mínimos.',
+        });
+        skippedCount++;
+        continue;
+      }
+
+      // ID Canopi sempre gerado internamente — sourceExternalId nunca vira id interno
+      // dominio já normalizado por normalizeDomain() acima
+      const canopiId = crypto.randomUUID();
+
+      const result = await syncAccountFromCRM(
+        {
+          id: canopiId,
+          nome: proposedNome,
+          dominio: proposedDominio,
+          segmento: proposedSegmento || undefined,
+        },
+        'create',
+      );
+
+      if (result.action === 'created') {
+        createdCount++;
+        createdRecords.push({ sourceExternalId, canopiId, dominio: proposedDominio, nome: proposedNome });
+        // Atualiza índice em memória para impedir duplicação intra-execução
+        domainIndex.set(proposedDominio, [canopiId]);
+      } else if (result.action === 'skipped') {
+        skippedRecords.push({
+          sourceExternalId,
+          displayName,
+          reason: result.reason ?? 'Conta ignorada na criação.',
+        });
+        skippedCount++;
+      } else if (result.action === 'error') {
+        warnings.push(`Erro ao criar "${displayName}": ${result.error}`);
+        errorCount++;
+      }
+    }
+  }
+
+  const finishedAt = new Date().toISOString();
+
+  // ── 5. Registra sync_summary_log no JSONB do contrato ────────────────────
+  const outcome = computeSyncOutcome(createdCount, updatedCount, skippedCount, errorCount);
+
+  const syncSummaryLog = {
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+  };
+
+  const updatedContractJson = {
+    ...contractJson,
+    sync_summary_log: syncSummaryLog,
+  };
+
+  // Transita para 'synced' somente se ao menos um registro foi criado ou atualizado sem erros
+  const newStatus: SyncContractStatus = outcome === 'synced' ? 'synced' : 'mapped';
+  const statusTransitioned = newStatus === 'synced';
+
+  await supabase
+    .from('salesforce_sync_contracts')
+    .update({
+      status: newStatus,
+      contract_json: updatedContractJson,
+      updated_at: finishedAt,
+    })
+    .eq('id', contractId);
+
+  return {
+    contractId,
+    entity: 'Account',
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+    statusTransitioned,
   };
 }
 

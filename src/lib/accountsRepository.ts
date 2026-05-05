@@ -13,6 +13,154 @@ import { getOportunidadesMap } from './oportunidadesRepository';
  * 4. Se conta não encontrada em mock, cria shell seguro com campos obrigatórios
  */
 
+// ─── CRM Sync (C4.7) ─────────────────────────────────────────────────────────
+
+/**
+ * Payload de sync CRM — Whitelist absoluta de campos permitidos para escrita.
+ * NUNCA inclui campos estratégicos, scoring ou inteligência Canopi.
+ * Campos ausentes são omitidos (não sobrescritos).
+ */
+export type CRMAccountSyncPayload = {
+  /** Identificador canônico da conta Canopi — obrigatório para update */
+  id: string;
+  /** Nome descritivo da empresa (sobrescrita permitida via CRM) */
+  nome?: string;
+  /** Domínio/website da empresa */
+  dominio?: string;
+  /** Vertical de mercado */
+  vertical?: string;
+  /** Segmento de atuação */
+  segmento?: string;
+  /** Porte da empresa */
+  porte?: string;
+  /** Localização geográfica */
+  localizacao?: string;
+  /** Owner principal na Canopi */
+  ownerPrincipal?: string;
+  /** Etapa do funil */
+  etapa?: string;
+};
+
+/**
+ * Resultado de uma operação de sync CRM para uma conta individual.
+ */
+export type CRMAccountSyncResult = {
+  action: 'created' | 'updated' | 'skipped' | 'error';
+  canopiId?: string;
+  reason?: string;
+  error?: string;
+};
+
+/**
+ * Escreve uma conta proveniente de sync CRM no Supabase com whitelist absoluta.
+ *
+ * Campos NUNCA sobrescritos (blindados por design):
+ *   - tipoEstrategico, playAtivo, scoring, potencial, risco, prontidao, coberturaRelacional
+ *   - inteligencia, leituraFactual, leituraInferida, leituraSugerida
+ *   - historico, proximaMelhorAcao, resumoExecutivo
+ *   - canaisCampanhas, tecnografia
+ *
+ * Campos permitidos: nome, dominio, vertical, segmento, porte, localizacao, ownerPrincipal, etapa.
+ *
+ * @param payload - Campos CRM-safe para escrita. Nunca aceita payload bruto do Salesforce.
+ * @param mode    - 'create' para INSERT, 'update' para UPDATE seletivo.
+ * @returns CRMAccountSyncResult com action, id e motivo/erro se aplicável.
+ */
+export async function syncAccountFromCRM(
+  payload: CRMAccountSyncPayload,
+  mode: 'create' | 'update',
+): Promise<CRMAccountSyncResult> {
+  if (!isSupabaseConfigured()) {
+    return {
+      action: 'skipped',
+      reason: 'Supabase não configurado. Sync CRM ignorado.',
+    };
+  }
+
+  if (!payload.id) {
+    return { action: 'error', error: 'ID da conta é obrigatório.' };
+  }
+
+  // ── Monta payload com whitelist estrita ───────────────────────────────────
+  // Apenas campos CRM-safe são incluídos. Campos undefined são omitidos
+  // para evitar sobrescrita acidental de valores existentes no banco.
+  const safePayload: Record<string, unknown> = { id: payload.id };
+
+  if (payload.nome !== undefined && payload.nome.trim())
+    safePayload['nome'] = payload.nome.trim();
+  if (payload.dominio !== undefined && payload.dominio.trim())
+    safePayload['dominio'] = payload.dominio.trim();
+  if (payload.vertical !== undefined && payload.vertical.trim())
+    safePayload['vertical'] = payload.vertical.trim();
+  if (payload.segmento !== undefined && payload.segmento.trim())
+    safePayload['segmento'] = payload.segmento.trim();
+  if (payload.porte !== undefined && payload.porte.trim())
+    safePayload['porte'] = payload.porte.trim();
+  if (payload.localizacao !== undefined && payload.localizacao.trim())
+    safePayload['localizacao'] = payload.localizacao.trim();
+  if (payload.ownerPrincipal !== undefined && payload.ownerPrincipal.trim())
+    safePayload['ownerPrincipal'] = payload.ownerPrincipal.trim();
+  if (payload.etapa !== undefined && payload.etapa.trim())
+    safePayload['etapa'] = payload.etapa.trim();
+
+  try {
+    if (mode === 'create') {
+      // Para criação, exige pelo menos nome e domínio
+      if (!safePayload['nome'] || !safePayload['dominio']) {
+        return {
+          action: 'skipped',
+          reason: 'Nome e domínio são obrigatórios para criar uma nova conta.',
+        };
+      }
+
+      // Gera slug a partir do domínio ou nome para evitar conflito de id
+      const slugBase = (safePayload['dominio'] as string)
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .replace(/[^a-z0-9]/gi, '-')
+        .toLowerCase()
+        .slice(0, 60);
+      safePayload['slug'] = slugBase || `crm-${payload.id.slice(0, 8)}`;
+
+      const { error } = await supabase!
+        .from('accounts')
+        .insert(safePayload);
+
+      if (error) {
+        return { action: 'error', canopiId: payload.id, error: error.message };
+      }
+
+      return { action: 'created', canopiId: payload.id };
+    } else {
+      // mode === 'update': atualiza apenas os campos CRM-safe presentes
+      const { id, ...updateFields } = safePayload;
+      void id; // id usado apenas para identificar o registro
+
+      if (Object.keys(updateFields).length === 0) {
+        return {
+          action: 'skipped',
+          canopiId: payload.id,
+          reason: 'Nenhum campo CRM-safe a atualizar.',
+        };
+      }
+
+      const { error } = await supabase!
+        .from('accounts')
+        .update(updateFields)
+        .eq('id', payload.id);
+
+      if (error) {
+        return { action: 'error', canopiId: payload.id, error: error.message };
+      }
+
+      return { action: 'updated', canopiId: payload.id };
+    }
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return { action: 'error', canopiId: payload.id, error: errorMsg };
+  }
+}
+
 export type PlayAtivo = 'ABM' | 'ABX' | 'Híbrido' | 'Nenhum';
 
 export type AccountRow = {

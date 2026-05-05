@@ -38,6 +38,12 @@ type SyncPreviewState =
   | { phase: 'done'; result: any }
   | { phase: 'error'; message: string };
 
+type SyncExecuteState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: any }
+  | { phase: 'error'; message: string };
+
 type EligibilityStatus = 'valid' | 'alert' | 'blocked';
 
 interface EligibilityResult {
@@ -1100,6 +1106,8 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const syncPreviewPanelRef = useRef<HTMLDivElement>(null);
 
   const [syncPreviewState, setSyncPreviewState] = useState<SyncPreviewState>({ phase: 'idle' });
+  const [syncExecuteState, setSyncExecuteState] = useState<SyncExecuteState>({ phase: 'idle' });
+  const syncExecutePanelRef = useRef<HTMLDivElement>(null);
 
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
@@ -1620,6 +1628,84 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
               <SyncPreviewPanel result={syncPreviewState.result} />
             </div>
           )}
+
+          {/* ── Painel de Execução C4.7 ── */}
+          {syncPreviewState.phase === 'done' && syncExecuteState.phase === 'idle' && (() => {
+            const execContractId = syncContractState.phase === 'done' ? syncContractState.contractId : null;
+            return (
+              <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+                <p className="text-sm font-black text-amber-900">Executar Sincronização Controlada</p>
+                <ul className="mt-2 space-y-1 text-xs font-medium text-amber-800">
+                  <li>⚠ Esta ação gravará apenas campos permitidos em Contas.</li>
+                  <li>🔒 Campos estratégicos da Canopi não serão sobrescritos.</li>
+                  <li>🚫 Writeback para Salesforce não está habilitado.</li>
+                  <li>📋 O log de execução será registrado no contrato.</li>
+                </ul>
+                {!execContractId && (
+                  <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">
+                    Contrato não identificado. Salve e mapeie o contrato antes de executar o sync.
+                  </p>
+                )}
+                <button
+                  id="sf-sync-execute-btn"
+                  type="button"
+                  disabled={!execContractId}
+                  onClick={async () => {
+                    if (!execContractId) return;
+                    setSyncExecuteState({ phase: 'loading' });
+                    try {
+                      const res = await fetch(
+                        '/api/account-connectors/salesforce/oauth/sync-execute',
+                        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contractId: execContractId }), cache: 'no-store' },
+                      );
+                      const data = await res.json();
+                      if (!res.ok || data.status !== 'success' || !data.result) {
+                        setSyncExecuteState({ phase: 'error', message: data.error ?? 'Erro ao executar sync.' });
+                        return;
+                      }
+                      setSyncExecuteState({ phase: 'done', result: data.result });
+                      setTimeout(() => syncExecutePanelRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+                    } catch {
+                      setSyncExecuteState({ phase: 'error', message: 'Falha de rede ao executar sync.' });
+                    }
+                  }}
+                  className="mt-4 rounded-xl bg-amber-700 px-5 py-2 text-xs font-black text-white shadow hover:bg-amber-800 active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-amber-700 disabled:active:scale-100"
+                >
+                  Executar sincronização controlada
+                </button>
+              </div>
+            );
+          })()}
+
+          {syncExecuteState.phase === 'loading' && (
+            <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <svg className="h-4 w-4 animate-spin text-amber-600" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
+              </svg>
+              <p className="text-xs font-bold text-slate-600">Executando sincronização controlada…</p>
+            </div>
+          )}
+
+          {syncExecuteState.phase === 'error' && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
+              <p className="text-sm font-black text-red-800">Erro na execução do sync</p>
+              <p className="mt-1 text-xs font-medium text-red-700">{syncExecuteState.message}</p>
+              <button
+                type="button"
+                onClick={() => setSyncExecuteState({ phase: 'idle' })}
+                className="mt-3 text-xs font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {syncExecuteState.phase === 'done' && (
+            <div ref={syncExecutePanelRef} className="scroll-mt-4">
+              <SyncExecutePanel result={syncExecuteState.result} />
+            </div>
+          )}
         </div>
       )}
     </Card>
@@ -1774,6 +1860,111 @@ function SyncPreviewPanel({ result }: { result: any }) {
         <p className="mt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">
           O sync persistente ainda não está habilitado.
         </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── SyncExecutePanel (C4.7) ──────────────────────────────────────────────────
+
+function SyncExecutePanel({ result }: { result: any }) {
+  const {
+    createdCount = 0,
+    updatedCount = 0,
+    skippedCount = 0,
+    errorCount = 0,
+    skippedRecords = [],
+    warnings = [],
+    startedAt,
+    finishedAt,
+    statusTransitioned,
+  } = result;
+
+  return (
+    <div className="rounded-2xl border-2 border-emerald-700 bg-white p-5 shadow-xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-0.5">
+          <p className="text-base font-black text-slate-900">Resultado da Sincronização Controlada</p>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="h-3 w-3" />
+              Campos Estratégicos Preservados
+            </span>
+            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+              Salesforce → Canopi
+            </span>
+          </div>
+        </div>
+        <div className="text-right text-[10px] text-slate-400 font-medium">
+          {startedAt && <p>Iniciado: {new Date(startedAt).toLocaleString('pt-BR')}</p>}
+          {finishedAt && <p>Finalizado: {new Date(finishedAt).toLocaleString('pt-BR')}</p>}
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-xl bg-emerald-50 p-3 text-center">
+          <p className="text-2xl font-black text-emerald-700">{createdCount}</p>
+          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Criadas</p>
+        </div>
+        <div className="rounded-xl bg-blue-50 p-3 text-center">
+          <p className="text-2xl font-black text-blue-700">{updatedCount}</p>
+          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">Atualizadas</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-2xl font-black text-slate-600">{skippedCount}</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Ignoradas</p>
+        </div>
+        <div className={`rounded-xl p-3 text-center ${errorCount > 0 ? 'bg-red-50' : 'bg-slate-50'}`}>
+          <p className={`text-2xl font-black ${errorCount > 0 ? 'text-red-700' : 'text-slate-400'}`}>{errorCount}</p>
+          <p className={`text-[10px] font-bold uppercase tracking-wide ${errorCount > 0 ? 'text-red-600' : 'text-slate-400'}`}>Erros</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2">
+        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${statusTransitioned ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+          {statusTransitioned ? 'Contrato → synced' : 'Contrato permanece mapped (erros detectados)'}
+        </span>
+      </div>
+
+      {skippedRecords.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-black text-slate-700">Registros Ignorados ({skippedRecords.length})</p>
+          <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
+            {(skippedRecords as Array<{ displayName: string; reason: string }>).map((rec, i) => (
+              <div key={i} className="flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2">
+                <span className="text-[10px] font-bold text-slate-500 shrink-0">{rec.displayName}</span>
+                <span className="text-[10px] text-slate-400">{rec.reason}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {warnings.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-black text-red-700">Avisos e Erros ({warnings.length})</p>
+          <div className="mt-2 space-y-1">
+            {(warnings as string[]).map((w, i) => (
+              <div key={i} className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2">
+                <AlertTriangle className="h-3 w-3 text-red-500 mt-0.5 shrink-0" />
+                <span className="text-[10px] font-medium text-red-700">{w}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-col items-center border-t border-slate-100 pt-5">
+        <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl">
+          <ShieldCheck className="h-4 w-4" />
+          <p className="text-xs font-black">Guardrails Ativos</p>
+        </div>
+        <ul className="mt-2 space-y-0.5 text-center text-[10px] font-medium text-slate-400">
+          <li>Campos estratégicos (tipoEstrategico, playAtivo, scoring) não foram sobrescritos.</li>
+          <li>Writeback para Salesforce não está habilitado.</li>
+          <li>Nenhuma Bulk API foi utilizada.</li>
+          <li>Log de execução registrado no contrato.</li>
+        </ul>
       </div>
     </div>
   );
