@@ -292,3 +292,140 @@ export async function persistContact(contact: ContactItem): Promise<void> {
     // Silencioso — nunca relança
   }
 }
+
+// ─── CRM Sync (C4.9) ─────────────────────────────────────────────────────────
+
+/**
+ * Payload de sync CRM para Contact — Whitelist absoluta.
+ *
+ * Campos PERMITIDOS (existem no schema de contacts):
+ *   - id, accountId, accountName, nome, cargo, area, status
+ *
+ * Campos estratégicos NUNCA sobrescritos em updates (blindados por design):
+ *   - classificacao, forcaRelacional, influencia, papelComite, senioridade
+ *   - receptividade, acessibilidade, potencialSucesso, scoreSucesso
+ *   - ganchoReuniao, liderId, owner, observacoes, historicoInteracoes, proximaAcao
+ *   - (email e telefone não existem no schema atual — sem migration necessária)
+ *   (Nota: creates inserem apenas defaults mínimos de schema não-enriquecidos)
+ */
+export type CRMContactSyncPayload = {
+  /** ID Canopi gerado internamente — nunca o sourceContactId do Salesforce */
+  id: string;
+  /** UUID da Account Canopi — obrigatório, nunca nulo */
+  accountId: string;
+  /** Nome legível da Account para desnormalização */
+  accountName: string;
+  /** Nome do contato — obrigatório */
+  nome: string;
+  /** Cargo/título (campo CRM-safe) */
+  cargo?: string;
+  /** Área/departamento (campo CRM-safe) */
+  area?: string;
+  /** Status operacional simples */
+  status?: string;
+};
+
+export type CRMContactSyncResult = {
+  action: 'created' | 'updated' | 'skipped' | 'error';
+  canopiId?: string;
+  reason?: string;
+  error?: string;
+};
+
+/**
+ * Escreve um contato proveniente de sync CRM no Supabase com whitelist absoluta.
+ *
+ * - Campos estratégicos NUNCA são sobrescritos em updates (blindados por design):
+ *   classificacao, forcaRelacional, influencia, papelComite, senioridade,
+ *   receptividade, acessibilidade, potencialSucesso, scoreSucesso,
+ *   ganchoReuniao, liderId, owner, observacoes, historicoInteracoes, proximaAcao.
+ * - Em creates, apenas defaults mínimos obrigatórios de schema são definidos
+ *   (ex: forcaRelacional = 0). Esses defaults não representam inteligência relacional enriquecida.
+ *
+ * Campos permitidos: id, accountId, accountName, nome, cargo, area, status.
+ *
+ * @param payload - Campos CRM-safe. Nunca aceita payload bruto do Salesforce.
+ * @param mode    - 'create' para INSERT, 'update' para UPDATE seletivo.
+ */
+export async function syncContactFromCRM(
+  payload: CRMContactSyncPayload,
+  mode: 'create' | 'update',
+): Promise<CRMContactSyncResult> {
+  if (!isSupabaseConfigured()) {
+    return {
+      action: 'skipped',
+      reason: 'Supabase não configurado. Sync CRM ignorado.',
+    };
+  }
+
+  if (!payload.id) {
+    return { action: 'error', error: 'ID do contato é obrigatório.' };
+  }
+  if (!payload.accountId) {
+    return { action: 'error', error: 'accountId é obrigatório — não criar contatos órfãos.' };
+  }
+  if (!payload.nome?.trim()) {
+    return { action: 'error', error: 'Nome é obrigatório para criar contato.' };
+  }
+
+  // ── Monta payload com whitelist estrita ────────────────────────────────────
+  // Apenas campos CRM-safe. Campos undefined são omitidos para evitar sobrescrita.
+  const safePayload: Record<string, unknown> = {
+    id: payload.id,
+    accountId: payload.accountId,
+    accountName: payload.accountName,
+    nome: payload.nome.trim(),
+  };
+
+  if (payload.cargo !== undefined && payload.cargo.trim())
+    safePayload['cargo'] = payload.cargo.trim();
+  if (payload.area !== undefined && payload.area.trim())
+    safePayload['area'] = payload.area.trim();
+  if (payload.status !== undefined && payload.status.trim())
+    safePayload['status'] = payload.status.trim();
+
+  // Defaults obrigatórios para criação (campos NOT NULL no schema)
+  if (mode === 'create') {
+    safePayload['forcaRelacional'] = safePayload['forcaRelacional'] ?? 0;
+    safePayload['influencia'] = safePayload['influencia'] ?? 0;
+    safePayload['classificacao'] = safePayload['classificacao'] ?? ['Stakeholder'];
+  }
+
+  try {
+    if (mode === 'create') {
+      const { error } = await supabase!
+        .from('contacts')
+        .insert(safePayload);
+
+      if (error) {
+        return { action: 'error', canopiId: payload.id, error: error.message };
+      }
+      return { action: 'created', canopiId: payload.id };
+    } else {
+      // mode === 'update': atualiza apenas os campos CRM-safe presentes, sem tocar nos estratégicos
+      const { id, ...updateFields } = safePayload;
+      void id;
+
+      if (Object.keys(updateFields).length === 0) {
+        return {
+          action: 'skipped',
+          canopiId: payload.id,
+          reason: 'Nenhum campo CRM-safe a atualizar.',
+        };
+      }
+
+      const { error } = await supabase!
+        .from('contacts')
+        .update(updateFields)
+        .eq('id', payload.id);
+
+      if (error) {
+        return { action: 'error', canopiId: payload.id, error: error.message };
+      }
+      return { action: 'updated', canopiId: payload.id };
+    }
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return { action: 'error', canopiId: payload.id, error: errorMsg };
+  }
+}

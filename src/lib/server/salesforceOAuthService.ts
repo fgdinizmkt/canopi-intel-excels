@@ -2273,6 +2273,302 @@ export async function getEligibleSalesforceContactPreviewContracts(): Promise<El
   return result;
 }
 
+// ─── Contact Sync Execute (C4.9) ──────────────────────────────────────────────
+
+export interface ContactSyncExecutionRecordPair {
+  sourceContactId: string;
+  canopiId: string;
+  nome: string;
+  accountId: string;
+}
+
+export interface ContactSyncExecutionSkippedRecord {
+  sourceContactId: string;
+  displayName: string;
+  reason: string;
+}
+
+export type ContactSyncOutcome = 'synced' | 'partial' | 'skipped' | 'error';
+
+export interface ContactSyncExecutionResult {
+  contractId: string;
+  entity: 'Contact';
+  startedAt: string;
+  finishedAt: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  errorCount: number;
+  outcome: ContactSyncOutcome;
+  createdRecords: ContactSyncExecutionRecordPair[];
+  updatedRecords: ContactSyncExecutionRecordPair[];
+  skippedRecords: ContactSyncExecutionSkippedRecord[];
+  warnings: string[];
+  statusTransitioned: boolean;
+}
+
+function computeContactSyncOutcome(
+  created: number,
+  updated: number,
+  skipped: number,
+  errors: number,
+): ContactSyncOutcome {
+  if (errors > 0 && created === 0 && updated === 0) return 'error';
+  if (created === 0 && updated === 0 && skipped > 0 && errors === 0) return 'skipped';
+  if (errors > 0) return 'partial';
+  return 'synced';
+}
+
+function normalizeContactName(raw: string): string {
+  return raw.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+/**
+ * Executa sync persistente controlado de Contacts Salesforce → Canopi.
+ *
+ * Guardrails absolutos:
+ * - Nunca aceita payload bruto do front-end.
+ * - Lê exclusivamente do contrato salvo no banco (status=mapped ou synced).
+ * - Grava apenas via syncContactFromCRM (whitelist estrita no repository).
+ * - Nunca sobrescreve campos estratégicos/relacionais da Canopi.
+ * - Contact sem Account resolvida = skip. Não cria órfãos.
+ * - Contact sem nome = skip.
+ * - Dedupe por accountId + nome normalizado (email não existe no schema atual).
+ * - Registra contact_sync_summary_log no JSONB do contrato (não cria nova tabela).
+ * - Não altera status do contrato (Contact sync não transita o contrato para outro status).
+ * - Não implementa Opportunity, Lead, Campaign, Bulk API ou writeback.
+ */
+export async function executeContactSync(contractId: string): Promise<ContactSyncExecutionResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const startedAt = new Date().toISOString();
+  const supabase = getSupabaseAdminClient();
+
+  // ── 1. Busca contrato mapped ou synced ───────────────────────────────────
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+
+  if (row.status !== 'mapped' && row.status !== 'synced') {
+    throw new Error('CONTRACT_STATUS_INVALID');
+  }
+
+  const contractJson = row.contract_json;
+  const entities: any[] = Array.isArray(contractJson?.entities) ? contractJson.entities : [];
+
+  // ── 2. Extrai registros de Contact do contrato ────────────────────────────
+  const contactEntity = entities.find((e: any) => e.objectApiName === 'Contact');
+  const sfContacts = (contactEntity?.selectedRecords ?? []) as any[];
+
+  if (sfContacts.length === 0) {
+    throw new Error('NO_CONTACTS_IN_CONTRACT');
+  }
+
+  // ── 3. Lookup Salesforce AccountId → Canopi accountId via sync_summary_log ─
+  // Reutiliza buildAccountIdLookup do C4.8 — sem escrita, sem alteração de contrato
+  const accountIdLookup = await buildAccountIdLookup(supabase);
+
+  // ── 4. Leitura fresh de contatos existentes para dedupe ──────────────────
+  // Sem fallback para mock — sync persistente exige fonte canônica
+  const { syncContactFromCRM } = await import('../contactsRepository');
+  const { data: freshContacts } = await supabase
+    .from('contacts')
+    .select('id, nome, accountId');
+
+  // Índice: accountId + nomeNormalizado → canopiId (detecta ambiguidade se >1)
+  const contactDedupeIndex = new Map<string, string[]>();
+  for (const c of freshContacts ?? []) {
+    const row = c as { id: string; nome?: string; accountId?: string };
+    if (!row.accountId || !row.nome) continue;
+    const key = `${row.accountId}::${normalizeContactName(row.nome)}`;
+    const existing = contactDedupeIndex.get(key) ?? [];
+    existing.push(row.id);
+    contactDedupeIndex.set(key, existing);
+  }
+
+  let createdCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+  let errorCount = 0;
+  const createdRecords: ContactSyncExecutionRecordPair[] = [];
+  const updatedRecords: ContactSyncExecutionRecordPair[] = [];
+  const skippedRecords: ContactSyncExecutionSkippedRecord[] = [];
+  const warnings: string[] = [];
+
+  // ── 5. Itera e executa sync contato a contato ─────────────────────────────
+  for (const sfCon of sfContacts) {
+    const sourceContactId = readSfField(sfCon, 'Id') || String(sfCon['id'] ?? '');
+    const sourceAccountId = readSfField(sfCon, 'AccountId');
+    const nome = (readSfField(sfCon, 'Name') || String(sfCon['displayName'] ?? '')).trim();
+    const cargo = readSfField(sfCon, 'Title').trim();
+    const area = readSfField(sfCon, 'Department').trim();
+    const displayName = nome || sourceContactId || 'Contato sem nome';
+
+    // Regra: nome obrigatório
+    if (!nome) {
+      skippedRecords.push({
+        sourceContactId,
+        displayName,
+        reason: 'Nome ausente. Contato não pode ser criado sem identificação.',
+      });
+      skippedCount++;
+      continue;
+    }
+
+    // Regra: Account deve estar resolvida — nenhum órfão
+    const resolved = sourceAccountId ? accountIdLookup.get(sourceAccountId) ?? null : null;
+    if (!resolved) {
+      skippedRecords.push({
+        sourceContactId,
+        displayName,
+        reason: sourceAccountId
+          ? `Salesforce AccountId "${sourceAccountId}" não encontrado nos contratos Account sincronizados. Contato ignorado para evitar órfão.`
+          : 'AccountId ausente no registro Salesforce. Contato ignorado para evitar órfão.',
+      });
+      skippedCount++;
+      continue;
+    }
+
+    const { canopiId: canopiAccountId, nome: accountName } = resolved;
+    const nomeNorm = normalizeContactName(nome);
+    const dedupeKey = `${canopiAccountId}::${nomeNorm}`;
+    const matchIds = contactDedupeIndex.get(dedupeKey) ?? [];
+
+    if (matchIds.length > 1) {
+      // Ambiguidade — mais de um contato com mesmo accountId + nome → skip conservador
+      skippedRecords.push({
+        sourceContactId,
+        displayName,
+        reason: 'Ambiguidade detectada: mais de um contato com mesmo accountId e nome normalizado. Sync ignorado.',
+      });
+      skippedCount++;
+    } else if (matchIds.length === 1) {
+      // UPDATE seletivo — apenas campos CRM-safe
+      const matchId = matchIds[0];
+      const result = await syncContactFromCRM(
+        {
+          id: matchId,
+          accountId: canopiAccountId,
+          accountName,
+          nome,
+          cargo: cargo || undefined,
+          area: area || undefined,
+        },
+        'update',
+      );
+
+      if (result.action === 'updated') {
+        updatedCount++;
+        updatedRecords.push({ sourceContactId, canopiId: matchId, nome, accountId: canopiAccountId });
+      } else if (result.action === 'skipped') {
+        skippedRecords.push({
+          sourceContactId,
+          displayName,
+          reason: result.reason ?? 'Sem campos a atualizar.',
+        });
+        skippedCount++;
+      } else if (result.action === 'error') {
+        warnings.push(`Erro ao atualizar "${displayName}": ${result.error}`);
+        errorCount++;
+      }
+    } else {
+      // CREATE — ID Canopi sempre gerado internamente
+      const canopiContactId = crypto.randomUUID();
+
+      const result = await syncContactFromCRM(
+        {
+          id: canopiContactId,
+          accountId: canopiAccountId,
+          accountName,
+          nome,
+          cargo: cargo || undefined,
+          area: area || undefined,
+          status: 'Ativa',
+        },
+        'create',
+      );
+
+      if (result.action === 'created') {
+        createdCount++;
+        createdRecords.push({ sourceContactId, canopiId: canopiContactId, nome, accountId: canopiAccountId });
+        // Atualiza índice em memória para impedir duplicação intra-execução
+        contactDedupeIndex.set(dedupeKey, [canopiContactId]);
+      } else if (result.action === 'skipped') {
+        skippedRecords.push({
+          sourceContactId,
+          displayName,
+          reason: result.reason ?? 'Contato ignorado na criação.',
+        });
+        skippedCount++;
+      } else if (result.action === 'error') {
+        warnings.push(`Erro ao criar "${displayName}": ${result.error}`);
+        errorCount++;
+      }
+    }
+  }
+
+  const finishedAt = new Date().toISOString();
+
+  // ── 6. Registra contact_sync_summary_log no JSONB do contrato ────────────
+  // Não cria nova tabela — armazena no contract_json existente
+  const outcome = computeContactSyncOutcome(createdCount, updatedCount, skippedCount, errorCount);
+
+  const contactSyncSummaryLog = {
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+  };
+
+  const updatedContractJson = {
+    ...contractJson,
+    contact_sync_summary_log: contactSyncSummaryLog,
+  };
+
+  // Não altera o status do contrato — Contact sync é independente do status de Account
+  await supabase
+    .from('salesforce_sync_contracts')
+    .update({
+      contract_json: updatedContractJson,
+      updated_at: finishedAt,
+    })
+    .eq('id', contractId);
+
+  return {
+    contractId,
+    entity: 'Contact',
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+    statusTransitioned: false, // Contact sync não transita o status do contrato
+  };
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {
