@@ -3,6 +3,27 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-06] — Salesforce C4.9 (Sync persistente controlado de Contacts)
+
+- **Natureza:** Implementação técnica e execução real de sync validada e saneada.
+- **Objetivo:** Executar de forma segura e com guardrails absolutos a primeira gravação de Contacts do Salesforce na Canopi, mantendo zero órfãos e blindagem de inteligência.
+- **Commit local:** `568aaa2` — `feat(settings): add controlled Salesforce Contact sync execution`
+- **O que foi materializado:**
+  - **Repository (`syncContactFromCRM`):** Lógica com whitelist absoluta e suporte a modos create/update. Defaults de schema são inseridos sem assumir inteligência relacional prévia.
+  - **Service (`executeContactSync`):** Resolve `accountId` via lookup (Salesforce → Canopi via C4.7), garantindo que apenas contas que tenham um destino na Canopi recebam contatos. Dedupes intra e inter executados em memória com base em nome e accountId.
+  - **Log:** `contact_sync_summary_log` persistido no contrato via Supabase, incluindo contadores de criados, atualizados, ignorados, erros e outcome total (synced).
+  - **Rota API:** Rota protegida `contact-sync-execute` aceita estritamente chamadas back-end com `contractId`.
+- **Validação manual:** Leitura read-only no Supabase DEV confirmou 5 Contacts criados, todos com `accountId` da respectiva Account Canopi, e 0 órfãos. O log foi verificado dentro do contrato id `4f43fb33...`. Resultado: `createdCount = 5`, `updatedCount = 0`, `skippedCount = 0`, `errorCount = 0`, `outcome = synced`.
+- **Validações técnicas:** `npm run build:safe` = 0; `npm run lint` OK. Nenhum código de validação foi deixado na árvore de trabalho (`audit_c49.cjs` limpo e removido).
+- **Limites confirmados:**
+  - C4.9 apenas grava Contacts com whitelist absoluta; nenhuma Account foi alterada e o contrato manteve seu status de origem.
+  - O sourceContactId fica isolado no log (Canopi gera seu próprio UUID interno).
+  - Opportunity não foi implementada.
+  - Writeback, Bulk API e migrations/alterações de schema ficaram fora do escopo.
+- **Próximo passo sugerido:** Avaliar o próximo recorte Salesforce com foco em Opportunity, mantendo a leitura relacional Account → Contact → Opportunity, sem writeback, Bulk API ou alteração de schema sem decisão explícita.
+
+---
+
 ## [2026-05-06] — Salesforce C4.8 (preview read-only de Contacts e Buying Committee)
 
 - **Natureza:** Implementação técnica e desvinculação de UX do preview de relacionamentos Contact → Account; validado visualmente no browser.

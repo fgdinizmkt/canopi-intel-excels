@@ -88,6 +88,25 @@ Pendências futuras (fora do escopo atual):
 
 ---
 
+### MARCO: Salesforce C4.9 — Sync persistente controlado de Contacts — 2026-05-06
+
+**Status: Concluído e Saneado (Commit `568aaa2`)**
+
+- **Natureza:** Primeira escrita real e controlada de dados de Contacts do Salesforce na tabela `contacts` da Canopi.
+- **Escopo Técnico:**
+  - **Repository Layer:** Implementado `syncContactFromCRM` com whitelist absoluta (id, accountId, accountName, nome, cargo, area, status).
+  - **Proteção Estratégica:** Em atualizações, campos estratégicos (classificacao, forcaRelacional, influencia, etc.) não são sobrescritos. Em criações, defaults mínimos são gerados apenas por exigência de schema, sem assumir inteligência relacional prévia.
+  - **Dedupe Robusto e Zero Órfãos:** Contatos sem Account vinculada e resolvida são bloqueados. Reutilizado o `accountIdLookup` do C4.8 (via log do C4.7) para evitar órfãos. Dedupe intra-execução via memória (por `accountId` + `nome`).
+  - **Log de Execução:** Registro detalhado de `contact_sync_summary_log` inserido no `contract_json` do próprio contrato, preservando histórico de sucesso, updates, e skips.
+- **UX/UI:** Adicionado o bloco técnico de execução (`ContactSyncExecutePanel`) validado e documentado visivelmente aos usuários sobre os guardrails aplicados e outcome do sync.
+- **Guardrails e Limites Confirmados:**
+  - `sourceContactId` fica apenas no log. O ID Canopi é gerado internamente.
+  - Nenhuma Account foi alterada. O contrato manteve seu status de origem.
+  - Sem implementações de Opportunity, writeback, ou Bulk API.
+  - Sem alteração no schema ou migrations necessárias.
+
+---
+
 ### MARCO: Salesforce C4.8 — Preview read-only de Contacts e Buying Committee — 2026-05-06
 
 **Status: Concluído e Validado Visualmente (Commit `485b092`)**
