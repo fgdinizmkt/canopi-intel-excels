@@ -88,6 +88,25 @@ Pendências futuras (fora do escopo atual):
 
 ---
 
+### MARCO: Salesforce C4.8 — Preview read-only de Contacts e Buying Committee — 2026-05-06
+
+**Status: Concluído e Validado Visualmente (Commit `485b092`)**
+
+- **Natureza:** Preview read-only autônomo de relacionamentos Contact → Account.
+- **Escopo Técnico:**
+  - **Service:** Adicionada `getEligibleSalesforceContactPreviewContracts` (GET) para listar contratos existentes que já possuam status `mapped` ou `synced` e incluam Contacts.
+  - **Identificação de Vínculos:** Mantida a lógica read-only do `accountIdLookup` baseada no `sync_summary_log` dos contratos de Account do C4.7.
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/contact-preview` (GET/POST) estabilizada sem duplicação de handlers.
+  - **Independência:** O preview de Contacts foi desvinculado do fluxo linear de Account; não é mais necessário executar um sync ou mapeamento ativo na sessão para acessá-lo.
+- **UX/UI:** O painel C4.8 renderiza de forma independente quando o OAuth está ativo. Foi implementado o modo "Discovery" para listar contratos disponíveis antes de acionar a carga do preview.
+- **Guardrails e Limites Confirmados:**
+  - Estritamente read-only: nenhum Contact ou Account foi gravado.
+  - Nenhum endpoint de `sync-execute` foi chamado.
+  - Sem alteração de schema, migrations ou writeback.
+  - O sync persistente de Contacts não foi incluído neste recorte.
+
+---
+
 ### MARCO: Salesforce C4.7 — Sync persistente controlado de Accounts — 2026-05-05
 
 **Status: Concluído e Saneado (Commit `0ed2a26`)**

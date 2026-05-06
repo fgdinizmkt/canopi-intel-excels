@@ -3,6 +3,25 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-06] — Salesforce C4.8 (preview read-only de Contacts e Buying Committee)
+
+- **Natureza:** Implementação técnica e desvinculação de UX do preview de relacionamentos Contact → Account; validado visualmente no browser.
+- **Objetivo:** Adicionar capacidade de visualizar o impacto de Contacts e seu vínculo com as Accounts da Canopi usando contratos existentes, preparando o buying committee sem exigir um novo fluxo de sincronização de Account.
+- **Commit local:** `485b092` — `feat(settings): add Salesforce Contact relationship preview`
+- **O que foi materializado:**
+  - **Service (`getEligibleSalesforceContactPreviewContracts`):** Função de backend para listar, com segurança read-only, contratos Salesforce elegíveis (com status `mapped` ou `synced` e com registros de Contact).
+  - **Rota API:** Refatoração de `/api/account-connectors/salesforce/oauth/contact-preview/route.ts` adicionando endpoint `GET` (para contratos) e corrigindo conflitos/duplicação no `POST`. A rota POST agora exige o envio de `contractId` explícito.
+  - **UX Independente:** Refatoração do painel no componente `SalesforceMultiEntityPreview.tsx`. O bloco agora renderiza baseado puramente em `oauthConnected`, contendo uma sub-fase para escolher contratos (Discovery).
+  - **Guardrails:** Adicionados textos na UI explicitando a natureza read-only e o lookup baseado em syncs anteriores.
+- **Validação manual:** O painel apareceu sem refazer o fluxo Account. A lista de contratos carregou, um contrato foi selecionado, e o preview retornou 5 contatos (5 resolvidos, 0 sem Account). Nenhuma gravação indesejada ocorreu.
+- **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (Build Exit 0) após correção de narrowing TypeScript de tipos literais.
+- **Limites confirmados:**
+  - O C4.8 é read-only; ainda não é o sync persistente de Contacts.
+  - A resolução de vínculos depende dos logs de Account do C4.7.
+  - Opportunity ficou fora do escopo.
+  - Sem bulk API, schema novo ou writeback.
+- **Próximo passo sugerido:** Avaliar o sync persistente controlado de Contacts, mantendo os mesmos guardrails de vínculo Account → Contact, whitelist de campos, logs de execução e proteção contra contatos órfãos.
+
 ---
 
 ## [2026-05-05] — Salesforce C4.7 (sync persistente controlado)
