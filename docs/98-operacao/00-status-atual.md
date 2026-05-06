@@ -82,9 +82,30 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Account canonical mapping (C4.5) concluído localmente em `7b55192`
 - Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
 - Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
+- Preview read-only de Opportunities e Pipeline Salesforce (C4.10) concluído localmente em `bfd7d0a`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
+
+---
+
+### MARCO: Salesforce C4.10 — Preview read-only de Opportunities e Pipeline — 2026-05-06
+
+**Status: Concluído e Auditado (Commit `bfd7d0a`)**
+
+- **Natureza:** Preview read-only autônomo de relacionamentos Opportunity → Account. Não é sync persistente.
+- **Escopo Técnico:**
+  - **Service:** Adicionadas `getEligibleSalesforceOpportunityPreviewContracts` (GET) e `generateOpportunityRelationshipPreview` (POST) em `salesforceOAuthService.ts`.
+  - **Resolução de Vínculo Account:** Reutilizado `buildAccountIdLookup()` para mapear `AccountId` Salesforce → Conta Canopi via `sync_summary_log` dos contratos de Account (C4.7).
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-preview` (GET/POST) com `contractId` obrigatório e sem fallback automático.
+  - **Independência:** O painel de Opportunity renderiza de forma independente de Account sync e Contact preview; basta OAuth ativo.
+- **UX/UI:** `OpportunityPreviewPanel` com labels descritivos por status (`ready_to_create`, `ready_to_update`, `unresolved_account`, `missing_required_fields`) e indicador explícito de lacuna `contactRoleLacuna`.
+- **Validação manual:** 5 Opportunities testadas — 2 resolvidas, 3 `unresolved_account`, 0 `missing_required_fields`. Nenhuma gravação indesejada ocorreu.
+- **Guardrails e Limites Confirmados:**
+  - Estritamente read-only: nenhuma Opportunity, Contact ou Account foi gravada.
+  - `contractId` obrigatório na rota POST; nenhum fallback automático é permitido.
+  - Vínculo Opportunity → Contact não inferido (OpportunityContactRole fora do escopo).
+  - Sem bulk API, writeback, schema novo ou migrations.
 
 ---
 

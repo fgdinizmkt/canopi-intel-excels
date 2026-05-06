@@ -3,6 +3,27 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-06] — Salesforce C4.10 (Preview read-only de Opportunities e Pipeline)
+
+- **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Canopi.
+- **Objetivo:** Visualizar o impacto de importação de Opportunities do Salesforce antes de qualquer sync, identificando quais têm Account resolvida na Canopi e quais ficam sem destino (unresolved).
+- **Commit local:** `bfd7d0a` — `feat(settings): add Salesforce Opportunity relationship preview`
+- **O que foi materializado:**
+  - **Service (`getEligibleSalesforceOpportunityPreviewContracts`):** Lista contratos com status `mapped` ou `synced` contendo Opportunities, com flag `hasAccountLookupSource` indicando se há contrato de Account synced disponível para lookup.
+  - **Service (`generateOpportunityRelationshipPreview`):** Lê contrato do banco, invoca `buildAccountIdLookup()` para resolver `AccountId` Salesforce → Conta Canopi via `sync_summary_log` dos contratos de Account (C4.7). Classifica cada Opportunity por `actionPreview` (`ready_to_create`, `ready_to_update`, `unresolved_account`, `missing_required_fields`). Sempre retorna `contactRoleLacuna: true` — vínculo Opportunity → Contact não é inferível sem OpportunityContactRole.
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-preview` (GET + POST); `contractId` obrigatório no POST, sem fallback automático.
+  - **Componente (`OpportunityPreviewPanel`):** Renderiza contadores, label descritivo por status e aviso explícito sobre lacuna de Contact. Painel independente de Account sync e Contact preview.
+- **Validação manual:** 5 Opportunities testadas — 2 resolvidas, 3 `unresolved_account`, 0 `missing_required_fields`. Nenhuma gravação indesejada ocorreu.
+- **Validações técnicas:** `git diff --check` limpo; `npm run lint` OK; `npm run build:safe` Exit 0. Exatamente 3 arquivos alterados/criados (`salesforceOAuthService.ts`, `SalesforceMultiEntityPreview.tsx`, `opportunity-preview/route.ts`).
+- **Limites confirmados:**
+  - C4.10 é estritamente read-only; não é sync persistente de Opportunities.
+  - Vínculo Opportunity → Contact não inferido (OpportunityContactRole fora do escopo).
+  - Sem bulk API, writeback, schema novo ou migrations.
+  - A resolução de Account depende dos logs de sync do C4.7.
+- **Próximo passo sugerido:** Avaliar sync persistente controlado de Opportunities, mantendo os mesmos guardrails de vínculo Account e whitelist de campos.
+
+---
+
 ## [2026-05-06] — Salesforce C4.9 (Sync persistente controlado de Contacts)
 
 - **Natureza:** Implementação técnica e execução real de sync validada e saneada.
