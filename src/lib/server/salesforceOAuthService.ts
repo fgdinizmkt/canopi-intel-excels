@@ -2027,6 +2027,252 @@ export async function executeAccountSync(contractId: string): Promise<SyncExecut
   };
 }
 
+// ─── Contact Relationship Preview (C4.8) ─────────────────────────────────────
+
+export type ContactActionPreview =
+  | 'ready_to_create'
+  | 'ready_to_update'
+  | 'unresolved_account'
+  | 'missing_required_fields';
+
+export interface ContactRelationshipPreviewItem {
+  sourceContactId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  email: string;
+  cargo: string;
+  area: string;
+  actionPreview: ContactActionPreview;
+  warnings: string[];
+}
+
+export interface ContactRelationshipPreviewResult {
+  contractId: string;
+  totalContacts: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  items: ContactRelationshipPreviewItem[];
+}
+
+/**
+ * Monta lookup Salesforce AccountId → Canopi accountId a partir dos
+ * sync_summary_log de contratos Account já sincronizados (C4.7).
+ * Fonte canônica: createdRecords e updatedRecords do log, onde
+ * sourceExternalId = SF AccountId e canopiId = UUID interno Canopi.
+ */
+async function buildAccountIdLookup(
+  supabase: ReturnType<typeof getSupabaseAdminClient>,
+): Promise<Map<string, { canopiId: string; nome: string }>> {
+  const lookup = new Map<string, { canopiId: string; nome: string }>();
+
+  const { data: contracts } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('contract_json')
+    .eq('provider', SALESFORCE_PROVIDER)
+    .eq('status', 'synced');
+
+  for (const c of contracts ?? []) {
+    const ssl = c.contract_json?.sync_summary_log;
+    if (!ssl) continue;
+    for (const rec of [...(ssl.createdRecords ?? []), ...(ssl.updatedRecords ?? [])]) {
+      const sfId: string = rec.sourceExternalId ?? '';
+      const canopiId: string = rec.canopiId ?? '';
+      const nome: string = rec.nome ?? '';
+      if (sfId && canopiId && !lookup.has(sfId)) {
+        lookup.set(sfId, { canopiId, nome });
+      }
+    }
+  }
+
+  return lookup;
+}
+
+/**
+ * Preview read-only de Contacts Salesforce → Canopi com resolução de vínculo Account.
+ *
+ * Guardrails:
+ * - Não grava em contacts.
+ * - Não altera accounts.
+ * - Não altera status do contrato.
+ * - Não cria sync_summary_log de Contacts.
+ * - Contact sem accountId Canopi resolvido = unresolved_account.
+ */
+export async function generateContactRelationshipPreview(
+  contractId: string,
+): Promise<ContactRelationshipPreviewResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const supabase = getSupabaseAdminClient();
+
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+  if (row.status !== 'mapped' && row.status !== 'synced') {
+    throw new Error('CONTRACT_NOT_MAPPED');
+  }
+
+  const contractJson = row.contract_json;
+  const entities: any[] = Array.isArray(contractJson?.entities) ? contractJson.entities : [];
+
+  const contactEntity = entities.find((e: any) => e.objectApiName === 'Contact');
+  const sfContacts = (contactEntity?.selectedRecords ?? []) as any[];
+
+  if (sfContacts.length === 0) {
+    throw new Error('NO_CONTACTS_IN_CONTRACT');
+  }
+
+  // Lookup SF AccountId → Canopi accountId via sync_summary_log de contratos Account
+  const accountIdLookup = await buildAccountIdLookup(supabase);
+
+  const items: ContactRelationshipPreviewItem[] = [];
+
+  for (const sfCon of sfContacts) {
+    const sourceContactId = readSfField(sfCon, 'Id') || String(sfCon['id'] ?? '');
+    const sourceAccountId = readSfField(sfCon, 'AccountId');
+    const nome = (readSfField(sfCon, 'Name') || String(sfCon['displayName'] ?? '')).trim();
+    const email = readSfField(sfCon, 'Email').trim();
+    const cargo = readSfField(sfCon, 'Title').trim();
+    const area = readSfField(sfCon, 'Department').trim();
+
+    const warnings: string[] = [];
+    let actionPreview: ContactActionPreview;
+
+    // Campos mínimos obrigatórios: nome
+    if (!nome) {
+      items.push({
+        sourceContactId,
+        sourceAccountId,
+        resolvedCanopiAccountId: null,
+        resolvedAccountName: null,
+        nome,
+        email,
+        cargo,
+        area,
+        actionPreview: 'missing_required_fields',
+        warnings: ['Nome ausente — contato não pode ser criado sem identificação.'],
+      });
+      continue;
+    }
+
+    // Resolver vínculo Account
+    const resolved = sourceAccountId ? accountIdLookup.get(sourceAccountId) ?? null : null;
+
+    if (!resolved) {
+      warnings.push(
+        sourceAccountId
+          ? `Salesforce AccountId "${sourceAccountId}" não encontrado nos contratos Account sincronizados.`
+          : 'AccountId ausente no registro Salesforce.',
+      );
+      actionPreview = 'unresolved_account';
+    } else {
+      // Verificar se já existe contato com esse sourceContactId (sem escrita — apenas check)
+      actionPreview = 'ready_to_create';
+    }
+
+    if (!email) warnings.push('E-mail ausente — contato será criado sem e-mail.');
+
+    items.push({
+      sourceContactId,
+      sourceAccountId,
+      resolvedCanopiAccountId: resolved?.canopiId ?? null,
+      resolvedAccountName: resolved?.nome ?? null,
+      nome,
+      email,
+      cargo,
+      area,
+      actionPreview,
+      warnings,
+    });
+  }
+
+  const resolvedCount = items.filter(
+    (i) => i.actionPreview === 'ready_to_create' || i.actionPreview === 'ready_to_update',
+  ).length;
+  const unresolvedCount = items.filter((i) => i.actionPreview === 'unresolved_account').length;
+  const missingFieldsCount = items.filter((i) => i.actionPreview === 'missing_required_fields').length;
+
+  return {
+    contractId,
+    totalContacts: items.length,
+    resolvedCount,
+    unresolvedCount,
+    missingFieldsCount,
+    items,
+  };
+}
+
+// ─── Eligible Contracts for Contact Preview (C4.8) ───────────────────────────
+
+export interface EligibleContactPreviewContract {
+  id: string;
+  status: 'mapped' | 'synced';
+  createdAt: string;
+  contactCount: number;
+  hasCanonicalMapping: boolean;
+  hasAccountLookupSource: boolean;
+}
+
+/**
+ * Lista contratos Salesforce elegíveis para preview de Contacts.
+ *
+ * Guardrails:
+ * - Read-only. Não altera nenhum dado.
+ * - Filtra apenas contratos com entity Contact e selectedRecords.length > 0.
+ * - Retorna apenas contratos com status mapped ou synced.
+ * - hasAccountLookupSource indica se existe ao menos um contrato synced (fonte de lookup de AccountId).
+ */
+export async function getEligibleSalesforceContactPreviewContracts(): Promise<EligibleContactPreviewContract[]> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data: rows, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, status, created_at, contract_json')
+    .eq('provider', SALESFORCE_PROVIDER)
+    .in('status', ['mapped', 'synced'])
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error('READ_CONTRACTS_FAILED');
+
+  // Verificar se existe ao menos um contrato synced para gerar lookup de AccountId
+  const hasSyncedAccountContract = (rows ?? []).some((r: any) => r.status === 'synced');
+
+  const result: EligibleContactPreviewContract[] = [];
+
+  for (const row of rows ?? []) {
+    const entities: any[] = Array.isArray(row.contract_json?.entities) ? row.contract_json.entities : [];
+    const contactEntity = entities.find((e: any) => e.objectApiName === 'Contact');
+    const contactCount = (contactEntity?.selectedRecords ?? []).length;
+
+    if (contactCount === 0) continue;
+
+    const hasCanonicalMapping = !!(row.contract_json?.canonicalMapping?.fieldMap);
+
+    result.push({
+      id: row.id,
+      status: row.status as 'mapped' | 'synced',
+      createdAt: row.created_at,
+      contactCount,
+      hasCanonicalMapping,
+      hasAccountLookupSource: hasSyncedAccountContract,
+    });
+  }
+
+  return result;
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {

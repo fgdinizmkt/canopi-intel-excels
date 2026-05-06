@@ -163,6 +163,51 @@ type CanonicalMappingState =
   | { phase: 'done'; updatedAt: string }
   | { phase: 'error'; message: string };
 
+// ─── Contact Relationship Preview (C4.8) ──────────────────────────────────────
+
+interface EligibleContactPreviewContract {
+  id: string;
+  status: 'mapped' | 'synced';
+  createdAt: string;
+  contactCount: number;
+  hasCanonicalMapping: boolean;
+  hasAccountLookupSource: boolean;
+}
+
+type EligibleContractsState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contracts: EligibleContactPreviewContract[] }
+  | { phase: 'error'; message: string };
+
+type ContactPreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: ContactRelationshipPreviewResult }
+  | { phase: 'error'; message: string };
+
+interface ContactRelationshipPreviewItem {
+  sourceContactId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  email: string;
+  cargo: string;
+  area: string;
+  actionPreview: 'ready_to_create' | 'ready_to_update' | 'unresolved_account' | 'missing_required_fields';
+  warnings: string[];
+}
+
+interface ContactRelationshipPreviewResult {
+  contractId: string;
+  totalContacts: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  items: ContactRelationshipPreviewItem[];
+}
+
 const ENTITY_ORDER = ['Account', 'Contact', 'Opportunity', 'Lead', 'Campaign'];
 
 const STATUS_STYLES: Record<EligibilityStatus, { row: string; badge: string; label: string }> = {
@@ -1109,6 +1154,12 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const [syncExecuteState, setSyncExecuteState] = useState<SyncExecuteState>({ phase: 'idle' });
   const syncExecutePanelRef = useRef<HTMLDivElement>(null);
 
+  // C4.8 — painel independente de contratos elegíveis + preview de Contacts
+  const [eligibleContractsState, setEligibleContractsState] = useState<EligibleContractsState>({ phase: 'idle' });
+  const [selectedContractId, setSelectedContractId] = useState<string>('');
+  const [contactPreviewState, setContactPreviewState] = useState<ContactPreviewState>({ phase: 'idle' });
+  const contactPreviewPanelRef = useRef<HTMLDivElement>(null);
+
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
     setSyncContractState({ phase: 'loading' });
@@ -1186,6 +1237,56 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
       }, 100);
     } catch {
       setSyncPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview.' });
+    }
+  }
+
+  async function handleLoadEligibleContracts() {
+    if (!oauthConnected) return;
+    setEligibleContractsState({ phase: 'loading' });
+    setContactPreviewState({ phase: 'idle' });
+    setSelectedContractId('');
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/contact-preview', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; contracts?: EligibleContactPreviewContract[]; error?: string };
+      if (!res.ok || data.status !== 'success') {
+        setEligibleContractsState({ phase: 'error', message: data.error ?? 'Não foi possível carregar contratos elegíveis.' });
+        return;
+      }
+      setEligibleContractsState({ phase: 'done', contracts: data.contracts ?? [] });
+      // Pré-selecionar o primeiro contrato se houver apenas um
+      if ((data.contracts ?? []).length === 1) {
+        setSelectedContractId(data.contracts![0].id);
+      }
+    } catch {
+      setEligibleContractsState({ phase: 'error', message: 'Não foi possível carregar contratos elegíveis.' });
+    }
+  }
+
+  async function handleLoadContactPreview() {
+    const contractId = selectedContractId;
+    if (!contractId) return;
+    setContactPreviewState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/contact-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; preview?: ContactRelationshipPreviewResult; error?: string };
+      if (!res.ok || data.status !== 'success' || !data.preview) {
+        setContactPreviewState({ phase: 'error', message: data.error ?? 'Não foi possível carregar o preview de Contacts.' });
+        return;
+      }
+      setContactPreviewState({ phase: 'done', result: data.preview });
+      setTimeout(() => {
+        contactPreviewPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } catch {
+      setContactPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview de Contacts.' });
     }
   }
 
@@ -1706,6 +1807,182 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
               <SyncExecutePanel result={syncExecuteState.result} />
             </div>
           )}
+
+        </div>
+      )}
+
+      {/* ── C4.8 — Preview de Contacts e Buying Committee ────────────────────────
+           Painel independente do fluxo de Account.
+           Aparece quando OAuth está conectado, usando contratos Salesforce já existentes.
+           Não depende de syncContractState, syncExecuteState, syncPreviewState
+           ou canonicalMappingState da sessão atual. */}
+      {oauthConnected && (
+        <div className="mt-6 rounded-2xl border-2 border-indigo-200 bg-white p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-black text-indigo-900">Preview de Contacts e Buying Committee</p>
+                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  <ShieldCheck className="h-3 w-3" />
+                  Read-Only
+                </span>
+              </div>
+              <p className="text-xs font-medium text-slate-600">
+                Use contratos Salesforce já salvos para validar vínculos Contact → Account Canopi sem executar sync.
+              </p>
+            </div>
+            {eligibleContractsState.phase !== 'loading' && contactPreviewState.phase === 'idle' && (
+              <button
+                type="button"
+                onClick={handleLoadEligibleContracts}
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-xs font-black text-white hover:bg-indigo-800 active:scale-95 transition-transform"
+              >
+                Carregar contratos de Contacts disponíveis
+              </button>
+            )}
+          </div>
+
+          {/* Guardrails sempre visíveis */}
+          <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-indigo-600">
+            <li>🔍 Nenhum contato será gravado nesta etapa.</li>
+            <li>🔄 Não é necessário executar novamente o sync de Account.</li>
+            <li>🔗 Contacts sem Account resolvida serão marcados como unresolved_account.</li>
+            <li>📋 Este preview prepara buying committee e relacionamento por conta para ABM/ABX.</li>
+          </ul>
+
+          {/* Estado: carregando contratos */}
+          {eligibleContractsState.phase === 'loading' && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+              <p className="text-xs font-bold text-indigo-700">Buscando contratos elegíveis…</p>
+            </div>
+          )}
+
+          {/* Estado: erro ao carregar contratos */}
+          {eligibleContractsState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <p className="text-xs font-black text-red-800">Erro ao carregar contratos</p>
+              <p className="mt-1 text-[10px] font-medium text-red-700">{eligibleContractsState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadEligibleContracts}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: contratos carregados — nenhum elegível */}
+          {eligibleContractsState.phase === 'done' && eligibleContractsState.contracts.length === 0 && (
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p className="text-xs font-black text-amber-800">Nenhum contrato elegível encontrado</p>
+              <p className="mt-1 text-[10px] font-medium text-amber-700">
+                Nenhum contrato Salesforce com Contacts selecionados e status <span className="font-black">mapped</span> ou <span className="font-black">synced</span> foi encontrado.
+                Complete ao menos o fluxo de mapeamento de Account para habilitar o preview de Contacts.
+              </p>
+            </div>
+          )}
+
+          {/* Estado: contratos carregados — seleção */}
+          {eligibleContractsState.phase === 'done' && eligibleContractsState.contracts.length > 0 && contactPreviewState.phase === 'idle' && (
+            <div className="mt-4 space-y-3">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                {eligibleContractsState.contracts.length} contrato{eligibleContractsState.contracts.length > 1 ? 's' : ''} disponível{eligibleContractsState.contracts.length > 1 ? 'is' : ''}
+              </p>
+              <div className="space-y-2">
+                {eligibleContractsState.contracts.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedContractId(c.id)}
+                    className={`w-full rounded-xl border px-4 py-3 text-left transition-all ${
+                      selectedContractId === c.id
+                        ? 'border-indigo-400 bg-indigo-50 shadow-sm'
+                        : 'border-slate-200 bg-slate-50 hover:border-indigo-200 hover:bg-indigo-50/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-black text-slate-800 font-mono">{c.id.slice(0, 8)}…</span>
+                          <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${
+                            c.status === 'synced' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                          }`}>{c.status}</span>
+                          {c.hasAccountLookupSource && (
+                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">
+                              lookup ativo
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] font-medium text-slate-500">
+                          {c.contactCount} contact{c.contactCount > 1 ? 's' : ''} · criado em {formatDate(c.createdAt)}
+                        </p>
+                      </div>
+                      {selectedContractId === c.id && (
+                        <CheckCircle2 className="h-4 w-4 text-indigo-600 shrink-0" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {!eligibleContractsState.contracts.some((c) => c.hasAccountLookupSource) && (
+                <p className="text-[10px] font-medium text-amber-700 bg-amber-50 rounded-lg px-3 py-2 border border-amber-200">
+                  ⚠ Nenhum contrato de Account com status <span className="font-black">synced</span> encontrado.
+                  O preview de Contacts pode ter todos os registros como <span className="font-black">unresolved_account</span>.
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={handleLoadContactPreview}
+                disabled={!selectedContractId}
+                className="mt-2 rounded-xl bg-indigo-700 px-5 py-2.5 text-xs font-black text-white shadow hover:bg-indigo-800 active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+              >
+                Carregar preview de Contacts
+              </button>
+            </div>
+          )}
+
+          {/* Estado: carregando preview */}
+          {contactPreviewState.phase === 'loading' && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+              <p className="text-xs font-bold text-slate-600">Resolvendo vínculos Account → Contact…</p>
+            </div>
+          )}
+
+          {/* Estado: erro no preview */}
+          {contactPreviewState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <p className="text-xs font-black text-red-800">Erro no preview de Contacts</p>
+              <p className="mt-1 text-[10px] font-medium text-red-700">{contactPreviewState.message}</p>
+              <button
+                type="button"
+                onClick={() => { setContactPreviewState({ phase: 'idle' }); }}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: preview pronto */}
+          {contactPreviewState.phase === 'done' && (
+            <div ref={contactPreviewPanelRef} className="mt-4 scroll-mt-4">
+              <ContactPreviewPanel result={contactPreviewState.result} />
+              <button
+                type="button"
+                onClick={() => {
+                  setContactPreviewState({ phase: 'idle' });
+                  setEligibleContractsState({ phase: 'idle' });
+                  setSelectedContractId('');
+                }}
+                className="mt-3 text-xs font-bold text-indigo-700 underline underline-offset-4"
+              >
+                ← Carregar outro contrato
+              </button>
+            </div>
+          )}
         </div>
       )}
     </Card>
@@ -1965,6 +2242,137 @@ function SyncExecutePanel({ result }: { result: any }) {
           <li>Nenhuma Bulk API foi utilizada.</li>
           <li>Log de execução registrado no contrato.</li>
         </ul>
+      </div>
+    </div>
+  );
+}
+
+// ─── ContactPreviewPanel (C4.8) ───────────────────────────────────────────────
+
+const ACTION_LABELS: Record<string, { label: string; color: string }> = {
+  ready_to_create:         { label: 'Pronto para criar',    color: 'text-emerald-700 bg-emerald-50' },
+  ready_to_update:         { label: 'Pronto para atualizar', color: 'text-blue-700 bg-blue-50' },
+  unresolved_account:      { label: 'Account não resolvida', color: 'text-amber-700 bg-amber-50' },
+  missing_required_fields: { label: 'Campos obrigatórios ausentes', color: 'text-red-700 bg-red-50' },
+};
+
+function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewResult }) {
+  const { totalContacts, resolvedCount, unresolvedCount, missingFieldsCount, items } = result;
+
+  return (
+    <div className="rounded-2xl border-2 border-indigo-700 bg-white p-5 shadow-xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-0.5">
+          <p className="text-base font-black text-slate-900">Preview de Contacts e Buying Committee</p>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="h-3 w-3" />
+              Read-Only
+            </span>
+            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+              Salesforce → Canopi
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[56px]">
+            <p className="text-[10px] font-black text-slate-700">{totalContacts}</p>
+            <p className="text-[8px] font-bold uppercase text-slate-400">Total</p>
+          </div>
+          <div className="flex flex-col items-center rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1.5 min-w-[56px]">
+            <p className="text-[10px] font-black text-emerald-700">{resolvedCount}</p>
+            <p className="text-[8px] font-bold uppercase text-emerald-500">Resolvidos</p>
+          </div>
+          <div className="flex flex-col items-center rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 min-w-[56px]">
+            <p className="text-[10px] font-black text-amber-700">{unresolvedCount}</p>
+            <p className="text-[8px] font-bold uppercase text-amber-500">S/ Account</p>
+          </div>
+          {missingFieldsCount > 0 && (
+            <div className="flex flex-col items-center rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 min-w-[56px]">
+              <p className="text-[10px] font-black text-red-700">{missingFieldsCount}</p>
+              <p className="text-[8px] font-bold uppercase text-red-500">Incompletos</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-slate-500">
+        <li>🔍 Nenhum contato será gravado nesta etapa.</li>
+        <li>🔗 Contacts sem Account resolvida serão ignorados.</li>
+        <li>📋 Este preview prepara a cobertura de buying committee para ABM/ABX.</li>
+      </ul>
+
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full text-[10px]">
+          <thead>
+            <tr className="border-b border-slate-100">
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Contact SF</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">E-mail</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Cargo / Área</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">SF AccountId</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Canopi</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Ação prevista</th>
+              <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Avisos</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {items.map((item, i) => {
+              const action = ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+              return (
+                <tr key={i} className="hover:bg-slate-50/50">
+                  <td className="py-2 pr-3 font-medium text-slate-800 whitespace-nowrap">
+                    {item.nome || '—'}
+                    {item.sourceContactId && (
+                      <span className="ml-1 text-slate-300 font-normal">{item.sourceContactId.slice(0, 8)}…</span>
+                    )}
+                  </td>
+                  <td className="py-2 pr-3 text-slate-600">{item.email || <span className="text-slate-300">—</span>}</td>
+                  <td className="py-2 pr-3 text-slate-600">
+                    {item.cargo && <span>{item.cargo}</span>}
+                    {item.cargo && item.area && <span className="text-slate-300"> / </span>}
+                    {item.area && <span className="text-slate-400">{item.area}</span>}
+                    {!item.cargo && !item.area && <span className="text-slate-300">—</span>}
+                  </td>
+                  <td className="py-2 pr-3 font-mono text-slate-400">
+                    {item.sourceAccountId ? item.sourceAccountId.slice(0, 10) + '…' : <span className="text-red-300">ausente</span>}
+                  </td>
+                  <td className="py-2 pr-3 font-medium text-slate-700">
+                    {item.resolvedAccountName ?? <span className="text-amber-400 font-bold">não resolvida</span>}
+                  </td>
+                  <td className="py-2 pr-3 whitespace-nowrap">
+                    <span className={`rounded-full px-2 py-0.5 font-black text-[9px] uppercase ${action.color}`}>
+                      {action.label}
+                    </span>
+                  </td>
+                  <td className="py-2 text-slate-400">
+                    {item.warnings.length > 0 ? (
+                      <ul className="space-y-0.5">
+                        {item.warnings.map((w, j) => (
+                          <li key={j} className="flex items-start gap-1">
+                            <AlertTriangle className="h-2.5 w-2.5 text-amber-400 mt-0.5 shrink-0" />
+                            {w}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-emerald-400">—</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+        <p className="text-[10px] font-black text-indigo-700 uppercase tracking-wide">Sobre este preview</p>
+        <p className="mt-1 text-[10px] font-medium text-indigo-600">
+          O vínculo Account é resolvido via{' '}
+          <span className="font-black">sync_summary_log</span> dos contratos Account sincronizados no C4.7.
+          Cada registro de Contact com Salesforce AccountId não mapeado permanece como{' '}
+          <span className="font-black">unresolved_account</span> e não será criado na Canopi.
+        </p>
       </div>
     </div>
   );
