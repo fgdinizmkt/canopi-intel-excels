@@ -26,7 +26,19 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Sem writeback** para o Salesforce.
   - **Sem Bulk API**.
   - **UX Técnica:** Mantida a interface assistida para controle de engenharia.
-- **Próximo passo sugerido:** Expandir o sync persistente para Contact e Opportunity (C4.8).
+- **Próximo passo sugerido:** Expandir o sync persistente para Contact (C4.8).
+
+---
+
+## [2026-05-05] — Decisões Estratégicas Pós-Salesforce C4.7
+
+- **Natureza:** Formalização de diretrizes de produto e arquitetura para os próximos recortes.
+- **ABM/ABX como Lente:** O conector Salesforce (e futuros) deve alimentar o modelo canônico da Canopi para servir tanto à prospecção (ABM) quanto à expansão/retenção (ABX). Account, Contact e Opportunity são os pilares essenciais desta visão.
+- **Escalabilidade de Fluxo:** 
+  - **Inbound:** Foco atual (CRM → Canopi).
+  - **Outbound (Writeback):** Planejado para fase posterior, devolvendo ao CRM decisões, sinais, recomendações e segmentação ABM/ABX. Exige consolidação de entidades e auditoria rigorosa.
+- **Evolução da UX:** A interface atual (técnica/assistida) será simplificada para o usuário final SaaS, mantendo os detalhes técnicos (contratos, logs, dry-runs) em um "Modo Avançado". O fluxo padrão será guiado: Conectar → Escolher → Validar → Impacto → Aprovar → Acompanhar.
+- **Impacto:** Estas decisões balizam o desenvolvimento do C4.8 (Contacts, buying committee e relacionamento por conta) e a padronização dos demais conectores, como HubSpot e futuros CRMs.
 
 ---
 

@@ -34,18 +34,36 @@ Não fechado neste marco:
 - uso de mapeamento em sync real para demais entidades Salesforce
 - Salesforce Connector completo
 
-## Decisões Estratégicas de UX (Maio 2026)
+## Decisões Estratégicas de Produto e UX (Maio 2026)
 
-### 1. Conectores CRM: Experiência Técnica vs. Produto Final
-- **Estado Atual:** A interface de Salesforce/CRM Connectors é uma experiência operacional, técnica e assistida.
-- **Propósito Atual:** Validar OAuth, preview, contrato, dry-run, mapeamento, preview read-only e guardrails de segurança.
-- **UX de Produto SaaS:** A interface atual NÃO representa o fluxo final para o usuário B2B.
-- **Visão Futura:** O produto final terá um fluxo guiado e simplificado: Conectar CRM -> Selecionar objeto -> Confirmar mapeamento sugerido -> Ver resumo de impacto -> Aprovar sincronização.
-- **Detalhes Técnicos:** Contratos, payloads, dry-run, logs, mapeamentos e auditorias devem ficar recolhidos em modo avançado, "ver detalhes" ou trilha de auditoria.
-- **Ação:** Manter a densidade técnica atual para garantir robustez e explicabilidade durante a fase de engenharia, sem iniciar redesign estético neste marco.
+### 1. ABM/ABX como lente dos próximos recortes
+- **Visão de Produto:** O conector Salesforce não deve ser tratado apenas como um importador técnico. Ele é o alimentador do modelo canônico da Canopi.
+- **Entidades:** 
+  - **Account:** Alimenta a base de contas, clientes/prospects, segmentação e contexto operacional.
+  - **Contact:** Alimenta o *buying committee*, cobertura relacional e engajamento por conta.
+  - **Opportunity:** Alimenta o pipeline, previsão de expansão, forecast e estágio comercial.
+- **Dualidade ABM/ABX:** A leitura deve servir tanto para a prospecção de contas-alvo (ABM) quanto para a experiência coordenada de retenção e expansão em clientes ativos (ABX).
+
+### 2. Writeback futuro: Canopi → CRM
+- **Fluxo Validado:** Atualmente o foco é 100% *inbound* (Salesforce → Canopi).
+- **Escrita Controlada:** A plataforma deve prever, em fase posterior, o *writeback* controlado.
+- **Payload de Retorno:** A Canopi poderá devolver ao CRM: decisões tomadas, ações recomendadas, sinais detectados, status de priorização, segmentação ABM/ABX e notas de qualificação.
+- **Guardrails:** O *writeback* não será ativado agora. Requer consolidação prévia de todas as entidades e regras de auditoria estritas para evitar corrupção de dados no CRM de origem.
+
+### 3. Conectores CRM: Experiência Técnica vs. Produto Final
+- **Estado Atual:** A interface de Salesforce/CRM Connectors é uma experiência operacional, técnica e assistida, usada para engenharia e validação.
+- **UX de Produto SaaS:** A UX final deve ser simplificada, guiada e reutilizável para todos os conectores (Salesforce, HubSpot, etc).
+- **Fluxo Esperado:** 
+  1. Conectar CRM
+  2. Escolher entidades/objetos
+  3. Validar mapeamento sugerido
+  4. Ver impacto (preview)
+  5. Aprovar sincronização
+  6. Acompanhar logs/auditoria
+- **Modo Avançado:** Detalhes técnicos (contrato, payload, dry-run, mapping detalhado, sync_summary_log) devem ficar recolhidos em modo avançado ou trilha de auditoria.
 
 Pendências futuras (fora do escopo atual):
-- Salesforce sync persistente de Accounts (gravação controlada em Canopi, sem writeback)
+- Salesforce sync persistente para demais entidades, começando por Contacts
 - Mapeamento persistente para demais entidades Salesforce
 - Salesforce Bulk API
 - Salesforce Writeback seguro
