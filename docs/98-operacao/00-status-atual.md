@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local e `origin/main` alinhados no commit documental mais recente. **Salesforce Setup Read-only fechado operacionalmente**; os recortes C3.0, C3.1, C3.2, C3.3, C4.0, C4.1 e C4.2 adicionaram preview read-only de Accounts via OAuth no commit `61f2799`, seleção controlada local para pré-sync read-only no commit `e407cbc`, contrato local de pré-sync read-only no commit `8bf34c2`, dry-run read-only local de Accounts no commit `d665137`, preview read-only multi-entidade no commit `d8bbe2f`, preparação local para sync read-only multi-entidade no commit `e735ccb` e contrato local multi-entidade no commit `fbb765b`, mantendo o estado funcional já fechado: OAuth produtivo, conexão persistida, validação Account/describe, discovery read-only multiobjeto (Account, Contact, Opportunity, Lead, Campaign), CSV por entidade como entrada local e Token temporário como validação pontual. A UI instável introduzida pelos commits `b4beff7` e `6297de5` foi revertida para restaurar estabilidade.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.11 (OpportunityContactRole Preview) implementado e commitado localmente em `cc1dbb4`, com documentação C4.11 consolidada no commit documental atual**; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.10 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, e preview de Opportunities. A implementação C4.11 adiciona a validação relacional explícita Opportunity ↔ Contact via OpportunityContactRole, mantendo o estado funcional estável e read-only.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -21,7 +21,9 @@ Fechado neste marco (Setup Read-only):
 - Dry-run read-only multi-entidade Salesforce (C4.3) concluído localmente em `51d8feb`
 - Persistência de contrato multi-entidade Salesforce (C4.4) concluído localmente em `f6643cd`
 - Mapeamento canônico Salesforce Account -> Canopi (C4.5) concluído localmente em `7b55192`
-- Preview read-only de sincronização de Account Salesforce (C4.6) concluído localmente em `30b9907`
+- Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
+- Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
+- Salesforce OpportunityContactRole Preview (C4.11) concluído localmente em `cc1dbb4`
 
 Não fechado neste marco:
 - sync real
@@ -83,9 +85,29 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
 - Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
 - Preview read-only de Opportunities e Pipeline Salesforce (C4.10) concluído localmente em `bfd7d0a`
+- Salesforce OpportunityContactRole Preview / Readiness Opportunity ↔ Contact (C4.11) concluído localmente em `cc1dbb4`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
+
+---
+
+### MARCO: Salesforce C4.11 — OpportunityContactRole Preview — 2026-05-06
+
+**Status: Implementado e Commitado Localmente (Commit `cc1dbb4`)**
+
+- **Natureza:** Preview read-only de relacionamentos explícitos Opportunity ↔ Contact via OpportunityContactRole.
+- **Objetivo:** Validar o "readiness" relacional para conectar oportunidades aos contatos sincronizados no C4.9, sem gravar vínculos ou alterar dados na Canopi.
+- **Escopo Técnico:**
+  - **Service:** Adicionada `generateOpportunityContactRoleRelationshipPreview` em `salesforceOAuthService.ts`.
+  - **Resolução de Vínculo:** Cruza `OpportunityId` (contrato) + `ContactId` (lookup no `contact_sync_summary_log` do C4.9) + `AccountId` (lookup em contratos de Account C4.7).
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-contact-role-preview` (GET/POST). Exige `contractId` explícito; sem fallback.
+  - **UX/UI:** Novo painel "Readiness Opportunity ↔ Contact" no `SalesforceMultiEntityPreview.tsx`.
+- **Guardrails Confirmados:**
+  - Estritamente read-only: nenhum vínculo, Opportunity ou Contact é gravado ou alterado.
+  - Zero inferência por nome, e-mail ou domínio; apenas IDs explícitos via logs de sync.
+  - Sem writeback, Bulk API, schema novo ou migrations.
+- **Validação Visual:** Aprovada visualmente como aceitável para a fase operacional de setup. Tratamento de estado vazio (sem contratos elegíveis) validado como não fatal.
 
 ---
 

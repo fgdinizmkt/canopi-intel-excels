@@ -3,6 +3,25 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-06] — Salesforce C4.11 (OpportunityContactRole Preview / Readiness Opportunity ↔ Contact)
+
+- **Natureza:** Preview read-only de relacionamentos Opportunity ↔ Contact via OpportunityContactRole.
+- **Objetivo:** Validar visualmente a prontidão relacional (readiness) entre oportunidades e contatos usando dados explícitos do Salesforce, eliminando inferências.
+- **Commit local:** `cc1dbb4` — `feat(settings): add Salesforce OpportunityContactRole preview`
+- **O que foi materializado:**
+  - **Service (`generateOpportunityContactRoleRelationshipPreview`):** Lógica relacional read-only que cruza IDs de OpportunityContactRole com os logs de sincronização de Account (C4.7) e Contact (C4.9).
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-contact-role-preview` (GET + POST); exige `contractId` explícito e opera estritamente em memória.
+  - **UI (`SalesforceMultiEntityPreview`):** Novo painel de Readiness com sumário compacto, tabela de prontidão e guardrails explícitos sobre a natureza read-only.
+- **Comportamento e Guardrails:**
+  - Sem gravação de dados, vínculos ou Opportunities na Canopi.
+  - Sem inferência por nome, e-mail ou domínio.
+  - Reutilização do `contact_sync_summary_log` para resolução de IDs Canopi.
+  - Tratamento de estados de erro/vazio (ex: sem contrato elegível) de forma amigável e não fatal.
+- **Validação:** `npm run lint` OK; `npm run build:safe` Exit 0; validação visual manual aprovada.
+- **Estado atual:** documentação C4.11 já consolidada no commit documental local; pendem apenas `push` e sync Drive.
+
+---
+
 ## [2026-05-06] — Salesforce C4.10 (Preview read-only de Opportunities e Pipeline)
 
 - **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Canopi.
@@ -907,7 +926,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - Console logging claro para rastreamento de fallbacks acionados
 
 **Estado Final:**
-- Local e `origin/main` 100% alinhados (commit `915a2ba`)
+- Local ahead de `origin/main` no estado atual; alinhamento com o remoto depende de `push`
 - Working tree limpo (nenhuma modificação)
 - Dois commits publicados nesta sessão: `3ac7938` + `915a2ba`
 - Documentação operacional atualizada
