@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
-import { AlertTriangle, ArrowRight, CheckCircle2, CheckSquare, ClipboardList, Eye, Loader2, MinusSquare, ShieldCheck, Square, XCircle, Zap } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle2, CheckSquare, ClipboardList, Eye, Info, Loader2, MinusSquare, ShieldCheck, Square, XCircle, Zap } from 'lucide-react';
 import { Card } from '@/src/components/ui';
 
 type PreviewValue = string | number | boolean | null;
@@ -184,6 +184,60 @@ type ContactPreviewState =
   | { phase: 'idle' }
   | { phase: 'loading' }
   | { phase: 'done'; result: ContactRelationshipPreviewResult }
+  | { phase: 'error'; message: string };
+
+// ─── Opportunity Preview (C4.10) ──────────────────────────────────────────────
+
+interface EligibleOpportunityPreviewContract {
+  id: string;
+  status: 'mapped' | 'synced';
+  createdAt: string;
+  opportunityCount: number;
+  hasAccountLookupSource: boolean;
+}
+
+type EligibleOpportunityContractsState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contracts: EligibleOpportunityPreviewContract[] }
+  | { phase: 'error'; message: string };
+
+type OpportunityActionPreview =
+  | 'ready_to_create'
+  | 'ready_to_update'
+  | 'unresolved_account'
+  | 'missing_required_fields';
+
+interface OpportunityRelationshipPreviewItem {
+  sourceOpportunityId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  stageName: string;
+  amount: number | null;
+  closeDate: string;
+  probability: number | null;
+  type: string;
+  ownerId: string;
+  actionPreview: OpportunityActionPreview;
+  warnings: string[];
+}
+
+interface OpportunityRelationshipPreviewResult {
+  contractId: string;
+  totalOpportunities: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  contactRoleLacuna: boolean;
+  items: OpportunityRelationshipPreviewItem[];
+}
+
+type OpportunityPreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: OpportunityRelationshipPreviewResult }
   | { phase: 'error'; message: string };
 
 // ─── Contact Sync Execute (C4.9) ───────────────────────────────────────────────
@@ -1171,6 +1225,12 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   // C4.9 — sync persistente controlado de Contacts
   const [contactSyncExecuteState, setContactSyncExecuteState] = useState<ContactSyncExecuteState>({ phase: 'idle' });
 
+  // C4.10 — Opportunity preview read-only
+  const [eligibleOppContractsState, setEligibleOppContractsState] = useState<EligibleOpportunityContractsState>({ phase: 'idle' });
+  const [selectedOppContractId, setSelectedOppContractId] = useState<string>('');
+  const [oppPreviewState, setOppPreviewState] = useState<OpportunityPreviewState>({ phase: 'idle' });
+  const oppPreviewPanelRef = useRef<HTMLDivElement>(null);
+
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
     setSyncContractState({ phase: 'loading' });
@@ -1318,6 +1378,54 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
       setContactSyncExecuteState({ phase: 'done', result: data.result });
     } catch {
       setContactSyncExecuteState({ phase: 'error', message: 'Não foi possível executar a sincronização de Contacts.' });
+    }
+  }
+
+  async function handleLoadEligibleOpportunityContracts() {
+    if (!oauthConnected) return;
+    setEligibleOppContractsState({ phase: 'loading' });
+    setOppPreviewState({ phase: 'idle' });
+    setSelectedOppContractId('');
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-preview', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; contracts?: EligibleOpportunityPreviewContract[]; error?: string };
+      if (!res.ok || data.status !== 'ok') {
+        setEligibleOppContractsState({ phase: 'error', message: data.error ?? 'Não foi possível carregar contratos de Opportunities.' });
+        return;
+      }
+      setEligibleOppContractsState({ phase: 'done', contracts: data.contracts ?? [] });
+      if ((data.contracts ?? []).length === 1) {
+        setSelectedOppContractId(data.contracts![0].id);
+      }
+    } catch {
+      setEligibleOppContractsState({ phase: 'error', message: 'Não foi possível carregar contratos de Opportunities.' });
+    }
+  }
+
+  async function handleLoadOpportunityPreview() {
+    if (!selectedOppContractId) return;
+    setOppPreviewState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId: selectedOppContractId }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; result?: OpportunityRelationshipPreviewResult; error?: string };
+      if (!res.ok || data.status !== 'ok' || !data.result) {
+        setOppPreviewState({ phase: 'error', message: data.error ?? 'Não foi possível carregar o preview de Opportunities.' });
+        return;
+      }
+      setOppPreviewState({ phase: 'done', result: data.result });
+      setTimeout(() => {
+        oppPreviewPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } catch {
+      setOppPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview de Opportunities.' });
     }
   }
 
@@ -1848,7 +1956,8 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
            Não depende de syncContractState, syncExecuteState, syncPreviewState
            ou canonicalMappingState da sessão atual. */}
       {oauthConnected && (
-        <div className="mt-6 rounded-2xl border-2 border-indigo-200 bg-white p-5">
+        <>
+          <div className="mt-6 rounded-2xl border-2 border-indigo-200 bg-white p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
@@ -2065,6 +2174,140 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
             </div>
           )}
         </div>
+
+        {/* ── C4.10 — Preview de Opportunities e Pipeline ────────────────────────
+             Aparece quando OAuth está conectado, independente do fluxo de Account/Contact. */}
+        <div className="mt-6 rounded-2xl border-2 border-indigo-200 bg-white p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-black text-indigo-900">Preview de Opportunities e Pipeline</p>
+                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  <ShieldCheck className="h-3 w-3" />
+                  Read-Only (Relacional)
+                </span>
+              </div>
+              <p className="text-xs font-medium text-slate-600">
+                Visualize as Opportunities do Salesforce e sua prontidão relacional com Accounts Canopi.
+              </p>
+            </div>
+            {eligibleOppContractsState.phase !== 'loading' && oppPreviewState.phase === 'idle' && (
+              <button
+                type="button"
+                onClick={handleLoadEligibleOpportunityContracts}
+                className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-xs font-black text-white hover:bg-indigo-800 active:scale-95 transition-transform"
+              >
+                Carregar contratos de Opportunities
+              </button>
+            )}
+          </div>
+
+          {/* Guardrails */}
+          <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-indigo-600">
+            <li>🛡 Nenhuma Opportunity será gravada nesta etapa.</li>
+            <li>🔗 Opportunities sem Account resolvida serão marcadas como unresolved_account.</li>
+            <li>👥 Vínculo Opportunity → Contact depende de OpportunityContactRole e não será inferido.</li>
+            <li>Pipeline Esta visualização prepara a leitura relacional Account → Contact → Opportunity.</li>
+          </ul>
+
+          {/* Estado: carregando contratos */}
+          {eligibleOppContractsState.phase === 'loading' && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+              <p className="text-xs font-bold text-indigo-700">Buscando contratos de Opportunities…</p>
+            </div>
+          )}
+
+          {/* Estado: contratos carregados */}
+          {eligibleOppContractsState.phase === 'done' && oppPreviewState.phase === 'idle' && (
+            <div className="mt-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Selecionar contrato para preview</p>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <select
+                  value={selectedOppContractId}
+                  onChange={(e) => setSelectedOppContractId(e.target.value)}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                >
+                  <option value="">— selecionar contrato —</option>
+                  {eligibleOppContractsState.contracts.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      Contrato {c.id.slice(0, 8)}… ({c.opportunityCount} opps) — {formatDate(c.createdAt)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={!selectedOppContractId}
+                  onClick={handleLoadOpportunityPreview}
+                  className="rounded-xl bg-indigo-700 px-5 py-2 text-xs font-black text-white shadow hover:bg-indigo-800 active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Carregar preview de Opportunities
+                </button>
+              </div>
+              {!eligibleOppContractsState.contracts.find(c => c.id === selectedOppContractId)?.hasAccountLookupSource && selectedOppContractId && (
+                <div className="mt-2 flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-[10px] font-medium text-amber-700">
+                  <AlertTriangle className="h-3 w-3" />
+                  Aviso: Nenhum contrato de Account sincronizado (C4.7) detectado para resolução de vínculos.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Estado: erro */}
+          {eligibleOppContractsState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <p className="text-xs font-black text-red-800">Erro: {eligibleOppContractsState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadEligibleOpportunityContracts}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: gerando preview */}
+          {oppPreviewState.phase === 'loading' && (
+            <div className="mt-4 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+              <p className="mt-3 text-sm font-bold text-slate-700">Gerando preview relacional de Opportunities…</p>
+            </div>
+          )}
+
+          {/* Estado: erro no preview */}
+          {oppPreviewState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+              <p className="text-xs font-black text-red-800">Erro ao gerar preview: {oppPreviewState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadOpportunityPreview}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: preview pronto */}
+          {oppPreviewState.phase === 'done' && (
+            <div ref={oppPreviewPanelRef} className="mt-4 scroll-mt-4">
+              <OpportunityPreviewPanel result={oppPreviewState.result} />
+              <button
+                type="button"
+                onClick={() => {
+                  setOppPreviewState({ phase: 'idle' });
+                  setEligibleOppContractsState({ phase: 'idle' });
+                  setSelectedOppContractId('');
+                }}
+                className="mt-3 text-xs font-bold text-indigo-700 underline underline-offset-4"
+              >
+                ← Carregar outro contrato
+              </button>
+            </div>
+          )}
+        </div>
+        </>
       )}
     </Card>
   );
@@ -2567,6 +2810,142 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
           <li>Writeback para Salesforce não está habilitado.</li>
           <li>Nenhuma Bulk API foi utilizada.</li>
           <li>Log de execução registrado no contrato (contact_sync_summary_log).</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+const OPPORTUNITY_ACTION_LABELS: Record<string, { label: string; color: string }> = {
+  ready_to_create: { label: 'Pronto para criar', color: 'text-emerald-700 bg-emerald-50' },
+  ready_to_update: { label: 'Pronto para atualizar', color: 'text-blue-700 bg-blue-50' },
+  unresolved_account: { label: 'Account não resolvida', color: 'text-amber-700 bg-amber-50' },
+  missing_required_fields: { label: 'Campos ausentes', color: 'text-red-700 bg-red-50' },
+};
+
+// ─── OpportunityPreviewPanel (C4.10) ──────────────────────────────────────────
+
+function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPreviewResult }) {
+  const { totalOpportunities, resolvedCount, unresolvedCount, missingFieldsCount, contactRoleLacuna, items } = result;
+
+  return (
+    <div className="rounded-2xl border-2 border-indigo-700 bg-white p-5 shadow-xl">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-0.5">
+          <p className="text-base font-black text-slate-900">Preview de Opportunities e Pipeline</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+              Leitura Relacional (Read-Only)
+            </span>
+            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+              Salesforce → Canopi
+            </span>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          {contactRoleLacuna && (
+            <div className="flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-amber-700">
+              <Info className="h-3.5 w-3.5" />
+              <span className="text-[10px] font-bold uppercase tracking-tight">Buying Committee não disponível</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-2xl font-black text-slate-900">{totalOpportunities}</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Total Opportunities</p>
+        </div>
+        <div className="rounded-xl bg-emerald-50 p-3 text-center">
+          <p className="text-2xl font-black text-emerald-700">{resolvedCount}</p>
+          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Com Account Resolvida</p>
+        </div>
+        <div className="rounded-xl bg-amber-50 p-3 text-center">
+          <p className="text-2xl font-black text-amber-700">{unresolvedCount}</p>
+          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wide">Account Não Resolvida</p>
+        </div>
+        <div className="rounded-xl bg-red-50 p-3 text-center">
+          <p className="text-2xl font-black text-red-700">{missingFieldsCount}</p>
+          <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide">Dados Incompletos</p>
+        </div>
+      </div>
+
+      <div className="mt-5 overflow-x-auto rounded-xl border border-slate-100">
+        <table className="w-full text-[11px]">
+          <thead>
+            <tr className="border-b border-slate-100 bg-slate-50/50">
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Opportunity (SF)</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Canopi</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Stage</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Amount</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Close Date</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Ação Prevista</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {items.map((item, i) => {
+              const action = OPPORTUNITY_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+              return (
+                <tr key={i} className="hover:bg-slate-50/50">
+                  <td className="px-4 py-3 font-medium text-slate-800">
+                    <div className="flex flex-col">
+                      <span>{item.nome || '—'}</span>
+                      <span className="text-[9px] font-mono text-slate-400">{item.sourceOpportunityId}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-slate-700">
+                    {item.resolvedAccountName ?? <span className="text-amber-500 font-bold italic">não resolvida</span>}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-bold uppercase text-slate-500">
+                      {item.stageName || '—'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 font-black text-slate-700">
+                    {item.amount !== null ? item.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {item.closeDate ? new Intl.DateTimeFormat('pt-BR').format(new Date(item.closeDate)) : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span className={`inline-block self-start rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${action.color}`}>
+                        {action.label}
+                      </span>
+                      {item.warnings.map((w, j) => (
+                        <span key={j} className="flex items-center gap-1 text-[9px] font-medium text-amber-600">
+                          <AlertTriangle className="h-2 w-2" />
+                          {w}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-5 space-y-2 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+        <p className="text-[10px] font-black text-indigo-700 uppercase tracking-wide italic">Guardrails Operacionais C4.10</p>
+        <ul className="grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
+          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+            <ShieldCheck className="h-3 w-3" />
+            Nenhuma Opportunity será gravada nesta etapa.
+          </li>
+          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+            <ShieldCheck className="h-3 w-3" />
+            Vínculo Opportunity → Account resolvido via C4.7.
+          </li>
+          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+            <ShieldCheck className="h-3 w-3" />
+            Vínculo com Contact/Buying Committee não inferido.
+          </li>
+          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+            <ShieldCheck className="h-3 w-3" />
+            Preparando leitura relacional para ABM/ABX.
+          </li>
         </ul>
       </div>
     </div>

@@ -2569,6 +2569,243 @@ export async function executeContactSync(contractId: string): Promise<ContactSyn
   };
 }
 
+// ─── Opportunity Preview (C4.10) ─────────────────────────────────────────────
+
+/**
+ * Preview read-only de Opportunities Salesforce → Canopi.
+ *
+ * Guardrails absolutos:
+ * - Não grava em opportunities, oportunidades, accounts ou contacts.
+ * - Não altera status do contrato.
+ * - Opportunity sem Account resolvida = unresolved_account.
+ * - Não infere vínculo com Contact. ContactRole não está disponível no payload atual.
+ * - Não implementa Campaign, Lead, writeback ou Bulk API.
+ */
+
+export type OpportunityActionPreview =
+  | 'ready_to_create'
+  | 'ready_to_update'
+  | 'unresolved_account'
+  | 'missing_required_fields';
+
+export interface OpportunityRelationshipPreviewItem {
+  sourceOpportunityId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  stageName: string;
+  amount: number | null;
+  closeDate: string;
+  probability: number | null;
+  type: string;
+  ownerId: string;
+  actionPreview: OpportunityActionPreview;
+  warnings: string[];
+}
+
+export interface OpportunityRelationshipPreviewResult {
+  contractId: string;
+  totalOpportunities: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  contactRoleLacuna: boolean; // Sempre true: OpportunityContactRole não disponível no payload
+  items: OpportunityRelationshipPreviewItem[];
+}
+
+export interface EligibleOpportunityPreviewContract {
+  id: string;
+  status: 'mapped' | 'synced';
+  createdAt: string;
+  opportunityCount: number;
+  hasAccountLookupSource: boolean;
+}
+
+/**
+ * Lista contratos Salesforce elegíveis para preview de Opportunities.
+ *
+ * Guardrails:
+ * - Read-only. Não altera nenhum dado.
+ * - Filtra apenas contratos com entity Opportunity e selectedRecords.length > 0.
+ * - Retorna apenas contratos com status mapped ou synced.
+ * - hasAccountLookupSource indica se existe ao menos um contrato synced (fonte de lookup de AccountId C4.7).
+ */
+export async function getEligibleSalesforceOpportunityPreviewContracts(): Promise<EligibleOpportunityPreviewContract[]> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data: rows, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, status, created_at, contract_json')
+    .eq('provider', SALESFORCE_PROVIDER)
+    .in('status', ['mapped', 'synced'])
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error('READ_CONTRACTS_FAILED');
+
+  // Verificar se existe ao menos um contrato synced para lookup de AccountId (C4.7)
+  const hasSyncedAccountContract = (rows ?? []).some((r: any) => r.status === 'synced');
+
+  const result: EligibleOpportunityPreviewContract[] = [];
+
+  for (const row of rows ?? []) {
+    const entities: any[] = Array.isArray(row.contract_json?.entities) ? row.contract_json.entities : [];
+    const oppEntity = entities.find((e: any) => e.objectApiName === 'Opportunity');
+    const opportunityCount = (oppEntity?.selectedRecords ?? []).length;
+
+    if (opportunityCount === 0) continue;
+
+    result.push({
+      id: row.id,
+      status: row.status as 'mapped' | 'synced',
+      createdAt: row.created_at,
+      opportunityCount,
+      hasAccountLookupSource: hasSyncedAccountContract,
+    });
+  }
+
+  return result;
+}
+
+/**
+ * Preview read-only de Opportunities Salesforce → Canopi com resolução de vínculo Account.
+ *
+ * Guardrails:
+ * - Exige contractId explícito — sem fallback para último contrato.
+ * - Lê exclusivamente do contrato salvo no banco (status=mapped ou synced).
+ * - Resolve Opportunity.AccountId via buildAccountIdLookup (C4.7).
+ * - Não infere vínculo com Contact. OpportunityContactRole não está disponível.
+ * - Não grava em oportunidades, accounts ou contacts.
+ * - Não altera status do contrato.
+ */
+export async function generateOpportunityRelationshipPreview(
+  contractId: string,
+): Promise<OpportunityRelationshipPreviewResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const supabase = getSupabaseAdminClient();
+
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+  if (row.status !== 'mapped' && row.status !== 'synced') {
+    throw new Error('CONTRACT_NOT_MAPPED');
+  }
+
+  const contractJson = row.contract_json;
+  const entities: any[] = Array.isArray(contractJson?.entities) ? contractJson.entities : [];
+
+  const oppEntity = entities.find((e: any) => e.objectApiName === 'Opportunity');
+  const sfOpportunities = (oppEntity?.selectedRecords ?? []) as any[];
+
+  if (sfOpportunities.length === 0) {
+    throw new Error('NO_OPPORTUNITIES_IN_CONTRACT');
+  }
+
+  // Lookup SF AccountId → Canopi accountId via sync_summary_log dos contratos Account (C4.7)
+  const accountIdLookup = await buildAccountIdLookup(supabase);
+
+  const items: OpportunityRelationshipPreviewItem[] = [];
+
+  for (const sfOpp of sfOpportunities) {
+    const sourceOpportunityId = readSfField(sfOpp, 'Id') || String(sfOpp['id'] ?? '');
+    const sourceAccountId = readSfField(sfOpp, 'AccountId');
+    const nome = (readSfField(sfOpp, 'Name') || String(sfOpp['displayName'] ?? '')).trim();
+    const stageName = readSfField(sfOpp, 'StageName').trim();
+    const amountRaw = readSfField(sfOpp, 'Amount');
+    const amount = amountRaw ? parseFloat(amountRaw) : null;
+    const closeDate = readSfField(sfOpp, 'CloseDate').trim();
+    const probabilityRaw = readSfField(sfOpp, 'Probability');
+    const probability = probabilityRaw ? parseFloat(probabilityRaw) : null;
+    const type = readSfField(sfOpp, 'Type').trim();
+    const ownerId = readSfField(sfOpp, 'OwnerId').trim();
+
+    const warnings: string[] = [];
+    let actionPreview: OpportunityActionPreview;
+
+    // Campos mínimos obrigatórios: nome
+    if (!nome) {
+      items.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        resolvedCanopiAccountId: null,
+        resolvedAccountName: null,
+        nome,
+        stageName,
+        amount,
+        closeDate,
+        probability,
+        type,
+        ownerId,
+        actionPreview: 'missing_required_fields',
+        warnings: ['Nome da Opportunity ausente — não pode ser registrada sem identificação.'],
+      });
+      continue;
+    }
+
+    // Resolver vínculo Account: Salesforce AccountId → Canopi accountId
+    const resolved = sourceAccountId ? accountIdLookup.get(sourceAccountId) ?? null : null;
+
+    if (!resolved) {
+      warnings.push(
+        sourceAccountId
+          ? `Salesforce AccountId "${sourceAccountId}" não encontrado nos contratos Account sincronizados (C4.7). Opportunity marcada como unresolved_account.`
+          : 'AccountId ausente no registro Salesforce. Opportunity marcada como unresolved_account.',
+      );
+      actionPreview = 'unresolved_account';
+    } else {
+      actionPreview = 'ready_to_create';
+    }
+
+    // Avisos de campos relevantes ausentes
+    if (!stageName) warnings.push('StageName ausente.');
+    if (!closeDate) warnings.push('CloseDate ausente.');
+    if (amount === null) warnings.push('Amount ausente.');
+
+    items.push({
+      sourceOpportunityId,
+      sourceAccountId,
+      resolvedCanopiAccountId: resolved?.canopiId ?? null,
+      resolvedAccountName: resolved?.nome ?? null,
+      nome,
+      stageName,
+      amount,
+      closeDate,
+      probability,
+      type,
+      ownerId,
+      actionPreview,
+      warnings,
+    });
+  }
+
+  const resolvedCount = items.filter(
+    (i) => i.actionPreview === 'ready_to_create' || i.actionPreview === 'ready_to_update',
+  ).length;
+  const unresolvedCount = items.filter((i) => i.actionPreview === 'unresolved_account').length;
+  const missingFieldsCount = items.filter((i) => i.actionPreview === 'missing_required_fields').length;
+
+  return {
+    contractId,
+    totalOpportunities: items.length,
+    resolvedCount,
+    unresolvedCount,
+    missingFieldsCount,
+    contactRoleLacuna: true, // OpportunityContactRole não disponível no payload atual — C4.10 não infere vínculo com Contact
+    items,
+  };
+}
+
 // ─── Revoke ──────────────────────────────────────────────────────────────────
 
 export async function revokeAndDisconnect(): Promise<void> {
