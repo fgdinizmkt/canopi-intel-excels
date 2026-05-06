@@ -240,6 +240,57 @@ type OpportunityPreviewState =
   | { phase: 'done'; result: OpportunityRelationshipPreviewResult }
   | { phase: 'error'; message: string };
 
+// ─── OpportunityContactRole Preview (C4.11) ───────────────────────────────
+
+interface EligibleOpportunityContactRolePreviewContract {
+  id: string;
+  createdAt: string;
+  roleCount: number;
+}
+
+type EligibleOpportunityContactRoleContractsState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contracts: EligibleOpportunityContactRolePreviewContract[] }
+  | { phase: 'error'; message: string };
+
+type OpportunityContactRoleActionPreview =
+  | 'ready_to_link'
+  | 'unresolved_opportunity'
+  | 'unresolved_contact'
+  | 'missing_required_fields';
+
+interface OpportunityContactRolePreviewItem {
+  sourceRoleId: string;
+  sourceOpportunityId: string | null;
+  sourceContactId: string | null;
+  roleName: string;
+  isPrimary: boolean;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  resolvedCanopiContactId: string | null;
+  resolvedContactName: string | null;
+  opportunityName: string | null;
+  actionPreview: OpportunityContactRoleActionPreview;
+  warnings: string[];
+}
+
+interface OpportunityContactRolePreviewResult {
+  contractId: string;
+  totalRoles: number;
+  readyToLinkCount: number;
+  unresolvedOppCount: number;
+  unresolvedContactCount: number;
+  missingFieldsCount: number;
+  items: OpportunityContactRolePreviewItem[];
+}
+
+type OpportunityContactRolePreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: OpportunityContactRolePreviewResult }
+  | { phase: 'error'; message: string };
+
 // ─── Contact Sync Execute (C4.9) ───────────────────────────────────────────────
 
 type ContactSyncExecuteState =
@@ -1231,6 +1282,12 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
   const [oppPreviewState, setOppPreviewState] = useState<OpportunityPreviewState>({ phase: 'idle' });
   const oppPreviewPanelRef = useRef<HTMLDivElement>(null);
 
+  // C4.11 — OpportunityContactRole preview read-only
+  const [eligibleOcrContractsState, setEligibleOcrContractsState] = useState<EligibleOpportunityContactRoleContractsState>({ phase: 'idle' });
+  const [selectedOcrContractId, setSelectedOcrContractId] = useState<string>('');
+  const [ocrPreviewState, setOcrPreviewState] = useState<OpportunityContactRolePreviewState>({ phase: 'idle' });
+  const ocrPreviewPanelRef = useRef<HTMLDivElement>(null);
+
   async function handleSaveSyncContract() {
     if (dryRunState.phase !== 'done' || !contract) return;
     setSyncContractState({ phase: 'loading' });
@@ -1426,6 +1483,54 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
       }, 100);
     } catch {
       setOppPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview de Opportunities.' });
+    }
+  }
+
+  async function handleLoadEligibleOpportunityContactRoleContracts() {
+    if (!oauthConnected) return;
+    setEligibleOcrContractsState({ phase: 'loading' });
+    setOcrPreviewState({ phase: 'idle' });
+    setSelectedOcrContractId('');
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-contact-role-preview', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; contracts?: EligibleOpportunityContactRolePreviewContract[]; error?: string };
+      if (!res.ok || data.status !== 'ok') {
+        setEligibleOcrContractsState({ phase: 'error', message: data.error ?? 'Não foi possível carregar contratos.' });
+        return;
+      }
+      setEligibleOcrContractsState({ phase: 'done', contracts: data.contracts ?? [] });
+      if ((data.contracts ?? []).length === 1) {
+        setSelectedOcrContractId(data.contracts![0].id);
+      }
+    } catch {
+      setEligibleOcrContractsState({ phase: 'error', message: 'Falha de rede.' });
+    }
+  }
+
+  async function handleLoadOpportunityContactRolePreview() {
+    if (!selectedOcrContractId) return;
+    setOcrPreviewState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-contact-role-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId: selectedOcrContractId }),
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as { status: string; result?: OpportunityContactRolePreviewResult; error?: string };
+      if (!res.ok || data.status !== 'ok' || !data.result) {
+        setOcrPreviewState({ phase: 'error', message: data.error ?? 'Não foi possível carregar o preview de Roles.' });
+        return;
+      }
+      setOcrPreviewState({ phase: 'done', result: data.result });
+      setTimeout(() => {
+        ocrPreviewPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    } catch {
+      setOcrPreviewState({ phase: 'error', message: 'Não foi possível carregar o preview de Roles.' });
     }
   }
 
@@ -2307,6 +2412,141 @@ export function SalesforceMultiEntityPreview({ oauthConnected }: SalesforceMulti
             </div>
           )}
         </div>
+
+        {/* ── C4.11 — Readiness Relacional de OpportunityContactRole ──────────────────────── */}
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-black text-slate-800">Readiness Opportunity ↔ Contact</p>
+                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  <ShieldCheck className="h-3 w-3" />
+                  Read-only
+                </span>
+              </div>
+              <p className="text-xs font-medium text-slate-600 max-w-2xl">
+                Valide se o Salesforce fornece OpportunityContactRole suficiente para conectar oportunidades aos contatos já sincronizados, sem gravar vínculos na Canopi.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-slate-500">
+                <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Nenhuma Opportunity será gravada</span>
+                <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Nenhum Contact será alterado</span>
+                <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Sem vínculos criados no banco</span>
+                <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Sem inferência por nome/e-mail/domínio</span>
+              </div>
+            </div>
+            {eligibleOcrContractsState.phase !== 'loading' && ocrPreviewState.phase === 'idle' && (
+              <button
+                type="button"
+                onClick={handleLoadEligibleOpportunityContactRoleContracts}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:scale-95 transition-all shadow-sm"
+              >
+                Buscar Contratos (Roles)
+              </button>
+            )}
+          </div>
+
+          {/* Estado: carregando contratos */}
+          {eligibleOcrContractsState.phase === 'loading' && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
+              <p className="text-xs font-bold text-slate-600">Buscando extrações de Contact Roles…</p>
+            </div>
+          )}
+
+          {/* Estado: contratos carregados */}
+          {eligibleOcrContractsState.phase === 'done' && ocrPreviewState.phase === 'idle' && (
+            <div className="mt-4 pt-2">
+              {eligibleOcrContractsState.contracts.length > 0 ? (
+                <>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Selecione o Contrato Base</p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <select
+                      value={selectedOcrContractId}
+                      onChange={(e) => setSelectedOcrContractId(e.target.value)}
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-300 shadow-sm min-w-[280px]"
+                    >
+                      <option value="">— selecione um contrato —</option>
+                      {eligibleOcrContractsState.contracts.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          Contrato {c.id.slice(0, 8)} ({c.roleCount} roles) — {formatDate(c.createdAt)}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      disabled={!selectedOcrContractId}
+                      onClick={handleLoadOpportunityContactRolePreview}
+                      className="rounded-xl bg-indigo-600 px-5 py-2 text-xs font-black text-white shadow hover:bg-indigo-700 active:scale-95 transition-transform disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Processar Readiness
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-xs font-black text-amber-800">Nenhum contrato possui OpportunityContactRole.</p>
+                  <p className="mt-1 text-xs font-medium text-amber-700">
+                    Gere uma nova extração garantindo que a permissão de OpportunityContactRole foi concedida na org do Salesforce.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Estado: erro contratos */}
+          {eligibleOcrContractsState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-black text-red-800">Erro: {eligibleOcrContractsState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadEligibleOpportunityContactRoleContracts}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar buscar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: gerando preview */}
+          {ocrPreviewState.phase === 'loading' && (
+            <div className="mt-4 flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-8 shadow-sm">
+              <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+              <p className="mt-3 text-xs font-bold text-slate-600">Calculando readiness relacional…</p>
+            </div>
+          )}
+
+          {/* Estado: erro no preview */}
+          {ocrPreviewState.phase === 'error' && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-white p-4 shadow-sm">
+              <p className="text-xs font-black text-red-800">Falha ao gerar readiness: {ocrPreviewState.message}</p>
+              <button
+                type="button"
+                onClick={handleLoadOpportunityContactRolePreview}
+                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+              >
+                Tentar processar novamente
+              </button>
+            </div>
+          )}
+
+          {/* Estado: preview pronto */}
+          {ocrPreviewState.phase === 'done' && (
+            <div ref={ocrPreviewPanelRef} className="mt-5 scroll-mt-4">
+              <OpportunityContactRolePreviewPanel result={ocrPreviewState.result} />
+              <button
+                type="button"
+                onClick={() => {
+                  setOcrPreviewState({ phase: 'idle' });
+                  setEligibleOcrContractsState({ phase: 'idle' });
+                  setSelectedOcrContractId('');
+                }}
+                className="mt-3 text-[10px] font-bold text-slate-500 underline underline-offset-4 hover:text-slate-800"
+              >
+                ← Fechar e voltar à seleção de contrato
+              </button>
+            </div>
+          )}
+        </div>
         </>
       )}
     </Card>
@@ -2947,6 +3187,108 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
             Preparando leitura relacional para ABM/ABX.
           </li>
         </ul>
+      </div>
+    </div>
+  );
+}
+const OCR_ACTION_LABELS: Record<string, { label: string; color: string }> = {
+  ready_to_link: { label: 'Pronto p/ Associar', color: 'text-emerald-700 bg-emerald-50 border border-emerald-200' },
+  unresolved_opportunity: { label: 'Opp Não Resolvida', color: 'text-amber-700 bg-amber-50 border border-amber-200' },
+  unresolved_contact: { label: 'Contato Não Resolvido', color: 'text-orange-700 bg-orange-50 border border-orange-200' },
+  missing_required_fields: { label: 'Dados Incompletos', color: 'text-red-700 bg-red-50 border border-red-200' },
+};
+
+function OpportunityContactRolePreviewPanel({ result }: { result: OpportunityContactRolePreviewResult }) {
+  const { totalRoles, readyToLinkCount, unresolvedOppCount, unresolvedContactCount, missingFieldsCount, items } = result;
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm mt-6">
+      {/* Header do Panel Auxiliar */}
+      <div className="border-b border-slate-100 bg-slate-50/50 px-4 py-3">
+        <p className="text-xs font-black text-slate-700 uppercase tracking-widest">Resumo do Readiness</p>
+      </div>
+
+      <div className="p-4">
+        {/* Sumário visual compacto */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <div className="rounded-lg bg-slate-50 p-2 text-center border border-slate-100">
+            <p className="text-xl font-black text-slate-700">{totalRoles}</p>
+            <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Total Roles</p>
+          </div>
+          <div className="rounded-lg bg-emerald-50 p-2 text-center border border-emerald-100">
+            <p className="text-xl font-black text-emerald-600">{readyToLinkCount}</p>
+            <p className="text-[8px] font-bold text-emerald-600 uppercase tracking-wide">Prontos p/ Ligar</p>
+          </div>
+          <div className="rounded-lg bg-amber-50 p-2 text-center border border-amber-100">
+            <p className="text-xl font-black text-amber-600">{unresolvedOppCount}</p>
+            <p className="text-[8px] font-bold text-amber-600 uppercase tracking-wide">Opp Sem Payload</p>
+          </div>
+          <div className="rounded-lg bg-orange-50 p-2 text-center border border-orange-100">
+            <p className="text-xl font-black text-orange-600">{unresolvedContactCount}</p>
+            <p className="text-[8px] font-bold text-orange-600 uppercase tracking-wide">Sem Contact Sinc.</p>
+          </div>
+          <div className="rounded-lg bg-red-50 p-2 text-center border border-red-100">
+            <p className="text-xl font-black text-red-600">{missingFieldsCount}</p>
+            <p className="text-[8px] font-bold text-red-600 uppercase tracking-wide">Incompletos</p>
+          </div>
+        </div>
+
+        <div className="mt-4 overflow-x-auto rounded-lg border border-slate-100">
+          <table className="w-full text-[10px]">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Opp Salesforce</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Account Canopi</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Contact Canopi</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Papel</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Status</th>
+              </tr>
+            </thead>
+          <tbody className="divide-y divide-slate-50">
+            {items.map((item, i) => {
+              const action = OCR_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+              return (
+                <tr key={i} className="hover:bg-slate-50/50">
+                  <td className="px-3 py-2 font-medium text-slate-800">
+                    <div className="flex flex-col">
+                      <span>{item.opportunityName || '—'}</span>
+                      <span className="text-[8px] font-mono text-slate-400">{item.sourceOpportunityId}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 font-medium text-slate-700">
+                    {item.resolvedAccountName ?? <span className="text-amber-500 font-bold italic">não resolvida</span>}
+                  </td>
+                  <td className="px-3 py-2 font-medium text-slate-800">
+                    <div className="flex flex-col">
+                      <span>{item.resolvedContactName || <span className="text-orange-500 font-bold italic">não resolvido</span>}</span>
+                      <span className="text-[8px] font-mono text-slate-400">{item.sourceContactId}</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 text-slate-600">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-bold text-slate-700">{item.roleName || '—'}</span>
+                      {item.isPrimary && <span className="text-[8px] font-black uppercase text-emerald-600">★ Primário</span>}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-col gap-1">
+                      <span className={`inline-block self-start rounded px-1.5 py-0.5 text-[9px] font-black uppercase ${action.color}`}>
+                        {action.label}
+                      </span>
+                      {item.warnings.map((w, j) => (
+                        <span key={j} className="flex items-center gap-1 text-[8px] font-medium text-red-600 leading-tight">
+                          <AlertTriangle className="h-2 w-2 shrink-0" />
+                          {w}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        </div>
       </div>
     </div>
   );

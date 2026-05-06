@@ -878,6 +878,7 @@ export const PREVIEW_ALLOWLIST: Record<string, string[]> = {
   Account: ['Id', 'Name', 'Website', 'Industry', 'Type', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Contact: ['Id', 'AccountId', 'Name', 'Email', 'Title', 'Department', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Opportunity: ['Id', 'AccountId', 'Name', 'StageName', 'Amount', 'CloseDate', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
+  OpportunityContactRole: ['Id', 'OpportunityId', 'ContactId', 'Role', 'IsPrimary', 'CreatedDate', 'LastModifiedDate'],
   Lead: ['Id', 'Company', 'Name', 'Email', 'Status', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
   Campaign: ['Id', 'Name', 'Type', 'Status', 'StartDate', 'EndDate', 'OwnerId', 'CreatedDate', 'LastModifiedDate'],
 };
@@ -2802,6 +2803,225 @@ export async function generateOpportunityRelationshipPreview(
     unresolvedCount,
     missingFieldsCount,
     contactRoleLacuna: true, // OpportunityContactRole não disponível no payload atual — C4.10 não infere vínculo com Contact
+    items,
+  };
+}
+
+// ─── C4.11 OpportunityContactRole Preview ───────────────────────────────────
+
+export interface EligibleOpportunityContactRolePreviewContract {
+  id: string;
+  createdAt: string;
+  roleCount: number;
+}
+
+export interface OpportunityContactRolePreviewItem {
+  sourceRoleId: string;
+  sourceOpportunityId: string | null;
+  sourceContactId: string | null;
+  roleName: string;
+  isPrimary: boolean;
+
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+
+  resolvedCanopiContactId: string | null;
+  resolvedContactName: string | null;
+
+  opportunityName: string | null;
+
+  actionPreview: 'ready_to_link' | 'unresolved_opportunity' | 'unresolved_contact' | 'missing_required_fields';
+  warnings: string[];
+}
+
+export interface OpportunityContactRolePreviewResult {
+  contractId: string;
+  totalRoles: number;
+  readyToLinkCount: number;
+  unresolvedOppCount: number;
+  unresolvedContactCount: number;
+  missingFieldsCount: number;
+  items: OpportunityContactRolePreviewItem[];
+}
+
+export async function getEligibleSalesforceOpportunityContactRolePreviewContracts(): Promise<EligibleOpportunityContactRolePreviewContract[]> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, created_at, status, contract_json')
+    .eq('provider', 'salesforce')
+    .in('status', ['mapped', 'synced'])
+    .order('created_at', { ascending: false });
+
+  if (error || !data) return [];
+
+  const eligible: EligibleOpportunityContactRolePreviewContract[] = [];
+
+  for (const row of data) {
+    const contract = row.contract_json;
+    if (!contract || !Array.isArray(contract.entities)) continue;
+
+    const ocrEntity = contract.entities.find((e: any) => e.objectApiName === 'OpportunityContactRole');
+    if (!ocrEntity) continue;
+
+    const recs = Array.isArray(ocrEntity.selectedRecords) ? ocrEntity.selectedRecords : [];
+    if (recs.length === 0) continue;
+
+    eligible.push({
+      id: row.id,
+      createdAt: row.created_at,
+      roleCount: recs.length,
+    });
+  }
+
+  return eligible;
+}
+
+export async function generateOpportunityContactRoleRelationshipPreview(
+  contractId: string,
+): Promise<OpportunityContactRolePreviewResult> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data: contractRow, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, contract_json')
+    .eq('id', contractId)
+    .single();
+
+  if (error || !contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const contractJson = contractRow.contract_json;
+  const entities = contractJson?.entities || [];
+
+  const ocrEntity = entities.find((e: any) => e.objectApiName === 'OpportunityContactRole');
+  if (!ocrEntity || !Array.isArray(ocrEntity.selectedRecords) || ocrEntity.selectedRecords.length === 0) {
+    throw new Error('NO_OPPORTUNITY_CONTACT_ROLES_IN_CONTRACT');
+  }
+  const roleRecords = ocrEntity.selectedRecords;
+
+  // Carregar lookups (C4.7 para Account, e das Opps do próprio contrato para Opportunity)
+  const accountIdLookup = await buildAccountIdLookup(supabase);
+  const oppEntity = entities.find((e: any) => e.objectApiName === 'Opportunity');
+  const oppRecords = oppEntity && Array.isArray(oppEntity.selectedRecords) ? oppEntity.selectedRecords : [];
+
+  const oppMap = new Map<string, any>();
+  for (const opp of oppRecords) {
+    const id = opp.Id || opp.id;
+    if (id) oppMap.set(id, opp);
+  }
+
+  // C4.9 Contact lookup a partir do contact_sync_summary_log
+  const contactLookup = new Map<string, { canopiId: string; nome: string }>();
+
+  // Vamos buscar todos os contratos synced de salesforce para montar um mapa global de contacts criados
+  const { data: syncedContracts } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('contract_json')
+    .eq('provider', 'salesforce')
+    .eq('status', 'synced');
+
+  if (syncedContracts) {
+    for (const sc of syncedContracts) {
+      const summary = sc.contract_json?.contact_sync_summary_log;
+      if (summary && Array.isArray(summary.createdRecords)) {
+        for (const rec of summary.createdRecords) {
+          if (rec.sourceContactId) {
+            contactLookup.set(rec.sourceContactId, { canopiId: rec.canopiId, nome: rec.nome });
+          }
+        }
+      }
+      if (summary && Array.isArray(summary.updatedRecords)) {
+        for (const rec of summary.updatedRecords) {
+          if (rec.sourceContactId) {
+            contactLookup.set(rec.sourceContactId, { canopiId: rec.canopiId, nome: rec.nome });
+          }
+        }
+      }
+    }
+  }
+
+  const items: OpportunityContactRolePreviewItem[] = [];
+
+  for (const rec of roleRecords) {
+    const sourceRoleId = (rec.Id || rec.id || '').trim();
+    const sourceOpportunityId = (rec.OpportunityId || rec.opportunityId || '').trim();
+    const sourceContactId = (rec.ContactId || rec.contactId || '').trim();
+    const roleName = (rec.Role || rec.role || '').trim();
+    const isPrimary = Boolean(rec.IsPrimary || rec.isPrimary);
+
+    let actionPreview: OpportunityContactRolePreviewItem['actionPreview'] = 'ready_to_link';
+    const warnings: string[] = [];
+
+    if (!sourceOpportunityId || !sourceContactId) {
+      actionPreview = 'missing_required_fields';
+      warnings.push('Campos OpportunityId ou ContactId ausentes.');
+    }
+
+    const opp = sourceOpportunityId ? oppMap.get(sourceOpportunityId) : null;
+    let resolvedCanopiAccountId: string | null = null;
+    let resolvedAccountName: string | null = null;
+    let opportunityName: string | null = null;
+
+    if (opp) {
+      opportunityName = opp.Name || opp.name || null;
+      const oppAccountId = opp.AccountId || opp.accountId;
+      if (oppAccountId) {
+        const accInfo = accountIdLookup.get(oppAccountId);
+        if (accInfo) {
+          resolvedCanopiAccountId = accInfo.canopiId;
+          resolvedAccountName = accInfo.nome;
+        }
+      }
+    } else if (sourceOpportunityId) {
+      warnings.push(`Opportunity "${sourceOpportunityId}" não encontrada no payload.`);
+      if (actionPreview === 'ready_to_link') actionPreview = 'unresolved_opportunity';
+    }
+
+    const contactInfo = sourceContactId ? contactLookup.get(sourceContactId) : null;
+    let resolvedCanopiContactId: string | null = null;
+    let resolvedContactName: string | null = null;
+
+    if (contactInfo) {
+      resolvedCanopiContactId = contactInfo.canopiId;
+      resolvedContactName = contactInfo.nome;
+    } else if (sourceContactId) {
+      warnings.push(`Contact "${sourceContactId}" não foi sincronizado na Canopi (C4.9).`);
+      if (actionPreview === 'ready_to_link') actionPreview = 'unresolved_contact';
+    }
+
+    if (!resolvedCanopiAccountId && opp) {
+        warnings.push(`Account da Opportunity não está resolvida. Readiness comprometido.`);
+    }
+
+    items.push({
+      sourceRoleId,
+      sourceOpportunityId,
+      sourceContactId,
+      roleName,
+      isPrimary,
+      resolvedCanopiAccountId,
+      resolvedAccountName,
+      resolvedCanopiContactId,
+      resolvedContactName,
+      opportunityName,
+      actionPreview,
+      warnings,
+    });
+  }
+
+  const readyToLinkCount = items.filter((i) => i.actionPreview === 'ready_to_link').length;
+  const unresolvedOppCount = items.filter((i) => i.actionPreview === 'unresolved_opportunity').length;
+  const unresolvedContactCount = items.filter((i) => i.actionPreview === 'unresolved_contact').length;
+  const missingFieldsCount = items.filter((i) => i.actionPreview === 'missing_required_fields').length;
+
+  return {
+    contractId,
+    totalRoles: items.length,
+    readyToLinkCount,
+    unresolvedOppCount,
+    unresolvedContactCount,
+    missingFieldsCount,
     items,
   };
 }
