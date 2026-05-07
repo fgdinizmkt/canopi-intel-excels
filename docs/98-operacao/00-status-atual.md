@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.13 (execução real controlada do Opportunity sync em DEV) validada e documentada no commit documental atual**, com base de código/documentação anterior em `850c383`; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.12 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact e sync persistente controlado de Opportunities. A execução C4.13 confirma o sync controlado de Opportunities Salesforce → Canopi em DEV, com persistência de log e sem efeitos colaterais em Accounts/Contacts.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.14 (validação visual pós-sync de Opportunities) aprovada no browser**, com base anterior em `5a61e0f`; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.13 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -26,6 +26,7 @@ Fechado neste marco (Setup Read-only):
 - Salesforce OpportunityContactRole Preview (C4.11) concluído localmente em `cc1dbb4`
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 - Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
+- Salesforce Opportunity validação visual pós-sync (C4.14) aprovada a partir de `5a61e0f`
 
 Não fechado neste marco:
 - sync real
@@ -90,6 +91,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce OpportunityContactRole Preview / Readiness Opportunity ↔ Contact (C4.11) concluído localmente em `cc1dbb4`
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 - Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
+- Salesforce Opportunity validação visual pós-sync (C4.14) aprovada a partir de `5a61e0f`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -146,7 +148,7 @@ Pendências futuras (fora do escopo atual):
 
 - **Natureza:** Execução real controlada do Opportunity sync persistente em DEV.
 - **Objetivo:** Validar o fluxo de persistência de Opportunities em banco com guardrails absolutos e sem efeitos colaterais em outras entidades.
-- **Base de Código/Documentação:** `850c383`
+- **Base de Código/Documentação:** `5a61e0f`
 - **Contrato auditado:** `75b7ccec-944d-4c6c-b51f-70eaae45438b`
 - **Resultado do Sync:**
   - `createdCount = 2`
@@ -167,6 +169,25 @@ Pendências futuras (fora do escopo atual):
   - Nenhum vínculo Opportunity ↔ Contact criado.
 - **Validação Operacional:** working tree permaneceu limpa; `HEAD = origin/main = 850c383` antes da documentação.
 - **Estado atual:** execução validada e registrada; pendem apenas push e sync Drive.
+
+---
+
+### MARCO: Salesforce C4.14 — Validação visual pós-sync de Opportunities — 2026-05-06
+
+**Status: Validação Visual Aprovada**
+
+- **Natureza:** Validação visual pós-sync de Opportunities no browser.
+- **Objetivo:** Confirmar que o preview de Opportunities passou a refletir o estado pós-sync via `opportunity_sync_summary_log`.
+- **Base Anterior:** `5a61e0f`
+- **Resultado Visual Validado:**
+  - `2` Opportunities prontas para atualizar / `ready_to_update`
+  - `3` Account não resolvida / `unresolved_account`
+  - `0` dados incompletos / `missing_required_fields`
+- **UX/UI Confirmada:**
+  - O bloco de sync controlado permaneceu visível e claro.
+  - Nenhum novo sync foi executado nesta validação.
+  - O comportamento pós-sync permaneceu coerente com o C4.13.
+- **Estado atual:** validação visual aprovada; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive.
 
 ---
 

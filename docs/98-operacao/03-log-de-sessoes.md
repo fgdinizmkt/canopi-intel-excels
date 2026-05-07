@@ -50,7 +50,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 - **Natureza:** Execução real controlada do Opportunity sync persistente em DEV.
 - **Objetivo:** Validar a persistência de Opportunities na Canopi com guardrails absolutos, sem efeitos colaterais em Accounts, Contacts ou vínculos Opportunity ↔ Contact.
-- **Base de código/documentação anterior:** `850c383`
+- **Base de código/documentação anterior:** `5a61e0f`
 - **Contrato auditado:** `75b7ccec-944d-4c6c-b51f-70eaae45438b`
 - **Resultado:**
   - `createdCount = 2`
@@ -71,6 +71,23 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - Nenhum vínculo Opportunity ↔ Contact criado.
 - **Validação operacional:** working tree permaneceu limpa; `HEAD = origin/main = 850c383` antes da documentação.
 - **Estado atual:** execução validada em DEV e registrada; pendem apenas push e sync Drive.
+
+---
+
+## [2026-05-06] — Salesforce C4.14 (Validação visual pós-sync de Opportunities)
+
+- **Natureza:** Validação visual pós-sync de Opportunities no browser.
+- **Objetivo:** Confirmar que o preview de Opportunities passou a refletir o estado pós-sync via `opportunity_sync_summary_log`.
+- **Base anterior:** `5a61e0f`
+- **Resultado visual validado:**
+  - `2` Opportunities prontas para atualizar / `ready_to_update`
+  - `3` Account não resolvida / `unresolved_account`
+  - `0` dados incompletos / `missing_required_fields`
+- **Comportamento observado:**
+  - O bloco de sync controlado permaneceu visível e claro.
+  - Nenhum novo sync foi executado nesta validação.
+  - O comportamento pós-sync permaneceu coerente com o C4.13.
+- **Estado atual:** validação visual aprovada; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive.
 
 ---
 
