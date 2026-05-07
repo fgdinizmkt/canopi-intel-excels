@@ -172,6 +172,20 @@ interface LocalPreSyncDryRun {
   rows: LocalPreSyncDryRunRow[];
 }
 
+interface AccountSyncExecutionResult {
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  errorCount: number;
+  outcome: string;
+}
+
+type AccountSyncState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contractId: string; result: AccountSyncExecutionResult }
+  | { phase: 'error'; message: string };
+
 function formatTestedAt(iso: string): string {
   try {
     return new Intl.DateTimeFormat('pt-BR', {
@@ -273,23 +287,22 @@ function buildLocalPreSyncDryRun(contract: LocalPreSyncContract): LocalPreSyncDr
 const METHODS: MethodDefinition[] = [
   {
     id: 'oauth',
-    title: 'OAuth / External Client App',
-    description: 'Conexão OAuth produtiva via External Client App para validação read-only controlada.',
-    badge: 'OAuth',
+    title: 'Conectar via Salesforce',
+    description: 'Recomendado para conexão contínua. Usa a conexão autorizada do Salesforce para buscar dados com segurança.',
+    badge: 'Recomendado',
     badgeVariant: 'blue',
     icon: <Network className="h-4 w-4" />,
     panel: {
       lines: [
-        'Conexão OAuth produtiva com External Client App.',
-        'Validação read-only inicial via Account/describe com persistência segura de credenciais.',
-        'Sem sync, sem writeback e sem importação real nesta etapa.',
+        'Conexão contínua com a sua conta do Salesforce.',
+        'Permite buscar dados com segurança, sem expor senhas.',
       ],
     },
   },
   {
     id: 'token',
-    title: 'Validação pontual',
-    description: 'Use para validar acesso pontual. Nada será salvo.',
+    title: 'Validar com acesso pontual',
+    description: 'Alternativa para validação rápida usando um token temporário.',
     badge: 'Validação pontual',
     badgeVariant: 'amber',
     icon: <KeyRound className="h-4 w-4" />,
@@ -297,16 +310,15 @@ const METHODS: MethodDefinition[] = [
   },
   {
     id: 'csv',
-    title: 'CSV exportado',
-    description: 'Alternativa de entrada local para a fonte Salesforce, sem criar conector global separado.',
-    badge: 'Local',
+    title: 'Usar arquivo CSV',
+    description: 'Alternativa local, sem conexão direta. Importe um arquivo exportado do Salesforce.',
+    badge: 'Sem conexão',
     badgeVariant: 'slate',
     icon: <FileJson className="h-4 w-4" />,
     panel: {
       lines: [
-        'Entrada local a partir de exportação do Salesforce.',
-        'Serve como alternativa de análise local sem criar conector global separado.',
-        'Não deve reativar CSV fora da página dedicada do CRM.',
+        'Use planilhas CSV exportadas diretamente do Salesforce.',
+        'Nenhuma conexão contínua será mantida.',
       ],
     },
   },
@@ -362,6 +374,29 @@ export function SalesforceMethodSelector() {
   const [prepareButtonBusy, setPrepareButtonBusy] = useState(false);
   const [contractButtonGenerated, setContractButtonGenerated] = useState(false);
   const [dryRunButtonBusy, setDryRunButtonBusy] = useState(false);
+  const [accountSyncState, setAccountSyncState] = useState<AccountSyncState>({ phase: 'idle' });
+  const resetAccountSyncStateToIdle = useCallback((force = false) => {
+    setAccountSyncState((current) => (force || current.phase !== 'loading' ? { phase: 'idle' } : current));
+  }, []);
+  const resetAccountsOperationalSession = useCallback(() => {
+    setAccountsPreview(null);
+    setAccountsPreviewLoading(false);
+    setAccountsPreviewError(null);
+    setSelectedAccountPreviewKeys([]);
+    setPreparedAccountsPreviewSelection(null);
+    setLocalPreSyncContract(null);
+    setLocalPreSyncDryRun(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setDryRunFeedback(null);
+    setContractJustGenerated(false);
+    setDryRunJustCompleted(false);
+    setPrepareButtonBusy(false);
+    setContractButtonGenerated(false);
+    setDryRunButtonBusy(false);
+    resetAccountSyncStateToIdle(true);
+  }, [resetAccountSyncStateToIdle]);
+  const accountSyncInputsSignatureRef = useRef('');
   const contractCardRef = useRef<HTMLDivElement | null>(null);
   const dryRunCardRef = useRef<HTMLDivElement | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
@@ -451,7 +486,10 @@ export function SalesforceMethodSelector() {
       return;
     }
 
-    if (oauthStatus.connected && !prevOAuthConnectedRef.current) {
+    if (prevOAuthConnectedRef.current && !oauthStatus.connected) {
+      resetAccountsOperationalSession();
+      setShowOAuthConfigForm(false);
+    } else if (oauthStatus.connected && !prevOAuthConnectedRef.current) {
       setShowOAuthConfigForm(false);
     } else if (!oauthStatus.connected && !prevOAuthConfiguredRef.current) {
       setShowOAuthConfigForm(false);
@@ -459,7 +497,7 @@ export function SalesforceMethodSelector() {
 
     prevOAuthConfiguredRef.current = oauthStatus.configured;
     prevOAuthConnectedRef.current = oauthStatus.connected;
-  }, [oauthStatus]);
+  }, [oauthStatus, resetAccountsOperationalSession]);
 
   async function handleTest() {
     if (!instanceUrl.trim() || !token.trim()) {
@@ -555,7 +593,7 @@ export function SalesforceMethodSelector() {
     }
   }
 
-  async function handleOAuthHealthCheck() {
+  async function handleOAuthHealthCheck(): Promise<boolean> {
     setOauthActionLoading('health');
     setOauthNotice(null);
     try {
@@ -568,18 +606,21 @@ export function SalesforceMethodSelector() {
       if (res.ok) {
         setLastValidationPulseAt(new Date().toISOString());
         setOauthNotice('Conexão validada com sucesso agora.');
+        return true;
       } else {
         setOauthNotice(data.error || 'Não foi possível validar a conexão OAuth.');
+        return false;
       }
     } catch {
       setOauthNotice('Não foi possível validar a conexão OAuth.');
+      return false;
     } finally {
       setOauthActionLoading(null);
     }
   }
 
-  async function handleLoadAccountsPreview() {
-    if (!oauthConnected) {
+  const handleLoadAccountsPreview = useCallback(async () => {
+    if (!oauthStatus?.connected) {
       setAccountsPreviewError('Conecte o Salesforce via OAuth para carregar o preview read-only de Accounts.');
       return;
     }
@@ -598,6 +639,7 @@ export function SalesforceMethodSelector() {
     setDryRunJustCompleted(false);
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
+    resetAccountSyncStateToIdle();
 
     try {
       const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
@@ -613,13 +655,22 @@ export function SalesforceMethodSelector() {
       }
 
       setAccountsPreview(data.preview);
+      setSelectedAccountPreviewKeys(
+        data.preview.records
+          .map((record, index) => ({
+            key: getAccountPreviewRowKey(record, index),
+            isValid: getAccountPreviewRowGaps(record).length === 0,
+          }))
+          .filter((row) => row.isValid)
+          .map((row) => row.key),
+      );
     } catch {
       setAccountsPreview(null);
       setAccountsPreviewError('Não foi possível carregar o preview read-only de Accounts.');
     } finally {
       setAccountsPreviewLoading(false);
     }
-  }
+  }, [oauthStatus?.connected, resetAccountSyncStateToIdle]);
 
   function toggleAccountPreviewRowSelection(rowKey: string) {
     setPreparedAccountsPreviewSelection(null);
@@ -633,6 +684,7 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
+    resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) =>
       current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
     );
@@ -650,18 +702,43 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
+    resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
   }
 
-  function handlePrepareAccountPreviewSelection() {
+  const handlePrepareAccountPreviewSelection = useCallback(() => {
+    const selectedRows = (accountsPreview?.records || [])
+      .map((record, index) => {
+        const gaps = getAccountPreviewRowGaps(record);
+        return {
+          key: getAccountPreviewRowKey(record, index),
+          label: getAccountPreviewRowLabel(record, index),
+          gaps,
+          isValid: gaps.length === 0,
+          record,
+        };
+      })
+      .filter((row) => selectedAccountPreviewKeys.includes(row.key));
+    const selectedValidCount = selectedRows.filter((row) => row.gaps.length === 0).length;
+    if (selectedRows.length > 0 && selectedValidCount === 0) {
+      setOauthNotice('Nenhuma Account válida foi encontrada nesta leitura. Revise a preparação técnica antes de continuar.');
+      document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    resetAccountSyncStateToIdle();
     setPrepareButtonBusy(true);
     setLocalPreSyncDryRun(null);
     setDryRunFeedback(null);
     setDryRunJustCompleted(false);
     setDryRunButtonBusy(false);
+    const validCount = selectedRows.filter((row) => row.gaps.length === 0).length;
+    const rowsWithGapsCount = selectedRows.filter((row) => row.gaps.length > 0).length;
     const nextSelection = {
-      ...liveAccountPreviewSummary,
       preparedAt: new Date().toISOString(),
+      selectedCount: selectedRows.length,
+      validCount,
+      rowsWithGapsCount,
+      rows: selectedRows,
     };
     window.setTimeout(() => {
       setPreparedAccountsPreviewSelection(nextSelection);
@@ -672,7 +749,7 @@ export function SalesforceMethodSelector() {
       setContractButtonGenerated(false);
       setPrepareButtonBusy(false);
     }, 120);
-  }
+  }, [accountsPreview, resetAccountSyncStateToIdle, selectedAccountPreviewKeys]);
 
   function handleGenerateLocalPreSyncContract() {
     if (!preparedAccountsPreviewSelection || !accountsPreview) return;
@@ -709,6 +786,126 @@ export function SalesforceMethodSelector() {
     }, 120);
   }
 
+  const handleExecuteAccountSync = useCallback(async (source: 'main' | 'advanced' = 'advanced'): Promise<boolean> => {
+    if (!preparedAccountsPreviewSelection || !accountsPreview || !localPreSyncContract || !localPreSyncDryRun) {
+      setOauthNotice('Accounts exigem preparação técnica antes do sync real.');
+      document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return false;
+    }
+    if (preparedAccountsPreviewSelection.validCount === 0 || localPreSyncDryRun.aptoCount === 0) {
+      setOauthNotice('Nenhuma Account válida está pronta para sincronização nesta sessão. Revise a preparação técnica antes de continuar.');
+      document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return false;
+    }
+
+    if (accountSyncState.phase === 'loading') return false;
+
+    setAccountSyncState({ phase: 'loading' });
+    try {
+      const selectedRecords = preparedAccountsPreviewSelection.rows.map((row) => ({
+        Id: row.record.Id,
+        Name: row.record.Name,
+        Website: row.record.Website,
+        Industry: row.record.Industry,
+        Type: row.record.Type,
+        OwnerId: row.record.OwnerId,
+        CreatedDate: row.record.CreatedDate,
+        LastModifiedDate: row.record.LastModifiedDate,
+        id: row.record.Id,
+        displayName: row.label,
+        fieldValues: { ...row.record },
+      }));
+
+      const contract = {
+        source: 'salesforce-oauth',
+        mode: 'assistant-account-sync',
+        entities: [
+          {
+            objectApiName: 'Account',
+            label: 'Account',
+            selectedRecords,
+          },
+        ],
+      };
+
+      const dryRunSummary = {
+        estimatedRecordsCanSync: preparedAccountsPreviewSelection.validCount,
+      };
+
+      const saveContractRes = await fetch('/api/account-connectors/salesforce/oauth/sync-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contract, dryRunSummary }),
+        cache: 'no-store',
+      });
+      const saveContractData = await saveContractRes.json();
+      if (!saveContractRes.ok || saveContractData.status !== 'success' || !saveContractData.syncContract?.id) {
+        setAccountSyncState({ phase: 'error', message: saveContractData.error ?? 'Não foi possível salvar o contrato de Accounts.' });
+        return false;
+      }
+
+      const contractId = saveContractData.syncContract.id as string;
+      const mapping = {
+        entity: 'Account',
+        sourceObjectApiName: 'Account',
+        fieldMap: {
+          source_external_id: 'Id',
+          nome: 'Name',
+          dominio: 'Website',
+          segmento: 'Industry',
+          tipo: 'Type',
+        },
+        dedupeRule: {
+          priority: ['source_external_id', 'domain_match'],
+          domainSourceField: 'Website',
+          preserveCanopiId: true,
+          neverOverwrite: ['id', 'tipoEstrategico', 'playAtivo', 'scoring'],
+        },
+        sourceExternalIdField: 'Id',
+        canonicalDedupeField: 'dominio',
+        updatedAt: new Date().toISOString(),
+      };
+
+      const mappingRes = await fetch('/api/account-connectors/salesforce/oauth/sync-contract', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId, mapping }),
+        cache: 'no-store',
+      });
+      const mappingData = await mappingRes.json();
+      if (!mappingRes.ok || mappingData.status !== 'success') {
+        setAccountSyncState({ phase: 'error', message: mappingData.error ?? 'Não foi possível salvar o mapeamento de Accounts.' });
+        return false;
+      }
+
+      const execRes = await fetch('/api/account-connectors/salesforce/oauth/sync-execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId }),
+        cache: 'no-store',
+      });
+      const execData = await execRes.json();
+      if (!execRes.ok || execData.status !== 'success' || !execData.result) {
+        setAccountSyncState({ phase: 'error', message: execData.error ?? 'Erro ao executar sync de Accounts.' });
+        return false;
+      }
+
+      const result = execData.result as AccountSyncExecutionResult;
+      setAccountSyncState({ phase: 'done', contractId, result });
+      setTimeout(() => contractCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      return true;
+    } catch {
+      setAccountSyncState({ phase: 'error', message: 'Falha de rede ao executar sync de Accounts.' });
+      return false;
+    }
+  }, [
+    accountSyncState.phase,
+    accountsPreview,
+    localPreSyncContract,
+    localPreSyncDryRun,
+    preparedAccountsPreviewSelection,
+  ]);
+
   async function handleOAuthDisconnect() {
     setOauthActionLoading('disconnect');
     setOauthNotice(null);
@@ -721,8 +918,10 @@ export function SalesforceMethodSelector() {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         setOauthNotice(data.error || 'Não foi possível desconectar OAuth.');
       } else {
-        setOauthNotice('Conexão OAuth removida com sucesso.');
+        setOauthNotice('Salesforce desconectado. Os dados já sincronizados permanecem na Canopi, mas a leitura atual foi encerrada.');
       }
+      resetAccountsOperationalSession();
+      resetAccountSyncStateToIdle(true);
       await loadOAuthStatus();
     } catch {
       setOauthNotice('Não foi possível desconectar OAuth.');
@@ -746,6 +945,7 @@ export function SalesforceMethodSelector() {
     if (!lastValidationPulseAt) return false;
     return Date.now() - new Date(lastValidationPulseAt).getTime() < 90_000;
   }, [lastValidationPulseAt]);
+  const connectionValidatedAt = lastValidationPulseAt ?? oauthStatus?.lastHealthCheckAt ?? null;
   const accountPreviewRows = useMemo(
     () =>
       (accountsPreview?.records || []).map((record, index) => {
@@ -783,6 +983,102 @@ export function SalesforceMethodSelector() {
   const isGenerateSuccess = contractButtonGenerated || Boolean(localPreSyncContract);
   const canExecuteLocalDryRun = Boolean(localPreSyncContract);
   const isDryRunSuccess = dryRunJustCompleted || Boolean(localPreSyncDryRun);
+  const accountSyncInputsSignature = useMemo(
+    () =>
+      [
+        selected,
+        oauthConnected ? 'connected' : 'disconnected',
+        accountsPreview?.testedAt ?? 'no-preview',
+        accountsPreview?.records.length ?? 0,
+        selectedAccountPreviewKeys.join('|'),
+        preparedAccountsPreviewSelection?.preparedAt ?? 'no-prepared',
+        localPreSyncContract?.createdAt ?? 'no-contract',
+        localPreSyncDryRun?.createdAt ?? 'no-dryrun',
+      ].join('::'),
+    [
+      selected,
+      oauthConnected,
+      accountsPreview?.testedAt,
+      accountsPreview?.records.length,
+      selectedAccountPreviewKeys,
+      preparedAccountsPreviewSelection?.preparedAt,
+      localPreSyncContract?.createdAt,
+      localPreSyncDryRun?.createdAt,
+    ],
+  );
+
+  useEffect(() => {
+    if (accountSyncState.phase === 'loading') return;
+    if (accountSyncInputsSignature === accountSyncInputsSignatureRef.current) return;
+    if (accountSyncInputsSignatureRef.current !== '') {
+      setAccountSyncState((current) => (current.phase === 'loading' ? current : { phase: 'idle' }));
+    }
+    accountSyncInputsSignatureRef.current = accountSyncInputsSignature;
+  }, [accountSyncInputsSignature, accountSyncState.phase]);
+
+  const accountsJourney = useMemo(() => {
+    const foundCount = accountsPreview?.records.length ?? 0;
+    const validCount = preparedAccountsPreviewSelection?.validCount ?? liveAccountPreviewSummary.validCount;
+    const selectedCount = preparedAccountsPreviewSelection?.selectedCount ?? selectedAccountPreviewRows.length;
+    const autoSelectionApplied = selectedAccountPreviewRows.length > 0;
+    const hasTechnicalReview =
+      Boolean(preparedAccountsPreviewSelection) &&
+      (!localPreSyncContract || !localPreSyncDryRun) &&
+      accountSyncState.phase !== 'done';
+
+    let status: 'not_loaded' | 'found' | 'prepared' | 'technical_review' | 'sync_ready' | 'syncing' | 'synced' | 'error' = 'not_loaded';
+    if (accountsPreviewError) {
+      status = 'error';
+    } else if (accountSyncState.phase === 'loading') {
+      status = 'syncing';
+    } else if (accountSyncState.phase === 'done') {
+      status = 'synced';
+    } else if (localPreSyncContract && localPreSyncDryRun && validCount > 0) {
+      status = 'sync_ready';
+    } else if (foundCount > 0 && validCount === 0) {
+      status = 'technical_review';
+    } else if (hasTechnicalReview) {
+      status = 'technical_review';
+    } else if (preparedAccountsPreviewSelection) {
+      status = 'prepared';
+    } else if (foundCount > 0) {
+      status = 'found';
+    }
+
+    return {
+      status,
+      foundCount,
+      validCount,
+      selectedCount,
+      autoSelectionApplied,
+      errorMessage: accountsPreviewError,
+      technicalReviewReason:
+        foundCount > 0 && validCount === 0
+          ? 'Nenhuma Account válida foi encontrada nesta leitura. Revise a preparação técnica antes de continuar.'
+          : hasTechnicalReview
+            ? 'A preparação técnica de Accounts é necessária antes do sync real.'
+            : null,
+      onLoad: handleLoadAccountsPreview,
+      onPrepare: handlePrepareAccountPreviewSelection,
+      onReviewTechnical: () => {
+        setOauthNotice('Accounts exigem revisão técnica antes do sync completo nesta sessão.');
+        document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      onSync: () => handleExecuteAccountSync('main'),
+    };
+  }, [
+    accountsPreview,
+    accountsPreviewError,
+    handleExecuteAccountSync,
+    handleLoadAccountsPreview,
+    handlePrepareAccountPreviewSelection,
+    localPreSyncContract,
+    localPreSyncDryRun,
+    preparedAccountsPreviewSelection,
+    selectedAccountPreviewRows.length,
+    accountSyncState.phase,
+    liveAccountPreviewSummary.validCount,
+  ]);
   const accountPreviewColumns = [
     ['Id', 'Id'],
     ['Nome', 'Name'],
@@ -1195,12 +1491,12 @@ export function SalesforceMethodSelector() {
                 )}
 
                 {!oauthConnected && oauthConfigured && (
-                  <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
+                  <Card className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
                     <p className="text-sm font-black text-blue-900">Configuração OAuth salva</p>
                     <p className="mt-1 text-sm font-medium text-blue-800">
                       A configuração da External Client App está pronta para iniciar a conexão OAuth.
                     </p>
-                  </div>
+                  </Card>
                 )}
 
                 {oauthNotice && (
@@ -1385,20 +1681,29 @@ export function SalesforceMethodSelector() {
                     </div>
                   </div>
                 )}
-              </div>
+                  </div>
             )}
+
+            <SalesforceMultiEntityPreview
+              oauthConnected={oauthConnected}
+              connectionValidatedAt={connectionValidatedAt}
+              onRequestConnectionValidation={handleOAuthHealthCheck}
+              onRequestConnectionStart={handleOAuthConnect}
+              accountsJourney={accountsJourney}
+            />
 
             <SalesforceDiscovery
               title="Discovery via OAuth conectado"
               description="Campos detectados são somente leitura. Nenhum registro será importado nesta etapa."
             />
 
-            <Card className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div id="salesforce-accounts-technical">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <p className="text-sm font-black text-slate-900">Preview read-only de Accounts</p>
+                  <p className="text-sm font-black text-slate-900">Preparação técnica de Accounts</p>
                   <p className="text-sm font-medium text-slate-600">
-                    Carrega uma amostra pequena e somente leitura de registros reais de Accounts via OAuth já persistido.
+                    Esta área prepara Accounts para sincronização quando a revisão automática não é suficiente.
                   </p>
                 </div>
                 <button
@@ -1422,6 +1727,9 @@ export function SalesforceMethodSelector() {
                   <li>• Não faz writeback.</li>
                   <li>• Não usa Bulk API.</li>
                 </ul>
+                <p className="mt-2 text-[11px] font-medium text-slate-500">
+                  Ações nesta área afetam os dados usados pela jornada principal, mas não avançam automaticamente a etapa do assistente.
+                </p>
               </div>
 
               {!oauthConnected && (
@@ -1935,10 +2243,10 @@ export function SalesforceMethodSelector() {
                   </Card>
                 </div>
               )}
-            </Card>
+            </div>
 
-            <SalesforceMultiEntityPreview oauthConnected={oauthConnected} />
           </div>
+        </div>
         )}
 
         {selected === 'token' && (
