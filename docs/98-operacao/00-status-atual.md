@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.12 (Opportunity sync persistente controlado) implementado e commitado localmente em `273529b`**, com documentação operacional C4.12 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.11 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities e readiness relacional Opportunity ↔ Contact. A implementação C4.12 adiciona sync persistente controlado de Opportunities Salesforce → Canopi, mantendo o estado funcional estável e conservador.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.13 (execução real controlada do Opportunity sync em DEV) validada e documentada no commit documental atual**, com base de código/documentação anterior em `850c383`; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.12 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact e sync persistente controlado de Opportunities. A execução C4.13 confirma o sync controlado de Opportunities Salesforce → Canopi em DEV, com persistência de log e sem efeitos colaterais em Accounts/Contacts.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -25,6 +25,7 @@ Fechado neste marco (Setup Read-only):
 - Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
 - Salesforce OpportunityContactRole Preview (C4.11) concluído localmente em `cc1dbb4`
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
+- Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
 
 Não fechado neste marco:
 - sync real
@@ -88,6 +89,7 @@ Pendências futuras (fora do escopo atual):
 - Preview read-only de Opportunities e Pipeline Salesforce (C4.10) concluído localmente em `bfd7d0a`
 - Salesforce OpportunityContactRole Preview / Readiness Opportunity ↔ Contact (C4.11) concluído localmente em `cc1dbb4`
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
+- Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -135,6 +137,36 @@ Pendências futuras (fora do escopo atual):
   - Sem migration/schema, writeback ou Bulk API.
 - **Validação:** `npm run lint` OK; `npm run build:safe` OK; validação visual manual pré-sync aprovada.
 - **Estado atual:** código commitado localmente; documentação operacional C4.12 registrada no commit documental atual; pendem apenas push e sync Drive.
+
+---
+
+### MARCO: Salesforce C4.13 — Execução real controlada do Opportunity sync em DEV — 2026-05-06
+
+**Status: Executado em DEV e Documentado**
+
+- **Natureza:** Execução real controlada do Opportunity sync persistente em DEV.
+- **Objetivo:** Validar o fluxo de persistência de Opportunities em banco com guardrails absolutos e sem efeitos colaterais em outras entidades.
+- **Base de Código/Documentação:** `850c383`
+- **Contrato auditado:** `75b7ccec-944d-4c6c-b51f-70eaae45438b`
+- **Resultado do Sync:**
+  - `createdCount = 2`
+  - `updatedCount = 0`
+  - `skippedCount = 3`
+  - `unresolvedAccountCount = 3`
+  - `missingRequiredFieldsCount = 0`
+  - `errorCount = 0`
+  - `outcome = partial`
+- **Opportunities Criadas:**
+  - `ece73fcb-beb8-46e9-9b29-f02010ec6048` → `grandhotels-com`
+  - `fbe4eed7-87cd-4b63-aada-71ab5f5ee75a` → `dickenson-consulting-com`
+- **Guardrails Confirmados:**
+  - `opportunity_sync_summary_log` persistido no `contract_json`.
+  - `skippedRecords` com motivo `unresolved_account`.
+  - Nenhuma Account criada.
+  - Nenhum Contact criado.
+  - Nenhum vínculo Opportunity ↔ Contact criado.
+- **Validação Operacional:** working tree permaneceu limpa; `HEAD = origin/main = 850c383` antes da documentação.
+- **Estado atual:** execução validada e registrada; pendem apenas push e sync Drive.
 
 ---
 

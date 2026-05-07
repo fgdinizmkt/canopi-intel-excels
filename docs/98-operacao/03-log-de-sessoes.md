@@ -46,6 +46,34 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-06] — Salesforce C4.13 (Execução real controlada do Opportunity sync em DEV)
+
+- **Natureza:** Execução real controlada do Opportunity sync persistente em DEV.
+- **Objetivo:** Validar a persistência de Opportunities na Canopi com guardrails absolutos, sem efeitos colaterais em Accounts, Contacts ou vínculos Opportunity ↔ Contact.
+- **Base de código/documentação anterior:** `850c383`
+- **Contrato auditado:** `75b7ccec-944d-4c6c-b51f-70eaae45438b`
+- **Resultado:**
+  - `createdCount = 2`
+  - `updatedCount = 0`
+  - `skippedCount = 3`
+  - `unresolvedAccountCount = 3`
+  - `missingRequiredFieldsCount = 0`
+  - `errorCount = 0`
+  - `outcome = partial`
+- **Opportunities criadas:**
+  - `ece73fcb-beb8-46e9-9b29-f02010ec6048` → `grandhotels-com`
+  - `fbe4eed7-87cd-4b63-aada-71ab5f5ee75a` → `dickenson-consulting-com`
+- **Comportamento observado:**
+  - `opportunity_sync_summary_log` persistido no `contract_json`.
+  - `skippedRecords` com motivo `unresolved_account`.
+  - Nenhuma Account criada.
+  - Nenhum Contact criado.
+  - Nenhum vínculo Opportunity ↔ Contact criado.
+- **Validação operacional:** working tree permaneceu limpa; `HEAD = origin/main = 850c383` antes da documentação.
+- **Estado atual:** execução validada em DEV e registrada; pendem apenas push e sync Drive.
+
+---
+
 ## [2026-05-06] — Salesforce C4.10 (Preview read-only de Opportunities e Pipeline)
 
 - **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Canopi.
