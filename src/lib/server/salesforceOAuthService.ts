@@ -2705,6 +2705,8 @@ export async function generateOpportunityRelationshipPreview(
 
   const contractJson = row.contract_json;
   const entities: any[] = Array.isArray(contractJson?.entities) ? contractJson.entities : [];
+  const priorSummary = contractJson?.opportunity_sync_summary_log as OpportunitySyncSummaryLog | undefined;
+  const priorSourceMapping = buildOpportunitySourceMappingLookup(priorSummary);
 
   const oppEntity = entities.find((e: any) => e.objectApiName === 'Opportunity');
   const sfOpportunities = (oppEntity?.selectedRecords ?? []) as any[];
@@ -2764,6 +2766,8 @@ export async function generateOpportunityRelationshipPreview(
           : 'AccountId ausente no registro Salesforce. Opportunity marcada como unresolved_account.',
       );
       actionPreview = 'unresolved_account';
+    } else if (priorSourceMapping.has(sourceOpportunityId)) {
+      actionPreview = 'ready_to_update';
     } else {
       actionPreview = 'ready_to_create';
     }
@@ -2804,6 +2808,553 @@ export async function generateOpportunityRelationshipPreview(
     missingFieldsCount,
     contactRoleLacuna: true, // OpportunityContactRole não disponível no payload atual — C4.10 não infere vínculo com Contact
     items,
+  };
+}
+
+// ─── Opportunity Sync Execute (C4.12) ────────────────────────────────────────
+
+export type OpportunitySyncOutcome = 'synced' | 'partial' | 'skipped' | 'error';
+
+export interface OpportunitySyncExecutionRecordPair {
+  sourceOpportunityId: string;
+  canopiOpportunityId: string;
+  accountId: string;
+  accountSlug: string;
+  nome: string;
+  etapa: string;
+  valor: number;
+}
+
+export interface OpportunitySyncExecutionSkippedRecord {
+  sourceOpportunityId: string;
+  sourceAccountId: string;
+  accountId: string | null;
+  accountSlug: string | null;
+  canopiOpportunityId: string | null;
+  nome: string;
+  reason: string;
+}
+
+export interface OpportunitySyncExecutionResult {
+  contractId: string;
+  entity: 'Opportunity';
+  startedAt: string;
+  finishedAt: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  unresolvedAccountCount: number;
+  missingRequiredFieldsCount: number;
+  existingMatchSkippedCount: number;
+  ambiguousMatchSkippedCount: number;
+  errorCount: number;
+  outcome: OpportunitySyncOutcome;
+  createdRecords: OpportunitySyncExecutionRecordPair[];
+  updatedRecords: OpportunitySyncExecutionRecordPair[];
+  skippedRecords: OpportunitySyncExecutionSkippedRecord[];
+  warnings: string[];
+  statusTransitioned: boolean;
+}
+
+function computeOpportunitySyncOutcome(
+  createdCount: number,
+  updatedCount: number,
+  skippedCount: number,
+  errorCount: number,
+): OpportunitySyncOutcome {
+  if (errorCount > 0 && createdCount === 0 && updatedCount === 0) return 'error';
+  if (createdCount === 0 && updatedCount === 0 && skippedCount > 0 && errorCount === 0) return 'skipped';
+  if (errorCount > 0 || skippedCount > 0) return 'partial';
+  return 'synced';
+}
+
+function normalizeOpportunityName(raw: string): string {
+  return raw.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function buildOpportunityIdentityKey(accountSlug: string, nome: string): string {
+  return `${accountSlug}::${normalizeOpportunityName(nome)}`;
+}
+
+type CanopiAccountLookupEntry = {
+  canopiId: string;
+  slug: string;
+  nome: string;
+};
+
+type OpportunityRowLookupEntry = {
+  id: string;
+  account_slug: string;
+  nome: string;
+  etapa: string;
+  valor: number;
+  owner: string;
+  risco: 'Alto' | 'Médio' | 'Baixo';
+  probabilidade: number;
+  historico: string[];
+};
+
+type OpportunitySyncSummaryLog = {
+  startedAt: string;
+  finishedAt: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  unresolvedAccountCount: number;
+  missingRequiredFieldsCount: number;
+  existingMatchSkippedCount: number;
+  ambiguousMatchSkippedCount: number;
+  errorCount: number;
+  outcome: OpportunitySyncOutcome;
+  createdRecords: OpportunitySyncExecutionRecordPair[];
+  updatedRecords: OpportunitySyncExecutionRecordPair[];
+  skippedRecords: OpportunitySyncExecutionSkippedRecord[];
+  warnings: string[];
+};
+
+async function buildCanopiAccountLookup(
+  supabase: ReturnType<typeof getSupabaseAdminClient>,
+): Promise<Map<string, CanopiAccountLookupEntry>> {
+  const lookup = new Map<string, CanopiAccountLookupEntry>();
+
+  const { data, error } = await supabase
+    .from('accounts')
+    .select('id, slug, nome');
+
+  if (error) throw new Error('READ_CANOPI_ACCOUNT_LOOKUP_FAILED');
+
+  for (const row of data ?? []) {
+    const id = String((row as { id?: string }).id ?? '').trim();
+    const slug = String((row as { slug?: string }).slug ?? '').trim();
+    const nome = String((row as { nome?: string }).nome ?? '').trim();
+    if (!id || !slug) continue;
+    lookup.set(id, { canopiId: id, slug, nome });
+  }
+
+  return lookup;
+}
+
+async function buildOpportunityRowLookup(
+  supabase: ReturnType<typeof getSupabaseAdminClient>,
+): Promise<{
+  rowsById: Map<string, OpportunityRowLookupEntry>;
+  rowsByIdentity: Map<string, OpportunityRowLookupEntry[]>;
+}> {
+  const rowsById = new Map<string, OpportunityRowLookupEntry>();
+  const rowsByIdentity = new Map<string, OpportunityRowLookupEntry[]>();
+
+  const { data, error } = await supabase
+    .from('oportunidades')
+    .select(`
+      id,
+      account_slug,
+      nome,
+      etapa,
+      valor,
+      owner,
+      risco,
+      probabilidade,
+      historico
+    `);
+
+  if (error) throw new Error('READ_EXISTING_OPPORTUNITIES_FAILED');
+
+  for (const row of data ?? []) {
+    const entry: OpportunityRowLookupEntry = {
+      id: String((row as { id?: string }).id ?? ''),
+      account_slug: String((row as { account_slug?: string }).account_slug ?? ''),
+      nome: String((row as { nome?: string }).nome ?? ''),
+      etapa: String((row as { etapa?: string }).etapa ?? ''),
+      valor: Number((row as { valor?: number }).valor ?? 0),
+      owner: String((row as { owner?: string }).owner ?? ''),
+      risco: ((row as { risco?: OpportunityRowLookupEntry['risco'] }).risco ?? 'Médio') as OpportunityRowLookupEntry['risco'],
+      probabilidade: Number((row as { probabilidade?: number }).probabilidade ?? 0),
+      historico: Array.isArray((row as { historico?: string[] }).historico) ? ((row as { historico?: string[] }).historico ?? []) : [],
+    };
+
+    if (!entry.id || !entry.account_slug || !entry.nome) continue;
+    rowsById.set(entry.id, entry);
+
+    const key = buildOpportunityIdentityKey(entry.account_slug, entry.nome);
+    const existing = rowsByIdentity.get(key) ?? [];
+    existing.push(entry);
+    rowsByIdentity.set(key, existing);
+  }
+
+  return { rowsById, rowsByIdentity };
+}
+
+function buildOpportunitySourceMappingLookup(summary: OpportunitySyncSummaryLog | undefined): Map<string, string> {
+  const lookup = new Map<string, string>();
+  if (!summary) return lookup;
+
+  for (const record of [...(summary.createdRecords ?? []), ...(summary.updatedRecords ?? [])]) {
+    if (record.sourceOpportunityId && record.canopiOpportunityId && !lookup.has(record.sourceOpportunityId)) {
+      lookup.set(record.sourceOpportunityId, record.canopiOpportunityId);
+    }
+  }
+
+  return lookup;
+}
+
+/**
+ * Executa sync persistente controlado de Opportunities Salesforce → Canopi.
+ *
+ * Guardrails absolutos:
+ * - Nunca aceita payload bruto do front-end.
+ * - Lê exclusivamente do contrato salvo no banco (status=mapped ou synced).
+ * - Grava somente Opportunities com Account resolvida via C4.7.
+ * - Nunca cria Accounts, Contacts ou vínculos Opportunity ↔ Contact.
+ * - Não usa OpportunityContactRole para persistência.
+ * - Não usa writeback Salesforce, Bulk API ou migration.
+ * - Não altera status do contrato.
+ * - Registra opportunity_sync_summary_log no JSONB do contrato existente.
+ */
+export async function executeOpportunitySync(contractId: string): Promise<OpportunitySyncExecutionResult> {
+  if (!contractId || typeof contractId !== 'string') {
+    throw new Error('CONTRACT_ID_REQUIRED');
+  }
+
+  const startedAt = new Date().toISOString();
+  const supabase = getSupabaseAdminClient();
+
+  const { data: contractRow, error: readError } = await supabase
+    .from('salesforce_sync_contracts')
+    .select('id, provider, status, contract_json')
+    .eq('id', contractId)
+    .eq('provider', SALESFORCE_PROVIDER)
+    .maybeSingle();
+
+  if (readError) throw new Error('READ_SYNC_CONTRACT_FAILED');
+  if (!contractRow) throw new Error('CONTRACT_NOT_FOUND');
+
+  const row = contractRow as { id: string; status: string; contract_json: any };
+  if (row.status !== 'mapped' && row.status !== 'synced') {
+    throw new Error('CONTRACT_STATUS_INVALID');
+  }
+
+  const contractJson = row.contract_json;
+  const entities: any[] = Array.isArray(contractJson?.entities) ? contractJson.entities : [];
+  const oppEntity = entities.find((e: any) => e.objectApiName === 'Opportunity');
+  const sfOpportunities = (oppEntity?.selectedRecords ?? []) as any[];
+
+  if (sfOpportunities.length === 0) {
+    throw new Error('NO_OPPORTUNITIES_IN_CONTRACT');
+  }
+
+  const priorSummary = contractJson?.opportunity_sync_summary_log as OpportunitySyncSummaryLog | undefined;
+  const priorSourceMapping = buildOpportunitySourceMappingLookup(priorSummary);
+
+  const warnings: string[] = [];
+  const [accountIdLookup, canopiAccountLookup, opportunityLookup] = await Promise.all([
+    buildAccountIdLookup(supabase),
+    buildCanopiAccountLookup(supabase),
+    buildOpportunityRowLookup(supabase),
+  ]);
+
+  const { syncOpportunityFromCRM } = await import('../oportunidadesRepository');
+
+  let createdCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+  let unresolvedAccountCount = 0;
+  let missingRequiredFieldsCount = 0;
+  let existingMatchSkippedCount = 0;
+  let ambiguousMatchSkippedCount = 0;
+  let errorCount = 0;
+
+  const createdRecords: OpportunitySyncExecutionRecordPair[] = [];
+  const updatedRecords: OpportunitySyncExecutionRecordPair[] = [];
+  const skippedRecords: OpportunitySyncExecutionSkippedRecord[] = [];
+
+  for (const sfOpp of sfOpportunities) {
+    const sourceOpportunityId = readSfField(sfOpp, 'Id') || String(sfOpp['id'] ?? '').trim();
+    const sourceAccountId = readSfField(sfOpp, 'AccountId');
+    const nome = (readSfField(sfOpp, 'Name') || String(sfOpp['displayName'] ?? '')).trim();
+    const stageName = readSfField(sfOpp, 'StageName').trim();
+    const amountRaw = readSfField(sfOpp, 'Amount');
+    const amount = amountRaw ? Number.parseFloat(amountRaw) : Number.NaN;
+    const closeDate = readSfField(sfOpp, 'CloseDate').trim();
+    const probabilityRaw = readSfField(sfOpp, 'Probability');
+    const probability = probabilityRaw ? Number.parseFloat(probabilityRaw) : 0;
+    const ownerId = readSfField(sfOpp, 'OwnerId').trim();
+    if (!closeDate) warnings.push(`CloseDate ausente em Opportunity "${nome || sourceOpportunityId || 'sem id'}".`);
+    if (!ownerId) warnings.push(`OwnerId ausente em Opportunity "${nome || sourceOpportunityId || 'sem id'}".`);
+
+    const basicAccount = sourceAccountId ? accountIdLookup.get(sourceAccountId) ?? null : null;
+    const resolvedCanopiAccount = basicAccount ? canopiAccountLookup.get(basicAccount.canopiId) ?? null : null;
+    const resolvedAccountSlug = resolvedCanopiAccount?.slug ?? null;
+    const resolvedAccountId = resolvedCanopiAccount?.canopiId ?? null;
+
+    if (!sourceOpportunityId || !sourceAccountId || !nome || !stageName || !Number.isFinite(amount)) {
+      missingRequiredFieldsCount++;
+      skippedCount++;
+      skippedRecords.push({
+        sourceOpportunityId: sourceOpportunityId || '',
+        sourceAccountId: sourceAccountId || '',
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: null,
+        nome: nome || '—',
+        reason: !sourceOpportunityId
+          ? 'Id da Opportunity ausente.'
+          : !sourceAccountId
+            ? 'AccountId ausente no registro Salesforce.'
+            : !nome
+              ? 'Nome da Opportunity ausente.'
+              : !stageName
+                ? 'StageName ausente.'
+                : 'Amount ausente.',
+      });
+      continue;
+    }
+
+    if (!resolvedCanopiAccount || !resolvedAccountSlug || !resolvedAccountId) {
+      unresolvedAccountCount++;
+      skippedCount++;
+      skippedRecords.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: null,
+        nome,
+        reason: sourceAccountId
+          ? `Salesforce AccountId "${sourceAccountId}" não encontrado nos contratos Account sincronizados (C4.7). Opportunity ignorada para evitar órfão.`
+          : 'AccountId ausente no registro Salesforce. Opportunity ignorada para evitar órfão.',
+      });
+      continue;
+    }
+
+    const existingMappedOpportunityId = priorSourceMapping.get(sourceOpportunityId) ?? null;
+    const existingMappedOpportunity = existingMappedOpportunityId
+      ? opportunityLookup.rowsById.get(existingMappedOpportunityId) ?? null
+      : null;
+
+    const identityKey = buildOpportunityIdentityKey(resolvedAccountSlug, nome);
+    const identityMatches = opportunityLookup.rowsByIdentity.get(identityKey) ?? [];
+
+    const syncNote = `Sincronizada do Salesforce C4.12 em ${new Date().toISOString()}`;
+    const syncHistorico = existingMappedOpportunity
+      ? [...(existingMappedOpportunity.historico || []), syncNote]
+      : [syncNote];
+
+    if (existingMappedOpportunityId && existingMappedOpportunity) {
+      const result = await syncOpportunityFromCRM(
+        {
+          id: existingMappedOpportunityId,
+          accountSlug: resolvedAccountSlug,
+          nome,
+          etapa: stageName,
+          valor: Number.isFinite(amount) ? amount : 0,
+          owner: ownerId || undefined,
+          probabilidade: Number.isFinite(probability) ? probability : 0,
+          historico: syncHistorico,
+        },
+        'update',
+      );
+
+      if (result.action === 'updated') {
+        updatedCount++;
+        updatedRecords.push({
+          sourceOpportunityId,
+          canopiOpportunityId: existingMappedOpportunityId,
+          accountId: resolvedAccountId,
+          accountSlug: resolvedAccountSlug,
+          nome,
+          etapa: stageName,
+          valor: Number.isFinite(amount) ? amount : 0,
+        });
+      } else if (result.action === 'skipped') {
+        skippedCount++;
+        existingMatchSkippedCount++;
+        skippedRecords.push({
+          sourceOpportunityId,
+          sourceAccountId,
+          accountId: resolvedAccountId,
+          accountSlug: resolvedAccountSlug,
+          canopiOpportunityId: existingMappedOpportunityId,
+          nome,
+          reason: result.reason ?? 'Opportunity mapeada previamente, mas não pôde ser atualizada.',
+        });
+      } else {
+        errorCount++;
+        warnings.push(`Erro ao atualizar Opportunity "${nome}": ${result.error}`);
+      }
+      continue;
+    }
+
+    if (existingMappedOpportunityId && !existingMappedOpportunity) {
+      skippedCount++;
+      existingMatchSkippedCount++;
+      skippedRecords.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: existingMappedOpportunityId,
+        nome,
+        reason: 'Mapeamento anterior existe no contrato, mas a Opportunity Canopi não foi encontrada para atualização. Sync conservador ignorado.',
+      });
+      continue;
+    }
+
+    if (identityMatches.length === 1) {
+      skippedCount++;
+      existingMatchSkippedCount++;
+      skippedRecords.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: identityMatches[0].id,
+        nome,
+        reason: 'Opportunity já existe na Canopi com a mesma combinação account_slug + nome normalizado. Sync conservador ignorou para evitar duplicidade.',
+      });
+      continue;
+    }
+
+    if (identityMatches.length > 1) {
+      skippedCount++;
+      ambiguousMatchSkippedCount++;
+      skippedRecords.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: null,
+        nome,
+        reason: 'Mais de uma Opportunity Canopi corresponde a account_slug + nome normalizado. Sync ignorado para evitar ambiguidade.',
+      });
+      continue;
+    }
+
+    const result = await syncOpportunityFromCRM(
+      {
+        id: crypto.randomUUID(),
+        accountSlug: resolvedAccountSlug,
+        nome,
+        etapa: stageName,
+        valor: Number.isFinite(amount) ? amount : 0,
+        owner: ownerId || undefined,
+        probabilidade: Number.isFinite(probability) ? probability : 0,
+        historico: syncHistorico,
+      },
+      'create',
+    );
+
+    if (result.action === 'created' && result.canopiId) {
+      createdCount++;
+      createdRecords.push({
+        sourceOpportunityId,
+        canopiOpportunityId: result.canopiId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        nome,
+        etapa: stageName,
+        valor: Number.isFinite(amount) ? amount : 0,
+      });
+      opportunityLookup.rowsById.set(result.canopiId, {
+        id: result.canopiId,
+        account_slug: resolvedAccountSlug,
+        nome,
+        etapa: stageName,
+        valor: Number.isFinite(amount) ? amount : 0,
+        owner: ownerId || '',
+        risco: 'Médio',
+        probabilidade: Number.isFinite(probability) ? probability : 0,
+        historico: syncHistorico,
+      });
+      const createdKey = buildOpportunityIdentityKey(resolvedAccountSlug, nome);
+      const nextIdentity = opportunityLookup.rowsByIdentity.get(createdKey) ?? [];
+      nextIdentity.push({
+        id: result.canopiId,
+        account_slug: resolvedAccountSlug,
+        nome,
+        etapa: stageName,
+        valor: Number.isFinite(amount) ? amount : 0,
+        owner: ownerId || '',
+        risco: 'Médio',
+        probabilidade: Number.isFinite(probability) ? probability : 0,
+        historico: syncHistorico,
+      });
+      opportunityLookup.rowsByIdentity.set(createdKey, nextIdentity);
+      priorSourceMapping.set(sourceOpportunityId, result.canopiId);
+    } else if (result.action === 'skipped') {
+      skippedCount++;
+      warnings.push(`Opportunity "${nome}" ignorada na criação: ${result.reason ?? 'sem motivo informado'}.`);
+      skippedRecords.push({
+        sourceOpportunityId,
+        sourceAccountId,
+        accountId: resolvedAccountId,
+        accountSlug: resolvedAccountSlug,
+        canopiOpportunityId: null,
+        nome,
+        reason: result.reason ?? 'Opportunity ignorada na criação.',
+      });
+    } else {
+      errorCount++;
+      warnings.push(`Erro ao criar Opportunity "${nome}": ${result.error}`);
+    }
+  }
+
+  const finishedAt = new Date().toISOString();
+  const outcome = computeOpportunitySyncOutcome(createdCount, updatedCount, skippedCount, errorCount);
+
+  const opportunitySyncSummaryLog: OpportunitySyncSummaryLog = {
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    unresolvedAccountCount,
+    missingRequiredFieldsCount,
+    existingMatchSkippedCount,
+    ambiguousMatchSkippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+  };
+
+  const updatedContractJson = {
+    ...contractJson,
+    opportunity_sync_summary_log: opportunitySyncSummaryLog,
+  };
+
+  const { error: updateError } = await supabase
+    .from('salesforce_sync_contracts')
+    .update({
+      contract_json: updatedContractJson,
+      updated_at: finishedAt,
+    })
+    .eq('id', contractId);
+
+  if (updateError) {
+    throw new Error('SAVE_OPPORTUNITY_SYNC_SUMMARY_FAILED');
+  }
+
+  return {
+    contractId,
+    entity: 'Opportunity',
+    startedAt,
+    finishedAt,
+    createdCount,
+    updatedCount,
+    skippedCount,
+    unresolvedAccountCount,
+    missingRequiredFieldsCount,
+    existingMatchSkippedCount,
+    ambiguousMatchSkippedCount,
+    errorCount,
+    outcome,
+    createdRecords,
+    updatedRecords,
+    skippedRecords,
+    warnings,
+    statusTransitioned: false,
   };
 }
 
