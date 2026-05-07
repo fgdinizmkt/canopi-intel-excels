@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.14 (validação visual pós-sync de Opportunities) aprovada no browser**, com base anterior em `5a61e0f`; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.13 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.14 (validação visual pós-sync de Opportunities) aprovada no browser**, com base anterior em `5a61e0f`; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -38,6 +38,28 @@ Não fechado neste marco:
 - persistência de mapeamento para demais entidades Salesforce
 - uso de mapeamento em sync real para demais entidades Salesforce
 - Salesforce Connector completo
+
+## Pendências controladas e regra operacional
+
+- **C4.16.17 — Ajustes finais Salesforce pós-validação visual**
+  - Confirmar se a etapa “Validar conexão” só é pulada quando há validação real registrada.
+  - Ajustar ou remover o bloco “Ação recomendada” quando ele trouxer texto genérico/inútil.
+  - Mover “Detalhes técnicos e auditoria / modo avançado” para a última seção da página.
+  - Auditar termos técnicos e padronizar linguagem em PT-BR na jornada principal.
+  - Manter termos em inglês apenas quando forem padrão de mercado ou nomes de objetos, como Salesforce, OAuth, CSV, API, Account, Contact e Opportunity.
+  - Não alterar lógica de sync, backend, services, rotas, schemas ou migrations neste ajuste.
+  - Retomar esse recorte após fechar os CRMs.
+
+- **Regra operacional de documentação persistente**
+  - Não deixar decisões importantes apenas no chat.
+  - Quando houver decisão operacional, pendência de recorte, regra nova ou checkpoint de fase, documentar no repositório por agente.
+  - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
+
+Próximo passo após esta documentação:
+- antes de abrir o próximo CRM, fazer auditoria curta do estado real;
+- verificar branch, HEAD, working tree e diff;
+- decidir se o estado atual do Salesforce será commitado como checkpoint, isolado ou mantido pendente;
+- só depois iniciar o próximo conector/CRM.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)
 

@@ -3,6 +3,28 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-07] — Registro operacional pendente Salesforce C4.16.17 e regra de documentação via agente
+
+- **Natureza:** Registro documental de pendência controlada e regra operacional de memória viva.
+- **Objetivo:** Registrar no repositório o follow-up do Salesforce C4.16.17 e formalizar que decisões operacionais persistentes não devem ficar só no chat.
+- **Pendência controlada C4.16.17:**
+  - Confirmar se a etapa “Validar conexão” só é pulada quando há validação real registrada.
+  - Ajustar ou remover o bloco “Ação recomendada” quando ele trouxer texto genérico/inútil.
+  - Mover “Detalhes técnicos e auditoria / modo avançado” para a última seção da página.
+  - Auditar termos técnicos e padronizar linguagem em PT-BR na jornada principal.
+  - Manter termos em inglês apenas quando forem padrão de mercado ou nomes de objetos, como Salesforce, OAuth, CSV, API, Account, Contact e Opportunity.
+  - Não alterar lógica de sync, backend, services, rotas, schemas ou migrations neste ajuste.
+  - Retomar esse recorte após fechar os CRMs.
+- **Regra operacional registrada:**
+  - Não deixar decisões importantes apenas no chat.
+  - Quando houver decisão operacional, pendência de recorte, regra nova ou checkpoint de fase, documentar no repositório por agente.
+  - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
+- **Próximo passo registrado:**
+  - Antes de abrir o próximo CRM, fazer auditoria curta do estado real.
+  - Verificar branch, HEAD, working tree e diff.
+  - Decidir se o estado atual do Salesforce será commitado como checkpoint, isolado ou mantido pendente.
+  - Só depois iniciar o próximo conector/CRM.
+
 ## [2026-05-06] — Salesforce C4.11 (OpportunityContactRole Preview / Readiness Opportunity ↔ Contact)
 
 - **Natureza:** Preview read-only de relacionamentos Opportunity ↔ Contact via OpportunityContactRole.
