@@ -3,6 +3,34 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-07] — Salesforce C4.17.1 (Gerador offline de massa sintética)
+
+- **Natureza:** Ferramenta offline para gerar dataset sintético local de Salesforce sem conexão externa.
+- **Objetivo:** Preparar massa sintética controlada para testes futuros, sem tocar no Salesforce real nem no banco.
+- **Commit local:** `30b072d` — `chore(salesforce): add offline synthetic dataset generator`
+- **O que foi materializado:**
+  - **Script:** `scripts/salesforce-generate-synthetic-dataset.mjs`
+  - **Ignora saída local:** `tmp/salesforce-synthetic-dataset/` adicionada ao `.gitignore`
+  - **Saída local:** dataset com `Accounts`, `Contacts`, `Opportunities` e `OpportunityContactRoles`
+- **Volume e cenários:**
+  - `50` Accounts
+  - `120` Contacts
+  - `80` Opportunities
+  - `20` relacionamentos Opportunity ↔ Contact
+  - Cenários de domínio válido, domínio ausente, domínio duplicado, nomes parecidos, Contacts sem Account, e-mail inválido, Opportunities sem Account, Account não resolvida e campos incompletos
+- **Validação:**
+  - Dry-run local executado com sucesso
+  - Escrita local executada com sucesso
+  - `git diff --check` OK
+  - `npm run lint` OK
+  - `npm run build:safe` OK
+- **Limites confirmados:**
+  - Sem conexão com Salesforce
+  - Sem sync real
+  - Sem gravação no banco
+  - Sem migration
+- **Próximo passo sugerido:** C4.17.2 — criar importador controlado apenas após Sandbox/DEV Salesforce confirmado.
+
 ## [2026-05-07] — Registro operacional pendente Salesforce C4.16.17 e regra de documentação via agente
 
 - **Natureza:** Registro documental de pendência controlada e regra operacional de memória viva.

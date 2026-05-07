@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.14 (validação visual pós-sync de Opportunities) aprovada no browser**, com base anterior em `5a61e0f`; documentação C4.14 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`**, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -27,6 +27,7 @@ Fechado neste marco (Setup Read-only):
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 - Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
 - Salesforce Opportunity validação visual pós-sync (C4.14) aprovada a partir de `5a61e0f`
+- Gerador offline de massa sintética Salesforce (C4.17.1) concluído em `30b072d`
 
 Não fechado neste marco:
 - sync real
@@ -38,6 +39,7 @@ Não fechado neste marco:
 - persistência de mapeamento para demais entidades Salesforce
 - uso de mapeamento em sync real para demais entidades Salesforce
 - Salesforce Connector completo
+- Salesforce synthetic data stress test (C4.17) concluído em fase offline pelo gerador local
 
 ## Pendências controladas e regra operacional
 
@@ -49,6 +51,12 @@ Não fechado neste marco:
   - Manter termos em inglês apenas quando forem padrão de mercado ou nomes de objetos, como Salesforce, OAuth, CSV, API, Account, Contact e Opportunity.
   - Não alterar lógica de sync, backend, services, rotas, schemas ou migrations neste ajuste.
   - Retomar esse recorte após fechar os CRMs.
+
+- **C4.17.2 — Importador controlado de massa sintética em Salesforce Sandbox/DEV confirmado**
+  - Criar importador controlado apenas quando o ambiente Salesforce estiver confirmado como Sandbox/DEV.
+  - Não usar produção nem dados reais sensíveis.
+  - Reusar o dataset local sintético gerado em `tmp/salesforce-synthetic-dataset/` como fonte de teste.
+  - Manter guardrails de validação, dry-run e confirmação explícita antes de qualquer escrita externa.
 
 - **Regra operacional de documentação persistente**
   - Não deixar decisões importantes apenas no chat.
