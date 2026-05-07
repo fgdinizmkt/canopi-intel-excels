@@ -22,6 +22,30 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
+## [2026-05-06] — Salesforce C4.12 (Opportunity sync persistente controlado)
+
+- **Natureza:** Sync persistente controlado de Opportunities Salesforce → Canopi.
+- **Objetivo:** Gravar Opportunities na Canopi de forma explícita e conservadora, sem schema novo, sem writeback e sem criar vínculos Opportunity ↔ Contact.
+- **Commit local:** `273529b` — `feat(settings): add controlled Salesforce Opportunity sync execution`
+- **O que foi materializado:**
+  - **Repository (`syncOpportunityFromCRM`):** Persistência de Opportunities na tabela atual `oportunidades`, usando os campos já disponíveis e sem migration/schema novo.
+  - **Service (`executeOpportunitySync`):** Execução controlada que lê apenas o contrato salvo, exige `contractId` explícito e grava somente Opportunities com Account resolvida via lookup do C4.7.
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-sync-execute`; não aceita fallback para último contrato.
+  - **UI (`SalesforceMultiEntityPreview`):** Painel atual de Opportunities recebeu botão explícito de sync controlado, com texto claro sobre o que é gravado e o que continua proibido.
+- **Comportamento e Guardrails:**
+  - Grava Opportunities na Canopi somente quando há Account resolvida.
+  - Não cria Account, Contact ou vínculo Opportunity ↔ Contact.
+  - Não usa OpportunityContactRole para persistência.
+  - Não usa nome, e-mail ou domínio de Contact como fallback.
+  - Update só ocorre com mapeamento confiável em `opportunity_sync_summary_log`.
+  - Match por `account_slug + nome normalizado` apenas bloqueia duplicidade; não atualiza.
+  - `opportunity_sync_summary_log` é persistido no `contract_json`.
+  - Sem writeback, Bulk API ou migrations.
+- **Validação:** `npm run lint` OK; `npm run build:safe` OK; validação visual manual pré-sync aprovada.
+- **Estado atual:** código commitado localmente; documentação operacional C4.12 registrada no commit documental atual; pendem apenas push e sync Drive.
+
+---
+
 ## [2026-05-06] — Salesforce C4.10 (Preview read-only de Opportunities e Pipeline)
 
 - **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Canopi.

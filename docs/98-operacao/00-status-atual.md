@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.11 (OpportunityContactRole Preview) implementado e commitado localmente em `cc1dbb4`, com documentação C4.11 consolidada no commit documental atual**; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.10 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, e preview de Opportunities. A implementação C4.11 adiciona a validação relacional explícita Opportunity ↔ Contact via OpportunityContactRole, mantendo o estado funcional estável e read-only.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.12 (Opportunity sync persistente controlado) implementado e commitado localmente em `273529b`**, com documentação operacional C4.12 registrada no commit documental atual; pendem apenas push e sync Drive. Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.11 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities e readiness relacional Opportunity ↔ Contact. A implementação C4.12 adiciona sync persistente controlado de Opportunities Salesforce → Canopi, mantendo o estado funcional estável e conservador.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -24,6 +24,7 @@ Fechado neste marco (Setup Read-only):
 - Salesforce Account sync preview (C4.6) concluído localmente em `30b9907`
 - Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
 - Salesforce OpportunityContactRole Preview (C4.11) concluído localmente em `cc1dbb4`
+- Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 
 Não fechado neste marco:
 - sync real
@@ -86,6 +87,7 @@ Pendências futuras (fora do escopo atual):
 - Salesforce Account sync persistente (C4.7) concluído localmente em `0ed2a26`
 - Preview read-only de Opportunities e Pipeline Salesforce (C4.10) concluído localmente em `bfd7d0a`
 - Salesforce OpportunityContactRole Preview / Readiness Opportunity ↔ Contact (C4.11) concluído localmente em `cc1dbb4`
+- Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 
 ## Fase atual do plano
 **Fase E — Supabase Migration & Scale** (Concluída: E1–E20 + Bloco C Infra + Consumo UI + AccountProfile/ContactProfile Parity + Refinamento Accounts 1–4c + Fallback Defensivo + E21 Bloco C Population + E22 CockpitV2 Tactical Polish + **Saneamento Absoluto Final**)
@@ -108,6 +110,31 @@ Pendências futuras (fora do escopo atual):
   - Zero inferência por nome, e-mail ou domínio; apenas IDs explícitos via logs de sync.
   - Sem writeback, Bulk API, schema novo ou migrations.
 - **Validação Visual:** Aprovada visualmente como aceitável para a fase operacional de setup. Tratamento de estado vazio (sem contratos elegíveis) validado como não fatal.
+
+---
+
+### MARCO: Salesforce C4.12 — Opportunity sync persistente controlado — 2026-05-06
+
+**Status: Implementado Localmente (Commit `273529b`)**
+
+- **Natureza:** Sync persistente controlado de Opportunities Salesforce → Canopi, com execução explícita e conservadora.
+- **Objetivo:** Gravar Opportunities na Canopi somente quando houver Account resolvida, sem criar schema novo e sem inferências indevidas.
+- **Escopo Técnico:**
+  - **Repository:** Adicionado `syncOpportunityFromCRM` em `oportunidadesRepository.ts`, reaproveitando a estrutura atual da tabela `oportunidades`.
+  - **Service:** Adicionado `executeOpportunitySync` em `salesforceOAuthService.ts`, lendo exclusivamente o contrato salvo, sem fallback para último contrato.
+  - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-sync-execute` com `contractId` explícito.
+  - **UX/UI:** O painel atual de Opportunities foi estendido para executar sync controlado explícito, sem misturar com C4.11.
+- **Guardrails Confirmados:**
+  - Exige `contractId` explícito e lê somente o contrato salvo.
+  - Grava somente Opportunities com Account resolvida.
+  - Não cria Account, Contact ou vínculo Opportunity ↔ Contact.
+  - Não usa OpportunityContactRole para persistência.
+  - Update só ocorre com mapeamento confiável em `opportunity_sync_summary_log`.
+  - Match por `account_slug + nome normalizado` apenas bloqueia duplicidade.
+  - Registra `opportunity_sync_summary_log` no `contract_json`.
+  - Sem migration/schema, writeback ou Bulk API.
+- **Validação:** `npm run lint` OK; `npm run build:safe` OK; validação visual manual pré-sync aprovada.
+- **Estado atual:** código commitado localmente; documentação operacional C4.12 registrada no commit documental atual; pendem apenas push e sync Drive.
 
 ---
 
