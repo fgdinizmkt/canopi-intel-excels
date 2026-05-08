@@ -3,6 +3,20 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-08] — Salesforce C4.16.29A (Hub de Configuração Operacional Salesforce)
+
+- **Agente:** Antigravity (Gemini Pro/High)
+- **Natureza:** Redefinição de UX e arquitetura funcional da integração Salesforce.
+- **Objetivo:** Abandonar o modelo de "Wizard Técnico" fragmentado em favor de um "Hub de Configuração Operacional" centralizado e modular.
+- **Artefato de Sessão:** `docs/98-operacao/39-salesforce-configuration-hub-spec.md`
+- **Principais Definições:**
+  - **Conexão Automática:** Validação silenciosa de OAuth no carregamento da página.
+  - **Arquitetura Modular:** Divisão da tela em blocos (Autenticação, Sincronização de Objetos, Escopo/Filtros, Identidade, Configurações de Fluxo, Mapeamento).
+  - **Integração de Pendências:** Discrepâncias de dados (quality resolutions) integradas contextualmente aos blocos de mapeamento, eliminando telas duplicadas.
+  - **Mapeamento Unificado:** Tabela centralizada para taxonomia de dados (Canopi <-> Salesforce).
+  - **Sidebar de Atividade:** Auditoria rápida de logs e performance sem poluir a área de configuração.
+- **Próximo Passo (C4.16.29B):** Implementação técnica dos blocos modulares, começando pela Reestruturação do Layout e Autenticação Master.
+
 ## [2026-05-07] — Salesforce C4.17.1 (Gerador offline de massa sintética)
 
 - **Natureza:** Ferramenta offline para gerar dataset sintético local de Salesforce sem conexão externa.

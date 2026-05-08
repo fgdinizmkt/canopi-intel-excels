@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.16.26 (auditoria + plano de refatoração da jornada) documentado; checkpoint `fc6ef50` com correções C4.16.25B.1–B.4 (quality resolution UX)**; C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`**, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.16.29A (Hub de Configuração Operacional) especificado em `39-salesforce-configuration-hub-spec.md`**; C4.16.26 (auditoria + plano de refatoração da jornada) documentado; checkpoint `fc6ef50` com correções C4.16.25B.1–B.4 (quality resolution UX); C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -66,9 +66,9 @@ Não fechado neste marco:
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
-- **C4.16.27 — Fase 0 State Safety**: remover resets acidentais de `accountQualityResolutions`, corrigir `resetAccountsOperationalSession`, remover cap-12 de itens pendentes.
-- Ver `37-salesforce-journey-refactor-plan.md` para plano faseado completo (Fases 0–6).
-- Não iniciar próximo CRM antes de concluir ao menos Fase 0 e Fase 1 da refatoração Salesforce.
+- **C4.16.29B — Implementação do Hub Salesforce (Fase 1.1)**: Reestruturação do layout da página `SalesforceMultiEntityPreview.tsx` para o modelo de blocos modulares e sidebar de atividade.
+- Ver `39-salesforce-configuration-hub-spec.md` para plano de implementação detalhado (Fases 1–5).
+- Não iniciar próximo CRM antes de concluir ao menos Fase 1 da refatoração Salesforce.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)
 
@@ -1058,7 +1058,7 @@ Registrada em `docs/98-operacao/35-matriz-agentes-modelos.md` a régua de decis�
 
 ## Próximo Passo
 
-- **Contas V2 — Próximo recorte:** nenhum recorte aberto automaticamente. A frente segue em Fontes e Conectores até nova autorização explícita do Fábio.
+- **C4.16.29B — Hub Salesforce:** Iniciar a conversão da página Salesforce em um dashboard modular conforme a especificação `39-salesforce-configuration-hub-spec.md`. Prioridade: Layout Grid + Bloco de Autenticação.
 - **Contas V2 — C2.9:** fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores concluído localmente no commit `2a65e6e`. CSV passou a ser tratado como método local de entrada/carga; HubSpot foi validado como primeiro CRM completo da versão atual; Salesforce é o próximo CRM a ser fechado; RD Station CRM e Outro CRM seguem pendentes de fechamento individual; a frente continua em fechamento CRM por CRM; OAuth completo, persistência segura, sync, importação real, writeback, RD real, Outro CRM real, Supabase e B.2 seguem fora do escopo da versão atual.
 - **Contas V2 — Fase B.2 pendente:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers. Não altera OAuth nem Supabase.
 - **Cockpit V2:** Refinamento dos recortes analíticos e interativos sobre a nova fundação estabilizada.
