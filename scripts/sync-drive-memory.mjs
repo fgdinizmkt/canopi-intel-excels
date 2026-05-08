@@ -12,6 +12,7 @@ const FILES = [
   'docs/98-operacao/03-log-de-sessoes.md',
   'docs/98-operacao/33-plano-loja-conectores-crms.md',
   'docs/98-operacao/34-protocolo-espelhamento-memoria-operacional.md',
+  'docs/98-operacao/39-salesforce-configuration-hub-spec.md',
 ];
 
 function run(cmd, args, opts = {}) {
