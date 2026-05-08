@@ -105,6 +105,26 @@ Não usar Codex como agente principal para:
 - **Limites:** não decide produto, não abre recorte, não commita sem aprovação, não faz push sem autorização, não substitui validação visual do usuário e não executa refactors estruturais.
 - **Uso recomendado:** manter Codex para auditoria técnica, validação de build/lint/Git e ajustes cirúrgicos bem delimitados. Escalar para Claude Code quando houver reestruturação de componente, reorganização de JSX grande ou renderização condicional complexa.
 
+### Protocolo obrigatório de output e economia de contexto
+- Este protocolo vale para todos os agentes do projeto Canopi: ChatGPT, Claude Code, Antigravity, Codex e qualquer executor auxiliar.
+- Não imprimir arquivo inteiro, salvo autorização explícita.
+- Não imprimir diff completo, salvo autorização explícita.
+- Não fazer full-file replacement sem justificar por que patch localizado é inviável.
+- Não substituir arquivos grandes de uma vez quando o recorte puder ser feito por blocos.
+- Implementar em blocos pequenos, validáveis e reversíveis.
+- Separar auditoria, implementação, validação e commit.
+- Responder com resumo curto, objetivo e estruturado.
+- Em recortes grandes, limitar a resposta final a status, arquivos alterados, validações, riscos e próximo passo.
+- Preferir `git diff --stat`, `git diff --name-only` e trechos mínimos em vez de diff integral.
+- Se precisar mostrar código, mostrar apenas o trecho alterado e contexto mínimo.
+- Se a tarefa exigir reescrita ampla, parar e propor novo recorte antes de continuar.
+- Se houver estouro de output, travamento ou interrupção, não repetir prompt grande. Rodar apenas `git status -sb`, `git diff --name-only` e `git diff --stat`.
+- Após interrupção, responder em até 40 linhas com: 1. se houve alteração parcial; 2. quais arquivos foram tocados; 3. se compila ou não; 4. se deve manter, corrigir ou reverter; 5. menor próximo passo seguro.
+- Para UX/UI e componentes grandes, especificar a direção visual antes de implementar.
+- Para componentes grandes, não reescrever o `return` inteiro como primeira opção.
+- Preferir subcomponentes pequenos ou blocos isolados.
+- Validar visualmente antes de commit.
+
 ### Matriz definitiva de uso
 - **Terminal, Git, commit, push, lint, build, `dev:check`, runtime e validação mecânica:** Claude Code + Haiku 4.5 ou Codex como auditor técnico-operacional.
 - **Copy simples, ajuste visual pequeno, troca de classe ou componente simples já especificado:** Claude Code + Haiku 4.5.
