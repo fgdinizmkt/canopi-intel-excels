@@ -92,6 +92,12 @@
 
 ---
 
+## Evoluções Futuras
+
+- **Configuração da Empresa Cliente:** Em futuras evoluções da Canopi, considerar como item estruturante uma página/área de Configuração da Empresa Cliente. Essa área deve calibrar a inteligência da plataforma a partir de posicionamento, ICPs, personas, produtos/serviços, ciclo médio de fechamento, OKRs, metas, contexto comercial e premissas de GTM. Ver detalhes em `docs/98-operacao/36-configuracao-empresa-cliente.md`.
+
+---
+
 ## Regras obrigatórias (Reforço)
 
 1. `npm run build` obrigatório antes de cada commit de fechamento de recorte (Exit 0).
