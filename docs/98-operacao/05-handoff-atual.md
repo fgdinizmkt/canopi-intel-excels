@@ -1,11 +1,24 @@
 # 05 - Handoff atual
 
-## Estado atual — 2026-04-19
+## Estado atual — 2026-05-08
 
-- **Branch:** `main` — sincronizada com `origin/main`
-- **Último commit em origin/main:** `add8d98` — `feat(cockpit-v2): replace foundation with high-fidelity integrated shell build`
-- **Status do build:** BUILD-STABLE (Ambiente restrito bloqueia npm run build binário, mas código validado via deploy/render)
+- **Branch:** `main` — 2 commits ahead de `origin/main` (fc6ef50 código + commit documental pendente de push)
+- **Último commit em origin/main:** `850c383` — `docs(ops): record controlled Salesforce Opportunity sync execution`
+- **Status do build:** Lint limpo. Build bloqueado por servidor dev em execução (esperado).
 - **Idioma Operacional:** Português do Brasil (Seção 8 de `04-regras-do-processo.md`)
+
+### Decisão de transição (2026-05-08)
+
+Hotfixes incrementais de UX Salesforce encerrados no checkpoint `fc6ef50`.
+A página Salesforce será refatorada como jornada operacional real (Fases 0–6).
+Ver plano completo em `37-salesforce-journey-refactor-plan.md`.
+
+**Próximo passo ativo: C4.16.27 — Fase 0 State Safety**
+
+Três correções críticas sem refatoração estrutural:
+1. Remover `setAccountQualityResolutions({})` de `toggleAccountPreviewRowSelection` e `handleLoadAccountsPreview`
+2. Corrigir `resetAccountsOperationalSession` para incluir `confirmedIndustryItems` e `editingResolutionKeys`
+3. Remover cap-12 de itens pendentes, adicionar toggle "Mostrar todos / Mostrar menos"
 
 ---
 

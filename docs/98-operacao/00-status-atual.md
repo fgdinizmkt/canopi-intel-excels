@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`**, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
+`main` local está ahead de `origin/main` até o push. **Salesforce C4.16.26 (auditoria + plano de refatoração da jornada) documentado; checkpoint `fc6ef50` com correções C4.16.25B.1–B.4 (quality resolution UX)**; C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`**, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -28,6 +28,8 @@ Fechado neste marco (Setup Read-only):
 - Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
 - Salesforce Opportunity validação visual pós-sync (C4.14) aprovada a partir de `5a61e0f`
 - Gerador offline de massa sintética Salesforce (C4.17.1) concluído em `30b072d`
+- Quality resolution UX hotfixes Salesforce (C4.16.25B.1–B.4) checkpoint em `fc6ef50`
+- Auditoria + plano de refatoração jornada Salesforce (C4.16.26) documentado em `37-salesforce-journey-refactor-plan.md`
 
 Não fechado neste marco:
 - sync real
@@ -64,10 +66,9 @@ Não fechado neste marco:
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
-- antes de abrir o próximo CRM, fazer auditoria curta do estado real;
-- verificar branch, HEAD, working tree e diff;
-- decidir se o estado atual do Salesforce será commitado como checkpoint, isolado ou mantido pendente;
-- só depois iniciar o próximo conector/CRM.
+- **C4.16.27 — Fase 0 State Safety**: remover resets acidentais de `accountQualityResolutions`, corrigir `resetAccountsOperationalSession`, remover cap-12 de itens pendentes.
+- Ver `37-salesforce-journey-refactor-plan.md` para plano faseado completo (Fases 0–6).
+- Não iniciar próximo CRM antes de concluir ao menos Fase 0 e Fase 1 da refatoração Salesforce.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)
 
