@@ -445,6 +445,7 @@ export function SalesforceMethodSelector() {
   const [accountQualityResolutions, setAccountQualityResolutions] = useState<Record<string, AccountQualityResolution>>({});
   const [confirmedIndustryItems, setConfirmedIndustryItems] = useState<Record<string, string>>({});
   const [editingResolutionKeys, setEditingResolutionKeys] = useState<Set<string>>(new Set());
+  const [showAllQualityItems, setShowAllQualityItems] = useState(false);
   const [accountSyncState, setAccountSyncState] = useState<AccountSyncState>({ phase: 'idle' });
   const resetAccountSyncStateToIdle = useCallback((force = false) => {
     setAccountSyncState((current) => (force || current.phase !== 'loading' ? { phase: 'idle' } : current));
@@ -461,6 +462,8 @@ export function SalesforceMethodSelector() {
     setContractFeedback(null);
     setDryRunFeedback(null);
     setAccountQualityResolutions({});
+    setConfirmedIndustryItems({});
+    setEditingResolutionKeys(new Set());
     setContractJustGenerated(false);
     setDryRunJustCompleted(false);
     setPrepareButtonBusy(false);
@@ -770,7 +773,6 @@ export function SalesforceMethodSelector() {
     setDryRunJustCompleted(false);
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
-    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
 
     try {
@@ -816,7 +818,6 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
-    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) =>
       current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
@@ -835,7 +836,6 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
-    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
   }
@@ -2200,7 +2200,7 @@ export function SalesforceMethodSelector() {
                       </div>
                     </div>
                     <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-                    {accountQualityPendingItems.slice(0, 12).map((item) => (
+                    {(showAllQualityItems ? accountQualityPendingItems : accountQualityPendingItems.slice(0, 12)).map((item) => (
                       <div key={item.key} className="rounded-xl border border-amber-200 bg-white p-3">
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div>
@@ -2354,9 +2354,20 @@ export function SalesforceMethodSelector() {
                     ))}
                     </div>
                     {accountQualityPendingItems.length > 12 && (
-                      <p className="text-xs font-bold text-amber-900">
-                        Mostrando 12 de {accountQualityPendingItems.length} pendências. Use decisões em massa por campo antes de recalcular.
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-xs font-medium text-amber-900">
+                          {showAllQualityItems
+                            ? `Mostrando todos os ${accountQualityPendingItems.length} itens.`
+                            : `Mostrando 12 de ${accountQualityPendingItems.length} pendências.`}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setShowAllQualityItems((prev) => !prev)}
+                          className="text-xs font-black text-amber-700 underline underline-offset-2 hover:text-amber-900"
+                        >
+                          {showAllQualityItems ? 'Mostrar menos' : 'Mostrar todos'}
+                        </button>
+                      </div>
                     )}
                     <div className="mt-4 space-y-2">
                       <div className="flex flex-wrap gap-3 items-start">
