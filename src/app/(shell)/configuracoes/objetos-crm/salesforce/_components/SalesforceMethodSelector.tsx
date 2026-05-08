@@ -108,10 +108,19 @@ interface AccountsPreviewApiResponse {
   error?: string;
 }
 
+type AccountQualityField = 'Id' | 'Name' | 'Website' | 'Industry' | 'Type' | 'OwnerId';
+type AccountQualityDecision = 'manual' | 'fix_salesforce' | 'accept' | 'remove' | 'blocker';
+
+interface AccountQualityResolution {
+  decision: AccountQualityDecision;
+  value: string;
+}
+
 interface PreparedAccountsPreviewRow {
   key: string;
   label: string;
   gaps: string[];
+  recommendedGaps: string[];
   isValid: boolean;
   record: AccountsPreviewRecord;
 }
@@ -133,6 +142,7 @@ interface LocalPreSyncContractRow {
   OwnerId: string | null;
   status: 'válido' | 'com lacunas';
   gaps: string[];
+  recommendedGaps: string[];
 }
 
 interface LocalPreSyncContract {
@@ -186,6 +196,25 @@ type AccountSyncState =
   | { phase: 'done'; contractId: string; result: AccountSyncExecutionResult }
   | { phase: 'error'; message: string };
 
+const INDUSTRY_STANDARD_OPTIONS = [
+  'Tecnologia',
+  'Serviços financeiros',
+  'Seguros',
+  'Saúde',
+  'Farmacêutico',
+  'Varejo',
+  'Educação',
+  'Indústria',
+  'Energia',
+  'Telecomunicações',
+  'Agronegócio',
+  'Logística',
+  'Alimentos e bebidas',
+  'Serviços profissionais',
+  'Setor público',
+  'Outro',
+];
+
 function formatTestedAt(iso: string): string {
   try {
     return new Intl.DateTimeFormat('pt-BR', {
@@ -208,13 +237,49 @@ function getAccountPreviewRowLabel(record: AccountsPreviewRecord, index: number)
   return record.Name?.trim() || record.Id?.trim() || `Account ${index + 1}`;
 }
 
+function getAccountQualityResolutionKey(rowKey: string, field: AccountQualityField): string {
+  return `${rowKey}::${field}`;
+}
+
+function getAccountQualityFieldFromGap(gap: string): AccountQualityField | null {
+  const field = gap.replace(/^sem\s+/i, '').trim();
+  if (field === 'Id' || field === 'Name' || field === 'Website' || field === 'Industry' || field === 'Type' || field === 'OwnerId') {
+    return field;
+  }
+  return null;
+}
+
+function getAccountQualityGapForField(field: AccountQualityField): string {
+  return `sem ${field}`;
+}
+
+function getDefaultAccountQualityDecision(field: AccountQualityField, isBlocking: boolean): AccountQualityDecision {
+  if (isBlocking || field === 'Id' || field === 'Name') return 'blocker';
+  if (field === 'Industry') return 'manual';
+  if (field === 'Website') return 'fix_salesforce';
+  return 'accept';
+}
+
 function getAccountPreviewRowGaps(record: AccountsPreviewRecord): string[] {
   const gaps: string[] = [];
   if (!record.Id?.trim()) gaps.push('sem Id');
   if (!record.Name?.trim()) gaps.push('sem Name');
+  return gaps;
+}
+
+function getAccountPreviewRowRecommendedGaps(record: AccountsPreviewRecord): string[] {
+  const gaps: string[] = [];
   if (!record.Website?.trim()) gaps.push('sem Website');
   if (!record.Industry?.trim()) gaps.push('sem Industry');
+  if (!record.Type?.trim()) gaps.push('sem Type');
+  if (!record.OwnerId?.trim()) gaps.push('sem OwnerId');
   return gaps;
+}
+
+function formatBlockingFieldsMessage(rows: PreparedAccountsPreviewRow[]): string {
+  const uniqueGaps = Array.from(new Set(rows.flatMap((row) => row.gaps)));
+  if (uniqueGaps.length === 0) return 'Campos mínimos ausentes na leitura atual.';
+  return `Campos bloqueadores: ${uniqueGaps.join(', ')}.`;
 }
 
 function buildLocalPreSyncContract(summary: PreparedAccountsPreviewSummary, preview: AccountsPreviewResult): LocalPreSyncContract {
@@ -236,8 +301,9 @@ function buildLocalPreSyncContract(summary: PreparedAccountsPreviewSummary, prev
       Industry: row.record.Industry,
       Type: row.record.Type,
       OwnerId: row.record.OwnerId,
-      status: row.isValid ? 'válido' : 'com lacunas',
+      status: row.isValid && row.recommendedGaps.length === 0 ? 'válido' : 'com lacunas',
       gaps: row.gaps,
+      recommendedGaps: row.recommendedGaps,
     })),
   };
 }
@@ -246,15 +312,14 @@ function getLocalPreSyncDryRunReasons(row: LocalPreSyncContractRow): string[] {
   const reasons: string[] = [];
   if (!row.Id?.trim()) reasons.push('sem Id');
   if (!row.Name?.trim()) reasons.push('sem Name');
-  if (!row.Website?.trim()) reasons.push('sem Website');
-  if (!row.Industry?.trim()) reasons.push('sem Industry');
+  reasons.push(...row.recommendedGaps);
   return reasons;
 }
 
 function classifyLocalPreSyncDryRunRow(row: LocalPreSyncContractRow, index: number): LocalPreSyncDryRunRow {
   const reasons = getLocalPreSyncDryRunReasons(row);
   const isBlocked = reasons.includes('sem Id') || reasons.includes('sem Name');
-  const isAlert = !isBlocked && (reasons.includes('sem Website') || reasons.includes('sem Industry'));
+  const isAlert = !isBlocked && row.recommendedGaps.length > 0;
 
   return {
     key: `${row.Id || row.Name || 'account'}-${index}`,
@@ -338,6 +403,8 @@ const CHECKLIST_ITEMS = [
   'Campos disponíveis',
 ];
 
+const ACCOUNT_PREVIEW_LIMIT_OPTIONS = [10, 25, 50, 100, 200] as const;
+
 export function SalesforceMethodSelector() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -359,6 +426,7 @@ export function SalesforceMethodSelector() {
   const [oauthConfigError, setOauthConfigError] = useState<string | null>(null);
   const [showOAuthConfigForm, setShowOAuthConfigForm] = useState(false);
   const [lastValidationPulseAt, setLastValidationPulseAt] = useState<string | null>(null);
+  const [accountPreviewLimit, setAccountPreviewLimit] = useState<number>(50);
   const [accountsPreview, setAccountsPreview] = useState<AccountsPreviewResult | null>(null);
   const [accountsPreviewLoading, setAccountsPreviewLoading] = useState(false);
   const [accountsPreviewError, setAccountsPreviewError] = useState<string | null>(null);
@@ -374,6 +442,9 @@ export function SalesforceMethodSelector() {
   const [prepareButtonBusy, setPrepareButtonBusy] = useState(false);
   const [contractButtonGenerated, setContractButtonGenerated] = useState(false);
   const [dryRunButtonBusy, setDryRunButtonBusy] = useState(false);
+  const [accountQualityResolutions, setAccountQualityResolutions] = useState<Record<string, AccountQualityResolution>>({});
+  const [confirmedIndustryItems, setConfirmedIndustryItems] = useState<Record<string, string>>({});
+  const [editingResolutionKeys, setEditingResolutionKeys] = useState<Set<string>>(new Set());
   const [accountSyncState, setAccountSyncState] = useState<AccountSyncState>({ phase: 'idle' });
   const resetAccountSyncStateToIdle = useCallback((force = false) => {
     setAccountSyncState((current) => (force || current.phase !== 'loading' ? { phase: 'idle' } : current));
@@ -389,6 +460,7 @@ export function SalesforceMethodSelector() {
     setSelectionFeedback(null);
     setContractFeedback(null);
     setDryRunFeedback(null);
+    setAccountQualityResolutions({});
     setContractJustGenerated(false);
     setDryRunJustCompleted(false);
     setPrepareButtonBusy(false);
@@ -401,6 +473,65 @@ export function SalesforceMethodSelector() {
   const dryRunCardRef = useRef<HTMLDivElement | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
+  const buildResolvedAccountRows = useCallback((rows: PreparedAccountsPreviewRow[]): PreparedAccountsPreviewRow[] => {
+    return rows.flatMap((row) => {
+      const hasRemoveDecision = [...row.gaps, ...row.recommendedGaps].some((gap) => {
+        const field = getAccountQualityFieldFromGap(gap);
+        if (!field) return false;
+        return accountQualityResolutions[getAccountQualityResolutionKey(row.key, field)]?.decision === 'remove';
+      });
+      if (hasRemoveDecision) return [];
+
+      const nextRecord: AccountsPreviewRecord = { ...row.record };
+      const nextGaps = [...row.gaps];
+      const nextRecommendedGaps = [...row.recommendedGaps];
+
+      [...row.gaps, ...row.recommendedGaps].forEach((gap) => {
+        const field = getAccountQualityFieldFromGap(gap);
+        if (!field) return;
+        const resolution = accountQualityResolutions[getAccountQualityResolutionKey(row.key, field)];
+        if (!resolution) return;
+
+        const rawValue = resolution.value ?? '';
+        const resolutionValue = rawValue.startsWith('__custom__:')
+          ? rawValue.slice(11)
+          : rawValue === '__ai__'
+            ? ''
+            : rawValue;
+
+        if (resolution.decision === 'manual' && resolutionValue.trim()) {
+          nextRecord[field] = resolutionValue.trim();
+          const fieldGap = getAccountQualityGapForField(field);
+          const blockerIndex = nextGaps.indexOf(fieldGap);
+          if (blockerIndex >= 0) nextGaps.splice(blockerIndex, 1);
+          const warningIndex = nextRecommendedGaps.indexOf(fieldGap);
+          if (warningIndex >= 0) nextRecommendedGaps.splice(warningIndex, 1);
+          return;
+        }
+
+        if (resolution.decision === 'accept') {
+          const warningIndex = nextRecommendedGaps.indexOf(getAccountQualityGapForField(field));
+          if (warningIndex >= 0) nextRecommendedGaps.splice(warningIndex, 1);
+          return;
+        }
+
+        if (resolution.decision === 'blocker') {
+          const fieldGap = getAccountQualityGapForField(field);
+          const warningIndex = nextRecommendedGaps.indexOf(fieldGap);
+          if (warningIndex >= 0) nextRecommendedGaps.splice(warningIndex, 1);
+          if (!nextGaps.includes(fieldGap)) nextGaps.push(fieldGap);
+        }
+      });
+
+      return [{
+        ...row,
+        gaps: nextGaps,
+        recommendedGaps: nextRecommendedGaps,
+        isValid: nextGaps.length === 0,
+        record: nextRecord,
+      }];
+    });
+  }, [accountQualityResolutions]);
   const [oauthConfigForm, setOauthConfigForm] = useState({
     clientId: '',
     clientSecret: '',
@@ -639,10 +770,11 @@ export function SalesforceMethodSelector() {
     setDryRunJustCompleted(false);
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
+    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
 
     try {
-      const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=10', {
+      const res = await fetch(`/api/account-connectors/salesforce/oauth/accounts?limit=${accountPreviewLimit}`, {
         method: 'GET',
         cache: 'no-store',
       });
@@ -670,7 +802,7 @@ export function SalesforceMethodSelector() {
     } finally {
       setAccountsPreviewLoading(false);
     }
-  }, [oauthStatus?.connected, resetAccountSyncStateToIdle]);
+  }, [accountPreviewLimit, oauthStatus?.connected, resetAccountSyncStateToIdle]);
 
   function toggleAccountPreviewRowSelection(rowKey: string) {
     setPreparedAccountsPreviewSelection(null);
@@ -684,6 +816,7 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
+    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) =>
       current.includes(rowKey) ? current.filter((key) => key !== rowKey) : [...current, rowKey]
@@ -702,54 +835,102 @@ export function SalesforceMethodSelector() {
     setContractButtonGenerated(false);
     setDryRunButtonBusy(false);
     setPrepareButtonBusy(false);
+    setAccountQualityResolutions({});
     resetAccountSyncStateToIdle();
     setSelectedAccountPreviewKeys((current) => (current.length === accountPreviewRows.length ? [] : accountPreviewRows.map((row) => row.key)));
   }
 
-  const handlePrepareAccountPreviewSelection = useCallback(() => {
-    const selectedRows = (accountsPreview?.records || [])
-      .map((record, index) => {
-        const gaps = getAccountPreviewRowGaps(record);
-        return {
-          key: getAccountPreviewRowKey(record, index),
-          label: getAccountPreviewRowLabel(record, index),
-          gaps,
-          isValid: gaps.length === 0,
-          record,
-        };
-      })
-      .filter((row) => selectedAccountPreviewKeys.includes(row.key));
-    const selectedValidCount = selectedRows.filter((row) => row.gaps.length === 0).length;
-    if (selectedRows.length > 0 && selectedValidCount === 0) {
-      setOauthNotice('Nenhuma Account válida foi encontrada nesta leitura. Revise a preparação técnica antes de continuar.');
+  const handlePrepareAccountPreviewSelection = useCallback((): LocalPreSyncContract | null => {
+    if (!accountsPreview) {
+      setOauthNotice('Accounts carregadas ausentes. Carregue Accounts antes de preparar a etapa técnica.');
       document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
+      return null;
     }
-    resetAccountSyncStateToIdle();
+
     setPrepareButtonBusy(true);
-    setLocalPreSyncDryRun(null);
-    setDryRunFeedback(null);
-    setDryRunJustCompleted(false);
-    setDryRunButtonBusy(false);
-    const validCount = selectedRows.filter((row) => row.gaps.length === 0).length;
-    const rowsWithGapsCount = selectedRows.filter((row) => row.gaps.length > 0).length;
-    const nextSelection = {
-      preparedAt: new Date().toISOString(),
-      selectedCount: selectedRows.length,
-      validCount,
-      rowsWithGapsCount,
-      rows: selectedRows,
-    };
-    window.setTimeout(() => {
+    setOauthNotice(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setContractJustGenerated(false);
+    setContractButtonGenerated(false);
+
+    try {
+      const selectedRows = buildResolvedAccountRows(accountsPreview.records
+        .map((record, index) => {
+          const gaps = getAccountPreviewRowGaps(record);
+          const recommendedGaps = getAccountPreviewRowRecommendedGaps(record);
+          return {
+            key: getAccountPreviewRowKey(record, index),
+            label: getAccountPreviewRowLabel(record, index),
+            gaps,
+            recommendedGaps,
+            isValid: gaps.length === 0,
+            record,
+          };
+        })
+        .filter((row) => selectedAccountPreviewKeys.includes(row.key)));
+
+      if (selectedRows.length === 0) {
+        setOauthNotice('Nenhuma Account selecionada. Selecione pelo menos um registro antes de preparar a etapa técnica.');
+        document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return null;
+      }
+
+      const selectedValidCount = selectedRows.filter((row) => row.gaps.length === 0).length;
+      if (selectedValidCount === 0) {
+        setPreparedAccountsPreviewSelection(null);
+        setLocalPreSyncContract(null);
+        setOauthNotice(`Nenhuma Account com Id e Name foi encontrada nesta leitura. ${formatBlockingFieldsMessage(selectedRows)}`);
+        document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return null;
+      }
+
+      resetAccountSyncStateToIdle();
+      setLocalPreSyncDryRun(null);
+      setDryRunFeedback(null);
+      setDryRunJustCompleted(false);
+      setDryRunButtonBusy(false);
+
+      const validCount = selectedValidCount;
+      const rowsWithGapsCount = selectedRows.filter((row) => row.gaps.length > 0 || row.recommendedGaps.length > 0).length;
+      const nextSelection = {
+        preparedAt: new Date().toISOString(),
+        selectedCount: selectedRows.length,
+        validCount,
+        rowsWithGapsCount,
+        rows: selectedRows,
+      };
+      const nextContract = buildLocalPreSyncContract(nextSelection, accountsPreview);
+
       setPreparedAccountsPreviewSelection(nextSelection);
+      setLocalPreSyncContract(nextContract);
+      const hasRecommendedGaps = selectedRows.some((row) => row.recommendedGaps.length > 0);
+      setSelectionFeedback(hasRecommendedGaps ? 'Seleção preparada. Contrato local criado com lacunas não bloqueadoras.' : 'Seleção preparada. Contrato local criado nesta sessão.');
+      setContractFeedback(hasRecommendedGaps ? 'Contrato local criado com lacunas não bloqueadoras.' : 'Contrato local criado nesta sessão.');
+      setContractJustGenerated(true);
+      setContractButtonGenerated(true);
+
+      if (typeof window !== 'undefined') {
+        window.requestAnimationFrame(() => {
+          contractCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+      return nextContract;
+    } catch (error) {
+      setPreparedAccountsPreviewSelection(null);
       setLocalPreSyncContract(null);
-      setSelectionFeedback('Seleção preparada. Contrato local liberado.');
+      setSelectionFeedback(null);
       setContractFeedback(null);
       setContractJustGenerated(false);
       setContractButtonGenerated(false);
+      setOauthNotice(
+        `Não foi possível criar o contrato local: ${error instanceof Error && error.message ? error.message : 'erro inesperado'}.`
+      );
+      return null;
+    } finally {
       setPrepareButtonBusy(false);
-    }, 120);
-  }, [accountsPreview, resetAccountSyncStateToIdle, selectedAccountPreviewKeys]);
+    }
+  }, [accountsPreview, buildResolvedAccountRows, resetAccountSyncStateToIdle, selectedAccountPreviewKeys]);
 
   function handleGenerateLocalPreSyncContract() {
     if (!preparedAccountsPreviewSelection || !accountsPreview) return;
@@ -767,24 +948,48 @@ export function SalesforceMethodSelector() {
     }, 0);
   }
 
-  function handleExecuteLocalDryRun() {
-    if (!localPreSyncContract) return;
+  const handleExecuteLocalDryRun = useCallback((contractOverride?: LocalPreSyncContract | null): Promise<boolean> => {
+    const contractToRun = contractOverride ?? localPreSyncContract;
+    if (!contractToRun) {
+      setDryRunFeedback('Contrato local pendente. Prepare a seleção antes de executar o dry-run read-only.');
+      return Promise.resolve(false);
+    }
 
     setDryRunButtonBusy(true);
     setDryRunFeedback(null);
     setLocalPreSyncDryRun(null);
 
-    window.setTimeout(() => {
-      const nextDryRun = buildLocalPreSyncDryRun(localPreSyncContract);
-      setLocalPreSyncDryRun(nextDryRun);
-      setDryRunFeedback('Dry-run read-only concluído nesta sessão.');
-      setDryRunJustCompleted(true);
-      setDryRunButtonBusy(false);
-      setTimeout(() => {
-        dryRunCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 0);
-    }, 120);
-  }
+    return new Promise((resolve) => {
+      const executeDryRun = () => {
+        try {
+          const nextDryRun = buildLocalPreSyncDryRun(contractToRun);
+          setLocalPreSyncDryRun(nextDryRun);
+          setDryRunFeedback('Dry-run read-only concluído nesta sessão.');
+          setDryRunJustCompleted(true);
+          if (typeof window !== 'undefined') {
+            window.setTimeout(() => {
+              dryRunCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 0);
+          }
+          resolve(true);
+        } catch (error) {
+          setDryRunFeedback(
+            `Não foi possível executar o dry-run read-only: ${error instanceof Error && error.message ? error.message : 'erro inesperado'}.`
+          );
+          setDryRunJustCompleted(false);
+          resolve(false);
+        } finally {
+          setDryRunButtonBusy(false);
+        }
+      };
+
+      if (typeof window !== 'undefined') {
+        window.setTimeout(executeDryRun, 120);
+      } else {
+        executeDryRun();
+      }
+    });
+  }, [localPreSyncContract]);
 
   const handleExecuteAccountSync = useCallback(async (source: 'main' | 'advanced' = 'advanced'): Promise<boolean> => {
     if (!preparedAccountsPreviewSelection || !accountsPreview || !localPreSyncContract || !localPreSyncDryRun) {
@@ -793,7 +998,7 @@ export function SalesforceMethodSelector() {
       return false;
     }
     if (preparedAccountsPreviewSelection.validCount === 0 || localPreSyncDryRun.aptoCount === 0) {
-      setOauthNotice('Nenhuma Account válida está pronta para sincronização nesta sessão. Revise a preparação técnica antes de continuar.');
+      setOauthNotice('Nenhuma Account com Id e Name está pronta para sincronização nesta sessão. Revise a preparação técnica antes de continuar.');
       document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return false;
     }
@@ -950,10 +1155,12 @@ export function SalesforceMethodSelector() {
     () =>
       (accountsPreview?.records || []).map((record, index) => {
         const gaps = getAccountPreviewRowGaps(record);
+        const recommendedGaps = getAccountPreviewRowRecommendedGaps(record);
         return {
           key: getAccountPreviewRowKey(record, index),
           label: getAccountPreviewRowLabel(record, index),
           gaps,
+          recommendedGaps,
           isValid: gaps.length === 0,
           record,
         };
@@ -968,14 +1175,17 @@ export function SalesforceMethodSelector() {
   const allAccountPreviewRowsSelected =
     accountPreviewRows.length > 0 && accountPreviewRows.every((row) => selectedAccountPreviewRowSet.has(row.key));
   const liveAccountPreviewSummary = useMemo<PreparedAccountsPreviewSummary>(
-    () => ({
-      preparedAt: new Date().toISOString(),
-      selectedCount: selectedAccountPreviewRows.length,
-      validCount: selectedAccountPreviewRows.filter((row) => row.isValid).length,
-      rowsWithGapsCount: selectedAccountPreviewRows.filter((row) => row.gaps.length > 0).length,
-      rows: selectedAccountPreviewRows,
-    }),
-    [selectedAccountPreviewRows]
+    () => {
+      const resolvedRows = buildResolvedAccountRows(selectedAccountPreviewRows);
+      return {
+        preparedAt: new Date().toISOString(),
+        selectedCount: resolvedRows.length,
+        validCount: resolvedRows.filter((row) => row.isValid).length,
+        rowsWithGapsCount: resolvedRows.filter((row) => row.gaps.length > 0 || row.recommendedGaps.length > 0).length,
+        rows: resolvedRows,
+      };
+    },
+    [buildResolvedAccountRows, selectedAccountPreviewRows]
   );
   const selectedRowsCount = preparedAccountsPreviewSelection?.selectedCount ?? selectedAccountPreviewRows.length;
   const canGenerateLocalContract = Boolean(preparedAccountsPreviewSelection);
@@ -1020,6 +1230,12 @@ export function SalesforceMethodSelector() {
     const foundCount = accountsPreview?.records.length ?? 0;
     const validCount = preparedAccountsPreviewSelection?.validCount ?? liveAccountPreviewSummary.validCount;
     const selectedCount = preparedAccountsPreviewSelection?.selectedCount ?? selectedAccountPreviewRows.length;
+    const accountsLoaded = foundCount > 0;
+    const accountsSelected = selectedCount > 0;
+    const accountsPrepared = Boolean(preparedAccountsPreviewSelection);
+    const localContractCreated = Boolean(localPreSyncContract);
+    const dryRunDone = Boolean(localPreSyncDryRun);
+    const realSyncDone = accountSyncState.phase === 'done';
     const autoSelectionApplied = selectedAccountPreviewRows.length > 0;
     const hasTechnicalReview =
       Boolean(preparedAccountsPreviewSelection) &&
@@ -1050,16 +1266,23 @@ export function SalesforceMethodSelector() {
       foundCount,
       validCount,
       selectedCount,
+      accountsLoaded,
+      accountsSelected,
+      accountsPrepared,
+      localContractCreated,
+      dryRunDone,
+      realSyncDone,
       autoSelectionApplied,
       errorMessage: accountsPreviewError,
       technicalReviewReason:
         foundCount > 0 && validCount === 0
-          ? 'Nenhuma Account válida foi encontrada nesta leitura. Revise a preparação técnica antes de continuar.'
+          ? 'Nenhuma Account com Id e Name foi encontrada nesta leitura. Revise a preparação técnica antes de continuar.'
           : hasTechnicalReview
             ? 'A preparação técnica de Accounts é necessária antes do sync real.'
             : null,
       onLoad: handleLoadAccountsPreview,
       onPrepare: handlePrepareAccountPreviewSelection,
+      onDryRun: handleExecuteLocalDryRun,
       onReviewTechnical: () => {
         setOauthNotice('Accounts exigem revisão técnica antes do sync completo nesta sessão.');
         document.getElementById('salesforce-accounts-technical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1070,6 +1293,7 @@ export function SalesforceMethodSelector() {
     accountsPreview,
     accountsPreviewError,
     handleExecuteAccountSync,
+    handleExecuteLocalDryRun,
     handleLoadAccountsPreview,
     handlePrepareAccountPreviewSelection,
     localPreSyncContract,
@@ -1089,6 +1313,189 @@ export function SalesforceMethodSelector() {
     ['Criado em', 'CreatedDate'],
     ['Atualizado em', 'LastModifiedDate'],
   ] as const;
+
+  const salesforceJourneyNextStep = useMemo(() => {
+    if (!oauthConnected) {
+      return {
+        title: 'Conectar Salesforce',
+        description: 'Autorize o OAuth antes de buscar dados.',
+        tone: 'slate',
+      };
+    }
+    if (!connectionValidatedAt) {
+      return {
+        title: 'Validar conexão',
+        description: 'Confirme a conexão ativa antes de encontrar dados.',
+        tone: 'blue',
+      };
+    }
+    if (!accountsPreview) {
+      return {
+        title: 'Mapear objetos e carregar Accounts',
+        description: 'Identifique objetos e campos disponíveis no Salesforce (leitura apenas). Carregue Accounts para analisar qualidade de dados.',
+        tone: 'blue',
+      };
+    }
+    if (!localPreSyncContract) {
+      return {
+        title: 'Preparar prévia segura',
+        description: 'Prepare a seleção para criar o contrato local read-only.',
+        tone: 'amber',
+      };
+    }
+    if (!localPreSyncDryRun) {
+      return {
+        title: 'Executar dry-run read-only',
+        description: 'Valide os avisos de qualidade antes de revisar pendências.',
+        tone: 'amber',
+      };
+    }
+    return {
+      title: 'Revisar pendências antes de sync real',
+      description: 'Confira avisos de qualidade e decida o que corrigir antes de qualquer gravação.',
+      tone: 'emerald',
+    };
+  }, [accountsPreview, connectionValidatedAt, localPreSyncContract, localPreSyncDryRun, oauthConnected]);
+
+  const accountQualityPendingItems = useMemo(() => {
+    if (!localPreSyncDryRun || !preparedAccountsPreviewSelection) return [];
+    return preparedAccountsPreviewSelection.rows.flatMap((row) =>
+      [...row.gaps, ...row.recommendedGaps].map((gap) => {
+        const field = getAccountQualityFieldFromGap(gap);
+        if (!field) return null;
+        const key = getAccountQualityResolutionKey(row.key, field);
+        const isBlocking = row.gaps.includes(gap);
+        const resolution = accountQualityResolutions[key];
+        const hasDecision = !!resolution;
+        const decision = resolution?.decision;
+        return {
+          key,
+          rowKey: row.key,
+          account: row.label,
+          field,
+          currentValue: row.record[field] || '—',
+          classification: decision ?? '',
+          value: resolution?.value ?? '',
+          type: isBlocking || decision === 'blocker' ? 'Bloqueador' : 'Aviso',
+          impact:
+            field === 'Id' || field === 'Name'
+              ? 'Impede usar esta Account em sincronização real.'
+              : field === 'Industry'
+                ? 'Afeta análises por vertical e segmentação; pode ser preenchido localmente antes do sync.'
+                : field === 'Website'
+                  ? 'Reduz qualidade de dedupe, enriquecimento e vínculos externos.'
+                  : field === 'Type'
+                    ? 'Reduz classificação comercial, mas não bloqueia a prévia.'
+                    : 'Aviso técnico; não bloqueia a prévia.',
+          action:
+            decision === 'manual'
+              ? 'Valor local será usado apenas no contrato/dry-run desta sessão.'
+              : decision === 'accept'
+                ? 'Lacuna aceita temporariamente nesta sessão.'
+                : decision === 'remove'
+                  ? 'Account será removida do conjunto preparado.'
+                  : decision === 'blocker'
+                    ? 'Campo tratado como bloqueador local nesta sessão.'
+                    : 'Escolha uma ação acima para resolver este item.',
+        };
+      }).filter((item): item is NonNullable<typeof item> => Boolean(item))
+    );
+  }, [accountQualityResolutions, localPreSyncDryRun, preparedAccountsPreviewSelection]);
+
+  const accountQualityResolvedItems = useMemo(() => {
+    if (Object.keys(accountQualityResolutions).length === 0) return [];
+    const rowMap = new Map(selectedAccountPreviewRows.map((row) => [row.key, row]));
+    return Object.entries(accountQualityResolutions).flatMap(([key, resolution]) => {
+      if (!resolution.decision) return [];
+      const separatorIdx = key.lastIndexOf('::');
+      if (separatorIdx === -1) return [];
+      const rowKey = key.slice(0, separatorIdx);
+      const field = key.slice(separatorIdx + 2) as AccountQualityField;
+      const row = rowMap.get(rowKey);
+      if (!row) return [];
+      const rawValue = resolution.value ?? '';
+      const displayValue = rawValue.startsWith('__custom__:')
+        ? rawValue.slice(11)
+        : rawValue === '__ai__'
+          ? ''
+          : rawValue;
+      const confirmedValue = field === 'Industry' ? confirmedIndustryItems[key] : undefined;
+      const decisionLabel: Record<AccountQualityDecision, string> = {
+        manual: 'Corrigido na Canopi',
+        fix_salesforce: 'Corrigir no Salesforce',
+        accept: 'Aceito temporariamente',
+        remove: 'Removido do sync',
+        blocker: 'Bloqueador',
+      };
+      return [{
+        key,
+        rowKey,
+        field,
+        account: row.label,
+        originValue: row.record[field] || '—',
+        decision: resolution.decision,
+        decisionLabel: decisionLabel[resolution.decision] ?? resolution.decision,
+        displayValue,
+        confirmedValue,
+      }];
+    });
+  }, [accountQualityResolutions, confirmedIndustryItems, selectedAccountPreviewRows]);
+
+  function updateAccountQualityResolution(key: string, patch: Partial<AccountQualityResolution>) {
+    setAccountQualityResolutions((current) => {
+      const existing = current[key];
+      if (existing) {
+        return { ...current, [key]: { ...existing, ...patch } };
+      }
+      if (patch.decision) {
+        return { ...current, [key]: patch as AccountQualityResolution };
+      }
+      return current;
+    });
+  }
+
+  function applyAccountQualityDecisionForField(field: AccountQualityField, decision: AccountQualityDecision) {
+    setAccountQualityResolutions((current) => {
+      const next = { ...current };
+      accountQualityPendingItems
+        .filter((item) => item.field === field)
+        .forEach((item) => {
+          const existing = next[item.key];
+          next[item.key] = existing
+            ? { ...existing, decision }
+            : { decision, value: '' };
+        });
+      return next;
+    });
+  }
+
+  async function handleRecalculateAccountsQualityReview() {
+    if (!accountsPreview) {
+      setOauthNotice('Accounts carregadas ausentes. Carregue Accounts antes de recalcular a qualidade.');
+      return;
+    }
+    const decidedCount = Object.keys(accountQualityResolutions).length;
+    const resolvedRows = buildResolvedAccountRows(selectedAccountPreviewRows);
+    const nextSelection: PreparedAccountsPreviewSummary = {
+      preparedAt: new Date().toISOString(),
+      selectedCount: resolvedRows.length,
+      validCount: resolvedRows.filter((row) => row.isValid).length,
+      rowsWithGapsCount: resolvedRows.filter((row) => row.gaps.length > 0 || row.recommendedGaps.length > 0).length,
+      rows: resolvedRows,
+    };
+    const nextContract = buildLocalPreSyncContract(nextSelection, accountsPreview);
+    setPreparedAccountsPreviewSelection(nextSelection);
+    setLocalPreSyncContract(nextContract);
+    const feedbackMsg = decidedCount > 0
+      ? `${decidedCount} decisão(ões) aplicada(s) ao contrato local. Dry-run recalculado. Nenhuma gravação externa.`
+      : 'Contrato local recalculado. Nenhuma decisão registrada ainda.';
+    setSelectionFeedback(feedbackMsg);
+    setContractFeedback(feedbackMsg);
+    const dryRunSucceeded = await handleExecuteLocalDryRun(nextContract);
+    if (!dryRunSucceeded) {
+      setOauthNotice('Não foi possível recalcular o dry-run read-only com as decisões locais.');
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -1692,12 +2099,509 @@ export function SalesforceMethodSelector() {
               accountsJourney={accountsJourney}
             />
 
-            <SalesforceDiscovery
-              title="Discovery via OAuth conectado"
-              description="Campos detectados são somente leitura. Nenhum registro será importado nesta etapa."
-            />
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Próximo passo da jornada</p>
+              <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="text-base font-black text-slate-950">{salesforceJourneyNextStep.title}</p>
+                  <p className="text-sm font-medium text-slate-600">{salesforceJourneyNextStep.description}</p>
+                </div>
+                <span
+                  className={`rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                    salesforceJourneyNextStep.tone === 'emerald'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : salesforceJourneyNextStep.tone === 'amber'
+                        ? 'bg-amber-100 text-amber-800'
+                        : salesforceJourneyNextStep.tone === 'blue'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {localPreSyncDryRun ? 'Prévia concluída' : localPreSyncContract ? 'Contrato criado' : accountsPreview ? 'Preparação pendente' : 'Aguardando leitura'}
+                </span>
+              </div>
+              {accountsPreview && (
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Etapa: Discovery e análise</p>
+                    <p className="mt-2 text-sm font-medium text-blue-900">
+                      Nenhum registro foi sincronizado. Esta etapa carrega um resumo de Accounts do Salesforce para análise de qualidade de dados. Use o limite para controlar quantos registros examinar. Próxima etapa: preparar seleção e validar.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Carregadas</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{accountsPreview.records.length}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total retornado</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{accountsPreview.totalSize}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Limite aplicado</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{accountsPreview.limit}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Leitura</p>
+                    <p className="mt-1 text-xs font-black text-slate-950">{accountsPreview.done ? 'Completa para o retorno' : 'Parcial'}</p>
+                    <p className="mt-1 text-[11px] font-medium text-slate-500">{formatTestedAt(accountsPreview.testedAt)}</p>
+                  </div>
+                </div>
+                </div>
+              )}
+            </div>
 
-            <div id="salesforce-accounts-technical">
+            {localPreSyncDryRun && (
+              <div id="salesforce-account-quality-pending" className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Pendências para resolver</p>
+                    <p className="text-base font-black text-amber-950">Pendências de qualidade dos dados</p>
+                    <p className="text-sm font-medium text-amber-800">
+                      Corrija ou aceite os avisos antes de qualquer sync real. Esta etapa segue read-only.
+                    </p>
+                  </div>
+                  <span className="rounded-lg bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-800">
+                    {accountQualityPendingItems.length} itens
+                  </span>
+                </div>
+
+                {accountQualityPendingItems.length > 0 ? (
+                  <div className="mt-4 space-y-3">
+                    <div className="rounded-xl border border-amber-200 bg-white px-3 py-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Decisão em massa por campo</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {Array.from(new Set(accountQualityPendingItems.map((item) => item.field))).map((field) => (
+                          <div key={field} className="flex flex-wrap items-center gap-1 rounded-lg border border-amber-100 bg-amber-50 px-2 py-1">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-amber-800">{field}</span>
+                            <button
+                              type="button"
+                              onClick={() => applyAccountQualityDecisionForField(field, 'accept')}
+                              className="rounded-md bg-white px-2 py-1 text-[10px] font-black text-slate-700 hover:bg-slate-50"
+                            >
+                              Aceitar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyAccountQualityDecisionForField(field, 'fix_salesforce')}
+                              className="rounded-md bg-white px-2 py-1 text-[10px] font-black text-slate-700 hover:bg-slate-50"
+                            >
+                              Salesforce
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => applyAccountQualityDecisionForField(field, 'blocker')}
+                              className="rounded-md bg-white px-2 py-1 text-[10px] font-black text-slate-700 hover:bg-slate-50"
+                            >
+                              Bloquear
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                    {accountQualityPendingItems.slice(0, 12).map((item) => (
+                      <div key={item.key} className="rounded-xl border border-amber-200 bg-white p-3">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <p className="text-sm font-black text-slate-950">{item.account}</p>
+                            <p className="mt-1 text-xs font-medium text-slate-600">Campo ausente: {item.field}</p>
+                            <p className="mt-1 text-xs font-medium text-slate-500">Valor atual: {item.currentValue}</p>
+                            {item.field === 'Industry' && confirmedIndustryItems[item.key] && (
+                              <p className="mt-1 text-xs font-bold text-emerald-700">Valor local: {confirmedIndustryItems[item.key]}</p>
+                            )}
+                          </div>
+                          <span className={`rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest ${item.type === 'Bloqueador' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                            {item.type}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs font-medium text-slate-700">Impacto: {item.impact}</p>
+                        <p className="mt-1 text-xs font-bold text-slate-800">Ação: {item.action}</p>
+                        <div className="mt-3 space-y-2">
+                          <select
+                            value={item.classification}
+                            onChange={(event) => updateAccountQualityResolution(item.key, { decision: event.target.value as AccountQualityDecision })}
+                            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700"
+                          >
+                            <option value="">Escolha uma ação</option>
+                            <option value="blocker">Bloqueador</option>
+                            <option value="manual">Corrigível na Canopi</option>
+                            <option value="fix_salesforce">Corrigir no Salesforce</option>
+                            <option value="accept">Aceitável temporariamente</option>
+                            <option value="remove">Ignorar/remover do sync</option>
+                          </select>
+                          {item.classification === 'manual' && (
+                            <div className="space-y-2">
+                              {item.field === 'Industry' ? (
+                                <>
+                                  <select
+                                    value={item.value.startsWith('__custom__:') ? '__custom__' : item.value}
+                                    onChange={(event) => {
+                                      if (event.target.value === '__custom__') {
+                                        updateAccountQualityResolution(item.key, { value: '__custom__:' });
+                                      } else if (event.target.value === '__ai__') {
+                                        updateAccountQualityResolution(item.key, { value: '__ai__' });
+                                      } else {
+                                        updateAccountQualityResolution(item.key, { value: event.target.value });
+                                      }
+                                    }}
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                  >
+                                    <option value="">Selecione um setor...</option>
+                                    {INDUSTRY_STANDARD_OPTIONS.map((industry) => (
+                                      <option key={industry} value={industry === 'Outro' ? '__custom__' : industry}>
+                                        {industry}
+                                      </option>
+                                    ))}
+                                    <option value="__ai__">💡 Sugerir com IA</option>
+                                  </select>
+                                  {item.value.startsWith('__custom__:') && (
+                                    <div className="space-y-2">
+                                      <input
+                                        type="text"
+                                        value={item.value.slice(11)}
+                                        onChange={(event) => {
+                                          updateAccountQualityResolution(item.key, { value: '__custom__:' + event.target.value });
+                                          if (confirmedIndustryItems[item.key]) {
+                                            setConfirmedIndustryItems((prev) => {
+                                              const next = { ...prev };
+                                              delete next[item.key];
+                                              return next;
+                                            });
+                                          }
+                                        }}
+                                        placeholder="Descreva o setor..."
+                                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                      />
+                                      {confirmedIndustryItems[item.key] ? (
+                                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                                          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">Setor confirmado</p>
+                                          <p className="mt-0.5 text-xs font-bold text-emerald-900">Valor local: {confirmedIndustryItems[item.key]}</p>
+                                          <p className="mt-0.5 text-[10px] font-medium text-emerald-700">Será usado apenas no contrato/dry-run desta sessão.</p>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const customValue = item.value.slice(11).trim();
+                                            if (customValue) {
+                                              setConfirmedIndustryItems((prev) => ({ ...prev, [item.key]: customValue }));
+                                              setOauthNotice(`Setor confirmado: ${customValue}`);
+                                            }
+                                          }}
+                                          className="w-full rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                                          disabled={!item.value.slice(11).trim()}
+                                        >
+                                          Confirmar setor
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                  {item.value === '__ai__' && (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      title="Sugestão com IA será habilitada quando o serviço estiver conectado"
+                                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-400 cursor-not-allowed"
+                                    >
+                                      Gerar sugestão com IA
+                                    </button>
+                                  )}
+                                </>
+                              ) : item.field === 'Type' ? (
+                                <select
+                                  value={item.value}
+                                  onChange={(event) => updateAccountQualityResolution(item.key, { value: event.target.value })}
+                                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                >
+                                  <option value="">Selecione um tipo...</option>
+                                  <option value="Prospect">Prospect</option>
+                                  <option value="Customer">Customer</option>
+                                  <option value="Partner">Partner</option>
+                                  <option value="Dormant">Dormant</option>
+                                  <option value="Strategic">Strategic</option>
+                                  <option value="Other">Other</option>
+                                </select>
+                              ) : item.field === 'Website' ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    value={item.value}
+                                    onChange={(event) => updateAccountQualityResolution(item.key, { value: event.target.value })}
+                                    placeholder="https://exemplo.com ou deixe vazio"
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                  />
+                                  <p className="text-[10px] font-medium text-slate-500">Dica: preencha um website local nesta sessão ou marque como &quot;Corrigir no Salesforce&quot;.</p>
+                                </>
+                              ) : item.field === 'OwnerId' ? (
+                                <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                                  <p className="text-[10px] font-black uppercase text-slate-600">Aviso técnico</p>
+                                  <p className="mt-1 text-[10px] font-medium text-slate-600">OwnerId não bloqueia sincronização. Você pode aceitar o valor atual ou marcar para corrigir no Salesforce.</p>
+                                </div>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={item.value}
+                                  onChange={(event) => updateAccountQualityResolution(item.key, { value: event.target.value })}
+                                  placeholder="Valor local nesta sessão"
+                                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    </div>
+                    {accountQualityPendingItems.length > 12 && (
+                      <p className="text-xs font-bold text-amber-900">
+                        Mostrando 12 de {accountQualityPendingItems.length} pendências. Use decisões em massa por campo antes de recalcular.
+                      </p>
+                    )}
+                    <div className="mt-4 space-y-2">
+                      <div className="flex flex-wrap gap-3 items-start">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const blockedItems = accountQualityPendingItems
+                              .filter((item) => item.classification === 'blocker');
+                            if (blockedItems.length > 0) {
+                              setOauthNotice(`Há ${blockedItems.length} item(ns) marcado(s) como bloqueador. Resolva antes de recalcular.`);
+                              return;
+                            }
+                            const undecidedItems = accountQualityPendingItems
+                              .filter((item) => !item.classification);
+                            if (undecidedItems.length > 0) {
+                              setOauthNotice(`Há ${undecidedItems.length} pendência(s) sem decisão. Escolha uma ação para cada item ou use as decisões em massa.`);
+                            }
+                            void handleRecalculateAccountsQualityReview();
+                          }}
+                          className="rounded-xl bg-emerald-700 px-4 py-2 text-xs font-black text-white hover:bg-emerald-800 transition-colors"
+                        >
+                          Salvar ajustes da sessão
+                        </button>
+                        <div className="flex-1 text-[10px] font-medium text-slate-600 pt-2.5">
+                          Ajustes salvos localmente. Contrato e dry-run serão recalculados com suas decisões. Nada gravado no Salesforce ou Supabase.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-4 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm font-bold text-emerald-800">
+                    Nenhuma pendência de qualidade foi encontrada no dry-run.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {accountQualityResolvedItems.length > 0 && (
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">Decisões desta sessão</p>
+                    <p className="text-base font-black text-emerald-950">Itens resolvidos nesta sessão</p>
+                    <p className="text-sm font-medium text-emerald-800">
+                      Valores locais usados apenas no contrato/dry-run. Nada foi gravado no Salesforce.
+                    </p>
+                  </div>
+                  <span className="rounded-lg bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-800">
+                    {accountQualityResolvedItems.length} resolvido(s)
+                  </span>
+                </div>
+                <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                  {accountQualityResolvedItems.map((item) => {
+                    const isEditing = editingResolutionKeys.has(item.key);
+                    const pendingItem = isEditing
+                      ? {
+                          key: item.key,
+                          rowKey: item.rowKey,
+                          account: item.account,
+                          field: item.field,
+                          currentValue: item.originValue,
+                          classification: accountQualityResolutions[item.key]?.decision ?? '',
+                          value: accountQualityResolutions[item.key]?.value ?? '',
+                          type: item.decision === 'blocker' ? 'Bloqueador' : 'Aviso',
+                          impact: '',
+                          action: '',
+                        }
+                      : null;
+
+                    if (isEditing && pendingItem) {
+                      return (
+                        <div key={item.key} className="rounded-xl border border-emerald-300 bg-white p-3">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div>
+                              <p className="text-sm font-black text-slate-950">{item.account}</p>
+                              <p className="text-xs font-medium text-slate-600">Campo: {item.field}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setEditingResolutionKeys((prev) => { const next = new Set(prev); next.delete(item.key); return next; })}
+                              className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-100"
+                            >
+                              Fechar edição
+                            </button>
+                          </div>
+                          <div className="space-y-2">
+                            <select
+                              value={pendingItem.classification}
+                              onChange={(event) => updateAccountQualityResolution(item.key, { decision: event.target.value as AccountQualityDecision })}
+                              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700"
+                            >
+                              <option value="">Escolha uma ação</option>
+                              <option value="blocker">Bloqueador</option>
+                              <option value="manual">Corrigível na Canopi</option>
+                              <option value="fix_salesforce">Corrigir no Salesforce</option>
+                              <option value="accept">Aceitável temporariamente</option>
+                              <option value="remove">Ignorar/remover do sync</option>
+                            </select>
+                            {pendingItem.classification === 'manual' && item.field === 'Industry' && (
+                              <div className="space-y-2">
+                                <select
+                                  value={pendingItem.value.startsWith('__custom__:') ? '__custom__' : pendingItem.value}
+                                  onChange={(event) => {
+                                    if (event.target.value === '__custom__') {
+                                      updateAccountQualityResolution(item.key, { value: '__custom__:' });
+                                    } else if (event.target.value === '__ai__') {
+                                      updateAccountQualityResolution(item.key, { value: '__ai__' });
+                                    } else {
+                                      updateAccountQualityResolution(item.key, { value: event.target.value });
+                                    }
+                                  }}
+                                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                >
+                                  <option value="">Selecione um setor...</option>
+                                  {INDUSTRY_STANDARD_OPTIONS.map((industry) => (
+                                    <option key={industry} value={industry === 'Outro' ? '__custom__' : industry}>
+                                      {industry}
+                                    </option>
+                                  ))}
+                                  <option value="__ai__">💡 Sugerir com IA</option>
+                                </select>
+                                {pendingItem.value.startsWith('__custom__:') && (
+                                  <div className="space-y-2">
+                                    <input
+                                      type="text"
+                                      value={pendingItem.value.slice(11)}
+                                      onChange={(event) => {
+                                        updateAccountQualityResolution(item.key, { value: '__custom__:' + event.target.value });
+                                        if (confirmedIndustryItems[item.key]) {
+                                          setConfirmedIndustryItems((prev) => { const next = { ...prev }; delete next[item.key]; return next; });
+                                        }
+                                      }}
+                                      placeholder="Descreva o setor..."
+                                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                    />
+                                    {confirmedIndustryItems[item.key] ? (
+                                      <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">Setor confirmado</p>
+                                        <p className="mt-0.5 text-xs font-bold text-emerald-900">Valor local: {confirmedIndustryItems[item.key]}</p>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const customValue = pendingItem.value.slice(11).trim();
+                                          if (customValue) {
+                                            setConfirmedIndustryItems((prev) => ({ ...prev, [item.key]: customValue }));
+                                          }
+                                        }}
+                                        disabled={!pendingItem.value.slice(11).trim()}
+                                        className="w-full rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                                      >
+                                        Confirmar setor
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {pendingItem.classification === 'manual' && item.field !== 'Industry' && item.field !== 'OwnerId' && (
+                              <input
+                                type="text"
+                                value={pendingItem.value}
+                                onChange={(event) => updateAccountQualityResolution(item.key, { value: event.target.value })}
+                                placeholder="Valor local nesta sessão"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div key={item.key} className="rounded-xl border border-emerald-200 bg-white p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2">
+                            <span className="mt-0.5 flex-shrink-0 rounded-full bg-emerald-100 p-0.5 text-emerald-700">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            </span>
+                            <div>
+                              <p className="text-sm font-black text-slate-950">{item.account}</p>
+                              <p className="mt-0.5 text-xs font-medium text-slate-600">Campo: {item.field}</p>
+                              <p className="mt-0.5 text-xs font-medium text-slate-500">Origem: {item.originValue}</p>
+                              {item.displayValue && (
+                                <p className="mt-0.5 text-xs font-bold text-emerald-700">Valor local: {item.confirmedValue ?? item.displayValue}</p>
+                              )}
+                              <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">{item.decisionLabel}</p>
+                              <p className="mt-0.5 text-[10px] font-medium text-slate-500">Será usado apenas no contrato/dry-run desta sessão.</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setEditingResolutionKeys((prev) => new Set(prev).add(item.key))}
+                            className="flex-shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-[10px] font-black text-slate-600 hover:bg-slate-100 transition-colors"
+                          >
+                            Editar
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {(localPreSyncContract || localPreSyncDryRun) && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Resumo do contrato local e dry-run</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-4">
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Contrato local</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{localPreSyncContract ? 'Criado' : 'Pendente'}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registros</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{localPreSyncContract?.totalSelected ?? 0}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Com avisos</p>
+                    <p className="mt-1 text-lg font-black text-amber-700">{localPreSyncDryRun?.alertCount ?? localPreSyncContract?.totalWithGaps ?? 0}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Garantia</p>
+                    <p className="mt-1 text-sm font-black text-emerald-700">Read-only</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <details id="salesforce-accounts-technical" className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-black text-slate-900">Detalhes da preparação técnica de Accounts</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tabelas, contrato local, dry-run e apoio operacional da jornada principal.
+                    </p>
+                  </div>
+                  <span className="rounded-lg bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                    Ver detalhes
+                  </span>
+                </div>
+              </summary>
+              <div className="mt-4">
               <div className="rounded-2xl border border-slate-200 bg-white p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
@@ -1706,15 +2610,32 @@ export function SalesforceMethodSelector() {
                     Esta área prepara Accounts para sincronização quando a revisão automática não é suficiente.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleLoadAccountsPreview}
-                  disabled={!oauthConnected || accountsPreviewLoading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {accountsPreviewLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {accountsPreviewLoading ? 'Carregando Accounts...' : 'Carregar Accounts'}
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700">
+                    Limite
+                    <select
+                      value={accountPreviewLimit}
+                      onChange={(event) => setAccountPreviewLimit(Number(event.target.value))}
+                      disabled={accountsPreviewLoading}
+                      className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-black text-slate-800"
+                    >
+                      {ACCOUNT_PREVIEW_LIMIT_OPTIONS.map((limit) => (
+                        <option key={limit} value={limit}>
+                          {limit}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleLoadAccountsPreview}
+                    disabled={!oauthConnected || accountsPreviewLoading}
+                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {accountsPreviewLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {accountsPreviewLoading ? 'Carregando Accounts...' : 'Carregar Accounts'}
+                  </button>
+                </div>
               </div>
 
               <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
@@ -1832,8 +2753,12 @@ export function SalesforceMethodSelector() {
                     )}
                   </div>
 
-                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                    <table className="w-full text-sm">
+                  <details className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                    <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-slate-600">
+                      Ver Accounts carregadas
+                    </summary>
+                    <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                      <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-slate-200 bg-slate-100">
                           <th className="w-12 px-3 py-2 text-center text-[10px] font-black uppercase tracking-wider text-slate-700">
@@ -1883,8 +2808,9 @@ export function SalesforceMethodSelector() {
                           );
                         })}
                       </tbody>
-                    </table>
-                  </div>
+                      </table>
+                    </div>
+                  </details>
 
                   <Card className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1905,14 +2831,14 @@ export function SalesforceMethodSelector() {
                         <p className="mt-1 text-2xl font-black text-blue-900">
                           {preparedAccountsPreviewSelection?.validCount ?? liveAccountPreviewSummary.validCount}
                         </p>
-                        <p className="mt-1 text-xs font-medium text-blue-700">Registros com Id, Name, Website e Industry completos.</p>
+                        <p className="mt-1 text-xs font-medium text-blue-700">Registros com Id e Name completos.</p>
                       </div>
                       <div className="rounded-xl border border-blue-100 bg-white p-3">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Registros com lacunas</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Registros com avisos</p>
                         <p className="mt-1 text-2xl font-black text-blue-900">
                           {preparedAccountsPreviewSelection?.rowsWithGapsCount ?? liveAccountPreviewSummary.rowsWithGapsCount}
                         </p>
-                        <p className="mt-1 text-xs font-medium text-blue-700">Lacunas simples: sem Id, sem Name, sem Website, sem Industry.</p>
+                        <p className="mt-1 text-xs font-medium text-blue-700">Campos recomendados ausentes não bloqueiam o contrato local.</p>
                       </div>
                       <div className="rounded-xl border border-blue-100 bg-white p-3">
                         <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Preparação local</p>
@@ -1928,15 +2854,17 @@ export function SalesforceMethodSelector() {
                     </div>
 
                     {preparedAccountsPreviewSelection ? (
-                      <div className="mt-4 space-y-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Resumo preparado</p>
-                        <div className="overflow-x-auto rounded-xl border border-blue-100 bg-white">
+                      <details className="mt-4 rounded-xl border border-blue-100 bg-white px-4 py-3">
+                        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-blue-700">
+                          Ver resumo preparado
+                        </summary>
+                        <div className="mt-3 overflow-x-auto rounded-xl border border-blue-100 bg-white">
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-blue-100 bg-blue-50">
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Registro</th>
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Status</th>
-                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Lacunas</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-blue-800">Avisos</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1946,23 +2874,27 @@ export function SalesforceMethodSelector() {
                                   <td className="px-3 py-2 text-sm">
                                     {row.isValid ? (
                                       <Badge className="border-none bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1">
-                                        Válido
+                                        Válido para contrato
                                       </Badge>
                                     ) : (
                                       <Badge className="border-none bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-2 py-1">
-                                        Com lacunas
+                                        Bloqueado
                                       </Badge>
                                     )}
                                   </td>
                                   <td className="px-3 py-2 text-sm text-blue-800">
-                                    {row.gaps.length > 0 ? row.gaps.join(', ') : '—'}
+                                    {row.gaps.length > 0
+                                      ? `Bloqueadores: ${row.gaps.join(', ')}`
+                                      : row.recommendedGaps.length > 0
+                                        ? `Campos recomendados ausentes: ${row.recommendedGaps.join(', ')}`
+                                        : '—'}
                                   </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      </details>
                     ) : (
                       <p className="mt-4 text-sm font-medium text-blue-800">
                         Selecione os Accounts carregados e clique em “Preparar seleção” para registrar o resumo local desta sessão.
@@ -1998,7 +2930,7 @@ export function SalesforceMethodSelector() {
                             ['Total carregados', String(localPreSyncContract.totalLoaded)],
                             ['Total selecionados', String(localPreSyncContract.totalSelected)],
                             ['Total válidos', String(localPreSyncContract.totalValid)],
-                            ['Total com lacunas', String(localPreSyncContract.totalWithGaps)],
+                            ['Total com avisos', String(localPreSyncContract.totalWithGaps)],
                           ] as [string, string][]).map(([label, value]) => (
                             <div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                               <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</p>
@@ -2018,8 +2950,12 @@ export function SalesforceMethodSelector() {
                           </div>
                         </div>
 
-                        <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
-                          <table className="w-full text-sm">
+                        <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                          <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-slate-600">
+                            Ver detalhes do contrato local
+                          </summary>
+                          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                            <table className="w-full text-sm">
                             <thead>
                               <tr className="border-b border-slate-200 bg-slate-100">
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Registro</th>
@@ -2030,7 +2966,7 @@ export function SalesforceMethodSelector() {
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Type</th>
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">OwnerId</th>
                                 <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Status</th>
-                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Lacunas</th>
+                                <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Avisos</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -2046,7 +2982,7 @@ export function SalesforceMethodSelector() {
                                   <td className="px-3 py-2 text-sm">
                                     {row.status === 'válido' ? (
                                       <Badge className="border-none bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1">
-                                        Válido
+                                        Válido para contrato
                                       </Badge>
                                     ) : (
                                       <Badge className="border-none bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-2 py-1">
@@ -2054,12 +2990,19 @@ export function SalesforceMethodSelector() {
                                       </Badge>
                                     )}
                                   </td>
-                                  <td className="px-3 py-2 text-sm text-slate-700">{row.gaps.length > 0 ? row.gaps.join(', ') : '—'}</td>
+                                  <td className="px-3 py-2 text-sm text-slate-700">
+                                    {row.gaps.length > 0
+                                      ? `Bloqueadores: ${row.gaps.join(', ')}`
+                                      : row.recommendedGaps.length > 0
+                                        ? `Campos recomendados ausentes: ${row.recommendedGaps.join(', ')}`
+                                        : '—'}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>
-                          </table>
-                        </div>
+                            </table>
+                          </div>
+                        </details>
 
                         <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails do contrato local</p>
@@ -2080,7 +3023,9 @@ export function SalesforceMethodSelector() {
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     <button
                       type="button"
-                      onClick={handleExecuteLocalDryRun}
+                      onClick={() => {
+                        void handleExecuteLocalDryRun();
+                      }}
                       disabled={!canExecuteLocalDryRun || dryRunButtonBusy}
                       title={!canExecuteLocalDryRun ? 'Prepare o contrato local para liberar o dry-run.' : undefined}
                       className={`rounded-xl px-3 py-2 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
@@ -2169,8 +3114,12 @@ export function SalesforceMethodSelector() {
                         </div>
                       </div>
 
-                      <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
-                        <table className="w-full text-sm">
+                      <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-slate-600">
+                          Ver detalhes do dry-run
+                        </summary>
+                        <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                          <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b border-slate-200 bg-slate-100">
                               <th className="px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">Registro</th>
@@ -2210,8 +3159,9 @@ export function SalesforceMethodSelector() {
                               </tr>
                             ))}
                           </tbody>
-                        </table>
-                      </div>
+                          </table>
+                        </div>
+                      </details>
 
                       <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Guardrails do dry-run</p>
@@ -2246,7 +3196,30 @@ export function SalesforceMethodSelector() {
             </div>
 
           </div>
-        </div>
+        </details>
+
+            <details className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-sm font-black text-slate-900">Detalhes técnicos do discovery</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Campos detectados, leitura completa e auditoria de descoberta ficam recolhidos por padrão.
+                    </p>
+                  </div>
+                  <span className="rounded-lg bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                    Ver detalhes
+                  </span>
+                </div>
+              </summary>
+              <div className="mt-4">
+                <SalesforceDiscovery
+                  title="Discovery via OAuth conectado"
+                  description="Campos detectados são somente leitura. Nenhum registro será importado nesta etapa."
+                />
+              </div>
+            </details>
+          </div>
         )}
 
         {selected === 'token' && (

@@ -40,7 +40,7 @@ function normalizeLimit(rawValue: string | null): number {
   if (!Number.isFinite(parsed)) return 10;
   const limit = Math.trunc(parsed);
   if (limit <= 0) return 10;
-  return Math.min(limit, 25);
+  return Math.min(limit, 200);
 }
 
 export async function GET(request: NextRequest) {

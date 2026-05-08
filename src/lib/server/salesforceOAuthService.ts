@@ -157,7 +157,7 @@ const ACCOUNT_PREVIEW_FIELDS = [
 ];
 
 const DEFAULT_ACCOUNTS_PREVIEW_LIMIT = 10;
-const MAX_ACCOUNTS_PREVIEW_LIMIT = 25;
+const MAX_ACCOUNTS_PREVIEW_LIMIT = 200;
 
 type ConnectionRow = {
   provider: string;

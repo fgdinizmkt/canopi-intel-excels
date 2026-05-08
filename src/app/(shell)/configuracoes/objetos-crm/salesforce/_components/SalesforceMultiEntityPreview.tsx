@@ -1300,16 +1300,49 @@ type SetupStep = 'connect' | 'validate' | 'discover' | 'sync' | 'review' | 'conc
 
 type AccountsJourneyStatus = 'not_loaded' | 'found' | 'prepared' | 'technical_review' | 'sync_ready' | 'syncing' | 'synced' | 'error';
 
+interface AccountsLocalContractRow {
+  Id: string | null;
+  Name: string | null;
+  Website: string | null;
+  Industry: string | null;
+  Type: string | null;
+  OwnerId: string | null;
+  status: 'válido' | 'com lacunas';
+  gaps: string[];
+  recommendedGaps: string[];
+}
+
+interface AccountsLocalContract {
+  createdAt: string;
+  source: 'Salesforce OAuth';
+  objectApiName: 'Account';
+  mode: 'read-only';
+  previewLimit: number;
+  totalLoaded: number;
+  totalSelected: number;
+  totalValid: number;
+  totalWithGaps: number;
+  fieldsConsidered: string[];
+  records: AccountsLocalContractRow[];
+}
+
 interface AccountsJourneyState {
   status: AccountsJourneyStatus;
   foundCount: number;
   validCount: number;
   selectedCount: number;
+  accountsLoaded: boolean;
+  accountsSelected: boolean;
+  accountsPrepared: boolean;
+  localContractCreated: boolean;
+  dryRunDone: boolean;
+  realSyncDone: boolean;
   autoSelectionApplied: boolean;
   errorMessage?: string | null;
   technicalReviewReason?: string | null;
   onLoad: () => Promise<void> | void;
-  onPrepare: () => void;
+  onPrepare: () => AccountsLocalContract | null;
+  onDryRun: (contractOverride?: AccountsLocalContract | null) => Promise<boolean>;
   onReviewTechnical: () => void;
   onSync: () => Promise<boolean>;
 }
@@ -1445,15 +1478,13 @@ export function SalesforceMultiEntityPreview({
       return;
     }
 
-    if (currentSetupStep === 'review' || currentSetupStep === 'conclude') {
+    if (currentSetupStep === 'sync' || currentSetupStep === 'review' || currentSetupStep === 'conclude') {
       return;
     }
 
     const nextStep: SetupStep = !connectionValidatedAt
       ? 'validate'
-      : (discoveryCompleted || state.phase === 'done')
-        ? 'sync'
-        : 'discover';
+      : 'discover';
 
     setCurrentSetupStep((current) => (current === nextStep ? current : nextStep));
   }, [
@@ -1936,9 +1967,16 @@ export function SalesforceMultiEntityPreview({
   const accountJourneyFoundCount = accountsJourney?.foundCount ?? 0;
   const accountJourneyValidCount = accountsJourney?.validCount ?? 0;
   const accountJourneySelectedCount = accountsJourney?.selectedCount ?? 0;
+  const accountsLoaded = accountsJourney?.accountsLoaded ?? false;
+  const accountsSelected = accountsJourney?.accountsSelected ?? false;
+  const accountsPrepared = accountsJourney?.accountsPrepared ?? false;
+  const localContractCreated = accountsJourney?.localContractCreated ?? false;
+  const dryRunDone = accountsJourney?.dryRunDone ?? false;
+  const accountRealSyncDone = accountsJourney?.realSyncDone ?? false;
   const accountJourneyHasPreview = accountJourneyFoundCount > 0;
-  const accountJourneySynced = accountJourneyStatus === 'synced';
+  const accountJourneySynced = accountRealSyncDone || accountJourneyStatus === 'synced';
   const accountJourneyReadyToSync = accountJourneyStatus === 'sync_ready';
+  const accountsOperationalReadyForReview = accountsPrepared && localContractCreated && dryRunDone;
   const accountJourneyRequiresTechnicalReview =
     accountJourneyStatus === 'prepared'
     || accountJourneyStatus === 'technical_review'
@@ -1952,7 +1990,7 @@ export function SalesforceMultiEntityPreview({
         : accountJourneyStatus === 'syncing'
           ? 'Sincronizando'
           : accountJourneyStatus === 'found' && accountJourneyValidCount === 0
-            ? 'Sem Accounts válidas'
+            ? 'Sem Accounts com Id e Name'
         : accountJourneyStatus === 'prepared'
           ? 'Preparadas'
           : accountJourneyStatus === 'technical_review'
@@ -1976,7 +2014,7 @@ export function SalesforceMultiEntityPreview({
           : accountJourneyStatus === 'technical_review'
             ? 'Revisar preparação técnica de Accounts'
             : accountJourneyStatus === 'found'
-              ? 'Preparar Accounts válidas'
+              ? 'Preparar Accounts com Id e Name'
               : accountJourneyStatus === 'error'
                 ? 'Revisar Accounts'
                 : 'Encontrar Accounts';
@@ -1986,7 +2024,7 @@ export function SalesforceMultiEntityPreview({
     || accountJourneySynced
     || contactSyncExecuteState.phase === 'done'
     || oppSyncExecuteState.phase === 'done';
-  const hasOperationalSyncOrExplicitSkip = hasRealOperationalSync || explicitSkipSyncWithPendingReview;
+  const hasOperationalSyncOrExplicitSkip = hasRealOperationalSync || (explicitSkipSyncWithPendingReview && accountsOperationalReadyForReview);
   const canFinishSalesforceSetup = oauthConnected
     && hasConnectionValidation
     && hasDiscoveryData
@@ -2024,16 +2062,16 @@ export function SalesforceMultiEntityPreview({
           ? 'Sincronizando'
         : explicitSkipSyncWithPendingReview
           ? 'Concluído com pendências'
-          : discoveryCompleted
+          : accountsOperationalReadyForReview || accountsLoaded
             ? 'Disponível'
             : 'Bloqueada',
       tone: currentSetupStep === 'sync'
         ? 'active'
         : hasRealOperationalSync
           ? 'done'
-          : accountJourneyStatus === 'syncing'
+        : accountJourneyStatus === 'syncing'
             ? 'ready'
-          : discoveryCompleted
+          : accountsOperationalReadyForReview || accountsLoaded
             ? 'ready'
             : 'pending',
     },
@@ -2041,12 +2079,12 @@ export function SalesforceMultiEntityPreview({
       key: 'review',
       step: '5',
       title: 'Revisar',
-      status: reviewCompleted ? 'Concluída' : hasOperationalSyncOrExplicitSkip ? 'Disponível' : 'Bloqueada',
+      status: reviewCompleted ? 'Concluída' : accountsOperationalReadyForReview ? 'Disponível' : 'Bloqueada',
       tone: currentSetupStep === 'review'
         ? 'active'
         : reviewCompleted
           ? 'done'
-          : hasOperationalSyncOrExplicitSkip
+          : accountsOperationalReadyForReview
             ? 'ready'
             : 'pending',
     },
@@ -2064,7 +2102,7 @@ export function SalesforceMultiEntityPreview({
             : 'pending',
     },
   ];
-  const canConcludeReview = hasOperationalSyncOrExplicitSkip;
+  const canConcludeReview = accountsOperationalReadyForReview && hasOperationalSyncOrExplicitSkip;
   const setupCards = [
     {
       title: 'Conexão Salesforce',
@@ -2151,7 +2189,7 @@ export function SalesforceMultiEntityPreview({
         impact: 'Accounts resolvem vínculos de conta para Contacts e Opportunities.',
         action: accountJourneyRequiresTechnicalReview
           ? 'Revisar preparação técnica de Accounts.'
-          : 'Preparar Accounts válidas na jornada principal.',
+          : 'Preparar Accounts com Id e Name na jornada principal.',
         blocking: 'Bloqueia registros dependentes, mas não bloqueia finalizar com pendências confirmadas.',
       }]
       : []),
@@ -2240,11 +2278,21 @@ export function SalesforceMultiEntityPreview({
       title: 'Sincronizar dados prontos',
       description: accountJourneySynced
         ? 'Accounts já foram tratadas nesta sessão. Siga para Contacts e Opportunities quando houver registros prontos.'
-        : accountJourneyStatus === 'syncing'
+      : accountJourneyStatus === 'syncing'
           ? 'Accounts estão sendo sincronizadas nesta sessão. Aguarde a conclusão para seguir com Contacts e Opportunities.'
+        : !accountsLoaded
+          ? 'Carregue Accounts antes de avançar para a preparação técnica.'
+        : !accountsSelected
+          ? 'Selecione Accounts com Id e Name antes de preparar a etapa técnica.'
+        : !accountsPrepared
+          ? 'Prepare a seleção de Accounts para consolidar a etapa técnica.'
+        : !localContractCreated
+          ? 'Crie o contrato local antes de executar a prévia segura.'
+        : !dryRunDone
+          ? 'Execute o dry-run read-only antes de revisar ou sincronizar.'
         : accountJourneyReadyToSync
           ? `${accountJourneyValidCount} Accounts prontas aguardam sync real.`
-          : accountJourneyHasPreview
+        : accountJourneyHasPreview
             ? `${accountJourneyFoundCount} Accounts encontradas · ${accountJourneyValidCount} prontas para revisão.`
             : opportunityPreviewResult
               ? `${opportunityReadyCount} prontas para sincronizar · ${opportunityPreviewResult.unresolvedCount} pendentes por conta não resolvida.`
@@ -2263,20 +2311,72 @@ export function SalesforceMultiEntityPreview({
               : 'Continuar para revisão'
         : accountJourneyStatus === 'syncing'
           ? 'Sincronizando Accounts...'
+        : !accountsLoaded
+          ? 'Encontrar Accounts'
+        : !accountsSelected
+          ? 'Carregar e preparar Accounts'
+        : !accountsPrepared
+          ? 'Preparar Accounts com Id e Name'
+        : !localContractCreated
+          ? 'Crie o contrato local antes de executar a prévia'
+        : !dryRunDone
+          ? 'Executar dry-run read-only'
         : accountJourneyReadyToSync
           ? 'Sincronizar Accounts prontas'
-          : accountJourneyRequiresTechnicalReview
+        : accountJourneyRequiresTechnicalReview
             ? 'Revisar preparação técnica de Accounts'
             : accountJourneyHasPreview
-              ? 'Preparar Accounts válidas'
+              ? 'Preparar Accounts com Id e Name'
               : 'Encontrar Accounts',
       onClick: async () => {
         if (accountJourneyStatus === 'not_loaded') {
           await accountsJourney?.onLoad();
           return;
         }
-        if (accountJourneyStatus === 'found') {
-          accountsJourney?.onPrepare();
+        if (!accountsLoaded) {
+          await accountsJourney?.onLoad();
+          return;
+        }
+        if (!accountsSelected) {
+          setJourneyNotice('Carregue e prepare Accounts antes de avançar.');
+          accountsJourney?.onReviewTechnical();
+          return;
+        }
+        if (!accountsPrepared || accountJourneyStatus === 'found') {
+          const preparedContract = accountsJourney?.onPrepare();
+          if (!preparedContract) {
+            setJourneyNotice('Não foi possível preparar Accounts. Revise os campos bloqueadores antes de continuar.');
+            return;
+          }
+          const dryRunSucceeded = await accountsJourney?.onDryRun(preparedContract);
+          if (!dryRunSucceeded) {
+            setJourneyNotice('Não foi possível executar o dry-run read-only. Revise a preparação técnica.');
+            return;
+          }
+          setJourneyNotice('Dry-run read-only concluído. Revise os resultados antes de qualquer sync real.');
+          return;
+        }
+        if (!localContractCreated) {
+          const preparedContract = accountsJourney?.onPrepare();
+          if (!preparedContract) {
+            setJourneyNotice('Crie o contrato local antes de executar a prévia.');
+            return;
+          }
+          const dryRunSucceeded = await accountsJourney?.onDryRun(preparedContract);
+          if (!dryRunSucceeded) {
+            setJourneyNotice('Não foi possível executar o dry-run read-only. Revise a preparação técnica.');
+            return;
+          }
+          setJourneyNotice('Dry-run read-only concluído. Revise os resultados antes de qualquer sync real.');
+          return;
+        }
+        if (!dryRunDone) {
+          const dryRunSucceeded = await accountsJourney?.onDryRun();
+          if (!dryRunSucceeded) {
+            setJourneyNotice('Não foi possível executar o dry-run read-only. Revise a preparação técnica.');
+            return;
+          }
+          setJourneyNotice('Dry-run read-only concluído. Revise os resultados antes de qualquer sync real.');
           return;
         }
         if (accountJourneyRequiresTechnicalReview) {
@@ -2284,27 +2384,24 @@ export function SalesforceMultiEntityPreview({
           return;
         }
         if (accountJourneyReadyToSync) {
-          const synced = await accountsJourney?.onSync();
-          if (!synced) return;
-          setExplicitSkipSyncWithPendingReview(false);
-          setSyncCompleted(true);
+          setJourneyNotice('Dry-run read-only concluído. Revise os resultados antes de qualquer sync real.');
+          goToSetupStep('review');
           return;
         }
-        if (accountJourneySynced && contactPreviewResult && contactPreviewResult.resolvedCount > 0) {
-          const synced = await handleExecuteContactSync('main');
-          if (!synced) return;
-          setExplicitSkipSyncWithPendingReview(false);
-          setSyncCompleted(true);
-          return;
-        }
-        if (accountJourneySynced && opportunityPreviewResult && opportunityReadyCount > 0) {
-          const synced = await handleExecuteOpportunitySync('main');
-          if (!synced) return;
-          setExplicitSkipSyncWithPendingReview(false);
-          setSyncCompleted(true);
+        if (
+          accountJourneySynced &&
+          ((contactPreviewResult && contactPreviewResult.resolvedCount > 0) || (opportunityPreviewResult && opportunityReadyCount > 0))
+        ) {
+          setJourneyNotice('Sync real permanece bloqueado no CTA principal. Revise os resultados antes de qualquer gravação.');
+          goToSetupStep('review');
           return;
         }
         if (pendingItems.length > 0) {
+          if (!accountsOperationalReadyForReview) {
+            setJourneyNotice('Execute o dry-run read-only antes de revisar.');
+            accountsJourney?.onReviewTechnical();
+            return;
+          }
           if (!accountJourneySynced) {
             setJourneyNotice('Essas Opportunities e Contacts dependem de Accounts resolvidas. Revise Accounts primeiro.');
             goToSetupStep('sync');
@@ -2321,26 +2418,26 @@ export function SalesforceMultiEntityPreview({
         goToSetupStep('review');
       },
       disabled: !oauthConnected || accountJourneyStatus === 'syncing' || oppSyncExecuteState.phase === 'loading' || contactSyncExecuteState.phase === 'loading' || syncExecuteState.phase === 'loading',
-      writesData: Boolean(
-        accountJourneyReadyToSync ||
-        (opportunityPreviewResult && opportunityReadyCount > 0) ||
-        (contactPreviewResult && contactPreviewResult.resolvedCount > 0),
-      ),
+      writesData: false,
     },
     review: {
       eyebrow: 'Etapa atual',
       title: 'Revisar resultados',
       description: reviewCompleted
         ? 'A revisão principal já foi concluída. Você pode fechar a jornada ou voltar para pendências.'
-        : hasOperationalSyncOrExplicitSkip
+        : accountsOperationalReadyForReview
           ? 'Revise o que entrou, o que ficou pendente e o que ainda exige atenção.'
-          : 'Finalize uma sincronização real ou confirme explicitamente que seguirá com pendências antes de concluir.',
+          : 'Execute o dry-run read-only antes de revisar os resultados.',
       helpTitle: 'O que conferir',
       helpText: 'Confira os detalhes da sincronização, quais registros ficaram pendentes e quais ajustes ainda são necessários.',
       action: 'Concluir revisão',
       onClick: () => {
+        if (!accountsOperationalReadyForReview) {
+          setJourneyNotice('Execute o dry-run read-only antes de revisar.');
+          return;
+        }
         if (!canConcludeReview) {
-          setJourneyNotice('Finalize uma sincronização real ou confirme explicitamente que seguirá com pendências para concluir.');
+          setJourneyNotice('Sync real ainda não foi executado. Confirme explicitamente as pendências antes de concluir.');
           return;
         }
         setReviewCompleted(true);
@@ -2630,7 +2727,7 @@ export function SalesforceMultiEntityPreview({
             )}
             {currentSetupStep === 'review' && !canConcludeReview && (
               <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">
-                Finalize uma sincronização real ou confirme explicitamente que há registros pendentes por Account não resolvida e que quer concluir por enquanto.
+                Sync real ainda não foi executado. Confirme explicitamente as pendências antes de finalizar a jornada.
               </p>
             )}
 
@@ -2652,7 +2749,9 @@ export function SalesforceMultiEntityPreview({
                   <button
                     type="button"
                     onClick={() => {
-                      const pendingSection = document.getElementById('salesforce-pending-items');
+                      const pendingSection =
+                        document.getElementById('salesforce-account-quality-pending')
+                        ?? document.getElementById('salesforce-pending-items');
                       pendingSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
                     className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-black text-slate-700 hover:bg-slate-50"
@@ -2660,7 +2759,7 @@ export function SalesforceMultiEntityPreview({
                     Ver pendências
                   </button>
                 )}
-                {currentSetupStep === 'sync' && !hasRealOperationalSync && pendingItems.length > 0 && (
+                {currentSetupStep === 'sync' && !hasRealOperationalSync && pendingItems.length > 0 && accountsOperationalReadyForReview && (
                   <button
                     type="button"
                     onClick={() => {
@@ -2811,7 +2910,17 @@ export function SalesforceMultiEntityPreview({
               </div>
             </div>
             <p className="mt-3 text-xs font-medium text-slate-600">
-              O botão principal desta etapa fica logo acima, no cartão da etapa atual.
+              {currentSetupStep === 'sync' && !accountsOperationalReadyForReview
+                ? !accountsLoaded
+                  ? 'Carregue Accounts antes de avançar.'
+                  : !accountsSelected
+                    ? 'Selecione Accounts com Id e Name antes de preparar.'
+                    : !localContractCreated
+                      ? 'Crie o contrato local antes de executar a prévia.'
+                      : 'Execute o dry-run read-only antes de revisar.'
+                : currentSetupStep === 'review' && !canConcludeReview
+                  ? 'Conclua a revisão antes de finalizar.'
+                  : 'Use a ação principal desta etapa para seguir no fluxo.'}
             </p>
           </div>
 
