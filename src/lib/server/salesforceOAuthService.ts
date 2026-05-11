@@ -249,7 +249,9 @@ export async function getOAuthConfigStatus(): Promise<OAuthConfigStatus> {
   if (row) {
     const clientId = row.client_id?.trim() || '';
     const secretEncrypted = row.encrypted_client_secret?.trim() || '';
-    const redirectUri = row.redirect_uri?.trim() || '';
+    const dbRedirectUri = row.redirect_uri?.trim() || '';
+    // Allow local-dev override: SALESFORCE_OAUTH_REDIRECT_URI takes precedence over DB when set.
+    const redirectUri = process.env.SALESFORCE_OAUTH_REDIRECT_URI?.trim() || dbRedirectUri;
     const loginUrl = normalizeLoginUrl(row.login_url);
     const scopes = normalizeScopes(row.scopes);
 
@@ -376,18 +378,28 @@ async function getEncryptedClientSecretOrThrow(): Promise<string> {
   return value;
 }
 
-export function buildAuthorizeUrl(config: OAuthConfigStatus, state: string): string {
+export function buildAuthorizeUrl(config: OAuthConfigStatus, state: string, forceLogin = false): string {
   const url = new URL(`${config.loginUrl}/services/oauth2/authorize`);
   url.searchParams.set('response_type', 'code');
   url.searchParams.set('client_id', config.clientId);
   url.searchParams.set('redirect_uri', config.redirectUri);
   url.searchParams.set('scope', config.scopes.join(' '));
   url.searchParams.set('state', state);
+  if (forceLogin) url.searchParams.set('prompt', 'login');
   return url.toString();
 }
 
 export function resolveSalesforceAppOrigin(redirectUri: string | null | undefined): string {
   const fallback = 'http://localhost:3053';
+
+  const appUrl = process.env.APP_URL?.trim();
+  if (appUrl) {
+    try {
+      const origin = new URL(appUrl).origin;
+      if (origin && origin !== 'null') return origin;
+    } catch { /* fall through */ }
+  }
+
   const raw = (redirectUri || '').trim();
   if (!raw) return fallback;
 

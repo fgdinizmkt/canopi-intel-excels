@@ -9,7 +9,7 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   const config = await getOAuthConfigStatus();
   if (!config.configured) {
     const appOrigin = resolveSalesforceAppOrigin(config.redirectUri);
@@ -17,8 +17,11 @@ export async function GET() {
     return NextResponse.redirect(fallback.toString(), { status: 302 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const forceLogin = searchParams.get('force_login') === '1';
+
   const state = generateOAuthState();
-  const redirectUrl = buildAuthorizeUrl(config, state);
+  const redirectUrl = buildAuthorizeUrl(config, state, forceLogin);
 
   const response = NextResponse.redirect(redirectUrl, { status: 302 });
   response.cookies.set({
