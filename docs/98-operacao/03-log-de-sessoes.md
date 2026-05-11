@@ -3,6 +3,35 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-11] — Salesforce Configuration Hub: Fechamento e Publicação (C4.16.30C e C4.17.1)
+
+- **Agentes envolvidos:** ChatGPT na condução/validação, agente de código na implementação e Antigravity no fechamento documental.
+- **Natureza:** Fechamento técnico, validação, publicação e atualização da memória operacional da frente Salesforce.
+- **Commits publicados:**
+  - `9b9ff75` — `feat(settings): redesign Salesforce configuration hub`
+  - `012d7f1` — `chore(salesforce): add synthetic upload pack generator`
+- **Resultados do Hub (9b9ff75):**
+  - Redesign da interface de configuração para layout modular.
+  - Separação entre Configuração OAuth (persistente/segura) e Conexão da Conta (dinâmica).
+  - Integração com os endpoints existentes de OAuth/configuração/status/carga de Accounts.
+  - Fluxo OAuth forçado (`force_login=1`) para permitir troca de conta sem cache de sessão.
+  - Consumer Secret e Consumer Key salvos sem exposição visual após gravação.
+  - Disconnect operacional limpa sessão mas preserva configuração da Connected App.
+  - Carga de Accounts manual (não automática após load) com seleção controlada.
+  - CTA inferior contextual ao estado da conexão (OAuth -> Connect -> Load -> Sync).
+- **Resultados do Gerador (012d7f1):**
+  - Script `scripts/salesforce-export-upload-csvs.mjs` para gerar massa de teste multiobjeto.
+  - Suporte a `Accounts`, `Contacts`, `Opportunities`, `Leads`, `Campaigns` e relacionamentos.
+  - Guardrail de dry-run obrigatório (exige `--write` para gerar arquivos).
+  - Ignora saída em `tmp/salesforce-upload-pack/`.
+- **Validação Confirmada:**
+  - `build:safe` passou; warnings de chart registrados como não bloqueantes e não relacionados à frente Salesforce.
+  - `git` final limpo e alinhado após push.
+  - Validação visual do Hub conectado.
+  - Validação visual da edição OAuth.
+  - Disconnect, reload e reconexão forçada testados.
+- **Status:** Frente fechada e publicada. Memória operacional atualizada.
+
 ## [2026-05-08] — Salesforce C4.16.29A (Hub de Configuração Operacional Salesforce)
 
 - **Agente:** Antigravity (Gemini Pro/High)

@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` local está ahead de `origin/main` até o push. **Salesforce C4.16.29A (Hub de Configuração Operacional) especificado em `39-salesforce-configuration-hub-spec.md`**; C4.16.26 (auditoria + plano de refatoração da jornada) documentado; checkpoint `fc6ef50` com correções C4.16.25B.1–B.4 (quality resolution UX); C4.17.1 (gerador offline de massa sintética) fechado em `30b072d`, com memória operacional atualizada; Salesforce Setup Read-only fechado operacionalmente; os recortes C3.0 a C4.14 adicionaram preview de Accounts, seleção controlada, contratos, dry-run, preview multi-entidade (Contact, Opportunity, Lead, Campaign), mapping canônico, sync de Accounts e Contacts, preview de Opportunities, readiness relacional Opportunity ↔ Contact, sync persistente controlado de Opportunities e execução real controlada em DEV. A validação C4.14 confirma que o preview de Opportunities reflete o estado pós-sync via `opportunity_sync_summary_log`, mantendo o estado funcional consistente. Salesforce está funcionalmente aceitável para seguir adiante nos CRMs, mas ainda não deve ser tratado como polido/final.
+`main` está alinhada com `origin/main` após push dos commits `9b9ff75` (Salesforce Hub Redesign) e `012d7f1` (Synthetic Upload Pack Generator). O **Salesforce Configuration Hub** foi redesenhado e estabilizado no escopo do Hub Salesforce conforme a especificação `39-salesforce-configuration-hub-spec.md`; C4.16.26 (auditoria + plano de refatoração) documentado; C4.17.1 (gerador de massa sintética) concluído e validado; Salesforce Setup agora é um Hub centralizado com configuração OAuth segura e separada por empresa; build:safe passou; warnings de chart registrados como observação não bloqueante e não relacionada ao Salesforce.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -27,9 +27,10 @@ Fechado neste marco (Setup Read-only):
 - Salesforce Opportunity sync persistente controlado (C4.12) concluído localmente em `273529b`
 - Salesforce Opportunity sync executado em DEV (C4.13) documentado a partir de `850c383`
 - Salesforce Opportunity validação visual pós-sync (C4.14) aprovada a partir de `5a61e0f`
-- Gerador offline de massa sintética Salesforce (C4.17.1) concluído em `30b072d`
 - Quality resolution UX hotfixes Salesforce (C4.16.25B.1–B.4) checkpoint em `fc6ef50`
 - Auditoria + plano de refatoração jornada Salesforce (C4.16.26) documentado em `37-salesforce-journey-refactor-plan.md`
+- **Salesforce Configuration Hub Redesign (C4.16.30C)** concluído em `9b9ff75`: layout modular, configuração OAuth segura, conexão/disconnect validada, carga manual de Accounts, CTA dinâmico e integração com os endpoints existentes de OAuth/configuração/status/carga de Accounts.
+- **Salesforce Synthetic Upload Pack Generator (C4.17.1)** concluído em `012d7f1`: script para geração de massa de teste em `scripts/salesforce-export-upload-csvs.mjs` com suporte a dry-run e escrita em `tmp/`.
 
 Não fechado neste marco:
 - sync real
@@ -41,7 +42,6 @@ Não fechado neste marco:
 - persistência de mapeamento para demais entidades Salesforce
 - uso de mapeamento em sync real para demais entidades Salesforce
 - Salesforce Connector completo
-- Salesforce synthetic data stress test (C4.17) concluído em fase offline pelo gerador local
 
 ## Pendências controladas e regra operacional
 
@@ -66,9 +66,8 @@ Não fechado neste marco:
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
-- **C4.16.29B — Implementação do Hub Salesforce (Fase 1.1)**: Reestruturação do layout da página `SalesforceMultiEntityPreview.tsx` para o modelo de blocos modulares e sidebar de atividade.
-- Ver `39-salesforce-configuration-hub-spec.md` para plano de implementação detalhado (Fases 1–5).
-- Não iniciar próximo CRM antes de concluir ao menos Fase 1 da refatoração Salesforce.
+- **Contas V2 — C2.9:** fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores; validação de CRMs pendentes (RD Station CRM, HubSpot, Outro CRM).
+- **Contas V2 — Fase B.2:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)
 
