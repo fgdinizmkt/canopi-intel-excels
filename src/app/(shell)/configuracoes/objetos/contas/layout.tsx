@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  ChevronLeft, 
+import { usePathname } from 'next/navigation';
+import {
+  ChevronLeft,
   Save,
 } from 'lucide-react';
 import { Badge } from '@/src/components/ui';
@@ -58,7 +59,10 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
             ? 'Salvar configuração'
             : 'Configuração já salva';
   const topSaveDisabled = isSaving || !selectedConnector || currentSourceCompleted || isHubspotMethodPending || (selectedConnector === 'hubspot' && selectedInputMethod === 'private_app_token' && hubspotConnectionTestStatus !== 'success') || !canSaveLocalSourceSetup;
-  
+
+  const pathname = usePathname();
+  const isConnectorDetailPage = Boolean(pathname?.startsWith('/configuracoes/objetos/contas/fontes-conectores/'));
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* STICKY HEADER PRESERVADO */}
@@ -76,36 +80,40 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           <div className="flex items-center gap-3">
-             <div className="mr-6 text-right hidden xl:block">
-                <p className="text-[10px] font-black text-slate-400 uppercase">Prontidão do setup local</p>
-                <div className="flex items-center gap-2">
-                   <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-1000 ${readinessScore > 80 ? 'bg-emerald-500' : readinessScore > 50 ? 'bg-amber-500' : 'bg-red-500'}`} 
+            {!isConnectorDetailPage && (
+              <>
+                <div className="mr-6 text-right hidden xl:block">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Prontidão do setup local</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-1000 ${readinessScore > 80 ? 'bg-emerald-500' : readinessScore > 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                         style={{ width: `${readinessScore}%` }}
                       />
-                   </div>
-                   <span className={`text-xs font-black ${readinessScore > 80 ? 'text-emerald-600' : 'text-slate-700'}`}>
-                     {readinessScore}%
-                   </span>
+                    </div>
+                    <span className={`text-xs font-black ${readinessScore > 80 ? 'text-emerald-600' : 'text-slate-700'}`}>
+                      {readinessScore}%
+                    </span>
+                  </div>
                 </div>
-             </div>
-             <button 
-              onClick={save}
-              disabled={topSaveDisabled}
-              className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-slate-200 hover:scale-105 active:scale-95 disabled:opacity-50"
-             >
-                {isSaving ? 'Salvando...' : topSaveLabel === 'Selecionar fonte' || topSaveLabel === 'Escolha o método' || topSaveLabel === 'Configuração concluída' || topSaveLabel === 'Configuração salva' ? topSaveLabel : <><Save className="w-4 h-4" /> {topSaveLabel}</>}
-             </button>
-             <button 
-              disabled={!canConcludeLocalSetup}
-              onClick={completeLocalSetup}
-              className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 ${
-                canConcludeLocalSetup ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
-              }`}
-             >
-                {currentSourceCompleted ? (isCsv ? 'Configuração concluída' : 'Etapa local registrada') : (isCsv ? 'Concluir configuração' : 'Concluir etapa local')}
-             </button>
+                <button
+                  onClick={save}
+                  disabled={topSaveDisabled}
+                  className="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-slate-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  {isSaving ? 'Salvando...' : topSaveLabel === 'Selecionar fonte' || topSaveLabel === 'Escolha o método' || topSaveLabel === 'Configuração concluída' || topSaveLabel === 'Configuração salva' ? topSaveLabel : <><Save className="w-4 h-4" /> {topSaveLabel}</>}
+                </button>
+                <button
+                  disabled={!canConcludeLocalSetup}
+                  onClick={completeLocalSetup}
+                  className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 ${
+                    canConcludeLocalSetup ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200' : 'bg-slate-200 text-slate-400 shadow-none'
+                  }`}
+                >
+                  {currentSourceCompleted ? (isCsv ? 'Configuração concluída' : 'Etapa local registrada') : (isCsv ? 'Concluir configuração' : 'Concluir etapa local')}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>

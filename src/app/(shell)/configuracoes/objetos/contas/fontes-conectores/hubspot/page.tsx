@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, Database, FileSearch, Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Database, FileSearch, Loader2, LogOut, RefreshCw, ShieldCheck } from 'lucide-react';
 import { Badge, Button, Card } from '@/src/components/ui';
 
-type ValidationPhase = 'idle' | 'loading' | 'success' | 'missing_config' | 'credential_error' | 'api_error';
+type ValidationPhase = 'idle' | 'loading' | 'success' | 'missing_config' | 'manual_disconnect' | 'credential_error' | 'api_error';
 type RequestPhase = 'idle' | 'loading' | 'success' | 'error';
 
 interface HubspotTestResult {
@@ -101,6 +101,31 @@ function formatTimestamp(value: string | null) {
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
 }
 
+const SESSION_KEY = 'canopi_hubspot_v1_session_token';
+
+function readHubspotSessionToken() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const value = window.sessionStorage.getItem(SESSION_KEY);
+    return value && value.trim() ? value.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeHubspotSessionToken(value: string | null) {
+  if (typeof window === 'undefined') return;
+  try {
+    if (!value) {
+      window.sessionStorage.removeItem(SESSION_KEY);
+    } else {
+      window.sessionStorage.setItem(SESSION_KEY, value.trim());
+    }
+  } catch {
+    // sessão local opcional; não bloqueia a UX.
+  }
+}
+
 function mapHubspotError(status: number | null) {
   if (status === 400) {
     return { phase: 'missing_config' as const, message: 'Private App token não informado. Informe uma credencial válida da HubSpot para validar o acesso de leitura.' };
@@ -133,6 +158,7 @@ export default function HubSpotPage() {
   });
   const [previewState, setPreviewState] = useState<RequestState<HubspotPreviewResult>>(createRequestState<HubspotPreviewResult>());
   const [schemaState, setSchemaState] = useState<RequestState<HubspotSchemaResult>>(createRequestState<HubspotSchemaResult>());
+  const restoredSessionRef = useRef(false);
 
   const normalizedToken = token.trim();
   const hasToken = normalizedToken.length > 0;
@@ -143,6 +169,7 @@ export default function HubSpotPage() {
 
   useEffect(() => {
     if (validationState.phase === 'success' && validationState.validatedToken && validationState.validatedToken !== normalizedToken) {
+      writeHubspotSessionToken(null);
       setValidationState({
         phase: hasToken ? 'idle' : 'missing_config',
         message: hasToken
@@ -158,6 +185,10 @@ export default function HubSpotPage() {
   }, [hasToken, normalizedToken, validationState.phase, validationState.validatedToken]);
 
   const mainStatus = useMemo(() => {
+    if (!hasToken && validationState.phase === 'manual_disconnect') {
+      return { label: 'Desconectado manualmente', tone: 'slate' as const, message: validationState.message };
+    }
+
     if (!hasToken) {
       return {
         label: 'Configuração incompleta',
@@ -171,7 +202,7 @@ export default function HubSpotPage() {
     }
 
     if (validationState.phase === 'success' && accessValidated) {
-      return { label: 'Acesso validado', tone: 'emerald' as const, message: 'Acesso validado para leitura nesta sessão.' };
+      return { label: 'Conectado', tone: 'emerald' as const, message: 'HubSpot conectado para leitura nesta sessão.' };
     }
 
     if (validationState.phase === 'credential_error') {
@@ -192,8 +223,25 @@ export default function HubSpotPage() {
   const canPreview = accessValidated;
   const canAnalyze = accessValidated;
 
-  const validateAccess = useCallback(async () => {
-    if (!hasToken) {
+  const disconnect = useCallback(() => {
+    setToken('');
+    writeHubspotSessionToken(null);
+    setValidationState({
+      phase: 'manual_disconnect',
+      message: 'Conexão removida. Informe um token para conectar novamente.',
+      data: null,
+      validatedToken: null,
+      updatedAt: new Date().toISOString(),
+    });
+    setPreviewState(createRequestState<HubspotPreviewResult>());
+    setSchemaState(createRequestState<HubspotSchemaResult>());
+  }, []);
+
+  const validateAccess = useCallback(async (tokenOverride?: string) => {
+    const tokenToValidate = (tokenOverride ?? normalizedToken).trim();
+
+    if (!tokenToValidate) {
+      writeHubspotSessionToken(null);
       setValidationState({
         phase: 'missing_config',
         message: 'Private App token não informado. Informe uma credencial válida da HubSpot para validar o acesso de leitura.',
@@ -209,8 +257,9 @@ export default function HubSpotPage() {
     setValidationState((current) => ({ ...current, phase: 'loading', message: 'Validando acesso...' }));
 
     try {
-      const { ok, status, payload } = await postJson<HubspotTestResult>('/api/account-connectors/hubspot/test', normalizedToken);
+      const { ok, status, payload } = await postJson<HubspotTestResult>('/api/account-connectors/hubspot/test', tokenToValidate);
       if (!ok || payload.status !== 'success') {
+        writeHubspotSessionToken(null);
         const mapped = mapHubspotError(status);
         setValidationState({
           phase: mapped.phase,
@@ -228,10 +277,12 @@ export default function HubSpotPage() {
         phase: 'success',
         message: 'Acesso validado para leitura nesta sessão.',
         data: payload as HubspotTestResult,
-        validatedToken: normalizedToken,
+        validatedToken: tokenToValidate,
         updatedAt: new Date().toISOString(),
       });
+      writeHubspotSessionToken(tokenToValidate);
     } catch {
+      writeHubspotSessionToken(null);
       setValidationState({
         phase: 'api_error',
         message: 'Não foi possível consultar a HubSpot agora. Verifique a conexão e tente novamente.',
@@ -242,7 +293,7 @@ export default function HubSpotPage() {
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResult>());
     }
-  }, [hasToken, normalizedToken]);
+  }, [normalizedToken]);
 
   const loadPreview = useCallback(async () => {
     if (!canPreview) {
@@ -328,13 +379,34 @@ export default function HubSpotPage() {
     }
   }, [canAnalyze, normalizedToken]);
 
-  const tokenStatusTone = mainStatus.tone === 'emerald' ? 'emerald' : mainStatus.tone === 'red' ? 'red' : mainStatus.tone === 'amber' ? 'amber' : 'blue';
+  useEffect(() => {
+    if (restoredSessionRef.current) return;
+    restoredSessionRef.current = true;
+
+    const storedToken = readHubspotSessionToken();
+    if (!storedToken) return;
+
+    setToken(storedToken);
+    void validateAccess(storedToken);
+  }, [validateAccess]);
+
+  const tokenStatusTone = mainStatus.tone === 'emerald'
+    ? 'emerald'
+    : mainStatus.tone === 'red'
+      ? 'red'
+      : mainStatus.tone === 'amber'
+        ? 'amber'
+        : mainStatus.tone === 'slate'
+          ? 'slate'
+          : 'blue';
   const tokenStatusPanelClassName = tokenStatusTone === 'emerald'
     ? 'border-emerald-100 bg-emerald-50 text-emerald-950'
     : tokenStatusTone === 'red'
       ? 'border-red-100 bg-red-50 text-red-950'
       : tokenStatusTone === 'amber'
         ? 'border-amber-100 bg-amber-50 text-amber-950'
+        : tokenStatusTone === 'slate'
+          ? 'border-slate-100 bg-slate-50 text-slate-950'
         : 'border-blue-100 bg-blue-50 text-blue-950';
 
   return (
@@ -374,48 +446,100 @@ export default function HubSpotPage() {
             <Badge variant="slate">Sem gravação</Badge>
           </div>
           <p className="mt-3 max-w-4xl text-sm font-medium leading-relaxed text-slate-600">
-            Nenhum dado será gravado na Canopi nesta etapa. Nenhuma credencial será salva nesta etapa. Esta etapa não altera dados na HubSpot.
+            Nenhum dado será gravado na Canopi nesta etapa. A credencial fica apenas nesta sessão local do navegador. Esta etapa não altera dados na HubSpot.
           </p>
         </div>
       </header>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <Card className="border border-slate-200">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Conectar HubSpot</p>
-              <h2 className="text-2xl font-black text-slate-900">Use um token para liberar a leitura</h2>
-              <p className="text-sm font-medium leading-relaxed text-slate-600">
-                Use um Private App token para validar o acesso de leitura da sua conta HubSpot antes de abrir empresas e analisar campos.
-              </p>
-            </div>
+          {accessValidated ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">HubSpot conectado</p>
+                <h2 className="text-2xl font-black text-slate-900">HubSpot conectado para leitura</h2>
+                <p className="text-sm font-medium leading-relaxed text-slate-600">
+                  Esta sessão já está conectada à HubSpot. Você pode carregar empresas, analisar campos ou desconectar para encerrar o acesso local.
+                </p>
+              </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que esta etapa faz</p>
-              <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
-                <li>• Valida o acesso de leitura</li>
-                <li>• Mostra uma amostra de empresas</li>
-                <li>• Lista campos úteis para mapeamento</li>
-              </ul>
-            </div>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Leitura disponível</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-slate-600">Empresas carregadas</span>
+                  <span className="font-black text-slate-900">
+                    {previewState.data ? `${previewState.data.count}` : 'Ainda não carregadas'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-slate-600">Campos analisados</span>
+                  <span className="font-black text-slate-900">
+                    {schemaState.data ? `${schemaState.data.count} propriedades` : 'Ainda não analisados'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-slate-600">Credencial</span>
+                  <span className="font-black text-slate-500">Ativa nesta sessão</span>
+                </div>
+              </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que ainda não acontece</p>
-              <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
-                <li>• Não sincroniza dados</li>
-                <li>• Não grava empresas na Canopi</li>
-                <li>• Não altera dados na HubSpot</li>
-                <li>• Não salva credenciais</li>
-              </ul>
-            </div>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que continua protegido</p>
+                <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
+                  <li>• Nenhum dado é gravado na Canopi</li>
+                  <li>• Nenhuma credencial é salva</li>
+                  <li>• Nenhum dado é alterado na HubSpot</li>
+                </ul>
+              </div>
 
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Próximo passo</p>
-              <p className="mt-1 text-sm font-medium leading-relaxed text-blue-950">
-                Informe o token, valide o acesso e então use as ações de empresas e campos.
-              </p>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Próximo passo</p>
+                <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-emerald-950">
+                  <li>• Carregar empresas</li>
+                  <li>• Analisar campos</li>
+                  <li>• Ou desconectar para limpar a sessão</li>
+                </ul>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Conectar HubSpot</p>
+                <h2 className="text-2xl font-black text-slate-900">Use um token para liberar a leitura</h2>
+                <p className="text-sm font-medium leading-relaxed text-slate-600">
+                  Use uma Service Key ou token da HubSpot com permissão de leitura para conectar sua conta nesta sessão.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que esta etapa faz</p>
+                <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
+                  <li>• Valida o acesso de leitura</li>
+                  <li>• Mostra uma amostra de empresas</li>
+                  <li>• Lista campos úteis para mapeamento</li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que ainda não acontece</p>
+                <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
+                  <li>• Não sincroniza dados</li>
+                  <li>• Não grava empresas na Canopi</li>
+                  <li>• Não altera dados na HubSpot</li>
+                  <li>• A credencial fica apenas nesta sessão local do navegador</li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Próximo passo</p>
+                <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-blue-950">
+                  <li>• Informe o token</li>
+                  <li>• Clique em Conectar</li>
+                  <li>• Depois carregue empresas e analise campos</li>
+                </ul>
+              </div>
+            </div>
+          )}
         </Card>
 
         <Card className="border border-slate-200">
@@ -450,15 +574,24 @@ export default function HubSpotPage() {
               <p className="mt-1 text-sm font-medium leading-relaxed">{mainStatus.message}</p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant="primary"
-                onClick={validateAccess}
-                disabled={validationState.phase === 'loading'}
-                icon={validationState.phase === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-              >
-                Validar acesso
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="primary"
+                  onClick={() => { void validateAccess(); }}
+                  disabled={validationState.phase === 'loading'}
+                  icon={validationState.phase === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+                >
+                  {accessValidated ? 'Reconectar' : 'Conectar'}
+                </Button>
+              {accessValidated && (
+                <Button
+                  variant="danger"
+                  onClick={disconnect}
+                  icon={<LogOut className="h-4 w-4" />}
+                >
+                  Desconectar
+                </Button>
+              )}
               <Button
                 variant="outline"
                 onClick={loadPreview}
@@ -468,69 +601,49 @@ export default function HubSpotPage() {
                 Pré-visualizar empresas
               </Button>
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={loadSchema}
                 disabled={!canAnalyze || schemaState.phase === 'loading'}
                 icon={schemaState.phase === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSearch className="h-4 w-4" />}
-              >
-                Analisar campos
-              </Button>
-            </div>
-
-            <p className="text-xs font-medium leading-relaxed text-slate-500">
-              Se o token estiver ausente ou incorreto, a mensagem acima explica exatamente o bloqueio.
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-3">
-        <Card className="border border-slate-200">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Validação</p>
-              <h3 className="text-xl font-black text-slate-900">Acesso</h3>
-            </div>
-            <Badge variant={validationState.phase === 'success' ? 'emerald' : validationState.phase === 'loading' ? 'blue' : validationState.phase === 'credential_error' || validationState.phase === 'api_error' ? 'red' : hasToken ? 'blue' : 'amber'}>
-              {!hasToken
-                ? 'Configuração incompleta'
-                : validationState.phase === 'success'
-                  ? 'Acesso validado'
-                  : validationState.phase === 'loading'
-                    ? 'Validando'
-                    : validationState.phase === 'credential_error'
-                      ? 'Falha'
-                      : validationState.phase === 'api_error'
-                        ? 'Erro'
-                        : 'Pronto para validar'}
-            </Badge>
-          </div>
-
-          <div className="mt-4 space-y-3 text-sm text-slate-700">
-            {!hasToken ? (
-              <p>Erro de configuração obrigatória ausente: Private App token não informado.</p>
-            ) : validationState.phase === 'loading' ? (
-              <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Validando acesso...
+                >
+                  Analisar campos
+                </Button>
               </div>
-            ) : validationState.phase === 'success' && validationState.data ? (
-              <>
-                <p><span className="font-semibold text-slate-900">Hub ID:</span> {validationState.data.hubId || 'não informado'}</p>
-                <p><span className="font-semibold text-slate-900">Scopes:</span> {validationState.data.scopes.length ? validationState.data.scopes.join(', ') : '—'}</p>
-                <p><span className="font-semibold text-slate-900">Leitura confirmada:</span> {validationState.data.readAccessConfirmed ? 'sim' : 'não'}</p>
-                <p className="text-xs text-slate-500">Validado em {formatTimestamp(validationState.updatedAt ?? validationState.data.testedAt)}</p>
-              </>
-            ) : validationState.phase === 'credential_error' || validationState.phase === 'api_error' ? (
-              <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-red-800">
-                {validationState.message}
-              </div>
-            ) : (
-              <p>Valide o acesso para liberar a pré-visualização de empresas e a análise de campos.</p>
-            )}
-          </div>
-        </Card>
 
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Resumo da conexão</p>
+                {accessValidated && validationState.data ? (
+                  <div className="mt-2 space-y-2 text-sm text-slate-700">
+                    <p><span className="font-semibold text-slate-900">Hub ID:</span> {validationState.data.hubId || 'não informado'}</p>
+                    <p><span className="font-semibold text-slate-900">Scopes:</span> {validationState.data.scopes.length ? validationState.data.scopes.join(', ') : '—'}</p>
+                    <p><span className="font-semibold text-slate-900">Leitura confirmada:</span> {validationState.data.readAccessConfirmed ? 'sim' : 'não'}</p>
+                    <p className="text-xs text-slate-500">
+                      Conectado em {formatTimestamp(validationState.updatedAt ?? validationState.data.testedAt)}.
+                    </p>
+                  </div>
+                ) : validationState.phase === 'manual_disconnect' ? (
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                    {validationState.message}
+                  </p>
+                ) : hasToken ? (
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                    Token preenchido. Valide o acesso para ativar a conexão.
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                    Nenhuma conexão ativa.
+                  </p>
+                )}
+              </div>
+
+              <p className="text-xs font-medium leading-relaxed text-slate-500">
+                Se o token estiver ausente ou incorreto, a mensagem acima explica exatamente o bloqueio.
+              </p>
+            </div>
+          </Card>
+        </div>
+
+      <div className="grid gap-6 xl:grid-cols-2 items-start">
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -671,7 +784,7 @@ export default function HubSpotPage() {
           </div>
           <ul className="mt-4 space-y-2 text-sm font-medium leading-relaxed text-slate-700">
             <li>• Nenhum dado será gravado na Canopi nesta etapa.</li>
-            <li>• Nenhuma credencial será salva nesta etapa.</li>
+            <li>• A credencial fica apenas nesta sessão local do navegador.</li>
             <li>• Esta etapa não altera dados na HubSpot.</li>
           </ul>
         </Card>
@@ -694,10 +807,14 @@ export default function HubSpotPage() {
         </Card>
       </div>
 
-      <div className="rounded-3xl border border-blue-100 bg-blue-50 p-5">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Próxima ação</p>
-        <p className="mt-2 text-sm font-medium leading-relaxed text-blue-950">
-          Informe o token, valide o acesso e então pré-visualize empresas ou analise campos. O fluxo é de leitura e não grava nada.
+      <div className={`rounded-3xl border p-5 ${accessValidated ? 'border-emerald-100 bg-emerald-50' : 'border-blue-100 bg-blue-50'}`}>
+        <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${accessValidated ? 'text-emerald-700' : 'text-blue-700'}`}>
+          {accessValidated ? 'Conectado' : 'Próxima ação'}
+        </p>
+        <p className={`mt-2 text-sm font-medium leading-relaxed ${accessValidated ? 'text-emerald-950' : 'text-blue-950'}`}>
+          {accessValidated
+            ? 'HubSpot conectado para leitura nesta sessão. Carregue empresas, analise campos ou desconecte para encerrar o acesso local. Nenhum dado é gravado.'
+            : 'Informe o token e clique em Conectar para liberar a leitura de empresas e campos. O fluxo é de leitura e não grava nada.'}
         </p>
       </div>
     </div>
