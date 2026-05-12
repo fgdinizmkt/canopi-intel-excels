@@ -210,7 +210,7 @@ export const HUBSPOT_PRESET: ConnectorPreset = {
     ],
     whatMustExist: [
       'HubSpot Private App Token',
-      'Permissions: crm.objects.companies.read / write',
+      'Permissions: crm.objects.companies.read',
     ],
     publishBlockers: [
       'Private App Token inválido',
@@ -229,8 +229,8 @@ export const HUBSPOT_PRESET: ConnectorPreset = {
   nativeObject: 'Company',
   requiredFields: ['hs_object_id', 'domain', 'name'],
   conflictPolicy: 'overwrite',
-  supportsWriteback: true,
-  writebackTargets: ['lifecyclestage', 'hs_lead_status', 'tier', 'abx_stage', 'orchestration_status'],
+  supportsWriteback: false,
+  writebackTargets: [],
   lgpdRisk: 'low',
   affectedSections: ['fontes', 'identidade', 'canonica', 'writeback', 'upload'],
   possibleBlockers: ['CONECTOR_MISSING', 'IDENTITY_CONFLICT'],

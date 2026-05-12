@@ -10,12 +10,12 @@ export const hubspotAdapter: AccountConnectorAdapterDefinition = {
   minimumExpectedFields: ['hs_object_id', 'name', 'domain', 'hubspot_owner_id'],
   supportsCustomFields: true,
   requiredScopes: ['crm.objects.companies.read'],
-  optionalScopes: ['crm.objects.companies.write', 'crm.schemas.companies.read'],
+  optionalScopes: ['crm.schemas.companies.read'],
   capabilities: {
     supportsRefreshToken: false,
     supportsMetadataDiscovery: true,
-    supportsIncrementalSync: true,
-    supportsWebhooks: true,
+    supportsIncrementalSync: false,
+    supportsWebhooks: false,
   },
   limitations: [
     'Token real ainda não solicitado ou armazenado nesta versão.',
