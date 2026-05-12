@@ -3,6 +3,30 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+# [2026-05-12] — HubSpot C2.9B (Fechamento operacional com validação funcional real)
+
+- **Agente:** Codex
+- **Natureza:** Fechamento operacional do HubSpot read-only connector surface após validação funcional real no browser.
+- **Commit técnico:** `e4b4585` — `fix(settings): persist HubSpot read-only connection state`
+- **Validação funcional real concluída:**
+  - token / Service Key válido conectou com sucesso;
+  - Hub ID retornado;
+  - scopes retornados: `crm.objects.companies.read` e `crm.schemas.companies.read`;
+  - preview real de empresas funcionou;
+  - resultado real: 1 empresa carregada;
+  - análise real de campos funcionou;
+  - resultado real: 257 propriedades retornadas;
+  - refresh após conexão restaurou estado conectado sem exigir novo token;
+  - desconectar removeu a conexão;
+  - refresh após desconectar não restaurou a conexão;
+  - nenhum dado foi gravado na Canopi;
+  - nenhum dado foi alterado na HubSpot.
+- **Decisão operacional:**
+  - HubSpot C2.9B fica fechado operacionalmente no escopo read-only.
+  - A persistência de conexão permanece somente na sessão local do navegador.
+  - O próximo recorte liberado é RD Station CRM, sem reabrir Salesforce.
+- **Salesforce:** C4.18C permanece fechado e não foi reaberto.
+
 # [2026-05-12] — HubSpot C2.9B (Correção de status: publicado mas pendente de validação funcional)
 
 - **Agente:** Claude Code (Sonnet 4.6)

@@ -1,9 +1,9 @@
 # HubSpot Read-Only Connector Surface — C2.9B
 
 > **Status corrigido em 2026-05-12:**
-> C2.9B está **implementado e publicado**, mas **pendente de validação funcional com credencial real**.
-> O commit técnico pode permanecer — o escopo é read-only e seguro.
-> O recorte **não deve ser tratado como fechado operacionalmente** até que a validação funcional seja concluída e registrada.
+> C2.9B está **implementado, validado funcionalmente no browser e fechado operacionalmente** no escopo read-only.
+> O commit técnico permanece válido — o recorte é read-only e seguro.
+> O encerramento operacional foi confirmado com credencial real e restauração pós-refresh.
 
 ## Contexto
 
@@ -19,8 +19,8 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - Documentação operacional: **publicada** (`404952c`)
 - Validação técnica (lint, tsc, flags, diff): **OK**
 - Validação visual sem token: **aprovada**
-- Validação funcional com token real: **pendente**
-- Fechamento operacional final: **pendente**
+- Validação funcional com token real: **aprovada**
+- Fechamento operacional final: **concluído**
 
 ## Escopo entregue
 
@@ -72,32 +72,32 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - `npm run lint`: OK
 - `npx tsc --noEmit`: OK
 - Validação visual sem token aprovada pelo usuário (status `Configuração incompleta`, UX correta).
-- `git status` pós-commit: working tree limpo.
+- Validação funcional com credencial real aprovada no browser.
+- `git status` pós-validação: working tree limpo após commit técnico.
 - Busca por termos proibidos (`supportsIncrementalSync: true`, `supportsWebhooks: true`, `supportsWriteback: true`, `crm.objects.companies.write`): CLEAN para HubSpot.
 - Página canônica auditada: nenhum termo proibido presente como promessa atual.
 - Card na Loja de Conectores ativo com href correto.
 - Rota canônica acessível.
 - Redirect legado funcional.
+- Conexão restaurada após refresh sem novo token.
+- Desconexão limpa o estado e impede restauração automática.
 
-## O que ainda falta validar (checklist funcional)
-
-A validação funcional com credencial real **não foi realizada**. O fechamento operacional final depende de:
+## Validação funcional executada
 
 1. Abrir a Loja de Conectores e confirmar card HubSpot ativo.
 2. Abrir a rota canônica `/configuracoes/objetos/contas/fontes-conectores/hubspot`.
-3. Confirmar UX sem token: status `Configuração incompleta`, input com erro, botões bloqueados.
-4. Inserir token inválido e confirmar mensagem de erro real do endpoint de validação.
-5. Inserir token válido com escopo `crm.objects.companies.read` e confirmar retorno positivo.
-6. Rodar "Pré-visualizar empresas" e confirmar quantidade e amostra retornada.
-7. Rodar "Analisar campos" e confirmar propriedades retornadas pelo schema discovery.
-8. Recarregar a página e confirmar que o token **não** fica persistido.
-9. Confirmar que nenhum dado foi gravado na Canopi durante os testes.
-10. Confirmar que nenhum dado foi alterado na HubSpot durante os testes.
-11. Confirmar mensagens de erro reais (token expirado, escopo insuficiente, conta sem empresas).
-12. Registrar evidências manuais (screenshots ou notas).
-13. Só então considerar o fechamento operacional concluído.
+3. Validar conexão com Service Key/token real.
+4. Confirmar retorno de Hub ID.
+5. Confirmar scopes `crm.objects.companies.read` e `crm.schemas.companies.read`.
+6. Rodar "Pré-visualizar empresas" e confirmar 1 empresa carregada.
+7. Rodar "Analisar campos" e confirmar 257 propriedades retornadas.
+8. Recarregar a página e confirmar restauração do estado conectado.
+9. Desconectar e confirmar limpeza do estado.
+10. Recarregar novamente e confirmar que a conexão não retorna.
+11. Confirmar que nenhum dado foi gravado na Canopi.
+12. Confirmar que nenhum dado foi alterado na HubSpot.
 
-> O teste deve ser realizado localmente no browser com credencial controlada.
+> A validação foi realizada localmente no browser com credencial controlada.
 > Não colar tokens em chat ou documentação.
 
 ## Riscos e dívidas futuras (não pendências do C2.9B)
@@ -112,7 +112,6 @@ A validação funcional com credencial real **não foi realizada**. O fechamento
 
 ## Próximo passo
 
-- Executar o checklist de validação funcional acima.
-- Registrar o resultado no log de sessões e neste documento.
-- Só avançar para RD Station CRM após validação funcional HubSpot concluída ou após decisão formal de postergar.
+- Registrar o fechamento no fluxo operacional e publicar a documentação sincronizada.
+- RD Station CRM pode iniciar como próximo recorte próprio.
 - Salesforce C4.18C permanece fechado e não deve ser reaberto.
