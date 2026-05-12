@@ -3,6 +3,50 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+# [2026-05-12] — Salesforce C4.18C (Fechamento técnico do full-load connector flow e auditoria de vínculos)
+
+- **Agentes envolvidos:** Codex na auditoria técnica e ChatGPT na condução documental.
+- **Natureza:** Fechamento técnico do Salesforce full-load connector flow com pendências explícitas de origem.
+- **Commit de código local:** `dd926ef` — `feat(settings): support Salesforce full-load connector flow`
+- **Validação funcional consolidada no browser:**
+  - **Accounts:** 494 carregadas com full-load e hidratação pós-refresh.
+  - **Contacts:** 317 carregados, 305 resolvidos, 12 sem vínculo.
+  - **Contact Sync:** 300 criados, 5 atualizados, 12 ignorados.
+  - **Leads:** 86 encontrados/carregados em leitura; Lead Sync pendente; nenhum Lead gravado na Canopi.
+  - **Opportunities:** 151 carregadas, 22 criadas, 9 já existentes, 120 sem vínculo.
+  - **Funil:** derivado das Opportunities, mantendo pendências de vínculo explícitas.
+  - **Estado final:** `Configuração concluída com pendências`.
+- **Comportamento confirmado:**
+  - Hidratação pós-refresh do Hub restaura o estado real sem rebaixar para amostra.
+  - Leads entram na visão operacional em modo read-only, sem implantar Lead Sync.
+  - CTA global de conclusão foi reposicionado fora do painel de Opportunities/Funil.
+  - A conclusão não mascara pendências de origem.
+- **Auditoria de vínculos pendentes:**
+  - `12` Contacts sem vínculo por ausência de `AccountId` no Salesforce.
+  - `120` Opportunities sem vínculo por ausência de `AccountId` no Salesforce.
+  - Nenhum caso de `AccountId` presente deixou de resolver na Canopi.
+  - Não há candidatos seguros para update automático.
+  - CSVs gerados em `tmp/salesforce-pending-links-audit/` são apenas auditoria local e não entram em commit.
+- **Validação técnica consolidada:**
+  - `npm run build:safe` OK.
+  - `npx tsc --noEmit` OK.
+  - `git diff --check` OK.
+  - `npm run lint` OK.
+- **Status operacional:** full-load connector flow fechado tecnicamente; código local pronto; docs sendo registrados; push ainda pendente.
+
+## [2026-05-11] — Salesforce Contact Sync: Validação C4.18B (DEV/Sandbox)
+
+- **Agentes envolvidos:** ChatGPT na condução da validação técnica e Antigravity no fechamento documental.
+- **Natureza:** Validação técnica operacional e comprovação de integridade relacional (Contact -> Account).
+- **Contrato validado:** `9e804e6c-0796-4c37-bb77-73cc46296110`
+- **Resultados Técnicos:**
+  - **Preview:** 5/5 contatos resolvidos (zero órfãos).
+  - **Sync Execute:** Idempotência comprovada (0 criados, 5 atualizados).
+  - **Integridade:** `accountId` resolvido com sucesso para todos os registros no banco Canopi.
+  - **Audit Log:** `contact_sync_summary_log` persistido corretamente no contrato.
+- **Observações:** Identificada e corrigida segregação de datasets que gerava órfãos em contratos anteriores (`44de93e6`).
+- **Status:** Contact Sync fechado e comprovado. Próximo passo: Opportunity Sync (C4.18C).
+
 ## [2026-05-11] — Salesforce Configuration Hub: Fechamento e Publicação (C4.16.30C e C4.17.1)
 
 - **Agentes envolvidos:** ChatGPT na condução/validação, agente de código na implementação e Antigravity no fechamento documental.

@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` está alinhada com `origin/main` após push dos commits `9b9ff75` (Salesforce Hub Redesign) e `012d7f1` (Synthetic Upload Pack Generator). O **Salesforce Configuration Hub** foi redesenhado e estabilizado no escopo do Hub Salesforce conforme a especificação `39-salesforce-configuration-hub-spec.md`; C4.16.26 (auditoria + plano de refatoração) documentado; C4.17.1 (gerador de massa sintética) concluído e validado; Salesforce Setup agora é um Hub centralizado com configuração OAuth segura e separada por empresa; build:safe passou; warnings de chart registrados como observação não bloqueante e não relacionada ao Salesforce.
+`main` está ahead de `origin/main` após o commit local `dd926ef` (`feat(settings): support Salesforce full-load connector flow`). O **Salesforce Configuration Hub** foi redesenhado e estabilizado no escopo do Hub Salesforce conforme a especificação `39-salesforce-configuration-hub-spec.md`; C4.16.26 (auditoria + plano de refatoração) documentado; C4.17.1 (gerador de massa sintética) concluído e validado; C4.18C (full-load connector flow com pendências explícitas) fechado tecnicamente no código local; Salesforce Setup agora é um Hub centralizado com configuração OAuth segura e separada por empresa; build:safe, tsc, lint e diff-check passaram; warnings de chart seguem registrados como observação não bloqueante e não relacionada ao Salesforce.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -31,6 +31,8 @@ Fechado neste marco (Setup Read-only):
 - Auditoria + plano de refatoração jornada Salesforce (C4.16.26) documentado em `37-salesforce-journey-refactor-plan.md`
 - **Salesforce Configuration Hub Redesign (C4.16.30C)** concluído em `9b9ff75`: layout modular, configuração OAuth segura, conexão/disconnect validada, carga manual de Accounts, CTA dinâmico e integração com os endpoints existentes de OAuth/configuração/status/carga de Accounts.
 - **Salesforce Synthetic Upload Pack Generator (C4.17.1)** concluído em `012d7f1`: script para geração de massa de teste em `scripts/salesforce-export-upload-csvs.mjs` com suporte a dry-run e escrita em `tmp/`.
+- **Salesforce Contact Sync (C4.18B)** fechado e comprovado em DEV/Sandbox (contrato `9e804e6c`).
+- **Salesforce Full-load Connector Flow (C4.18C)** fechado tecnicamente em `dd926ef`: full-load de Accounts com hidratação pós-refresh, Contacts e Leads integrados na visão operacional, Opportunities e Funil com CTA global de conclusão e pendências de vínculo de origem explicitadas.
 
 Não fechado neste marco:
 - sync real
@@ -41,6 +43,8 @@ Não fechado neste marco:
 - criação/atualização de registros no Salesforce
 - persistência de mapeamento para demais entidades Salesforce
 - uso de mapeamento em sync real para demais entidades Salesforce
+- Lead Sync persistente
+- módulo futuro de Pendências de vínculo
 - Salesforce Connector completo
 
 ## Pendências controladas e regra operacional
@@ -60,12 +64,22 @@ Não fechado neste marco:
   - Reusar o dataset local sintético gerado em `tmp/salesforce-synthetic-dataset/` como fonte de teste.
   - Manter guardrails de validação, dry-run e confirmação explícita antes de qualquer escrita externa.
 
+- **C4.18C — Fechamento Salesforce full-load connector flow**
+  - Accounts: 494 carregadas com full-load e hidratação pós-refresh.
+  - Contacts: 317 carregados, 305 resolvidos, 12 sem vínculo; sync com 300 criados, 5 atualizados e 12 ignorados.
+  - Leads: 86 encontrados/carregados em leitura; Lead Sync permanece pendente.
+  - Opportunities: 151 carregadas, 22 criadas, 9 já existentes e 120 sem vínculo.
+  - Estado final do Hub: `Configuração concluída com pendências`.
+  - Pendências de origem confirmadas: 12 Contacts e 120 Opportunities sem `AccountId` no Salesforce; não há candidatos seguros para update automático.
+  - Próximo passo: manter a frente fechada e, se necessário, abrir o módulo futuro de Pendências de vínculo sem reabrir a jornada principal.
+
 - **Regra operacional de documentação persistente**
   - Não deixar decisões importantes apenas no chat.
   - Quando houver decisão operacional, pendência de recorte, regra nova ou checkpoint de fase, documentar no repositório por agente.
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
+- **Publicar o fechamento documental C4.18C** sem reabrir o recorte técnico.
 - **Contas V2 — C2.9:** fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores; validação de CRMs pendentes (RD Station CRM, HubSpot, Outro CRM).
 - **Contas V2 — Fase B.2:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers.
 
@@ -1068,4 +1082,3 @@ Registrada em `docs/98-operacao/35-matriz-agentes-modelos.md` a régua de decis�
 ## Evoluções Futuras Estruturantes
 
 - **Configuração da Empresa Cliente:** Em futuras evoluções da Canopi, considerar como item estruturante uma página/área de Configuração da Empresa Cliente (ver `docs/98-operacao/36-configuracao-empresa-cliente.md`). Essa área deve calibrar a inteligência da plataforma a partir de posicionamento, ICPs, personas, produtos/serviços, ciclo médio de fechamento, OKRs, metas, contexto comercial e premissas de GTM.
-
