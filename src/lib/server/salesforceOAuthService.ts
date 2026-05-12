@@ -884,6 +884,294 @@ export async function fetchAccountsPreview(limitInput = DEFAULT_ACCOUNTS_PREVIEW
   }
 }
 
+// ─── Paginated full-load helpers ────────────────────────────────────────────
+
+const FULL_LOAD_MAX_RECORDS = 10000;
+
+async function paginatedSalesforceQuery(
+  instanceUrl: string,
+  accessToken: string,
+  apiVersion: string,
+  soql: string,
+  maxRecords: number,
+): Promise<{ records: Record<string, unknown>[]; totalSize: number; pages: number }> {
+  const queryUrl = new URL(`${instanceUrl}/services/data/${apiVersion}/query`);
+  queryUrl.searchParams.set('q', soql);
+
+  const allRecords: Record<string, unknown>[] = [];
+  let nextUrl: string | null = queryUrl.toString();
+  let totalSize = 0;
+  let pages = 0;
+
+  while (nextUrl && allRecords.length < maxRecords) {
+    const res = await fetch(nextUrl, {
+      method: 'GET',
+      headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      const err = new Error('PAGINATED_QUERY_FAILED');
+      (err as Error & { status?: number }).status = res.status;
+      throw err;
+    }
+
+    const payload = (await res.json().catch(() => null)) as {
+      totalSize?: number;
+      done?: boolean;
+      records?: Record<string, unknown>[];
+      nextRecordsUrl?: string;
+    } | null;
+
+    if (!payload) break;
+    if (typeof payload.totalSize === 'number') totalSize = payload.totalSize;
+    pages++;
+
+    for (const record of Array.isArray(payload.records) ? payload.records : []) {
+      allRecords.push(record);
+      if (allRecords.length >= maxRecords) break;
+    }
+
+    nextUrl = payload.done === false && payload.nextRecordsUrl
+      ? `${instanceUrl}${payload.nextRecordsUrl}`
+      : null;
+  }
+
+  return { records: allRecords, totalSize, pages };
+}
+
+export interface SalesforceFullLoadSummaryItem {
+  objectApiName: string;
+  recordCount: number;
+}
+
+export interface SalesforceAccountFullLoadResult extends SalesforceAccountPreviewResult {
+  pages: number;
+}
+
+export async function fetchAllAccountsPaginated(
+  maxRecords = FULL_LOAD_MAX_RECORDS,
+): Promise<SalesforceAccountFullLoadResult> {
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  const fields = ACCOUNT_PREVIEW_FIELDS.join(', ');
+  const soql = `SELECT ${fields} FROM Account ORDER BY LastModifiedDate DESC`;
+
+  const doFetch = async () => {
+    const { records: rawRecords, totalSize, pages } = await paginatedSalesforceQuery(
+      instanceUrl, accessToken, apiVersion, soql, maxRecords,
+    );
+    const records = rawRecords.map((record) => ({
+      Id: typeof record.Id === 'string' ? record.Id : null,
+      Name: typeof record.Name === 'string' ? record.Name : null,
+      Website: typeof record.Website === 'string' ? record.Website : null,
+      Industry: typeof record.Industry === 'string' ? record.Industry : null,
+      Type: typeof record.Type === 'string' ? record.Type : null,
+      OwnerId: typeof record.OwnerId === 'string' ? record.OwnerId : null,
+      CreatedDate: typeof record.CreatedDate === 'string' ? record.CreatedDate : null,
+      LastModifiedDate: typeof record.LastModifiedDate === 'string' ? record.LastModifiedDate : null,
+    }));
+    return { records, totalSize, pages };
+  };
+
+  try {
+    const { records, totalSize, pages } = await doFetch();
+    return { records, totalSize, done: records.length >= totalSize, limit: maxRecords, apiVersion, instanceUrl, accountLabel: 'Account', testedAt: new Date().toISOString(), pages };
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status;
+    if ((status === 401 || status === 403) && refreshToken) {
+      const refreshed = await refreshAccessToken(refreshToken, config);
+      accessToken = refreshed.access_token?.trim() || '';
+      if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+      if (refreshed.instance_url?.trim()) instanceUrl = refreshed.instance_url.trim();
+      await updateOAuthConnectionPatch({
+        status: 'connected',
+        instance_url: instanceUrl,
+        access_token_encrypted: encryptToken(accessToken),
+        access_token_issued_at: refreshed.issued_at ? new Date(Number(refreshed.issued_at)).toISOString() : new Date().toISOString(),
+        scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+        last_health_check_at: new Date().toISOString(),
+        error_message: null,
+      });
+      const { records, totalSize, pages } = await doFetch();
+      return { records, totalSize, done: records.length >= totalSize, limit: maxRecords, apiVersion, instanceUrl, accountLabel: 'Account', testedAt: new Date().toISOString(), pages };
+    }
+    throw error;
+  }
+}
+
+// ─── Lead preview (read-only, no sync) ──────────────────────────────────────
+
+const LEAD_PREVIEW_FIELDS = ['Id', 'Name', 'Company', 'Status', 'Email', 'OwnerId', 'CreatedDate', 'LastModifiedDate'];
+
+export interface SalesforceLeadRecord {
+  Id: string | null;
+  Name: string | null;
+  Company: string | null;
+  Status: string | null;
+  Email: string | null;
+  OwnerId: string | null;
+  CreatedDate: string | null;
+  LastModifiedDate: string | null;
+}
+
+export interface SalesforceLeadPreviewResult {
+  records: SalesforceLeadRecord[];
+  totalSize: number;
+  done: boolean;
+  pages: number;
+  apiVersion: string;
+  instanceUrl: string;
+  testedAt: string;
+}
+
+export async function fetchLeadsPreview(
+  maxRecords = FULL_LOAD_MAX_RECORDS,
+): Promise<SalesforceLeadPreviewResult> {
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  const soql = `SELECT ${LEAD_PREVIEW_FIELDS.join(', ')} FROM Lead ORDER BY LastModifiedDate DESC`;
+
+  const doFetch = async () => {
+    const { records: rawRecords, totalSize, pages } = await paginatedSalesforceQuery(
+      instanceUrl, accessToken, apiVersion, soql, maxRecords,
+    );
+    const records = rawRecords.map((r) => ({
+      Id: typeof r.Id === 'string' ? r.Id : null,
+      Name: typeof r.Name === 'string' ? r.Name : null,
+      Company: typeof r.Company === 'string' ? r.Company : null,
+      Status: typeof r.Status === 'string' ? r.Status : null,
+      Email: typeof r.Email === 'string' ? r.Email : null,
+      OwnerId: typeof r.OwnerId === 'string' ? r.OwnerId : null,
+      CreatedDate: typeof r.CreatedDate === 'string' ? r.CreatedDate : null,
+      LastModifiedDate: typeof r.LastModifiedDate === 'string' ? r.LastModifiedDate : null,
+    }));
+    return { records, totalSize, pages };
+  };
+
+  try {
+    const { records, totalSize, pages } = await doFetch();
+    return { records, totalSize, done: records.length >= totalSize, pages, apiVersion, instanceUrl, testedAt: new Date().toISOString() };
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status;
+    if ((status === 401 || status === 403) && refreshToken) {
+      const refreshed = await refreshAccessToken(refreshToken, config);
+      accessToken = refreshed.access_token?.trim() || '';
+      if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+      if (refreshed.instance_url?.trim()) instanceUrl = refreshed.instance_url.trim();
+      await updateOAuthConnectionPatch({
+        status: 'connected',
+        instance_url: instanceUrl,
+        access_token_encrypted: encryptToken(accessToken),
+        access_token_issued_at: refreshed.issued_at ? new Date(Number(refreshed.issued_at)).toISOString() : new Date().toISOString(),
+        scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+        last_health_check_at: new Date().toISOString(),
+        error_message: null,
+      });
+      const { records, totalSize, pages } = await doFetch();
+      return { records, totalSize, done: records.length >= totalSize, pages, apiVersion, instanceUrl, testedAt: new Date().toISOString() };
+    }
+    throw error;
+  }
+}
+
+export async function createSalesforceFullLoadContract(
+  objects: Array<'Contact' | 'Opportunity'>,
+  maxRecordsPerObject = FULL_LOAD_MAX_RECORDS,
+): Promise<{ contractId: string; summary: SalesforceFullLoadSummaryItem[] }> {
+  if (!objects.length) throw new Error('FULL_LOAD_NO_OBJECTS');
+
+  const config = await getOAuthConfigStatus();
+  if (!config.configured) throw new Error('NOT_CONFIGURED');
+
+  const row = await getOAuthConnection();
+  if (!row || row.status !== 'connected') throw new Error('NOT_CONNECTED');
+
+  let accessToken = decryptToken(row.access_token_encrypted);
+  const refreshToken = decryptToken(row.refresh_token_encrypted);
+  let instanceUrl = row.instance_url || '';
+  const apiVersion = row.api_version || DEFAULT_API_VERSION;
+
+  const fetchWithRetry = async (soql: string, max: number) => {
+    try {
+      return await paginatedSalesforceQuery(instanceUrl, accessToken, apiVersion, soql, max);
+    } catch (error) {
+      const status = (error as Error & { status?: number }).status;
+      if ((status === 401 || status === 403) && refreshToken) {
+        const refreshed = await refreshAccessToken(refreshToken, config);
+        accessToken = refreshed.access_token?.trim() || '';
+        if (!accessToken) throw new Error('TOKEN_REFRESH_EMPTY');
+        if (refreshed.instance_url?.trim()) instanceUrl = refreshed.instance_url.trim();
+        await updateOAuthConnectionPatch({
+          status: 'connected',
+          instance_url: instanceUrl,
+          access_token_encrypted: encryptToken(accessToken),
+          access_token_issued_at: refreshed.issued_at ? new Date(Number(refreshed.issued_at)).toISOString() : new Date().toISOString(),
+          scopes: refreshed.scope ? parseScopes(refreshed.scope) : row.scopes,
+          last_health_check_at: new Date().toISOString(),
+          error_message: null,
+        });
+        return paginatedSalesforceQuery(instanceUrl, accessToken, apiVersion, soql, max);
+      }
+      throw error;
+    }
+  };
+
+  const entities: Array<{ objectApiName: string; selectedRecords: Record<string, unknown>[] }> = [];
+  const summary: SalesforceFullLoadSummaryItem[] = [];
+
+  for (const objectApiName of objects) {
+    const fields = PREVIEW_ALLOWLIST[objectApiName];
+    if (!fields?.length) throw new Error(`OBJECT_NOT_IN_ALLOWLIST_${objectApiName}`);
+
+    const soql = `SELECT ${fields.join(', ')} FROM ${objectApiName} ORDER BY LastModifiedDate DESC`;
+    const { records } = await fetchWithRetry(soql, maxRecordsPerObject);
+
+    entities.push({ objectApiName, selectedRecords: records });
+    summary.push({ objectApiName, recordCount: records.length });
+  }
+
+  if (!entities.some((e) => e.selectedRecords.length > 0)) {
+    throw new Error('FULL_LOAD_NO_RECORDS');
+  }
+
+  const totalRecords = entities.reduce((acc, e) => acc + e.selectedRecords.length, 0);
+
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('salesforce_sync_contracts')
+    .insert({
+      provider: SALESFORCE_PROVIDER,
+      status: 'mapped',
+      contract_json: { entities, fullLoad: true, createdAt: new Date().toISOString() },
+      dry_run_summary: { estimatedRecordsCanSync: totalRecords, fullLoad: true, objects },
+    })
+    .select('id')
+    .single();
+
+  if (error || !data) throw new Error('SAVE_FULL_LOAD_CONTRACT_FAILED');
+
+  return { contractId: (data as { id: string }).id, summary };
+}
+
 // ─── Multi-entity preview ───────────────────────────────────────────────────
 
 export const PREVIEW_ALLOWLIST: Record<string, string[]> = {
@@ -2598,6 +2886,7 @@ export async function executeContactSync(contractId: string): Promise<ContactSyn
 export type OpportunityActionPreview =
   | 'ready_to_create'
   | 'ready_to_update'
+  | 'existing_match'
   | 'unresolved_account'
   | 'missing_required_fields';
 
@@ -2621,6 +2910,7 @@ export interface OpportunityRelationshipPreviewResult {
   contractId: string;
   totalOpportunities: number;
   resolvedCount: number;
+  existingMatchCount: number;
   unresolvedCount: number;
   missingFieldsCount: number;
   contactRoleLacuna: boolean; // Sempre true: OpportunityContactRole não disponível no payload
@@ -2728,7 +3018,11 @@ export async function generateOpportunityRelationshipPreview(
   }
 
   // Lookup SF AccountId → Canopi accountId via sync_summary_log dos contratos Account (C4.7)
-  const accountIdLookup = await buildAccountIdLookup(supabase);
+  const [accountIdLookup, canopiAccountLookup, opportunityRowLookup] = await Promise.all([
+    buildAccountIdLookup(supabase),
+    buildCanopiAccountLookup(supabase),
+    buildOpportunityRowLookup(supabase),
+  ]);
 
   const items: OpportunityRelationshipPreviewItem[] = [];
 
@@ -2781,7 +3075,18 @@ export async function generateOpportunityRelationshipPreview(
     } else if (priorSourceMapping.has(sourceOpportunityId)) {
       actionPreview = 'ready_to_update';
     } else {
-      actionPreview = 'ready_to_create';
+      // Check if this Opportunity already exists in Canopi by identity key (account_slug + nome)
+      const canopiAccount = canopiAccountLookup.get(resolved.canopiId);
+      const identityKey = canopiAccount
+        ? buildOpportunityIdentityKey(canopiAccount.slug, nome)
+        : null;
+      const identityMatches = identityKey ? (opportunityRowLookup.rowsByIdentity.get(identityKey) ?? []) : [];
+      if (identityMatches.length > 0) {
+        actionPreview = 'existing_match';
+        warnings.push('Opportunity já existe na Canopi com mesmo vínculo de conta e nome — será ignorada no sync conservador.');
+      } else {
+        actionPreview = 'ready_to_create';
+      }
     }
 
     // Avisos de campos relevantes ausentes
@@ -2809,6 +3114,7 @@ export async function generateOpportunityRelationshipPreview(
   const resolvedCount = items.filter(
     (i) => i.actionPreview === 'ready_to_create' || i.actionPreview === 'ready_to_update',
   ).length;
+  const existingMatchCount = items.filter((i) => i.actionPreview === 'existing_match').length;
   const unresolvedCount = items.filter((i) => i.actionPreview === 'unresolved_account').length;
   const missingFieldsCount = items.filter((i) => i.actionPreview === 'missing_required_fields').length;
 
@@ -2816,6 +3122,7 @@ export async function generateOpportunityRelationshipPreview(
     contractId,
     totalOpportunities: items.length,
     resolvedCount,
+    existingMatchCount,
     unresolvedCount,
     missingFieldsCount,
     contactRoleLacuna: true, // OpportunityContactRole não disponível no payload atual — C4.10 não infere vínculo com Contact

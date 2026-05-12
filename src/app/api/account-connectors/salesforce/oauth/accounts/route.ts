@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchAccountsPreview } from '@/src/lib/server/salesforceOAuthService';
+import { fetchAccountsPreview, fetchAllAccountsPaginated } from '@/src/lib/server/salesforceOAuthService';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,14 +44,18 @@ function normalizeLimit(rawValue: string | null): number {
 }
 
 export async function GET(request: NextRequest) {
-  const limit = normalizeLimit(request.nextUrl.searchParams.get('limit'));
+  const rawLimit = request.nextUrl.searchParams.get('limit');
+  const loadAll = rawLimit === 'all';
 
   try {
-    const preview = await fetchAccountsPreview(limit);
+    const preview = loadAll
+      ? await fetchAllAccountsPaginated()
+      : await fetchAccountsPreview(normalizeLimit(rawLimit));
     return NextResponse.json({
       status: 'success',
       provider: 'salesforce',
       preview,
+      loadAll,
     });
   } catch (error) {
     const mapped = sanitizeAccountsPreviewError(error);

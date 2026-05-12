@@ -131,6 +131,40 @@ interface PreparedAccountsPreviewSummary {
   rows: PreparedAccountsPreviewRow[];
 }
 
+type SyncSummary = {
+  startedAt?: string;
+  finishedAt?: string;
+  createdCount?: number;
+  updatedCount?: number;
+  skippedCount?: number;
+  errorCount?: number;
+  unresolvedAccountCount?: number;
+  missingRequiredFieldsCount?: number;
+  existingMatchSkippedCount?: number;
+  ambiguousMatchSkippedCount?: number;
+  outcome?: string;
+};
+
+interface SalesforceHubHydrationResponse {
+  status: 'success' | 'error';
+  provider: 'salesforce';
+  hydratedAt?: string;
+  salesforce?: {
+    accounts?: { totalSize: number; recordsLoaded: number; done: boolean; testedAt: string };
+    contacts?: { totalSize: number; recordsLoaded: number; testedAt: string | null };
+    opportunities?: { totalSize: number; recordsLoaded: number; testedAt: string | null };
+    leads?: { totalSize: number; recordsLoaded: number; done: boolean; testedAt: string };
+  };
+  canopi?: {
+    accounts?: { count: number; latestSync: SyncSummary | null; contractId: string | null; preview: AccountsPreviewResult | null };
+    contacts?: { count: number; latestSync: SyncSummary | null; contractId: string | null; preview: ContactPreviewData | null };
+    opportunities?: { count: number; latestSync: SyncSummary | null; contractId: string | null; preview: OpportunityPreviewData | null };
+  };
+  configurationCompleted?: boolean;
+  leadLoadState?: { phase: 'idle'; message: string };
+  error?: string;
+}
+
 interface LocalPreSyncContractRow {
   Id: string | null;
   Name: string | null;
@@ -192,6 +226,111 @@ type AccountSyncState =
   | { phase: 'idle' }
   | { phase: 'loading' }
   | { phase: 'done'; contractId: string; result: AccountSyncExecutionResult }
+  | { phase: 'error'; message: string };
+
+interface ContactPreviewItem {
+  sourceContactId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  email: string;
+  cargo: string | null;
+  area: string | null;
+  actionPreview: string;
+  warnings: string[];
+}
+
+interface ContactPreviewData {
+  contractId: string;
+  totalContacts: number;
+  resolvedCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  items: ContactPreviewItem[];
+}
+
+interface ContactSyncResult {
+  contractId: string;
+  entity: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  errorCount: number;
+  outcome: string;
+}
+
+type ContactPreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contractId: string; preview: ContactPreviewData; contractSource: 'account_sync' | 'fallback' }
+  | { phase: 'error'; message: string };
+
+type ContactSyncState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: ContactSyncResult }
+  | { phase: 'error'; message: string };
+
+interface OpportunityPreviewItem {
+  sourceOpportunityId: string;
+  sourceAccountId: string;
+  resolvedCanopiAccountId: string | null;
+  resolvedAccountName: string | null;
+  nome: string;
+  stageName: string;
+  amount: number | null;
+  closeDate: string;
+  probability: number | null;
+  type: string;
+  ownerId: string;
+  actionPreview: string;
+  warnings: string[];
+}
+
+interface OpportunityPreviewData {
+  contractId: string;
+  totalOpportunities: number;
+  resolvedCount: number;
+  existingMatchCount: number;
+  unresolvedCount: number;
+  missingFieldsCount: number;
+  contactRoleLacuna: boolean;
+  items: OpportunityPreviewItem[];
+}
+
+interface LeadRecord {
+  Id: string | null;
+  Name: string | null;
+  Company: string | null;
+  Status: string | null;
+  Email: string | null;
+  OwnerId: string | null;
+  CreatedDate: string | null;
+  LastModifiedDate: string | null;
+}
+
+interface OpportunitySyncResult {
+  contractId: string;
+  entity: string;
+  createdCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  unresolvedAccountCount: number;
+  errorCount: number;
+  outcome: string;
+}
+
+type OpportunityPreviewState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; contractId: string; preview: OpportunityPreviewData }
+  | { phase: 'error'; message: string };
+
+type OpportunitySyncState =
+  | { phase: 'idle' }
+  | { phase: 'loading' }
+  | { phase: 'done'; result: OpportunitySyncResult }
   | { phase: 'error'; message: string };
 
 const INDUSTRY_STANDARD_OPTIONS = [
@@ -272,6 +411,21 @@ function getAccountPreviewRowRecommendedGaps(record: AccountsPreviewRecord): str
   if (!record.Type?.trim()) gaps.push('sem Type');
   if (!record.OwnerId?.trim()) gaps.push('sem OwnerId');
   return gaps;
+}
+
+function buildAccountPreviewRows(records: AccountsPreviewRecord[]): PreparedAccountsPreviewRow[] {
+  return records.map((record, index) => {
+    const gaps = getAccountPreviewRowGaps(record);
+    const recommendedGaps = getAccountPreviewRowRecommendedGaps(record);
+    return {
+      key: getAccountPreviewRowKey(record, index),
+      label: getAccountPreviewRowLabel(record, index),
+      gaps,
+      recommendedGaps,
+      isValid: gaps.length === 0,
+      record,
+    };
+  });
 }
 
 function formatBlockingFieldsMessage(rows: PreparedAccountsPreviewRow[]): string {
@@ -445,6 +599,17 @@ export function SalesforceMethodSelector() {
   const [editingResolutionKeys, setEditingResolutionKeys] = useState<Set<string>>(new Set());
   const [showAllQualityItems, setShowAllQualityItems] = useState(false);
   const [accountSyncState, setAccountSyncState] = useState<AccountSyncState>({ phase: 'idle' });
+  const [activeObject, setActiveObject] = useState<'accounts' | 'contacts' | 'opportunities'>('accounts');
+  const [contactPreviewState, setContactPreviewState] = useState<ContactPreviewState>({ phase: 'idle' });
+  const [contactSyncState, setContactSyncState] = useState<ContactSyncState>({ phase: 'idle' });
+  const [opportunityPreviewState, setOpportunityPreviewState] = useState<OpportunityPreviewState>({ phase: 'idle' });
+  const [opportunitySyncState, setOpportunitySyncState] = useState<OpportunitySyncState>({ phase: 'idle' });
+  const [configurationCompleted, setConfigurationCompleted] = useState(false);
+  const [accountsFullLoadState, setAccountsFullLoadState] = useState<{ phase: 'idle' | 'loading' | 'done' | 'error'; totalLoaded?: number; message?: string }>({ phase: 'idle' });
+  const [contactFullLoadState, setContactFullLoadState] = useState<{ phase: 'idle' | 'loading' | 'done' | 'error'; recordCount?: number; message?: string }>({ phase: 'idle' });
+  const [opportunityFullLoadState, setOpportunityFullLoadState] = useState<{ phase: 'idle' | 'loading' | 'done' | 'error'; recordCount?: number; message?: string }>({ phase: 'idle' });
+  const [leadLoadState, setLeadLoadState] = useState<{ phase: 'idle' | 'loading' | 'done' | 'error'; records?: LeadRecord[]; totalSize?: number; message?: string }>({ phase: 'idle' });
+  const [hubRefreshState, setHubRefreshState] = useState<{ phase: 'idle' | 'loading' | 'done' | 'error'; message?: string; updatedAt?: string }>({ phase: 'idle' });
   const resetAccountSyncStateToIdle = useCallback((force = false) => {
     setAccountSyncState((current) => (force || current.phase !== 'loading' ? { phase: 'idle' } : current));
   }, []);
@@ -474,6 +639,7 @@ export function SalesforceMethodSelector() {
   const dryRunCardRef = useRef<HTMLDivElement | null>(null);
   const prevOAuthConfiguredRef = useRef(false);
   const prevOAuthConnectedRef = useRef(false);
+  const hydratingHubStateRef = useRef(true);
   const buildResolvedAccountRows = useCallback((rows: PreparedAccountsPreviewRow[]): PreparedAccountsPreviewRow[] => {
     return rows.flatMap((row) => {
       const hasRemoveDecision = [...row.gaps, ...row.recommendedGaps].some((gap) => {
@@ -589,6 +755,169 @@ export function SalesforceMethodSelector() {
     loadOAuthStatus();
     loadOAuthConfig();
   }, [loadOAuthStatus, loadOAuthConfig]);
+
+  const loadHubHydration = useCallback(async () => {
+    hydratingHubStateRef.current = true;
+    setHubRefreshState((current) => (current.phase === 'loading' ? current : { phase: 'loading', message: 'Recarregando estado...' }));
+
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/hub-state', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as SalesforceHubHydrationResponse;
+
+      if (!res.ok || data.status !== 'success' || !data.canopi) {
+        setHubRefreshState({ phase: 'error', message: 'Não foi possível recarregar o estado do Hub.' });
+        return;
+      }
+
+      const accountPreview = data.canopi.accounts?.preview ?? null;
+      if (accountPreview) {
+        setAccountsPreview(accountPreview);
+        setAccountsPreviewError(null);
+        const hydratedRows = buildAccountPreviewRows(accountPreview.records);
+        const hydratedSelectedKeys = hydratedRows.map((row) => row.key);
+        const hydratedSelectedRows = buildResolvedAccountRows(hydratedRows);
+        const hydratedSelection: PreparedAccountsPreviewSummary = {
+          preparedAt: data.hydratedAt ?? new Date().toISOString(),
+          selectedCount: hydratedSelectedRows.length,
+          validCount: hydratedSelectedRows.filter((row) => row.isValid).length,
+          rowsWithGapsCount: hydratedSelectedRows.filter((row) => row.gaps.length > 0 || row.recommendedGaps.length > 0).length,
+          rows: hydratedSelectedRows,
+        };
+        const hydratedContract = buildLocalPreSyncContract(hydratedSelection, accountPreview);
+        const hydratedDryRun = buildLocalPreSyncDryRun(hydratedContract);
+
+        setSelectedAccountPreviewKeys(hydratedSelectedKeys);
+        setPreparedAccountsPreviewSelection(hydratedSelection);
+        setLocalPreSyncContract(hydratedContract);
+        setLocalPreSyncDryRun(hydratedDryRun);
+        setSelectionFeedback('Estado restaurado do último sync persistido.');
+        setContractFeedback('Contrato local restaurado do último sync persistido.');
+        setDryRunFeedback('Dry-run read-only restaurado do último sync persistido.');
+        setContractJustGenerated(true);
+        setDryRunJustCompleted(true);
+      }
+
+      if (data.canopi.accounts) {
+        const hydratedAccounts = data.canopi.accounts;
+        const accountSync = hydratedAccounts.latestSync ?? null;
+        if (accountSync) {
+          setAccountSyncState({
+            phase: 'done',
+            contractId: hydratedAccounts.contractId ?? 'persisted',
+            result: {
+              createdCount: accountSync.createdCount ?? 0,
+              updatedCount: accountSync.updatedCount ?? 0,
+              skippedCount: accountSync.skippedCount ?? 0,
+              errorCount: accountSync.errorCount ?? 0,
+              outcome: accountSync.outcome ?? 'synced',
+            },
+          });
+          setAccountsFullLoadState({
+            phase: 'done',
+            totalLoaded: hydratedAccounts.count,
+            message: 'Estado restaurado do último Account Sync.',
+          });
+        }
+      }
+
+      if (data.canopi.contacts) {
+        const hydratedContacts = data.canopi.contacts;
+        const contactSync = hydratedContacts.latestSync ?? null;
+        if (contactSync) {
+          setContactSyncState({
+            phase: 'done',
+            result: {
+              contractId: hydratedContacts.contractId ?? 'persisted',
+              entity: 'Contact',
+              createdCount: contactSync.createdCount ?? 0,
+              updatedCount: contactSync.updatedCount ?? 0,
+              skippedCount: contactSync.skippedCount ?? 0,
+              errorCount: contactSync.errorCount ?? 0,
+              outcome: contactSync.outcome ?? 'synced',
+            },
+          });
+          setContactFullLoadState({
+            phase: 'done',
+            recordCount: hydratedContacts.count,
+            message: 'Estado restaurado do último Contact Sync.',
+          });
+        } else if (hydratedContacts.preview) {
+          setContactFullLoadState({
+            phase: 'done',
+            recordCount: hydratedContacts.preview.totalContacts,
+            message: 'Estado restaurado da última prévia de Contacts.',
+          });
+        }
+
+        if (hydratedContacts.preview) {
+          setContactPreviewState({
+            phase: 'done',
+            contractId: hydratedContacts.contractId ?? 'persisted',
+            preview: hydratedContacts.preview,
+            contractSource: 'fallback',
+          });
+        }
+      }
+
+      if (data.canopi.opportunities) {
+        const hydratedOpportunities = data.canopi.opportunities;
+        const opportunitySync = hydratedOpportunities.latestSync ?? null;
+        if (opportunitySync) {
+          setOpportunitySyncState({
+            phase: 'done',
+            result: {
+              contractId: hydratedOpportunities.contractId ?? 'persisted',
+              entity: 'Opportunity',
+              createdCount: opportunitySync.createdCount ?? 0,
+              updatedCount: opportunitySync.updatedCount ?? 0,
+              skippedCount: opportunitySync.skippedCount ?? 0,
+              unresolvedAccountCount: opportunitySync.unresolvedAccountCount ?? 0,
+              errorCount: opportunitySync.errorCount ?? 0,
+              outcome: opportunitySync.outcome ?? 'synced',
+            },
+          });
+          setOpportunityFullLoadState({
+            phase: 'done',
+            recordCount: hydratedOpportunities.count,
+            message: 'Estado restaurado do último Opportunity Sync.',
+          });
+        } else if (hydratedOpportunities.preview) {
+          setOpportunityFullLoadState({
+            phase: 'done',
+            recordCount: hydratedOpportunities.preview.items.length,
+            message: 'Estado restaurado da última prévia de Opportunities.',
+          });
+        }
+
+        if (hydratedOpportunities.preview) {
+          setOpportunityPreviewState({
+            phase: 'done',
+            contractId: hydratedOpportunities.contractId ?? 'persisted',
+            preview: hydratedOpportunities.preview,
+          });
+        }
+      }
+
+      setConfigurationCompleted(Boolean(data.configurationCompleted));
+      setHubRefreshState({
+        phase: 'done',
+        message: 'Estado atualizado agora',
+        updatedAt: data.hydratedAt ?? new Date().toISOString(),
+      });
+    } catch {
+      setHubRefreshState({ phase: 'error', message: 'Não foi possível recarregar o estado do Hub.' });
+      // Mantém a tela funcional mesmo sem hidratação persistida.
+    } finally {
+      hydratingHubStateRef.current = false;
+    }
+  }, [buildResolvedAccountRows]);
+
+  useEffect(() => {
+    void loadHubHydration();
+  }, [loadHubHydration]);
 
   useEffect(() => {
     if (!oauthFlowStatus) return;
@@ -1101,6 +1430,320 @@ export function SalesforceMethodSelector() {
     preparedAccountsPreviewSelection,
   ]);
 
+  async function handleContactPreview() {
+    // Pré-condição: Account Sync deve estar concluído para que o lookup de Accounts esteja disponível.
+    // O contractId do Account Sync NÃO é usado como fonte de Contacts — ele é um contrato de Account.
+    if (accountSyncState.phase !== 'done') {
+      setContactPreviewState({ phase: 'error', message: 'Sincronize Accounts antes de validar Contacts.' });
+      return;
+    }
+
+    setContactPreviewState({ phase: 'loading' });
+
+    type EligibleContract = { id: string; status: string; contactCount: number; hasAccountLookupSource: boolean; createdAt: string };
+
+    // Busca contratos elegíveis que realmente contenham registros de Contact (contactCount > 0).
+    // O backend já filtra por contactCount > 0 em getEligibleSalesforceContactPreviewContracts.
+    let eligibleContracts: EligibleContract[] = [];
+    try {
+      const eligibleRes = await fetch('/api/account-connectors/salesforce/oauth/contact-preview', { cache: 'no-store' });
+      const eligibleData = await eligibleRes.json().catch(() => ({})) as { status?: string; contracts?: EligibleContract[]; error?: string };
+      if (eligibleData.status !== 'success') {
+        setContactPreviewState({ phase: 'error', message: eligibleData.error ?? 'Erro ao buscar contratos de Contacts.' });
+        return;
+      }
+      eligibleContracts = (eligibleData.contracts ?? []).filter((c) => c.contactCount > 0);
+    } catch {
+      setContactPreviewState({ phase: 'error', message: 'Erro de rede ao buscar contratos de Contacts.' });
+      return;
+    }
+
+    // Nenhum contrato com registros de Contact encontrado — situação esperada se o usuário
+    // ainda não gerou um contrato multi-entidade (Account + Contact).
+    if (eligibleContracts.length === 0) {
+      setContactPreviewState({
+        phase: 'error',
+        message:
+          'Accounts estão sincronizadas, mas ainda não há fonte de Contacts disponível para preview. Gere ou carregue um contrato multi-entidade com Contacts antes de validar Contact Sync.',
+      });
+      return;
+    }
+
+    // Critério de seleção: synced > hasAccountLookupSource > contactCount > createdAt mais recente.
+    const sorted = [...eligibleContracts].sort((a, b) => {
+      const byStatus = (b.status === 'synced' ? 1 : 0) - (a.status === 'synced' ? 1 : 0);
+      if (byStatus !== 0) return byStatus;
+      const byLookup = (b.hasAccountLookupSource ? 1 : 0) - (a.hasAccountLookupSource ? 1 : 0);
+      if (byLookup !== 0) return byLookup;
+      const byCount = b.contactCount - a.contactCount;
+      if (byCount !== 0) return byCount;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    const chosen = sorted[0];
+
+    try {
+      const previewRes = await fetch('/api/account-connectors/salesforce/oauth/contact-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId: chosen.id }),
+        cache: 'no-store',
+      });
+      const previewData = await previewRes.json().catch(() => ({})) as { status?: string; preview?: ContactPreviewData; error?: string };
+      if (previewData.status !== 'success' || !previewData.preview) {
+        setContactPreviewState({ phase: 'error', message: previewData.error ?? 'Erro ao gerar preview de Contacts.' });
+        return;
+      }
+      if (previewData.preview.totalContacts === 0) {
+        setContactPreviewState({ phase: 'error', message: 'A fonte selecionada não contém Contacts.' });
+        return;
+      }
+      setContactPreviewState({ phase: 'done', contractId: chosen.id, preview: previewData.preview, contractSource: 'fallback' });
+    } catch {
+      setContactPreviewState({ phase: 'error', message: 'Erro de rede ao gerar preview de Contacts.' });
+    }
+  }
+
+  async function handleContactSync() {
+    if (contactPreviewState.phase !== 'done') return;
+    // Guardrail: bloqueia sync se nenhum Contact tem Account resolvida.
+    if (contactPreviewState.preview.resolvedCount === 0) {
+      setContactSyncState({
+        phase: 'error',
+        message: 'Contacts encontrados, mas nenhum vínculo com Accounts sincronizadas foi resolvido. Reexecute Account Sync ou selecione um contrato compatível.',
+      });
+      return;
+    }
+    const contractId = contactPreviewState.contractId;
+    setContactSyncState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/contact-sync-execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId }),
+        cache: 'no-store',
+      });
+      const data = await res.json().catch(() => ({})) as { status?: string; result?: ContactSyncResult; error?: string };
+      if (data.status !== 'ok' || !data.result) {
+        setContactSyncState({ phase: 'error', message: data.error ?? 'Erro ao executar sync de Contacts.' });
+        return;
+      }
+      setContactSyncState({ phase: 'done', result: data.result });
+    } catch {
+      setContactSyncState({ phase: 'error', message: 'Erro de rede ao executar sync de Contacts.' });
+    }
+  }
+
+  async function handleOpportunityPreview() {
+    if (contactSyncState.phase !== 'done') {
+      setOpportunityPreviewState({ phase: 'error', message: 'Valide Contacts antes de validar Opportunities.' });
+      return;
+    }
+    setOpportunityPreviewState({ phase: 'loading' });
+
+    type EligibleOppContract = { id: string; status: string; opportunityCount: number; hasAccountLookupSource: boolean; createdAt: string };
+
+    let eligible: EligibleOppContract[] = [];
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-preview', { cache: 'no-store' });
+      const data = await res.json().catch(() => ({})) as { status?: string; contracts?: EligibleOppContract[]; error?: string };
+      if (data.status !== 'ok') {
+        setOpportunityPreviewState({ phase: 'error', message: data.error ?? 'Erro ao buscar contratos de Opportunities.' });
+        return;
+      }
+      eligible = (data.contracts ?? []).filter((c) => c.opportunityCount > 0);
+    } catch {
+      setOpportunityPreviewState({ phase: 'error', message: 'Erro de rede ao buscar contratos de Opportunities.' });
+      return;
+    }
+
+    if (eligible.length === 0) {
+      setOpportunityPreviewState({
+        phase: 'error',
+        message: 'Accounts e Contacts estão sincronizados, mas ainda não há fonte de Opportunities disponível para preview. Gere ou carregue um contrato multi-entidade com Opportunities antes de validar Opportunity Sync.',
+      });
+      return;
+    }
+
+    const sorted = [...eligible].sort((a, b) => {
+      const byStatus = (b.status === 'synced' ? 1 : 0) - (a.status === 'synced' ? 1 : 0);
+      if (byStatus !== 0) return byStatus;
+      const byLookup = (b.hasAccountLookupSource ? 1 : 0) - (a.hasAccountLookupSource ? 1 : 0);
+      if (byLookup !== 0) return byLookup;
+      const byCount = b.opportunityCount - a.opportunityCount;
+      if (byCount !== 0) return byCount;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    const chosen = sorted[0];
+
+    try {
+      const previewRes = await fetch('/api/account-connectors/salesforce/oauth/opportunity-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId: chosen.id }),
+        cache: 'no-store',
+      });
+      const previewData = await previewRes.json().catch(() => ({})) as { status?: string; result?: OpportunityPreviewData; error?: string };
+      if (previewData.status !== 'ok' || !previewData.result) {
+        setOpportunityPreviewState({ phase: 'error', message: previewData.error ?? 'Erro ao gerar preview de Opportunities.' });
+        return;
+      }
+      if (previewData.result.totalOpportunities === 0) {
+        setOpportunityPreviewState({ phase: 'error', message: 'A fonte selecionada não contém Opportunities.' });
+        return;
+      }
+      setOpportunityPreviewState({ phase: 'done', contractId: chosen.id, preview: previewData.result });
+    } catch {
+      setOpportunityPreviewState({ phase: 'error', message: 'Erro de rede ao gerar preview de Opportunities.' });
+    }
+  }
+
+  async function handleOpportunitySync() {
+    if (opportunityPreviewState.phase !== 'done') return;
+    if (opportunityPreviewState.preview.resolvedCount === 0) {
+      setOpportunitySyncState({
+        phase: 'error',
+        message: 'Opportunities encontradas, mas nenhuma Account foi resolvida. Verifique o contrato de Opportunities.',
+      });
+      return;
+    }
+    const contractId = opportunityPreviewState.contractId;
+    setOpportunitySyncState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/opportunity-sync-execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contractId }),
+        cache: 'no-store',
+      });
+      const data = await res.json().catch(() => ({})) as { status?: string; result?: OpportunitySyncResult; error?: string };
+      if (data.status !== 'ok' || !data.result) {
+        setOpportunitySyncState({ phase: 'error', message: data.error ?? 'Erro ao executar sync de Opportunities.' });
+        return;
+      }
+      setOpportunitySyncState({ phase: 'done', result: data.result });
+    } catch {
+      setOpportunitySyncState({ phase: 'error', message: 'Erro de rede ao executar sync de Opportunities.' });
+    }
+  }
+
+  function handleRevalidateOpportunityPreview() {
+    setOpportunitySyncState({ phase: 'idle' });
+    void handleOpportunityPreview();
+  }
+
+  async function handleLoadAllAccounts() {
+    if (!oauthStatus?.connected) return;
+    setAccountsFullLoadState({ phase: 'loading' });
+    setAccountsPreviewLoading(true);
+    setAccountsPreviewError(null);
+    setSelectedAccountPreviewKeys([]);
+    setPreparedAccountsPreviewSelection(null);
+    setLocalPreSyncContract(null);
+    setLocalPreSyncDryRun(null);
+    setSelectionFeedback(null);
+    setContractFeedback(null);
+    setDryRunFeedback(null);
+    setContractJustGenerated(false);
+    setDryRunJustCompleted(false);
+    setContractButtonGenerated(false);
+    setDryRunButtonBusy(false);
+    resetAccountSyncStateToIdle();
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/accounts?limit=all', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = (await res.json()) as AccountsPreviewApiResponse & { loadAll?: boolean };
+      if (!res.ok || data.status !== 'success' || !data.preview) {
+        setAccountsFullLoadState({ phase: 'error', message: data.error || 'Não foi possível carregar todas as Accounts.' });
+        setAccountsPreviewError(data.error || 'Não foi possível carregar todas as Accounts.');
+        return;
+      }
+      setAccountsPreview(data.preview);
+      // Auto-select all valid records
+      const allKeys = (data.preview.records ?? [])
+        .filter((r: any) => r.Id)
+        .map((r: any) => r.Id as string);
+      setSelectedAccountPreviewKeys(allKeys);
+      setAccountsFullLoadState({ phase: 'done', totalLoaded: allKeys.length });
+    } catch {
+      setAccountsFullLoadState({ phase: 'error', message: 'Erro de rede ao carregar todas as Accounts.' });
+      setAccountsPreviewError('Erro de rede ao carregar todas as Accounts.');
+    } finally {
+      setAccountsPreviewLoading(false);
+    }
+  }
+
+  async function handleCreateContactFullLoadContract() {
+    setContactFullLoadState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/full-load-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ objects: ['Contact'] }),
+        cache: 'no-store',
+      });
+      const data = await res.json().catch(() => ({})) as { status?: string; contractId?: string; summary?: Array<{ objectApiName: string; recordCount: number }>; error?: string };
+      if (data.status !== 'ok' || !data.contractId) {
+        setContactFullLoadState({ phase: 'error', message: data.error ?? 'Erro ao carregar Contacts.' });
+        return;
+      }
+      const contactSummary = data.summary?.find((s) => s.objectApiName === 'Contact');
+      setContactFullLoadState({ phase: 'done', recordCount: contactSummary?.recordCount });
+    } catch {
+      setContactFullLoadState({ phase: 'error', message: 'Erro de rede ao carregar Contacts.' });
+    }
+  }
+
+  async function handleCreateOpportunityFullLoadContract() {
+    setOpportunityFullLoadState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/full-load-contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ objects: ['Opportunity'] }),
+        cache: 'no-store',
+      });
+      const data = await res.json().catch(() => ({})) as { status?: string; contractId?: string; summary?: Array<{ objectApiName: string; recordCount: number }>; error?: string };
+      if (data.status !== 'ok' || !data.contractId) {
+        setOpportunityFullLoadState({ phase: 'error', message: data.error ?? 'Erro ao carregar Opportunities.' });
+        return;
+      }
+      const oppSummary = data.summary?.find((s) => s.objectApiName === 'Opportunity');
+      setOpportunityFullLoadState({ phase: 'done', recordCount: oppSummary?.recordCount });
+    } catch {
+      setOpportunityFullLoadState({ phase: 'error', message: 'Erro de rede ao carregar Opportunities.' });
+    }
+  }
+
+  const handleLoadLeads = useCallback(async () => {
+    if (!oauthStatus?.connected) return;
+    setLeadLoadState({ phase: 'loading' });
+    try {
+      const res = await fetch('/api/account-connectors/salesforce/oauth/leads', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      const data = await res.json().catch(() => ({})) as { status?: string; leads?: { records: LeadRecord[]; totalSize: number }; error?: string };
+      if (data.status !== 'success' || !data.leads) {
+        setLeadLoadState({ phase: 'error', message: data.error ?? 'Não foi possível consultar Leads no Salesforce.' });
+        return;
+      }
+      setLeadLoadState({ phase: 'done', records: data.leads.records, totalSize: data.leads.totalSize });
+    } catch {
+      setLeadLoadState({ phase: 'error', message: 'Erro de rede ao consultar Leads.' });
+    }
+  }, [oauthStatus?.connected]);
+
+  useEffect(() => {
+    if (activeObject !== 'contacts') return;
+    if (contactSyncState.phase !== 'done') return;
+    if (leadLoadState.phase !== 'idle') return;
+    void handleLoadLeads();
+  }, [activeObject, contactSyncState.phase, handleLoadLeads, leadLoadState.phase]);
+
   async function handleOAuthDisconnect() {
     setOauthActionLoading('disconnect');
     setOauthNotice(null);
@@ -1209,6 +1852,10 @@ export function SalesforceMethodSelector() {
 
   useEffect(() => {
     if (accountSyncState.phase === 'loading') return;
+    if (hydratingHubStateRef.current) {
+      accountSyncInputsSignatureRef.current = accountSyncInputsSignature;
+      return;
+    }
     if (accountSyncInputsSignature === accountSyncInputsSignatureRef.current) return;
     if (accountSyncInputsSignatureRef.current !== '') {
       setAccountSyncState((current) => (current.phase === 'loading' ? current : { phase: 'idle' }));
@@ -1528,11 +2175,34 @@ export function SalesforceMethodSelector() {
       onHealthCheck={handleOAuthHealthCheck}
       onDisconnect={handleOAuthDisconnect}
       onLoadAccounts={handleLoadAccountsPreview}
+      onReloadHubState={() => { void loadHubHydration(); }}
+      onLoadAllAccounts={handleLoadAllAccounts}
+      accountsFullLoadState={accountsFullLoadState}
+      hubRefreshState={hubRefreshState}
       onSelectAll={handleToggleSelectAllAccountPreviewRows}
       onPrepare={handlePrepareAccountPreviewSelection}
       onGenerateContract={handleGenerateLocalPreSyncContract}
       onDryRun={() => void handleExecuteLocalDryRun()}
       onSync={() => void handleExecuteAccountSync('main')}
+      activeObject={activeObject}
+      contactPreviewState={contactPreviewState}
+      contactSyncState={contactSyncState}
+      onSetActiveObject={setActiveObject}
+      onContactPreview={() => void handleContactPreview()}
+      onContactSync={() => void handleContactSync()}
+      contactFullLoadState={contactFullLoadState}
+      onLoadAllContacts={handleCreateContactFullLoadContract}
+      opportunityPreviewState={opportunityPreviewState}
+      opportunitySyncState={opportunitySyncState}
+      onOpportunityPreview={() => void handleOpportunityPreview()}
+      onOpportunitySync={() => void handleOpportunitySync()}
+      onRevalidateOpportunityPreview={handleRevalidateOpportunityPreview}
+      opportunityFullLoadState={opportunityFullLoadState}
+      onLoadAllOpportunities={handleCreateOpportunityFullLoadContract}
+      configurationCompleted={configurationCompleted}
+      onCompleteConfiguration={() => setConfigurationCompleted(true)}
+      leadLoadState={leadLoadState}
+      onLoadLeads={handleLoadLeads}
     />
   );
 }
