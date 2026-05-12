@@ -3,6 +3,32 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+# [2026-05-12] — HubSpot C2.9B (Fechamento técnico e operacional do read-only connector surface)
+
+- **Agente:** Claude Code (Sonnet 4.6)
+- **Natureza:** Fechamento técnico e operacional do HubSpot read-only connector surface.
+- **Commit técnico:** `5a3a019` — `feat(settings): add HubSpot read-only connector surface`
+- **Escopo entregue:**
+  - Card HubSpot ativo na Loja de Conectores com `ctaEnabled: true` e `ctaHref` correto.
+  - Rota canônica `/configuracoes/objetos/contas/fontes-conectores/hubspot` criada.
+  - Redirect legado `/configuracoes/objetos-crm/hubspot` → rota canônica.
+  - Validação de Private App token em sessão local; sem persistência de credencial.
+  - Preview read-only de Companies via HubSpot API.
+  - Schema discovery de propriedades de Companies.
+  - UX sem token validada visualmente: `Configuração incompleta`, badges corretos, copy de segurança.
+- **Alinhamento técnico:**
+  - `hubspotAdapter.ts`: `supportsIncrementalSync: false`, `supportsWebhooks: false`, sem `crm.objects.companies.write`.
+  - `contaConnectorsV2.ts`: `supportsWriteback: false`, `writebackTargets: []`, permissão apenas de leitura.
+- **Validação técnica:**
+  - `npm run lint`: OK.
+  - `npx tsc --noEmit`: OK.
+  - Busca por termos proibidos em escopo HubSpot: CLEAN.
+  - `git status` pós-commit local: working tree limpo, `ahead 1`.
+- **Salesforce:** C4.18C permanece fechado. Nenhum arquivo Salesforce alterado neste recorte.
+- **Status:** C2.9B fechado tecnicamente e documentado. Commits publicados no GitHub.
+
+---
+
 # [2026-05-12] — Salesforce C4.18C (Fechamento técnico do full-load connector flow e auditoria de vínculos)
 
 - **Agentes envolvidos:** Codex na auditoria técnica e ChatGPT na condução documental.
