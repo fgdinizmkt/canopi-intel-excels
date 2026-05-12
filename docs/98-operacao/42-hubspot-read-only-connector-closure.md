@@ -1,14 +1,26 @@
-# HubSpot Read-Only Connector Closure — C2.9B
+# HubSpot Read-Only Connector Surface — C2.9B
+
+> **Status corrigido em 2026-05-12:**
+> C2.9B está **implementado e publicado**, mas **pendente de validação funcional com credencial real**.
+> O commit técnico pode permanecer — o escopo é read-only e seguro.
+> O recorte **não deve ser tratado como fechado operacionalmente** até que a validação funcional seja concluída e registrada.
 
 ## Contexto
 
-Este documento registra o fechamento operacional do **HubSpot read-only connector surface** após validação técnica e visual do escopo C2.9B dentro da frente de padronização de conectores CRM.
+Este documento registra a publicação técnica e documental do **HubSpot read-only connector surface** (C2.9B) e o checklist de validação funcional pendente.
 
 O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connector surface`.
 
-## Marco fechado
+## Status do marco
 
 **C2.9B — HubSpot read-only connector surface**
+
+- Implementação técnica: **publicada** (`5a3a019`)
+- Documentação operacional: **publicada** (`404952c`)
+- Validação técnica (lint, tsc, flags, diff): **OK**
+- Validação visual sem token: **aprovada**
+- Validação funcional com token real: **pendente**
+- Fechamento operacional final: **pendente**
 
 ## Escopo entregue
 
@@ -55,15 +67,38 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - HubSpot fica limitado neste recorte a Companies + Properties read-only.
 - CSV/upload não é conector CRM peer e não foi promovido como tal.
 
-## Validações realizadas
+## O que foi realmente validado
 
 - `npm run lint`: OK
 - `npx tsc --noEmit`: OK
-- Validação visual sem token aprovada pelo usuário (Configuração incompleta, UX correta).
-- `git status` pós-commit local: working tree limpo.
-- Branch `ahead 1` antes do push (commit técnico `5a3a019`).
-- Busca por termos proibidos (`supportsIncrementalSync: true`, `supportsWebhooks: true`, `supportsWriteback: true`, `crm.objects.companies.write`) retornou CLEAN para HubSpot.
+- Validação visual sem token aprovada pelo usuário (status `Configuração incompleta`, UX correta).
+- `git status` pós-commit: working tree limpo.
+- Busca por termos proibidos (`supportsIncrementalSync: true`, `supportsWebhooks: true`, `supportsWriteback: true`, `crm.objects.companies.write`): CLEAN para HubSpot.
 - Página canônica auditada: nenhum termo proibido presente como promessa atual.
+- Card na Loja de Conectores ativo com href correto.
+- Rota canônica acessível.
+- Redirect legado funcional.
+
+## O que ainda falta validar (checklist funcional)
+
+A validação funcional com credencial real **não foi realizada**. O fechamento operacional final depende de:
+
+1. Abrir a Loja de Conectores e confirmar card HubSpot ativo.
+2. Abrir a rota canônica `/configuracoes/objetos/contas/fontes-conectores/hubspot`.
+3. Confirmar UX sem token: status `Configuração incompleta`, input com erro, botões bloqueados.
+4. Inserir token inválido e confirmar mensagem de erro real do endpoint de validação.
+5. Inserir token válido com escopo `crm.objects.companies.read` e confirmar retorno positivo.
+6. Rodar "Pré-visualizar empresas" e confirmar quantidade e amostra retornada.
+7. Rodar "Analisar campos" e confirmar propriedades retornadas pelo schema discovery.
+8. Recarregar a página e confirmar que o token **não** fica persistido.
+9. Confirmar que nenhum dado foi gravado na Canopi durante os testes.
+10. Confirmar que nenhum dado foi alterado na HubSpot durante os testes.
+11. Confirmar mensagens de erro reais (token expirado, escopo insuficiente, conta sem empresas).
+12. Registrar evidências manuais (screenshots ou notas).
+13. Só então considerar o fechamento operacional concluído.
+
+> O teste deve ser realizado localmente no browser com credencial controlada.
+> Não colar tokens em chat ou documentação.
 
 ## Riscos e dívidas futuras (não pendências do C2.9B)
 
@@ -75,10 +110,9 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - Documentação futura de escopos mínimos por conector.
 - Eventual migração/versionamento de APIs HubSpot.
 
-## Próximo passo recomendado
+## Próximo passo
 
-- Fechar documentação e sincronização operacional do C2.9B (este documento).
-- Avançar para o próximo conector CRM planejado conforme sequência da frente C2.9:
-  **HubSpot (fechado) → RD Station CRM → Outro CRM / importações orientadas.**
-- Antes de qualquer novo incremento HubSpot, usar auditoria oficial e este documento como base.
-- Salesforce C4.18C permanece fechado e não deve ser reaberto a partir desta frente.
+- Executar o checklist de validação funcional acima.
+- Registrar o resultado no log de sessões e neste documento.
+- Só avançar para RD Station CRM após validação funcional HubSpot concluída ou após decisão formal de postergar.
+- Salesforce C4.18C permanece fechado e não deve ser reaberto.

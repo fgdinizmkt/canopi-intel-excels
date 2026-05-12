@@ -3,10 +3,31 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
-# [2026-05-12] — HubSpot C2.9B (Fechamento técnico e operacional do read-only connector surface)
+# [2026-05-12] — HubSpot C2.9B (Correção de status: publicado mas pendente de validação funcional)
 
 - **Agente:** Claude Code (Sonnet 4.6)
-- **Natureza:** Fechamento técnico e operacional do HubSpot read-only connector surface.
+- **Natureza:** Correção de critério de fechamento — commit/push não equivalem a validação funcional.
+- **Problema identificado:** O recorte C2.9B foi tratado como "fechado operacionalmente" com base apenas em lint, tsc, diff, validação visual sem token e sincronização Drive. A validação funcional com token real da HubSpot não foi realizada.
+- **Correção aplicada:**
+  - `42-hubspot-read-only-connector-closure.md` atualizado: status corrigido, checklist funcional adicionado.
+  - `00-status-atual.md` atualizado: C2.9B descrito como publicado mas pendente de validação funcional.
+  - Esta entrada de log registra a correção.
+- **Status correto:**
+  - Implementação técnica: publicada (`5a3a019`).
+  - Documentação: publicada (`404952c`).
+  - Validação visual sem token: aprovada.
+  - Validação funcional com token real: **pendente**.
+  - Fechamento operacional final: **pendente**.
+- **Regra reforçada:** commit/push publicam código e documentação; não equivalem a validação funcional. O fechamento operacional de qualquer conector CRM exige validação com credencial real.
+- **RD Station CRM:** bloqueado até validação funcional HubSpot ser concluída ou postergada formalmente.
+- **Salesforce:** C4.18C permanece fechado. Não foi reaberto.
+
+---
+
+# [2026-05-12] — HubSpot C2.9B (Publicação técnica e documental do read-only connector surface)
+
+- **Agente:** Claude Code (Sonnet 4.6)
+- **Natureza:** Publicação técnica e documental do HubSpot read-only connector surface (validação funcional pendente).
 - **Commit técnico:** `5a3a019` — `feat(settings): add HubSpot read-only connector surface`
 - **Escopo entregue:**
   - Card HubSpot ativo na Loja de Conectores com `ctaEnabled: true` e `ctaHref` correto.
@@ -25,7 +46,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - Busca por termos proibidos em escopo HubSpot: CLEAN.
   - `git status` pós-commit local: working tree limpo, `ahead 1`.
 - **Salesforce:** C4.18C permanece fechado. Nenhum arquivo Salesforce alterado neste recorte.
-- **Status:** C2.9B fechado tecnicamente e documentado. Commits publicados no GitHub.
+- **Status:** C2.9B publicado tecnicamente e documentado. Validação funcional com token real pendente. Ver correção na entrada seguinte.
 
 ---
 

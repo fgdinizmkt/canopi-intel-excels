@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` alinhado com `origin/main` após publicação de C2.9B. Commits publicados: `5a3a019` (`feat(settings): add HubSpot read-only connector surface`) e commit documental de fechamento. **HubSpot read-only connector surface (C2.9B)** fechado: card ativo na Loja de Conectores, rota canônica `/configuracoes/objetos/contas/fontes-conectores/hubspot`, redirect legado, validação de token local, preview read-only de Companies, schema discovery. **Salesforce C4.18C permanece fechado** e não foi reaberto. lint e tsc passaram. Próxima frente de conectores: RD Station CRM.
+`main` alinhado com `origin/main`. Commits publicados: `5a3a019` (`feat(settings): add HubSpot read-only connector surface`) e `404952c` (documental). **HubSpot read-only connector surface (C2.9B)** está implementado e publicado, mas **pendente de validação funcional com token real** — não deve ser tratado como fechado operacionalmente até que o checklist funcional em `42-hubspot-read-only-connector-closure.md` seja executado. **Não avançar para RD Station CRM** até essa validação ser concluída ou postergada formalmente. **Salesforce C4.18C permanece fechado** e não foi reaberto. lint e tsc passaram.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -33,7 +33,7 @@ Fechado neste marco (Setup Read-only):
 - **Salesforce Synthetic Upload Pack Generator (C4.17.1)** concluído em `012d7f1`: script para geração de massa de teste em `scripts/salesforce-export-upload-csvs.mjs` com suporte a dry-run e escrita em `tmp/`.
 - **Salesforce Contact Sync (C4.18B)** fechado e comprovado em DEV/Sandbox (contrato `9e804e6c`).
 - **Salesforce Full-load Connector Flow (C4.18C)** fechado tecnicamente em `dd926ef`: full-load de Accounts com hidratação pós-refresh, Contacts e Leads integrados na visão operacional, Opportunities e Funil com CTA global de conclusão e pendências de vínculo de origem explicitadas.
-- **HubSpot Read-Only Connector Surface (C2.9B)** fechado em `5a3a019`: card na Loja de Conectores, rota canônica, redirect legado, validação de token local, preview read-only de Companies, schema discovery. Adaptador alinhado (sem sync, writeback, webhooks). Ver `42-hubspot-read-only-connector-closure.md`.
+- **HubSpot Read-Only Connector Surface (C2.9B)** publicado em `5a3a019`: card na Loja de Conectores, rota canônica, redirect legado, adaptador alinhado (sem sync, writeback, webhooks). **Pendente de validação funcional com token real.** Ver checklist em `42-hubspot-read-only-connector-closure.md`.
 
 Não fechado neste marco:
 - sync real
