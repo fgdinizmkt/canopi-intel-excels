@@ -10,6 +10,8 @@ const FILES = [
   'docs/98-operacao/00-status-atual.md',
   'docs/98-operacao/02-decisoes-arquiteturais.md',
   'docs/98-operacao/03-log-de-sessoes.md',
+  'docs/98-operacao/40-salesforce-contact-sync-closure.md',
+  'docs/98-operacao/41-salesforce-full-load-connector-closure.md',
   'docs/98-operacao/33-plano-loja-conectores-crms.md',
   'docs/98-operacao/34-protocolo-espelhamento-memoria-operacional.md',
   'docs/98-operacao/39-salesforce-configuration-hub-spec.md',
@@ -55,7 +57,7 @@ function requireCleanGit({ dryRun }) {
 
     // Bootstrap exception: allow only these two dirty paths during dry-run.
     const allowed = new Set(['package.json', 'scripts/sync-drive-memory.mjs']);
-    const hasOnlyAllowed = dirty.every((p) => allowed.has(p)) && dirty.length === allowed.size;
+    const hasOnlyAllowed = dirty.every((p) => allowed.has(p));
     if (!hasOnlyAllowed) {
       throw new Error('GIT_DIRTY');
     }
