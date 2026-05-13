@@ -3,6 +3,33 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot C2.9C (Fechamento operacional do writeback dry-run flow)
+
+- **Agente:** Codex
+- **Natureza:** Fechamento operacional do HubSpot writeback dry-run flow após commit técnico e publicação no GitHub.
+- **Commit técnico:** `43ed689` — `feat(settings): add HubSpot writeback dry-run flow`
+- **Entregas validadas:**
+  - HubSpot read-only preservado;
+  - preview de empresas carregando automaticamente;
+  - catálogo de campos com 257 propriedades;
+  - upload separado de Base de empresas e Base de contatos;
+  - análise automática ao selecionar arquivos;
+  - dry-run consolidado com IDs Canopi e associações;
+  - CSV de revisão;
+  - botão “Enviar para HubSpot” visível, porém bloqueado sem scopes de escrita;
+  - mensagem clara de bloqueio por permissão;
+  - sem escrita real no HubSpot.
+- **Validação visual confirmada:**
+  - 348 empresas, 736 contatos, 736 associados e 0 bloqueados no dry-run consolidado;
+  - preview com 1 empresa;
+  - catálogo com 257 propriedades;
+  - empresas não foram infladas pela base de contatos.
+- **Decisão operacional:**
+  - C2.9C fica fechado tecnicamente e publicado.
+  - Próximo recorte correto: C2.9D — HubSpot Writeback Setup.
+  - O setup deve validar/criar propriedades Canopi, preparar scopes de escrita e só então liberar writeback real.
+- **Salesforce:** C4.18C permanece fechado e não foi reaberto.
+
 # [2026-05-12] — HubSpot C2.9B (Fechamento operacional com validação funcional real)
 
 - **Agente:** Codex

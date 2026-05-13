@@ -34,6 +34,7 @@ Fechado neste marco (Setup Read-only):
 - **Salesforce Contact Sync (C4.18B)** fechado e comprovado em DEV/Sandbox (contrato `9e804e6c`).
 - **Salesforce Full-load Connector Flow (C4.18C)** fechado tecnicamente em `dd926ef`: full-load de Accounts com hidratação pós-refresh, Contacts e Leads integrados na visão operacional, Opportunities e Funil com CTA global de conclusão e pendências de vínculo de origem explicitadas.
 - **HubSpot Read-Only Connector Surface (C2.9B)** validado funcionalmente e fechado operacionalmente em `e4b4585`: conexão com token/Service Key válido, preview real de empresas, análise real de campos, persistência apenas em sessão local do navegador, desconexão limpa e restauração correta após refresh. Ver fechamento em `42-hubspot-read-only-connector-closure.md`.
+- **HubSpot Writeback Dry-Run Flow (C2.9C)** fechado tecnicamente e publicado em `43ed689`: upload separado de empresas e contatos, dry-run consolidado, geração de IDs Canopi, associação contato → empresa, CSV de revisão e botão de envio bloqueado sem scopes de escrita. Ver fechamento em `43-hubspot-writeback-dry-run-closure.md`.
 
 Não fechado neste marco:
 - sync real
@@ -80,9 +81,9 @@ Não fechado neste marco:
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
-- **Publicar o fechamento documental C4.18C** sem reabrir o recorte técnico.
-- **Contas V2 — C2.9:** fechamento de linguagem, boundaries e taxonomia de Fontes e Conectores; validação de CRMs pendentes (RD Station CRM, HubSpot, Outro CRM).
-- **Contas V2 — Fase B.2:** Integrar `canonicalMappingReviewed` à validação local (AccountValidation) e blockers.
+- **C2.9D — HubSpot Writeback Setup**: validar/criar propriedades Canopi no HubSpot, preparar scopes de escrita e só então desbloquear writeback real.
+- **RD Station CRM** permanece postergado até decisão após HubSpot Setup ou fechamento formal da frente HubSpot.
+- **Salesforce C4.18C** permanece fechado e não deve ser reaberto.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)
 
