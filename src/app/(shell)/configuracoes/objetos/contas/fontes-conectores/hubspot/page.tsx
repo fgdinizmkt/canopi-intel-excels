@@ -9,7 +9,9 @@ import type {
   AccountSchemaDiscoveryResult,
 } from '@/src/lib/accountConnectionModel';
 import { HubspotSchemaCatalog } from './HubspotSchemaCatalog';
+import { HubspotWritebackSetup } from './HubspotWritebackSetup';
 import { HubspotWritebackImport } from './HubspotWritebackImport';
+import type { HubspotWritebackSetupResult } from '@/src/lib/hubspotWritebackSetupTypes';
 
 type ValidationPhase = 'idle' | 'loading' | 'success' | 'missing_config' | 'manual_disconnect' | 'credential_error' | 'api_error';
 type RequestPhase = 'idle' | 'loading' | 'success' | 'error';
@@ -134,6 +136,7 @@ export default function HubSpotPage() {
   });
   const [previewState, setPreviewState] = useState<RequestState<HubspotPreviewResult>>(createRequestState<HubspotPreviewResult>());
   const [schemaState, setSchemaState] = useState<RequestState<HubspotSchemaResponse>>(createRequestState<HubspotSchemaResponse>());
+  const [setupState, setSetupState] = useState<HubspotWritebackSetupResult | null>(null);
   const restoredSessionRef = useRef(false);
   const autoLoadedTokenRef = useRef<string | null>(null);
 
@@ -144,7 +147,7 @@ export default function HubSpotPage() {
   const grantedScopes = validationState.data?.scopes ?? [];
   const requiredWriteScopes = ['crm.objects.companies.write', 'crm.objects.contacts.write'];
   const missingWriteScopes = requiredWriteScopes.filter((scope) => !grantedScopes.includes(scope));
-  const canWriteHubspot = accessValidated && missingWriteScopes.length === 0;
+  const canWriteHubspot = accessValidated && missingWriteScopes.length === 0 && Boolean(setupState?.ready);
 
   useEffect(() => {
     if (validationState.phase === 'success' && validationState.validatedToken && validationState.validatedToken !== normalizedToken) {
@@ -161,6 +164,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSetupState(null);
     }
   }, [hasToken, normalizedToken, validationState.phase, validationState.validatedToken]);
 
@@ -216,6 +220,7 @@ export default function HubSpotPage() {
     });
     setPreviewState(createRequestState<HubspotPreviewResult>());
     setSchemaState(createRequestState<HubspotSchemaResponse>());
+    setSetupState(null);
   }, []);
 
   const validateAccess = useCallback(async (tokenOverride?: string) => {
@@ -233,6 +238,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSetupState(null);
       return;
     }
 
@@ -253,6 +259,7 @@ export default function HubSpotPage() {
         });
         setPreviewState(createRequestState<HubspotPreviewResult>());
         setSchemaState(createRequestState<HubspotSchemaResponse>());
+        setSetupState(null);
         return;
       }
 
@@ -276,6 +283,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSetupState(null);
     }
   }, [normalizedToken]);
 
@@ -636,8 +644,16 @@ export default function HubSpotPage() {
                 Se o token estiver ausente ou incorreto, a mensagem acima explica exatamente o bloqueio.
               </p>
             </div>
-          </Card>
-        </div>
+        </Card>
+      </div>
+
+      <HubspotWritebackSetup
+        token={normalizedToken}
+        connectionActive={accessValidated}
+        companiesReadActive={validationState.data?.readAccessConfirmed ?? false}
+        catalogLoaded={schemaState.phase === 'success'}
+        onSetupStateChange={setSetupState}
+      />
 
       <div className="space-y-6">
         <Card className="border border-slate-200">
@@ -732,6 +748,7 @@ export default function HubSpotPage() {
       <HubspotWritebackImport
         canWriteHubspot={canWriteHubspot}
         missingWriteScopes={missingWriteScopes}
+        setupState={setupState}
       />
 
       <div className={`rounded-3xl border p-5 ${accessValidated ? 'border-emerald-100 bg-emerald-50' : 'border-blue-100 bg-blue-50'}`}>

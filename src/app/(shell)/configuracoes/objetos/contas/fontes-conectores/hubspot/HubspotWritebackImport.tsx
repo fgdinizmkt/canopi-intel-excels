@@ -8,10 +8,12 @@ import type {
   HubspotWritebackContactRecord,
   HubspotWritebackDryRunResult,
 } from '@/src/lib/hubspotWritebackTypes';
+import type { HubspotWritebackSetupResult } from '@/src/lib/hubspotWritebackSetupTypes';
 
 interface HubspotWritebackImportProps {
   canWriteHubspot: boolean;
   missingWriteScopes: string[];
+  setupState: HubspotWritebackSetupResult | null;
 }
 
 type WritebackPhase = 'idle' | 'analyzing' | 'ready' | 'blocked' | 'prepared' | 'error';
@@ -212,7 +214,7 @@ function FileSlot({
   );
 }
 
-export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes }: HubspotWritebackImportProps) {
+export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, setupState }: HubspotWritebackImportProps) {
   const [companiesFile, setCompaniesFile] = useState<File | null>(null);
   const [contactsFile, setContactsFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<HubspotWritebackDryRunResult | null>(null);
@@ -239,7 +241,7 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes }: 
       return 'A conexão atual permite preparar o envio. A escrita real continua fora deste recorte.';
     }
     if (missingWriteScopes.length === 0) {
-      return 'Reconecte HubSpot com permissão de escrita para liberar o writeback assistido.';
+      return 'Reconecte HubSpot com permissão de escrita.';
     }
     return `Scopes ausentes: ${missingWriteScopes.join(', ')}.`;
   }, [canWriteHubspot, missingWriteScopes]);
@@ -598,9 +600,21 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes }: 
             ) : (
               <div className="space-y-2">
                 <p className="font-semibold text-slate-700">
-                  Envio bloqueado por permissão. Reconecte o HubSpot com escopos de escrita para liberar o writeback.
+                  {!setupState || !setupState.ready
+                    ? 'Envio bloqueado: conclua os pré-requisitos do HubSpot antes de liberar o writeback.'
+                    : 'Envio bloqueado por permissão. Reconecte o HubSpot com escopos de escrita para liberar o writeback.'}
                 </p>
-                <p>{scopeMessage}</p>
+                {!setupState || !setupState.ready ? (
+                  <ul className="space-y-1 text-slate-600">
+                    {setupState?.issues.slice(0, 4).map((issue) => (
+                      <li key={`${issue.objectType}-${issue.title}`}>• {issue.message}</li>
+                    ))}
+                    {setupState && setupState.issues.length === 0 ? <li>• Propriedades Canopi ausentes no HubSpot ou IDs externos ainda não configurados como únicos.</li> : null}
+                    {!setupState ? <li>• Valide os pré-requisitos acima para liberar o envio real.</li> : null}
+                  </ul>
+                ) : (
+                  <p>{scopeMessage}</p>
+                )}
                 <p className="text-xs text-slate-500">
                   A reconexão continua disponível no card superior de validação.
                 </p>
