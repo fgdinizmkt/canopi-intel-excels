@@ -3,6 +3,32 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot C2.9D.1 (Fechamento operacional do Writeback Setup)
+
+- **Agente:** Codex
+- **Natureza:** Fechamento operacional da camada de setup HubSpot antes do writeback real protegido.
+- **Commit técnico:** `a7b3034` — `feat(settings): add HubSpot writeback setup flow`
+- **Validação funcional confirmada:**
+  - Service Key atualizada com scopes de escrita/schema;
+  - setup reconheceu conexão, leitura, catálogo, escrita, propriedades Canopi e IDs externos únicos como prontos;
+  - ação **Criar propriedades Canopi no HubSpot** executada;
+  - a tela atualizou sozinha após criar/validar propriedades;
+  - nenhum registro foi enviado ao HubSpot.
+- **Entregas registradas:**
+  - seção visual de pré-requisitos para writeback;
+  - verificação de conexão, leitura e catálogo/schema;
+  - validação de permissões de escrita;
+  - validação de propriedades Canopi em Companies e Contacts;
+  - validação de IDs externos únicos;
+  - rota de setup HubSpot;
+  - criação explícita de propriedades Canopi;
+  - bloqueio do botão de envio até o setup ficar pronto.
+- **Decisão operacional:**
+  - C2.9D.1 fica fechado tecnicamente e publicado.
+  - Próximo recorte correto: C2.9D.2 — HubSpot Writeback Real Protegido.
+  - Nenhum writeback real foi executado nesta etapa.
+- **Salesforce:** C4.18C permanece fechado e não foi reaberto.
+
 ## [2026-05-13] — HubSpot C2.9C (Fechamento operacional do writeback dry-run flow)
 
 - **Agente:** Codex
