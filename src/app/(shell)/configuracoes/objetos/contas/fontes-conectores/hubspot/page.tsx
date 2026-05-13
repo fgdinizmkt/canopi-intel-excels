@@ -3,11 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, Database, FileSearch, Loader2, LogOut, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Building2, ChevronLeft, Database, FileSearch, Link2, Loader2, LogOut, Megaphone, ShieldCheck, Sparkles, Target, Users } from 'lucide-react';
 import { Badge, Button, Card } from '@/src/components/ui';
 import type {
   AccountSchemaDiscoveryResult,
 } from '@/src/lib/accountConnectionModel';
+import type { HubspotSnapshotEntity, HubspotSnapshotResult } from '@/src/lib/hubspotSnapshotTypes';
 import { HubspotSchemaCatalog } from './HubspotSchemaCatalog';
 import { HubspotWritebackSetup } from './HubspotWritebackSetup';
 import { HubspotWritebackImport } from './HubspotWritebackImport';
@@ -79,6 +80,123 @@ function formatTimestamp(value: string | null) {
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
 }
 
+function formatCount(value: number | null) {
+  if (value === null) return '—';
+  return new Intl.NumberFormat('pt-BR').format(value);
+}
+
+function getSnapshotEntityIcon(objectType: string) {
+  switch (objectType) {
+    case 'companies':
+      return Building2;
+    case 'contacts':
+      return Users;
+    case 'deals':
+      return Target;
+    case 'leads':
+      return Sparkles;
+    case 'campaigns':
+      return Megaphone;
+    case 'properties':
+      return Database;
+    case 'associations':
+      return Link2;
+    default:
+      return AlertTriangle;
+  }
+}
+
+function getSnapshotCountKindLabel(countKind: string) {
+  switch (countKind) {
+    case 'real_total':
+      return 'total real';
+    case 'sample':
+      return 'amostra';
+    case 'not_implemented':
+      return 'não inventariado';
+    case 'not_available':
+    default:
+      return 'não calculado nesta leitura';
+  }
+}
+
+function getSnapshotPropertyStatusLabel(status: string | undefined) {
+  switch (status) {
+    case 'available':
+      return 'Canopi calculada';
+    case 'missing_scope':
+      return 'sem escopo de schema';
+    case 'not_configured':
+      return 'propriedade Canopi não encontrada';
+    case 'error':
+      return 'erro de leitura';
+    default:
+      return 'não calculado nesta leitura';
+  }
+}
+
+function getSnapshotStatusLabel(status: string) {
+  switch (status) {
+    case 'available':
+      return 'Disponível';
+    case 'missing_scope':
+      return 'Sem escopo';
+    case 'unavailable':
+      return 'Não disponível';
+    case 'not_implemented':
+      return 'Não inventariado';
+    case 'error':
+    default:
+      return 'Erro de leitura';
+  }
+}
+
+function getSnapshotInventoryState(entity: HubspotSnapshotEntity) {
+  if (entity.objectType === 'associations') {
+    if (entity.status === 'available') return 'Amostra';
+    return getSnapshotStatusLabel(entity.status);
+  }
+
+  if (entity.status === 'missing_scope') return 'Sem escopo';
+  if (entity.status === 'unavailable') return 'Não disponível';
+  if (entity.status === 'not_implemented') return 'Não inventariado';
+  if (entity.status === 'error') return 'Erro';
+
+  if ((entity.objectType === 'companies' || entity.objectType === 'contacts') && entity.canopiTagStatus === 'not_configured') {
+    return 'Propriedade Canopi não encontrada';
+  }
+
+  if (entity.objectType === 'deals') {
+    return 'Não trabalhado pela Canopi';
+  }
+
+  return 'Disponível';
+}
+
+function getSnapshotInventoryObservation(entity: HubspotSnapshotEntity) {
+  if (entity.objectType === 'companies') {
+    if (entity.canopiTagStatus === 'available') return 'Canopi por canopi_company_id.';
+    if (entity.canopiTagStatus === 'not_configured') return 'Propriedade canopi_company_id ausente.';
+    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Canopi.';
+    return entity.note || 'Total no HubSpot.';
+  }
+
+  if (entity.objectType === 'contacts') {
+    if (entity.canopiTagStatus === 'available') return 'Canopi por canopi_contact_id.';
+    if (entity.canopiTagStatus === 'not_configured') return 'Propriedade canopi_contact_id ausente.';
+    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Canopi.';
+    return entity.note || 'Total no HubSpot.';
+  }
+
+  if (entity.objectType === 'deals') return 'Canopi ainda não escreve Deals.';
+  if (entity.objectType === 'leads') return entity.status === 'available' ? 'Objeto disponível nesta leitura.' : 'Objeto não disponível nesta leitura.';
+  if (entity.objectType === 'campaigns') return entity.scopeRequired ? `Requer ${entity.scopeRequired}.` : 'Leitura de campanhas.';
+  if (entity.objectType === 'properties') return 'Catálogo de Companies.';
+  if (entity.objectType === 'associations') return 'Amostra de vínculos do primeiro registro lido.';
+
+  return entity.note || 'Leitura atual.';
+}
+
 const SESSION_KEY = 'canopi_hubspot_v1_session_token';
 
 function readHubspotSessionToken() {
@@ -114,6 +232,19 @@ function mapHubspotError(status: number | null) {
   return { phase: 'api_error' as const, message: 'Não foi possível consultar a HubSpot agora. Verifique a conexão e tente novamente.' };
 }
 
+function mapHubspotSnapshotError(status: number | null) {
+  if (status === 400) {
+    return 'Private App token não informado. Informe uma credencial válida da HubSpot para montar o snapshot.';
+  }
+  if (status === 401 || status === 403) {
+    return 'Não foi possível ler o snapshot do HubSpot com este token. Revise permissões de leitura.';
+  }
+  if (status === 429) {
+    return 'HubSpot atingiu limite temporário ao montar o snapshot. Tente novamente em alguns instantes.';
+  }
+  return 'Não foi possível consultar o snapshot da HubSpot agora. Verifique a conexão e tente novamente.';
+}
+
 async function postJson<T>(url: string, token: string): Promise<{ ok: boolean; status: number; payload: T | { error?: string; status?: string } }> {
   const response = await fetch(url, {
     method: 'POST',
@@ -136,6 +267,7 @@ export default function HubSpotPage() {
   });
   const [previewState, setPreviewState] = useState<RequestState<HubspotPreviewResult>>(createRequestState<HubspotPreviewResult>());
   const [schemaState, setSchemaState] = useState<RequestState<HubspotSchemaResponse>>(createRequestState<HubspotSchemaResponse>());
+  const [snapshotState, setSnapshotState] = useState<RequestState<HubspotSnapshotResult>>(createRequestState<HubspotSnapshotResult>());
   const [setupState, setSetupState] = useState<HubspotWritebackSetupResult | null>(null);
   const restoredSessionRef = useRef(false);
   const autoLoadedTokenRef = useRef<string | null>(null);
@@ -144,6 +276,7 @@ export default function HubSpotPage() {
   const hasToken = normalizedToken.length > 0;
   const accessValidated = validationState.phase === 'success' && validationState.validatedToken === normalizedToken;
   const previewRows = previewState.data?.companies.slice(0, 5) ?? [];
+  const snapshotEntities = useMemo(() => snapshotState.data?.entities ?? [], [snapshotState.data]);
   const grantedScopes = validationState.data?.scopes ?? [];
   const requiredWriteScopes = ['crm.objects.companies.write', 'crm.objects.contacts.write'];
   const missingWriteScopes = requiredWriteScopes.filter((scope) => !grantedScopes.includes(scope));
@@ -164,6 +297,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSnapshotState(createRequestState<HubspotSnapshotResult>());
       setSetupState(null);
     }
   }, [hasToken, normalizedToken, validationState.phase, validationState.validatedToken]);
@@ -220,6 +354,7 @@ export default function HubSpotPage() {
     });
     setPreviewState(createRequestState<HubspotPreviewResult>());
     setSchemaState(createRequestState<HubspotSchemaResponse>());
+    setSnapshotState(createRequestState<HubspotSnapshotResult>());
     setSetupState(null);
   }, []);
 
@@ -238,6 +373,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSnapshotState(createRequestState<HubspotSnapshotResult>());
       setSetupState(null);
       return;
     }
@@ -259,6 +395,7 @@ export default function HubSpotPage() {
         });
         setPreviewState(createRequestState<HubspotPreviewResult>());
         setSchemaState(createRequestState<HubspotSchemaResponse>());
+        setSnapshotState(createRequestState<HubspotSnapshotResult>());
         setSetupState(null);
         return;
       }
@@ -283,6 +420,7 @@ export default function HubSpotPage() {
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
       setSchemaState(createRequestState<HubspotSchemaResponse>());
+      setSnapshotState(createRequestState<HubspotSnapshotResult>());
       setSetupState(null);
     }
   }, [normalizedToken]);
@@ -371,6 +509,47 @@ export default function HubSpotPage() {
     }
   }, [canAnalyze, normalizedToken]);
 
+  const loadSnapshot = useCallback(async () => {
+    if (!accessValidated) {
+      setSnapshotState({
+        phase: 'error',
+        data: null,
+        error: 'Valide o acesso antes de carregar o snapshot do CRM.',
+        updatedAt: new Date().toISOString(),
+      });
+      return;
+    }
+
+    setSnapshotState((current) => ({ ...current, phase: 'loading', error: null }));
+
+    try {
+      const { ok, status, payload } = await postJson<HubspotSnapshotResult>('/api/account-connectors/hubspot/snapshot', normalizedToken);
+      if (!ok || payload.status !== 'success') {
+        setSnapshotState({
+          phase: 'error',
+          data: null,
+          error: mapHubspotSnapshotError(status),
+          updatedAt: new Date().toISOString(),
+        });
+        return;
+      }
+
+      setSnapshotState({
+        phase: 'success',
+        data: payload as HubspotSnapshotResult,
+        error: null,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch {
+      setSnapshotState({
+        phase: 'error',
+        data: null,
+        error: 'Não foi possível consultar o snapshot da HubSpot agora. Verifique a conexão e tente novamente.',
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  }, [accessValidated, normalizedToken]);
+
   useEffect(() => {
     if (!accessValidated) {
       autoLoadedTokenRef.current = null;
@@ -381,7 +560,8 @@ export default function HubSpotPage() {
     autoLoadedTokenRef.current = normalizedToken;
     void loadPreview();
     void loadSchema();
-  }, [accessValidated, loadPreview, loadSchema, normalizedToken]);
+    void loadSnapshot();
+  }, [accessValidated, loadPreview, loadSchema, loadSnapshot, normalizedToken]);
 
   useEffect(() => {
     if (restoredSessionRef.current) return;
@@ -412,6 +592,96 @@ export default function HubSpotPage() {
         : tokenStatusTone === 'slate'
           ? 'border-slate-100 bg-slate-50 text-slate-950'
         : 'border-blue-100 bg-blue-50 text-blue-950';
+  const snapshotStatusLabel = snapshotState.phase === 'success'
+    ? 'Snapshot atualizado'
+    : snapshotState.phase === 'loading'
+      ? 'Carregando snapshot'
+      : snapshotState.phase === 'error'
+        ? 'Falha no snapshot'
+        : 'Aguardando leitura';
+  const enrichmentPriorities = useMemo(() => {
+    const entityByObjectType = new Map(snapshotEntities.map((entity) => [entity.objectType, entity] as const));
+    const companies = entityByObjectType.get('companies');
+    const contacts = entityByObjectType.get('contacts');
+    const deals = entityByObjectType.get('deals');
+    const leads = entityByObjectType.get('leads');
+    const associations = entityByObjectType.get('associations');
+
+    return [
+      {
+        title: 'Enriquecimento',
+        icon: Sparkles,
+        status: 'não calculado nesta leitura',
+        detail: 'Depende da persistência Canopi e das regras de classificação.',
+      },
+      {
+        title: 'Contas target',
+        icon: Building2,
+        status: 'não calculado nesta leitura',
+        detail: companies?.status === 'missing_scope'
+          ? 'Depende do inventário de Companies.'
+          : 'Depende da classificação Canopi persistida.',
+      },
+      {
+        title: 'Leads quentes',
+        icon: Target,
+        status: 'não calculado nesta leitura',
+        detail: leads?.status === 'missing_scope'
+          ? 'Depende de lifecycle/status e score.'
+          : 'Depende de lifecycle/status e score.',
+      },
+      {
+        title: 'Opps em fechamento',
+        icon: Target,
+        status: 'não calculado nesta leitura',
+        detail: deals?.status === 'missing_scope'
+          ? 'Depende da leitura de Deals.'
+          : 'Depende da leitura de Deals.',
+      },
+      {
+        title: 'Contatos sem cargo',
+        icon: Users,
+        status: 'não calculado nesta leitura',
+        detail: contacts?.status === 'missing_scope'
+          ? 'Só calculado se Contacts e jobtitle forem lidos.'
+          : 'Só calculado se Contacts e jobtitle forem lidos.',
+      },
+      {
+        title: 'Contas sem cobertura relacional',
+        icon: Link2,
+        status: associations?.status === 'available' && typeof associations.sampleCount === 'number'
+          ? `${formatCount(associations.sampleCount)} vínculos na amostra`
+          : 'não calculado nesta leitura',
+        detail: associations?.status === 'not_implemented'
+          ? 'Endpoint não inventariado nesta leitura.'
+          : 'Depende de Contacts + associações inventariadas.',
+      },
+    ];
+  }, [snapshotEntities]);
+
+  const snapshotSummary = useMemo(() => {
+    const entityByObjectType = new Map(snapshotEntities.map((entity) => [entity.objectType, entity] as const));
+    const companies = entityByObjectType.get('companies');
+    const contacts = entityByObjectType.get('contacts');
+    const attentionEntities = snapshotEntities.filter((entity) => (
+      entity.status === 'missing_scope'
+      || entity.status === 'unavailable'
+      || entity.status === 'not_implemented'
+      || entity.status === 'error'
+      || entity.canopiTagStatus === 'missing_scope'
+      || entity.canopiTagStatus === 'not_configured'
+      || entity.canopiBatchStatus === 'missing_scope'
+      || entity.canopiBatchStatus === 'not_configured'
+    ));
+
+    return {
+      companiesTotal: companies?.hubspotTotalCount ?? companies?.count ?? null,
+      companiesCanopi: companies?.canopiTaggedCount ?? null,
+      contactsCanopi: contacts?.canopiTaggedCount ?? null,
+      attentionCount: attentionEntities.length,
+      loadedAt: snapshotState.data?.loadedAt ?? null,
+    };
+  }, [snapshotEntities, snapshotState.data?.loadedAt]);
 
   return (
     <div className="space-y-10">
@@ -437,7 +707,7 @@ export default function HubSpotPage() {
           <div className="space-y-2">
             <h1 className="text-4xl font-black tracking-tighter text-slate-900">HubSpot</h1>
             <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
-              Conecte sua conta, valide o acesso de leitura e veja uma amostra de empresas e campos disponíveis antes de avançar.
+              HubSpot é a fonte principal de empresas, contatos, propriedades e relacionamentos. A Canopi primeiro se conecta para ler e diagnosticar a base; depois, quando fizer sentido, devolve dados preparados ao CRM.
             </p>
           </div>
         </div>
@@ -467,42 +737,62 @@ export default function HubSpotPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Leitura disponível</p>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-600">Empresas carregadas</span>
-                  <span className="font-black text-slate-900">
-                    {previewState.data ? `${previewState.data.count}` : 'Ainda não carregadas'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-600">Campos analisados</span>
-                  <span className="font-black text-slate-900">
-                    {schemaState.data ? `${schemaState.data.count} propriedades` : 'Ainda não analisados'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-600">Credencial</span>
-                  <span className="font-black text-slate-500">Ativa nesta sessão</span>
-                </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="blue">Acesso de leitura</Badge>
+                <Badge variant="slate">Pré-visualização</Badge>
+                <Badge variant="slate">Catálogo de campos</Badge>
+                <Badge variant="slate">Sem gravação</Badge>
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que continua protegido</p>
-                <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
-                  <li>• Nenhum dado é gravado na Canopi</li>
-                  <li>• Nenhuma credencial é salva</li>
-                  <li>• Nenhum dado é alterado na HubSpot</li>
-                </ul>
-              </div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Leitura disponível</p>
+                {snapshotState.phase === 'loading' ? (
+                  <div className="mt-2 flex items-center gap-2 text-xs font-medium text-slate-700">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Carregando snapshot do HubSpot...
+                  </div>
+                ) : snapshotState.phase === 'error' ? (
+                  <p className="mt-2 text-xs font-medium leading-relaxed text-red-800">
+                    {snapshotState.error || 'Não foi possível carregar o snapshot do CRM.'}
+                  </p>
+                ) : snapshotState.data ? (
+                  <div className="mt-2 space-y-1.5">
+                    {snapshotEntities.map((entity) => {
+                      const EntityIcon = getSnapshotEntityIcon(entity.objectType);
+                      const totalValue = entity.hubspotTotalCount !== null
+                        ? formatCount(entity.hubspotTotalCount)
+                        : entity.count !== null
+                          ? formatCount(entity.count)
+                          : '—';
+                      const canopiValue = entity.canopiTaggedCount !== null ? formatCount(entity.canopiTaggedCount) : '—';
+                      const stateLabel = getSnapshotInventoryState(entity);
 
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Próximo passo</p>
-                <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-emerald-950">
-                  <li>• Carregar empresas</li>
-                  <li>• Atualizar campos</li>
-                  <li>• Ou desconectar para limpar a sessão</li>
-                </ul>
+                      return (
+                        <div key={entity.objectType} className="flex items-center gap-2 rounded-xl bg-white px-2.5 py-2">
+                          <div className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
+                            <EntityIcon className="h-2.5 w-2.5" />
+                          </div>
+                          <p className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-900">{entity.label}</p>
+                          <p className="whitespace-nowrap text-[11px] font-black text-slate-950">HubSpot {totalValue}</p>
+                          <p className="whitespace-nowrap text-[11px] font-black text-slate-700">Canopi {canopiValue}</p>
+                          <div className="text-[11px] font-medium text-slate-500">
+                            <p className="whitespace-nowrap">{stateLabel}</p>
+                            {stateLabel === 'Sem escopo' && entity.scopeRequired ? (
+                              <p className="whitespace-nowrap text-[9px] text-slate-400">{entity.scopeRequired}</p>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <p className="pt-1 text-[10px] font-medium leading-relaxed text-slate-500">
+                      Total HubSpot e registros Canopi são leituras separadas.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-xs font-medium leading-relaxed text-slate-500">
+                    Valide o acesso para carregar o inventário operacional do CRM.
+                  </p>
+                )}
               </div>
             </div>
           ) : (
@@ -511,7 +801,7 @@ export default function HubSpotPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Conectar HubSpot</p>
                 <h2 className="text-2xl font-black text-slate-900">Use um token para liberar a leitura</h2>
                 <p className="text-sm font-medium leading-relaxed text-slate-600">
-                  Use uma Service Key ou token da HubSpot com permissão de leitura para conectar sua conta nesta sessão.
+                  Use uma Service Key ou token da HubSpot com permissão de leitura para conectar sua conta nesta sessão e iniciar a leitura da base.
                 </p>
               </div>
 
@@ -519,8 +809,8 @@ export default function HubSpotPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que esta etapa faz</p>
                 <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
                   <li>• Valida o acesso de leitura</li>
-                  <li>• Mostra uma amostra de empresas</li>
-                  <li>• Lista campos úteis para mapeamento</li>
+                  <li>• Mostra uma amostra de até 10 empresas</li>
+                  <li>• Lista campos úteis para diagnóstico e mapeamento</li>
                 </ul>
               </div>
 
@@ -530,6 +820,7 @@ export default function HubSpotPage() {
                   <li>• Não sincroniza dados</li>
                   <li>• Não grava empresas na Canopi</li>
                   <li>• Não altera dados na HubSpot</li>
+                  <li>• Contacts, Deals/Opportunities e associações entram em inventário ampliado futuro</li>
                   <li>• A credencial fica apenas nesta sessão local do navegador</li>
                 </ul>
               </div>
@@ -539,7 +830,7 @@ export default function HubSpotPage() {
                 <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-blue-950">
                   <li>• Informe o token</li>
                   <li>• Clique em Conectar</li>
-                  <li>• Depois carregue empresas e analise campos</li>
+                  <li>• Depois carregue empresas e revise o catálogo de campos</li>
                 </ul>
               </div>
             </div>
@@ -647,23 +938,21 @@ export default function HubSpotPage() {
         </Card>
       </div>
 
-      <HubspotWritebackSetup
-        token={normalizedToken}
-        connectionActive={accessValidated}
-        companiesReadActive={validationState.data?.readAccessConfirmed ?? false}
-        catalogLoaded={schemaState.phase === 'success'}
-        onSetupStateChange={setSetupState}
-      />
-
       <div className="space-y-6">
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Empresas</p>
-              <h3 className="text-xl font-black text-slate-900">Pré-visualização de empresas</h3>
+              <h3 className="text-xl font-black text-slate-900">Pré-visualização amostral de empresas</h3>
+              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+                Dados lidos do HubSpot para diagnóstico rápido da base antes de qualquer etapa de preparação assistida.
+              </p>
+              <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">
+                Essa leitura mostra apenas uma amostra de até 10 empresas, não o total do CRM.
+              </p>
             </div>
             <Badge variant={!canPreview ? 'slate' : previewState.phase === 'success' ? 'emerald' : previewState.phase === 'loading' ? 'blue' : previewState.phase === 'error' ? 'red' : 'blue'}>
-              {!canPreview ? 'Bloqueado' : previewState.phase === 'success' ? `${previewState.data?.count ?? 0} carregadas` : previewState.phase === 'loading' ? 'Carregando' : previewState.phase === 'error' ? 'Falha' : 'Pronto'}
+              {!canPreview ? 'Bloqueado' : previewState.phase === 'success' ? `${previewState.data?.count ?? 0} na amostra` : previewState.phase === 'loading' ? 'Carregando' : previewState.phase === 'error' ? 'Falha' : 'Pronto'}
             </Badge>
           </div>
 
@@ -671,11 +960,11 @@ export default function HubSpotPage() {
             {!canPreview ? (
               <p className="text-slate-600">Valide o acesso antes de pré-visualizar empresas.</p>
             ) : previewState.phase === 'idle' ? (
-              <p className="text-slate-600">Clique para carregar uma amostra de empresas da HubSpot.</p>
+              <p className="text-slate-600">Clique para carregar uma amostra rápida de até 10 empresas da HubSpot.</p>
             ) : previewState.phase === 'loading' ? (
               <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Carregando...
+                Carregando amostra...
               </div>
             ) : previewState.phase === 'error' ? (
               <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-red-800">
@@ -683,7 +972,9 @@ export default function HubSpotPage() {
               </div>
             ) : previewState.data ? (
               <>
-                <p className="text-slate-700">{previewState.data.count} empresa(s) carregada(s) para leitura em {formatTimestamp(previewState.updatedAt ?? previewState.data.loadedAt)}.</p>
+                <p className="text-slate-700">
+                  {previewState.data.count} empresa(s) na amostra lida do HubSpot em {formatTimestamp(previewState.updatedAt ?? previewState.data.loadedAt)}.
+                </p>
                 {previewRows.length > 0 ? (
                   <div className="overflow-x-auto rounded-2xl border border-slate-100">
                     <table className="min-w-full divide-y divide-slate-100 text-left text-xs">
@@ -718,6 +1009,9 @@ export default function HubSpotPage() {
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Campos</p>
               <h3 className="text-xl font-black text-slate-900">Catálogo de campos</h3>
+              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+                A Canopi usa este catálogo para entender propriedades, grupos e oportunidades de mapeamento no HubSpot.
+              </p>
             </div>
             <Badge variant={!canAnalyze ? 'slate' : schemaState.phase === 'success' ? 'emerald' : schemaState.phase === 'loading' ? 'blue' : schemaState.phase === 'error' ? 'red' : 'blue'}>
               {!canAnalyze ? 'Bloqueado' : schemaState.phase === 'success' ? `${schemaState.data?.count ?? 0} propriedades` : schemaState.phase === 'loading' ? 'Atualizando' : schemaState.phase === 'error' ? 'Falha' : 'Pronto'}
@@ -744,6 +1038,58 @@ export default function HubSpotPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="border border-slate-200">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-slate-700" />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Diagnóstico de enriquecimento</p>
+          </div>
+          <div className="grid gap-2 md:grid-cols-2">
+            {enrichmentPriorities.map((item) => {
+              const ItemIcon = item.icon;
+              return (
+                <div key={item.title} className="flex items-start gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2.5">
+                  <div className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700">
+                    <ItemIcon className="h-3 w-3" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-slate-900">{item.title}</p>
+                    <p className="mt-0.5 text-xs font-semibold text-slate-700">{item.status}</p>
+                    <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-slate-500">{item.detail}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="rounded-2xl border border-slate-100 bg-white px-3 py-3">
+            <div className="flex items-center gap-2">
+              <Database className="h-4 w-4 text-slate-700" />
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Leitura para a Canopi</p>
+            </div>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-slate-700">
+              Após inventário, normalização e persistência, estes dados alimentam Contas, Sinais, Comitê, Plays e demais leituras da Canopi.
+            </p>
+            <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+              <p className="font-semibold text-slate-900">Catálogo de campos</p>
+              <p className="mt-1">
+                {schemaState.data ? `${schemaState.data.count} propriedades lidas nesta sessão.` : 'Não calculado nesta leitura.'}
+              </p>
+              <p className="mt-2">
+                Última verificação: {formatTimestamp(snapshotState.updatedAt ?? snapshotState.data?.loadedAt ?? validationState.updatedAt)}.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      <HubspotWritebackSetup
+        token={normalizedToken}
+        connectionActive={accessValidated}
+        companiesReadActive={validationState.data?.readAccessConfirmed ?? false}
+        catalogLoaded={schemaState.phase === 'success'}
+        onSetupStateChange={setSetupState}
+      />
 
       <HubspotWritebackImport
         token={normalizedToken}

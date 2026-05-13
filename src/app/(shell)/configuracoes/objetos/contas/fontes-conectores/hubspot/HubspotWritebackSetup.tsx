@@ -201,10 +201,10 @@ export function HubspotWritebackSetup({
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pré-requisitos para writeback</p>
-            <h3 className="text-2xl font-black text-slate-950">Setup HubSpot</h3>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pré-requisitos para atualização do HubSpot</p>
+            <h3 className="text-2xl font-black text-slate-950">HubSpot pronto para atualização</h3>
             <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
-              O envio real só será liberado depois que o HubSpot tiver permissões de escrita e propriedades Canopi configuradas.
+              A atualização do HubSpot só será liberada depois que o HubSpot tiver permissões de escrita e propriedades Canopi configuradas.
             </p>
           </div>
           <Badge variant={statusVariant(phase)}>{badgeText}</Badge>
@@ -248,7 +248,7 @@ export function HubspotWritebackSetup({
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Companies</p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
-              {companySummary?.ready ? 'Prontas para writeback' : 'Aguardando ajustes'}
+              {companySummary?.ready ? 'Prontas para atualização' : 'Aguardando ajustes'}
             </p>
             <p className="mt-1 text-sm font-medium text-slate-600">
               {companySummary?.missing.length ? `${companySummary.missing.length} propriedade(s) ausente(s).` : 'Sem propriedades ausentes.'}
@@ -261,7 +261,7 @@ export function HubspotWritebackSetup({
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Contacts</p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
-              {contactSummary?.ready ? 'Prontos para writeback' : 'Aguardando ajustes'}
+              {contactSummary?.ready ? 'Prontos para atualização' : 'Aguardando ajustes'}
             </p>
             <p className="mt-1 text-sm font-medium text-slate-600">
               {contactSummary?.missing.length ? `${contactSummary.missing.length} propriedade(s) ausente(s).` : 'Sem propriedades ausentes.'}

@@ -259,7 +259,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
   const uploadedSessionCount = sentCompanyIds.length + sentContactIds.length + sentAssociationKeys.length;
   const scopeMessage = useMemo(() => {
     if (canWriteHubspot) {
-      return 'A conexão atual permite subir a base. A escrita real continua protegida por confirmação explícita.';
+      return 'A conexão atual permite atualizar o HubSpot. A escrita real continua protegida por confirmação explícita.';
     }
     if (missingWriteScopes.length === 0) {
       return 'Reconecte HubSpot com permissão de escrita.';
@@ -280,9 +280,9 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
     if (phase === 'ready') return 'Análise atualizada';
     if (phase === 'blocked') return 'Existem registros que precisam de correção';
     if (phase === 'prepared' || executePhase === 'confirming') return 'Confirmação necessária';
-    if (executePhase === 'sending') return 'Subindo base';
-    if (executePhase === 'success') return 'Subida concluída';
-    if (executePhase === 'success_with_errors' || executePhase === 'partial_error') return 'Subida concluída com erros';
+    if (executePhase === 'sending') return 'Atualizando HubSpot';
+    if (executePhase === 'success') return 'Atualização concluída';
+    if (executePhase === 'success_with_errors' || executePhase === 'partial_error') return 'Atualização concluída com erros';
     if (executePhase === 'permission_error') return 'Erro de permissão';
     if (executePhase === 'setup_error') return 'Erro de setup';
     if (phase === 'error') return 'Não foi possível analisar a base';
@@ -526,10 +526,10 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Subida assistida ao HubSpot</p>
-              <h3 className="text-2xl font-black text-slate-950">Subir base para o HubSpot</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Entrada assistida por arquivos</p>
+              <h3 className="text-2xl font-black text-slate-950">Preparação da base</h3>
               <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
-                A Canopi vai subir a base para o HubSpot em lotes internos seguros. Você não precisa enviar manualmente de 50 em 50.
+                Use arquivos quando precisar complementar a leitura direta do HubSpot, revisar uma base externa ou preparar dados para retorno assistido ao CRM.
               </p>
             </div>
             <Badge
@@ -569,7 +569,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
             {hasAnyFile ? (
-              <p>{uploadModeLabel}. O resultado sempre reflete apenas os arquivos atualmente selecionados.</p>
+              <p>{uploadModeLabel}. O resultado sempre reflete apenas os arquivos atualmente selecionados nesta sessão.</p>
             ) : (
               <p>Aguardando arquivos. Ao selecionar uma base, a análise é executada automaticamente.</p>
             )}
@@ -582,9 +582,9 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Resumo consolidado</p>
-              <h4 className="text-xl font-black text-slate-950">Prévia do dry-run atual</h4>
+              <h4 className="text-xl font-black text-slate-950">Prévia da base preparada</h4>
               <p className="mt-1 text-sm font-medium text-slate-600">
-                Empresas únicas, contatos, vínculos válidos e bloqueios aparecem consolidados sem acumular resultados antigos.
+                Empresas únicas, contatos, vínculos válidos e bloqueios aparecem consolidados para orientar a revisão antes de qualquer retorno ao CRM.
               </p>
             </div>
             <Badge variant={blockerCount > 0 ? 'amber' : 'slate'}>{analysis ? 'Resultado atual' : 'Sem análise'}</Badge>
@@ -628,7 +628,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Prévia curta</p>
               <h4 className="text-xl font-black text-slate-950">Empresas, contatos e associações</h4>
               <p className="mt-1 text-sm font-medium text-slate-600">
-                A prévia mostra apenas uma amostra útil. O dry-run completo continua disponível no CSV de revisão.
+                A prévia mostra apenas uma amostra útil. O CSV de revisão continua disponível para checagem completa.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -672,13 +672,16 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Próxima ação</p>
-              <h4 className="text-xl font-black text-slate-950">Subida controlada</h4>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Retorno ao HubSpot</p>
+              <h4 className="text-xl font-black text-slate-950">Atualizar HubSpot a partir da Canopi</h4>
               <p className="mt-1 text-sm font-medium text-slate-600">
-                Exporte o CSV de revisão e confirme os vínculos antes de preparar a subida.
+                Exporte o CSV de revisão e confirme os vínculos antes de devolver dados preparados ao HubSpot.
+              </p>
+              <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                A atualização usa IDs externos Canopi únicos no HubSpot. Se a mesma base gerar os mesmos IDs, o HubSpot atualiza os registros existentes.
               </p>
             </div>
-            <Badge variant={canWriteHubspot ? 'emerald' : 'slate'}>{canWriteHubspot ? 'Subida disponível' : 'Subida bloqueada'}</Badge>
+            <Badge variant={canWriteHubspot ? 'emerald' : 'slate'}>{canWriteHubspot ? 'Atualização disponível' : 'Atualização bloqueada'}</Badge>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -712,9 +715,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
               <div className="space-y-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Confirmação necessária</p>
-                  <p className="mt-1 font-semibold">
-                    Confirmo que revisei o dry-run e quero subir esta base para o HubSpot.
-                  </p>
+                  <p className="mt-1 font-semibold">Confirmo que revisei a prévia e quero atualizar o HubSpot com esta base.</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-2xl border border-blue-100 bg-white p-3">
@@ -743,10 +744,10 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                       onChange={(event) => setConfirmationChecked(event.target.checked)}
                       className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                     />
-                    Confirmo que revisei o dry-run e quero subir esta base para o HubSpot.
+                    Confirmo que revisei a prévia e quero atualizar o HubSpot com esta base.
                   </label>
                   <span className="text-xs font-medium text-slate-500">
-                    Modo: {pendingExecutionMode === 'remaining' ? 'subida controlada' : 'lote de teste'} · Limite por lote: 50
+                    Modo: {pendingExecutionMode === 'remaining' ? 'retorno controlado' : 'lote de teste'} · Limite por lote: 50
                   </span>
                 </div>
 
@@ -778,13 +779,13 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
             {canWriteHubspot ? (
-              <p>Preparação local pronta. A subida real continua protegida por confirmação explícita.</p>
+              <p>Revisão pronta. A atualização real continua protegida por confirmação explícita.</p>
             ) : (
               <div className="space-y-2">
                 <p className="font-semibold text-slate-700">
                   {!setupState || !setupState.ready
-                    ? 'Subida bloqueada: conclua os pré-requisitos do HubSpot antes de liberar a subida.'
-                    : 'Subida bloqueada por permissão. Reconecte o HubSpot com escopos de escrita para liberar a subida.'}
+                    ? 'Atualização bloqueada: conclua os pré-requisitos do HubSpot antes de liberar a atualização.'
+                    : 'Atualização bloqueada por permissão. Reconecte o HubSpot com escopos de escrita para liberar a atualização.'}
                 </p>
                 {!setupState || !setupState.ready ? (
                   <ul className="space-y-1 text-slate-600">
@@ -804,22 +805,26 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
             )}
           </div>
 
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
+            A atualização usa IDs externos Canopi para localizar registros no HubSpot. Reenviar a mesma base tende a atualizar os registros existentes quando os IDs permanecem iguais. Se mudanças em campos sensíveis gerarem IDs diferentes, pode haver risco de novo registro; esse cenário deve evoluir para uma revisão assistida antes da criação ou atualização.
+          </div>
+
           {executionResult ? (
             <div className={`rounded-2xl border p-4 text-sm font-medium ${executionResult.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                {executionResult.ok ? 'Subida concluída' : 'Subida concluída com erros'}
+                {executionResult.ok ? 'Atualização concluída' : 'Atualização concluída com erros'}
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Total pronto</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Total preparado</p>
                   <p className="mt-1 text-lg font-black">{executionResult.received.companies + executionResult.received.contacts}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Subidas nesta execução</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Atualizados nesta execução</p>
                   <p className="mt-1 text-lg font-black">{executionResult.succeeded.companies + executionResult.succeeded.contacts}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Já subidos nesta sessão</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Já atualizados nesta sessão</p>
                   <p className="mt-1 text-lg font-black">{uploadedSessionCount}</p>
                 </div>
                 <div>
@@ -829,7 +834,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
               </div>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Contatos prontos</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Contatos preparados</p>
                   <p className="mt-1 text-lg font-black">{executionResult.received.contacts}</p>
                 </div>
                 <div>
@@ -837,7 +842,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                   <p className="mt-1 text-lg font-black">{executionResult.failed.companies + executionResult.failed.contacts + executionResult.failed.associations}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Ignorados por já subidos</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Ignorados por já atualizados</p>
                   <p className="mt-1 text-lg font-black">
                     {executionResult.skippedAlreadySent.companies + executionResult.skippedAlreadySent.contacts + executionResult.skippedAlreadySent.associations}
                   </p>
@@ -848,7 +853,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500">
-                Modo: {executionResult.mode === 'remaining' ? 'subida controlada' : 'lote de teste'} · Iniciado em {formatTimestamp(executionResult.startedAt)} · Finalizado em {formatTimestamp(executionResult.finishedAt)}
+                Modo: {executionResult.mode === 'remaining' ? 'retorno controlado' : 'lote de teste'} · Iniciado em {formatTimestamp(executionResult.startedAt)} · Finalizado em {formatTimestamp(executionResult.finishedAt)}
               </p>
               {executionResult.errors.length > 0 ? (
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
