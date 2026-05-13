@@ -1,7 +1,7 @@
 # Status atual do projeto
 
 ## Branch principal
-`main` alinhado com `origin/main`. Commits publicados: `5a3a019` (`feat(settings): add HubSpot read-only connector surface`), `404952c` (documental), `e4b4585` (`fix(settings): persist HubSpot read-only connection state`), `43ed689` (`feat(settings): add HubSpot writeback dry-run flow`), `833b1f2` (documental) e `a7b3034` (`feat(settings): add HubSpot writeback setup flow`). **HubSpot read-only connector surface (C2.9B)** está implementado, validado funcionalmente no browser e **fechado operacionalmente** no escopo read-only. **HubSpot C2.9C está fechado como dry-run/preparação**. **HubSpot C2.9D.1 está fechado tecnicamente e publicado**, preparando o caminho para writeback real protegido. **RD Station CRM continua postergado** até encerramento formal da frente HubSpot ou decisão explícita. **Salesforce C4.18C permanece fechado** e não foi reaberto. lint e tsc passaram.
+`main` alinhado com `origin/main`. Commits publicados: `5a3a019` (`feat(settings): add HubSpot read-only connector surface`), `404952c` (documental), `e4b4585` (`fix(settings): persist HubSpot read-only connection state`), `43ed689` (`feat(settings): add HubSpot writeback dry-run flow`), `833b1f2` (documental), `a7b3034` (`feat(settings): add HubSpot writeback setup flow`), `1b5ab47` (documental) e `0c0f70b` (`feat(settings): add protected HubSpot writeback execution`). **HubSpot read-only connector surface (C2.9B)** está implementado, validado funcionalmente no browser e **fechado operacionalmente** no escopo read-only. **HubSpot C2.9C está fechado como dry-run/preparação**. **HubSpot C2.9D.1 está fechado tecnicamente e publicado**. **HubSpot C2.9D.2 está fechado tecnicamente e validado funcionalmente**, com base completa subida e conferida no HubSpot. **RD Station CRM continua postergado** até encerramento formal da frente HubSpot ou decisão explícita. **Salesforce C4.18C permanece fechado** e não foi reaberto. lint e tsc passaram.
 
 Fechado neste marco (Setup Read-only):
 - OAuth produtivo e conexão persistida
@@ -36,6 +36,7 @@ Fechado neste marco (Setup Read-only):
 - **HubSpot Read-Only Connector Surface (C2.9B)** validado funcionalmente e fechado operacionalmente em `e4b4585`: conexão com token/Service Key válido, preview real de empresas, análise real de campos, persistência apenas em sessão local do navegador, desconexão limpa e restauração correta após refresh. Ver fechamento em `42-hubspot-read-only-connector-closure.md`.
 - **HubSpot Writeback Dry-Run Flow (C2.9C)** fechado tecnicamente e publicado em `43ed689`: upload separado de empresas e contatos, dry-run consolidado, geração de IDs Canopi, associação contato → empresa, CSV de revisão e botão de envio bloqueado sem scopes de escrita. Ver fechamento em `43-hubspot-writeback-dry-run-closure.md`.
 - **HubSpot Writeback Setup (C2.9D.1)** fechado tecnicamente e publicado em `a7b3034`: pré-requisitos para writeback, validação de conexão/leitura/catálogo/escrita, propriedades Canopi em Companies e Contacts, validação de IDs externos únicos e criação explícita de propriedades Canopi no HubSpot. Ver fechamento em `44-hubspot-writeback-setup-closure.md`.
+- **HubSpot Writeback Real Protegido (C2.9D.2)** fechado tecnicamente e validado funcionalmente em `0c0f70b`: confirmação explícita, upsert de Companies/Contacts por IDs Canopi, associações Contact ↔ Company, modo `limited`, modo `remaining`, chunks internos e estado local de IDs já subidos na sessão. Ver fechamento em `45-hubspot-writeback-real-protegido-closure.md`.
 
 Não fechado neste marco:
 - sync real
@@ -82,8 +83,7 @@ Não fechado neste marco:
   - O ChatGPT deve fornecer o prompt de documentação e não tentar conexões diretas se o usuário orientar a não conectar.
 
 Próximo passo após esta documentação:
-- **C2.9D.2 — HubSpot Writeback Real Protegido**: confirmar explicitamente antes do envio, executar upsert de Companies por `canopi_company_id`, upsert de Contacts por `canopi_contact_id`, criar associações Contact ↔ Company e manter bloqueios por dry-run/erro.
-- **RD Station CRM** permanece postergado até decisão após HubSpot Setup ou fechamento formal da frente HubSpot.
+- **RD Station CRM** permanece postergado até decisão após o fechamento formal da frente HubSpot.
 - **Salesforce C4.18C** permanece fechado e não deve ser reaberto.
 
 ## Decisões Estratégicas de Produto e UX (Maio 2026)

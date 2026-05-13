@@ -3,6 +3,42 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot C2.9D.2 (Fechamento operacional do Writeback Real Protegido)
+
+- **Agente:** Codex
+- **Natureza:** Fechamento técnico e validação funcional do writeback real protegido da HubSpot.
+- **Commit técnico:** `0c0f70b` — `feat(settings): add protected HubSpot writeback execution`
+- **Validação real confirmada:**
+  - primeiro lote real enviado com sucesso com 50 empresas, 50 contatos, 50 associações e 0 erros;
+  - base completa subida depois;
+  - usuário conferiu no HubSpot e confirmou que está ok;
+  - nenhuma execução adicional foi iniciada nesta etapa documental.
+- **Entregas registradas:**
+  - rota protegida de execução real;
+  - confirmação explícita antes do envio;
+  - upsert de Companies por `canopi_company_id`;
+  - upsert de Contacts por `canopi_contact_id`;
+  - associação Contact ↔ Company;
+  - modo `limited` para lote de teste;
+  - modo `remaining` para subir base/restante;
+  - chunks internos controlados;
+  - estado local de IDs já subidos na sessão;
+  - retorno estruturado de execução;
+  - UI mínima com **Subir base para o HubSpot** e **Confirmar e subir base**.
+- **Proteções confirmadas:**
+  - sem confirmação explícita não executa;
+  - sem setup pronto não executa;
+  - sem dry-run válido não executa;
+  - com blockers não executa;
+  - sem token não executa;
+  - não executa automaticamente ao abrir a tela;
+  - não exige clique manual de 50 em 50;
+  - revalida setup no servidor.
+- **Decisão operacional:**
+  - C2.9D.2 fica fechado tecnicamente e validado funcionalmente.
+  - O que ficou fora segue explicitado no documento de fechamento.
+  - Salesforce, RD Station CRM e Outro CRM não foram alterados nesta frente.
+
 ## [2026-05-13] — HubSpot C2.9D.1 (Fechamento operacional do Writeback Setup)
 
 - **Agente:** Codex
