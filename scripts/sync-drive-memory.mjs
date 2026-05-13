@@ -21,6 +21,7 @@ const FILES = [
   'docs/98-operacao/45-hubspot-writeback-real-protegido-closure.md',
   'docs/98-operacao/46-hubspot-pos-writeback-roadmap.md',
   'docs/98-operacao/47-hubspot-read-only-snapshot-closure.md',
+  'docs/98-operacao/48-hubspot-ingest-contract-foundation-closure.md',
 ];
 
 function run(cmd, args, opts = {}) {

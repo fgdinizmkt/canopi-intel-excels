@@ -3,6 +3,31 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot C2.9E.2A (Fundação técnica do contrato de ingestão)
+
+- **Agente:** Codex
+- **Natureza:** Fundação técnica do contrato salvo de ingestão HubSpot → Canopi, sem execução canônica.
+- **Commit técnico:** `b6c9d4a` — `feat(settings): add HubSpot ingest contract foundation`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Entregas registradas:**
+  - migration `hubspot_ingest_contracts`;
+  - tipos server-side/client-safe para contrato de ingestão;
+  - service server-side para preparar/salvar contrato;
+  - rota `POST/GET` em `/api/account-connectors/hubspot/ingest/contracts`;
+  - dry-run summary sem ingestão real;
+  - representação de Companies + Contacts;
+  - representação de Contacts sem `canopi_contact_id` como unresolved/backlog.
+- **Validação funcional real:**
+  - pendente por ausência de Supabase local configurado e token HubSpot seguro no ambiente.
+- **Decisão operacional:**
+  - C2.9E.2A fica tecnicamente publicado;
+  - C2.9E.2B ainda não foi iniciado;
+  - nenhum writeback ou ingestão real foi executado nesta frente.
+- **Próximo passo:** atualizar documentação operacional, sincronizar memória no Drive e só então abrir o recorte C2.9E.2B com execução canônica baseada no contrato salvo.
+
 ## [2026-05-13] — HubSpot read-only CRM snapshot (fechamento técnico e operacional)
 
 - **Agente:** Codex
