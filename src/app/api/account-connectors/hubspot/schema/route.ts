@@ -4,6 +4,11 @@ import type {
   AccountSchemaProperty,
   AccountSchemaSuggestedMapping,
 } from '@/src/lib/accountConnectionModel';
+import {
+  classifyHubspotCompanyProperty,
+  normalizeHubspotCompanyOptions,
+  summarizeHubspotCompanyOptions,
+} from '@/src/lib/hubspotCompanyPropertyClassification';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,14 +19,24 @@ type HubspotPropertyRecord = {
   fieldType?: string;
   description?: string;
   groupName?: string;
+  formField?: boolean;
   hidden?: boolean;
+  archived?: boolean;
   calculated?: boolean;
+  externalOptions?: boolean;
   modificationMetadata?: {
     readOnlyValue?: boolean;
     readOnlyDefinition?: boolean;
   };
   hasUniqueValue?: boolean;
-  options?: unknown[];
+  createdAt?: string;
+  updatedAt?: string;
+  options?: Array<{
+    label?: string;
+    value?: string;
+    displayOrder?: number;
+    hidden?: boolean;
+  }>;
   referencedObjectType?: string;
 };
 
@@ -107,20 +122,53 @@ function sanitizeHubspotError(status: number): string {
 
 function sanitizeProperty(property: HubspotPropertyRecord): AccountSchemaProperty {
   const modificationMetadata = property.modificationMetadata || {};
+  const normalizedOptions = normalizeHubspotCompanyOptions(property);
+  const classification = classifyHubspotCompanyProperty({
+    name: property.name,
+    label: property.label,
+    description: property.description,
+    groupName: property.groupName,
+    type: property.type,
+    fieldType: property.fieldType,
+    formField: property.formField,
+    hidden: property.hidden,
+    archived: property.archived,
+    calculated: property.calculated,
+    externalOptions: property.externalOptions,
+    readOnlyDefinition: modificationMetadata.readOnlyDefinition,
+    readOnlyValue: modificationMetadata.readOnlyValue,
+    hasUniqueValue: property.hasUniqueValue,
+    createdAt: property.createdAt,
+    updatedAt: property.updatedAt,
+    referencedObjectType: property.referencedObjectType,
+    options: normalizedOptions,
+  });
   return {
     name: readString(property.name) || '',
     label: readString(property.label) || readString(property.name) || '',
-    type: readString(property.type) || 'unknown',
-    fieldType: readString(property.fieldType) || 'unknown',
     description: readString(property.description),
     groupName: readString(property.groupName),
+    type: readString(property.type) || 'unknown',
+    fieldType: readString(property.fieldType) || 'unknown',
+    formField: readBoolean(property.formField),
     hidden: readBoolean(property.hidden),
+    archived: readBoolean(property.archived),
+    externalOptions: readBoolean(property.externalOptions),
     calculated: readBoolean(property.calculated),
     readOnlyValue: readBoolean(modificationMetadata.readOnlyValue),
     readOnlyDefinition: readBoolean(modificationMetadata.readOnlyDefinition),
     hasUniqueValue: readBoolean(property.hasUniqueValue),
-    optionCount: Array.isArray(property.options) ? property.options.length : 0,
+    optionsCount: normalizedOptions.length,
+    options: normalizedOptions,
+    optionsSummary: summarizeHubspotCompanyOptions({
+      ...property,
+      options: normalizedOptions,
+    }),
     referencedObjectType: readString(property.referencedObjectType),
+    createdAt: readString(property.createdAt),
+    updatedAt: readString(property.updatedAt),
+    canopiPopulationClass: classification.canopiPopulationClass,
+    canopiPopulationReason: classification.canopiPopulationReason,
   };
 }
 

@@ -106,18 +106,42 @@ export interface AccountConnectorAdapterDefinition {
 export interface AccountSchemaProperty {
   name: string;
   label: string;
-  type: string;
-  fieldType: string;
   description: string | null;
   groupName: string | null;
+  type: string;
+  fieldType: string;
+  formField: boolean;
   hidden: boolean;
+  archived: boolean;
+  externalOptions: boolean;
   calculated: boolean;
   readOnlyValue: boolean;
   readOnlyDefinition: boolean;
   hasUniqueValue: boolean;
-  optionCount: number;
+  optionsCount: number;
+  options: Array<{
+    label: string;
+    value: string;
+    displayOrder: number | null;
+    hidden: boolean;
+  }>;
+  optionsSummary: string;
   referencedObjectType: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  canopiPopulationClass: HubSpotCompanyPopulationClass;
+  canopiPopulationReason: string;
 }
+
+export type HubSpotCompanyPopulationClass =
+  | 'POPULATE_NOW'
+  | 'POPULATE_IF_AVAILABLE'
+  | 'OPTION_FIELD_REVIEW'
+  | 'SYSTEM_READ_ONLY'
+  | 'HUBSPOT_CALCULATED'
+  | 'HIDDEN_OR_INTERNAL'
+  | 'IGNORE_FOR_NOW'
+  | 'CUSTOM_FIELD_CANDIDATE';
 
 export interface AccountSchemaSuggestedMapping {
   hubspotField: string;

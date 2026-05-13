@@ -3,8 +3,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, Database, FileSearch, Loader2, LogOut, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, Database, FileSearch, Loader2, LogOut, ShieldCheck } from 'lucide-react';
 import { Badge, Button, Card } from '@/src/components/ui';
+import type {
+  AccountSchemaDiscoveryResult,
+} from '@/src/lib/accountConnectionModel';
+import { HubspotSchemaCatalog } from './HubspotSchemaCatalog';
+import { HubspotWritebackImport } from './HubspotWritebackImport';
 
 type ValidationPhase = 'idle' | 'loading' | 'success' | 'missing_config' | 'manual_disconnect' | 'credential_error' | 'api_error';
 type RequestPhase = 'idle' | 'loading' | 'success' | 'error';
@@ -37,41 +42,6 @@ interface HubspotPreviewResult {
   companies: HubspotPreviewCompany[];
 }
 
-interface HubspotSchemaProperty {
-  name: string;
-  label: string;
-  type: string;
-  fieldType: string;
-  description: string | null;
-  groupName: string | null;
-  hidden: boolean;
-  calculated: boolean;
-  readOnlyValue: boolean;
-  readOnlyDefinition: boolean;
-  hasUniqueValue: boolean;
-  optionCount: number;
-  referencedObjectType: string | null;
-}
-
-interface HubspotSchemaMapping {
-  hubspotField: string;
-  hubspotLabel: string;
-  canopiField: string;
-  canopiLabel: string;
-  confidence: 'alta' | 'média' | 'baixa';
-  status: 'encontrado' | 'ausente';
-}
-
-interface HubspotSchemaResult {
-  status: 'success';
-  provider: 'hubspot';
-  loadedAt: string;
-  count: number;
-  properties: HubspotSchemaProperty[];
-  suggestedMappings: HubspotSchemaMapping[];
-  missingRecommendedFields: HubspotSchemaMapping[];
-}
-
 interface ValidationState {
   phase: ValidationPhase;
   message: string;
@@ -79,6 +49,12 @@ interface ValidationState {
   validatedToken: string | null;
   updatedAt: string | null;
 }
+
+type HubspotSchemaResponse = AccountSchemaDiscoveryResult & {
+  status: 'success' | 'error';
+  provider: 'hubspot';
+  error?: string;
+};
 
 interface RequestState<T> {
   phase: RequestPhase;
@@ -157,19 +133,23 @@ export default function HubSpotPage() {
     updatedAt: null,
   });
   const [previewState, setPreviewState] = useState<RequestState<HubspotPreviewResult>>(createRequestState<HubspotPreviewResult>());
-  const [schemaState, setSchemaState] = useState<RequestState<HubspotSchemaResult>>(createRequestState<HubspotSchemaResult>());
+  const [schemaState, setSchemaState] = useState<RequestState<HubspotSchemaResponse>>(createRequestState<HubspotSchemaResponse>());
   const restoredSessionRef = useRef(false);
+  const autoLoadedTokenRef = useRef<string | null>(null);
 
   const normalizedToken = token.trim();
   const hasToken = normalizedToken.length > 0;
   const accessValidated = validationState.phase === 'success' && validationState.validatedToken === normalizedToken;
   const previewRows = previewState.data?.companies.slice(0, 5) ?? [];
-  const schemaRows = schemaState.data?.suggestedMappings.slice(0, 8) ?? [];
-  const missingRows = schemaState.data?.missingRecommendedFields.slice(0, 5) ?? [];
+  const grantedScopes = validationState.data?.scopes ?? [];
+  const requiredWriteScopes = ['crm.objects.companies.write', 'crm.objects.contacts.write'];
+  const missingWriteScopes = requiredWriteScopes.filter((scope) => !grantedScopes.includes(scope));
+  const canWriteHubspot = accessValidated && missingWriteScopes.length === 0;
 
   useEffect(() => {
     if (validationState.phase === 'success' && validationState.validatedToken && validationState.validatedToken !== normalizedToken) {
       writeHubspotSessionToken(null);
+      autoLoadedTokenRef.current = null;
       setValidationState({
         phase: hasToken ? 'idle' : 'missing_config',
         message: hasToken
@@ -180,7 +160,7 @@ export default function HubSpotPage() {
         updatedAt: null,
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
-      setSchemaState(createRequestState<HubspotSchemaResult>());
+      setSchemaState(createRequestState<HubspotSchemaResponse>());
     }
   }, [hasToken, normalizedToken, validationState.phase, validationState.validatedToken]);
 
@@ -226,6 +206,7 @@ export default function HubSpotPage() {
   const disconnect = useCallback(() => {
     setToken('');
     writeHubspotSessionToken(null);
+    autoLoadedTokenRef.current = null;
     setValidationState({
       phase: 'manual_disconnect',
       message: 'Conexão removida. Informe um token para conectar novamente.',
@@ -234,7 +215,7 @@ export default function HubSpotPage() {
       updatedAt: new Date().toISOString(),
     });
     setPreviewState(createRequestState<HubspotPreviewResult>());
-    setSchemaState(createRequestState<HubspotSchemaResult>());
+    setSchemaState(createRequestState<HubspotSchemaResponse>());
   }, []);
 
   const validateAccess = useCallback(async (tokenOverride?: string) => {
@@ -242,6 +223,7 @@ export default function HubSpotPage() {
 
     if (!tokenToValidate) {
       writeHubspotSessionToken(null);
+      autoLoadedTokenRef.current = null;
       setValidationState({
         phase: 'missing_config',
         message: 'Private App token não informado. Informe uma credencial válida da HubSpot para validar o acesso de leitura.',
@@ -250,7 +232,7 @@ export default function HubSpotPage() {
         updatedAt: new Date().toISOString(),
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
-      setSchemaState(createRequestState<HubspotSchemaResult>());
+      setSchemaState(createRequestState<HubspotSchemaResponse>());
       return;
     }
 
@@ -260,6 +242,7 @@ export default function HubSpotPage() {
       const { ok, status, payload } = await postJson<HubspotTestResult>('/api/account-connectors/hubspot/test', tokenToValidate);
       if (!ok || payload.status !== 'success') {
         writeHubspotSessionToken(null);
+        autoLoadedTokenRef.current = null;
         const mapped = mapHubspotError(status);
         setValidationState({
           phase: mapped.phase,
@@ -269,7 +252,7 @@ export default function HubSpotPage() {
           updatedAt: new Date().toISOString(),
         });
         setPreviewState(createRequestState<HubspotPreviewResult>());
-        setSchemaState(createRequestState<HubspotSchemaResult>());
+        setSchemaState(createRequestState<HubspotSchemaResponse>());
         return;
       }
 
@@ -283,6 +266,7 @@ export default function HubSpotPage() {
       writeHubspotSessionToken(tokenToValidate);
     } catch {
       writeHubspotSessionToken(null);
+      autoLoadedTokenRef.current = null;
       setValidationState({
         phase: 'api_error',
         message: 'Não foi possível consultar a HubSpot agora. Verifique a conexão e tente novamente.',
@@ -291,7 +275,7 @@ export default function HubSpotPage() {
         updatedAt: new Date().toISOString(),
       });
       setPreviewState(createRequestState<HubspotPreviewResult>());
-      setSchemaState(createRequestState<HubspotSchemaResult>());
+      setSchemaState(createRequestState<HubspotSchemaResponse>());
     }
   }, [normalizedToken]);
 
@@ -342,7 +326,7 @@ export default function HubSpotPage() {
       setSchemaState({
         phase: 'error',
         data: null,
-        error: 'Valide o acesso antes de analisar campos.',
+        error: 'Valide o acesso antes de atualizar campos.',
         updatedAt: new Date().toISOString(),
       });
       return;
@@ -351,7 +335,7 @@ export default function HubSpotPage() {
     setSchemaState((current) => ({ ...current, phase: 'loading', error: null }));
 
     try {
-      const { ok, status, payload } = await postJson<HubspotSchemaResult>('/api/account-connectors/hubspot/schema', normalizedToken);
+      const { ok, status, payload } = await postJson<HubspotSchemaResponse>('/api/account-connectors/hubspot/schema', normalizedToken);
       if (!ok || payload.status !== 'success') {
         const mapped = mapHubspotError(status);
         setSchemaState({
@@ -365,7 +349,7 @@ export default function HubSpotPage() {
 
       setSchemaState({
         phase: 'success',
-        data: payload as HubspotSchemaResult,
+        data: payload as HubspotSchemaResponse,
         error: null,
         updatedAt: new Date().toISOString(),
       });
@@ -378,6 +362,18 @@ export default function HubSpotPage() {
       });
     }
   }, [canAnalyze, normalizedToken]);
+
+  useEffect(() => {
+    if (!accessValidated) {
+      autoLoadedTokenRef.current = null;
+      return;
+    }
+
+    if (autoLoadedTokenRef.current === normalizedToken) return;
+    autoLoadedTokenRef.current = normalizedToken;
+    void loadPreview();
+    void loadSchema();
+  }, [accessValidated, loadPreview, loadSchema, normalizedToken]);
 
   useEffect(() => {
     if (restoredSessionRef.current) return;
@@ -442,7 +438,7 @@ export default function HubSpotPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="blue">Acesso de leitura</Badge>
             <Badge variant="slate">Pré-visualização</Badge>
-            <Badge variant="slate">Análise de campos</Badge>
+            <Badge variant="slate">Catálogo de campos</Badge>
             <Badge variant="slate">Sem gravação</Badge>
           </div>
           <p className="mt-3 max-w-4xl text-sm font-medium leading-relaxed text-slate-600">
@@ -459,7 +455,7 @@ export default function HubSpotPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">HubSpot conectado</p>
                 <h2 className="text-2xl font-black text-slate-900">HubSpot conectado para leitura</h2>
                 <p className="text-sm font-medium leading-relaxed text-slate-600">
-                  Esta sessão já está conectada à HubSpot. Você pode carregar empresas, analisar campos ou desconectar para encerrar o acesso local.
+                  Esta sessão já está conectada à HubSpot. Você pode carregar empresas, atualizar campos ou desconectar para encerrar o acesso local.
                 </p>
               </div>
 
@@ -496,7 +492,7 @@ export default function HubSpotPage() {
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Próximo passo</p>
                 <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-emerald-950">
                   <li>• Carregar empresas</li>
-                  <li>• Analisar campos</li>
+                  <li>• Atualizar campos</li>
                   <li>• Ou desconectar para limpar a sessão</li>
                 </ul>
               </div>
@@ -600,13 +596,13 @@ export default function HubSpotPage() {
               >
                 Pré-visualizar empresas
               </Button>
-              <Button
-                variant="outline"
-                onClick={loadSchema}
-                disabled={!canAnalyze || schemaState.phase === 'loading'}
-                icon={schemaState.phase === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSearch className="h-4 w-4" />}
+                <Button
+                  variant="outline"
+                  onClick={loadSchema}
+                  disabled={!canAnalyze || schemaState.phase === 'loading'}
+                  icon={schemaState.phase === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSearch className="h-4 w-4" />}
                 >
-                  Analisar campos
+                  Atualizar campos
                 </Button>
               </div>
 
@@ -643,7 +639,7 @@ export default function HubSpotPage() {
           </Card>
         </div>
 
-      <div className="grid gap-6 xl:grid-cols-2 items-start">
+      <div className="space-y-6">
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -705,107 +701,38 @@ export default function HubSpotPage() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Campos</p>
-              <h3 className="text-xl font-black text-slate-900">Análise de campos</h3>
+              <h3 className="text-xl font-black text-slate-900">Catálogo de campos</h3>
             </div>
             <Badge variant={!canAnalyze ? 'slate' : schemaState.phase === 'success' ? 'emerald' : schemaState.phase === 'loading' ? 'blue' : schemaState.phase === 'error' ? 'red' : 'blue'}>
-              {!canAnalyze ? 'Bloqueado' : schemaState.phase === 'success' ? `${schemaState.data?.count ?? 0} propriedades` : schemaState.phase === 'loading' ? 'Analisando' : schemaState.phase === 'error' ? 'Falha' : 'Pronto'}
+              {!canAnalyze ? 'Bloqueado' : schemaState.phase === 'success' ? `${schemaState.data?.count ?? 0} propriedades` : schemaState.phase === 'loading' ? 'Atualizando' : schemaState.phase === 'error' ? 'Falha' : 'Pronto'}
             </Badge>
           </div>
 
           <div className="mt-4 space-y-3 text-sm">
             {!canAnalyze ? (
-              <p className="text-slate-600">Valide o acesso antes de analisar campos.</p>
+              <p className="text-slate-600">Valide o acesso antes de atualizar campos.</p>
             ) : schemaState.phase === 'idle' ? (
-              <p className="text-slate-600">Clique para analisar campos de empresas disponíveis para mapeamento.</p>
+              <p className="text-slate-600">Clique em Atualizar campos para carregar o catálogo de empresas disponível para leitura e mapeamento.</p>
             ) : schemaState.phase === 'loading' ? (
               <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Analisando...
+                Atualizando...
               </div>
             ) : schemaState.phase === 'error' ? (
               <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-red-800">
                 {schemaState.error}
               </div>
             ) : schemaState.data ? (
-              <>
-                <p className="text-slate-700">{schemaState.data.count} propriedade(s) identificada(s) em {formatTimestamp(schemaState.updatedAt ?? schemaState.data.loadedAt)}.</p>
-                <div className="overflow-x-auto rounded-2xl border border-slate-100">
-                  <table className="min-w-full divide-y divide-slate-100 text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-500">
-                      <tr>
-                        <th className="px-3 py-2 font-bold uppercase tracking-widest">HubSpot</th>
-                        <th className="px-3 py-2 font-bold uppercase tracking-widest">Canopi</th>
-                        <th className="px-3 py-2 font-bold uppercase tracking-widest">Confiança</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 bg-white">
-                      {schemaRows.map((mapping) => (
-                        <tr key={`${mapping.hubspotField}-${mapping.canopiField}`}>
-                          <td className="px-3 py-2">
-                            <p className="font-medium text-slate-900">{mapping.hubspotLabel}</p>
-                            <p className="text-[11px] text-slate-500">{mapping.hubspotField}</p>
-                          </td>
-                          <td className="px-3 py-2">
-                            <p className="font-medium text-slate-900">{mapping.canopiLabel}</p>
-                            <p className="text-[11px] text-slate-500">{mapping.canopiField}</p>
-                          </td>
-                          <td className="px-3 py-2">
-                            <Badge variant={mapping.confidence === 'alta' ? 'emerald' : mapping.confidence === 'média' ? 'amber' : 'slate'}>
-                              {mapping.confidence}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {missingRows.length > 0 && (
-                  <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">Campos recomendados ausentes</p>
-                    <ul className="mt-2 space-y-1 text-sm font-medium text-amber-950">
-                      {missingRows.map((mapping) => (
-                        <li key={`${mapping.hubspotField}-${mapping.canopiField}`}>• {mapping.hubspotLabel}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </>
+              <HubspotSchemaCatalog schema={schemaState.data} />
             ) : null}
           </div>
         </Card>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <Card className="border border-slate-200">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Segurança desta etapa</p>
-          </div>
-          <ul className="mt-4 space-y-2 text-sm font-medium leading-relaxed text-slate-700">
-            <li>• Nenhum dado será gravado na Canopi nesta etapa.</li>
-            <li>• A credencial fica apenas nesta sessão local do navegador.</li>
-            <li>• Esta etapa não altera dados na HubSpot.</li>
-          </ul>
-        </Card>
-
-        <Card className="border border-slate-200">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 text-blue-700" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Leitura útil</p>
-          </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Permissão mínima</p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">Leitura de empresas</p>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Campos úteis</p>
-              <p className="mt-2 text-sm font-semibold text-slate-900">Nome, domínio, setor e responsável</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <HubspotWritebackImport
+        canWriteHubspot={canWriteHubspot}
+        missingWriteScopes={missingWriteScopes}
+      />
 
       <div className={`rounded-3xl border p-5 ${accessValidated ? 'border-emerald-100 bg-emerald-50' : 'border-blue-100 bg-blue-50'}`}>
         <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${accessValidated ? 'text-emerald-700' : 'text-blue-700'}`}>
