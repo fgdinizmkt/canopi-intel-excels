@@ -3,6 +3,29 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot read-only CRM snapshot (fechamento técnico e operacional)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico do snapshot read-only do HubSpot com conferência funcional e separação explícita entre total HubSpot e registros Canopi.
+- **Commit técnico:** `446da55` — `feat(settings): add HubSpot read-only CRM snapshot`
+- **Validação funcional confirmada:**
+  - Companies / Contas: HubSpot `418`, Canopi `348`;
+  - Contacts / Contatos: HubSpot `738`, Canopi `736`;
+  - diferença real de Contacts: `2` contatos sem `canopi_contact_id`;
+  - a UI ficou viável para seguir sem novo redesenho nesta etapa.
+- **Entregas registradas:**
+  - snapshot read-only de HubSpot;
+  - separação entre total HubSpot, registros Canopi e amostra de associações;
+  - Contacts totais mantidos em leitura read-only;
+  - `canopi_contact_id` contado quando a propriedade existe;
+  - fallback explícito para estado de escopo/propriedade.
+- **Decisões registradas:**
+  - não perseguir `798` para Contacts;
+  - não manter a troca para List API como correção deste recorte;
+  - os 2 Contacts sem `canopi_contact_id` ficam como backlog futuro de backfill/resolução de identidade;
+  - não executar writeback nesta etapa.
+- **Próximo passo:** publicar documentação operacional, sincronizar memória no Drive e deixar o backlog dos 2 Contacts explícito para recorte futuro.
+
 ## [2026-05-13] — HubSpot pós-writeback: roadmap operacional H1–H9
 
 - **Agente/documentação:** ChatGPT + registro operacional publicado no GitHub.
