@@ -16,6 +16,10 @@ const FILES = [
   'docs/98-operacao/33-plano-loja-conectores-crms.md',
   'docs/98-operacao/34-protocolo-espelhamento-memoria-operacional.md',
   'docs/98-operacao/39-salesforce-configuration-hub-spec.md',
+  'docs/98-operacao/43-hubspot-writeback-dry-run-closure.md',
+  'docs/98-operacao/44-hubspot-writeback-setup-closure.md',
+  'docs/98-operacao/45-hubspot-writeback-real-protegido-closure.md',
+  'docs/98-operacao/46-hubspot-pos-writeback-roadmap.md',
 ];
 
 function run(cmd, args, opts = {}) {

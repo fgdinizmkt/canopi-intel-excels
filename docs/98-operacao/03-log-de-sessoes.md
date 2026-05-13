@@ -3,6 +3,24 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-13] — HubSpot pós-writeback: roadmap operacional H1–H9
+
+- **Agente/documentação:** ChatGPT + registro operacional publicado no GitHub.
+- **Commit documental:** `9ac4b29` — `docs(ops): record HubSpot post-writeback roadmap`
+- **Documento criado:** `docs/98-operacao/46-hubspot-pos-writeback-roadmap.md`
+- **Natureza:** documentação de roadmap, auditorias e testes operacionais pós-writeback.
+- **Decisões registradas:**
+  - painel conectado deve mostrar estado real do HubSpot;
+  - preview de 10 Companies é amostra, não inventário;
+  - identidade atual é dependente de IDs Canopi e precisa evoluir para identidade estável;
+  - drawer de decisão assistida será necessário para conflitos;
+  - classificação operacional de entidades será necessária;
+  - dados do HubSpot devem alimentar páginas transversais da Canopi após normalização/persistência;
+  - enriquecimento fica depois de snapshot, classificação e identidade;
+  - RD Station CRM segue postergado;
+  - Salesforce não foi reaberto.
+- **Próximo passo:** aguardar retorno do Codex sobre snapshot real read-only e analisar antes de novo prompt.
+
 ## [2026-05-13] — HubSpot C2.9D.2 (Fechamento operacional do Writeback Real Protegido)
 
 - **Agente:** Codex

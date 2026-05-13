@@ -51,6 +51,10 @@ Não fechado neste marco:
 - módulo futuro de Pendências de vínculo
 - Salesforce Connector completo
 
+## HubSpot pós-writeback — roadmap operacional em aberto
+
+Após o fechamento técnico e validação funcional do HubSpot C2.9D.2, foi criado o documento `46-hubspot-pos-writeback-roadmap.md` para registrar os próximos recortes da frente HubSpot antes do fechamento formal. A frente HubSpot ainda não está encerrada como um todo. O próximo foco é validar o WIP técnico de UI/snapshot real read-only do HubSpot, seguido por classificação operacional de entidades, identidade estável, dry-run semântico, drawer de decisão assistida, persistência canônica HubSpot -> Canopi e enriquecimento posterior.
+
 ## Pendências controladas e regra operacional
 
 - **C4.16.17 — Ajustes finais Salesforce pós-validação visual**
