@@ -746,6 +746,7 @@ export default function HubSpotPage() {
       </div>
 
       <HubspotWritebackImport
+        token={normalizedToken}
         canWriteHubspot={canWriteHubspot}
         missingWriteScopes={missingWriteScopes}
         setupState={setupState}

@@ -9,8 +9,10 @@ import type {
   HubspotWritebackDryRunResult,
 } from '@/src/lib/hubspotWritebackTypes';
 import type { HubspotWritebackSetupResult } from '@/src/lib/hubspotWritebackSetupTypes';
+import type { HubspotWritebackExecutionResult } from '@/src/lib/hubspotWritebackExecuteTypes';
 
 interface HubspotWritebackImportProps {
+  token: string;
   canWriteHubspot: boolean;
   missingWriteScopes: string[];
   setupState: HubspotWritebackSetupResult | null;
@@ -18,11 +20,18 @@ interface HubspotWritebackImportProps {
 
 type WritebackPhase = 'idle' | 'analyzing' | 'ready' | 'blocked' | 'prepared' | 'error';
 type PreviewTab = 'companies' | 'contacts' | 'associations';
+type ExecutePhase = 'idle' | 'confirming' | 'sending' | 'success' | 'success_with_errors' | 'blocked' | 'permission_error' | 'setup_error' | 'partial_error' | 'error';
+type ExecutionMode = 'limited' | 'remaining';
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatTimestamp(value: string | null) {
+  if (!value) return '—';
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
 }
 
 function escapeCsv(value: unknown): string {
@@ -214,13 +223,23 @@ function FileSlot({
   );
 }
 
-export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, setupState }: HubspotWritebackImportProps) {
+export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteScopes, setupState }: HubspotWritebackImportProps) {
   const [companiesFile, setCompaniesFile] = useState<File | null>(null);
   const [contactsFile, setContactsFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<HubspotWritebackDryRunResult | null>(null);
   const [phase, setPhase] = useState<WritebackPhase>('idle');
   const [error, setError] = useState<string | null>(null);
   const [prepared, setPrepared] = useState(false);
+  const [pendingExecutionMode, setPendingExecutionMode] = useState<ExecutionMode>('remaining');
+  const [confirmationChecked, setConfirmationChecked] = useState(false);
+  const [executePhase, setExecutePhase] = useState<ExecutePhase>('idle');
+  const [executionResult, setExecutionResult] = useState<HubspotWritebackExecutionResult | null>(null);
+  const [executionError, setExecutionError] = useState<string | null>(null);
+  const [sentCompanyIds, setSentCompanyIds] = useState<string[]>([]);
+  const [sentContactIds, setSentContactIds] = useState<string[]>([]);
+  const [sentAssociationKeys, setSentAssociationKeys] = useState<string[]>([]);
+  const [sentCompanyHubspotIds, setSentCompanyHubspotIds] = useState<Record<string, string>>({});
+  const [sentContactHubspotIds, setSentContactHubspotIds] = useState<Record<string, string>>({});
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewTab, setPreviewTab] = useState<PreviewTab>('companies');
   const requestSequence = useRef(0);
@@ -236,9 +255,11 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
   const reviewCount = summary?.reviewCount ?? 0;
   const readyCount = summary ? summary.readyForSendCompanies + summary.readyForSendContacts : 0;
   const totalContacts = summary?.contactsIdentified ?? 0;
+  const totalAssociations = summary?.contactsAssociated ?? 0;
+  const uploadedSessionCount = sentCompanyIds.length + sentContactIds.length + sentAssociationKeys.length;
   const scopeMessage = useMemo(() => {
     if (canWriteHubspot) {
-      return 'A conexão atual permite preparar o envio. A escrita real continua fora deste recorte.';
+      return 'A conexão atual permite subir a base. A escrita real continua protegida por confirmação explícita.';
     }
     if (missingWriteScopes.length === 0) {
       return 'Reconecte HubSpot com permissão de escrita.';
@@ -258,10 +279,15 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
     if (phase === 'analyzing') return uploadModeLabel;
     if (phase === 'ready') return 'Análise atualizada';
     if (phase === 'blocked') return 'Existem registros que precisam de correção';
-    if (phase === 'prepared') return 'Pronto para envio';
+    if (phase === 'prepared' || executePhase === 'confirming') return 'Confirmação necessária';
+    if (executePhase === 'sending') return 'Subindo base';
+    if (executePhase === 'success') return 'Subida concluída';
+    if (executePhase === 'success_with_errors' || executePhase === 'partial_error') return 'Subida concluída com erros';
+    if (executePhase === 'permission_error') return 'Erro de permissão';
+    if (executePhase === 'setup_error') return 'Erro de setup';
     if (phase === 'error') return 'Não foi possível analisar a base';
     return uploadModeLabel;
-  }, [hasAnyFile, phase, uploadModeLabel]);
+  }, [executePhase, hasAnyFile, phase, uploadModeLabel]);
 
   useEffect(() => {
     abortRef.current?.abort();
@@ -271,8 +297,18 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
       setAnalysis(null);
       setError(null);
       setPrepared(false);
+      setPendingExecutionMode('remaining');
+      setConfirmationChecked(false);
+      setExecutionResult(null);
+      setExecutionError(null);
+      setExecutePhase('idle');
       setPhase('idle');
       setPreviewTab('companies');
+      setSentCompanyIds([]);
+      setSentContactIds([]);
+      setSentAssociationKeys([]);
+      setSentCompanyHubspotIds({});
+      setSentContactHubspotIds({});
       return;
     }
 
@@ -283,8 +319,18 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
     setAnalysis(null);
     setError(null);
     setPrepared(false);
+    setPendingExecutionMode('remaining');
+    setConfirmationChecked(false);
+    setExecutionResult(null);
+    setExecutionError(null);
+    setExecutePhase('idle');
     setPhase('analyzing');
     setPreviewTab('companies');
+    setSentCompanyIds([]);
+    setSentContactIds([]);
+    setSentAssociationKeys([]);
+    setSentCompanyHubspotIds({});
+    setSentContactHubspotIds({});
 
     const run = async () => {
       try {
@@ -343,10 +389,70 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
     }
   };
 
-  const handlePrepareSend = () => {
+  const handlePrepareSend = (mode: ExecutionMode) => {
     if (!analysis || !canWriteHubspot || blockerCount > 0 || readyCount === 0) return;
+    setPendingExecutionMode(mode);
     setPrepared(true);
+    setExecutePhase('confirming');
+    setConfirmationChecked(false);
     setPhase('prepared');
+    setExecutionError(null);
+    setExecutionResult(null);
+  };
+
+  const handleExecuteWriteback = async () => {
+    if (!analysis || !canWriteHubspot || blockerCount > 0 || readyCount === 0) return;
+    if (!confirmationChecked) return;
+    if (!setupState?.ready) return;
+
+    setExecutePhase('sending');
+    setExecutionError(null);
+    setExecutionResult(null);
+
+    try {
+      const response = await fetch('/api/account-connectors/hubspot/writeback/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: token.trim(),
+          confirmWriteback: true,
+          setupReady: Boolean(setupState.ready),
+          dryRun: analysis,
+          executionMode: pendingExecutionMode,
+          sentCompanyIds,
+          sentContactIds,
+          sentAssociationKeys,
+          sentCompanyHubspotIds,
+          sentContactHubspotIds,
+          maxCompaniesPerBatch: 50,
+          maxContactsPerBatch: 50,
+          maxAssociationsPerBatch: 50,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload || payload.status !== 'success') {
+        setExecutePhase(payload?.error?.includes('setup') ? 'setup_error' : payload?.error?.includes('permiss') ? 'permission_error' : 'error');
+        setExecutionError(payload?.error || 'Não foi possível executar o writeback protegido.');
+        return;
+      }
+
+      const result = payload as HubspotWritebackExecutionResult;
+      setExecutionResult(result);
+      setExecutePhase(result.ok ? 'success' : 'success_with_errors');
+      setPrepared(false);
+      setConfirmationChecked(false);
+      setSentCompanyIds((current) => Array.from(new Set([...current, ...(result.sent?.companyIds || [])])));
+      setSentContactIds((current) => Array.from(new Set([...current, ...(result.sent?.contactIds || [])])));
+      setSentAssociationKeys((current) => Array.from(new Set([...current, ...(result.sent?.associationKeys || [])])));
+      setSentCompanyHubspotIds((current) => ({ ...current, ...(result.hubspotIds?.companyIdsByCanopiId || {}) }));
+      setSentContactHubspotIds((current) => ({ ...current, ...(result.hubspotIds?.contactIdsByCanopiId || {}) }));
+    } catch (caughtError) {
+      setExecutePhase('error');
+      setExecutionError(caughtError instanceof Error ? caughtError.message : 'Não foi possível executar o writeback protegido.');
+    }
   };
 
   const slotStatus = (file: File | null) => {
@@ -420,10 +526,10 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
         <div className="space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">HubSpot Writeback Assistido</p>
-              <h3 className="text-2xl font-black text-slate-950">Importar base para HubSpot</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Subida assistida ao HubSpot</p>
+              <h3 className="text-2xl font-black text-slate-950">Subir base para o HubSpot</h3>
               <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
-                Suba a base de empresas e, se houver, a base de contatos. A Canopi preserva o vínculo contato → empresa usando IDs Canopi, não apenas domínio de e-mail.
+                A Canopi vai subir a base para o HubSpot em lotes internos seguros. Você não precisa enviar manualmente de 50 em 50.
               </p>
             </div>
             <Badge
@@ -567,12 +673,12 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Próxima ação</p>
-              <h4 className="text-xl font-black text-slate-950">Preparar revisão</h4>
+              <h4 className="text-xl font-black text-slate-950">Subida controlada</h4>
               <p className="mt-1 text-sm font-medium text-slate-600">
-                Exporte o CSV de revisão e confirme os vínculos antes de preparar o envio.
+                Exporte o CSV de revisão e confirme os vínculos antes de preparar a subida.
               </p>
             </div>
-            <Badge variant={canWriteHubspot ? 'emerald' : 'slate'}>{canWriteHubspot ? 'Escrita disponível' : 'Escrita bloqueada'}</Badge>
+            <Badge variant={canWriteHubspot ? 'emerald' : 'slate'}>{canWriteHubspot ? 'Subida disponível' : 'Subida bloqueada'}</Badge>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -586,23 +692,99 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
             </Button>
             <Button
               variant="primary"
-              onClick={handlePrepareSend}
+              onClick={() => handlePrepareSend('remaining')}
               disabled={!analysis || !canWriteHubspot || blockerCount > 0 || readyCount === 0}
               icon={prepared ? <CircleCheckBig className="h-4 w-4" /> : <Send className="h-4 w-4" />}
             >
-              Enviar para HubSpot
+              Subir base para o HubSpot
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handlePrepareSend('limited')}
+              disabled={!analysis || !canWriteHubspot || blockerCount > 0 || readyCount === 0}
+            >
+              Enviar lote de teste
             </Button>
           </div>
 
+          {prepared ? (
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm font-medium leading-relaxed text-blue-950">
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Confirmação necessária</p>
+                  <p className="mt-1 font-semibold">
+                    Confirmo que revisei o dry-run e quero subir esta base para o HubSpot.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-2xl border border-blue-100 bg-white p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Empresas</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{summary?.readyForSendCompanies ?? 0}</p>
+                  </div>
+                  <div className="rounded-2xl border border-blue-100 bg-white p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Contatos</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{summary?.readyForSendContacts ?? 0}</p>
+                  </div>
+                  <div className="rounded-2xl border border-blue-100 bg-white p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Associações</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{totalAssociations}</p>
+                  </div>
+                  <div className="rounded-2xl border border-blue-100 bg-white p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Bloqueados</p>
+                    <p className="mt-1 text-lg font-black text-slate-950">{summary?.blockedContacts ?? 0}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-blue-100 bg-white p-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={confirmationChecked}
+                      onChange={(event) => setConfirmationChecked(event.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    Confirmo que revisei o dry-run e quero subir esta base para o HubSpot.
+                  </label>
+                  <span className="text-xs font-medium text-slate-500">
+                    Modo: {pendingExecutionMode === 'remaining' ? 'subida controlada' : 'lote de teste'} · Limite por lote: 50
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="primary"
+                    onClick={handleExecuteWriteback}
+                    disabled={!confirmationChecked || executePhase === 'sending' || !analysis || !canWriteHubspot || blockerCount > 0 || readyCount === 0 || !setupState?.ready}
+                    icon={executePhase === 'sending' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  >
+                    {pendingExecutionMode === 'remaining' ? 'Confirmar e subir base' : 'Confirmar e enviar lote de teste'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPrepared(false);
+                      setConfirmationChecked(false);
+                      setExecutePhase('idle');
+                      setExecutionError(null);
+                      setPhase(blockerCount > 0 ? 'blocked' : 'ready');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
             {canWriteHubspot ? (
-              <p>Preparação local pronta. A escrita real continua fora deste recorte.</p>
+              <p>Preparação local pronta. A subida real continua protegida por confirmação explícita.</p>
             ) : (
               <div className="space-y-2">
                 <p className="font-semibold text-slate-700">
                   {!setupState || !setupState.ready
-                    ? 'Envio bloqueado: conclua os pré-requisitos do HubSpot antes de liberar o writeback.'
-                    : 'Envio bloqueado por permissão. Reconecte o HubSpot com escopos de escrita para liberar o writeback.'}
+                    ? 'Subida bloqueada: conclua os pré-requisitos do HubSpot antes de liberar a subida.'
+                    : 'Subida bloqueada por permissão. Reconecte o HubSpot com escopos de escrita para liberar a subida.'}
                 </p>
                 {!setupState || !setupState.ready ? (
                   <ul className="space-y-1 text-slate-600">
@@ -610,7 +792,7 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
                       <li key={`${issue.objectType}-${issue.title}`}>• {issue.message}</li>
                     ))}
                     {setupState && setupState.issues.length === 0 ? <li>• Propriedades Canopi ausentes no HubSpot ou IDs externos ainda não configurados como únicos.</li> : null}
-                    {!setupState ? <li>• Valide os pré-requisitos acima para liberar o envio real.</li> : null}
+                    {!setupState ? <li>• Valide os pré-requisitos acima para liberar a subida real.</li> : null}
                   </ul>
                 ) : (
                   <p>{scopeMessage}</p>
@@ -622,9 +804,68 @@ export function HubspotWritebackImport({ canWriteHubspot, missingWriteScopes, se
             )}
           </div>
 
-          {prepared ? (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-950">
-              Preparação concluída. Nenhuma escrita real foi executada neste recorte.
+          {executionResult ? (
+            <div className={`rounded-2xl border p-4 text-sm font-medium ${executionResult.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                {executionResult.ok ? 'Subida concluída' : 'Subida concluída com erros'}
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Total pronto</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.received.companies + executionResult.received.contacts}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Subidas nesta execução</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.succeeded.companies + executionResult.succeeded.contacts}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Já subidos nesta sessão</p>
+                  <p className="mt-1 text-lg font-black">{uploadedSessionCount}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Associações criadas</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.succeeded.associations}</p>
+                </div>
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Contatos prontos</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.received.contacts}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Erros nesta execução</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.failed.companies + executionResult.failed.contacts + executionResult.failed.associations}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Ignorados por já subidos</p>
+                  <p className="mt-1 text-lg font-black">
+                    {executionResult.skippedAlreadySent.companies + executionResult.skippedAlreadySent.contacts + executionResult.skippedAlreadySent.associations}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Duração</p>
+                  <p className="mt-1 text-lg font-black">{executionResult.durationMs} ms</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-slate-500">
+                Modo: {executionResult.mode === 'remaining' ? 'subida controlada' : 'lote de teste'} · Iniciado em {formatTimestamp(executionResult.startedAt)} · Finalizado em {formatTimestamp(executionResult.finishedAt)}
+              </p>
+              {executionResult.errors.length > 0 ? (
+                <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Erros principais</p>
+                  <ul className="mt-2 space-y-1 text-sm text-slate-700">
+                    {executionResult.errors.slice(0, 5).map((item, index) => (
+                      <li key={`${item.stage}-${item.canopiId || 'sem-id'}-${index}`}>• {item.message}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {executionError ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">
+              {executionError}
             </div>
           ) : null}
 
