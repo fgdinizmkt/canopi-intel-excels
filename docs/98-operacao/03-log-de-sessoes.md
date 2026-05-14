@@ -12,6 +12,20 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - `git diff --check` OK;
   - `npm run lint` OK;
   - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada:**
+  - `HUBSPOT_PRIVATE_APP_TOKEN` corrigido no `.env.local`;
+  - Companies search HubSpot: `200`;
+  - Contacts search HubSpot: `200`;
+  - Properties Companies HubSpot: `200`;
+  - Properties Contacts HubSpot: `200`;
+  - contrato real recriado com ID `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - status do contrato: `ready`;
+  - `responseHasToken=false`;
+  - `GET` por `id` retornou `200` e `sameContract=true`;
+  - `hubspot_ingest_contracts`: `2 -> 3`;
+  - `accounts`: `250 -> 250`;
+  - `contacts`: `305 -> 305`;
+  - dry-run validado com Companies HubSpot `418`, Companies Canopi/tagged `348`, Companies fora da Canopi `70`, Contacts HubSpot `738`, Contacts Canopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
 - **Entregas registradas:**
   - migration `hubspot_ingest_contracts`;
   - tipos server-side/client-safe para contrato de ingestão;
@@ -20,13 +34,11 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - dry-run summary sem ingestão real;
   - representação de Companies + Contacts;
   - representação de Contacts sem `canopi_contact_id` como unresolved/backlog.
-- **Validação funcional real:**
-  - pendente por ausência de Supabase local configurado e token HubSpot seguro no ambiente.
 - **Decisão operacional:**
-  - C2.9E.2A fica tecnicamente publicado;
-  - C2.9E.2B ainda não foi iniciado;
+  - C2.9E.2A fica tecnicamente publicado e funcionalmente validado;
+  - C2.9E.2B é o próximo recorte;
   - nenhum writeback ou ingestão real foi executado nesta frente.
-- **Próximo passo:** atualizar documentação operacional, sincronizar memória no Drive e só então abrir o recorte C2.9E.2B com execução canônica baseada no contrato salvo.
+- **Próximo passo:** atualizar documentação operacional, sincronizar memória no Drive e abrir o recorte C2.9E.2B com execução canônica baseada no contrato salvo.
 
 ## [2026-05-13] — HubSpot read-only CRM snapshot (fechamento técnico e operacional)
 

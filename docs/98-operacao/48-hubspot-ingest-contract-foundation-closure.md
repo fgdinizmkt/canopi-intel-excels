@@ -3,7 +3,7 @@
 ## Status
 - Fundação técnica implementada, commitada e publicada.
 - Validação estática aprovada.
-- Validação funcional real pendente.
+- Validação funcional real concluída com sucesso.
 
 ## Commit
 - `b6c9d4a` — `feat(settings): add HubSpot ingest contract foundation`
@@ -36,12 +36,15 @@
 - `git diff --check`;
 - `npm run lint`;
 - `npx tsc --noEmit`;
-- validação funcional real não executada por falta de Supabase local configurado e token HubSpot seguro no ambiente.
+- reexecução do contrato real com `POST` e token HubSpot seguro no ambiente;
+- `GET` por `id` retornando `200` e `sameContract=true`;
+- verificação de que o token não foi persistido nem retornado (`responseHasToken=false`);
+- conferência de que `hubspot_ingest_contracts` passou de `2` para `3` registros;
+- conferência de que `accounts` permaneceu em `250`;
+- conferência de que `contacts` permaneceu em `305`;
+- dry-run validado com Companies HubSpot `418`, Companies Canopi/tagged `348`, Companies fora da Canopi `70`, Contacts HubSpot `738`, Contacts Canopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
 
 ## Pendências
-- aplicar e validar a migration em ambiente seguro;
-- criar contrato real via `POST` com token seguro;
-- validar `GET` list e `GET ?id=`;
-- confirmar que token não é salvo nem retornado;
-- confirmar que `accounts` e `contacts` não sofrem alteração;
-- abrir `C2.9E.2B` somente depois disso.
+- registrar `C2.9E.2B` como próximo recorte canônico baseado no contrato salvo;
+- manter Deals, Leads, Campaigns, Properties e Associações fora do primeiro recorte;
+- preservar o guardrail de não executar novo `POST` ou nova ingestão sem aprovação explícita.
