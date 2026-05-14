@@ -8,6 +8,7 @@ import type {
   HubspotIngestContractStatus,
   HubspotIngestContractSummary,
   HubspotIngestCountKind,
+  HubspotIngestExecutionPlanSnapshotExecutionSummary,
   HubspotIngestDryRunSummary,
   HubspotIngestEntityStatus,
   HubspotIngestEntitySummary,
@@ -942,6 +943,28 @@ export async function saveHubspotIngestContract(params: {
 
   if (error || !data) {
     throw new Error('SAVE_HUBSPOT_INGEST_CONTRACT_FAILED');
+  }
+
+  return mapContractRow(data as HubspotIngestContractRow);
+}
+
+export async function updateHubspotIngestContractExecutionSummary(params: {
+  contractId: string;
+  executionSummary: HubspotIngestExecutionPlanSnapshotExecutionSummary;
+}): Promise<HubspotIngestContract> {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from('hubspot_ingest_contracts')
+    .update({
+      execution_summary: params.executionSummary,
+    })
+    .eq('provider', HUBSPOT_PROVIDER)
+    .eq('id', params.contractId)
+    .select('id, provider, status, source_connection_id, created_by, contract_json, dry_run_summary, execution_summary, notes, created_at, updated_at')
+    .single();
+
+  if (error || !data) {
+    throw new Error('UPDATE_HUBSPOT_INGEST_CONTRACT_EXECUTION_SUMMARY_FAILED');
   }
 
   return mapContractRow(data as HubspotIngestContractRow);

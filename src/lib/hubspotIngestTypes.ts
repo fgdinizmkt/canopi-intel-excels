@@ -174,6 +174,12 @@ export type HubspotIngestExecutionMode = 'dry_run';
 
 export type HubspotIngestExecutionStatus = 'success' | 'blocked';
 
+export type HubspotIngestExecutionPlanSnapshotMode = 'execution_plan_snapshot';
+
+export type HubspotIngestExecutionPlanSnapshotStatus = 'planned' | 'blocked';
+
+export type HubspotIngestExecutionRecordAction = 'update' | 'review' | 'skip';
+
 export interface HubspotIngestExecutionPlanSection {
   totalPlanned: number | null;
   create: number;
@@ -206,6 +212,52 @@ export interface HubspotIngestExecutionSummary {
   persisted: false;
   dryRunOnly: true;
   contractStatus: HubspotIngestContractStatus;
+}
+
+export interface HubspotIngestExecutionPlanSnapshotSection {
+  planned: number;
+  update: number;
+  review: number;
+  create: number;
+  skip: number;
+}
+
+export interface HubspotIngestExecutionPlanRecord {
+  hubspotId: string;
+  canopiId: string;
+  action: HubspotIngestExecutionRecordAction;
+  allowedFields: string[];
+  fieldCandidates: Record<string, string | null>;
+  conflicts: string[];
+  warnings: string[];
+}
+
+export interface HubspotIngestExecutionPlanSnapshotSummary {
+  accounts: HubspotIngestExecutionPlanSnapshotSection;
+  contacts: HubspotIngestExecutionPlanSnapshotSection;
+}
+
+export interface HubspotIngestExecutionPlanSnapshotExecutionSummary {
+  version: 'c2.9e.2b.2a';
+  mode: HubspotIngestExecutionPlanSnapshotMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  planHash: string | null;
+  createdAt: string;
+  status: HubspotIngestExecutionPlanSnapshotStatus;
+  persisted: false;
+  canPersist: false;
+  canonicalPersisted: false;
+  summary: HubspotIngestExecutionPlanSnapshotSummary;
+  records: {
+    accounts: HubspotIngestExecutionPlanRecord[];
+    contacts: HubspotIngestExecutionPlanRecord[];
+  };
+  unresolved: HubspotIngestExecutionUnresolvedSummary;
+  outOfScope: HubspotIngestObjectType[];
+  guardrails: string[];
+  blockers: string[];
+  warnings: string[];
 }
 
 export interface HubspotIngestExecutionResult {
