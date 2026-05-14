@@ -3,6 +3,44 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-14] — HubSpot C2.9E.2B.1 (dry-run de execução canônica baseada em contrato salvo)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico do endpoint de dry-run de execução canônica HubSpot → Canopi sem escrita.
+- **Commit técnico:** `93491cf` — `feat(settings): add HubSpot ingest execution dry-run`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada:**
+  - `POST /api/account-connectors/hubspot/ingest/execute` retornou `HTTP 200` no contrato salvo `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - `status=success`;
+  - `mode=dry_run`;
+  - `provider=hubspot`;
+  - `canPersist=false`;
+  - `summary.persisted=false`;
+  - `summary.dryRunOnly=true`;
+  - resposta sem chave `token`;
+  - contagens mantidas: `hubspot_ingest_contracts` `3 -> 3`, `accounts` `250 -> 250`, `contacts` `305 -> 305`.
+- **Teste negativo confirmado:**
+  - payloads com `token`, `companies`, `contacts` e `records` foram bloqueados;
+  - payload vazio, `contractId` vazio e `contractId` inexistente também foram bloqueados;
+  - todos os bloqueios com `canPersist=false` e sem chave `token` na resposta.
+- **Plano retornado:**
+  - `accounts`: `418` total, `348` update, `70` review;
+  - `contacts`: `738` total, `736` update, `2` review.
+- **Entregas registradas:**
+  - rota `POST /api/account-connectors/hubspot/ingest/execute`;
+  - service `hubspotIngestExecuteService.ts`;
+  - tipos atualizados para resposta de dry-run auditável;
+  - guardrails de leitura por `contractId`, bloqueio de payload proibido e rejeição de contrato inexistente/fora de escopo;
+  - nenhum writeback, ingestão real ou persistência canônica executados.
+- **Decisão operacional:**
+  - C2.9E.2B.1 fica tecnicamente fechado e validado funcionalmente;
+  - o próximo recorte é C2.9E.2B.2;
+  - a persistência futura segue bloqueada até um apply explícito com idempotência e `execution_summary`.
+- **Próximo passo:** atualizar a memória operacional, sincronizar o doc 49 no Drive e abrir o sub-recorte C2.9E.2B.2.
+
 ## [2026-05-13] — HubSpot C2.9E.2A (Fundação técnica do contrato de ingestão)
 
 - **Agente:** Codex
