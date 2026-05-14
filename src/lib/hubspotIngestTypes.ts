@@ -169,3 +169,65 @@ export interface HubspotIngestContractDraftResult {
   unresolvedItems: HubspotIngestUnresolvedItem[];
   ambiguousItems: HubspotIngestAmbiguousItem[];
 }
+
+export type HubspotIngestExecutionMode = 'dry_run';
+
+export type HubspotIngestExecutionStatus = 'success' | 'blocked';
+
+export interface HubspotIngestExecutionPlanSection {
+  totalPlanned: number | null;
+  create: number;
+  update: number;
+  skip: number;
+  review: number;
+  allowedFields: string[];
+  notes: string;
+}
+
+export interface HubspotIngestExecutionOutOfScopeItem {
+  included: false;
+  action: 'skip';
+  reason: string;
+}
+
+export interface HubspotIngestExecutionUnresolvedSummary {
+  companiesOutsideCanopi: number | null;
+  contactsWithoutCanopiId: number | null;
+  ambiguousItems: number;
+}
+
+export interface HubspotIngestExecutionSummary {
+  companiesTotal: number | null;
+  contactsTotal: number | null;
+  companiesPlannedUpdate: number;
+  contactsPlannedUpdate: number;
+  unresolvedCompanies: number | null;
+  unresolvedContacts: number | null;
+  persisted: false;
+  dryRunOnly: true;
+  contractStatus: HubspotIngestContractStatus;
+}
+
+export interface HubspotIngestExecutionResult {
+  status: HubspotIngestExecutionStatus;
+  mode: HubspotIngestExecutionMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  canPersist: false;
+  blockers: string[];
+  warnings: string[];
+  plan: {
+    accounts: HubspotIngestExecutionPlanSection;
+    contacts: HubspotIngestExecutionPlanSection;
+  };
+  outOfScope: {
+    deals: HubspotIngestExecutionOutOfScopeItem;
+    leads: HubspotIngestExecutionOutOfScopeItem;
+    campaigns: HubspotIngestExecutionOutOfScopeItem;
+    properties: HubspotIngestExecutionOutOfScopeItem;
+    associations: HubspotIngestExecutionOutOfScopeItem;
+  };
+  unresolved: HubspotIngestExecutionUnresolvedSummary;
+  guardrails: string[];
+  summary: HubspotIngestExecutionSummary;
+}
