@@ -260,6 +260,55 @@ export interface HubspotIngestExecutionPlanSnapshotExecutionSummary {
   warnings: string[];
 }
 
+export type HubspotIngestApplyPreflightMode = 'apply_preflight';
+
+export type HubspotIngestApplyPreflightStatus = 'ready' | 'blocked';
+
+export interface HubspotIngestApplyPreflightRecordResult {
+  hubspotId: string;
+  canopiId: string;
+  status: 'ready_to_apply' | 'review' | 'blocked' | 'skip';
+  action: HubspotIngestExecutionRecordAction;
+  allowedFields: string[];
+  fieldCandidates: Record<string, string | null>;
+  existingValues: Record<string, string | null>;
+  conflicts: string[];
+  warnings: string[];
+}
+
+export interface HubspotIngestApplyPreflightSummarySection {
+  planned: number;
+  readyToApply: number;
+  review: number;
+  blocked: number;
+  skip: number;
+}
+
+export interface HubspotIngestApplyPreflightSummary {
+  accounts: HubspotIngestApplyPreflightSummarySection;
+  contacts: HubspotIngestApplyPreflightSummarySection;
+}
+
+export interface HubspotIngestApplyPreflightResult {
+  status: HubspotIngestApplyPreflightStatus;
+  mode: HubspotIngestApplyPreflightMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  approvedPlanHash: string;
+  idempotencyKey: string;
+  canApply: false;
+  wouldPersist: false;
+  summary: HubspotIngestApplyPreflightSummary;
+  conflicts: {
+    accounts: HubspotIngestApplyPreflightRecordResult[];
+    contacts: HubspotIngestApplyPreflightRecordResult[];
+  };
+  blockers: string[];
+  warnings: string[];
+  guardrails: string[];
+  nextStep: 'apply_real_requires_transactional_boundary';
+}
+
 export interface HubspotIngestExecutionResult {
   status: HubspotIngestExecutionStatus;
   mode: HubspotIngestExecutionMode;
