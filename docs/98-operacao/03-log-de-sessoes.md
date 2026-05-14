@@ -41,6 +41,49 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - a persistência futura segue bloqueada até um apply explícito com idempotência e `execution_summary`.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 49 no Drive e abrir o sub-recorte C2.9E.2B.2.
 
+## [2026-05-14] — HubSpot C2.9E.2B.2A (snapshot de execução com plano por registro e hash)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico do snapshot de execução canônica HubSpot → Canopi, com materialização de plano por registro e hash determinístico, sem apply.
+- **Commit técnico:** `6b19b38` — `feat(settings): add HubSpot ingest execution plan snapshot`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada:**
+  - `POST /api/account-connectors/hubspot/ingest/execute/plan` retornou `HTTP 200` no contrato salvo `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - `status=planned`;
+  - `mode=execution_plan_snapshot`;
+  - `provider=hubspot`;
+  - `canPersist=false`;
+  - `persisted=false`;
+  - `canonicalPersisted=false`;
+  - `planHash=5f4dda77bbeed3f04d4b801cc663eebe6ae76a9778eb1ddb18124fe187163258`;
+  - `execution_summary` salvo no contrato;
+  - `contract_json` permaneceu em `c2.9e.2a`;
+  - contrato permaneceu `ready`;
+  - resposta sem chave `token`;
+  - contagens mantidas: `hubspot_ingest_contracts` `3 -> 3`, `accounts` `250 -> 250`, `contacts` `305 -> 305`.
+- **Teste negativo confirmado:**
+  - payloads com `token`, `companies`, `contacts`, `records` e `mode` foram bloqueados;
+  - payload vazio, `contractId` vazio e `contractId` inexistente também foram bloqueados;
+  - todos os bloqueios com `canPersist=false` e sem chave `token` na resposta.
+- **Plano retornado:**
+  - `accounts`: `418` total, `348` update, `70` review;
+  - `contacts`: `738` total, `736` update, `2` review.
+- **Entregas registradas:**
+  - rota `POST /api/account-connectors/hubspot/ingest/execute/plan`;
+  - service `hubspotIngestExecutionPlanService.ts`;
+  - helper `updateHubspotIngestContractExecutionSummary`;
+  - tipos atualizados para snapshot determinístico com plano por registro;
+  - guardrails de leitura por `contractId`, bloqueio de payload proibido, persistência apenas em `execution_summary` e preservação de `contract_json`/`status`;
+  - nenhum apply, writeback ou ingestão real executados.
+- **Decisão operacional:**
+  - C2.9E.2B.2A fica tecnicamente fechado e validado funcionalmente;
+  - o próximo recorte é C2.9E.2B.2B;
+  - a persistência canônica continua bloqueada até apply explícito com idempotência e `approvedPlanHash`.
+- **Próximo passo:** atualizar a memória operacional, sincronizar o doc 50 no Drive e abrir o sub-recorte C2.9E.2B.2B.
+
 ## [2026-05-13] — HubSpot C2.9E.2A (Fundação técnica do contrato de ingestão)
 
 - **Agente:** Codex

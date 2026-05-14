@@ -23,6 +23,7 @@ const FILES = [
   'docs/98-operacao/47-hubspot-read-only-snapshot-closure.md',
   'docs/98-operacao/48-hubspot-ingest-contract-foundation-closure.md',
   'docs/98-operacao/49-hubspot-ingest-execution-dry-run-closure.md',
+  'docs/98-operacao/50-hubspot-ingest-execution-plan-snapshot-closure.md',
 ];
 
 function run(cmd, args, opts = {}) {
