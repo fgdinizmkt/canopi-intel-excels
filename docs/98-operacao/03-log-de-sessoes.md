@@ -4304,3 +4304,42 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
    - `03-log-de-sessoes.md`: esta sessão
 
 **Status:** Documentação operacional criada e referências adicionadas. Pronto para commit operacional.
+
+## [2026-05-14] — HubSpot C2.9E.2B.2B.1 (preflight de apply idempotente sem escrita canônica)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico do preflight de apply idempotente HubSpot → Canopi, sem escrita canônica.
+- **Commit técnico:** `95d37cc` — `feat(settings): add HubSpot ingest apply preflight`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada:**
+  - `POST /api/account-connectors/hubspot/ingest/execute/apply/preflight` retornou `HTTP 200` no contrato salvo `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - `status=ready`;
+  - `mode=apply_preflight`;
+  - `provider=hubspot`;
+  - `canApply=false`;
+  - `wouldPersist=false`;
+  - resposta sem chave `token`;
+  - `nextStep=apply_real_requires_transactional_boundary`;
+  - contagens mantidas: `hubspot_ingest_contracts` `3 -> 3`, `accounts` `250 -> 250`, `contacts` `305 -> 305`.
+- **Teste negativo confirmado:**
+  - payloads com `token`, `companies`, `contacts`, `records`, `mode` e `apply` foram bloqueados;
+  - payload vazio, `contractId` vazio, `approvedPlanHash` vazio, `approvedPlanHash` divergente, `idempotencyKey` vazio e `contractId` inexistente também foram bloqueados;
+  - todos os bloqueios com `canApply=false`, `wouldPersist=false` e sem chave `token` na resposta.
+- **Plano retornado:**
+  - `accounts`: `418` total, `348` readyToApply, `0` review, `0` blocked, `0` skip;
+  - `contacts`: `738` total, `736` readyToApply, `0` review, `0` blocked, `0` skip.
+- **Entregas registradas:**
+  - rota `POST /api/account-connectors/hubspot/ingest/execute/apply/preflight`;
+  - service `hubspotIngestApplyPreflightService.ts`;
+  - tipos atualizados para resposta de preflight auditável;
+  - validação de `approvedPlanHash`, `idempotencyKey` e snapshot salvo;
+  - comparação da base Canopi atual sem escrita canônica;
+  - nenhum apply, writeback ou ingestão real executados.
+- **Decisão operacional:**
+  - C2.9E.2B.2B.1 fica tecnicamente fechado e validado funcionalmente;
+  - o próximo recorte é C2.9E.2B.2B.2;
+  - a persistência canônica continua bloqueada até o apply real transacional.
+- **Próximo passo:** atualizar a memória operacional, sincronizar o doc 51 no Drive e abrir o sub-recorte C2.9E.2B.2B.2.

@@ -1085,6 +1085,12 @@ Registrada em `docs/98-operacao/35-matriz-agentes-modelos.md` a régua de decis�
 - **Cockpit V2:** Refinamento dos recortes analíticos e interativos sobre a nova fundação estabilizada.
 - **Pendência técnica Cockpit:** Monitorar performance do SVG foreignObject em densidades extremas de sinal.
 
+### Atualização HubSpot C2.9E.2B.2B.1
+- Preflight idempotente de apply fechado tecnicamente e validado funcionalmente em `95d37cc`.
+- Rota confirmada: `POST /api/account-connectors/hubspot/ingest/execute/apply/preflight`.
+- `canApply=false`, `wouldPersist=false`, sem escrita canônica.
+- Próximo recorte operacional: `C2.9E.2B.2B.2`.
+
 ---
 
 ## Evoluções Futuras Estruturantes
