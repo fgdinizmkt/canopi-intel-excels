@@ -309,6 +309,57 @@ export interface HubspotIngestApplyPreflightResult {
   nextStep: 'apply_real_requires_transactional_boundary';
 }
 
+export type HubspotIngestApplyMode = 'apply';
+export type HubspotIngestApplyStatus = 'success' | 'blocked';
+
+export interface HubspotIngestApplySummarySection {
+  planned: number;
+  applied: number;
+  review: number;
+  blocked: number;
+  skip: number;
+}
+
+export interface HubspotIngestApplySummary {
+  accounts: HubspotIngestApplySummarySection;
+  contacts: HubspotIngestApplySummarySection;
+}
+
+export interface HubspotIngestApplySourceSnapshot {
+  version: 'c2.9e.2b.2a';
+  mode: HubspotIngestExecutionPlanSnapshotMode;
+  planHash: string;
+  status: HubspotIngestExecutionPlanSnapshotStatus;
+  createdAt?: string;
+}
+
+export interface HubspotIngestApplyRpcResult {
+  status: HubspotIngestApplyStatus;
+  mode: HubspotIngestApplyMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  approvedPlanHash: string;
+  idempotencyKey: string;
+  persisted: boolean;
+  canonicalPersisted: boolean;
+  contractStatusBefore: HubspotIngestContractStatus;
+  contractStatusAfter: HubspotIngestContractStatus;
+  summary: HubspotIngestApplySummary;
+  blockers: string[];
+  warnings: string[];
+  countsBefore: {
+    hubspot_ingest_contracts: number;
+    accounts: number;
+    contacts: number;
+  };
+  countsAfter: {
+    hubspot_ingest_contracts: number;
+    accounts: number;
+    contacts: number;
+  };
+  sourceSnapshot: HubspotIngestApplySourceSnapshot;
+}
+
 export interface HubspotIngestExecutionResult {
   status: HubspotIngestExecutionStatus;
   mode: HubspotIngestExecutionMode;
