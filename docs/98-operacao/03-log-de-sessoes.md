@@ -41,6 +41,34 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - a persistência futura segue bloqueada até um apply explícito com idempotência e `execution_summary`.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 49 no Drive e abrir o sub-recorte C2.9E.2B.2.
 
+## [2026-05-17] — HubSpot C2.9E.2B.2A (fundação SQL/RPC transacional para apply real)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico da fundação SQL/RPC transacional que sustentará o apply real HubSpot → Canopi.
+- **Commit técnico:** `f00ac0a` — `feat(settings): add HubSpot ingest apply RPC foundation`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação manual confirmada:**
+  - migration `supabase/migrations/20260514183000_hubspot_ingest_apply_rpc.sql` aplicada manualmente no Supabase SQL Editor;
+  - resultado: `Success. No rows returned`;
+  - RPC criada/atualizada sem execução;
+  - nenhuma alteração em `accounts`, `contacts` ou `hubspot_ingest_contracts`.
+- **Escopo entregue:**
+  - helper SQL `hubspot_ingest_apply_build_result(...)`;
+  - RPC transacional `apply_hubspot_ingest_contract(contract_id, approved_plan_hash, idempotency_key)`;
+  - service server-side `hubspotIngestApplyRpcService.ts`;
+  - tipos atualizados para retorno auditável do apply;
+  - proteção transacional com lock e revalidação do snapshot salvo.
+- **Guardrail corrigido:**
+  - `contacts.id` não entrou como campo mutável no apply;
+  - `contacts.id` permanece apenas como chave de localização no `WHERE`.
+- **Decisão operacional:**
+  - nenhum apply real foi executado;
+  - a frente segue para auditoria da rota que chamará a RPC, sem execução automática.
+- **Próximo passo:** atualizar o doc 52, sincronizar a memória operacional no Drive e abrir a auditoria da rota de apply real.
+
 ## [2026-05-14] — HubSpot C2.9E.2B.2A (snapshot de execução com plano por registro e hash)
 
 - **Agente:** Codex
