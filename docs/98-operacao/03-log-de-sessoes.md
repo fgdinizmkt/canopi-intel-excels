@@ -3,6 +3,56 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-18] — HubSpot C2.9E.2D.8/9/10/10A (plano mínimo + registry + dry-run nova carga limpa)
+
+- **Agente:** Codex
+- **Natureza:** quatro recortes em sequência na frente de nova carga limpa HubSpot a partir da Canopi.
+- **Commits técnicos:**
+  - `d07e276` — `feat(settings): add HubSpot property registry for clean reload` (C2.9E.2D.9)
+  - `e5d0fc0` — `feat(settings): add HubSpot clean reload dry-run service and route` (C2.9E.2D.10)
+- **Validação estática confirmada (ambos os commits):**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **C2.9E.2D.8 — Plano mínimo (arquitetural, sem código):**
+  - decisão de tratar HubSpot atual como histórico auditável e iniciar nova carga limpa a partir da Canopi;
+  - definição do contrato obrigatório de identidade: `canopi_canonical_id`, `canopi_company_id`, `canopi_tenant_id`, `canopi_import_batch_id`, `canopi_contract_version`, `canopi_sync_status`;
+  - confirmação de que `hubspot_identity_mappings` tinha `0` registros úteis após crosswalk contra a base Canopi atual.
+- **C2.9E.2D.9 — Property registry formal:**
+  - `src/lib/hubspotPropertyRegistry.ts` com 42 propriedades (Company 11, Contact 12, Deal 10, Product/Service 9);
+  - helpers: `getHubspotPropertiesByEntity`, `getBlockingHubspotProperties`, `getRequiredHubspotProperties`, `isRegisteredHubspotProperty`, `validateHubspotPropertyRegistry`;
+  - nenhuma propriedade real criada no HubSpot;
+  - doc operacional em `58-hubspot-property-registry.md`.
+- **C2.9E.2D.10 — Dry-run da nova carga limpa:**
+  - `src/lib/server/hubspotCleanReloadDryRunService.ts` + rota `POST /api/account-connectors/hubspot/clean-reload/dry-run`;
+  - lê `accounts` e `contacts` somente em leitura, valida contra a registry, gera `planHash` SHA-256 determinístico, retorna `canProceedToCleanCreate`;
+  - nenhuma escrita no HubSpot, Supabase ou mappings;
+  - doc operacional em `59-hubspot-clean-reload-dry-run.md`.
+- **C2.9E.2D.10A — Validação funcional do dry-run:**
+  - 6 testes negativos confirmados:
+    - payload vazio → `BATCH_ID_REQUIRED`, `canProceedToCleanCreate: false`;
+    - `apply` → `BLOCKED_PAYLOAD_KEYS`, `canProceedToCleanCreate: false`;
+    - `reset` → `BLOCKED_PAYLOAD_KEYS`, `canProceedToCleanCreate: false`;
+    - `token` → `BLOCKED_PAYLOAD_KEYS`, `canProceedToCleanCreate: false`;
+    - `companies`+`contacts` → `BLOCKED_PAYLOAD_KEYS`, `canProceedToCleanCreate: false`;
+    - `batchId` sem `tenantId` → todas 250 companies bloqueadas, `canProceedToCleanCreate: false`.
+  - 1 teste positivo confirmado:
+    - `batchId: "canopi-clean-reload-validation-2026-05-18"`, `tenantId: "canopi-local-validation-tenant"`, `contractVersion: "c2.9e.2d.9"`, `sampleSize: 6`;
+    - `registryValidation.valid: true`, `totalProperties: 42`;
+    - `companies.total: 250`, `companies.valid: 247`, `companies.blocked: 3` (IDs "1","11","14" — legados sem nome/domínio);
+    - `contacts.total: 305`, `contacts.valid: 305`, `blockedNoAnchor: 0`, `blockedOther: 0`;
+    - `existingMappings.total: 0` — estado limpo confirmado;
+    - `blockers: []`, `warnings: ["3 companies bloqueadas e excluídas do plano"]`;
+    - `planHash: 939400e35fcd7774eb2d311f171a1cff4647d3915d7675664a8e656fae5e1cf6` — determinístico confirmado (2 chamadas consecutivas, hash idêntico);
+    - `canProceedToCleanCreate: true`;
+    - sem `token` na resposta.
+- **Observação documental:**
+  - doc `58-hubspot-property-registry.md` registrava Contact com 13 propriedades (total 43); a registry real tem Contact com 12 (total 42). Discrepância apenas documental — a registry é funcionalmente válida (`missingBlocking: []`).
+- **Decisão operacional:**
+  - nova carga limpa pode prosseguir para C2.9E.2D.11 (setup de propriedades no HubSpot) após este fechamento;
+  - os 3 accounts legados (IDs "1","11","14") permanecem bloqueados por ausência de nome — são placeholder e não entram na carga.
+- **Próximo passo:** abrir C2.9E.2D.11 — verificar/criar propriedades bloqueadoras no HubSpot antes do create real.
+
 ## [2026-05-14] — HubSpot C2.9E.2B.1 (dry-run de execução canônica baseada em contrato salvo)
 
 - **Agente:** Codex

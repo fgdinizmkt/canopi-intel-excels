@@ -33,6 +33,7 @@ const FILES = [
   'docs/98-operacao/57-hubspot-operational-decision-clean-reload.md',
   'docs/98-operacao/58-hubspot-property-registry.md',
   'docs/98-operacao/59-hubspot-clean-reload-dry-run.md',
+  'docs/98-operacao/60-hubspot-clean-reload-dry-run-functional-validation.md',
 ];
 
 function run(cmd, args, opts = {}) {
