@@ -3,6 +3,26 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-18] — HubSpot C2.9E.2D.12 (create limpo de Companies + persistência de mappings)
+
+- **Agente:** Codex
+- **Natureza:** implementação do serviço e rota de create limpo de Companies no HubSpot com captura de `hs_object_id` e persistência de mappings em `hubspot_identity_mappings`.
+- **Escopo entregue:**
+  - `src/lib/server/hubspotCleanReloadCompanyCreateService.ts`: serviço com preflight (registry, setup properties, existing mappings, valid accounts), processamento em chunks de 50, matching por `canopi_canonical_id`, persistência de mappings (`entity_type=account`, `status=active`), tratamento explícito de `created_without_mapping`;
+  - `src/app/api/account-connectors/hubspot/clean-reload/create-companies/route.ts`: rota POST com `confirmCreateCompanies: true` obrigatório, `batchId` obrigatório, `tenantId` obrigatório, chaves bloqueadas (`token`, `contacts`, `deals`, `products`, `services`, `reset`, `delete`, `upsert`, `applyAll`);
+  - doc operacional `62-hubspot-clean-reload-company-create.md`.
+- **Validação estática confirmada:**
+  - `git diff --check` OK; `npm run lint` OK; `npx tsc --noEmit` OK.
+- **Validação funcional confirmada (C2.9E.2D.12A):**
+  - 4 testes negativos: `CONFIRM_REQUIRED`, `BLOCKED_PAYLOAD_KEYS` (token), `BATCH_ID_REQUIRED`, `TENANT_ID_REQUIRED`;
+  - Preflight real: `registryValid: true`, `setupReady: true`, `metadataPropertiesCreated: [canopi_contract_version, canopi_sync_status]`, `existingCompanyMappings: 0`, `validCompanies: 247`, `blockedCompanies: 3` (IDs 1, 11, 14);
+  - Create real: 247/247 companies criadas, 247 mappings persistidos, `canProceedToContactCreate: true`;
+  - Causa diagnosticada dos 47 failures iniciais: domínio `expressl&t.net` com `&` inválido bloqueando o batch inteiro do 5º chunk;
+  - Fixes aplicados: `sanitizeDomain()`, `resumeMode`, detecção de conflito `canopi_company_id` histórico, retry 429;
+  - `resumeMode: true` usado para criar os 47 restantes (attempted: 47, created: 47, failed: 0);
+  - Nenhum token retornado; nenhum Contact, Deal ou Product criado; nenhuma escrita em `accounts`/`contacts` no Supabase.
+- **Próximo passo:** C2.9E.2D.13 — create limpo de Contacts + associação Contact → Company.
+
 ## [2026-05-18] — HubSpot C2.9E.2D.11 (setup de propriedades bloqueadoras para nova carga limpa)
 
 - **Agente:** Codex
