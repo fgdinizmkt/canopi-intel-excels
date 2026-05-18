@@ -4470,3 +4470,51 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - o próximo recorte é popular/recuperar mappings de identidade de forma controlada;
   - depois disso, regenerar snapshot com `canonicalId`, endurecer preflight e adaptar a RPC.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 55 no Drive e abrir o próximo recorte de recuperação/persistência controlada de mappings.
+
+## [2026-05-18] — HubSpot C2.9E.2C.3 (proposta controlada de recuperação de mappings)
+
+- **Agente:** Codex
+- **Natureza:** fechamento operacional da proposta controlada de recuperação de mappings HubSpot ↔ Canopi, somente leitura.
+- **Commit técnico:** `2119893` — `feat(settings): add HubSpot identity mapping proposal dry-run`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional manual confirmada no Supabase SQL Editor:**
+  - consultas somente leitura (`SELECT`) executadas contra o contrato `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - `total_accounts=348`;
+  - `accounts_with_nome=348`;
+  - `accounts_with_dominio=348`;
+  - `accounts_with_nome_e_dominio=348`;
+  - `accounts_missing_required_fields=0`;
+  - `proposed_exact=0`;
+  - `proposed_strong=0`;
+  - `ambiguous=0`;
+  - `unsafe=0`;
+  - `unresolved=348`;
+  - `missing_required_fields=0`;
+  - `direct_canonical_matches=0`;
+  - `mapping_matches=0`;
+  - `pair_count_one=0`;
+  - `pair_count_many=0`;
+  - `name_count_one=0`;
+  - `domain_count_one=0`.
+- **Contagens observadas após a validação:**
+  - `hubspot_identity_mappings=0`;
+  - `hubspot_ingest_contracts=3`;
+  - `accounts=250`;
+  - `contacts=305`.
+- **Diagnóstico operacional:**
+  - não houve match seguro por ID canônico, mapping, nome, domínio ou par nome+domínio;
+  - todas as 348 accounts do snapshot permanecem unresolved;
+  - o problema é desalinhamento entre a base HubSpot usada no snapshot e a base canônica atual.
+- **Entregas registradas:**
+  - serviço `hubspotIdentityMappingProposalDryRunService.ts`;
+  - tipos ajustados em `hubspotIngestTypes.ts`;
+  - nenhuma escrita em banco;
+  - nenhum apply real executado;
+  - nenhuma RPC chamada.
+- **Decisão operacional:**
+  - não persistir mappings agora;
+  - investigar o desalinhamento entre a base HubSpot e a base canônica atual antes de qualquer insert.
+- **Próximo passo:** atualizar a memória operacional, sincronizar o doc 56 no Drive e só então considerar persistência controlada de mappings.
