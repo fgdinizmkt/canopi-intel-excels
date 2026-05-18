@@ -4570,3 +4570,44 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - a registry fecha o gap de property coverage identificado no plano C2.9E.2D.8;
   - o próximo recorte (C2.9E.2D.10) pode usar os helpers para validar o dry-run da nova carga limpa.
 - **Próximo passo:** abrir C2.9E.2D.10 — dry-run de nova carga limpa Canopi → HubSpot usando a registry como guardrail de validação.
+
+## [2026-05-18] — HubSpot C2.9E.2D.10 (dry-run da nova carga limpa Canopi → HubSpot)
+
+- **Agente:** Claude Code / Sonnet 4.6
+- **Natureza:** implementação do dry-run de validação da nova carga limpa, usando a property registry como guardrail, sem escrita no HubSpot, Supabase ou mappings.
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Escopo entregue:**
+  - `src/lib/server/hubspotCleanReloadDryRunService.ts` — serviço de dry-run;
+  - `src/app/api/account-connectors/hubspot/clean-reload/dry-run/route.ts` — rota POST;
+  - `docs/98-operacao/59-hubspot-clean-reload-dry-run.md` — doc operacional.
+- **Funcionalidades:**
+  - leitura de `accounts` e `contacts` da Canopi (somente leitura, sem escrita);
+  - validação contra `getBlockingHubspotProperties` e `getRequiredHubspotProperties` da registry C2.9E.2D.9;
+  - `validateHubspotPropertyRegistry()` como primeira checagem de sanidade;
+  - ancoragem contact → company: contacts sem `accountId` resolvido ficam bloqueados;
+  - verificação de mappings existentes em `hubspot_identity_mappings` (warning, não bloqueador);
+  - `planHash` SHA-256 determinístico sobre canonical IDs + batchId + contractVersion + tenantId;
+  - `canProceedToCleanCreate: true` apenas se: registry válida + tenantId presente + ao menos uma company válida + zero blockers;
+  - amostras mistas de registros válidos e bloqueados;
+  - guardrails explícitos na resposta.
+- **Guardrails da rota:**
+  - chaves bloqueadas: `token`, `companies`, `contacts`, `records`, `mode`, `apply`, `create`, `reset`;
+  - `batchId` obrigatório;
+  - `sampleSize` limitado entre 1 e 20;
+  - nenhum dado de credencial exposto na resposta.
+- **Limites explícitos:**
+  - nenhuma escrita no HubSpot;
+  - nenhum create executado;
+  - nenhum mapping criado;
+  - nenhum apply executado;
+  - nenhuma RPC chamada;
+  - nenhuma escrita em Supabase;
+  - nenhum reset executado.
+- **Decisão operacional:**
+  - o dry-run usa a base atual (250 accounts, 305 contacts) como fonte;
+  - `canProceedToCleanCreate` será `false` até que `tenantId` seja fornecido;
+  - o `planHash` permite rastrear mudanças na base entre execuções do dry-run.
+- **Próximo passo:** validar funcionalmente com `batchId` e `tenantId` reais; depois abrir C2.9E.2D.11 — setup de propriedades para nova carga limpa.
