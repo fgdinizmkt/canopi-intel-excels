@@ -452,6 +452,75 @@ export interface HubspotIdentityMappingRecoveryDryRunResult {
   guardrails: string[];
 }
 
+export type HubspotIdentityMappingProposalMode = 'identity_mapping_proposal_dry_run';
+
+export type HubspotIdentityMappingProposalStatus = 'success' | 'blocked';
+
+export type HubspotIdentityMappingProposalClassification =
+  | 'proposed_exact'
+  | 'proposed_strong'
+  | 'ambiguous'
+  | 'unresolved'
+  | 'unsafe'
+  | 'missing_required_fields';
+
+export type HubspotIdentityMappingProposalMatchSource =
+  | 'direct_canonical_id'
+  | 'identity_mapping_canopi_external_id'
+  | 'identity_mapping_hubspot_id'
+  | 'heuristic_name_domain'
+  | 'heuristic_name_only'
+  | 'heuristic_domain_only'
+  | 'none';
+
+export interface HubspotIdentityMappingProposalRecord {
+  entityType: HubspotIdentityMappingEntityType;
+  hubspotId: string;
+  snapshotCanopiId: string;
+  canonicalId: string | null;
+  classification: HubspotIdentityMappingProposalClassification;
+  matchSource: HubspotIdentityMappingProposalMatchSource;
+  mappingId: string | null;
+  candidateCanonicalIds: string[];
+  reasons: string[];
+  snapshotFields: Record<string, string | null>;
+}
+
+export interface HubspotIdentityMappingProposalSummarySection {
+  total: number;
+  proposedExact: number;
+  proposedStrong: number;
+  ambiguous: number;
+  unresolved: number;
+  unsafe: number;
+  missingRequiredFields: number;
+}
+
+export interface HubspotIdentityMappingProposalContactsSummary {
+  total: number;
+  dependentOnUnresolvedAccount: number;
+  evaluableIfAccountsResolved: number;
+  missingRequiredFields: number;
+  blockers: string[];
+}
+
+export interface HubspotIdentityMappingProposalDryRunResult {
+  status: HubspotIdentityMappingProposalStatus;
+  mode: HubspotIdentityMappingProposalMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  generatedAt: string;
+  snapshot: HubspotIngestApplySourceSnapshot;
+  summary: {
+    accounts: HubspotIdentityMappingProposalSummarySection;
+    contacts: HubspotIdentityMappingProposalContactsSummary;
+  };
+  accounts: HubspotIdentityMappingProposalRecord[];
+  blockers: string[];
+  warnings: string[];
+  guardrails: string[];
+}
+
 export interface HubspotIngestExecutionResult {
   status: HubspotIngestExecutionStatus;
   mode: HubspotIngestExecutionMode;
