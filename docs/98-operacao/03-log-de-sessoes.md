@@ -4537,3 +4537,36 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - **Documento operacional criado:**
   - `57-hubspot-operational-decision-clean-reload.md`
 - **Próximo passo:** transformar a decisão em plano mínimo de regravação limpa e contrato de identidade, sem executar reset, apply ou escrita neste recorte.
+
+## [2026-05-18] — HubSpot C2.9E.2D.9 (property registry formal da nova carga limpa)
+
+- **Agente:** Claude Code / Sonnet 4.6
+- **Natureza:** criação da registry formal de propriedades HubSpot da Canopi para Company, Contact, Deal e Product/Service, sem criar propriedades reais no HubSpot e sem escrever dados de negócio.
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Escopo entregue:**
+  - `src/lib/hubspotPropertyRegistry.ts` — registry completa com 43 propriedades;
+  - tipos: `HubspotRegistryEntityType`, `HubspotPropertyType`, `HubspotPropertyFieldType`, `HubspotPropertyDirection`, `HubspotPropertyConflictRule`, `HubspotRegistryProperty`, `HubspotPropertyRegistryValidationResult`;
+  - helpers: `getHubspotPropertiesByEntity`, `getBlockingHubspotProperties`, `getRequiredHubspotProperties`, `isRegisteredHubspotProperty`, `validateHubspotPropertyRegistry`;
+  - cobertura: Company 11 props, Contact 13 props, Deal 10 props, Product/Service 9 props;
+  - propriedades de identidade (blocking): `canopi_canonical_id`, `canopi_company_id`, `canopi_contact_id`, `canopi_opportunity_id`, `canopi_product_id`, `canopi_tenant_id`;
+  - propriedades de metadados: `canopi_import_batch_id`, `canopi_contract_version`, `canopi_sync_status`, `canopi_last_synced_at`, `canopi_source`;
+  - propriedades de enriquecimento: `canopi_icp_tier`, `canopi_segment`, `canopi_account_score` (Company); `canopi_contact_role`, `canopi_engagement_score`, `canopi_buying_committee_role` (Contact); `canopi_stage_canonical`, `canopi_forecast_category`, `canopi_opportunity_score` (Deal); `canopi_product_type`, `canopi_solution_family` (Product);
+  - doc operacional `58-hubspot-property-registry.md` criado;
+  - `00-status-atual.md` atualizado;
+  - `scripts/sync-drive-memory.mjs` atualizado com o doc 58.
+- **Limites explícitos:**
+  - nenhuma propriedade criada no HubSpot;
+  - nenhum writeback executado;
+  - nenhum apply executado;
+  - nenhuma RPC chamada;
+  - nenhuma escrita em Supabase;
+  - nenhum mapping criado;
+  - `hubspotWritebackSetup.ts` não foi alterado;
+  - a registry coexiste com o setup histórico sem substituí-lo.
+- **Decisão operacional:**
+  - a registry fecha o gap de property coverage identificado no plano C2.9E.2D.8;
+  - o próximo recorte (C2.9E.2D.10) pode usar os helpers para validar o dry-run da nova carga limpa.
+- **Próximo passo:** abrir C2.9E.2D.10 — dry-run de nova carga limpa Canopi → HubSpot usando a registry como guardrail de validação.
