@@ -4518,3 +4518,22 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - não persistir mappings agora;
   - investigar o desalinhamento entre a base HubSpot e a base canônica atual antes de qualquer insert.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 56 no Drive e só então considerar persistência controlada de mappings.
+
+## [2026-05-18] — HubSpot C2.9E.2D.7 (decisão operacional para desalinhamento HubSpot x Canopi)
+
+- **Agente:** Codex
+- **Natureza:** registro documental da decisão operacional após o crosswalk real retornar `0` matches de empresas e `0` matches de contatos.
+- **Diagnóstico consolidado:**
+  - HubSpot atual povoado a partir de population pack histórico sem IDs canônicos Canopi;
+  - base Canopi atual em outro universo de contas e contatos;
+  - crosswalk real entre o pack e os exports completos do Supabase confirmou ponte insuficiente;
+  - persistir mappings agora fabricaria vínculo falso.
+- **Decisão operacional registrada:**
+  - HubSpot atual fica como histórico auditável;
+  - nova carga HubSpot deve nascer limpa a partir da Canopi atual;
+  - Canopi segue como fonte de verdade;
+  - contrato de identidade vem antes de qualquer nova carga;
+  - não haverá reset improvisado nem apply com o estado atual.
+- **Documento operacional criado:**
+  - `57-hubspot-operational-decision-clean-reload.md`
+- **Próximo passo:** transformar a decisão em plano mínimo de regravação limpa e contrato de identidade, sem executar reset, apply ou escrita neste recorte.
