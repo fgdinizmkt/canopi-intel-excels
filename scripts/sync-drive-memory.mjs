@@ -28,6 +28,7 @@ const FILES = [
   'docs/98-operacao/52-hubspot-ingest-apply-rpc-foundation-closure.md',
   'docs/98-operacao/53-hubspot-ingest-protected-apply-route-closure.md',
   'docs/98-operacao/54-hubspot-identity-mapping-foundation-closure.md',
+  'docs/98-operacao/55-hubspot-identity-mapping-recovery-dry-run-closure.md',
 ];
 
 function run(cmd, args, opts = {}) {

@@ -4430,3 +4430,43 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - o próximo recorte é C2.9E.2B.2B.2;
   - a persistência canônica continua bloqueada até o apply real transacional.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 51 no Drive e abrir o sub-recorte C2.9E.2B.2B.2.
+
+## [2026-05-17] — HubSpot C2.9E.2C.2 (dry-run de recuperação de mappings de identidade)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico do dry-run de recuperação de mappings de identidade HubSpot → Canopi, em leitura pura.
+- **Commit técnico:** `ed53cc0` — `feat(settings): add HubSpot identity mapping recovery dry-run`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada:**
+  - dry-run read-only executado com o contrato `d673e0d5-7a9c-4c01-bd64-a74e6f2bda12`;
+  - `status=success`;
+  - `mode=identity_mapping_recovery_dry_run`;
+  - `snapshot.version=c2.9e.2b.2a`;
+  - `snapshot.mode=execution_plan_snapshot`;
+  - `snapshot.status=planned`;
+  - `accounts`: `348` total, `348` unresolved;
+  - `contacts`: `736` total, `736` unresolved;
+  - `blockers=[]`.
+- **Contagens observadas após a validação:**
+  - `hubspot_identity_mappings=0`;
+  - `hubspot_ingest_contracts=3`;
+  - `accounts=250`;
+  - `contacts=305`.
+- **Correção semântica registrada:**
+  - contacts sem `anchorCanonicalId` passaram a ser classificados como `unresolved`;
+  - `missing_required_fields` ficou reservado para ausência real de campos mínimos do contato;
+  - `matchSource` passou a diferenciar `direct_canonical_id`, `identity_mapping_canopi_external_id` e `identity_mapping_hubspot_id`.
+- **Entregas registradas:**
+  - service `hubspotIdentityMappingRecoveryDryRunService.ts`;
+  - tipos atualizados em `hubspotIngestTypes.ts`;
+  - nenhuma escrita em banco;
+  - nenhum apply real executado;
+  - nenhuma RPC chamada.
+- **Decisão operacional:**
+  - C2.9E.2C.2 fica tecnicamente fechado e validado funcionalmente;
+  - o próximo recorte é popular/recuperar mappings de identidade de forma controlada;
+  - depois disso, regenerar snapshot com `canonicalId`, endurecer preflight e adaptar a RPC.
+- **Próximo passo:** atualizar a memória operacional, sincronizar o doc 55 no Drive e abrir o próximo recorte de recuperação/persistência controlada de mappings.
