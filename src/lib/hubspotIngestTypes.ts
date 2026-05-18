@@ -360,6 +360,38 @@ export interface HubspotIngestApplyRpcResult {
   sourceSnapshot: HubspotIngestApplySourceSnapshot;
 }
 
+export type HubspotIdentityMappingProvider = 'hubspot';
+export type HubspotIdentityMappingEntityType = 'account' | 'contact';
+export type HubspotIdentityMappingStatus = 'active' | 'inactive' | 'blocked';
+
+export interface HubspotIdentityMappingMetadata {
+  [key: string]: unknown;
+}
+
+export interface HubspotIdentityMapping {
+  id: string;
+  provider: HubspotIdentityMappingProvider;
+  entityType: HubspotIdentityMappingEntityType;
+  canonicalId: string;
+  canopiExternalId: string;
+  hubspotId: string | null;
+  sourceConnectionId: string | null;
+  sourceFingerprint: string | null;
+  status: HubspotIdentityMappingStatus;
+  metadataJson: HubspotIdentityMappingMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HubspotIdentityMappingLookupFilters {
+  provider?: HubspotIdentityMappingProvider;
+  entityType?: HubspotIdentityMappingEntityType;
+  canonicalId?: string;
+  canopiExternalId?: string;
+  hubspotId?: string;
+  status?: HubspotIdentityMappingStatus;
+}
+
 export interface HubspotIngestExecutionResult {
   status: HubspotIngestExecutionStatus;
   mode: HubspotIngestExecutionMode;
