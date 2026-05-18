@@ -392,6 +392,66 @@ export interface HubspotIdentityMappingLookupFilters {
   status?: HubspotIdentityMappingStatus;
 }
 
+export type HubspotIdentityMappingRecoveryMode = 'identity_mapping_recovery_dry_run';
+
+export type HubspotIdentityMappingRecoveryStatus = 'success' | 'blocked';
+
+export type HubspotIdentityMappingRecoveryClassification =
+  | 'resolved_exact'
+  | 'unresolved'
+  | 'ambiguous'
+  | 'unsafe'
+  | 'missing_required_fields';
+
+export type HubspotIdentityMappingRecoveryMatchSource =
+  | 'direct_canonical_id'
+  | 'identity_mapping_canopi_external_id'
+  | 'identity_mapping_hubspot_id'
+  | 'heuristic_name_domain'
+  | 'heuristic_account_anchor'
+  | 'heuristic_contact_identity'
+  | 'none';
+
+export interface HubspotIdentityMappingRecoveryRecord {
+  entityType: HubspotIdentityMappingEntityType;
+  hubspotId: string;
+  snapshotCanopiId: string;
+  canonicalId: string | null;
+  classification: HubspotIdentityMappingRecoveryClassification;
+  matchSource: HubspotIdentityMappingRecoveryMatchSource;
+  mappingId: string | null;
+  candidateCanonicalIds: string[];
+  reasons: string[];
+  snapshotFields: Record<string, string | null>;
+}
+
+export interface HubspotIdentityMappingRecoverySummarySection {
+  total: number;
+  resolvedExact: number;
+  unresolved: number;
+  ambiguous: number;
+  unsafe: number;
+  missingRequiredFields: number;
+}
+
+export interface HubspotIdentityMappingRecoveryDryRunResult {
+  status: HubspotIdentityMappingRecoveryStatus;
+  mode: HubspotIdentityMappingRecoveryMode;
+  provider: HubspotIngestProvider;
+  contractId: string;
+  generatedAt: string;
+  snapshot: HubspotIngestApplySourceSnapshot;
+  summary: {
+    accounts: HubspotIdentityMappingRecoverySummarySection;
+    contacts: HubspotIdentityMappingRecoverySummarySection;
+  };
+  accounts: HubspotIdentityMappingRecoveryRecord[];
+  contacts: HubspotIdentityMappingRecoveryRecord[];
+  blockers: string[];
+  warnings: string[];
+  guardrails: string[];
+}
+
 export interface HubspotIngestExecutionResult {
   status: HubspotIngestExecutionStatus;
   mode: HubspotIngestExecutionMode;
