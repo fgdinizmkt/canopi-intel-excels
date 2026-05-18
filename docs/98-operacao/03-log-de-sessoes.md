@@ -94,6 +94,40 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - até lá, o caminho segue bloqueado por padrão.
 - **Próximo passo:** sincronizar a memória operacional no Drive e iniciar a auditoria de execução controlada do apply real com a flag explicitamente habilitada.
 
+## [2026-05-17] — HubSpot C2.9E.2C.1 (fundação do mapeamento de identidade HubSpot ↔ Canopi)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico da fundação estrutural de identidade para resolver HubSpot ↔ Canopi antes de qualquer nova tentativa de apply.
+- **Commit técnico:** `3193a5e` — `feat(settings): add HubSpot identity mapping foundation`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação manual confirmada:**
+  - migration `supabase/migrations/20260517100000_hubspot_identity_mappings.sql` aplicada manualmente no Supabase SQL Editor;
+  - resultado: `Success. No rows returned`;
+  - tabela `hubspot_identity_mappings` criada;
+  - `rls_enabled = true`;
+  - `policies_count = 3`;
+  - `mappings_count = 0`;
+  - nenhuma RPC foi chamada;
+  - nenhum apply real foi executado;
+  - nenhuma alteração em `accounts`, `contacts`, `hubspot_ingest_contracts` ou backups.
+- **Escopo entregue:**
+  - tabela dedicada `hubspot_identity_mappings`;
+  - tipos centrais para mapping HubSpot ↔ Canopi;
+  - service server-side para leitura/busca de mappings por `canonical_id`, `canopi_external_id` e `hubspot_id`;
+  - guardrails RLS/service_role seguindo o padrão das tabelas técnicas anteriores.
+- **Limites explícitos:**
+  - não houve backfill;
+  - snapshot, preflight e RPC ainda não foram adaptados para usar o mapping;
+  - não houve gravação de mappings;
+  - não houve nova tentativa de apply.
+- **Decisão operacional:**
+  - a fundação de identidade fica pronta para o próximo recorte de recuperação/população de mappings;
+  - só depois disso faz sentido regenerar snapshot com `canonicalId`, endurecer preflight e adaptar a RPC.
+- **Próximo passo:** atualizar a memória operacional, publicar a documentação do recorte e seguir para o recorte de população/recuperação segura dos mappings.
+
 ## [2026-05-14] — HubSpot C2.9E.2B.2A (snapshot de execução com plano por registro e hash)
 
 - **Agente:** Codex
