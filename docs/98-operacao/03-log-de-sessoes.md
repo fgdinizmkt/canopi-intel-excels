@@ -3,6 +3,32 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-18] — HubSpot C2.9E.2D.11 (setup de propriedades bloqueadoras para nova carga limpa)
+
+- **Agente:** Codex
+- **Natureza:** implementação e validação funcional do serviço e rota de setup/verificação das propriedades bloqueadoras no HubSpot antes do create real da nova carga limpa.
+- **Commit técnico:** ver hash abaixo após publicação
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Escopo entregue:**
+  - `src/lib/server/hubspotCleanReloadSetupService.ts`: serviço que lê `HUBSPOT_PRIVATE_APP_TOKEN` do env, lê propriedades reais do HubSpot, audita as 6 blocking properties (3 Company + 3 Contact) e as cria em modo `create_missing`;
+  - `src/app/api/account-connectors/hubspot/clean-reload/setup-properties/route.ts`: rota POST com `mode_setup` (`verify` padrão, `create_missing` requer `confirm=true`), chaves bloqueadas (`token`, `records`, `companies`, `contacts`, `apply`, `create`, `reset`) e `CONFIRM_REQUIRED` sem confirm;
+  - doc operacional `61-hubspot-clean-reload-setup-properties.md`.
+- **Validação funcional confirmada (C2.9E.2D.11A):**
+  - Payload `{ "token": "x" }` → `BLOCKED_PAYLOAD_KEYS`, HTTP 400;
+  - `create_missing` sem `confirm` → `CONFIRM_REQUIRED`, HTTP 400;
+  - verify inicial: `{ ok: 2, missing: 4, incompatible: 0 }` — `canopi_company_id` e `canopi_contact_id` já existiam do C2.9D.1;
+  - `create_missing` com `confirm: true`: 4 propriedades criadas (`canopi_canonical_id` e `canopi_tenant_id` para Company e Contact), `created: 4, failed: 0`;
+  - re-verify: 6/6 `ok`, `canProceedToCleanCreate: true`;
+  - nenhum token retornado; nenhuma Company, Contact, mapping ou dado Supabase criado.
+- **Propriedades que já existiam (do C2.9D.1):**
+  - `companies.canopi_company_id`; `contacts.canopi_contact_id`.
+- **Propriedades criadas neste recorte:**
+  - `companies.canopi_canonical_id`, `companies.canopi_tenant_id`, `contacts.canopi_canonical_id`, `contacts.canopi_tenant_id`.
+- **Próximo passo:** C2.9E.2D.12 — create limpo de Companies + captura de `hs_object_id` + persistência de mappings.
+
 ## [2026-05-18] — HubSpot C2.9E.2D.8/9/10/10A (plano mínimo + registry + dry-run nova carga limpa)
 
 - **Agente:** Codex
