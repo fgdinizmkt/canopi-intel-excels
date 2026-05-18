@@ -36,6 +36,7 @@ const FILES = [
   'docs/98-operacao/60-hubspot-clean-reload-dry-run-functional-validation.md',
   'docs/98-operacao/61-hubspot-clean-reload-setup-properties.md',
   'docs/98-operacao/62-hubspot-clean-reload-company-create.md',
+  'docs/98-operacao/63-orquestracao-subagentes-ambientes-executores.md',
 ];
 
 function run(cmd, args, opts = {}) {

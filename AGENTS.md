@@ -9,10 +9,25 @@ Este projeto é a plataforma Canopi | intel excels.
 ## Guia Operacional Rápido (Protocolo Obrigatório)
 
 ### Especialidades e Agentes
-1. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, escolha explícita do agente e do modelo adequado antes de cada recorte, controle de aderência ao plano documentado, definição do próximo passo.
-2. **Claude Code:** Executor técnico principal para código no repo local. Deve operar com modelo escolhido conforme complexidade: Haiku para tarefas mecânicas e Sonnet para arquitetura, fluxo novo, backend, autenticação, integrações, Salesforce real, metadados, mapping, segurança ou debugging ambíguo.
-3. **Antigravity:** Executor/parceiro principal de UX/UI visual e validação no browser. Deve operar com Gemini leve/Flash para checks simples e microajustes, e Gemini Pro/High para análise visual complexa, jornada, layout, experiência renderizada ou tarefas com muito contexto visual.
-4. **Codex:** Auditor técnico-operacional, validador de diff/build/runtime/Git. Executor apenas de ajustes pequenos, cirúrgicos e bem delimitados. Pode ser usado seletivamente para comparar implementação, revisar diff complexo ou gerar/refatorar blocos grandes quando explicitamente solicitado.
+1. **ChatGPT:** Orquestração geral, corte de escopo, revisão crítica, escolha explícita do ambiente executor e do subagente/perfil adequado antes de cada recorte, controle de aderência ao plano documentado, definição do próximo passo.
+2. **Claude Code / Claude Code Sonnet:** Ambiente executor principal para código no repo local. Deve operar com modelo escolhido conforme complexidade: Haiku para tarefas mecânicas e Sonnet para arquitetura, fluxo novo, backend, autenticação, integrações, Salesforce real, metadados, mapping, segurança ou debugging ambíguo.
+3. **Codex:** Ambiente executor para auditoria técnico-operacional, validação de diff/build/runtime/Git e ajustes pequenos, cirúrgicos e bem delimitados. Pode ser usado seletivamente para comparar implementação, revisar diff complexo ou gerar/refatorar blocos grandes quando explicitamente solicitado.
+4. **Gemini / Gemini CLI / Antigravity:** Ambiente executor para UX/UI visual, validação no browser e análise contextual. Deve operar com Gemini leve/Flash para checks simples e microajustes, e Gemini Pro/High para análise visual complexa, jornada, layout, experiência renderizada ou tarefas com muito contexto visual.
+5. **GooseWorks, OpenSquad, Agency Agents e outros subagentes instalados:** perfis/subagentes acionáveis dentro dos ambientes executores acima. Não são tratados como ferramentas autônomas paralelas; a escolha correta é sempre `ambiente executor + subagente/perfil + objetivo`.
+
+### Regra de direcionamento por ambiente e subagente
+- Antes de qualquer prompt para execução, declarar explicitamente:
+  - **Ambiente executor recomendado**
+  - **Subagente/perfil recomendado**
+  - **Motivo da escolha**
+  - **Condição de troca**, quando aplicável
+- O ambiente vem primeiro; o subagente/perfil vem depois.
+- Exemplos operacionais:
+  - pesquisa externa e enriquecimento: escolher o ambiente disponível mais adequado e acionar GooseWorks como subagente/perfil;
+  - orquestração multiagente: usar o ambiente executor definido e acionar OpenSquad como subagente/perfil de coordenação;
+  - validação técnica local, diff, build, Git: usar Codex diretamente ou com subagente/perfil especializado, se houver;
+  - arquitetura sensível, mapping, identidade, segurança e fluxo de dados: usar Claude Code/Sonnet como ambiente executor, com subagente/perfil especializado quando fizer sentido;
+  - revisão ampla, comparação e apoio analítico: usar Gemini/Gemini CLI/Antigravity com o subagente/perfil adequado, se esse ambiente estiver melhor posicionado.
 
 ### Regra obrigatória de escolha de agente e modelo
 Antes de qualquer prompt para agente externo, declarar no topo:

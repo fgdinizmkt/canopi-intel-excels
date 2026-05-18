@@ -3,6 +3,21 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-18] — OPS.AGENTS.01 (orquestração de subagentes e ambientes executores)
+
+- **Agente:** Codex
+- **Natureza:** enriquecimento da memória operacional viva para distinguir ambiente executor de subagente/perfil especializado.
+- **Delta registrado:**
+  - ambientes executores formalizados: Claude Code / Claude Code Sonnet, Codex e Gemini / Gemini CLI / Antigravity;
+  - subagentes/perfis formalizados: GooseWorks, OpenSquad, Agency Agents e demais perfis instalados;
+  - regra de direcionamento atualizada para decidir primeiro o ambiente executor e depois o subagente/perfil;
+  - obrigação de registrar o motivo da combinação escolhida em cada recorte;
+  - nenhum fluxo funcional alterado.
+- **Impacto operacional:**
+  - a memória viva passa a tratar essas capacidades como perfis acionáveis dentro de um ambiente executor, não como ferramentas paralelas autônomas;
+  - a leitura de orquestração agora exige ambiente + subagente + objetivo como unidade mínima de decisão.
+- **Próximo passo:** aplicar esta regra nos próximos recortes operacionais e manter o status/log sincronizados.
+
 ## [2026-05-18] — HubSpot C2.9E.2D.12 (create limpo de Companies + persistência de mappings)
 
 - **Agente:** Codex
