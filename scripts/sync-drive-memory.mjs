@@ -26,6 +26,7 @@ const FILES = [
   'docs/98-operacao/50-hubspot-ingest-execution-plan-snapshot-closure.md',
   'docs/98-operacao/51-hubspot-ingest-apply-preflight-closure.md',
   'docs/98-operacao/52-hubspot-ingest-apply-rpc-foundation-closure.md',
+  'docs/98-operacao/53-hubspot-ingest-protected-apply-route-closure.md',
 ];
 
 function run(cmd, args, opts = {}) {

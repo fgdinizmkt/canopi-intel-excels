@@ -69,6 +69,31 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - a frente segue para auditoria da rota que chamará a RPC, sem execução automática.
 - **Próximo passo:** atualizar o doc 52, sincronizar a memória operacional no Drive e abrir a auditoria da rota de apply real.
 
+## [2026-05-17] — HubSpot C2.9E.2B.2B.2B (rota protegida de apply real)
+
+- **Agente:** Codex
+- **Natureza:** fechamento técnico da rota protegida que chamará a RPC transacional do apply real HubSpot → Canopi.
+- **Commit técnico:** `535f8ca` — `feat(settings): add protected HubSpot ingest apply route`
+- **Validação estática confirmada:**
+  - `git diff --check` OK;
+  - `npm run lint` OK;
+  - `npx tsc --noEmit` OK.
+- **Validação funcional real confirmada em modo bloqueado:**
+  - rota `POST /api/account-connectors/hubspot/ingest/execute/apply` implementada;
+  - payload vazio, array, campos extras, `token`, `records`, `companies`, `contacts`, `mode` e `apply` foram bloqueados com `HTTP 400`;
+  - payload formalmente válido com a flag desligada retornou `HTTP 403`;
+  - `status=blocked`;
+  - `canPersist=false`;
+  - nenhuma RPC foi chamada;
+  - nenhum apply real foi executado.
+- **Guardrail implementado:**
+  - feature flag obrigatória `CANOPI_ENABLE_HUBSPOT_INGEST_APPLY=true`;
+  - sem a flag, a rota não chama RPC e bloqueia o apply real por configuração operacional.
+- **Decisão operacional:**
+  - a rota só deve executar apply real quando a flag for ligada explicitamente em sessão controlada;
+  - até lá, o caminho segue bloqueado por padrão.
+- **Próximo passo:** sincronizar a memória operacional no Drive e iniciar a auditoria de execução controlada do apply real com a flag explicitamente habilitada.
+
 ## [2026-05-14] — HubSpot C2.9E.2B.2A (snapshot de execução com plano por registro e hash)
 
 - **Agente:** Codex
