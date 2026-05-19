@@ -39,6 +39,7 @@ const FILES = [
   'docs/98-operacao/63-orquestracao-subagentes-ambientes-executores.md',
   'docs/98-operacao/64-hubspot-post-company-create-audit.md',
   'docs/98-operacao/65-hubspot-clean-reload-contact-create.md',
+  'docs/98-operacao/66-hubspot-clean-reload-deal-create.md',
 ];
 
 function run(cmd, args, opts = {}) {

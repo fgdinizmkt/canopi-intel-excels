@@ -3,6 +3,39 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-19] — HubSpot C2.9E.2D.14 (create limpo de Deals + recovery de mappings + associações Deal → Company/Contact + preflightOnly)
+
+- **Agente:** Claude Code / Sonnet 4.6
+- **Perfil/subagente:** `ai-data-remediation-engineer` (Agency Agents / Engineering) — inline
+- **Natureza:** implementação do serviço e rota de create limpo de Deals no HubSpot com associações Deal → Company e Deal → Contact, persistência de mappings `entity_type=deal`, recovery sem create adicional e correção do serviço com `preflightOnly` real.
+- **Escopo entregue:**
+  - `src/lib/hubspotIngestTypes.ts`: `HubspotIdentityMappingEntityType` estendido com `'deal'`;
+  - `src/lib/server/hubspotIdentityMappingService.ts`: `readEntityType` reconhece `'deal'`;
+  - `src/lib/server/hubspotCleanReloadDealCreateService.ts`: preflight (registry, deal properties, contact count guardrail, company/contact/deal mappings, candidatos via resolução `account_slug → accounts.slug → accounts.id → company mapping`), batch create em chunks de 50, matching por `canopi_canonical_id`, persistência de mappings (`entity_type=deal`), associações Deal → Company (`associationTypeId=5`) e Deal → Contact (`associationTypeId=3`), `resumeMode`, `preflightOnly`;
+  - `src/lib/server/hubspotCleanReloadDealRecoveryService.ts`: recovery de mappings e associações para Deals já criados, sem nenhum create adicional no HubSpot;
+  - `src/app/api/account-connectors/hubspot/clean-reload/create-deals/route.ts`: gate `confirmCreateDeals: true`, `preflightOnly: true`, chaves bloqueadas, idempotência;
+  - `src/app/api/account-connectors/hubspot/clean-reload/recover-deal-mappings/route.ts`: gate `confirmRecoverDealMappings: true`, `knownDealMappings[]`;
+  - `docs/98-operacao/66-hubspot-clean-reload-deal-create.md`: documentação completa do recorte.
+- **Incidente resolvido:**
+  - 27 Deals criados no HubSpot antes do esperado (serviço sem preflight-only real avançou para create ao não encontrar bloqueadores);
+  - 27 mappings falharam por constraint Supabase `entity_type_check` aceitar apenas `('account', 'contact')`;
+  - constraint ajustada manualmente para `('account', 'contact', 'deal')`;
+  - recovery executado via `POST /recover-deal-mappings` com os 27 pares conhecidos `canonicalId → hs_object_id` — sem nenhum create adicional;
+  - serviço corrigido com gate `preflightOnly` inserido no serviço (não apenas na rota) imediatamente após avaliação de bloqueadores.
+- **Resultado do create real + recovery:**
+  - 27/27 Deals criados no HubSpot;
+  - 27/27 mappings `entity_type=deal` persistidos;
+  - 27/27 associações Deal → Company criadas;
+  - 80/80 associações Deal → Contact criadas;
+  - `canProceedToNextRecorte: true`;
+  - 0 falhas, 0 warnings;
+  - Contacts HubSpot permaneceram em 993;
+  - 0 Contacts/Companies/Products/Services criados;
+  - 0 escrita em `accounts`, `contacts` ou `oportunidades` no Supabase.
+- **Validações executadas:** `git diff --check` ✅, lint ✅, tsc ✅, `preflightOnly=true` retorna 0 writes ✅, idempotência ✅.
+- **Decisão técnica relevante:** Deals não têm FK direta para Contacts em `oportunidades`; resolução feita via `contacts.accountId` para listar contatos por account e cruzar com contact mappings ativos. Deals sem `dealstage`/`pipeline`/`closedate` (não existem no schema atual) — `etapa` enviada como `canopi_stage_canonical`.
+- **Próximo passo:** C2.9E.2D.15 — Enriquecimento ou validação visual dos Deals, ou recorte de Products/Services se priorizado antes.
+
 ## [2026-05-19] — HubSpot C2.9E.2D.13 (create limpo de Contacts + associação Contact → Company + mappings)
 
 - **Agente:** Claude Code / Sonnet 4.6
