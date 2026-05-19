@@ -3,6 +3,30 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-18] — HubSpot C2.9E.2D.12B (auditoria pós-create de Companies)
+
+- **Agente:** Codex
+- **Natureza:** fechamento documental e de memória operacional da auditoria pós-create de Companies no HubSpot.
+- **Perfil/subagente:** nenhum obrigatório; auditoria conduzida diretamente no ambiente executor.
+- **Motivo:** recorte restrito a Git, documentação e memória operacional, sem nova decisão de produto nem alteração funcional.
+- **Achados principais:**
+  - 665 Companies auditadas no HubSpot;
+  - 247 Companies da base operacional nova com `canopi_canonical_id`;
+  - 348 Companies históricas com `canopi_company_id` e sem `canopi_canonical_id`;
+  - 70 Companies fora do padrão Canopi;
+  - 0 duplicidades reais entre base nova e histórico;
+  - 89 duplicidades visuais sintéticas explicadas pelo artefato C4.17.1;
+  - 247/247 mappings íntegros com `hs_object_id` confirmado;
+  - campos preenchidos apenas de identidade e controle;
+  - enriquecimento real ainda ausente;
+  - Contacts segue como próximo recorte recomendado.
+- **Guardrails confirmados:**
+  - nenhuma escrita;
+  - nenhum update/delete/archive/reset;
+  - nenhum mapping novo;
+  - nenhuma alteração funcional ou de UI.
+- **Próximo passo:** avançar para a auditoria/execução dos Contacts, mantendo a distinção entre histórico e base operacional nova.
+
 ## [2026-05-18] — OPS.AGENTS.01 (orquestração de subagentes e ambientes executores)
 
 - **Agente:** Codex
