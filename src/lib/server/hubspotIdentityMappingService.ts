@@ -38,7 +38,9 @@ function readProvider(value: unknown): HubspotIdentityMappingProvider {
 }
 
 function readEntityType(value: unknown): HubspotIdentityMappingEntityType {
-  return value === 'account' ? 'account' : 'contact';
+  if (value === 'account') return 'account';
+  if (value === 'deal') return 'deal';
+  return 'contact';
 }
 
 function readStatus(value: unknown): HubspotIdentityMappingStatus {

@@ -361,7 +361,7 @@ export interface HubspotIngestApplyRpcResult {
 }
 
 export type HubspotIdentityMappingProvider = 'hubspot';
-export type HubspotIdentityMappingEntityType = 'account' | 'contact';
+export type HubspotIdentityMappingEntityType = 'account' | 'contact' | 'deal';
 export type HubspotIdentityMappingStatus = 'active' | 'inactive' | 'blocked';
 
 export interface HubspotIdentityMappingMetadata {
