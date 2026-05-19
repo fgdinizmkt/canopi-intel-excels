@@ -3,6 +3,27 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-05-19] — HubSpot C2.9E.2D.13 (create limpo de Contacts + associação Contact → Company + mappings)
+
+- **Agente:** Claude Code / Sonnet 4.6
+- **Perfil/subagente:** `ai-data-remediation-engineer` (Agency Agents / Engineering) — inline
+- **Natureza:** implementação do serviço e rota de create limpo de Contacts no HubSpot com associação Contact → Company e persistência de mappings.
+- **Escopo entregue:**
+  - `src/lib/server/hubspotCleanReloadContactCreateService.ts`: preflight (registry, contact properties, company mappings, idempotência), batch create em chunks de 50, split de nome em firstname/lastname, matching por `canopi_canonical_id`, persistência de mappings (`entity_type=contact`, `status=active`), associação Contact → Company via API v4 (`POST /crm/v4/associations/contacts/companies/batch/create`, `associationTypeId=1`), `resumeMode` para retomar após falha parcial;
+  - `src/app/api/account-connectors/hubspot/clean-reload/create-contacts/route.ts`: gate `confirmCreateContacts: true`, chaves bloqueadas, validação de `batchId` e `tenantId`;
+  - `docs/98-operacao/65-hubspot-clean-reload-contact-create.md`: documentação completa do recorte.
+- **Resultado do create real:**
+  - 305/305 Contacts criados no HubSpot;
+  - 305/305 associações Contact → Company criadas;
+  - 305/305 mappings `entity_type=contact` persistidos;
+  - `canProceedToDealCreate: true`;
+  - 0 falhas, 0 warnings;
+  - 0 Companies/Deals/Products criados;
+  - 0 escrita em `accounts` ou `contacts` no Supabase.
+- **Validações executadas:** lint ✅, tsc ✅, 4 testes negativos ✅, idempotência ✅
+- **Decisão técnica relevante:** associação Contact → Company feita em etapa separada pós-create (HubSpot batch create não suporta inline); API v4 com `HUBSPOT_DEFINED + associationTypeId=1` (Contact to Company primária).
+- **Próximo passo:** C2.9E.2D.14 — Create limpo de Deals, ou recorte de enriquecimento se priorizado antes.
+
 ## [2026-05-18] — HubSpot C2.9E.2D.12B (auditoria pós-create de Companies)
 
 - **Agente:** Codex
