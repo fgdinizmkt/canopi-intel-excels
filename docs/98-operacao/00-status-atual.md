@@ -1,6 +1,6 @@
 # Status atual do projeto
 
-**HubSpot C2.9E.2D.13** fechado: 305 Contacts criados limpos no HubSpot, 305 associações Contact → Company criadas via API v4, 305 mappings `entity_type=contact` persistidos em `hubspot_identity_mappings`, `canProceedToDealCreate: true`, 0 falhas, 0 Companies/Deals/Products criados, 0 escrita em `accounts`/`contacts` no Supabase; idempotência confirmada (segunda chamada bloqueada com 305 mappings ativos); doc operacional em `65-hubspot-clean-reload-contact-create.md`.
+**HubSpot C2.9E.2D.13** fechado: 305 Contacts criados limpos no HubSpot, 305 associações Contact → Company criadas via API v4, 305 mappings `entity_type=contact` persistidos em `hubspot_identity_mappings`, `canProceedToDealCreate: true`, 0 falhas, 0 Companies/Deals/Products criados, 0 escrita em `accounts`/`contacts` no Supabase; o preflight/setup também criou no HubSpot as propriedades `canopi_contract_version` e `canopi_sync_status` como metadata de controle; o token privado foi exposto em output operacional e exigiu rotação manual fora do repo/chat; idempotência confirmada (segunda chamada bloqueada com 305 mappings ativos); doc operacional em `65-hubspot-clean-reload-contact-create.md`.
 
 **OPS.AGENTS.01** registrado: ambientes executores são Claude Code, Codex e Gemini/Gemini CLI/Antigravity; GooseWorks, OpenSquad e Agency Agents passam a ser tratados como subagentes/perfis acionáveis dentro desses ambientes, sempre com registro explícito de ambiente + subagente + motivo.
 

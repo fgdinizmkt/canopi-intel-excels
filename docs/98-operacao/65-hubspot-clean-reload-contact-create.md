@@ -1,6 +1,6 @@
 # HubSpot — Create Limpo de Contacts — C2.9E.2D.13
 
-> **Status:** implementado e executado com sucesso em 2026-05-19. 305/305 Contacts criados, associados e mapeados.
+> **Status:** implementado e executado com sucesso em 2026-05-19. 305/305 Contacts criados, associados e mapeados. Durante o preflight/setup, o HubSpot também recebeu as propriedades de metadados `canopi_contract_version` e `canopi_sync_status`.
 
 ## Ambiente executor e perfil
 
@@ -196,6 +196,7 @@ Implementado: ao passar `resumeMode: true`, o serviço:
 - Nenhuma escrita em `accounts` ou `contacts` no Supabase ✅
 - Mapping só persiste para Contacts criados com sucesso neste recorte ✅
 - Token não exposto na resposta ✅
+- O token exposto no output operacional exigiu rotação manual fora do repo/chat ✅
 - Salesforce não reaberto ✅
 - RD Station não tocado ✅
 
@@ -210,6 +211,8 @@ Implementado: ao passar `resumeMode: true`, o serviço:
 | Products/Services criados neste recorte | **0** |
 | Escrita em `accounts` (Supabase) | **0** |
 | Escrita em `contacts` (Supabase) | **0** |
+
+> Precisão operacional: a execução não escreveu dados de negócio no HubSpot além do setup de metadados do preflight. As propriedades `canopi_contract_version` e `canopi_sync_status` foram criadas no HubSpot durante o setup, e isso deve ser documentado como metadata setup, não como criação de Companies/Contacts/Deals/Products.
 
 ---
 

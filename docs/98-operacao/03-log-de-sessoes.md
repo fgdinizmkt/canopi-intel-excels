@@ -20,6 +20,10 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - 0 falhas, 0 warnings;
   - 0 Companies/Deals/Products criados;
   - 0 escrita em `accounts` ou `contacts` no Supabase.
+- **Precisão operacional:**
+  - o preflight/setup também criou no HubSpot as propriedades de metadata `canopi_contract_version` e `canopi_sync_status`;
+  - o token privado foi exposto no output operacional anterior e exigiu rotação manual fora do repo/chat;
+  - essas ações não representam escrita em `accounts`/`contacts` no Supabase nem criação de Companies/Deals/Products.
 - **Validações executadas:** lint ✅, tsc ✅, 4 testes negativos ✅, idempotência ✅
 - **Decisão técnica relevante:** associação Contact → Company feita em etapa separada pós-create (HubSpot batch create não suporta inline); API v4 com `HUBSPOT_DEFINED + associationTypeId=1` (Contact to Company primária).
 - **Próximo passo:** C2.9E.2D.14 — Create limpo de Deals, ou recorte de enriquecimento se priorizado antes.
