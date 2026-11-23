@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Mail, Lock, LogIn, ArrowRight, Github, Chrome, Apple, AlertCircle } from 'lucide-react';
-import { setCanopiAuthClient } from '@/src/lib/canopiAuth';
+import { setKnopiAuthClient } from '@/src/lib/knopiAuth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,7 +48,7 @@ export default function LoginPage() {
       }
 
       if (username === validUsername && password === validPassword) {
-        setCanopiAuthClient(true);
+        setKnopiAuthClient(true);
         router.push('/');
       } else {
         setError(`Credenciais inválidas. Tente ${validUsername} / ${validPassword}`);

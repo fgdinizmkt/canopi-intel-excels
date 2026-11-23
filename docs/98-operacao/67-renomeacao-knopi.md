@@ -17,11 +17,11 @@ A identidade visual única e definitiva é o **Knopi · Manual de Marca v1.1** (
 ## Etapas
 | # | Etapa | Status |
 |---|---|---|
-| 1 | Marca visível em `src/`: "Canopi" → "Knopi" e "CANOPI" → "KNOPI", só como palavra isolada | Feito, aguardando commit |
-| 2 | Nomes internos de código e nome do pacote | Pendente |
+| 1 | Marca visível em `src/`: "Canopi" → "Knopi" e "CANOPI" → "KNOPI", só como palavra isolada | Feito (`c4a6f59`) |
+| 2 | Nomes internos que vivem só no app, nome do pacote e nomes dos CSVs de exemplo | Feito, aguardando commit |
 | 3 | Documentação | Pendente |
-| 4 | Contratos externos: propriedades `knopi_*` novas no HubSpot, cópia dos valores (247 empresas, 305 contatos, 27 negócios), migração Supabase e código, com teste antes de gravar | Pendente, plano próprio |
-| 5 | Texto gravado em dados (`seed/`, registros existentes) | Pendente |
+| 4 | Contratos externos, mais os 60 nomes internos camelCase que passam por gravação no banco ou RPC (por exemplo `canopiId`, que a função SQL de apply lê): propriedades `knopi_*` novas no HubSpot, cópia dos valores (247 empresas, 305 contatos, 27 negócios), migração Supabase e código, com teste antes de gravar | Pendente, plano próprio |
+| 5 | Texto gravado em dados (`seed/`, registros existentes) e chaves do navegador (`canopi_actions`, `canopi_v1_actions`, `canopi_v1_logs`, `canopi_hubspot_v1_session_token`), com leitura da chave antiga para não perder o que está salvo | Pendente |
 | 6 | Pasta local e configuração do Claude Code ligada a ela | Pendente |
 | 7 | Repositório no GitHub (`fgdinizmkt/canopi-intel-excels`) | Pendente |
 | 8 | Aplicação da identidade visual do manual v1.1 no app | Pendente, plano próprio |
@@ -31,3 +31,10 @@ A identidade visual única e definitiva é o **Knopi · Manual de Marca v1.1** (
 - Conferido que nenhum texto trocado é comparado com valor gravado em banco.
 - `npx tsc --noEmit` sem erros; tela de login conferida renderizando em `localhost:3053`.
 - Valores padrão novos: `origin` "Knopi Command Center" e `actor` "Knopi AI" (`src/context/AccountDetailContext.tsx`). Registros antigos continuam com "Canopi" até a etapa 5.
+
+## Etapa 2 · o que mudou
+- 12 nomes internos que não passam por banco, RPC ou armazenamento: `canopiAuth` (arquivo `src/lib/canopiAuth.ts` → `src/lib/knopiAuth.ts`), `setCanopiAuthClient`, `clearCanopiAuthClient`, `CanopiEvent`, `canopiEvents`, `canopiAttr`, `canopiFlag`, `canopiMap`, `canopiOwned`, `findHubspotIdentityMappingByCanopiExternalId`, `listHubspotIdentityMappingsByCanopiExternalId` e `normalizedCanopiExternalId`.
+- Pacote `canopi-intel-excels-app` → `knopi-intel-excels-app` em `package.json` e `package-lock.json`.
+- CSVs de exemplo do Salesforce: `canopi_salesforce_*_exemplo.csv` → `knopi_salesforce_*_exemplo.csv`.
+- Os outros 60 nomes camelCase ficam em arquivos que gravam no HubSpot, no Supabase ou no Salesforce; vários são chaves de contratos guardados no banco, então seguem com a etapa 4.
+- `npx tsc --noEmit` sem erros; login e shell respondendo no servidor local.

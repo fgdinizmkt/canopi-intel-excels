@@ -23,7 +23,7 @@ function clearCookie() {
   });
 }
 
-export function setCanopiAuthClient(isAuthenticated: boolean) {
+export function setKnopiAuthClient(isAuthenticated: boolean) {
   if (typeof window === 'undefined') return;
 
   if (isAuthenticated) {
@@ -38,6 +38,6 @@ export function setCanopiAuthClient(isAuthenticated: boolean) {
   clearCookie();
 }
 
-export function clearCanopiAuthClient() {
-  setCanopiAuthClient(false);
+export function clearKnopiAuthClient() {
+  setKnopiAuthClient(false);
 }

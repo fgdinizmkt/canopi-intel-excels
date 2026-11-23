@@ -7,7 +7,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Search, Bell, Settings, ChevronRight, LogOut } from 'lucide-react';
 import Image from 'next/image';
-import { clearCanopiAuthClient } from '@/src/lib/canopiAuth';
+import { clearKnopiAuthClient } from '@/src/lib/knopiAuth';
 
 // Avatar padrão masculino — seed 'James' gera avatar masculino no DiceBear v7 avataaars
 const MALE_AVATAR_URL =
@@ -43,7 +43,7 @@ export const Topbar: React.FC = () => {
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
 
   const handleLogout = () => {
-    clearCanopiAuthClient();
+    clearKnopiAuthClient();
     localStorage.removeItem('user_avatar_photo');
     window.location.assign('/logout');
   };

@@ -111,7 +111,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       '001Bxxxxxxxxxxxxxxxxx,Global Industries,Prospect,Manufacturing,https://globalind.com,+55 11 90000-0002,005Bxxxxxxxxxxxxxxxxx,2024-02-01T09:00:00Z,2024-04-10T11:00:00Z,Rio de Janeiro,RJ,Brazil',
       '001Cxxxxxxxxxxxxxxxxx,TechStart Ltda,Partner,Software,https://techstart.com.br,+55 11 90000-0003,005Cxxxxxxxxxxxxxxxxx,2024-03-05T08:00:00Z,2024-04-30T16:00:00Z,Curitiba,PR,Brazil',
     ].join('\n'),
-    filename: 'canopi_salesforce_account_exemplo.csv',
+    filename: 'knopi_salesforce_account_exemplo.csv',
   },
   Contact: {
     label: 'Contact',
@@ -158,7 +158,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       '003Bxxxxxxxxxxxxxxxxx,Maria,Santos,maria.santos@globalind.com,+55 21 90000-0002,Diretora,Sales,001Bxxxxxxxxxxxxxxxxx,005Bxxxxxxxxxxxxxxxxx,2024-02-01T09:00:00Z,2024-04-10T11:00:00Z',
       '003Cxxxxxxxxxxxxxxxxx,Pedro,Lima,pedro.lima@techstart.com.br,+55 41 90000-0003,CTO,Engineering,001Cxxxxxxxxxxxxxxxxx,005Cxxxxxxxxxxxxxxxxx,2024-03-05T08:00:00Z,2024-04-30T16:00:00Z',
     ].join('\n'),
-    filename: 'canopi_salesforce_contact_exemplo.csv',
+    filename: 'knopi_salesforce_contact_exemplo.csv',
   },
   Opportunity: {
     label: 'Opportunity',
@@ -199,7 +199,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       '006Bxxxxxxxxxxxxxxxxx,Expansão Global Industries,001Bxxxxxxxxxxxxxxxxx,Proposal/Price Quote,80000,2025-05-31,40,New Business,005Bxxxxxxxxxxxxxxxxx,2024-12-01T10:00:00Z,2025-02-20T11:00:00Z',
       '006Cxxxxxxxxxxxxxxxxx,TechStart Plataforma,001Cxxxxxxxxxxxxxxxxx,Value Proposition,45000,2025-04-30,60,New Business,005Cxxxxxxxxxxxxxxxxx,2025-01-10T08:00:00Z,2025-03-05T09:00:00Z',
     ].join('\n'),
-    filename: 'canopi_salesforce_opportunity_exemplo.csv',
+    filename: 'knopi_salesforce_opportunity_exemplo.csv',
   },
   Lead: {
     label: 'Lead',
@@ -243,7 +243,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       '00QBxxxxxxxxxxxxxxxxx,Carlos,Pereira,TechStart Ltda,carlos.pereira@techstart.com.br,+55 41 90000-0002,CTO,New,Phone,005Bxxxxxxxxxxxxxxxxx,2024-03-01T09:00:00Z,2024-05-20T14:00:00Z',
       '00QCxxxxxxxxxxxxxxxxx,Ana,Lima,Inovação SA,ana.lima@inovacao.com.br,+55 11 90000-0003,VP Sales,Contacted,Email,005Cxxxxxxxxxxxxxxxxx,2024-03-15T10:00:00Z,2024-06-01T11:00:00Z',
     ].join('\n'),
-    filename: 'canopi_salesforce_lead_exemplo.csv',
+    filename: 'knopi_salesforce_lead_exemplo.csv',
   },
   Campaign: {
     label: 'Campaign',
@@ -286,7 +286,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
       '701Bxxxxxxxxxxxxxxxxx,Webinar Produto Março,Webinar,Completed,2025-03-10,2025-03-10,8000,7500,25000,false,005Bxxxxxxxxxxxxxxxxx,2025-01-20T09:00:00Z,2025-04-01T10:00:00Z',
       '701Cxxxxxxxxxxxxxxxxx,Newsletter Abril,Email,Active,2025-04-01,2025-04-30,5000,1200,15000,true,005Cxxxxxxxxxxxxxxxxx,2025-03-01T08:00:00Z,2025-04-15T14:00:00Z',
     ].join('\n'),
-    filename: 'canopi_salesforce_campaign_exemplo.csv',
+    filename: 'knopi_salesforce_campaign_exemplo.csv',
   },
 };
 

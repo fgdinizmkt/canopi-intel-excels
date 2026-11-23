@@ -42,55 +42,55 @@ type DiscoveryState =
   | { phase: 'done'; discoveries: SalesforceObjectDiscovery[] }
   | { phase: 'error'; message: string };
 
-const CANOPI_MAPPING: Record<string, Array<{ canopiAttr: string; sfField: string }>> = {
+const CANOPI_MAPPING: Record<string, Array<{ knopiAttr: string; sfField: string }>> = {
   Account: [
-    { canopiAttr: 'Nome da conta', sfField: 'Name' },
-    { canopiAttr: 'Site', sfField: 'Website' },
-    { canopiAttr: 'Setor', sfField: 'Industry' },
-    { canopiAttr: 'Tipo', sfField: 'Type' },
-    { canopiAttr: 'Receita anual', sfField: 'AnnualRevenue' },
-    { canopiAttr: 'Funcionários', sfField: 'NumberOfEmployees' },
-    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+    { knopiAttr: 'Nome da conta', sfField: 'Name' },
+    { knopiAttr: 'Site', sfField: 'Website' },
+    { knopiAttr: 'Setor', sfField: 'Industry' },
+    { knopiAttr: 'Tipo', sfField: 'Type' },
+    { knopiAttr: 'Receita anual', sfField: 'AnnualRevenue' },
+    { knopiAttr: 'Funcionários', sfField: 'NumberOfEmployees' },
+    { knopiAttr: 'Dono', sfField: 'OwnerId' },
   ],
   Contact: [
-    { canopiAttr: 'Nome', sfField: 'Name' },
-    { canopiAttr: 'Email', sfField: 'Email' },
-    { canopiAttr: 'Telefone', sfField: 'Phone' },
-    { canopiAttr: 'Cargo', sfField: 'Title' },
-    { canopiAttr: 'Departamento', sfField: 'Department' },
-    { canopiAttr: 'Conta relacionada', sfField: 'AccountId' },
-    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+    { knopiAttr: 'Nome', sfField: 'Name' },
+    { knopiAttr: 'Email', sfField: 'Email' },
+    { knopiAttr: 'Telefone', sfField: 'Phone' },
+    { knopiAttr: 'Cargo', sfField: 'Title' },
+    { knopiAttr: 'Departamento', sfField: 'Department' },
+    { knopiAttr: 'Conta relacionada', sfField: 'AccountId' },
+    { knopiAttr: 'Dono', sfField: 'OwnerId' },
   ],
   Opportunity: [
-    { canopiAttr: 'Nome da oportunidade', sfField: 'Name' },
-    { canopiAttr: 'Conta relacionada', sfField: 'AccountId' },
-    { canopiAttr: 'Estágio', sfField: 'StageName' },
-    { canopiAttr: 'Valor', sfField: 'Amount' },
-    { canopiAttr: 'Fechamento', sfField: 'CloseDate' },
-    { canopiAttr: 'Probabilidade', sfField: 'Probability' },
-    { canopiAttr: 'Tipo', sfField: 'Type' },
-    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+    { knopiAttr: 'Nome da oportunidade', sfField: 'Name' },
+    { knopiAttr: 'Conta relacionada', sfField: 'AccountId' },
+    { knopiAttr: 'Estágio', sfField: 'StageName' },
+    { knopiAttr: 'Valor', sfField: 'Amount' },
+    { knopiAttr: 'Fechamento', sfField: 'CloseDate' },
+    { knopiAttr: 'Probabilidade', sfField: 'Probability' },
+    { knopiAttr: 'Tipo', sfField: 'Type' },
+    { knopiAttr: 'Dono', sfField: 'OwnerId' },
   ],
   Lead: [
-    { canopiAttr: 'Nome', sfField: 'Name' },
-    { canopiAttr: 'Empresa', sfField: 'Company' },
-    { canopiAttr: 'Email', sfField: 'Email' },
-    { canopiAttr: 'Telefone', sfField: 'Phone' },
-    { canopiAttr: 'Cargo', sfField: 'Title' },
-    { canopiAttr: 'Status', sfField: 'Status' },
-    { canopiAttr: 'Origem', sfField: 'LeadSource' },
-    { canopiAttr: 'Dono', sfField: 'OwnerId' },
+    { knopiAttr: 'Nome', sfField: 'Name' },
+    { knopiAttr: 'Empresa', sfField: 'Company' },
+    { knopiAttr: 'Email', sfField: 'Email' },
+    { knopiAttr: 'Telefone', sfField: 'Phone' },
+    { knopiAttr: 'Cargo', sfField: 'Title' },
+    { knopiAttr: 'Status', sfField: 'Status' },
+    { knopiAttr: 'Origem', sfField: 'LeadSource' },
+    { knopiAttr: 'Dono', sfField: 'OwnerId' },
   ],
   Campaign: [
-    { canopiAttr: 'Nome da campanha', sfField: 'Name' },
-    { canopiAttr: 'Tipo', sfField: 'Type' },
-    { canopiAttr: 'Status', sfField: 'Status' },
-    { canopiAttr: 'Início', sfField: 'StartDate' },
-    { canopiAttr: 'Fim', sfField: 'EndDate' },
-    { canopiAttr: 'Orçamento', sfField: 'BudgetedCost' },
-    { canopiAttr: 'Custo real', sfField: 'ActualCost' },
-    { canopiAttr: 'Receita esperada', sfField: 'ExpectedRevenue' },
-    { canopiAttr: 'Ativa', sfField: 'IsActive' },
+    { knopiAttr: 'Nome da campanha', sfField: 'Name' },
+    { knopiAttr: 'Tipo', sfField: 'Type' },
+    { knopiAttr: 'Status', sfField: 'Status' },
+    { knopiAttr: 'Início', sfField: 'StartDate' },
+    { knopiAttr: 'Fim', sfField: 'EndDate' },
+    { knopiAttr: 'Orçamento', sfField: 'BudgetedCost' },
+    { knopiAttr: 'Custo real', sfField: 'ActualCost' },
+    { knopiAttr: 'Receita esperada', sfField: 'ExpectedRevenue' },
+    { knopiAttr: 'Ativa', sfField: 'IsActive' },
   ],
 };
 
@@ -149,7 +149,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
   const cfg = STATUS_CONFIG[discovery.status];
   const recTotal = discovery.recommendedFields.length + discovery.missingRecommendedFields.length;
   const fieldNameSet = new Set(discovery.fields.map((f) => f.name));
-  const canopiMap = CANOPI_MAPPING[discovery.objectApiName] ?? [];
+  const knopiMap = CANOPI_MAPPING[discovery.objectApiName] ?? [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -252,7 +252,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
           )}
 
           {/* Knopi mapping suggestions */}
-          {canopiMap.length > 0 && (
+          {knopiMap.length > 0 && (
             <div>
               <p className="mb-1 text-xs font-black uppercase tracking-widest text-slate-500">
                 Mapeamento Knopi sugerido
@@ -261,14 +261,14 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                 Campos detectados via Salesforce describe · somente leitura na Knopi
               </p>
               <div className="rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
-                {canopiMap.map(({ canopiAttr, sfField }) => {
+                {knopiMap.map(({ knopiAttr, sfField }) => {
                   const exists = fieldNameSet.has(sfField);
                   return (
                     <div
                       key={sfField}
                       className="flex items-center justify-between gap-3 px-3 py-1.5 border-b border-slate-100 last:border-0"
                     >
-                      <span className="text-xs font-medium text-slate-700">{canopiAttr}</span>
+                      <span className="text-xs font-medium text-slate-700">{knopiAttr}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span
                           className={`font-mono text-xs font-bold ${

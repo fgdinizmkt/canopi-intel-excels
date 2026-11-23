@@ -44,7 +44,7 @@ interface MediaSource {
   pendingChanges?: boolean;
 }
 
-interface CanopiEvent {
+interface KnopiEvent {
   id: string;
   name: string;
   type: 'primary' | 'secondary';
@@ -69,7 +69,7 @@ interface TaxonomyRule {
   field: string;
   pattern: string;
   mandatory: boolean;
-  canopiFlag?: 'abm' | 'abx' | 'play';
+  knopiFlag?: 'abm' | 'abx' | 'play';
 }
 
 interface AudienceSync {
@@ -572,7 +572,7 @@ const ConfigStage1: React.FC = () => {
   ]);
 
   // ===== ESTADO: EVENTOS E CONVERSÕES (ETAPA 2) =====
-  const [canopiEvents] = useState<CanopiEvent[]>([
+  const [knopiEvents] = useState<KnopiEvent[]>([
     { id: 'e1', name: 'page_view_pricing', type: 'secondary', source: 'ga4', status: 'active', usage: ['performance', 'signals'], destination: 'Knopi Dashboard' },
     { id: 'e2', name: 'demo_request_form_submit', type: 'primary', source: 'interno', status: 'active', usage: ['performance', 'signals', 'attribution', 'cockpit'], value: 500, destination: 'CRM + Slack' },
     { id: 'e3', name: 'pricing_calculator_use', type: 'secondary', source: 'ga4', status: 'validating', usage: ['performance'], destination: 'Knopi' },
@@ -593,8 +593,8 @@ const ConfigStage1: React.FC = () => {
   const [taxonomyRules] = useState<TaxonomyRule[]>([
     { id: '1', field: 'utm_source', pattern: 'ga4_standards', mandatory: true },
     { id: '2', field: 'utm_medium', pattern: 'paid|organic|owned', mandatory: true },
-    { id: '3', field: 'utm_campaign', pattern: 'v[0-9]_{vertical}_{cluster}', mandatory: true, canopiFlag: 'play' },
-    { id: '4', field: 'abm_flag', pattern: 'true|false', mandatory: false, canopiFlag: 'abm' },
+    { id: '3', field: 'utm_campaign', pattern: 'v[0-9]_{vertical}_{cluster}', mandatory: true, knopiFlag: 'play' },
+    { id: '4', field: 'abm_flag', pattern: 'true|false', mandatory: false, knopiFlag: 'abm' },
   ]);
 
   // ===== ESTADO: AUDIENCIAS (ETAPA 2) =====
@@ -1162,7 +1162,7 @@ const ConfigStage1: React.FC = () => {
           </button>
         </div>
         <div className="space-y-3">
-          {canopiEvents.map((event) => (
+          {knopiEvents.map((event) => (
             <div key={event.id} className="p-4 border border-slate-200 rounded-xl hover:border-blue-300 transition-all bg-white flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -1228,8 +1228,8 @@ const ConfigStage1: React.FC = () => {
                   {rule.mandatory && <Badge className="bg-red-50 text-red-600 text-xs">Mandatory</Badge>}
                 </div>
                 <code className="text-xs text-blue-600 block bg-blue-50/50 p-1 rounded font-mono truncate">{rule.pattern}</code>
-                {rule.canopiFlag && (
-                  <Badge className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs uppercase tracking-widest">{rule.canopiFlag}</Badge>
+                {rule.knopiFlag && (
+                  <Badge className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs uppercase tracking-widest">{rule.knopiFlag}</Badge>
                 )}
               </div>
             ))}

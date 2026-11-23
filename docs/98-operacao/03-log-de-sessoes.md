@@ -10,7 +10,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Escopo entregue:** "Canopi" → "Knopi" e "CANOPI" → "KNOPI" como palavra isolada em 67 arquivos de `src/`; plano completo em `docs/98-operacao/67-renomeacao-knopi.md`.
 - **Validação:** `npx tsc --noEmit` sem erros; login conferido renderizando.
 - **Decisões:** troca em tudo, inclusive propriedades `canopi_*` do HubSpot e colunas do Supabase (Fábio, 23/11); identidade visual definitiva no manual v1.1.
-- **Próximo passo:** etapa 2, nomes internos de código e nome do pacote.
+- **Etapa 2 (mesmo dia):** 12 nomes internos que vivem só no app, arquivo `knopiAuth.ts`, pacote `knopi-intel-excels-app` e CSVs de exemplo; os 60 nomes camelCase ligados a gravação seguem com a etapa 4.
+- **Próximo passo:** etapa 3, documentação.
 
 ## [2026-05-19] — HubSpot C2.9E.2D.14 (create limpo de Deals + recovery de mappings + associações Deal → Company/Contact + preflightOnly)
 

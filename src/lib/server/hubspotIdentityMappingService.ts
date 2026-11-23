@@ -120,13 +120,13 @@ export async function listHubspotIdentityMappingsByCanonicalId(
   return queryIdentityMappings({ ...filters, canonicalId: normalizedCanonicalId });
 }
 
-export async function listHubspotIdentityMappingsByCanopiExternalId(
+export async function listHubspotIdentityMappingsByKnopiExternalId(
   canopiExternalId: string,
   filters: Omit<HubspotIdentityMappingLookupFilters, 'canopiExternalId'> = {},
 ): Promise<HubspotIdentityMapping[]> {
-  const normalizedCanopiExternalId = readString(canopiExternalId);
-  if (!normalizedCanopiExternalId) return [];
-  return queryIdentityMappings({ ...filters, canopiExternalId: normalizedCanopiExternalId });
+  const normalizedKnopiExternalId = readString(canopiExternalId);
+  if (!normalizedKnopiExternalId) return [];
+  return queryIdentityMappings({ ...filters, canopiExternalId: normalizedKnopiExternalId });
 }
 
 export async function listHubspotIdentityMappingsByHubspotId(
@@ -146,11 +146,11 @@ export async function findHubspotIdentityMappingByCanonicalId(
   return first ?? null;
 }
 
-export async function findHubspotIdentityMappingByCanopiExternalId(
+export async function findHubspotIdentityMappingByKnopiExternalId(
   canopiExternalId: string,
   filters: Omit<HubspotIdentityMappingLookupFilters, 'canopiExternalId'> = {},
 ): Promise<HubspotIdentityMapping | null> {
-  const [first] = await listHubspotIdentityMappingsByCanopiExternalId(canopiExternalId, filters);
+  const [first] = await listHubspotIdentityMappingsByKnopiExternalId(canopiExternalId, filters);
   return first ?? null;
 }
 
