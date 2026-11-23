@@ -515,7 +515,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
             <Target className="w-6 h-6 text-blue-400" />
           </div>
           <div>
-            <h3 className="font-black text-sm text-slate-900 uppercase tracking-[0.2em] leading-tight">Canopi Intelligence Oracle</h3>
+            <h3 className="font-black text-sm text-slate-900 uppercase tracking-[0.2em] leading-tight">Knopi Intelligence Oracle</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-slate-400 font-black uppercase tracking-widest">Decision MindMap</span>
               <div className="w-1 h-1 bg-slate-200 rounded-full" />

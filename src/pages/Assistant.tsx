@@ -109,7 +109,7 @@ interface ContextBlock {
 
 export const Assistant: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', content: 'Olá! Sou o estrategista de IA da Canopi | intel excels. Como posso ajudar com a sua estratégia B2B hoje?' }
+    { role: 'assistant', content: 'Olá! Sou o estrategista de IA da Knopi | intel excels. Como posso ajudar com a sua estratégia B2B hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

@@ -465,13 +465,13 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           </div>
         </section>
 
-        {/* --- MANUAL DE ABORDAGEM CANOPI AI --- */}
+        {/* --- MANUAL DE ABORDAGEM KNOPI AI --- */}
         <section className="bg-gradient-to-br from-blue-900/20 to-slate-900 p-5 rounded-2xl border border-blue-500/20 relative overflow-hidden shadow-xl">
           <div className="absolute -right-4 -top-4 opacity-10">
             <BrainCircuit className="w-24 h-24 text-blue-400" />
           </div>
           <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Sparkles className="w-4 h-4" /> Inteligência de Abordagem Canopi
+            <Sparkles className="w-4 h-4" /> Inteligência de Abordagem Knopi
           </h3>
           
           <div className="space-y-4">
@@ -529,7 +529,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                 </>
               ) : (
                 <>
-                  <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação Canopi AI
+                  <MessageSquare className="w-3.5 h-3.5" /> Preparar Interação Knopi AI
                 </>
               )}
             </button>

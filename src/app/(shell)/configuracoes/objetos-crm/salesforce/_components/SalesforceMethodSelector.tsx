@@ -1756,7 +1756,7 @@ export function SalesforceMethodSelector() {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         setOauthNotice(data.error || 'Não foi possível desconectar OAuth.');
       } else {
-        setOauthNotice('Salesforce desconectado. Os dados já sincronizados permanecem na Canopi, mas a leitura atual foi encerrada.');
+        setOauthNotice('Salesforce desconectado. Os dados já sincronizados permanecem na Knopi, mas a leitura atual foi encerrada.');
       }
       resetAccountsOperationalSession();
       resetAccountSyncStateToIdle(true);
@@ -2058,7 +2058,7 @@ export function SalesforceMethodSelector() {
           : rawValue;
       const confirmedValue = field === 'Industry' ? confirmedIndustryItems[key] : undefined;
       const decisionLabel: Record<AccountQualityDecision, string> = {
-        manual: 'Corrigido na Canopi',
+        manual: 'Corrigido na Knopi',
         fix_salesforce: 'Corrigir no Salesforce',
         accept: 'Aceito temporariamente',
         remove: 'Removido do sync',

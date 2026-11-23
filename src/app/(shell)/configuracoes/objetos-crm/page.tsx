@@ -22,7 +22,7 @@ export default function HubCrmDadosPage() {
           <div>
             <h2 className="text-4xl font-black tracking-tighter text-slate-900 uppercase">Hub de CRM e Dados</h2>
             <p className="text-sm font-medium text-slate-400">
-              Este hub separa a configuração local por CRM da camada canônica global da Canopi.
+              Este hub separa a configuração local por CRM da camada canônica global da Knopi.
             </p>
           </div>
         </div>
@@ -72,13 +72,13 @@ export default function HubCrmDadosPage() {
               <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">Camada canônica global</p>
             </div>
             <Badge className="bg-emerald-100 text-emerald-700 border-none text-xs font-black uppercase tracking-widest px-3 py-1">
-              Canopi global
+              Knopi global
             </Badge>
           </div>
 
           <Card className="border border-slate-200 bg-white p-6 rounded-3xl">
             <div className="space-y-2">
-              <h3 className="text-xl font-black text-slate-900">Modelo Canônico Canopi</h3>
+              <h3 className="text-xl font-black text-slate-900">Modelo Canônico Knopi</h3>
               <p className="text-sm font-medium text-slate-400 leading-relaxed">
                 Revise Conta, Contato, Oportunidade e Campanha como destinos canônicos.
               </p>

@@ -498,7 +498,7 @@ export default function Performance() {
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.18em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Ciclo fechado</span>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">{pl}</span>
         </div>
-        <div className="text-xs font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+        <div className="text-xs font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Knopi · Revenue Ops · Desempenho</div>
         <div className="text-5xl font-black tracking-tighter leading-none mb-2">Desempenho</div>
         <div className="text-sm text-white/60 leading-relaxed max-w-2xl mb-5">Entenda o que gerou resultado. Feche o ciclo Sinal → Ação → Desempenho → novo Sinal.</div>
 
@@ -647,7 +647,7 @@ export default function Performance() {
 
                 {/* rodapé: botões */}
                 <div className="flex items-center gap-2 border-t border-[#f1f5f9] px-6 py-3 bg-white/50">
-                  <button className="h-8 px-4 rounded-full text-xs font-bold bg-[#2b44ff] text-white hover:bg-[#1a2dbb] transition-all shadow-sm hover:shadow-md cursor-pointer">→ Ver no Canopi</button>
+                  <button className="h-8 px-4 rounded-full text-xs font-bold bg-[#2b44ff] text-white hover:bg-[#1a2dbb] transition-all shadow-sm hover:shadow-md cursor-pointer">→ Ver no Knopi</button>
                   <button className="h-8 px-4 rounded-full text-xs font-bold bg-white text-slate-400 border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer" onClick={() => showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
                   <div className="ml-auto flex items-center gap-2">
                     <div className="flex -space-x-1.5">
@@ -923,7 +923,7 @@ export default function Performance() {
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-3xl shadow-2xl">{intPanel.icon}</div>
                 <div>
-                  <div className="text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-2">Canopi · Tecnologias · Diagnóstico</div>
+                  <div className="text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-2">Knopi · Tecnologias · Diagnóstico</div>
                   <h2 className="text-[36px] font-black text-white tracking-tighter leading-none mb-3">{intPanel.name}</h2>
                   <span className={bc(intPanel.status==='Conectado'?'bg':intPanel.status==='Degradado'?'bam':'br')}>{intPanel.status}</span>
                 </div>
@@ -986,7 +986,7 @@ export default function Performance() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowExport(false)} />
           <div className="relative w-full max-w-[480px] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-8">
-              <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-3">Canopi · Revenue Ops</div>
+              <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-3">Knopi · Revenue Ops</div>
               <h3 className="text-[24px] font-black text-white tracking-tight mb-2">Exportar Relatório</h3>
               <p className="text-[13px] text-white/60">Desempenho · {pl}</p>
             </div>
@@ -1034,7 +1034,7 @@ export default function Performance() {
           <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-10 flex flex-col gap-8">
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+                <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-2">Knopi · Revenue Ops · Desempenho</div>
                 <h2 className="text-[42px] font-black text-white tracking-tighter leading-none mb-3">Sinais Gerados</h2>
                 <p className="text-[15px] text-white/60">O desempenho atual está gerando estes sinais para o próximo ciclo</p>
               </div>

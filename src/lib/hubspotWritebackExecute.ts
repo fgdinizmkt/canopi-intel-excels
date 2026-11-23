@@ -519,7 +519,7 @@ export async function executeHubspotWriteback(options: HubspotWritebackExecuteRe
   if (!setup.companies.uniqueReady || !setup.contacts.uniqueReady) {
     return {
       ok: false,
-      error: 'IDs externos Canopi precisam estar configurados como únicos no HubSpot.',
+      error: 'IDs externos Knopi precisam estar configurados como únicos no HubSpot.',
       details: 'Valide canopi_company_id e canopi_contact_id como propriedades únicas antes de executar.',
     };
   }

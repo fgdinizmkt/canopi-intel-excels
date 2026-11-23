@@ -309,9 +309,9 @@ export async function persistContact(contact: ContactItem): Promise<void> {
  *   (Nota: creates inserem apenas defaults mínimos de schema não-enriquecidos)
  */
 export type CRMContactSyncPayload = {
-  /** ID Canopi gerado internamente — nunca o sourceContactId do Salesforce */
+  /** ID Knopi gerado internamente — nunca o sourceContactId do Salesforce */
   id: string;
-  /** UUID da Account Canopi — obrigatório, nunca nulo */
+  /** UUID da Account Knopi — obrigatório, nunca nulo */
   accountId: string;
   /** Nome legível da Account para desnormalização */
   accountName: string;

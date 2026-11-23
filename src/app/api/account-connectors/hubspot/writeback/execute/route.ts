@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       status: 'error',
       provider: 'hubspot',
       error: 'O setup HubSpot ainda não está pronto para writeback real.',
-      details: 'Valide pré-requisitos, propriedades Canopi e scopes de escrita antes de enviar.',
+      details: 'Valide pré-requisitos, propriedades Knopi e scopes de escrita antes de enviar.',
     };
     return NextResponse.json(error, { status: 403 });
   }

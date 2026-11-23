@@ -253,7 +253,7 @@ export const PaidMedia: React.FC = () => {
                  </div>
                  <div>
                     <h4 className="text-white font-bold text-sm uppercase tracking-tight">Campaign Strategy Builder</h4>
-                    <p className="text-xs text-blue-400 font-bold tracking-widest uppercase">Canopi Intelligence Integration</p>
+                    <p className="text-xs text-blue-400 font-bold tracking-widest uppercase">Knopi Intelligence Integration</p>
                  </div>
               </div>
               
@@ -599,7 +599,7 @@ export const PaidMedia: React.FC = () => {
              <div className="relative z-10 space-y-5">
                 <div className="flex items-center gap-2 bg-blue-500/10 p-2 pr-4 rounded-full border border-blue-500/20 w-fit">
                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                   <span className="text-white text-xs font-bold tracking-widest uppercase">Canopi Intelligence</span>
+                   <span className="text-white text-xs font-bold tracking-widest uppercase">Knopi Intelligence</span>
                 </div>
                 
                 {[
@@ -737,7 +737,7 @@ export const PaidMedia: React.FC = () => {
                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
                   <Network className="w-4 h-4 text-blue-600" /> Fontes de Dados Conectadas
                </h3>
-               <p className="text-xs text-slate-500 font-bold mt-1 uppercase tracking-tight">Status de sincronização global Canopi Intel</p>
+               <p className="text-xs text-slate-500 font-bold mt-1 uppercase tracking-tight">Status de sincronização global Knopi Intel</p>
             </div>
             <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50 transition-colors shadow-sm">
                <RefreshCw className="w-3 h-3 text-blue-500" /> Sincronizar Tudo
@@ -764,7 +764,7 @@ export const PaidMedia: React.FC = () => {
       <Modal 
         isOpen={modalOpen} 
         onClose={() => setModalOpen(false)} 
-        title={modalData?.title || 'Canopi Paid Media Suite'}
+        title={modalData?.title || 'Knopi Paid Media Suite'}
         //@ts-ignore
         size={modalData?.size || 'md'}
       >

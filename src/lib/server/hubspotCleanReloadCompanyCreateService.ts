@@ -121,11 +121,11 @@ interface MetadataPropertySpec {
 }
 
 const COMPANY_METADATA_PROPERTIES: MetadataPropertySpec[] = [
-  { name: 'canopi_import_batch_id', label: 'Canopi Import Batch ID', type: 'string', fieldType: 'text' },
-  { name: 'canopi_contract_version', label: 'Canopi Contract Version', type: 'string', fieldType: 'text' },
+  { name: 'canopi_import_batch_id', label: 'Knopi Import Batch ID', type: 'string', fieldType: 'text' },
+  { name: 'canopi_contract_version', label: 'Knopi Contract Version', type: 'string', fieldType: 'text' },
   {
     name: 'canopi_sync_status',
-    label: 'Canopi Sync Status',
+    label: 'Knopi Sync Status',
     type: 'enumeration',
     fieldType: 'select',
     options: [
@@ -136,8 +136,8 @@ const COMPANY_METADATA_PROPERTIES: MetadataPropertySpec[] = [
       { label: 'Arquivado', value: 'archived' },
     ],
   },
-  { name: 'canopi_last_sync_at', label: 'Canopi Last Sync At', type: 'string', fieldType: 'text' },
-  { name: 'canopi_source', label: 'Canopi Source', type: 'string', fieldType: 'text' },
+  { name: 'canopi_last_sync_at', label: 'Knopi Last Sync At', type: 'string', fieldType: 'text' },
+  { name: 'canopi_source', label: 'Knopi Source', type: 'string', fieldType: 'text' },
 ];
 
 async function fetchExistingCanopiCompanyIds(token: string): Promise<Set<string>> {

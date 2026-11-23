@@ -520,7 +520,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-400 text-xs italic">Sincronizado Canopi AI</span>
+            <span className="text-slate-400 text-xs italic">Sincronizado Knopi AI</span>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
         </div>
@@ -712,7 +712,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <SparkleIcon className="w-4 h-4 text-blue-500" />
-                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Leitura Canopi AI</h2>
+                <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Leitura Knopi AI</h2>
               </div>
               <button
                 onClick={() => setEditingLeitura(editingLeitura ? null : { ...localLeitura })}
@@ -1472,11 +1472,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             ) : <div className="p-8 border border-slate-800 text-center text-xs italic text-slate-400">Nenhum contato mapeado.</div>}
           </div>
 
-          {/* Plays Recomendados (Canopi AI) — RECORTE BLOCO C */}
+          {/* Plays Recomendados (Knopi AI) — RECORTE BLOCO C */}
           {playRecommendations.length > 0 && (
             <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/60 p-5 rounded-2xl border border-blue-500/20 shadow-xl">
               <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-5 flex items-center gap-2">
-                <SparkleIcon className="w-4 h-4 animate-pulse" /> Recomendações Estratégicas (Canopi AI)
+                <SparkleIcon className="w-4 h-4 animate-pulse" /> Recomendações Estratégicas (Knopi AI)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {playRecommendations.map(play => (

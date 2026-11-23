@@ -25,7 +25,7 @@ export default function ShellLayoutClient({ children }: { children: React.ReactN
           <footer className="p-8 border-t border-slate-100 flex flex-col items-center gap-2">
             <div className="flex items-center gap-3 opacity-40">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">Canopi</span>
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">Knopi</span>
                 <div className="h-3 w-px bg-slate-300"></div>
                 <span className="text-xs font-bold text-brand uppercase tracking-widest">Intel Excels</span>
               </div>

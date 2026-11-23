@@ -79,7 +79,7 @@ export default function LoginPage() {
 
           <div className="relative z-10 space-y-4 mt-8">
             <h1 className="text-4xl font-black text-white tracking-tight">
-              Bem-vindo à Canopi
+              Bem-vindo à Knopi
             </h1>
             <p className="text-blue-100/90 text-lg font-medium max-w-sm mx-auto">
               Sua plataforma Gateway para a Orquestração Inteligente de Pipelines.
@@ -108,7 +108,7 @@ export default function LoginPage() {
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                 <div className="w-4 h-4 border-[3px] border-white rounded-sm border-t-transparent border-l-transparent transform rotate-45"></div>
               </div>
-              <span className="font-extrabold text-slate-900 text-2xl tracking-tight leading-none">Canopi</span>
+              <span className="font-extrabold text-slate-900 text-2xl tracking-tight leading-none">Knopi</span>
             </div>
 
             {/* Toggle Sign In / Sign Up */}

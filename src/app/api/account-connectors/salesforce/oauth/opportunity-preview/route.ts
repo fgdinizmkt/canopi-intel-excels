@@ -32,7 +32,7 @@ export async function GET() {
 /**
  * POST /api/account-connectors/salesforce/oauth/opportunity-preview
  *
- * Executa preview read-only de Opportunities Salesforce → Canopi.
+ * Executa preview read-only de Opportunities Salesforce → Knopi.
  *
  * Guardrails:
  * - Exige contractId explícito no body — sem fallback para último contrato.

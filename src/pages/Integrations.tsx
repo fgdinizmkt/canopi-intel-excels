@@ -155,7 +155,7 @@ export const Integrations: React.FC = () => {
             <div className="space-y-3 max-w-2xl">
               <Badge variant="blue" className="bg-white/10 text-white border-white/20">PAINEL DE CONFIABILIDADE DO STACK</Badge>
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Integrações</h1>
-              <p className="text-white/80 text-sm md:text-base">Mantenha a saúde das fontes de dados para garantir a precisão da inteligência Canopi.</p>
+              <p className="text-white/80 text-sm md:text-base">Mantenha a saúde das fontes de dados para garantir a precisão da inteligência Knopi.</p>
             </div>
             <div className="grid grid-cols-2 gap-3 min-w-[280px]">
               <div className="bg-white/5 border border-white/10 rounded-xl p-3">
@@ -263,7 +263,7 @@ export const Integrations: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="max-w-xl">
             <h2 className="text-2xl font-bold tracking-tight">Auditando integridade do stack...</h2>
-            <p className="text-white/70 text-sm mt-2">O Canopi monitora continuamente a qualidade dos dados para evitar alarmes falsos e garantir a precisão da IA.</p>
+            <p className="text-white/70 text-sm mt-2">O Knopi monitora continuamente a qualidade dos dados para evitar alarmes falsos e garantir a precisão da IA.</p>
           </div>
           <button className="bg-white text-slate-900 hover:bg-slate-100 px-6 py-3 font-bold rounded-xl transition-all whitespace-nowrap">
             Baixar Relatório de Audit

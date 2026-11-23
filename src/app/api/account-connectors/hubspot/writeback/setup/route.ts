@@ -295,7 +295,7 @@ async function handleSetup(options: {
         const error: HubspotWritebackSetupError = {
           status: 'error',
           provider: 'hubspot',
-          error: 'Confirmação explícita ausente para criar propriedades Canopi.',
+          error: 'Confirmação explícita ausente para criar propriedades Knopi.',
         };
         return NextResponse.json(error, { status: 400 });
       }
@@ -305,7 +305,7 @@ async function handleSetup(options: {
         return NextResponse.json({
           status: 'error',
           provider: 'hubspot',
-          error: 'Faltam permissões de leitura ou escrita para criar propriedades Canopi no HubSpot.',
+          error: 'Faltam permissões de leitura ou escrita para criar propriedades Knopi no HubSpot.',
           details: 'Reconecte o HubSpot com escopos de leitura e schema write antes de criar propriedades.',
         }, { status: 403 });
       }

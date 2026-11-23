@@ -243,7 +243,7 @@ export const SeoInbound: React.FC = () => {
            <div className="space-y-4">
               <h4 className="font-bold text-slate-800 flex items-center gap-2"><Bot className="w-4 h-4 text-purple-600"/> Answer Engine Tracking Limit</h4>
               <div className="bg-purple-50 text-purple-800 p-4 rounded-xl text-sm leading-relaxed border border-purple-100">
-                O índice de <strong>Visibilidade AEO (Answer Engine Optimization)</strong> cruza citações do domínio e menções positivas através da API do Perplexity e de simulações sistêmicas feitas pela Canopi em prompts do ChatGPT visando suas Keywords Core.
+                O índice de <strong>Visibilidade AEO (Answer Engine Optimization)</strong> cruza citações do domínio e menções positivas através da API do Perplexity e de simulações sistêmicas feitas pela Knopi em prompts do ChatGPT visando suas Keywords Core.
               </div>
               <button className="w-full bg-white border border-slate-200 text-slate-700 font-bold text-xs py-2.5 rounded-lg shadow-sm" onClick={() => setModalOpen(false)}>Visualizar Histórico de Prompts</button>
            </div>
@@ -274,7 +274,7 @@ export const SeoInbound: React.FC = () => {
                  <FileSpreadsheet className="w-8 h-8" />
               </div>
               <h4 className="font-bold text-slate-800 text-lg">Exportar Data Lake de Performance</h4>
-              <p className="text-sm text-slate-500 px-4">Esta ação compilará os logs de acesso orgânico, cruzamentos de IP x Empresas (Clearbit/Canopi) e referências de AEO num CSV detalhado.</p>
+              <p className="text-sm text-slate-500 px-4">Esta ação compilará os logs de acesso orgânico, cruzamentos de IP x Empresas (Clearbit/Knopi) e referências de AEO num CSV detalhado.</p>
               <div className="pt-2 w-full max-w-xs mx-auto">
                  <button className="w-full bg-blue-700 text-white font-bold py-3 text-sm rounded-xl shadow-md hover:bg-blue-800" onClick={() => setModalOpen(false)}>Confirmar Download (214 MB)</button>
               </div>
@@ -332,7 +332,7 @@ export const SeoInbound: React.FC = () => {
            <div className="space-y-4">
               <h4 className="font-bold text-slate-800 flex items-center gap-2"><Linkedin className="w-4 h-4 text-blue-600"/> Employee Advocacy Tracker</h4>
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                <p className="text-sm text-slate-700 font-medium">O rastreio de menções via CRM indica que <strong>118 Leads</strong> ouviram falar da Canopi através do seu CEO e Top Voices internos antes de pesquisar o nome da marca no Google clássico.</p>
+                <p className="text-sm text-slate-700 font-medium">O rastreio de menções via CRM indica que <strong>118 Leads</strong> ouviram falar da Knopi através do seu CEO e Top Voices internos antes de pesquisar o nome da marca no Google clássico.</p>
               </div>
            </div>
          );
@@ -589,7 +589,7 @@ export const SeoInbound: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {[
                   { title: "Futuro do ABM e AGI", cat: "Blog Post", views: "12.4k", conv: "3.2%", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=240&h=160" },
-                  { title: "Demo: Inteligência Canopi", cat: "Landing Page", views: "8.1k", conv: "14.5%", img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=240&h=160" },
+                  { title: "Demo: Inteligência Knopi", cat: "Landing Page", views: "8.1k", conv: "14.5%", img: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=240&h=160" },
                   { title: "ROI de Vendas Analytics", cat: "Blog Post", views: "5.8k", conv: "2.1%", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=240&h=160" },
                 ].map((post, idx) => (
                   <div key={idx} className="group bg-slate-50/50 rounded-2xl border border-slate-100 overflow-hidden hover:border-blue-200 transition-all cursor-pointer shadow-sm" onClick={() => openSimModal(post.title, 'PAGE_AUDIT')}>

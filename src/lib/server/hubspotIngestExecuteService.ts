@@ -103,7 +103,7 @@ function buildWarnings(contract: HubspotIngestContract): string[] {
   }
 
   if (dryRunSummary.companiesWithoutCanopiId && dryRunSummary.companiesWithoutCanopiId > 0) {
-    warnings.push(`${dryRunSummary.companiesWithoutCanopiId} Companies fora da Canopi permanecem em revisão.`);
+    warnings.push(`${dryRunSummary.companiesWithoutCanopiId} Companies fora da Knopi permanecem em revisão.`);
   }
 
   if (dryRunSummary.contactsWithoutCanopiId && dryRunSummary.contactsWithoutCanopiId > 0) {
@@ -133,7 +133,7 @@ function buildPlan(contract: HubspotIngestContract) {
       skip: 0,
       review: companyReview,
       allowedFields: ACCOUNT_FIELDS,
-      notes: 'Somente Companies/tagged entram como candidatos a atualização canônica; Companies fora da Canopi seguem para revisão.',
+      notes: 'Somente Companies/tagged entram como candidatos a atualização canônica; Companies fora da Knopi seguem para revisão.',
     }),
     contacts: buildPlanSection({
       totalPlanned: contactTotal,

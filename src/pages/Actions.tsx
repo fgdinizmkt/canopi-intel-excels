@@ -1639,7 +1639,7 @@ export const Actions: React.FC = () => {
                 <span className="bg-emerald-500/10 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-300 border border-emerald-500/10">Sinais conectados</span>
                 <span className="bg-white/10 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white/70 border border-white/5">Projeto por ação</span>
               </div>
-              <p className="text-xs font-bold tracking-[0.24em] uppercase text-white/40 mt-6">Canopi · Revenue Ops · Fila de ações</p>
+              <p className="text-xs font-bold tracking-[0.24em] uppercase text-white/40 mt-6">Knopi · Revenue Ops · Fila de ações</p>
               <h1 className="text-5xl font-black tracking-tight leading-[1.05] mt-4">Fila operacional de ações</h1>
               <p className="mt-5 text-[15px] leading-relaxed text-white/60 font-medium">
                 Orquestração de ações com contexto de conta, sinal, owner, SLA, histórico e fluxo operacional por ação. A leitura geral fica leve, e o detalhe profundo abre em overlay central quando a equipe precisa decidir e agir.

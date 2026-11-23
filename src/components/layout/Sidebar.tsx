@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
     <aside className="fixed left-0 top-0 bottom-0 w-60 bg-white border-r border-slate-100 flex flex-col z-50">
         <div className="h-20 flex flex-col items-start justify-center px-6 border-b border-slate-50 mb-4">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-brand text-xl tracking-tight leading-none">Canopi</span>
+            <span className="font-bold text-brand text-xl tracking-tight leading-none">Knopi</span>
             <div className="h-6 w-px bg-slate-200"></div>
             <div className="flex flex-col leading-none">
               <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">intel</span>

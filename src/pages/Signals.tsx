@@ -441,7 +441,7 @@ export const Signals: React.FC = () => {
         <div className="hero-tags">
           <span className="hero-tag hero-tag-white">Inteligência</span><span className="hero-tag hero-tag-green">Sinais conectados</span>
         </div>
-        <div className="hero-context">Canopi · Revenue Intelligence · Sinais</div>
+        <div className="hero-context">Knopi · Revenue Intelligence · Sinais</div>
         <div className="hero-title">Sinais</div>
         <div className="hero-subtitle">Detecção proativa de anomalias, oportunidades e mudanças que exigem atenção ou ação.</div>
         <div className="hero-metrics">

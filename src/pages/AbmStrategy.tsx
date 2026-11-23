@@ -116,11 +116,11 @@ const abmHeatmapCriteria = [
   },
   {
     id: 'ft',
-    title: 'Fit com a Canopi',
+    title: 'Fit com a Knopi',
     subtitle: 'Alinhamento tecnológico, cultural e de timing',
-    xLabel: 'FIT CANOPI',
+    xLabel: 'FIT KNOPI',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
-    note: 'Eixo X = alinhamento da conta com o stack tecnológico, maturidade analítica e timing comercial da Canopi. Contas com fit alto e importância alta são candidatas a fast-track no pipeline.',
+    note: 'Eixo X = alinhamento da conta com o stack tecnológico, maturidade analítica e timing comercial da Knopi. Contas com fit alto e importância alta são candidatas a fast-track no pipeline.',
     desc: (a: any) =>
       `Fit ${a.ft}% — ${a.ft >= 75 ? 'Fit excelente. Stack tecnológica e maturidade analítica alinhadas.' : a.ft >= 50 ? 'Fit parcial. Identificar gaps e propor roadmap gradual.' : 'Fit baixo. Considerar parceiros integradores antes de avançar.'}`,
     scoreKey: 'ft' as const,
@@ -131,7 +131,7 @@ const abmHeatmapCriteria = [
     subtitle: 'Score consolidado dos 5 critérios — ranking ABM',
     xLabel: 'SCORE CONSOLIDADO',
     yLabel: 'IMPORTÂNCIA ESTRATÉGICA',
-    note: 'Score composto = média de ICP, Engajamento CRM, Potencial da Vertical, Contatos Mapeados e Fit Canopi. Contas acima de 72% são classificadas como TOP TIER e recebem SDR + AE dedicados.',
+    note: 'Score composto = média de ICP, Engajamento CRM, Potencial da Vertical, Contatos Mapeados e Fit Knopi. Contas acima de 72% são classificadas como TOP TIER e recebem SDR + AE dedicados.',
     desc: (a: any) => {
       const avg = Math.round((a.icp + a.crm + a.vp + a.ct + a.ft) / 5);
       return `Média ${avg}% — ${avg >= 72 ? 'TOP TIER: Alocar SDR + AE dedicados. Iniciar play imediatamente.' : avg >= 55 ? 'MID TIER: Incluir em sequência nurturing avançada.' : 'LOW TIER: Manter em watch list e reavaliar em 90 dias.'}`;
@@ -1169,7 +1169,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          <p className="text-xs text-emerald-600 font-bold uppercase">Sinergia &gt; 85% com o tier 1</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Importar contas via IA" aria-label="Importar do Canopi Intel">Importar do Canopi Intel</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Importar contas via IA" aria-label="Importar do Knopi Intel">Importar do Knopi Intel</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Refinar IA' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Enriquecer' },
@@ -1475,7 +1475,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                };
 
                const matrixViews = [
-                 { id: 'pos', title: 'Gráfico de Dispersão de Posicionamento', desc: 'Mapeamento vetorial de como as personas se posicionam diante da Canopi.', yAxisDef: defaultYAxis, note: 'Cada bolha é um Cargo. O eixo Y sinaliza onde aquele cargo estaciona na jornada de decisão. O tamanho rege o volume de contatos.' },
+                 { id: 'pos', title: 'Gráfico de Dispersão de Posicionamento', desc: 'Mapeamento vetorial de como as personas se posicionam diante da Knopi.', yAxisDef: defaultYAxis, note: 'Cada bolha é um Cargo. O eixo Y sinaliza onde aquele cargo estaciona na jornada de decisão. O tamanho rege o volume de contatos.' },
                  { id: 'pot', title: 'Potencial de Contato por Vertical vs Cargo', desc: 'Score agregado de propensão a conversão e engajamento da conta alvo.', yAxisDef: defaultYAxis, note: 'Cruze os eixos de Vertical (colunas) e Cargo (linhas) para descobrir cruzamentos de máximo potencial.' },
                  { id: 'recept', title: 'Receptividade Média (Rapport)', desc: 'Grau de abertura para criar um relacionamento inicial qualificado.', yAxisDef: defaultYAxis, note: 'Tons mais quentes identificam hierarquias corporativas super engajadas.' },
                  { id: 'access', title: 'Acessibilidade de Contato', desc: 'Nível de dificuldade política ou logística para alcançar o decisor.', yAxisDef: defaultYAxis, note: 'Mede a ausência de Gatekeepers. Áreas verdes significam alta blindagem.' }

@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Canopi | intel excels',
+  title: 'Knopi | intel excels',
   description: 'Plataforma SaaS B2B de inteligência operacional, estratégica e account-centric.',
   other: {
   }

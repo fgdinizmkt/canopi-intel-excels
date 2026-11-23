@@ -330,7 +330,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
         {/* ── COLUNA CENTRAL: NARRATIVAS & INTELIGÊNCIA (8/12) ── */}
         <div className="col-span-8 space-y-8">
            
-           {/* Canopi AI Strategic Approach (RESTAURADO) */}
+           {/* Knopi AI Strategic Approach (RESTAURADO) */}
            <section className="bg-brand text-white rounded-3xl p-8 relative overflow-hidden group shadow-2xl shadow-brand/20">
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                  <MessageSquare className="w-32 h-32" />
@@ -338,7 +338,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
               <div className="relative z-10">
                  <div className="flex items-center gap-3 mb-6">
                     <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20">
-                       Inteligência de Abordagem Canopi AI
+                       Inteligência de Abordagem Knopi AI
                     </span>
                     <Sparkles className="w-4 h-4 text-white/60 animate-pulse" />
                  </div>
@@ -367,7 +367,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                       disabled={!!prepStatus}
                       className={`px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:scale-105 flex items-center gap-2 ${prepStatus ? 'bg-emerald-600 text-white' : 'bg-white text-brand'}`}
                     >
-                       {prepStatus ? <><CheckCircle2 className="w-4 h-4" /> {prepStatus}</> : <><MessageSquare className="w-4 h-4 text-brand" /> Preparar Interação Canopi AI</>}
+                       {prepStatus ? <><CheckCircle2 className="w-4 h-4" /> {prepStatus}</> : <><MessageSquare className="w-4 h-4 text-brand" /> Preparar Interação Knopi AI</>}
                     </button>
                     <button className="px-6 py-3 bg-brand-dark/30 backdrop-blur-md border border-white/20 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark/50 transition-all">
                        Copiar Gancho para Email

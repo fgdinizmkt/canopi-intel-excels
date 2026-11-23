@@ -125,7 +125,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
       <footer className="bg-white border-t border-slate-200 p-8">
          <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs font-black text-slate-400 uppercase tracking-widest">
             <div className="flex items-center gap-8">
-               <span>Canopi © 2026</span>
+               <span>Knopi © 2026</span>
             </div>
          </div>
       </footer>

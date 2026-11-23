@@ -585,7 +585,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6">
                 <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20">
-                   Canopi Command Engine
+                   Knopi Command Engine
                 </span>
                 <Sparkles className="w-4 h-4 text-white/50 animate-pulse" />
               </div>
@@ -623,7 +623,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             {[
               { id: 'operacional', label: 'Estratégia & Fila', icon: Activity },
               { id: 'relacional', label: 'Comitê & Organograma', icon: Users2 },
-              { id: 'inteligencia', label: 'Leitura Canopi AI', icon: Sparkles },
+              { id: 'inteligencia', label: 'Leitura Knopi AI', icon: Sparkles },
               { id: 'estrategia', label: 'Pipeline & Metas', icon: Target },
             ].map(tab => (
               <button
@@ -819,7 +819,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                             }}
                             className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs font-black text-emerald-400 uppercase tracking-widest transition-all"
                           >
-                             Simular ROI Canopi
+                             Simular ROI Knopi
                           </button>
                       </div>
                    </div>
@@ -1049,14 +1049,14 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
             {activeTab === 'inteligencia' && (
               <div className="space-y-8 animate-in fade-in">
-                 {/* Leitura Canopi AI Section (Restored Parity) */}
+                 {/* Leitura Knopi AI Section (Restored Parity) */}
                  <section className="bg-white border border-slate-200 rounded-3xl p-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5">
                        <Sparkles className="w-24 h-24 text-blue-500" />
                     </div>
                     <div className="flex items-center justify-between mb-8">
                        <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-blue-500" /> Dril-down Canopi Intelligence
+                          <Sparkles className="w-4 h-4 text-blue-500" /> Dril-down Knopi Intelligence
                        </h3>
                        <button onClick={() => setEditingLeitura(editingLeitura === null ? { ...localLeitura } : null)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-black text-slate-400 transition-all uppercase hover:text-blue-400">
                           {editingLeitura ? <X className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />} {editingLeitura ? 'Cancelar' : 'Sugerir Insights'}
@@ -1143,7 +1143,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                            </div>
                         </div>
                         <div className="pt-8 border-t border-slate-300/50">
-                           <span className="text-xs font-black text-amber-500 uppercase tracking-widest mb-4 block">A Maior Lição (Canopi Core)</span>
+                           <span className="text-xs font-black text-amber-500 uppercase tracking-widest mb-4 block">A Maior Lição (Knopi Core)</span>
                            <div className="flex items-start gap-4 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
                               <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-1" />
                               <p className="text-xs text-orange-600 font-bold leading-relaxed">

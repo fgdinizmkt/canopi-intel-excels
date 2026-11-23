@@ -340,7 +340,7 @@ export const Overview: React.FC = () => {
             </div>
             <span className="text-xs font-bold text-brand uppercase tracking-widest">Plataforma de Inteligência de Receita</span>
           </div>
-          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Bem-vindo à Canopi</h1>
+          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Bem-vindo à Knopi</h1>
           <p className="text-slate-500 mt-2 max-w-md font-medium">
             Sua central de inteligência está sincronizada. Detectamos{' '}
             <span className="text-brand font-bold">{advancedSignals.length} novos sinais</span> de alta intenção hoje.

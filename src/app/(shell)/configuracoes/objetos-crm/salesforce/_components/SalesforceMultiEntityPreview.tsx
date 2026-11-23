@@ -1133,7 +1133,7 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
           Configurar mapeamento de campos
         </p>
         <p className="mt-1 text-xs font-medium text-slate-500">
-          Selecione qual campo do Salesforce corresponde a cada campo canônico da Canopi.
+          Selecione qual campo do Salesforce corresponde a cada campo canônico da Knopi.
         </p>
 
         <div className="mt-3 overflow-x-auto rounded-xl border border-slate-100">
@@ -1141,7 +1141,7 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50">
                 <th className="whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
-                  Campo canônico (Canopi)
+                  Campo canônico (Knopi)
                 </th>
                 <th className="whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
                   Obrigatório
@@ -1229,11 +1229,11 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
           </li>
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-            O ID interno da Canopi será preservado — nunca sobrescrito pelo Salesforce.
+            O ID interno da Knopi será preservado — nunca sobrescrito pelo Salesforce.
           </li>
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
-            Campos estratégicos da Canopi não serão sobrescritos por Salesforce:{' '}
+            Campos estratégicos da Knopi não serão sobrescritos por Salesforce:{' '}
             <code className="rounded bg-slate-200 px-1 text-xs">tipoEstrategico</code>,{' '}
             <code className="rounded bg-slate-200 px-1 text-xs">playAtivo</code>,{' '}
             <code className="rounded bg-slate-200 px-1 text-xs">scoring</code>.
@@ -2174,7 +2174,7 @@ export function SalesforceMultiEntityPreview({
         title: 'Contacts',
         count: contactPreviewResult.unresolvedCount,
         cause: 'Conta não resolvida',
-        impact: 'Esses Contacts não entram até a conta correspondente existir na Canopi.',
+        impact: 'Esses Contacts não entram até a conta correspondente existir na Knopi.',
         action: 'Sincronize Accounts prontas antes de tentar Contacts novamente.',
         blocking: 'Não bloqueia a conclusão.',
       }]
@@ -2220,9 +2220,9 @@ export function SalesforceMultiEntityPreview({
       title: 'Conectar Salesforce',
       description: oauthConnected
         ? 'A conexão já está ativa. Continue para validar o acesso e seguir com segurança.'
-        : 'Escolha como deseja conectar sua conta para começar a trazer dados para a Canopi.',
+        : 'Escolha como deseja conectar sua conta para começar a trazer dados para a Knopi.',
       helpTitle: 'O que acontece aqui',
-      helpText: 'A Canopi usa esta conexão para ler os dados necessários do Salesforce. Nada é sincronizado nesta etapa.',
+      helpText: 'A Knopi usa esta conexão para ler os dados necessários do Salesforce. Nada é sincronizado nesta etapa.',
       action: oauthConnected ? 'Continuar para validar conexão' : 'Conectar Salesforce',
       onClick: () => {
         if (!oauthConnected) {
@@ -2258,9 +2258,9 @@ export function SalesforceMultiEntityPreview({
       title: 'Encontrar dados',
       description: discoveryCompleted
         ? 'Os dados principais já foram encontrados. Siga para sincronizar o que está pronto.'
-        : 'A Canopi encontra contas, contatos e oportunidades disponíveis antes de decidir o que sincronizar.',
+        : 'A Knopi encontra contas, contatos e oportunidades disponíveis antes de decidir o que sincronizar.',
       helpTitle: 'Como seguir',
-      helpText: 'A Canopi vai procurar contas, contatos e oportunidades disponíveis. Esta leitura serve para preparar a sincronização com segurança.',
+      helpText: 'A Knopi vai procurar contas, contatos e oportunidades disponíveis. Esta leitura serve para preparar a sincronização com segurança.',
       action: discoveryCompleted ? 'Continuar para sincronizar' : 'Encontrar dados',
       onClick: async () => {
         if (!discoveryCompleted) {
@@ -2298,7 +2298,7 @@ export function SalesforceMultiEntityPreview({
               ? `${opportunityReadyCount} prontas para sincronizar · ${opportunityPreviewResult.unresolvedCount} pendentes por conta não resolvida.`
               : contactPreviewResult
                 ? `${contactPreviewResult.resolvedCount} contatos prontos · ${contactPreviewResult.unresolvedCount} com conta não resolvida.`
-                : 'Accounts vêm primeiro; depois Contacts e Opportunities prontos entram na Canopi.',
+                : 'Accounts vêm primeiro; depois Contacts e Opportunities prontos entram na Knopi.',
       helpTitle: 'Antes de sincronizar',
       helpText: 'Accounts resolvem vínculos de conta para Contacts e Opportunities. Quando a revisão automática não for suficiente, a preparação técnica continua disponível para a mesma sessão.',
       action: accountJourneySynced
@@ -2453,8 +2453,8 @@ export function SalesforceMultiEntityPreview({
         ? 'Jornada Salesforce finalizada com dados tratados'
         : 'Jornada Salesforce finalizada sem novos dados sincronizados',
       description: hasRealOperationalSync
-        ? 'Seu Salesforce está conectado e a jornada principal foi finalizada com sync real. A Canopi usa apenas os dados tratados com segurança. Pendências continuam disponíveis para revisão posterior.'
-        : 'Você confirmou que seguirá com pendências não bloqueantes. A Canopi mantém itens pendentes separados para correção posterior.',
+        ? 'Seu Salesforce está conectado e a jornada principal foi finalizada com sync real. A Knopi usa apenas os dados tratados com segurança. Pendências continuam disponíveis para revisão posterior.'
+        : 'Você confirmou que seguirá com pendências não bloqueantes. A Knopi mantém itens pendentes separados para correção posterior.',
       helpTitle: 'Último passo',
       helpText: 'A configuração padrão está pronta. Use esta área apenas para auditoria, investigação ou ajustes manuais quando necessário.',
       action: 'Voltar para conectores',
@@ -2546,7 +2546,7 @@ export function SalesforceMultiEntityPreview({
           <div className="space-y-1">
             <p className="text-xl font-black text-slate-950">Configurar Salesforce</p>
             <p className="max-w-3xl text-sm font-medium text-slate-400">
-              Conecte sua conta, revise os dados encontrados e sincronize com segurança os dados prontos para a Canopi.
+              Conecte sua conta, revise os dados encontrados e sincronize com segurança os dados prontos para a Knopi.
             </p>
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
@@ -2625,7 +2625,7 @@ export function SalesforceMultiEntityPreview({
               <div id="salesforce-accounts-main" className="mt-6 border-t border-slate-200 pt-6">
                 <p className="text-sm font-black text-slate-900">Accounts</p>
                 <p className="mt-1 text-xs font-medium text-slate-400">
-                  Accounts ajudam a resolver Contacts e Opportunities que dependem de uma conta já existente na Canopi.
+                  Accounts ajudam a resolver Contacts e Opportunities que dependem de uma conta já existente na Knopi.
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-4">
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -2686,7 +2686,7 @@ export function SalesforceMultiEntityPreview({
                     <p className="text-3xl font-black text-emerald-700">{opportunityReadyCount}</p>
                     <p className="mt-1 text-xs font-bold text-emerald-900">prontas para sincronizar</p>
                     <p className="mt-1 text-xs font-medium text-emerald-700">
-                      Serão atualizadas ou criadas na Canopi.
+                      Serão atualizadas ou criadas na Knopi.
                     </p>
                   </div>
                   <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
@@ -2722,7 +2722,7 @@ export function SalesforceMultiEntityPreview({
 
             {activeStepContent.writesData && (
               <p className="mt-3 rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-bold text-emerald-800">
-                Esta ação grava apenas registros seguros na Canopi. Itens com pendências serão ignorados.
+                Esta ação grava apenas registros seguros na Knopi. Itens com pendências serão ignorados.
               </p>
             )}
             {currentSetupStep === 'review' && !canConcludeReview && (
@@ -2904,7 +2904,7 @@ export function SalesforceMultiEntityPreview({
                 <p className="mt-1 text-sm font-black text-slate-900">{activeStepContent.action}</p>
                 {activeStepContent.writesData && (
                   <p className="mt-1 text-xs font-bold text-emerald-800">
-                    Esta ação grava apenas dados prontos na Canopi. Itens com pendência continuam ignorados.
+                    Esta ação grava apenas dados prontos na Knopi. Itens com pendência continuam ignorados.
                   </p>
                 )}
               </div>
@@ -2935,11 +2935,11 @@ export function SalesforceMultiEntityPreview({
                   </p>
                   <p className="text-xs font-medium text-emerald-800">
                     {hasRealOperationalSync
-                      ? 'Seu Salesforce está conectado e a jornada principal foi finalizada com sync real. A Canopi usa apenas os dados tratados com segurança.'
-                      : 'Você confirmou que seguirá com pendências não bloqueantes. A Canopi mantém itens pendentes separados para correção posterior.'}
+                      ? 'Seu Salesforce está conectado e a jornada principal foi finalizada com sync real. A Knopi usa apenas os dados tratados com segurança.'
+                      : 'Você confirmou que seguirá com pendências não bloqueantes. A Knopi mantém itens pendentes separados para correção posterior.'}
                   </p>
                   <p className="mt-2 text-xs font-medium text-emerald-800">
-                    Concluir não apaga pendências nem força dados incompletos. A Canopi usa apenas dados tratados com segurança e mantém itens pendentes separados para correção posterior.
+                    Concluir não apaga pendências nem força dados incompletos. A Knopi usa apenas dados tratados com segurança e mantém itens pendentes separados para correção posterior.
                   </p>
                 </div>
                 <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-700">
@@ -3275,7 +3275,7 @@ export function SalesforceMultiEntityPreview({
                 <div className="flex flex-col items-center justify-center py-10">
                   <Loader2 className="h-8 w-8 animate-spin text-violet-700" />
                   <p className="mt-3 text-sm font-bold text-slate-700">Gerando preview de sincronização...</p>
-                  <p className="text-xs font-medium text-slate-500">Comparando dados do Salesforce com sua base local Canopi</p>
+                  <p className="text-xs font-medium text-slate-500">Comparando dados do Salesforce com sua base local Knopi</p>
                 </div>
               )}
 
@@ -3310,7 +3310,7 @@ export function SalesforceMultiEntityPreview({
                     <p className="text-sm font-black text-amber-900">Executar Sincronização Controlada</p>
                     <ul className="mt-2 space-y-1 text-xs font-medium text-amber-800">
                       <li>⚠ Esta ação gravará apenas campos permitidos em Contas.</li>
-                      <li>🔒 Campos estratégicos da Canopi não serão sobrescritos.</li>
+                      <li>🔒 Campos estratégicos da Knopi não serão sobrescritos.</li>
                       <li>🚫 Writeback para Salesforce não está habilitado.</li>
                       <li>📋 O log de execução será registrado no contrato.</li>
                     </ul>
@@ -3426,7 +3426,7 @@ export function SalesforceMultiEntityPreview({
                 </span>
               </div>
               <p className="text-xs font-medium text-slate-400">
-                Use contratos Salesforce já salvos para validar vínculos Contact → Account Canopi sem executar sync.
+                Use contratos Salesforce já salvos para validar vínculos Contact → Account Knopi sem executar sync.
               </p>
             </div>
             {eligibleContractsState.phase !== 'loading' && contactPreviewState.phase === 'idle' && (
@@ -3576,7 +3576,7 @@ export function SalesforceMultiEntityPreview({
                   <ul className="mt-3 space-y-1 text-xs font-medium text-slate-500">
                     <li>✅ Esta ação gravará apenas campos permitidos em Contacts.</li>
                     <li>🔒 Contacts sem Account resolvida serão ignorados.</li>
-                    <li>🛡 Campos relacionais estratégicos da Canopi não serão sobrescritos.</li>
+                    <li>🛡 Campos relacionais estratégicos da Knopi não serão sobrescritos.</li>
                     <li>🚫 Writeback para Salesforce não está habilitado.</li>
                   </ul>
                   <button
@@ -3638,7 +3638,7 @@ export function SalesforceMultiEntityPreview({
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-600">Macroárea 4 · Sync principal de Opportunities</p>
           <p className="mt-1 text-sm font-black text-slate-900">Preview e sincronização principal ficam em destaque</p>
           <p className="mt-1 text-xs font-medium text-slate-400">
-            A execução controlada grava Opportunities na Canopi; as leituras avançadas continuam subordinadas abaixo.
+            A execução controlada grava Opportunities na Knopi; as leituras avançadas continuam subordinadas abaixo.
           </p>
         </div>
 
@@ -3655,7 +3655,7 @@ export function SalesforceMultiEntityPreview({
                 </span>
               </div>
               <p className="text-xs font-medium text-slate-400">
-                Visualize as Opportunities do Salesforce e sua prontidão relacional com Accounts Canopi.
+                Visualize as Opportunities do Salesforce e sua prontidão relacional com Accounts Knopi.
               </p>
             </div>
             {eligibleOppContractsState.phase !== 'loading' && oppPreviewState.phase === 'idle' && (
@@ -3797,7 +3797,7 @@ export function SalesforceMultiEntityPreview({
                   <div className="space-y-1">
                     <p className="text-sm font-black text-emerald-900">Sync controlado de Opportunities</p>
                     <p className="text-xs font-medium text-emerald-700 max-w-3xl">
-                      Este passo grava Opportunities na Canopi. Não grava Accounts, Contacts nem vínculos Opportunity ↔ Contact.
+                      Este passo grava Opportunities na Knopi. Não grava Accounts, Contacts nem vínculos Opportunity ↔ Contact.
                       O contrato precisa estar selecionado e o preview acima deve ser revisado antes da execução.
                     </p>
                   </div>
@@ -4058,7 +4058,7 @@ function SyncPreviewPanel({ result }: { result: any }) {
                 Campos Traduzidos (Preview)
               </th>
               <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
-                Estado na Canopi
+                Estado na Knopi
               </th>
               <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
                 Ação Prevista
@@ -4147,7 +4147,7 @@ function SyncPreviewPanel({ result }: { result: any }) {
           <p className="text-xs font-black">Sincronização Read-Only</p>
         </div>
         <p className="mt-3 max-w-md text-center text-xs font-medium text-slate-500">
-          Nenhum dado foi gravado na sua base de Contas da Canopi.
+          Nenhum dado foi gravado na sua base de Contas da Knopi.
           Este painel apenas simula a tradução dos campos e o impacto que o sync teria se fosse executado agora.
         </p>
         <p className="mt-1 text-xs font-black text-slate-400 uppercase tracking-widest">
@@ -4184,7 +4184,7 @@ function SyncExecutePanel({ result }: { result: any }) {
               Campos Estratégicos Preservados
             </span>
             <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-              Salesforce → Canopi
+              Salesforce → Knopi
             </span>
           </div>
         </div>
@@ -4286,7 +4286,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
               Read-Only
             </span>
             <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-              Salesforce → Canopi
+              Salesforce → Knopi
             </span>
           </div>
         </div>
@@ -4330,7 +4330,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">E-mail</th>
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Cargo / Área</th>
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">SF AccountId</th>
-                <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Canopi</th>
+                <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Knopi</th>
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Ação prevista</th>
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Avisos</th>
               </tr>
@@ -4386,7 +4386,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
         </div>
         <p className="mt-4 text-xs font-medium text-indigo-600">
           O vínculo com Account usa o <span className="font-black">sync_summary_log</span> dos contratos Account sincronizados no C4.7.
-          Cada Contact sem Account resolvida permanece como <span className="font-black">unresolved_account</span> e não será criado na Canopi.
+          Cada Contact sem Account resolvida permanece como <span className="font-black">unresolved_account</span> e não será criado na Knopi.
         </p>
       </details>
     </div>
@@ -4419,7 +4419,7 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
               Campos Estratégicos Preservados
             </span>
             <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-              Salesforce → Canopi
+              Salesforce → Knopi
             </span>
           </div>
         </div>
@@ -4535,7 +4535,7 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
               Sincronização segura
             </span>
             <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-              Salesforce para Canopi
+              Salesforce para Knopi
             </span>
           </div>
         </div>
@@ -4573,7 +4573,7 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/50">
               <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Opportunity (SF)</th>
-              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Canopi</th>
+              <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Account Knopi</th>
               <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Stage</th>
               <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Amount</th>
               <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Close Date</th>
@@ -4612,7 +4612,7 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
                       </span>
                       {item.actionPreview === 'ready_to_create' || item.actionPreview === 'ready_to_update' ? (
                         <span className="text-xs font-medium text-emerald-700">
-                          Este registro pode entrar com segurança na Canopi.
+                          Este registro pode entrar com segurança na Knopi.
                         </span>
                       ) : item.actionPreview === 'unresolved_account' ? (
                         <span className="text-xs font-medium text-amber-700">
@@ -4699,7 +4699,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
           <div className="flex flex-wrap items-center gap-2">
             <span className="flex items-center gap-1 text-xs font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
-              Grava Opportunities na Canopi
+              Grava Opportunities na Knopi
             </span>
             <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Sem Accounts, Contacts ou vínculos OCR
@@ -4888,8 +4888,8 @@ function OpportunityContactRolePreviewPanel({ result }: { result: OpportunityCon
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50">
                 <th className="px-3 py-2 text-left font-bold text-slate-500">Opp Salesforce</th>
-                <th className="px-3 py-2 text-left font-bold text-slate-500">Account Canopi</th>
-                <th className="px-3 py-2 text-left font-bold text-slate-500">Contact Canopi</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Account Knopi</th>
+                <th className="px-3 py-2 text-left font-bold text-slate-500">Contact Knopi</th>
                 <th className="px-3 py-2 text-left font-bold text-slate-500">Papel</th>
                 <th className="px-3 py-2 text-left font-bold text-slate-500">Status</th>
               </tr>

@@ -22,7 +22,7 @@ export function AccountUploadLgpd() {
                   <Download className="w-48 h-48 text-slate-900" />
                </div>
                <div className="relative">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-4">Template de Escala Canopi</h3>
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-4">Template de Escala Knopi</h3>
                   <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-xl mb-10 italic">
                      O upload por planilha é um fluxo controlado. Use apenas o template oficial para garantir que colunas de rastreabilidade e LGPD sejam preenchidas corretamente.
                   </p>

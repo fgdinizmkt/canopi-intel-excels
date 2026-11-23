@@ -38,7 +38,7 @@ export interface ContatoConta {
   potencialSucesso: number;
   /** Score consolidado de probabilidade de conversão (0-100) */
   scoreSucesso: number;
-  /** Sugestão de abertura de conversa Canopi AI */
+  /** Sugestão de abertura de conversa Knopi AI */
   ganchoReuniao?: string;
   /** Observações tácticas sobre o stakeholder */
   observacoes?: string;
@@ -161,10 +161,10 @@ export const initialActions: ActionItem[] = [
       { id: "a1p1", lane: "Diagnóstico", label: "Mapear casos afetados", owner: "Ligia", startWeek: 1, duration: 1, status: "done", detail: "Levantamento dos 13 leads e impacto em SLA." },
       { id: "a1p2", lane: "Configuração", label: "Corrigir regra no HubSpot", owner: "Daniel", startWeek: 2, duration: 2, status: "risk", detail: "Ajuste bloqueado por permissão administrativa." },
       { id: "a1p3", lane: "Remediação", label: "Reatribuir backlog", owner: "Ligia", startWeek: 4, duration: 2, status: "pending", detail: "Distribuição para squad certo por vertical." },
-      { id: "a1p4", lane: "Validação", label: "Monitorar novas entradas", owner: "Canopi", startWeek: 6, duration: 2, status: "pending", detail: "Checagem de 7 dias sem reincidência." },
+      { id: "a1p4", lane: "Validação", label: "Monitorar novas entradas", owner: "Knopi", startWeek: 6, duration: 2, status: "pending", detail: "Checagem de 7 dias sem reincidência." },
     ],
     history: [
-      { id: "a1h1", when: "Hoje · 09:12", actor: "Canopi", type: "evidência", text: "Consolidou 13 leads enterprise sem owner e fora do SLA." },
+      { id: "a1h1", when: "Hoje · 09:12", actor: "Knopi", type: "evidência", text: "Consolidou 13 leads enterprise sem owner e fora do SLA." },
       { id: "a1h2", when: "Hoje · 09:40", actor: "Fábio", type: "mudança", text: "Elevou a prioridade para Crítica e escalou o impacto em receita." },
       { id: "a1h3", when: "Hoje · 10:05", actor: "Daniel Rocha", type: "risco", text: "Indicou dependência de acesso administrativo para aplicar a correção." },
     ],
@@ -214,7 +214,7 @@ export const initialActions: ActionItem[] = [
       { id: "a2p4", lane: "Agenda", label: "Confirmar reunião", owner: "Camila", startWeek: 6, duration: 2, status: "pending", detail: "Objetivo é recolocar comitê no rito de decisão." },
     ],
     history: [
-      { id: "a2h1", when: "Hoje · 08:58", actor: "Canopi", type: "evidência", text: "Detectou queda relevante de engajamento em relação à média das últimas 4 semanas." },
+      { id: "a2h1", when: "Hoje · 08:58", actor: "Knopi", type: "evidência", text: "Detectou queda relevante de engajamento em relação à média das últimas 4 semanas." },
       { id: "a2h2", when: "Hoje · 09:30", actor: "Camila Ribeiro", type: "owner", text: "Assumiu a ação e iniciou revisão da tese de abordagem." },
       { id: "a2h3", when: "Hoje · 10:22", actor: "Fábio", type: "follow-up", text: "Ligou a ação a um play de recuperação com sponsor técnico." },
     ],
@@ -261,7 +261,7 @@ export const initialActions: ActionItem[] = [
       { id: "a3p4", lane: "QBR", label: "Executar rito blindado", owner: "Squad Minerva", startWeek: 7, duration: 2, status: "pending", detail: "Condução with sponsor aquecido e próxima etapa definida." },
     ],
     history: [
-      { id: "a3h1", when: "Hoje · 08:20", actor: "Canopi", type: "evidência", text: "Detectou mudança de stakeholder em conta de expansão sensível." },
+      { id: "a3h1", when: "Hoje · 08:20", actor: "Knopi", type: "evidência", text: "Detectou mudança de stakeholder em conta de expansão sensível." },
       { id: "a3h2", when: "Hoje · 09:15", actor: "Fábio", type: "owner", text: "Assumiu a ação por impacto direto na expansão da conta." },
     ],
     buttons: [
@@ -304,10 +304,10 @@ export const initialActions: ActionItem[] = [
       { id: "a4p1", lane: "Análise", label: "Mapear desperdício", owner: "Camila", startWeek: 1, duration: 1, status: "done", detail: "Leitura de conjuntos, CTR e qualificação." },
       { id: "a4p2", lane: "Mídia", label: "Redistribuir verba", owner: "Camila", startWeek: 2, duration: 2, status: "active", detail: "Corte de grupos ruins e reforço em intent alta." },
       { id: "a4p3", lane: "Qualidade", label: "Atualizar negativas", owner: "Juliana", startWeek: 4, duration: 2, status: "pending", detail: "Redução de tráfego com baixa aderência ICP." },
-      { id: "a4p4", lane: "Validação", label: "Ler impacto em 72h", owner: "Canopi", startWeek: 6, duration: 2, status: "pending", detail: "Checagem de CPL e qualidade pós-ajuste." },
+      { id: "a4p4", lane: "Validação", label: "Ler impacto em 72h", owner: "Knopi", startWeek: 6, duration: 2, status: "pending", detail: "Checagem de CPL e qualidade pós-ajuste." },
     ],
     history: [
-      { id: "a4h1", when: "Ontem · 18:05", actor: "Canopi", type: "evidência", text: "Gerou alerta persistente de CPL acima da meta." },
+      { id: "a4h1", when: "Ontem · 18:05", actor: "Knopi", type: "evidência", text: "Gerou alerta persistente de CPL acima da meta." },
       { id: "a4h2", when: "Hoje · 09:10", actor: "Camila Ribeiro", type: "mudança", text: "Moveu para Em andamento e iniciou redistribuição do budget." },
     ],
     buttons: [
@@ -347,13 +347,13 @@ export const initialActions: ActionItem[] = [
     projectObjective: "Transformar visita recorrente em play outbound contextualizado.",
     projectSuccess: "Lista priorizada entregue, cadência criada e primeiras abordagens disparadas.",
     projectSteps: [
-      { id: "a5p1", lane: "Sinal", label: "Consolidar visitas", owner: "Canopi", startWeek: 1, duration: 1, status: "done", detail: "Agrupamento por conta e recorrência." },
+      { id: "a5p1", lane: "Sinal", label: "Consolidar visitas", owner: "Knopi", startWeek: 1, duration: 1, status: "done", detail: "Agrupamento por conta e recorrência." },
       { id: "a5p2", lane: "Priorização", label: "Filtrar ICP + recorrência", owner: "Henrique", startWeek: 2, duration: 2, status: "active", detail: "Separação por fit e intensidade de sinal." },
       { id: "a5p3", lane: "Comercial", label: "Montar briefing para SDR", owner: "Ligia", startWeek: 4, duration: 2, status: "pending", detail: "Contexto de intenção, página visitada e ângulo de abordagem." },
       { id: "a5p4", lane: "Cadência", label: "Executar outbound", owner: "Squad SDR", startWeek: 6, duration: 2, status: "pending", detail: "Disparo da cadência com referência aos temas visitados." },
     ],
     history: [
-      { id: "a5h1", when: "Hoje · 08:48", actor: "Canopi", type: "evidência", text: "Agrupou visitas qualificadas por conta-alvo." },
+      { id: "a5h1", when: "Hoje · 08:48", actor: "Knopi", type: "evidência", text: "Agrupou visitas qualificadas por conta-alvo." },
       { id: "a5h2", when: "Hoje · 09:32", actor: "Henrique Matos", type: "owner", text: "Recebeu a frente de priorização das contas por intenção." },
     ],
     buttons: [
@@ -398,7 +398,7 @@ export const initialActions: ActionItem[] = [
       { id: "a6p4", lane: "Distribuição", label: "Ativar nos canais", owner: "Marketing", startWeek: 7, duration: 2, status: "pending", detail: "Entrada do ativo em campanhas e repertório comercial." },
     ],
     history: [
-      { id: "a6h1", when: "Hoje · 09:05", actor: "Canopi", type: "evidência", text: "Criou ação a partir de case reconhecido e ainda sem ativação formal." },
+      { id: "a6h1", when: "Hoje · 09:05", actor: "Knopi", type: "evidência", text: "Criou ação a partir de case reconhecido e ainda sem ativação formal." },
       { id: "a6h2", when: "Hoje · 11:00", actor: "Juliana Costa", type: "owner", text: "Assumiu autorização e coleta com o cliente." },
     ],
     buttons: [
@@ -484,13 +484,13 @@ export const initialActions: ActionItem[] = [
     projectObjective: "Preparar entrada consultiva bem contextualizada em conta internacional estratégica.",
     projectSuccess: "Contato escolhido, outreach disparado e primeira resposta monitorada.",
     projectSteps: [
-      { id: "a8p1", lane: "Pesquisa", label: "Refinar sinal e tese", owner: "Canopi", startWeek: 1, duration: 1, status: "done", detail: "Leitura do sinal público e hipóteses aderentes." },
+      { id: "a8p1", lane: "Pesquisa", label: "Refinar sinal e tese", owner: "Knopi", startWeek: 1, duration: 1, status: "done", detail: "Leitura do sinal público e hipóteses aderentes." },
       { id: "a8p2", lane: "Contato", label: "Escolher porta de entrada", owner: "Caio", startWeek: 2, duration: 2, status: "active", detail: "Definição do stakeholder mais plausível." },
       { id: "a8p3", lane: "Mensagem", label: "Escrever outreach", owner: "Caio", startWeek: 4, duration: 2, status: "pending", detail: "Email consultivo with prova e tese curta." },
       { id: "a8p4", lane: "Execução", label: "Disparo e follow-up", owner: "Caio", startWeek: 6, duration: 2, status: "pending", detail: "Primeiro envio e reação monitorada." },
     ],
     history: [
-      { id: "a8h1", when: "Hoje · 07:55", actor: "Canopi", type: "evidência", text: "Relacionou movimento público da conta a uma tese relevante de abordagem." },
+      { id: "a8h1", when: "Hoje · 07:55", actor: "Knopi", type: "evidência", text: "Relacionou movimento público da conta a uma tese relevante de abordagem." },
       { id: "a8h2", when: "Hoje · 09:42", actor: "Caio Moura", type: "owner", text: "Assumiu a definição do contato e preparação do outreach." },
     ],
     buttons: [
@@ -532,7 +532,7 @@ export const initialActions: ActionItem[] = [
       { id: "a9p1", lane: "Amostra", label: "Extrair casos recentes", owner: "Fábio", startWeek: 1, duration: 2, status: "active", detail: "Base das 30 últimas contas promovidas." },
       { id: "a9p2", lane: "Modelo", label: "Rever pesos", owner: "Fábio", startWeek: 3, duration: 2, status: "pending", detail: "Ajuste de fit vs. atividade." },
       { id: "a9p3", lane: "Validação", label: "Revisar com vendas", owner: "Leadership", startWeek: 5, duration: 2, status: "pending", detail: "Checagem da utilidade prática da nova regra." },
-      { id: "a9p4", lane: "Publicação", label: "Aplicar e monitorar", owner: "Canopi", startWeek: 7, duration: 2, status: "pending", detail: "Entrada da nova lógica e leitura dos primeiros dias." },
+      { id: "a9p4", lane: "Publicação", label: "Aplicar e monitorar", owner: "Knopi", startWeek: 7, duration: 2, status: "pending", detail: "Entrada da nova lógica e leitura dos primeiros dias." },
     ],
     history: [
       { id: "a9h1", when: "Ontem · 17:05", actor: "Vendas", type: "evidência", text: "Relatou ruído em contas com alto engajamento e baixo fit." },
@@ -621,10 +621,10 @@ export const initialActions: ActionItem[] = [
     projectSteps: [
       { id: "a11p1", lane: "Infra", label: "Validar propriedade", owner: "Tech Ops", startWeek: 1, duration: 1, status: "active", detail: "Confirmação do domínio no Search Console." },
       { id: "a11p2", lane: "SEO", label: "Subir sitemap", owner: "SEO", startWeek: 2, duration: 1, status: "pending", detail: "Leitura da estrutura atual de páginas." },
-      { id: "a11p3", lane: "Relatório", label: "Conectar dashboard", owner: "Canopi", startWeek: 3, duration: 2, status: "pending", detail: "Acompanhamento contínuo do subdomínio." },
+      { id: "a11p3", lane: "Relatório", label: "Conectar dashboard", owner: "Knopi", startWeek: 3, duration: 2, status: "pending", detail: "Acompanhamento contínuo do subdomínio." },
     ],
     history: [
-      { id: "a11h1", when: "Hoje · 09:00", actor: "Canopi", type: "evidência", text: "Identificou que o subdomínio já está no ar sem medição orgânica consolidada." },
+      { id: "a11h1", when: "Hoje · 09:00", actor: "Knopi", type: "evidência", text: "Identificou que o subdomínio já está no ar sem medição orgânica consolidada." },
     ],
     buttons: [
       { id: "view", label: "Ver perfil completo", tone: "secondary", action: "open" },
@@ -663,14 +663,14 @@ export const initialActions: ActionItem[] = [
     projectObjective: "Aproveitar o retorno de intenção antes que o timing se perca.",
     projectSuccess: "Owner definido, abordagem disparada e resposta monitorada até o dia seguinte.",
     projectSteps: [
-      { id: "a12p1", lane: "Histórico", label: "Revisar lost deal", owner: "Canopi", startWeek: 1, duration: 1, status: "done", detail: "Consolidação do motivo de perda anterior." },
+      { id: "a12p1", lane: "Histórico", label: "Revisar lost deal", owner: "Knopi", startWeek: 1, duration: 1, status: "done", detail: "Consolidação do motivo de perda anterior." },
       { id: "a12p2", lane: "Alocação", label: "Definir owner", owner: "Revenue Ops", startWeek: 2, duration: 1, status: "risk", detail: "Sem definição a ação perde timing." },
       { id: "a12p3", lane: "Mensagem", label: "Escrever abordagem", owner: "Caio", startWeek: 3, duration: 2, status: "pending", detail: "Mensagem curta ancorada no tema visitado." },
       { id: "a12p4", lane: "Reativação", label: "Agendar conversa", owner: "Owner final", startWeek: 5, duration: 2, status: "pending", detail: "Objetivo é reabrir o diálogo com timing favorável." },
     ],
     history: [
-      { id: "a12h1", when: "Hoje · 08:05", actor: "Canopi", type: "evidência", text: "Sinalizou retorno de interesse na conta VIP." },
-      { id: "a12h2", when: "Hoje · 10:55", actor: "Canopi", type: "risco", text: "Marcado risco por ausência de owner definido até o momento." },
+      { id: "a12h1", when: "Hoje · 08:05", actor: "Knopi", type: "evidência", text: "Sinalizou retorno de interesse na conta VIP." },
+      { id: "a12h2", when: "Hoje · 10:55", actor: "Knopi", type: "risco", text: "Marcado risco por ausência de owner definido até o momento." },
     ],
     buttons: [
       { id: "view", label: "Ver perfil completo", tone: "secondary", action: "open" },
@@ -811,7 +811,7 @@ export const contasMock: Conta[] = [
        ativa: ['Suíte Analytics Operational', 'Sensor Core v2'],
        negociacao: ['Módulo Preditivo Logística', 'Expansão Unidade Sul'],
        risco: ['Suíte Analytics Operational (Vence em 60 dias)'],
-       whitespace: ['Canopi AI Autonomous', 'Dashboard de Governança ESG']
+       whitespace: ['Knopi AI Autonomous', 'Dashboard de Governança ESG']
     },
     oportunidadePrincipal: 'Renovação multi-unidade 2026',
     possuiOportunidade: true,
@@ -1216,7 +1216,7 @@ export const contasMock: Conta[] = [
     ultimaMovimentacao: '2026-04-06', atividadeRecente: 'Alta', playAtivo: 'Nenhum', statusGeral: 'Crítico',
     icp: 100, crm: 95, vp: 100, ct: 100, ft: 100, budgetBrl: 0, possuiOportunidade: true,
     oportunidadePrincipal: 'Garantia de saúde operacional contínua da plataforma', proximaMelhorAcao: 'Monitorar integrações e resolver alertas operacionais de sincronização.',
-    resumoExecutivo: 'Conta interna de operação do Canopi. Monitora saúde de integrações, sincronização de dados e alertas sistêmicos da plataforma. Não é conta comercial, é infraestrutura operacional do sistema.',
+    resumoExecutivo: 'Conta interna de operação do Knopi. Monitora saúde de integrações, sincronização de dados e alertas sistêmicos da plataforma. Não é conta comercial, é infraestrutura operacional do sistema.',
     leituraFactual: ['Integração com Supabase ativa.', 'Sincronização de seed a cada novo deployment.', 'Alertas operacionais: validação de coerência de dados.'],
     leituraInferida: ['Saúde deste "cliente interno" determina leiturabilidade da plataforma.', 'Falhas aqui impactam visibilidade de todas as contas no cockpit.'],
     leituraSugerida: ['Monitorar alertas de sincronização de seed.', 'Manter validação de coerência entre tabelas core (accounts, contacts, signals, actions, oportunidades).'],
@@ -1234,7 +1234,7 @@ export const contasMock: Conta[] = [
     abm: { motivo: '', fit: '', cluster: '', similaridade: '', coberturaInicialComite: '', playsEntrada: [], potencialAbertura: '', hipoteses: [], contasSimilares: [] },
     abx: { motivo: '', evolucaoJornada: '', maturidadeRelacional: '', sponsorAtivo: '', profundidadeComite: '', continuidade: '', expansao: '', retencao: '', riscoEstagnacao: '' },
     inteligencia: { sucessos: ['Seed de base canônica estável desde Lote 1.'], insucessos: [], padroes: ['Coerência de dados determina confiança na plataforma.'], learnings: ['Validação de referências precisa ser automática.'], hipoteses: ['Monitoramento contínuo elimina falhas de sincronização.'], fatoresRecomendacao: ['Infraestrutura crítica para operação', 'Monitoramento contínuo necessário'] },
-    tecnografia: ['Supabase', 'PostgreSQL', 'Canopi Platform'],
+    tecnografia: ['Supabase', 'PostgreSQL', 'Knopi Platform'],
     historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Alertas operacionais de sincronização monitorados.', icone: 'AlertTriangle' }, { data: '2026-04-01', tipo: 'Ação', descricao: 'Validação de seed canonico Bloco A materializada.', icone: 'CheckCircle' }],
     reconciliationStatus: 'ativa'
   },
@@ -1297,7 +1297,7 @@ export const contasMock: Conta[] = [
     abx: { motivo: 'Cluster healthtech com campanha em otimização.', evolucaoJornada: 'Campanha de aquisição em ajuste tático.', maturidadeRelacional: 'Inicial, baseada em mídia paga.', sponsorAtivo: 'Gerente de marketing digital.', profundidadeComite: 'Baixa (apenas marketing).', continuidade: 'Dependente de melhoria de CPL.', expansao: 'Mapeamento futuro.', retencao: 'Não aplicável.', riscoEstagnacao: 'Médio se CPL não melhorar em 72h.' },
     inteligencia: { sucessos: ['Conversão de landing estável indica qualidade de copy/oferta.'], insucessos: ['Origem do tráfego com baixa aderência ICP.'], padroes: ['Healthtech responde bem a campanhas focadas em compliance + eficiência operacional.'], learnings: ['Concentração de gasto em poucos conjuntos amplia risco de desperdício.'], hipoteses: ['Distribuição uniforme de gasto reduz CPL em 20%.'], fatoresRecomendacao: ['Desvio de performance', 'Potencial de recuperação rápida', 'Ação tática simples'] },
     tecnografia: ['Google Ads', 'Meta Ads', 'HubSpot', 'Segment'],
-    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Alerta persistente de CPL acima da meta gerado por Canopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
+    historico: [{ data: '2026-04-06', tipo: 'Tendência', descricao: 'Alerta persistente de CPL acima da meta gerado por Knopi.', icone: 'AlertTriangle' }, { data: '2026-04-06', tipo: 'Ação', descricao: 'Ação de otimização criada com urgência alta.', icone: 'Zap' }],
     reconciliationStatus: 'ativa'
   },
   // --- LOTE 3A: CONTAS ÓRFÃS RECONCILIADAS ---

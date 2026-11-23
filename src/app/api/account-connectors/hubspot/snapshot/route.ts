@@ -258,7 +258,7 @@ async function fetchCanopiPropertyCount(params: {
       errorMessage: params.catalog.errorMessage,
       scopeRequired: params.schemaScope,
       sourceEndpoint: `/crm/v3/properties/${params.objectType}`,
-      note: 'Não foi possível ler o catálogo de propriedades para confirmar o campo Canopi.',
+      note: 'Não foi possível ler o catálogo de propriedades para confirmar o campo Knopi.',
     };
   }
 
@@ -495,12 +495,12 @@ export async function POST(request: NextRequest) {
         canopiBatchStatus: companyCanopiBatchResult?.status ?? 'not_configured',
         note: companyCanopiTagResult?.status === 'available'
           ? companyCanopiBatchResult?.status === 'available'
-            ? 'Total real do HubSpot. Canopi calculada por canopi_company_id; lote por canopi_import_batch_id.'
-            : 'Total real do HubSpot. Canopi calculada por canopi_company_id.'
+            ? 'Total real do HubSpot. Knopi calculada por canopi_company_id; lote por canopi_import_batch_id.'
+            : 'Total real do HubSpot. Knopi calculada por canopi_company_id.'
           : companyCanopiTagResult?.status === 'not_configured'
-            ? 'Total real do HubSpot. Propriedade Canopi não encontrada nesta conta.'
+            ? 'Total real do HubSpot. Propriedade Knopi não encontrada nesta conta.'
             : companyCanopiTagResult?.status === 'missing_scope'
-              ? 'Total real do HubSpot. Escopo de schema ausente para ler propriedades Canopi.'
+              ? 'Total real do HubSpot. Escopo de schema ausente para ler propriedades Knopi.'
               : 'Total real retornado pelo HubSpot Search API.',
       })
     : buildEntity({
@@ -544,12 +544,12 @@ export async function POST(request: NextRequest) {
         canopiBatchStatus: contactCanopiBatchResult?.status ?? 'not_configured',
         note: contactCanopiTagResult?.status === 'available'
           ? contactCanopiBatchResult?.status === 'available'
-            ? 'Total real do HubSpot. Canopi calculada por canopi_contact_id; lote por canopi_import_batch_id.'
-            : 'Total real do HubSpot. Canopi calculada por canopi_contact_id.'
+            ? 'Total real do HubSpot. Knopi calculada por canopi_contact_id; lote por canopi_import_batch_id.'
+            : 'Total real do HubSpot. Knopi calculada por canopi_contact_id.'
           : contactCanopiTagResult?.status === 'not_configured'
-            ? 'Total real do HubSpot. Propriedade Canopi não encontrada nesta conta.'
+            ? 'Total real do HubSpot. Propriedade Knopi não encontrada nesta conta.'
             : contactCanopiTagResult?.status === 'missing_scope'
-              ? 'Escopo de schema ausente para ler propriedades Canopi.'
+              ? 'Escopo de schema ausente para ler propriedades Knopi.'
               : 'Total real retornado pelo HubSpot Search API.',
       })
     : buildEntity({
@@ -591,7 +591,7 @@ export async function POST(request: NextRequest) {
         sourceEndpoint: '/crm/v3/objects/deals/search',
         canopiTagStatus: 'not_configured',
         canopiBatchStatus: 'not_configured',
-        note: 'Canopi ainda não escreve Deals neste fluxo.',
+        note: 'Knopi ainda não escreve Deals neste fluxo.',
       })
     : buildEntity({
         objectType: 'deals',

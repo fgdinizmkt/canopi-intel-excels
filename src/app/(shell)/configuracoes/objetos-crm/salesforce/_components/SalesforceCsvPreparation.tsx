@@ -97,7 +97,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
         fields: ['Account Id', 'Account Name', 'Account Type', 'Industry', 'Website', 'Phone', 'Owner', 'Created Date', 'Last Modified Date', 'Billing City', 'Billing State', 'Billing Country'],
       },
       {
-        group: 'Canopi local',
+        group: 'Knopi local',
         fields: ['Nome da conta para preview', 'Domínio', 'Owner local', 'Estágio local', 'Documento local', 'Segmento local', 'Tamanho da empresa', 'Receita estimada local', 'País', 'Região'],
       },
     ],
@@ -146,7 +146,7 @@ const ENTITY_CONFIGS: Record<CrmEntity, EntityConfig> = {
         group: 'Salesforce Contact',
         fields: ['Contact Id', 'First Name', 'Last Name', 'Full Name', 'Email', 'Phone', 'Title', 'Department', 'Account Id', 'Owner', 'Created Date', 'Last Modified Date'],
       },
-      { group: 'Canopi local', fields: ['Email local', 'Nome local'] },
+      { group: 'Knopi local', fields: ['Email local', 'Nome local'] },
     ],
     recommendedLabels: ['Email', 'Phone', 'Title', 'Account Id'],
     primaryIdKey: 'id',
@@ -1052,7 +1052,7 @@ export function SalesforceCsvPreparation() {
                         Antes de confirmar, ajuste os campos obrigatórios
                       </p>
                       <p className="mt-0.5 text-xs font-medium text-amber-800">
-                        Para confirmar a preparação local, a Canopi precisa identificar pelo menos o {entityConfig.requiredGroupA.title.toLowerCase()} e a {entityConfig.requiredGroupB.title.toLowerCase()}.
+                        Para confirmar a preparação local, a Knopi precisa identificar pelo menos o {entityConfig.requiredGroupA.title.toLowerCase()} e a {entityConfig.requiredGroupB.title.toLowerCase()}.
                       </p>
                     </div>
                   </div>

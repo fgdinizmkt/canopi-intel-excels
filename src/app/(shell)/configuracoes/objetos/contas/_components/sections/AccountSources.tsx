@@ -1826,7 +1826,7 @@ export function AccountSources() {
       if (hubspotConnectionTestStatus === 'testing') {
         return {
           title: 'Testando a conexão HubSpot.',
-          description: 'A Canopi está validando o token da Private App no servidor.',
+          description: 'A Knopi está validando o token da Private App no servidor.',
           buttonLabel: 'Teste em andamento',
           tone: 'info' as const,
           disabled: true,
@@ -1850,7 +1850,7 @@ export function AccountSources() {
       if (salesforceTesting) {
         return {
           title: 'Testando a conexão Salesforce.',
-          description: 'A Canopi está validando a URL da instância e o token temporário no servidor.',
+          description: 'A Knopi está validando a URL da instância e o token temporário no servidor.',
           buttonLabel: 'Teste em andamento',
           tone: 'info' as const,
           disabled: true,
@@ -1887,7 +1887,7 @@ export function AccountSources() {
           ? 'Configuração salva. Agora confirme o uso deste CSV.'
           : 'Configuração salva. Agora revise a entrada desta fonte.',
         description: isCsvInput
-          ? 'Isso confirma que o arquivo e os campos escolhidos estão prontos para uso local na Canopi.'
+          ? 'Isso confirma que o arquivo e os campos escolhidos estão prontos para uso local na Knopi.'
           : 'A validação é local e libera a conclusão quando a fonte estiver consistente.',
         buttonLabel: isCsvInput ? 'Confirmar CSV' : 'Confirmar uso',
         tone: 'info' as const,
@@ -2258,7 +2258,7 @@ export function AccountSources() {
               <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Importar via CSV para esta fonte</h4>
               <p className="text-sm font-medium text-slate-400 max-w-3xl">
-                A Canopi vai ler o arquivo apenas no navegador. Nada será enviado para backend nesta etapa.
+                A Knopi vai ler o arquivo apenas no navegador. Nada será enviado para backend nesta etapa.
               </p>
             </div>
             <button
@@ -2457,7 +2457,7 @@ export function AccountSources() {
                           <thead className="bg-slate-50">
                             <tr className="text-left text-xs font-black uppercase tracking-[0.22em] text-slate-500">
                               <th className="px-4 py-3">Campo CSV</th>
-                              <th className="px-4 py-3">Campo sugerido Canopi</th>
+                              <th className="px-4 py-3">Campo sugerido Knopi</th>
                               <th className="px-4 py-3">Confiança</th>
                               <th className="px-4 py-3">Motivo</th>
                               <th className="px-4 py-3">Status</th>
@@ -2590,7 +2590,7 @@ export function AccountSources() {
               <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste com token temporário do Salesforce</h4>
               <p className="text-sm font-medium text-slate-400 max-w-3xl">
-                A Canopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
+                A Knopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -2731,7 +2731,7 @@ export function AccountSources() {
               <p className="text-xs font-black uppercase tracking-[0.28em] text-blue-500">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Testar conexão real do HubSpot</h4>
               <p className="text-sm font-medium text-slate-400 max-w-3xl">
-                A Canopi valida o token da Private App no servidor, sem salvar o segredo e sem iniciar sync real.
+                A Knopi valida o token da Private App no servidor, sem salvar o segredo e sem iniciar sync real.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -3124,7 +3124,7 @@ export function AccountSources() {
                           <th className="px-4 py-3">Campo HubSpot</th>
                           <th className="px-4 py-3">Rótulo HubSpot</th>
                           <th className="px-4 py-3">Tipo</th>
-                          <th className="px-4 py-3">Campo sugerido na Canopi</th>
+                          <th className="px-4 py-3">Campo sugerido na Knopi</th>
                           <th className="px-4 py-3">Confiança</th>
                           <th className="px-4 py-3">Status</th>
                         </tr>
@@ -3195,7 +3195,7 @@ export function AccountSources() {
                         <div key={`${mapping.canopiField}-missing`} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                           <p className="text-sm font-black text-slate-900">{mapping.hubspotField}</p>
                           <p className="text-xs text-slate-400">
-                            Sugestão Canopi: {mapping.canopiField} • {mapping.canopiLabel}
+                            Sugestão Knopi: {mapping.canopiField} • {mapping.canopiLabel}
                           </p>
                         </div>
                       )) : (

@@ -251,14 +251,14 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
             </div>
           )}
 
-          {/* Canopi mapping suggestions */}
+          {/* Knopi mapping suggestions */}
           {canopiMap.length > 0 && (
             <div>
               <p className="mb-1 text-xs font-black uppercase tracking-widest text-slate-500">
-                Mapeamento Canopi sugerido
+                Mapeamento Knopi sugerido
               </p>
               <p className="mb-2 text-xs font-medium text-slate-400">
-                Campos detectados via Salesforce describe · somente leitura na Canopi
+                Campos detectados via Salesforce describe · somente leitura na Knopi
               </p>
               <div className="rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
                 {canopiMap.map(({ canopiAttr, sfField }) => {

@@ -52,7 +52,7 @@ function buildNewAction(partialAction: Partial<ActionItem>): ActionItem {
     description: partialAction.description || "",
     accountName: partialAction.accountName || "Conta não identificada",
     accountContext: partialAction.accountContext || "Contexto manual",
-    origin: partialAction.origin || "Canopi Command Center",
+    origin: partialAction.origin || "Knopi Command Center",
     relatedSignal: partialAction.relatedSignal || "Ação disparada via Centro de Comando",
     ownerName: partialAction.ownerName || null,
     suggestedOwner: partialAction.suggestedOwner || "Fábio Diniz",
@@ -67,13 +67,13 @@ function buildNewAction(partialAction: Partial<ActionItem>): ActionItem {
       {
         id: `hist-${Date.now()}`,
         when: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        actor: "Canopi AI",
+        actor: "Knopi AI",
         type: "evidência",
         text: `Ação operacional materializada via ${partialAction.sourceType || 'manual'}.`
       },
       ...(Array.isArray(partialAction.history) ? partialAction.history : [])
     ],
-    projectObjective: partialAction.projectObjective || "Executar tese de abordagem conforme recomendação Canopi.",
+    projectObjective: partialAction.projectObjective || "Executar tese de abordagem conforme recomendação Knopi.",
     projectSuccess: partialAction.projectSuccess || "Aprovação do próximo passo pelo stakeholder.",
     projectSteps: Array.isArray(partialAction.projectSteps) ? partialAction.projectSteps : [],
     buttons: Array.isArray(partialAction.buttons) ? partialAction.buttons : [
@@ -189,7 +189,7 @@ export const AccountDetailProvider: React.FC<{ children: React.ReactNode; router
         
         if (storedLogs) setSessionLogs(JSON.parse(storedLogs));
       } catch (e) {
-        console.error('Falha ao hidratar camada operacional Canopi:', e);
+        console.error('Falha ao hidratar camada operacional Knopi:', e);
         setSessionActions(initialActions);
       } finally {
         setIsHydrated(true);
@@ -358,7 +358,7 @@ const FALLBACK_CONTEXT: AccountDetailContextType = {
 };
 
 /**
- * Hook para interagir com o Perfil da Conta de qualquer lugar do Canopi.
+ * Hook para interagir com o Perfil da Conta de qualquer lugar do Knopi.
  * Fora do Provider retorna um contexto de fallback seguro (no-op) em vez de throw.
  */
 export const useAccountDetail = () => {
@@ -368,7 +368,7 @@ export const useAccountDetail = () => {
     // Garante que componentes em rotas App Router não colapam o runtime
     // quando o Provider ainda não montou ou não está na árvore.
     if (typeof window !== 'undefined') {
-      console.warn('[Canopi] useAccountDetail chamado fora do AccountDetailProvider — retornando fallback no-op.');
+      console.warn('[Knopi] useAccountDetail chamado fora do AccountDetailProvider — retornando fallback no-op.');
     }
     return FALLBACK_CONTEXT;
   }

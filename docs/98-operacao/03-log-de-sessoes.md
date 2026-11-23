@@ -3,6 +3,15 @@
 ## Objetivo
 Registro cronológico do trabalho executado por sessão. Não substitui o git log — registra decisões, contexto e raciocínio que não ficam nos commits.
 
+## [2026-11-23] — Renomeação Canopi → Knopi, etapa 1 (marca visível)
+
+- **Agente:** Claude Code / Opus 5.5
+- **Natureza:** retomada do projeto depois de cinco meses; commit do trabalho parado desde 12/06 (gitignore de credenciais, sistema de agentes, auditoria read-only de Deals no HubSpot e passe de legibilidade) e início da troca de nome.
+- **Escopo entregue:** "Canopi" → "Knopi" e "CANOPI" → "KNOPI" como palavra isolada em 67 arquivos de `src/`; plano completo em `docs/98-operacao/67-renomeacao-knopi.md`.
+- **Validação:** `npx tsc --noEmit` sem erros; login conferido renderizando.
+- **Decisões:** troca em tudo, inclusive propriedades `canopi_*` do HubSpot e colunas do Supabase (Fábio, 23/11); identidade visual definitiva no manual v1.1.
+- **Próximo passo:** etapa 2, nomes internos de código e nome do pacote.
+
 ## [2026-05-19] — HubSpot C2.9E.2D.14 (create limpo de Deals + recovery de mappings + associações Deal → Company/Contact + preflightOnly)
 
 - **Agente:** Claude Code / Sonnet 4.6

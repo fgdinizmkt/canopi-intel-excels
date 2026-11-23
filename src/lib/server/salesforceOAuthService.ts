@@ -2077,7 +2077,7 @@ export interface SyncExecutionResult {
   skippedCount: number;
   errorCount: number;
   outcome: SyncOutcome;
-  /** Pares de IDs/dados para registros criados — sourceExternalId nunca vira id Canopi */
+  /** Pares de IDs/dados para registros criados — sourceExternalId nunca vira id Knopi */
   createdRecords: SyncExecutionRecordPair[];
   /** Pares de IDs/dados para registros atualizados */
   updatedRecords: SyncExecutionRecordPair[];
@@ -2088,13 +2088,13 @@ export interface SyncExecutionResult {
 }
 
 /**
- * Executa sync persistente controlado de Accounts Salesforce → Canopi.
+ * Executa sync persistente controlado de Accounts Salesforce → Knopi.
  *
  * Guardrails absolutos:
  * - Nunca aceita payload bruto do front-end.
  * - Lê exclusivamente do contrato salvo no banco (status=mapped).
  * - Grava apenas via syncAccountFromCRM (whitelist estrita no repository).
- * - Nunca sobrescreve campos estratégicos, scoring ou inteligência Canopi.
+ * - Nunca sobrescreve campos estratégicos, scoring ou inteligência Knopi.
  * - Registra sync_summary_log no JSONB do contrato (não cria nova tabela).
  * - Transita status para 'synced' apenas após execução completa sem erro fatal.
  * - Contas sem nome ou domínio são ignoradas com rastreabilidade no log.
@@ -2198,7 +2198,7 @@ export async function executeAccountSync(contractId: string): Promise<SyncExecut
       skippedRecords.push({
         sourceExternalId,
         displayName,
-        reason: 'Domínio duplicado na base Canopi. Sync ignorado para evitar ambiguidade.',
+        reason: 'Domínio duplicado na base Knopi. Sync ignorado para evitar ambiguidade.',
       });
       skippedCount++;
     } else if (matchIds.length === 1) {
@@ -2240,7 +2240,7 @@ export async function executeAccountSync(contractId: string): Promise<SyncExecut
         continue;
       }
 
-      // ID Canopi sempre gerado internamente — sourceExternalId nunca vira id interno
+      // ID Knopi sempre gerado internamente — sourceExternalId nunca vira id interno
       // dominio já normalizado por normalizeDomain() acima
       const canopiId = crypto.randomUUID();
 
@@ -2359,10 +2359,10 @@ export interface ContactRelationshipPreviewResult {
 }
 
 /**
- * Monta lookup Salesforce AccountId → Canopi accountId a partir dos
+ * Monta lookup Salesforce AccountId → Knopi accountId a partir dos
  * sync_summary_log de contratos Account já sincronizados (C4.7).
  * Fonte canônica: createdRecords e updatedRecords do log, onde
- * sourceExternalId = SF AccountId e canopiId = UUID interno Canopi.
+ * sourceExternalId = SF AccountId e canopiId = UUID interno Knopi.
  */
 async function buildAccountIdLookup(
   supabase: ReturnType<typeof getSupabaseAdminClient>,
@@ -2392,14 +2392,14 @@ async function buildAccountIdLookup(
 }
 
 /**
- * Preview read-only de Contacts Salesforce → Canopi com resolução de vínculo Account.
+ * Preview read-only de Contacts Salesforce → Knopi com resolução de vínculo Account.
  *
  * Guardrails:
  * - Não grava em contacts.
  * - Não altera accounts.
  * - Não altera status do contrato.
  * - Não cria sync_summary_log de Contacts.
- * - Contact sem accountId Canopi resolvido = unresolved_account.
+ * - Contact sem accountId Knopi resolvido = unresolved_account.
  */
 export async function generateContactRelationshipPreview(
   contractId: string,
@@ -2435,7 +2435,7 @@ export async function generateContactRelationshipPreview(
     throw new Error('NO_CONTACTS_IN_CONTRACT');
   }
 
-  // Lookup SF AccountId → Canopi accountId via sync_summary_log de contratos Account
+  // Lookup SF AccountId → Knopi accountId via sync_summary_log de contratos Account
   const accountIdLookup = await buildAccountIdLookup(supabase);
 
   const items: ContactRelationshipPreviewItem[] = [];
@@ -2625,13 +2625,13 @@ function normalizeContactName(raw: string): string {
 }
 
 /**
- * Executa sync persistente controlado de Contacts Salesforce → Canopi.
+ * Executa sync persistente controlado de Contacts Salesforce → Knopi.
  *
  * Guardrails absolutos:
  * - Nunca aceita payload bruto do front-end.
  * - Lê exclusivamente do contrato salvo no banco (status=mapped ou synced).
  * - Grava apenas via syncContactFromCRM (whitelist estrita no repository).
- * - Nunca sobrescreve campos estratégicos/relacionais da Canopi.
+ * - Nunca sobrescreve campos estratégicos/relacionais da Knopi.
  * - Contact sem Account resolvida = skip. Não cria órfãos.
  * - Contact sem nome = skip.
  * - Dedupe por accountId + nome normalizado (email não existe no schema atual).
@@ -2675,7 +2675,7 @@ export async function executeContactSync(contractId: string): Promise<ContactSyn
     throw new Error('NO_CONTACTS_IN_CONTRACT');
   }
 
-  // ── 3. Lookup Salesforce AccountId → Canopi accountId via sync_summary_log ─
+  // ── 3. Lookup Salesforce AccountId → Knopi accountId via sync_summary_log ─
   // Reutiliza buildAccountIdLookup do C4.8 — sem escrita, sem alteração de contrato
   const accountIdLookup = await buildAccountIdLookup(supabase);
 
@@ -2783,7 +2783,7 @@ export async function executeContactSync(contractId: string): Promise<ContactSyn
         errorCount++;
       }
     } else {
-      // CREATE — ID Canopi sempre gerado internamente
+      // CREATE — ID Knopi sempre gerado internamente
       const canopiContactId = crypto.randomUUID();
 
       const result = await syncContactFromCRM(
@@ -2873,7 +2873,7 @@ export async function executeContactSync(contractId: string): Promise<ContactSyn
 // ─── Opportunity Preview (C4.10) ─────────────────────────────────────────────
 
 /**
- * Preview read-only de Opportunities Salesforce → Canopi.
+ * Preview read-only de Opportunities Salesforce → Knopi.
  *
  * Guardrails absolutos:
  * - Não grava em opportunities, oportunidades, accounts ou contacts.
@@ -2971,7 +2971,7 @@ export async function getEligibleSalesforceOpportunityPreviewContracts(): Promis
 }
 
 /**
- * Preview read-only de Opportunities Salesforce → Canopi com resolução de vínculo Account.
+ * Preview read-only de Opportunities Salesforce → Knopi com resolução de vínculo Account.
  *
  * Guardrails:
  * - Exige contractId explícito — sem fallback para último contrato.
@@ -3017,7 +3017,7 @@ export async function generateOpportunityRelationshipPreview(
     throw new Error('NO_OPPORTUNITIES_IN_CONTRACT');
   }
 
-  // Lookup SF AccountId → Canopi accountId via sync_summary_log dos contratos Account (C4.7)
+  // Lookup SF AccountId → Knopi accountId via sync_summary_log dos contratos Account (C4.7)
   const [accountIdLookup, canopiAccountLookup, opportunityRowLookup] = await Promise.all([
     buildAccountIdLookup(supabase),
     buildCanopiAccountLookup(supabase),
@@ -3062,7 +3062,7 @@ export async function generateOpportunityRelationshipPreview(
       continue;
     }
 
-    // Resolver vínculo Account: Salesforce AccountId → Canopi accountId
+    // Resolver vínculo Account: Salesforce AccountId → Knopi accountId
     const resolved = sourceAccountId ? accountIdLookup.get(sourceAccountId) ?? null : null;
 
     if (!resolved) {
@@ -3075,7 +3075,7 @@ export async function generateOpportunityRelationshipPreview(
     } else if (priorSourceMapping.has(sourceOpportunityId)) {
       actionPreview = 'ready_to_update';
     } else {
-      // Check if this Opportunity already exists in Canopi by identity key (account_slug + nome)
+      // Check if this Opportunity already exists in Knopi by identity key (account_slug + nome)
       const canopiAccount = canopiAccountLookup.get(resolved.canopiId);
       const identityKey = canopiAccount
         ? buildOpportunityIdentityKey(canopiAccount.slug, nome)
@@ -3083,7 +3083,7 @@ export async function generateOpportunityRelationshipPreview(
       const identityMatches = identityKey ? (opportunityRowLookup.rowsByIdentity.get(identityKey) ?? []) : [];
       if (identityMatches.length > 0) {
         actionPreview = 'existing_match';
-        warnings.push('Opportunity já existe na Canopi com mesmo vínculo de conta e nome — será ignorada no sync conservador.');
+        warnings.push('Opportunity já existe na Knopi com mesmo vínculo de conta e nome — será ignorada no sync conservador.');
       } else {
         actionPreview = 'ready_to_create';
       }
@@ -3317,7 +3317,7 @@ function buildOpportunitySourceMappingLookup(summary: OpportunitySyncSummaryLog 
 }
 
 /**
- * Executa sync persistente controlado de Opportunities Salesforce → Canopi.
+ * Executa sync persistente controlado de Opportunities Salesforce → Knopi.
  *
  * Guardrails absolutos:
  * - Nunca aceita payload bruto do front-end.
@@ -3513,7 +3513,7 @@ export async function executeOpportunitySync(contractId: string): Promise<Opport
         accountSlug: resolvedAccountSlug,
         canopiOpportunityId: existingMappedOpportunityId,
         nome,
-        reason: 'Mapeamento anterior existe no contrato, mas a Opportunity Canopi não foi encontrada para atualização. Sync conservador ignorado.',
+        reason: 'Mapeamento anterior existe no contrato, mas a Opportunity Knopi não foi encontrada para atualização. Sync conservador ignorado.',
       });
       continue;
     }
@@ -3528,7 +3528,7 @@ export async function executeOpportunitySync(contractId: string): Promise<Opport
         accountSlug: resolvedAccountSlug,
         canopiOpportunityId: identityMatches[0].id,
         nome,
-        reason: 'Opportunity já existe na Canopi com a mesma combinação account_slug + nome normalizado. Sync conservador ignorou para evitar duplicidade.',
+        reason: 'Opportunity já existe na Knopi com a mesma combinação account_slug + nome normalizado. Sync conservador ignorou para evitar duplicidade.',
       });
       continue;
     }
@@ -3543,7 +3543,7 @@ export async function executeOpportunitySync(contractId: string): Promise<Opport
         accountSlug: resolvedAccountSlug,
         canopiOpportunityId: null,
         nome,
-        reason: 'Mais de uma Opportunity Canopi corresponde a account_slug + nome normalizado. Sync ignorado para evitar ambiguidade.',
+        reason: 'Mais de uma Opportunity Knopi corresponde a account_slug + nome normalizado. Sync ignorado para evitar ambiguidade.',
       });
       continue;
     }
@@ -3856,7 +3856,7 @@ export async function generateOpportunityContactRoleRelationshipPreview(
       resolvedCanopiContactId = contactInfo.canopiId;
       resolvedContactName = contactInfo.nome;
     } else if (sourceContactId) {
-      warnings.push(`Contact "${sourceContactId}" não foi sincronizado na Canopi (C4.9).`);
+      warnings.push(`Contact "${sourceContactId}" não foi sincronizado na Knopi (C4.9).`);
       if (actionPreview === 'ready_to_link') actionPreview = 'unresolved_contact';
     }
 

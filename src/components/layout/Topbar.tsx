@@ -81,20 +81,20 @@ export const Topbar: React.FC = () => {
   };
 
   const pageBreadcrumbs: Record<string, string[]> = {
-    '/acoes': ['CANOPI', 'REVENUE OPS'],
-    '/contas': ['CANOPI', 'INTELIGÊNCIA'],
-    '/sinais': ['CANOPI', 'INTELIGÊNCIA'],
-    '/estrategia-abm': ['CANOPI', 'ESTRATÉGIA'],
-    '/orquestracao-abx': ['CANOPI', 'ESTRATÉGIA'],
-    '/inteligencia-cruzada': ['CANOPI', 'ESTRATÉGIA'],
-    '/outbound': ['CANOPI', 'OUTBOUND'],
-    '/integracoes': ['CANOPI', 'CONFIGURAÇÕES', 'INTEGRAÇÕES'],
-    '/assistente': ['CANOPI', 'ASSISTENTE'],
-    '/contatos': ['CANOPI', 'CONTATOS'],
+    '/acoes': ['KNOPI', 'REVENUE OPS'],
+    '/contas': ['KNOPI', 'INTELIGÊNCIA'],
+    '/sinais': ['KNOPI', 'INTELIGÊNCIA'],
+    '/estrategia-abm': ['KNOPI', 'ESTRATÉGIA'],
+    '/orquestracao-abx': ['KNOPI', 'ESTRATÉGIA'],
+    '/inteligencia-cruzada': ['KNOPI', 'ESTRATÉGIA'],
+    '/outbound': ['KNOPI', 'OUTBOUND'],
+    '/integracoes': ['KNOPI', 'CONFIGURAÇÕES', 'INTEGRAÇÕES'],
+    '/assistente': ['KNOPI', 'ASSISTENTE'],
+    '/contatos': ['KNOPI', 'CONTATOS'],
   };
 
-  const derivedTitle = (pathname ? pageTitles[pathname] : undefined) ?? 'Canopi Platform';
-  const derivedBreadcrumbs = (pathname ? pageBreadcrumbs[pathname] : undefined) ?? ['CANOPI'];
+  const derivedTitle = (pathname ? pageTitles[pathname] : undefined) ?? 'Knopi Platform';
+  const derivedBreadcrumbs = (pathname ? pageBreadcrumbs[pathname] : undefined) ?? ['KNOPI'];
 
   const showTabs = pathname === '/contas' || pathname === '/sinais' || pathname === '/estrategia-abm';
 

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/account-connectors/salesforce/oauth/opportunity-sync-execute
  *
- * Executa sync persistente controlado de Opportunities Salesforce → Canopi.
+ * Executa sync persistente controlado de Opportunities Salesforce → Knopi.
  *
  * Guardrails:
  * - Exige contractId explícito no body — sem fallback para último contrato.

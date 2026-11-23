@@ -299,7 +299,7 @@ export function SalesforceHubRedesign({
           <div>
             <h1 className="text-3xl font-black tracking-tight text-slate-950">Configuração Salesforce</h1>
             <p className="mt-1 text-sm font-medium text-slate-500">
-              Gerencie a conexão e o mapeamento de dados entre Canopi e Salesforce.
+              Gerencie a conexão e o mapeamento de dados entre Knopi e Salesforce.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -420,7 +420,7 @@ export function SalesforceHubRedesign({
                 {/* Callback URL */}
                 <div>
                   <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-500">
-                    Callback URL da Canopi — use esta URL no Connected App do Salesforce
+                    Callback URL da Knopi — use esta URL no Connected App do Salesforce
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -850,7 +850,7 @@ export function SalesforceHubRedesign({
               <div className="space-y-4">
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Direção</p>
-                  <p className="text-xs font-bold mt-0.5">SF → Canopi</p>
+                  <p className="text-xs font-bold mt-0.5">SF → Knopi</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Modo</p>
@@ -890,7 +890,7 @@ export function SalesforceHubRedesign({
 
                   {contactPreviewState.phase === 'idle' && (
                     <div className="text-center py-8 space-y-3">
-                      <p className="text-sm font-medium text-slate-500">Busca os contatos do contrato sincronizado e resolve o vínculo com Accounts Canopi.</p>
+                      <p className="text-sm font-medium text-slate-500">Busca os contatos do contrato sincronizado e resolve o vínculo com Accounts Knopi.</p>
                       <div className="flex flex-col items-center gap-2">
                         {contactFullLoadState.phase !== 'done' ? (
                           <button
@@ -1056,7 +1056,7 @@ export function SalesforceHubRedesign({
                       <Database className="h-4 w-4 text-slate-400" />
                       <div>
                         <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Leads</h4>
-                        <p className="text-xs text-slate-400 mt-0.5">Leads carregados apenas para leitura. Nenhum Lead é gravado na Canopi.</p>
+                        <p className="text-xs text-slate-400 mt-0.5">Leads carregados apenas para leitura. Nenhum Lead é gravado na Knopi.</p>
                       </div>
                     </div>
                     <Badge className="bg-amber-100 text-amber-700 border-none text-xs font-bold">Sync pendente</Badge>
@@ -1110,7 +1110,7 @@ export function SalesforceHubRedesign({
                         <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
                           <p className="text-xs font-black uppercase tracking-widest text-amber-700">Leads carregados apenas para leitura</p>
                           <p className="mt-0.5 text-xs font-medium text-slate-400">
-                            Nenhum Lead foi gravado na Canopi. Lead Sync permanece pendente.
+                            Nenhum Lead foi gravado na Knopi. Lead Sync permanece pendente.
                           </p>
                         </div>
 
@@ -1163,7 +1163,7 @@ export function SalesforceHubRedesign({
                         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
                           <p className="text-xs font-black uppercase tracking-widest text-amber-700">Sincronização de Leads pendente</p>
                           <p className="mt-0.5 text-xs font-medium text-slate-400">
-                            {records.length} Leads encontrados e carregados do Salesforce. Nenhum dado de Lead foi gravado na Canopi.
+                            {records.length} Leads encontrados e carregados do Salesforce. Nenhum dado de Lead foi gravado na Knopi.
                           </p>
                         </div>
                       </div>
@@ -1564,7 +1564,7 @@ export function SalesforceHubRedesign({
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 border-b border-slate-100">
                     <tr>
-                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">Campo Canopi</th>
+                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">Campo Knopi</th>
                       <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-center">Tipo</th>
                       <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">Salesforce</th>
                       <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
@@ -1604,7 +1604,7 @@ export function SalesforceHubRedesign({
                     ].filter(Boolean).join(' · ')}
                   </p>
                   <p className="mt-2 text-xs font-medium text-amber-600">
-                    Preencha os campos ausentes no CSV e importe no Salesforce para atualizar os registros. Depois, recarregue Accounts na Canopi.
+                    Preencha os campos ausentes no CSV e importe no Salesforce para atualizar os registros. Depois, recarregue Accounts na Knopi.
                   </p>
                   <p className="mt-1 text-xs font-medium text-amber-500">
                     Use a coluna <span className="font-black">Id</span> como identificador no Salesforce. A coluna <span className="font-black">Canopi_Reference_AccountName</span> é apenas referência e não deve ser mapeada no upload.
@@ -1679,7 +1679,7 @@ export function SalesforceHubRedesign({
                   <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-slate-400">Opcional</span>
                 </div>
                 <p className="mt-0.5 text-xs font-medium text-slate-500">
-                  Use um CSV padronizado para importar dados para a Canopi quando a conexão direta não for suficiente.
+                  Use um CSV padronizado para importar dados para a Knopi quando a conexão direta não for suficiente.
                 </p>
               </div>
             </div>

@@ -59,7 +59,7 @@ const CockpitV2 = () => {
         risk: "Queda na conversão de Plays Enterprise.",
         opportunity: "Orquestrar contas alta intenção sem plays.",
         nextMove: "Ativar Playbook Intenção",
-        sources: ["HubSpot", "6sense", "Canopi"],
+        sources: ["HubSpot", "6sense", "Knopi"],
         items: ["Plays Scale MM", "Intent Surge", "Camp. Retenção", "Maturidade Q3"],
         sublayer: ["Ativação de Plays", "Identific. Lacunas", "Maturidade Tecnológica", "Orquestração Dinâmica"],
       },
@@ -207,7 +207,7 @@ const CockpitV2 = () => {
               <p className="text-slate-500 text-xs mb-4 leading-relaxed max-w-xl">
                 {selectedSignalCase
                   ? `Navegando decisão sobre ${selectedSignalCase.signalType === 'risk' ? 'risco' : 'oportunidade'} com confiança de ${Math.round(selectedSignalCase.confidence)}%. Registre marcos relevantes na jornada.`
-                  : 'A Canopi monitora continuamente a saúde da sua geração de receita cruzando sinais orgânicos vindos de todas as suas frentes dimensionais ativas.'
+                  : 'A Knopi monitora continuamente a saúde da sua geração de receita cruzando sinais orgânicos vindos de todas as suas frentes dimensionais ativas.'
                 }
               </p>
             </div>
@@ -1040,7 +1040,7 @@ const CockpitV2 = () => {
 
                <p className="text-indigo-400 font-bold mb-4">squad@canopi.com.br</p>
 
-               <p className="text-xs uppercase tracking-widest font-black">© 2026 Canopi. Intel Excels.</p>
+               <p className="text-xs uppercase tracking-widest font-black">© 2026 Knopi. Intel Excels.</p>
 
              </div>
 

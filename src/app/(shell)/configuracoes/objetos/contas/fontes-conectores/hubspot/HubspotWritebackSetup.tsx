@@ -111,7 +111,7 @@ export function HubspotWritebackSetup({
       if (controller.signal.aborted || requestId !== requestSequence.current) return;
 
       if (!response.ok || !payload || payload.status !== 'success') {
-        setError(payload?.error || 'Não foi possível criar as propriedades Canopi.');
+        setError(payload?.error || 'Não foi possível criar as propriedades Knopi.');
         setPhase('error');
         return;
       }
@@ -127,7 +127,7 @@ export function HubspotWritebackSetup({
       if (controller.signal.aborted || requestId !== requestSequence.current) return;
       setError(caughtError instanceof Error && caughtError.name === 'AbortError'
         ? null
-        : 'Não foi possível criar as propriedades Canopi.');
+        : 'Não foi possível criar as propriedades Knopi.');
       setPhase(caughtError instanceof Error && caughtError.name === 'AbortError' ? 'idle' : 'error');
     }
   }, [onSetupStateChange, setupResult, token]);
@@ -176,9 +176,9 @@ export function HubspotWritebackSetup({
       buildEntry('Catálogo de campos carregado', catalogLoaded ? 'ready' : 'pending', catalogLoaded ? 'Campos disponíveis para revisão.' : 'Atualize o catálogo de campos antes de criar propriedades.'),
       buildEntry('Permissão de escrita em empresas', writeScopesReady ? 'ready' : 'blocked', writeScopesReady ? 'crm.objects.companies.write disponível.' : 'crm.objects.companies.write ausente.'),
       buildEntry('Permissão de escrita em contatos', writeScopesReady ? 'ready' : 'blocked', writeScopesReady ? 'crm.objects.contacts.write disponível.' : 'crm.objects.contacts.write ausente.'),
-      buildEntry('Propriedades Canopi em Companies', companySummary?.ready ? 'ready' : companySummary?.incompatible.length ? 'blocked' : 'pending', companySummary?.ready ? 'Todas as propriedades necessárias estão prontas.' : companySummary?.incompatible.length ? 'Há propriedades incompatíveis em Companies.' : 'Ainda faltam propriedades em Companies.'),
-      buildEntry('Propriedades Canopi em Contacts', contactSummary?.ready ? 'ready' : contactSummary?.incompatible.length ? 'blocked' : 'pending', contactSummary?.ready ? 'Todas as propriedades necessárias estão prontas.' : contactSummary?.incompatible.length ? 'Há propriedades incompatíveis em Contacts.' : 'Ainda faltam propriedades em Contacts.'),
-      buildEntry('IDs externos únicos configurados', idsReady ? 'ready' : idsBlocked ? 'blocked' : 'pending', idsReady ? 'Canopi Company ID e Canopi Contact ID estão prontos.' : idsBlocked ? 'Os IDs externos têm incompatibilidades e precisam de ajuste.' : 'Os IDs externos ainda precisam ser criados ou validados.'),
+      buildEntry('Propriedades Knopi em Companies', companySummary?.ready ? 'ready' : companySummary?.incompatible.length ? 'blocked' : 'pending', companySummary?.ready ? 'Todas as propriedades necessárias estão prontas.' : companySummary?.incompatible.length ? 'Há propriedades incompatíveis em Companies.' : 'Ainda faltam propriedades em Companies.'),
+      buildEntry('Propriedades Knopi em Contacts', contactSummary?.ready ? 'ready' : contactSummary?.incompatible.length ? 'blocked' : 'pending', contactSummary?.ready ? 'Todas as propriedades necessárias estão prontas.' : contactSummary?.incompatible.length ? 'Há propriedades incompatíveis em Contacts.' : 'Ainda faltam propriedades em Contacts.'),
+      buildEntry('IDs externos únicos configurados', idsReady ? 'ready' : idsBlocked ? 'blocked' : 'pending', idsReady ? 'Knopi Company ID e Knopi Contact ID estão prontos.' : idsBlocked ? 'Os IDs externos têm incompatibilidades e precisam de ajuste.' : 'Os IDs externos ainda precisam ser criados ou validados.'),
     ];
   }, [catalogLoaded, companiesReadActive, companySummary, contactSummary, connectionActive, idsBlocked, idsReady, writeScopesReady]);
 
@@ -204,7 +204,7 @@ export function HubspotWritebackSetup({
             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Pré-requisitos para atualização do HubSpot</p>
             <h3 className="text-2xl font-black text-slate-950">HubSpot pronto para atualização</h3>
             <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-400">
-              A atualização do HubSpot só será liberada depois que o HubSpot tiver permissões de escrita e propriedades Canopi configuradas.
+              A atualização do HubSpot só será liberada depois que o HubSpot tiver permissões de escrita e propriedades Knopi configuradas.
             </p>
           </div>
           <Badge variant={statusVariant(phase)}>{badgeText}</Badge>
@@ -288,7 +288,7 @@ export function HubspotWritebackSetup({
                 disabled={!connectionActive || !setupResult || !setupResult.canCreateProperties || phase === 'creating' || phase === 'verifying' || !schemaWriteReady}
                 icon={phase === 'creating' ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlusCircle className="h-4 w-4" />}
               >
-                Criar propriedades Canopi no HubSpot
+                Criar propriedades Knopi no HubSpot
               </Button>
               <Button
                 variant="ghost"

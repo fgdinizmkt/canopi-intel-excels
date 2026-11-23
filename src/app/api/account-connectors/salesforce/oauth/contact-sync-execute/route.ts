@@ -4,7 +4,7 @@ import { executeContactSync } from '@/src/lib/server/salesforceOAuthService';
 /**
  * POST /api/account-connectors/salesforce/oauth/contact-sync-execute
  *
- * Executa sync persistente controlado de Contacts Salesforce → Canopi.
+ * Executa sync persistente controlado de Contacts Salesforce → Knopi.
  *
  * Guardrails:
  * - Exige contractId explícito no body — sem fallback para último contrato.
@@ -12,7 +12,7 @@ import { executeContactSync } from '@/src/lib/server/salesforceOAuthService';
  * - Read exclusivamente do contrato no banco (status=mapped ou synced).
  * - Grava apenas via syncContactFromCRM (whitelist estrita no repository).
  * - Contatos sem Account resolvida são ignorados — nunca cria órfãos.
- * - Campos estratégicos/relacionais da Canopi não são sobrescritos.
+ * - Campos estratégicos/relacionais da Knopi não são sobrescritos.
  * - Não implementa Opportunity, Lead, Campaign, Bulk API ou writeback.
  * - Não altera status do contrato.
  */

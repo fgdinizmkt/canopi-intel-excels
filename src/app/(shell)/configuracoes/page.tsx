@@ -276,7 +276,7 @@ const ConfigStage1: React.FC = () => {
       weight: 30,
       components: [
         { name: 'ICP Match', weight: 50, source: 'LinkedIn/CRM' },
-        { name: 'Tecnografia', weight: 30, source: 'Canopi Crawler' },
+        { name: 'Tecnografia', weight: 30, source: 'Knopi Crawler' },
         { name: 'Volume de Contatos', weight: 20, source: 'CRM' }
       ],
       threshold: 70,
@@ -291,7 +291,7 @@ const ConfigStage1: React.FC = () => {
       components: [
         { name: 'Atividade Web', weight: 40, source: 'GA4' },
         { name: 'Abertura Email', weight: 30, source: 'HubSpot' },
-        { name: 'Interações Sales', weight: 30, source: 'Canopi History' }
+        { name: 'Interações Sales', weight: 30, source: 'Knopi History' }
       ],
       threshold: 60,
       impact: 'Determina a urgência de abordagem no Cockpit.',
@@ -565,17 +565,17 @@ const ConfigStage1: React.FC = () => {
 
   // ===== ESTADO: FONTES DE MÍDIA (ETAPA 2) =====
   const [mediaSources] = useState<MediaSource[]>([
-    { id: '1', name: 'Google Analytics 4', platform: 'ga4', status: 'connected', accountName: 'Canopi Main - 123456', syncFreq: '2 horas', scope: ['página', 'evento', 'usuário'], impact: 'Desempenho Inbound' },
-    { id: '2', name: 'Google Ads', platform: 'google_ads', status: 'partial', accountName: 'Canopi Performance', syncFreq: '4 horas', scope: ['campanha', 'conversão'], impact: 'ROI de Mídia' },
-    { id: '3', name: 'Meta Ads', platform: 'meta', status: 'error', accountName: 'Canopi FB/IG', syncFreq: 'Diário', scope: ['campanha'], impact: 'Social Leads', pendingChanges: true },
-    { id: '4', name: 'LinkedIn Ads', platform: 'linkedin', status: 'connected', accountName: 'Canopi B2B', syncFreq: '6 horas', scope: ['campanha', 'leads'], impact: 'ABM Audiences' },
+    { id: '1', name: 'Google Analytics 4', platform: 'ga4', status: 'connected', accountName: 'Knopi Main - 123456', syncFreq: '2 horas', scope: ['página', 'evento', 'usuário'], impact: 'Desempenho Inbound' },
+    { id: '2', name: 'Google Ads', platform: 'google_ads', status: 'partial', accountName: 'Knopi Performance', syncFreq: '4 horas', scope: ['campanha', 'conversão'], impact: 'ROI de Mídia' },
+    { id: '3', name: 'Meta Ads', platform: 'meta', status: 'error', accountName: 'Knopi FB/IG', syncFreq: 'Diário', scope: ['campanha'], impact: 'Social Leads', pendingChanges: true },
+    { id: '4', name: 'LinkedIn Ads', platform: 'linkedin', status: 'connected', accountName: 'Knopi B2B', syncFreq: '6 horas', scope: ['campanha', 'leads'], impact: 'ABM Audiences' },
   ]);
 
   // ===== ESTADO: EVENTOS E CONVERSÕES (ETAPA 2) =====
   const [canopiEvents] = useState<CanopiEvent[]>([
-    { id: 'e1', name: 'page_view_pricing', type: 'secondary', source: 'ga4', status: 'active', usage: ['performance', 'signals'], destination: 'Canopi Dashboard' },
+    { id: 'e1', name: 'page_view_pricing', type: 'secondary', source: 'ga4', status: 'active', usage: ['performance', 'signals'], destination: 'Knopi Dashboard' },
     { id: 'e2', name: 'demo_request_form_submit', type: 'primary', source: 'interno', status: 'active', usage: ['performance', 'signals', 'attribution', 'cockpit'], value: 500, destination: 'CRM + Slack' },
-    { id: 'e3', name: 'pricing_calculator_use', type: 'secondary', source: 'ga4', status: 'validating', usage: ['performance'], destination: 'Canopi' },
+    { id: 'e3', name: 'pricing_calculator_use', type: 'secondary', source: 'ga4', status: 'validating', usage: ['performance'], destination: 'Knopi' },
     { id: 'e4', name: 'webinar_registration', type: 'primary', source: 'linkedin', status: 'active', usage: ['performance', 'signals'], value: 150, destination: 'CRM' },
     { id: 'e5', name: 'opportunity_created', type: 'primary', source: 'crm', status: 'active', usage: ['attribution', 'cockpit'], value: 2000, destination: 'Internal Reports' },
   ]);
@@ -1924,7 +1924,7 @@ const ConfigStage1: React.FC = () => {
       <div className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between z-10 shrink-0">
         <div>
           <h1 className="text-2xl font-black text-slate-900 leading-tight">Configurações & Setup</h1>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Canopi Cockpit • Parametrização Real</p>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Knopi Cockpit • Parametrização Real</p>
         </div>
         <div className="flex items-center gap-4">
           {isDirty && (

@@ -28,7 +28,7 @@ export function AccountClassification() {
                   <div className="flex justify-between items-center mb-4">
                     <label className="text-sm font-black text-slate-700 uppercase tracking-tight">{key.replace(/_/g, ' ')}</label>
                     <select className="text-xs font-black uppercase text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
-                       <option>PRIORIDADE: CANOPI</option>
+                       <option>PRIORIDADE: KNOPI</option>
                        <option>PRIORIDADE: FONTE</option>
                     </select>
                   </div>
@@ -59,7 +59,7 @@ export function AccountClassification() {
                   Lógica de Derivação
                </h3>
                <p className="text-sm text-slate-400 leading-relaxed font-medium mb-6">
-                  Se a conta não possuir classificação na fonte, o Canopi tentará derivar o <strong className="text-white">ABM_TIER</strong> baseado na matriz de ICP definida na etapa 4.
+                  Se a conta não possuir classificação na fonte, o Knopi tentará derivar o <strong className="text-white">ABM_TIER</strong> baseado na matriz de ICP definida na etapa 4.
                </p>
                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3">
                   <div className="flex items-center justify-between">

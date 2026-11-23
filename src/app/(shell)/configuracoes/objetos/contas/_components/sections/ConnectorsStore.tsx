@@ -141,7 +141,7 @@ export function ConnectorsStore() {
       <header className="space-y-3">
         <h2 className="text-3xl font-black tracking-tight text-slate-900">Loja de Conectores</h2>
         <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
-          Catalogo de integracoes de contas da Canopi. Cada conector possui configuracao dedicada em sua propria tela,
+          Catalogo de integracoes de contas da Knopi. Cada conector possui configuracao dedicada em sua propria tela,
           com metodos de conexao, requisitos e objetos suportados.
         </p>
       </header>

@@ -20,7 +20,7 @@ export function AccountCanonical() {
 
   const resolvePipelineUsage = (source: string) => {
     if (source === 'fact') return 'Ingestão';
-    if (source === 'canopi') return 'Canopi';
+    if (source === 'canopi') return 'Knopi';
     if (source === 'recommendation') return 'Recomendação';
     return 'Custom';
   };
@@ -60,7 +60,7 @@ export function AccountCanonical() {
           <div>
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">4. Camada Canônica</h2>
             <p className="text-lg text-slate-500 mt-4 max-w-3xl font-medium">
-              Esta etapa transforma os campos da fonte já escolhida em schema Canopi para uso operacional em lote.
+              Esta etapa transforma os campos da fonte já escolhida em schema Knopi para uso operacional em lote.
             </p>
           </div>
           <Badge className="bg-slate-900 text-white font-black py-2 px-4 rounded-xl">
@@ -70,7 +70,7 @@ export function AccountCanonical() {
 
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-medium text-blue-900">
-            Não é cadastro manual de conta. Aqui você revisa o schema Canopi derivado da fonte selecionada.
+            Não é cadastro manual de conta. Aqui você revisa o schema Knopi derivado da fonte selecionada.
           </div>
           <div className="rounded-2xl border border-amber-100 bg-amber-50 px-5 py-4 text-sm font-medium text-amber-900">
             Estado local/simulado na sessão atual. Sem persistência em backend real nesta fase.

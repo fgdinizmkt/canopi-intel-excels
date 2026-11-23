@@ -160,24 +160,24 @@ interface DealPropertySpec {
 
 const DEAL_PROPERTY_SPECS: DealPropertySpec[] = [
   // Blocking — identity
-  { name: 'canopi_canonical_id', label: 'Canopi Canonical ID', type: 'string', fieldType: 'text', hasUniqueValue: true },
-  { name: 'canopi_opportunity_id', label: 'Canopi Opportunity ID', type: 'string', fieldType: 'text', hasUniqueValue: true },
-  { name: 'canopi_tenant_id', label: 'Canopi Tenant ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_canonical_id', label: 'Knopi Canonical ID', type: 'string', fieldType: 'text', hasUniqueValue: true },
+  { name: 'canopi_opportunity_id', label: 'Knopi Opportunity ID', type: 'string', fieldType: 'text', hasUniqueValue: true },
+  { name: 'canopi_tenant_id', label: 'Knopi Tenant ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
   // Metadata — not blocking
-  { name: 'canopi_associated_company_id', label: 'Canopi Associated Company ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
-  { name: 'canopi_import_batch_id', label: 'Canopi Import Batch ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
-  { name: 'canopi_contract_version', label: 'Canopi Contract Version', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_associated_company_id', label: 'Knopi Associated Company ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_import_batch_id', label: 'Knopi Import Batch ID', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_contract_version', label: 'Knopi Contract Version', type: 'string', fieldType: 'text', hasUniqueValue: false },
   {
     name: 'canopi_sync_status',
-    label: 'Canopi Sync Status',
+    label: 'Knopi Sync Status',
     type: 'enumeration',
     fieldType: 'select',
     hasUniqueValue: false,
     options: SYNC_STATUS_OPTIONS,
   },
-  { name: 'canopi_last_sync_at', label: 'Canopi Last Sync At', type: 'string', fieldType: 'text', hasUniqueValue: false },
-  { name: 'canopi_source', label: 'Canopi Source', type: 'string', fieldType: 'text', hasUniqueValue: false },
-  { name: 'canopi_stage_canonical', label: 'Canopi Stage Canonical', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_last_sync_at', label: 'Knopi Last Sync At', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_source', label: 'Knopi Source', type: 'string', fieldType: 'text', hasUniqueValue: false },
+  { name: 'canopi_stage_canonical', label: 'Knopi Stage Canonical', type: 'string', fieldType: 'text', hasUniqueValue: false },
 ];
 
 const DEAL_BLOCKING_NAMES = new Set(['canopi_canonical_id', 'canopi_opportunity_id', 'canopi_tenant_id']);

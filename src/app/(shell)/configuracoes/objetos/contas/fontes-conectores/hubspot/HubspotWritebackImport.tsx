@@ -491,7 +491,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
   const previewColumns =
     previewTab === 'companies'
       ? [
-          { key: 'campo', label: 'ID Canopi' },
+          { key: 'campo', label: 'ID Knopi' },
           { key: 'label', label: 'Nome' },
           { key: 'grupo', label: 'Domínio' },
           { key: 'classificacao', label: 'Classificação' },
@@ -499,7 +499,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         ]
       : previewTab === 'contacts'
         ? [
-            { key: 'campo', label: 'ID Canopi' },
+            { key: 'campo', label: 'ID Knopi' },
             { key: 'label', label: 'Contato' },
             { key: 'grupo', label: 'Empresa' },
             { key: 'classificacao', label: 'Confiança' },
@@ -673,12 +673,12 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Retorno ao HubSpot</p>
-              <h4 className="text-xl font-black text-slate-950">Atualizar HubSpot a partir da Canopi</h4>
+              <h4 className="text-xl font-black text-slate-950">Atualizar HubSpot a partir da Knopi</h4>
               <p className="mt-1 text-sm font-medium text-slate-400">
                 Exporte o CSV de revisão e confirme os vínculos antes de devolver dados preparados ao HubSpot.
               </p>
               <p className="mt-2 text-sm font-medium leading-relaxed text-slate-400">
-                A atualização usa IDs externos Canopi únicos no HubSpot. Se a mesma base gerar os mesmos IDs, o HubSpot atualiza os registros existentes.
+                A atualização usa IDs externos Knopi únicos no HubSpot. Se a mesma base gerar os mesmos IDs, o HubSpot atualiza os registros existentes.
               </p>
             </div>
             <Badge variant={canWriteHubspot ? 'emerald' : 'slate'}>{canWriteHubspot ? 'Atualização disponível' : 'Atualização bloqueada'}</Badge>
@@ -792,7 +792,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                     {setupState?.issues.slice(0, 4).map((issue) => (
                       <li key={`${issue.objectType}-${issue.title}`}>• {issue.message}</li>
                     ))}
-                    {setupState && setupState.issues.length === 0 ? <li>• Propriedades Canopi ausentes no HubSpot ou IDs externos ainda não configurados como únicos.</li> : null}
+                    {setupState && setupState.issues.length === 0 ? <li>• Propriedades Knopi ausentes no HubSpot ou IDs externos ainda não configurados como únicos.</li> : null}
                     {!setupState ? <li>• Valide os pré-requisitos acima para liberar a subida real.</li> : null}
                   </ul>
                 ) : (
@@ -806,7 +806,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-400">
-            A atualização usa IDs externos Canopi para localizar registros no HubSpot. Reenviar a mesma base tende a atualizar os registros existentes quando os IDs permanecem iguais. Se mudanças em campos sensíveis gerarem IDs diferentes, pode haver risco de novo registro; esse cenário deve evoluir para uma revisão assistida antes da criação ou atualização.
+            A atualização usa IDs externos Knopi para localizar registros no HubSpot. Reenviar a mesma base tende a atualizar os registros existentes quando os IDs permanecem iguais. Se mudanças em campos sensíveis gerarem IDs diferentes, pode haver risco de novo registro; esse cenário deve evoluir para uma revisão assistida antes da criação ou atualização.
           </div>
 
           {executionResult ? (

@@ -28,7 +28,7 @@ export async function GET() {
 /**
  * POST /api/account-connectors/salesforce/oauth/opportunity-contact-role-preview
  *
- * Executa preview read-only de OpportunityContactRole Salesforce → Canopi.
+ * Executa preview read-only de OpportunityContactRole Salesforce → Knopi.
  */
 export async function POST(req: Request) {
   try {

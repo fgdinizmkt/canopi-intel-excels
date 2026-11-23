@@ -186,7 +186,7 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
             <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Catálogo de campos</p>
             <h4 className="text-lg font-black text-slate-900">{schema.count} propriedades carregadas</h4>
             <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
-              A Canopi identificou {schema.count} propriedades no HubSpot. Esta tela mostra uma prévia dos campos mais úteis para população e mapeamento. Para analisar todos os campos e montar uma massa mais completa, baixe o CSV completo.
+              A Knopi identificou {schema.count} propriedades no HubSpot. Esta tela mostra uma prévia dos campos mais úteis para população e mapeamento. Para analisar todos os campos e montar uma massa mais completa, baixe o CSV completo.
             </p>
             <p className="text-xs font-medium text-slate-400">
               Exportações locais baseadas nos dados carregados nesta sessão.
@@ -230,7 +230,7 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
         </div>
 
         <p className="text-sm font-medium leading-relaxed text-slate-400">
-          A prévia não limita a população. O CSV completo inclui campos úteis, históricos, lifecycle, cliente/ex-cliente, target account, analytics, sinais, opções controladas e campos técnicos. Use a classificação Canopi como orientação, não como trava.
+          A prévia não limita a população. O CSV completo inclui campos úteis, históricos, lifecycle, cliente/ex-cliente, target account, analytics, sinais, opções controladas e campos técnicos. Use a classificação Knopi como orientação, não como trava.
         </p>
 
         <div className="overflow-x-auto rounded-2xl border border-slate-100">
@@ -280,7 +280,7 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
 
         <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-950">
-            A prévia não limita a população. O CSV completo inclui campos úteis, históricos, lifecycle, cliente/ex-cliente, target account, analytics, sinais, opções controladas e campos técnicos. Use a classificação Canopi como orientação, não como trava.
+            A prévia não limita a população. O CSV completo inclui campos úteis, históricos, lifecycle, cliente/ex-cliente, target account, analytics, sinais, opções controladas e campos técnicos. Use a classificação Knopi como orientação, não como trava.
           </p>
           <p className="mt-2 text-sm font-medium leading-relaxed text-amber-900">
             Antes de importar dados na HubSpot, revise campos read-only, calculados, ocultos e campos com opções controladas.

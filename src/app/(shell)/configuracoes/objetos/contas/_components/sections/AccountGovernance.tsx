@@ -36,7 +36,7 @@ export function AccountGovernance() {
             <div className="space-y-6">
                <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest">Visão Consolidada</h3>
                <div className="space-y-3">
-                  {['Salesforce → Canopi', 'CSV Upload → Canopi', 'Canopi → Salesforce (Writeback)'].map((fluxo, i) => (
+                  {['Salesforce → Knopi', 'CSV Upload → Knopi', 'Knopi → Salesforce (Writeback)'].map((fluxo, i) => (
                      <div key={i} className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-500 transition-all shadow-sm">
                         <span className="text-xs font-black text-slate-700 uppercase">{fluxo}</span>
                         <div className="flex items-center gap-4">
@@ -52,7 +52,7 @@ export function AccountGovernance() {
                <div className="relative">
                   <h3 className="text-xl font-black text-white uppercase mb-4 tracking-tighter">Última Validação de Governança</h3>
                   <p className="text-sm text-slate-400 leading-relaxed font-medium mb-8">
-                     A arquitetura de dados atual foi validada em <strong className="text-white">23/04/2026</strong> por <strong className="text-white">Canopi Growth Intelligence</strong>. Nenhuma lacuna crítica pendente.
+                     A arquitetura de dados atual foi validada em <strong className="text-white">23/04/2026</strong> por <strong className="text-white">Knopi Growth Intelligence</strong>. Nenhuma lacuna crítica pendente.
                   </p>
                   <button className="flex items-center gap-3 text-xs font-black text-white hover:text-blue-400 transition-all uppercase underline tracking-widest">
                      Ver Logs Históricos

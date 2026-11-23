@@ -1,6 +1,12 @@
 # CONTEXTO OPERACIONAL — Canopi
 > Leia este arquivo no início de TODA sessão. É a memória viva do projeto para IA.
-> Última atualização: 10/06/2026 — 1ª revisão (setup inicial do sistema de agentes Claude Code)
+> Última atualização: 23/11/2026 — 2ª revisão (início da renomeação para Knopi)
+
+---
+
+## RENOMEAÇÃO CANOPI → KNOPI (desde 23/11/2026)
+
+O produto passa a se chamar **Knopi**, com troca em tudo, inclusive contratos externos. Identidade visual única e definitiva: **Knopi · Manual de Marca v1.1**. Plano, etapas e status em `docs/98-operacao/67-renomeacao-knopi.md`. Etapa 1 (marca visível em `src/`) feita em 23/11.
 
 ---
 

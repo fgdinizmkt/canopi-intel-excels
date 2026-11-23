@@ -534,7 +534,7 @@ export const CrossIntelligence: React.FC = () => {
         nextStep: item.proximoEstado,
         dependencies: item.prerequisitos,
         evidence: [item.recomendacao, item.logSincronizacao],
-        history: [{ id: `h-${Date.now()}`, when: new Date().toLocaleString(), actor: "Canopi", type: "mudança", text: "Ação gerada via despacho de Inteligência Cruzada." }],
+        history: [{ id: `h-${Date.now()}`, when: new Date().toLocaleString(), actor: "Knopi", type: "mudança", text: "Ação gerada via despacho de Inteligência Cruzada." }],
         buttons: [
           { id: "view", label: "Ver detalhes", tone: "secondary", action: "open" },
           { id: "start", label: "Iniciar execução", tone: "primary", action: "start" }
@@ -1183,7 +1183,7 @@ export const CrossIntelligence: React.FC = () => {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-widest">
-        <p>© 2024 CANOPI | intel excels. BUILT FOR ENTERPRISE GROWTH.</p>
+        <p>© 2024 KNOPI | intel excels. BUILT FOR ENTERPRISE GROWTH.</p>
         <div className="flex gap-8">
           <button className="hover:text-brand transition-colors">Privacidade</button>
           <button className="hover:text-brand transition-colors">Documentação</button>

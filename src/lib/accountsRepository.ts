@@ -17,11 +17,11 @@ import { getOportunidadesMap } from './oportunidadesRepository';
 
 /**
  * Payload de sync CRM — Whitelist absoluta de campos permitidos para escrita.
- * NUNCA inclui campos estratégicos, scoring ou inteligência Canopi.
+ * NUNCA inclui campos estratégicos, scoring ou inteligência Knopi.
  * Campos ausentes são omitidos (não sobrescritos).
  */
 export type CRMAccountSyncPayload = {
-  /** Identificador canônico da conta Canopi — obrigatório para update */
+  /** Identificador canônico da conta Knopi — obrigatório para update */
   id: string;
   /** Nome descritivo da empresa (sobrescrita permitida via CRM) */
   nome?: string;
@@ -35,7 +35,7 @@ export type CRMAccountSyncPayload = {
   porte?: string;
   /** Localização geográfica */
   localizacao?: string;
-  /** Owner principal na Canopi */
+  /** Owner principal na Knopi */
   ownerPrincipal?: string;
   /** Etapa do funil */
   etapa?: string;

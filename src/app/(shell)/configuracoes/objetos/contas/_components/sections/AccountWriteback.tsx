@@ -12,7 +12,7 @@ export function AccountWriteback() {
     <section id="writeback" className="space-y-10">
       <header>
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">6. Writeback (Retorno ao CRM)</h2>
-        <p className="text-lg text-slate-500 mt-4 max-w-3xl font-medium">Configure a direção e integridade dos dados atualizados pela Canopi na fonte de origem.</p>
+        <p className="text-lg text-slate-500 mt-4 max-w-3xl font-medium">Configure a direção e integridade dos dados atualizados pela Knopi na fonte de origem.</p>
       </header>
 
       <Card className="p-8 border-slate-200">
@@ -21,7 +21,7 @@ export function AccountWriteback() {
                <div className="p-4 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20"><Zap className="w-8 h-8 text-white" /></div>
                <div>
                   <p className="font-black text-2xl uppercase tracking-tighter leading-none mb-2">Master Intelligence Sync</p>
-                  <p className="text-sm font-medium text-slate-400">Ativado: A Canopi atualiza o CRM automaticamente.</p>
+                  <p className="text-sm font-medium text-slate-400">Ativado: A Knopi atualiza o CRM automaticamente.</p>
                </div>
             </div>
             <div className="flex flex-col items-end gap-2">
@@ -43,7 +43,7 @@ export function AccountWriteback() {
                           <ArrowRightLeft className="w-5 h-5" />
                        </div>
                        <div>
-                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Fonte: CANOPI CANONICAL</p>
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Fonte: KNOPI CANONICAL</p>
                           <p className="font-black text-slate-800 text-lg uppercase tracking-tight">{m.canonicalField}</p>
                        </div>
                      </div>

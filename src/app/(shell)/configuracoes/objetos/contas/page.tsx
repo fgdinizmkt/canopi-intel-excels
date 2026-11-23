@@ -85,7 +85,7 @@ export default function ContasHubPage() {
     { 
       id: 'canonica', 
       title: '4. Camada Canônica', 
-      desc: 'Revisão local do mapeamento e schema Canopi (sem conexão real).', 
+      desc: 'Revisão local do mapeamento e schema Knopi (sem conexão real).', 
       icon: Table, 
       color: 'text-orange-600', 
       bg: 'bg-orange-50',

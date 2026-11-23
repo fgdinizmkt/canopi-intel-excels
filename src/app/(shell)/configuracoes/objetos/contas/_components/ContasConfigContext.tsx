@@ -790,7 +790,7 @@ export const ContasConfigProvider: React.FC<{ children: React.ReactNode }> = ({ 
               ? 'configured'
               : 'optional',
         prerequisite: 'Classificação disponível para revisão de retorno ao CRM.',
-        impact: 'Revisa o retorno de campos Canopi para a fonte quando aplicável.',
+        impact: 'Revisa o retorno de campos Knopi para a fonte quando aplicável.',
         blockers: getStepBlockers('writeback'),
       },
       {

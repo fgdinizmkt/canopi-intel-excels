@@ -549,7 +549,7 @@ const RankingsLayer: React.FC<{ hotUpsell: any[]; hotCrossSell: any[]; highRiskC
 
 const CommercialMemoryLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => void }> = ({ accounts, onSelect }) => (
   <div className="space-y-6">
-    <SectionHeader title="Memória Comercial Canopi" subtitle="Histórico de vitórias, perdas e projetos ativos nas top contas" icon={<History className="w-5 h-5" />} />
+    <SectionHeader title="Memória Comercial Knopi" subtitle="Histórico de vitórias, perdas e projetos ativos nas top contas" icon={<History className="w-5 h-5" />} />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {accounts.slice(0, 4).map((acc, i) => (
         <Card key={i} className="p-8 border-slate-200 shadow-sm rounded-[40px] bg-white hover:shadow-md transition-all">
@@ -1101,7 +1101,7 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
 const ContactActionsLayer: React.FC = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 pb-12">
     { [
-      { title: 'Aproximar Sponsor', person: 'Elena Silva', account: 'Global Bank S.A.', action: 'Agendar Intro Executiva via CEO Canopi', color: 'blue', tag: 'High Priority' },
+      { title: 'Aproximar Sponsor', person: 'Elena Silva', account: 'Global Bank S.A.', action: 'Agendar Intro Executiva via CEO Knopi', color: 'blue', tag: 'High Priority' },
       { title: 'Contornar Bloqueador', person: 'Ricardo Mello', account: 'Innova Retail', action: 'Enviar prova social de TI específica do setor', color: 'red', tag: 'Critical' },
       { title: 'Reativar Champion', person: 'Paula Torres', account: 'TechCorp S.A.', action: 'Compartilhar novo Case Study de Automação', color: 'emerald', tag: 'Opportunity' },
       { title: 'Blindar Conta', person: 'Gustavo Lima', account: 'Sky Logistics', action: 'Incluir em Newsletter Premium Persona-based', color: 'indigo', tag: 'Retention' },
@@ -1146,7 +1146,7 @@ const DataOriginFooter: React.FC = () => (
         ))}
      </div>
      <div className="text-right">
-       <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Canopi Intel Engine v4.2</p>
+       <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Knopi Intel Engine v4.2</p>
        <p className="text-xs font-bold text-slate-400">© 2026 ABX Command Center</p>
      </div>
   </div>
@@ -1173,7 +1173,7 @@ export const ABXOrchestration: React.FC = () => {
     { name: 'Apollo.io', value: 35 },
     { name: 'Inbound CRM', value: 25 },
     { name: 'Paid Social', value: 15 },
-    { name: 'Nativo (Canopi)', value: 12 },
+    { name: 'Nativo (Knopi)', value: 12 },
     { name: 'Events', value: 8 },
     { name: 'Others', value: 5 },
   ];

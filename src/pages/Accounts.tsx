@@ -429,7 +429,7 @@ export const Accounts = () => {
 
             {/* Breadcrumb & Title Area */}
             <div className="mb-6">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-2">Canopi · Intelligence · Portfolio</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-2">Knopi · Intelligence · Portfolio</p>
               <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none mb-4">
                 Portfólio de Contas
               </h1>
@@ -516,8 +516,8 @@ export const Accounts = () => {
                 >
                   <option value="potencial_desc">Potencial (maior)</option>
                   <option value="risco_desc">Risco (maior)</option>
-                  <option value="score_desc">Score Canopi (maior)</option>
-                  <option value="score_asc">Score Canopi (menor)</option>
+                  <option value="score_desc">Score Knopi (maior)</option>
+                  <option value="score_asc">Score Knopi (menor)</option>
                   <option value="engajamento_desc">Engajamento Recente</option>
                   <option value="movimentacao_desc">Última movimentação</option>
                 </select>
@@ -679,7 +679,7 @@ export const Accounts = () => {
               </div>
               <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Machine Insight</span>
             </div>
-            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Sugestão de plays recomendados pela inteligência Canopi.</p>
+            <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Sugestão de plays recomendados pela inteligência Knopi.</p>
           </button>
         </div>
 

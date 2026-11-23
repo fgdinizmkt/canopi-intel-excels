@@ -1,6 +1,6 @@
 /**
  * Conta Connectors V2 — Corrected Architecture
- * SEPARATES: FATO DO CRM | PRESET CANOPI | COMPORTAMENTO CONFIGURÁVEL
+ * SEPARATES: FATO DO CRM | PRESET KNOPI | COMPORTAMENTO CONFIGURÁVEL
  * Source: 'fact' | 'recommendation' | 'custom'
  */
 
@@ -10,15 +10,15 @@ export interface ConnectorIdentity {
   chosenPrimaryKey: string; // CONFIGURATION: user's choice
   chosenSecondaryKey?: string; // CONFIGURATION: user's choice
   dedupeStrategy: 'primary_only' | 'primary_secondary' | 'primary_domain' | 'primary_email' | 'custom';
-  recommendedPrimaryKey: string; // RECOMMENDATION: Canopi suggestion
-  recommendedDedupeStrategy: string; // RECOMMENDATION: Canopi suggestion
+  recommendedPrimaryKey: string; // RECOMMENDATION: Knopi suggestion
+  recommendedDedupeStrategy: string; // RECOMMENDATION: Knopi suggestion
   confidenceScore: number; // 0-100: How reliable is this source's identity?
   notes?: string;
 }
 
 export interface FieldMapping {
   nativeField: string; // CRM field name
-  canonicalField: string; // Canopi field name
+  canonicalField: string; // Knopi field name
   dataType: string;
   required: boolean;
   source: 'fact' | 'recommendation' | 'custom' | 'canopi'; // SOURCE CLASSIFICATION
@@ -37,7 +37,7 @@ export interface ConnectorInstructions {
   factsAboutConnector: string[]; // Immutable facts about this CRM
   whatMustExist: string[]; // Prerequisites (API keys, permissions, etc)
   publishBlockers: string[]; // Explicit blockers (not suggestions)
-  recommendations: string[]; // Canopi suggestions
+  recommendations: string[]; // Knopi suggestions
   traceabilityFields?: string[];
   traceabilityExample?: string;
   lgpdInstructions?: string[];
@@ -370,7 +370,7 @@ export const OTHER_CRM_PRESET: ConnectorPreset = {
     factsAboutConnector: ['Custom setup — defina sua própria PK'],
     whatMustExist: ['API ou Database Access'],
     publishBlockers: ['Falha na conexão de teste', 'Mapeamento ID/Name ausente'],
-    recommendations: ['Siga o padrão de campos canônicos Canopi'],
+    recommendations: ['Siga o padrão de campos canônicos Knopi'],
   },
   nativeObject: '',
   requiredFields: [],

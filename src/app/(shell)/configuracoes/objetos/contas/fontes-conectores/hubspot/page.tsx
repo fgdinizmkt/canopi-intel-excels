@@ -123,11 +123,11 @@ function getSnapshotCountKindLabel(countKind: string) {
 function getSnapshotPropertyStatusLabel(status: string | undefined) {
   switch (status) {
     case 'available':
-      return 'Canopi calculada';
+      return 'Knopi calculada';
     case 'missing_scope':
       return 'sem escopo de schema';
     case 'not_configured':
-      return 'propriedade Canopi não encontrada';
+      return 'propriedade Knopi não encontrada';
     case 'error':
       return 'erro de leitura';
     default:
@@ -163,11 +163,11 @@ function getSnapshotInventoryState(entity: HubspotSnapshotEntity) {
   if (entity.status === 'error') return 'Erro';
 
   if ((entity.objectType === 'companies' || entity.objectType === 'contacts') && entity.canopiTagStatus === 'not_configured') {
-    return 'Propriedade Canopi não encontrada';
+    return 'Propriedade Knopi não encontrada';
   }
 
   if (entity.objectType === 'deals') {
-    return 'Não trabalhado pela Canopi';
+    return 'Não trabalhado pela Knopi';
   }
 
   return 'Disponível';
@@ -175,20 +175,20 @@ function getSnapshotInventoryState(entity: HubspotSnapshotEntity) {
 
 function getSnapshotInventoryObservation(entity: HubspotSnapshotEntity) {
   if (entity.objectType === 'companies') {
-    if (entity.canopiTagStatus === 'available') return 'Canopi por canopi_company_id.';
+    if (entity.canopiTagStatus === 'available') return 'Knopi por canopi_company_id.';
     if (entity.canopiTagStatus === 'not_configured') return 'Propriedade canopi_company_id ausente.';
-    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Canopi.';
+    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Knopi.';
     return entity.note || 'Total no HubSpot.';
   }
 
   if (entity.objectType === 'contacts') {
-    if (entity.canopiTagStatus === 'available') return 'Canopi por canopi_contact_id.';
+    if (entity.canopiTagStatus === 'available') return 'Knopi por canopi_contact_id.';
     if (entity.canopiTagStatus === 'not_configured') return 'Propriedade canopi_contact_id ausente.';
-    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Canopi.';
+    if (entity.canopiTagStatus === 'missing_scope') return 'Escopo de schema ausente para Knopi.';
     return entity.note || 'Total no HubSpot.';
   }
 
-  if (entity.objectType === 'deals') return 'Canopi ainda não escreve Deals.';
+  if (entity.objectType === 'deals') return 'Knopi ainda não escreve Deals.';
   if (entity.objectType === 'leads') return entity.status === 'available' ? 'Objeto disponível nesta leitura.' : 'Objeto não disponível nesta leitura.';
   if (entity.objectType === 'campaigns') return entity.scopeRequired ? `Requer ${entity.scopeRequired}.` : 'Leitura de campanhas.';
   if (entity.objectType === 'properties') return 'Catálogo de Companies.';
@@ -612,7 +612,7 @@ export default function HubSpotPage() {
         title: 'Enriquecimento',
         icon: Sparkles,
         status: 'não calculado nesta leitura',
-        detail: 'Depende da persistência Canopi e das regras de classificação.',
+        detail: 'Depende da persistência Knopi e das regras de classificação.',
       },
       {
         title: 'Contas target',
@@ -620,7 +620,7 @@ export default function HubSpotPage() {
         status: 'não calculado nesta leitura',
         detail: companies?.status === 'missing_scope'
           ? 'Depende do inventário de Companies.'
-          : 'Depende da classificação Canopi persistida.',
+          : 'Depende da classificação Knopi persistida.',
       },
       {
         title: 'Leads quentes',
@@ -707,7 +707,7 @@ export default function HubSpotPage() {
           <div className="space-y-2">
             <h1 className="text-4xl font-black tracking-tighter text-slate-900">HubSpot</h1>
             <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-400">
-              HubSpot é a fonte principal de empresas, contatos, propriedades e relacionamentos. A Canopi primeiro se conecta para ler e diagnosticar a base; depois, quando fizer sentido, devolve dados preparados ao CRM.
+              HubSpot é a fonte principal de empresas, contatos, propriedades e relacionamentos. A Knopi primeiro se conecta para ler e diagnosticar a base; depois, quando fizer sentido, devolve dados preparados ao CRM.
             </p>
           </div>
         </div>
@@ -720,7 +720,7 @@ export default function HubSpotPage() {
             <Badge variant="slate">Sem gravação</Badge>
           </div>
           <p className="mt-3 max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
-            Nenhum dado será gravado na Canopi nesta etapa. A credencial fica apenas nesta sessão local do navegador. Esta etapa não altera dados na HubSpot.
+            Nenhum dado será gravado na Knopi nesta etapa. A credencial fica apenas nesta sessão local do navegador. Esta etapa não altera dados na HubSpot.
           </p>
         </div>
       </header>
@@ -774,7 +774,7 @@ export default function HubSpotPage() {
                           </div>
                           <p className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-900">{entity.label}</p>
                           <p className="whitespace-nowrap text-xs font-black text-slate-950">HubSpot {totalValue}</p>
-                          <p className="whitespace-nowrap text-xs font-black text-slate-700">Canopi {canopiValue}</p>
+                          <p className="whitespace-nowrap text-xs font-black text-slate-700">Knopi {canopiValue}</p>
                           <div className="text-xs font-medium text-slate-500">
                             <p className="whitespace-nowrap">{stateLabel}</p>
                             {stateLabel === 'Sem escopo' && entity.scopeRequired ? (
@@ -785,7 +785,7 @@ export default function HubSpotPage() {
                       );
                     })}
                     <p className="pt-1 text-xs font-medium leading-relaxed text-slate-500">
-                      Total HubSpot e registros Canopi são leituras separadas.
+                      Total HubSpot e registros Knopi são leituras separadas.
                     </p>
                   </div>
                 ) : (
@@ -818,7 +818,7 @@ export default function HubSpotPage() {
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">O que ainda não acontece</p>
                 <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
                   <li>• Não sincroniza dados</li>
-                  <li>• Não grava empresas na Canopi</li>
+                  <li>• Não grava empresas na Knopi</li>
                   <li>• Não altera dados na HubSpot</li>
                   <li>• Contacts, Deals/Opportunities e associações entram em inventário ampliado futuro</li>
                   <li>• A credencial fica apenas nesta sessão local do navegador</li>
@@ -1010,7 +1010,7 @@ export default function HubSpotPage() {
               <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Campos</p>
               <h3 className="text-xl font-black text-slate-900">Catálogo de campos</h3>
               <p className="mt-1 text-sm font-medium leading-relaxed text-slate-400">
-                A Canopi usa este catálogo para entender propriedades, grupos e oportunidades de mapeamento no HubSpot.
+                A Knopi usa este catálogo para entender propriedades, grupos e oportunidades de mapeamento no HubSpot.
               </p>
             </div>
             <Badge variant={!canAnalyze ? 'slate' : schemaState.phase === 'success' ? 'emerald' : schemaState.phase === 'loading' ? 'blue' : schemaState.phase === 'error' ? 'red' : 'blue'}>
@@ -1065,10 +1065,10 @@ export default function HubSpotPage() {
           <div className="rounded-2xl border border-slate-100 bg-white px-3 py-3">
             <div className="flex items-center gap-2">
               <Database className="h-4 w-4 text-slate-700" />
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Leitura para a Canopi</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Leitura para a Knopi</p>
             </div>
             <p className="mt-2 text-sm font-medium leading-relaxed text-slate-700">
-              Após inventário, normalização e persistência, estes dados alimentam Contas, Sinais, Comitê, Plays e demais leituras da Canopi.
+              Após inventário, normalização e persistência, estes dados alimentam Contas, Sinais, Comitê, Plays e demais leituras da Knopi.
             </p>
             <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-400">
               <p className="font-semibold text-slate-900">Catálogo de campos</p>
