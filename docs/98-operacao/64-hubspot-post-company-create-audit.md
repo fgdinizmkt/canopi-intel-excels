@@ -32,7 +32,7 @@
 |---|---|---|
 | **Base operacional nova** | **247** | `canopi_canonical_id` presente — criadas em C2.9E.2D.12A |
 | **Histórico antigo** | **348** | `canopi_company_id` presente, `canopi_canonical_id` ausente — population pack C2.9D.2 |
-| **Fora do padrão Canopi** | **70** | Sem `canopi_company_id` — registros externos/manuais sem rastreabilidade Canopi |
+| **Fora do padrão Knopi** | **70** | Sem `canopi_company_id` — registros externos/manuais sem rastreabilidade Knopi |
 | **Total** | **665** | — |
 
 **Conclusão:** O HubSpot convive com duas bases explicitamente distintas. A separação é limpa e detectável via `canopi_canonical_id`.
@@ -87,7 +87,7 @@ Todos os 247 registros apresentam exatamente o mesmo conjunto de campos preenchi
 
 | Campo | Valor | Tipo |
 |---|---|---|
-| `name` | nome da account Canopi | identidade |
+| `name` | nome da account Knopi | identidade |
 | `domain` | domínio sanitizado (ou omitido se inválido) | identidade |
 | `canopi_canonical_id` | UUID de `accounts.id` | identidade bloqueadora |
 | `canopi_company_id` | `cpco_${hash}` | identidade bloqueadora |
@@ -115,8 +115,8 @@ Todos os 247 registros apresentam exatamente o mesmo conjunto de campos preenchi
 | `annualrevenue` | sizing para ICP | **vazio** |
 | `description` | contexto narrativo | **vazio** |
 | `linkedin_company_page` | enrichment LinkedIn | **vazio** |
-| `canopi_icp_tier` | classificação ICP Canopi | **vazio** |
-| `canopi_abm_tier` | segmentação ABM Canopi | **vazio** |
+| `canopi_icp_tier` | classificação ICP Knopi | **vazio** |
+| `canopi_abm_tier` | segmentação ABM Knopi | **vazio** |
 | `canopi_segment` | segmento de mercado | **vazio** |
 
 ---
@@ -139,12 +139,12 @@ Todos os 247 registros apresentam exatamente o mesmo conjunto de campos preenchi
 - **Viável:** sim, mas recomendado somente após resolver a questão dos dados sintéticos
 
 ### Opção C — Separar histórico de operacional no HubSpot
-- **Prós:** visibilidade clara no HubSpot entre "o que é Canopi-operacional" e "o que é histórico"; reduz risco de confusão operacional
+- **Prós:** visibilidade clara no HubSpot entre "o que é Knopi-operacional" e "o que é histórico"; reduz risco de confusão operacional
 - **Contras:** requer intervenção manual ou rota de archive/tag no HubSpot — fora do escopo do clean reload atual
 - **Recomendação:** implementar via propriedade `canopi_data_tier` ou similar em recorte separado
 
 ### Opção D — Criar estado/tela de separação entre histórico e operacional
-- **Prós:** visibilidade na plataforma Canopi; operador sabe o que cada base representa
+- **Prós:** visibilidade na plataforma Knopi; operador sabe o que cada base representa
 - **Contras:** requer UI e lógica de leitura diferenciada
 - **Timing:** relevante em fase posterior
 
@@ -161,7 +161,7 @@ Todos os 247 registros apresentam exatamente o mesmo conjunto de campos preenchi
 | Contacts vinculados a Companies sintéticas | Baixa | Dado de teste, ambiente de validação |
 | 89 grupos de nomes duplicados no HubSpot | Baixa | Artefato sintético, não impacta fluxo técnico |
 | 348 Companies históricas coexistindo sem tag visual | Média | Confusão operacional futura se o HubSpot for usado por humanos |
-| 70 Companies sem rastreabilidade Canopi | Baixa | Registros externos, não afetam o clean reload |
+| 70 Companies sem rastreabilidade Knopi | Baixa | Registros externos, não afetam o clean reload |
 | `canopi_sync_status` em `pending` para todas | Baixa | Esperado — atualização para `active` é recorte futuro |
 | Enriquecimento aplicado antes de dados reais | Média | Não enriquecer Companies sintéticas — aguardar dados reais |
 

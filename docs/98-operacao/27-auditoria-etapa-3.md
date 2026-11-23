@@ -42,13 +42,13 @@ Com base no arquivo `src/app/(shell)/configuracoes/page.tsx`:
 
 ---
 
-## 3. Mapa de Espelhamento: Configuração ↔ Canopi
+## 3. Mapa de Espelhamento: Configuração ↔ Knopi
 
-| Configuração Criada | Onde aparece na Canopi | O que muda quando alterada |
+| Configuração Criada | Onde aparece na Knopi | O que muda quando alterada |
 | :--- | :--- | :--- |
 | **Lead Fit Score** | Dashboard de Contas / Cockpit | A qualificação de contas para entrada em Plays ABM. |
 | **Alta Intenção (Signal)** | Fila de Ações do SDR / Notificações | A urgência de abordagem e prioridade na fila. |
-| **Enterprise Routing** | Atribuição de Owner no CRM/Canopi | Quem recebe o alerta e o prazo para primeira interação (SLA). |
+| **Enterprise Routing** | Atribuição de Owner no CRM/Knopi | Quem recebe o alerta e o prazo para primeira interação (SLA). |
 
 ---
 

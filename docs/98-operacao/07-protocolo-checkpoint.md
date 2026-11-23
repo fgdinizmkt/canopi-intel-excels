@@ -1,4 +1,4 @@
-# Protocolo Formal de CHECKPOINT — Canopi | Intel Excels
+# Protocolo Formal de CHECKPOINT — Knopi | Intel Excels
 
 ## Finalidade
 

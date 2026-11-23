@@ -1,4 +1,4 @@
-# CONTEXTO OPERACIONAL — Canopi
+# CONTEXTO OPERACIONAL — Knopi
 > Leia este arquivo no início de TODA sessão. É a memória viva do projeto para IA.
 > Última atualização: 23/11/2026 — 2ª revisão (início da renomeação para Knopi)
 
@@ -12,7 +12,7 @@ O produto passa a se chamar **Knopi**, com troca em tudo, inclusive contratos ex
 
 ## QUEM OPERA
 
-**Fábio** — construtor solo da Canopi.
+**Fábio** — construtor solo da Knopi.
 - Usa Claude Code como executor principal de código (Sonnet para arquitetura, Haiku para mecânico)
 - ChatGPT: orquestração e revisão crítica de escopo
 - Gemini/Antigravity: UX/UI visual, validação no browser
@@ -24,7 +24,7 @@ O produto passa a se chamar **Knopi**, com troca em tudo, inclusive contratos ex
 
 ## O PRODUTO
 
-**Canopi** — SaaS B2B de inteligência de receita e Account Intelligence para times de Revenue/GTM.
+**Knopi** — SaaS B2B de inteligência de receita e Account Intelligence para times de Revenue/GTM.
 - Repo: `fgdinizmkt/canopi-intel-excels`
 - App local: `127.0.0.1:3053` via `npm run dev:clean`
 - Stack: Next.js 14 + Supabase + TypeScript + Tailwind
@@ -58,7 +58,7 @@ O produto passa a se chamar **Knopi**, com troca em tudo, inclusive contratos ex
 
 ### Próximo recorte recomendado
 Auditoria pós-deal-create + validação funcional dos 27 deals no HubSpot UI.
-Depois: definir próxima frente (ingest real com dados HubSpot → Canopi, ou Salesforce reativar).
+Depois: definir próxima frente (ingest real com dados HubSpot → Knopi, ou Salesforce reativar).
 
 ---
 

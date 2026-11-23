@@ -1,7 +1,7 @@
 # HubSpot identity mapping proposal dry-run — fechamento operacional
 
 ## Status
-- Proposta controlada de recuperação de mappings HubSpot ↔ Canopi implementada, validada manualmente no Supabase SQL Editor em modo read-only e fechada operacionalmente.
+- Proposta controlada de recuperação de mappings HubSpot ↔ Knopi implementada, validada manualmente no Supabase SQL Editor em modo read-only e fechada operacionalmente.
 - Nenhuma escrita foi feita.
 - Nenhum apply foi executado.
 - Nenhuma RPC foi chamada.
@@ -83,7 +83,7 @@
 - Não houve match por nome normalizado.
 - Não houve match por domínio normalizado.
 - Não houve match por par nome+domínio.
-- O problema é de desalinhamento entre a base HubSpot usada no snapshot e a base canônica atual da Canopi.
+- O problema é de desalinhamento entre a base HubSpot usada no snapshot e a base canônica atual da Knopi.
 - A conclusão operacional é não persistir mappings agora.
 
 ## Limites explícitos deste recorte
@@ -100,6 +100,6 @@
 - Investigar o desalinhamento entre a base HubSpot e a base canônica atual antes de qualquer insert.
 
 ## Próximo recorte recomendado
-- Investigar a origem do desalinhamento entre HubSpot e Canopi.
+- Investigar a origem do desalinhamento entre HubSpot e Knopi.
 - Só depois decidir se haverá persistência controlada de mappings.
 - Caso persista, regenerar snapshot com `canonicalId`, endurecer preflight e adaptar a RPC.

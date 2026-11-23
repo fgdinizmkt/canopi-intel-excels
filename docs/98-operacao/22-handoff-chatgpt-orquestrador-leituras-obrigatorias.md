@@ -1,7 +1,7 @@
 # HANDOFF — ChatGPT Orquestrador | Leituras obrigatórias primeiro
 
 ## Função deste handoff
-Este documento existe para iniciar corretamente um novo chat do projeto **Canopi | intel excels** com o ChatGPT atuando como **orquestrador principal**.
+Este documento existe para iniciar corretamente um novo chat do projeto **Knopi | intel excels** com o ChatGPT atuando como **orquestrador principal**.
 
 O objetivo aqui não é resumir tudo de forma solta.
 O objetivo principal é deixar explícito **o que deve ser lido obrigatoriamente, em qual ordem, antes de qualquer decisão**.
@@ -36,7 +36,7 @@ Estas leituras devem acontecer **antes de qualquer resposta mais estratégica, t
 
 ### Bloco 1 — Estado factual do projeto
 2. `docs/98-operacao/00-status-atual.md`
-   - fonte principal do estado publicado do Canopi
+   - fonte principal do estado publicado do Knopi
    - fase atual
    - último estado consolidado
    - recortes concluídos
@@ -96,7 +96,7 @@ Estas leituras devem acontecer **antes de qualquer resposta mais estratégica, t
 ---
 
 ## Regra prática de leitura por tipo de assunto
-### Se o assunto for estado atual do Canopi
+### Se o assunto for estado atual do Knopi
 Ler obrigatoriamente:
 - `AGENTS.md`
 - `docs/98-operacao/00-status-atual.md`
@@ -132,7 +132,7 @@ Ler obrigatoriamente:
 ---
 
 ## Estado real do produto que nunca deve ser esquecido
-O **Canopi já é uma plataforma madura**.
+O **Knopi já é uma plataforma madura**.
 
 Não é correto falar como se estivéssemos inventando uma plataforma do zero no contexto do produto atual.
 

@@ -4,14 +4,14 @@
 
 ## Identificação do recorte
 
-- **Nome:** C2.9E.2D.10A — Validação funcional do dry-run da nova carga limpa Canopi → HubSpot
+- **Nome:** C2.9E.2D.10A — Validação funcional do dry-run da nova carga limpa Knopi → HubSpot
 - **Dependência direta:** C2.9E.2D.10 — `POST /api/account-connectors/hubspot/clean-reload/dry-run`
 - **Data de execução:** 2026-05-18
 - **Servidor:** `next dev -H 0.0.0.0 -p 3053`
 
 ## Objetivo
 
-Confirmar que a rota implementada em C2.9E.2D.10 se comporta corretamente em todos os cenários de bloqueio e no cenário positivo com base de dados real Canopi, sem executar nenhuma escrita externa.
+Confirmar que a rota implementada em C2.9E.2D.10 se comporta corretamente em todos os cenários de bloqueio e no cenário positivo com base de dados real Knopi, sem executar nenhuma escrita externa.
 
 ## Testes negativos
 

@@ -1,6 +1,6 @@
 # Regra operacional — autorização explícita
 
-Status: ativa no projeto Canopi.
+Status: ativa no projeto Knopi.
 
 Esta regra vale para a condução do projeto, documentação operacional, auditorias, implementações e sincronizações.
 

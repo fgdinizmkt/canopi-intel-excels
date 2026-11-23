@@ -5,7 +5,7 @@ Escopo: Configurações → Objetos → Contas V2.
 
 ## 1. Decisão de produto
 
-Contas V2 não deve ser tratada como cadastro manual de uma conta individual. A frente deve configurar como o Canopi lê, normaliza, deduplica, classifica, governa e publica uma base de contas em lote.
+Contas V2 não deve ser tratada como cadastro manual de uma conta individual. A frente deve configurar como o Knopi lê, normaliza, deduplica, classifica, governa e publica uma base de contas em lote.
 
 Campos como website, name, owner e status só podem aparecer como campos da fonte, campos de matching, campos de dedupe ou campos de schema.
 
@@ -64,7 +64,7 @@ Deve conter:
 Não deve conter:
 
 - tabela completa de mapeamento canônico;
-- edição de campo Canopi;
+- edição de campo Knopi;
 - política detalhada de dedupe;
 - chaves secundárias de dedupe;
 - writeback policy;
@@ -491,7 +491,7 @@ Status: concluído e publicado em `origin/main`.
 
 Identidade e Dedupe recebe chaves secundárias, estratégia strict/fuzzy, política de conflito e confirmação explícita das regras de identidade.
 
-Camada Canônica recebe a tabela de mapeamento completo, campo da fonte, campo Canopi, obrigatoriedade, uso no pipeline, uso em matching, uso em score e status de revisão.
+Camada Canônica recebe a tabela de mapeamento completo, campo da fonte, campo Knopi, obrigatoriedade, uso no pipeline, uso em matching, uso em score e status de revisão.
 
 Writeback recebe campos permitidos para retorno ao CRM, política por campo, owner de aprovação e risco aceito.
 
@@ -575,7 +575,7 @@ Contas V2 ainda não estava fechada naquele momento; apenas o recorte B.1 havia 
 
 - **Status:** concluído localmente.
 - **Commit funcional:** `2a65e6e` — `fix(settings): clarify connector source boundaries`
-- **Objetivo:** fechar Fontes e Conectores para a versão atual da Canopi sem inflar o escopo produtivo.
+- **Objetivo:** fechar Fontes e Conectores para a versão atual da Knopi sem inflar o escopo produtivo.
 - **Escopo entregue:**
   - CSV passou a ser tratado como método local de entrada/carga, não como CRM/conector externo;
   - HubSpot permaneceu como conexão real mínima com preview/schema read-only e reset;
@@ -991,7 +991,7 @@ Não iniciar OAuth/Token antes de fechar o setup local com gates e artefatos coe
 Registro de premissas técnicas para o próximo recorte. Esta seção não implementa C1 e não altera o estado atual local/simulado.
 
 1. Estabilidade OAuth: prever renovação automática quando houver refresh token; evitar quebra silenciosa da análise por expiração; tratar estados explícitos de token válido, token expirado, refresh falhou e reconexão necessária.
-2. Mapeamento de metadados: estruturar captura de objetos, campos padrão e campos customizados; permitir uso da mesma lógica canônica para HubSpot, Salesforce, RD Station e futuros CRMs; separar metadados de origem do schema canônico da Canopi.
+2. Mapeamento de metadados: estruturar captura de objetos, campos padrão e campos customizados; permitir uso da mesma lógica canônica para HubSpot, Salesforce, RD Station e futuros CRMs; separar metadados de origem do schema canônico da Knopi.
 3. Segurança de escopo: aplicar menor privilégio; solicitar apenas permissões necessárias para leitura, teste de conexão e sync planejado; documentar scopes por provedor antes da implementação.
 4. Adaptadores por CRM: isolar cada CRM em adapter próprio; evitar acoplamento direto de Salesforce/HubSpot/RD no núcleo do app; permitir novo provedor por novo adapter sem refatorar o core.
 5. Separação obrigatória de responsabilidades: provider adapter; auth handler; metadata discovery; field mapping; sync strategy; connection status; data confidence.

@@ -6,7 +6,7 @@ O modelo atual de "Cards de Pendência" + "Seção Verde de Resolvidos" apresent
 - **Espaço Desperdiçado:** A seção de itens resolvidos ocupa espaço vertical precioso de forma meramente decorativa, sem oferecer poder operacional real após a correção.
 - **Incerteza de Fluxo:** Não há um feedback claro de "Conclusão". O usuário resolve um item, ele "some" de um lugar e "aparece" em outro, gerando uma carga cognitiva desnecessária para rastrear o progresso.
 - **Hierarquia Invertida:** A jornada parece uma lista de tarefas (to-do list) em vez de um processo de integração profissional (Mapeamento -> Qualidade -> Sincronização).
-- **Fragmentação da Decisão:** As correções locais parecem descoladas da fonte original, quando deveriam ser tratadas como um "Mapeamento de Valor" (ex: "No Salesforce é X, na Canopi será Y").
+- **Fragmentação da Decisão:** As correções locais parecem descoladas da fonte original, quando deveriam ser tratadas como um "Mapeamento de Valor" (ex: "No Salesforce é X, na Knopi será Y").
 
 ## 2. Jornada-alvo da Página Salesforce
 
@@ -22,7 +22,7 @@ A experiência deve seguir um fluxo linear de 10 passos:
 | 6 | **Resolver Inline** | Corrigir gaps sem sair da tela | Aplicar Correção | Status: Pronto | Valor normalizado em memória |
 | 7 | **Recalcular** | Atualizar visão após ajustes | Recalcular análise | 100% Prontos | Contrato pronto para dry-run |
 | 8 | **Revisar Impacto** | Ver o que será alterado | Revisar dry-run | Sem bloqueadores | Segurança operacional |
-| 9 | **Confirmar Sync** | Executar gravação segura | Sincronizar dados | Sync em progresso | Gravação no DB Canopi |
+| 9 | **Confirmar Sync** | Executar gravação segura | Sincronizar dados | Sync em progresso | Gravação no DB Knopi |
 | 10 | **Concluir** | Fechar ciclo | Ver Dashboard | Finalizado | Memória de sessão limpa |
 
 ## 3. Seção: "Guia de mapeamento e qualidade dos dados"
@@ -38,7 +38,7 @@ Esta seção substitui integralmente os componentes `AccountQualityPendingCards`
 1. **Conta/Registro:** Nome e Id do Salesforce (com link externo).
 2. **Campo:** O nome do campo (ex: Industry, Website).
 3. **Valor Salesforce:** O valor original vindo da API.
-4. **Valor Canopi / Decisão:** Select ou Input para edição inline.
+4. **Valor Knopi / Decisão:** Select ou Input para edição inline.
 5. **Status:** Badge visual indicando o estado da linha.
 6. **Ação:** Botão "Aplicar" ou ícone de "Salvar".
 
@@ -47,17 +47,17 @@ Esta seção substitui integralmente os componentes `AccountQualityPendingCards`
 | Status | Sinal Visual | Significado | Operacional |
 | :--- | :--- | :--- | :--- |
 | **Requer ajuste** | 🟡 Amarelo | Campo vazio ou valor inválido | Bloqueia sync deste registro |
-| **Corrigido local** | 🔵 Azul | Valor alterado manualmente na Canopi | Usa o valor local no sync |
+| **Corrigido local** | 🔵 Azul | Valor alterado manualmente na Knopi | Usa o valor local no sync |
 | **Bloqueador** | 🔴 Vermelho | Falta Id ou Nome (campos chave) | Bloqueia o processo inteiro |
 | **Ignorado** | ⚪ Cinza | Usuário optou por não sincronizar este item | Registro pulado no sync |
 | **Pronto** | 🟢 Verde | Dados válidos e mapeados | Pronto para gravação |
 
 ## 5. Edição Inline por Campo
 
-As correções ocorrem diretamente na célula da coluna **Valor Canopi / Decisão**:
+As correções ocorrem diretamente na célula da coluna **Valor Knopi / Decisão**:
 
 - **Industry (Setor):**
-    - Select com os setores oficiais da Canopi.
+    - Select com os setores oficiais da Knopi.
     - Se "Outro", abre input de texto.
     - Botão "Aplicar" na linha. Status vira "Corrigido local".
 - **Type (Tipo):**
@@ -95,7 +95,7 @@ O botão de ação principal da página (embaixo) reage ao guia:
 |  [||||||||||-------] 8 de 12 itens prontos (1 bloqueador)             |
 |                                                                       |
 |  +-----------------------------------------------------------------+  |
-|  | Conta        | Campo     | Valor Salesforce | Valor Canopi      |  |
+|  | Conta        | Campo     | Valor Salesforce | Valor Knopi      |  |
 |  +--------------+-----------+------------------+-------------------+  |
 |  | Acme Corp    | Industry  | <vazio>          | [ Selecionar... ] |  | [Aplicar]
 |  | Globex Inc   | Website   | inv@lid          | [ globex.com    ] |  | [Aplicar]

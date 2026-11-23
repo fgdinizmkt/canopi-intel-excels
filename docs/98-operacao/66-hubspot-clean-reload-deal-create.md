@@ -34,7 +34,7 @@
 |---|---|---|
 | `confirmCreateDeals` | `true` | Gate explícito — obrigatório quando `preflightOnly` não for `true` |
 | `batchId` | string | Identificador do lote de importação |
-| `tenantId` | string | Identificador do tenant Canopi |
+| `tenantId` | string | Identificador do tenant Knopi |
 
 ### Campos opcionais
 

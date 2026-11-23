@@ -14,7 +14,7 @@ A frente HubSpot já possui:
 - preview de Companies;
 - catálogo de propriedades;
 - dry-run de base de empresas e contatos;
-- setup de propriedades Canopi;
+- setup de propriedades Knopi;
 - writeback real protegido validado com upsert de Companies e Contacts;
 - associação Contact ↔ Company;
 - base completa subida e conferida no HubSpot.
@@ -60,13 +60,13 @@ Decisão:
 - não exibir “10 empresas” como se fosse total do HubSpot;
 - criar recorte separado para snapshot/inventário read-only com contagem real ou status honesto de limitação.
 
-### 2.3 Identidade atual evita duplicidade apenas quando IDs Canopi permanecem iguais
+### 2.3 Identidade atual evita duplicidade apenas quando IDs Knopi permanecem iguais
 
 O upsert está correto tecnicamente, mas depende de `canopi_company_id` e `canopi_contact_id` estáveis.
 
 Risco confirmado:
 
-- se campos que hoje entram na geração do ID mudarem, a Canopi pode gerar novo ID;
+- se campos que hoje entram na geração do ID mudarem, a Knopi pode gerar novo ID;
 - nesse caso, o HubSpot pode interpretar como novo registro;
 - isso é especialmente sensível para e-mail de contato, domínio, website e nome de empresa.
 
@@ -78,13 +78,13 @@ Decisão:
 
 ### 2.4 Drawer de decisão assistida
 
-Quando houver conflito, baixa confiança, alteração de campo sensível ou risco de duplicidade, a Canopi deve abrir um drawer para decisão do usuário.
+Quando houver conflito, baixa confiança, alteração de campo sensível ou risco de duplicidade, a Knopi deve abrir um drawer para decisão do usuário.
 
 O drawer deve mostrar:
 
 - entidade afetada;
 - registro atual no HubSpot;
-- registro proposto pela Canopi;
+- registro proposto pela Knopi;
 - campos modificados;
 - valor atual;
 - valor proposto;
@@ -102,7 +102,7 @@ Ações esperadas:
 
 ### 2.5 Enriquecimento não pode ser limitado a exemplos simples
 
-A Canopi vai enriquecer muito mais do que e-mail, telefone, cargo ou domínio.
+A Knopi vai enriquecer muito mais do que e-mail, telefone, cargo ou domínio.
 
 Campos e camadas que devem ser tratados como atributos mutáveis/enriquecíveis:
 
@@ -133,10 +133,10 @@ A classificação deve combinar:
 - owner e origem comercial/marketing;
 - histórico de interações;
 - vínculo com conta cliente ou prospect;
-- regras Canopi por tenant;
+- regras Knopi por tenant;
 - sinais e comportamento.
 
-### 2.7 Dados do HubSpot devem alimentar a Canopi transversalmente
+### 2.7 Dados do HubSpot devem alimentar a Knopi transversalmente
 
 Os dados lidos, normalizados e persistidos do HubSpot devem alimentar:
 
@@ -243,7 +243,7 @@ Critério de saída:
 
 Objetivo:
 
-- mapear como a Canopi classifica entidades vindas do HubSpot.
+- mapear como a Knopi classifica entidades vindas do HubSpot.
 
 Classificações iniciais:
 
@@ -266,7 +266,7 @@ Auditoria:
 
 - identificar campos HubSpot disponíveis para classificação;
 - mapear lifecycle/status, lead status, owner, source, campaign, deal association e company association;
-- definir regras Canopi por prioridade e conflito.
+- definir regras Knopi por prioridade e conflito.
 
 Critério de saída:
 
@@ -296,9 +296,9 @@ Critério de saída:
 - especificação da identidade estável por entidade;
 - decisão sobre `identity_key` persistido;
 - estratégia de reaproveitamento de HubSpot ID;
-- estratégia para registros antigos sem Canopi ID.
+- estratégia para registros antigos sem Knopi ID.
 
-### H5 — Dry-run semântico com comparação HubSpot versus Canopi
+### H5 — Dry-run semântico com comparação HubSpot versus Knopi
 
 Objetivo:
 
@@ -314,7 +314,7 @@ Escopo:
 
 Testes:
 
-- mesmo ID Canopi;
+- mesmo ID Knopi;
 - mesmo HubSpot ID conhecido;
 - mesmo e-mail com empresa igual;
 - e-mail alterado;
@@ -347,7 +347,7 @@ Persistência necessária:
 - timestamp;
 - entidade;
 - HubSpot ID;
-- Canopi ID;
+- Knopi ID;
 - campos comparados;
 - confiança;
 - motivo;
@@ -359,11 +359,11 @@ Critério de saída:
 - execute respeita decisões;
 - não repete alertas iguais sem necessidade.
 
-### H7 — Persistência canônica HubSpot → Canopi
+### H7 — Persistência canônica HubSpot → Knopi
 
 Objetivo:
 
-- transformar dados lidos do HubSpot em entidades canônicas utilizáveis por toda a Canopi.
+- transformar dados lidos do HubSpot em entidades canônicas utilizáveis por toda a Knopi.
 
 Áreas consumidoras:
 
@@ -389,7 +389,7 @@ Critério de saída:
 
 - dados sincronizados deixam de ser apenas preview/writeback e passam a alimentar a inteligência operacional.
 
-### H8 — Enriquecimento Canopi
+### H8 — Enriquecimento Knopi
 
 Objetivo:
 

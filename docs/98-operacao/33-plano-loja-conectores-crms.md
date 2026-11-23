@@ -144,7 +144,7 @@ Regra de progressão:
 **Não iniciar agora.** Esta frente só entra depois de todas as configurações de CRMs estarem fechadas.
 
 Objetivo:
-Criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Canopi consegue **ler, interpretar, relacionar e organizar** os dados corretamente antes de qualquer sync real.
+Criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Knopi consegue **ler, interpretar, relacionar e organizar** os dados corretamente antes de qualquer sync real.
 
 Entregáveis previstos (por CRM):
 - CSVs por entidade;
@@ -152,8 +152,8 @@ Entregáveis previstos (por CRM):
 - dicionário de campos (origem → significado);
 - regras de vínculo entre entidades;
 - cenários bons e ruins (dados sujos, duplicidade, campos ausentes, vínculos inválidos);
-- checklist do que a Canopi deve ler (fatos);
-- checklist do que a Canopi deve inferir (hipóteses explícitas);
+- checklist do que a Knopi deve ler (fatos);
+- checklist do que a Knopi deve inferir (hipóteses explícitas);
 - critérios para declarar “pronto para sync real” (read-only controlado primeiro).
 
 Salesforce Test Data Pack v1 (previsto):
@@ -194,7 +194,7 @@ Guardrails desta frente:
 - governança;
 - validação/publicação.
 
-## Decisão arquitetural — CRM local + Canopi global
+## Decisão arquitetural — CRM local + Knopi global
 ### 1. Problema identificado
 - O fluxo atual ainda parte de Configurações > Objetos & CRM > Entidades > Conta > Fontes e Conectores.
 - Isso faz parecer que a fonte/CRM pertence à entidade Conta.
@@ -208,13 +208,13 @@ Guardrails desta frente:
   - conexão;
   - método de entrada;
   - objetos disponíveis;
-  - mapping da fonte para Canopi;
+  - mapping da fonte para Knopi;
   - matching/dedupe aplicado à fonte;
   - pipeline local;
   - writeback local;
   - governança local;
   - validação local.
-- A Canopi mantém uma camada global separada para consolidar regras entre fontes:
+- A Knopi mantém uma camada global separada para consolidar regras entre fontes:
   - modelo canônico;
   - dedupe global entre fontes;
   - survivorship;
@@ -283,7 +283,7 @@ Fase 1B — Redesenho do Hub de CRM e Dados
 Objetivo:
 Reposicionar a Loja de Conectores como entrada primária e separar claramente:
 - configuração local por CRM;
-- camada canônica global da Canopi.
+- camada canônica global da Knopi.
 
 ## 11) Ordem de implementação
 - Fase 0: documentação e plano.

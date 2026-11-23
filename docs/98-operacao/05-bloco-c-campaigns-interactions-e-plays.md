@@ -472,4 +472,4 @@ bash scripts/seed/runBlockCSeed.sh
 
 **Versão:** 1.0.0  
 **Última atualização:** 2026-04-13  
-**Responsável:** Canopi Seed Operations
+**Responsável:** Knopi Seed Operations

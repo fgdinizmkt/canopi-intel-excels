@@ -1,6 +1,6 @@
 # Auditoria de Aderência — Etapa 4 (Plays, ABM e ABX)
 
-Esta auditoria valida a materialização da Etapa 4 da página de Configurações, focando na camada de orquestração e táticas avançadas da Canopi.
+Esta auditoria valida a materialização da Etapa 4 da página de Configurações, focando na camada de orquestração e táticas avançadas da Knopi.
 
 ## 1. Prova de Materialização (Ground Truth)
 
@@ -43,9 +43,9 @@ Com base no arquivo `src/app/(shell)/configuracoes/page.tsx`:
 
 ---
 
-## 3. Mapa de Espelhamento: Configuração ↔ Canopi
+## 3. Mapa de Espelhamento: Configuração ↔ Knopi
 
-| Configuração Criada | Onde aparece na Canopi | O que muda quando alterada |
+| Configuração Criada | Onde aparece na Knopi | O que muda quando alterada |
 | :--- | :--- | :--- |
 | **Tactical Plays** | Cockpit / Ações Sugeridas | As táticas que o SDR/AE visualiza ao abrir uma conta. |
 | **Account Tiers** | Visão Geral de Contas | A priorização e o nível de serviço (SLA) aplicado à conta. |

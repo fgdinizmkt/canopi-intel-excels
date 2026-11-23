@@ -1,6 +1,6 @@
 # Protocolo Obrigatório de Fechamento de Fase
 
-Nenhuma fase do Canopi pode ser declarada como fechada apenas com build, TSC, commit, tag ou preview.
+Nenhuma fase do Knopi pode ser declarada como fechada apenas com build, TSC, commit, tag ou preview.
 
 Antes de fechar qualquer fase, é obrigatório comprovar:
 

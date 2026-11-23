@@ -8,7 +8,7 @@
 
 ## 1. Objetivo
 
-Este documento fixa regras mínimas de aceite para o seed canônico do Canopi.
+Este documento fixa regras mínimas de aceite para o seed canônico do Knopi.
 
 Ele existe para impedir que a plataforma seja populada com uma base aparentemente correta em estrutura, mas insuficiente em densidade operacional, profundidade relacional e volume mínimo para uma demo crível.
 

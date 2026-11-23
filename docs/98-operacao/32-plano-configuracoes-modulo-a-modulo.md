@@ -1,16 +1,16 @@
 # Plano mestre — Configurações módulo a módulo
 
 ## Objetivo
-Parar a evolução genérica da área de Configurações e passar a executar a frente módulo a módulo, submódulo a submódulo, com aderência real ao produto Canopi.
+Parar a evolução genérica da área de Configurações e passar a executar a frente módulo a módulo, submódulo a submódulo, com aderência real ao produto Knopi.
 
 A regra desta frente passa a ser:
 - trabalhar um módulo por vez
 - fechar o módulo atual antes de abrir o próximo
 - não misturar várias frentes na mesma rodada
 - evitar editor genérico sem efeito operacional
-- forçar coerência com a Canopi real, seus conectores e seus usos no produto
+- forçar coerência com a Knopi real, seus conectores e seus usos no produto
 
-## Caminho dentro da Canopi
+## Caminho dentro da Knopi
 Configurações
 
 ## Macroestrutura oficial da frente
@@ -96,7 +96,7 @@ Configurações
 
 ## Regra de passagem de módulo
 Um módulo só pode ser considerado fechado quando atender os 6 critérios abaixo:
-1. configuração crível para o papel real do módulo na Canopi
+1. configuração crível para o papel real do módulo na Knopi
 2. persistência funcional (draft, publish, reload)
 3. CTAs principais realmente funcionais
 4. aderência ao produto e às integrações relevantes
@@ -108,7 +108,7 @@ Cada rodada deve cobrir somente:
 - o módulo ou submódulo aprovado
 - seus campos, comportamentos e CTAs reais
 - sua persistência dentro da infraestrutura existente de settings
-- seu efeito esperado dentro da Canopi
+- seu efeito esperado dentro da Knopi
 
 Cada rodada não deve cobrir:
 - módulos vizinhos
@@ -118,7 +118,7 @@ Cada rodada não deve cobrir:
 
 ## Regra de qualidade por módulo
 Todo módulo deve ser especificado e implementado considerando:
-- papel operacional na Canopi
+- papel operacional na Knopi
 - superfícies do produto afetadas
 - o que é configurável de verdade
 - o que é apenas leitura ou resumo

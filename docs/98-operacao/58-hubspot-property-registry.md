@@ -10,7 +10,7 @@
 
 ## Objetivo
 
-Formalizar em código o contrato de propriedades HubSpot da Canopi para Company, Contact, Deal e Product/Service, de forma que:
+Formalizar em código o contrato de propriedades HubSpot da Knopi para Company, Contact, Deal e Product/Service, de forma que:
 
 - qualquer carga futura possa validar o próprio payload contra a registry antes de enviar;
 - qualquer enriquecimento possa verificar se a propriedade está registrada antes de exportar;
@@ -50,37 +50,37 @@ As propriedades abaixo são obrigatórias (`required: true`) e compõem o núcle
 ### Company
 | Propriedade HubSpot | Blocking | Descrição |
 |---|---|---|
-| `canopi_canonical_id` | **Sim** | UUID canônico da account na Canopi |
+| `canopi_canonical_id` | **Sim** | UUID canônico da account na Knopi |
 | `canopi_company_id` | **Sim** | ID externo hash-based; único no HubSpot |
-| `canopi_tenant_id` | **Sim** | Tenant da instalação Canopi |
+| `canopi_tenant_id` | **Sim** | Tenant da instalação Knopi |
 | `canopi_import_batch_id` | Não | Identificador do lote de carga |
 | `canopi_contract_version` | Não | Versão do contrato para auditoria |
 
 ### Contact
 | Propriedade HubSpot | Blocking | Descrição |
 |---|---|---|
-| `canopi_canonical_id` | **Sim** | UUID canônico do contact na Canopi |
+| `canopi_canonical_id` | **Sim** | UUID canônico do contact na Knopi |
 | `canopi_contact_id` | **Sim** | ID externo hash-based; único no HubSpot |
-| `canopi_tenant_id` | **Sim** | Tenant da instalação Canopi |
-| `canopi_associated_company_id` | Não | ID Canopi da company âncora |
+| `canopi_tenant_id` | **Sim** | Tenant da instalação Knopi |
+| `canopi_associated_company_id` | Não | ID Knopi da company âncora |
 | `canopi_import_batch_id` | Não | Identificador do lote de carga |
 | `canopi_contract_version` | Não | Versão do contrato para auditoria |
 
 ### Deal
 | Propriedade HubSpot | Blocking | Descrição |
 |---|---|---|
-| `canopi_canonical_id` | **Sim** | UUID canônico da oportunidade na Canopi |
+| `canopi_canonical_id` | **Sim** | UUID canônico da oportunidade na Knopi |
 | `canopi_opportunity_id` | **Sim** | ID externo; único no HubSpot |
-| `canopi_tenant_id` | **Sim** | Tenant da instalação Canopi |
+| `canopi_tenant_id` | **Sim** | Tenant da instalação Knopi |
 | `canopi_import_batch_id` | Não | Identificador do lote de carga |
 | `canopi_contract_version` | Não | Versão do contrato para auditoria |
 
 ### Product
 | Propriedade HubSpot | Blocking | Descrição |
 |---|---|---|
-| `canopi_canonical_id` | **Sim** | UUID canônico do produto/serviço na Canopi |
+| `canopi_canonical_id` | **Sim** | UUID canônico do produto/serviço na Knopi |
 | `canopi_product_id` | **Sim** | ID externo; único no HubSpot |
-| `canopi_tenant_id` | **Sim** | Tenant da instalação Canopi |
+| `canopi_tenant_id` | **Sim** | Tenant da instalação Knopi |
 | `canopi_import_batch_id` | Não | Identificador do lote de carga |
 | `canopi_contract_version` | Não | Versão do contrato para auditoria |
 
@@ -99,7 +99,7 @@ Não são obrigatórias para a carga limpa, mas estão registradas para uso futu
 - `canopi_buying_committee_role` — papel no buying committee
 
 ### Deal
-- `canopi_stage_canonical` — estágio canônico no modelo Canopi
+- `canopi_stage_canonical` — estágio canônico no modelo Knopi
 - `canopi_forecast_category` — categoria de forecast (pipeline, best_case, commit, closed_won, omitted)
 - `canopi_opportunity_score` — score quantitativo
 
@@ -113,8 +113,8 @@ A registry distingue:
 
 - `blocking: true` — a ausência ou divergência desta propriedade bloqueia qualquer operação de carga ou sync.
 - `conflictRule: 'block_on_diverge'` — se a propriedade já existe no HubSpot com valor diferente, bloquear antes de qualquer update.
-- `canopiOwned: true` — a Canopi é a dona do campo; edições manuais no HubSpot são sobrescritas.
-- `canReturnFromHubSpot: false` — o valor desta propriedade nunca volta do HubSpot para a Canopi como fonte de verdade.
+- `canopiOwned: true` — a Knopi é a dona do campo; edições manuais no HubSpot são sobrescritas.
+- `canReturnFromHubSpot: false` — o valor desta propriedade nunca volta do HubSpot para a Knopi como fonte de verdade.
 
 Propriedades com `direction: 'bidirectional'` e `canReturnFromHubSpot: true` (ex: `canopi_sync_status`) podem ser atualizadas pelo HubSpot e refletidas de volta.
 
@@ -179,7 +179,7 @@ O próximo recorte (C2.9E.2D.10) poderá usar:
 
 ## Próximo recorte recomendado
 
-**C2.9E.2D.10 — Dry-run de nova carga limpa Canopi → HubSpot**
+**C2.9E.2D.10 — Dry-run de nova carga limpa Knopi → HubSpot**
 
 - Congelar snapshot dos 250 accounts e 305 contacts atuais.
 - Validar cada entidade contra `getRequiredHubspotProperties`.

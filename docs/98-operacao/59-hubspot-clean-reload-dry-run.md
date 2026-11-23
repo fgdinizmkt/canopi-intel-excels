@@ -4,7 +4,7 @@
 
 ## Identificação do recorte
 
-- **Nome:** C2.9E.2D.10 — Dry-run da nova carga limpa Canopi → HubSpot
+- **Nome:** C2.9E.2D.10 — Dry-run da nova carga limpa Knopi → HubSpot
 - **Dependência direta:** C2.9E.2D.9 — `src/lib/hubspotPropertyRegistry.ts`
 - **Arquivos criados:**
   - `src/lib/server/hubspotCleanReloadDryRunService.ts`
@@ -12,9 +12,9 @@
 
 ## Objetivo
 
-Montar e validar um plano de carga limpa da Canopi para o HubSpot, sem escrever nada. O dry-run:
+Montar e validar um plano de carga limpa da Knopi para o HubSpot, sem escrever nada. O dry-run:
 
-1. Lê `accounts` e `contacts` da Canopi (Supabase, somente leitura).
+1. Lê `accounts` e `contacts` da Knopi (Supabase, somente leitura).
 2. Valida cada entidade contra a property registry (C2.9E.2D.9).
 3. Verifica ancoragem contact → company.
 4. Verifica ausência de conflito com mappings históricos.
@@ -94,7 +94,7 @@ O serviço usa obrigatoriamente:
     warnings: string[],
   },
   companies: {
-    total: number,               // todos os accounts Canopi
+    total: number,               // todos os accounts Knopi
     valid: number,               // aptos para carga
     blocked: number,             // excluídos do plano
     requiredProperties: string[],
@@ -136,7 +136,7 @@ O `planHash` é um SHA-256 determinístico de:
 }
 ```
 
-O mesmo `batchId` + `contractVersion` + `tenantId` + mesma base Canopi sempre gera o mesmo hash. Hash diferente indica que a base mudou entre duas execuções.
+O mesmo `batchId` + `contractVersion` + `tenantId` + mesma base Knopi sempre gera o mesmo hash. Hash diferente indica que a base mudou entre duas execuções.
 
 ## Condição para `canProceedToCleanCreate: true`
 

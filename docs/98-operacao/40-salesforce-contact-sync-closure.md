@@ -3,14 +3,14 @@
 > Nota: este documento registra o fechamento específico de C4.18B (Contact Sync). O fechamento completo do Salesforce full-load connector flow está registrado em `41-salesforce-full-load-connector-closure.md`.
 
 ## Contexto
-Este documento registra o fechamento operacional e a comprovação técnica da sincronização de **Contacts** (Contatos) do Salesforce para a plataforma Canopi, realizada em ambiente de desenvolvimento (DEV/Sandbox).
+Este documento registra o fechamento operacional e a comprovação técnica da sincronização de **Contacts** (Contatos) do Salesforce para a plataforma Knopi, realizada em ambiente de desenvolvimento (DEV/Sandbox).
 
 A validação foi conduzida após a estabilização do Salesforce Configuration Hub e foca na integridade relacional entre Contacts e Accounts já sincronizadas.
 
 ## Pré-condições
 - **OAuth:** Conectado e saudável.
 - **Accounts:** Previamente sincronizadas (dependência para resolução de `accountId`).
-- **Ambiente:** DEV/Sandbox (Salesforce) + Local (Canopi).
+- **Ambiente:** DEV/Sandbox (Salesforce) + Local (Knopi).
 
 ## Execução da Validação
 - **Data:** 2026-05-11
@@ -19,7 +19,7 @@ A validação foi conduzida após a estabilização do Salesforce Configuration 
 
 ### Resultado do Preview (C4.18A)
 - **Total Contacts:** 5
-- **Resolved Count:** 5 (Mapeamento de Account via AccountId Salesforce -> Canopi ID)
+- **Resolved Count:** 5 (Mapeamento de Account via AccountId Salesforce -> Knopi ID)
 - **Unresolved Count:** 0
 - **Missing Fields Count:** 0
 - **Warnings:** [] (Limpo)
@@ -39,7 +39,7 @@ A validação foi conduzida após a estabilização do Salesforce Configuration 
 ## Validação de Banco de Dados
 A auditoria pós-sync confirmou:
 - **Volume:** 5 registros persistidos na tabela `contacts`.
-- **Relacional:** Todos os registros possuem `accountId` (UUID Canopi) corretamente resolvido a partir do vínculo original do Salesforce.
+- **Relacional:** Todos os registros possuem `accountId` (UUID Knopi) corretamente resolvido a partir do vínculo original do Salesforce.
 - **Idempotência:** A execução repetida resultou em `updatedCount` preservando a contagem total, sem gerar duplicatas.
 - **Audit Log:** O campo `contract_json` do contrato persistiu o objeto `contact_sync_summary_log`.
 

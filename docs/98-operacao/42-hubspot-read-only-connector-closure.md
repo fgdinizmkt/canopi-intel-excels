@@ -34,7 +34,7 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - Análise de campos e propriedades de empresas (schema discovery).
 - UX sem token validada visualmente: status `Configuração incompleta`, mensagem clara, input com erro, botões Pré-visualizar e Analisar bloqueados.
 - Badges públicos na UI: Acesso de leitura / Pré-visualização / Análise de campos / Sem gravação.
-- Copy de segurança: nenhum dado gravado na Canopi, nenhuma credencial salva, nada alterado na HubSpot.
+- Copy de segurança: nenhum dado gravado na Knopi, nenhuma credencial salva, nada alterado na HubSpot.
 
 ## Alinhamento técnico do adaptador
 
@@ -58,7 +58,7 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 - Paginação real
 - Retry / backoff
 - Importação persistente
-- Enriquecimento de dados Canopi
+- Enriquecimento de dados Knopi
 
 ## Decisões de produto registradas
 
@@ -94,7 +94,7 @@ O commit técnico é `5a3a019` — `feat(settings): add HubSpot read-only connec
 8. Recarregar a página e confirmar restauração do estado conectado.
 9. Desconectar e confirmar limpeza do estado.
 10. Recarregar novamente e confirmar que a conexão não retorna.
-11. Confirmar que nenhum dado foi gravado na Canopi.
+11. Confirmar que nenhum dado foi gravado na Knopi.
 12. Confirmar que nenhum dado foi alterado na HubSpot.
 
 > A validação foi realizada localmente no browser com credencial controlada.

@@ -14,7 +14,7 @@ O fechamento foi realizado com o commit local `dd926ef` — `feat(settings): sup
 - **Contacts sem vínculo:** 12.
 - **Contact Sync:** 300 criados, 5 atualizados, 12 ignorados.
 - **Leads:** 86 encontrados/carregados em leitura.
-- **Lead Sync:** pendente; nenhum Lead gravado na Canopi.
+- **Lead Sync:** pendente; nenhum Lead gravado na Knopi.
 - **Opportunities:** 151 carregadas.
 - **Opportunities criadas:** 22.
 - **Opportunities já existentes:** 9.
@@ -32,7 +32,7 @@ O fechamento foi realizado com o commit local `dd926ef` — `feat(settings): sup
 ## Auditoria de pendências
 - **Contacts sem vínculo:** 12, todos sem `AccountId` no Salesforce.
 - **Opportunities sem vínculo:** 120, todas sem `AccountId` no Salesforce.
-- **Resolução Canopi:** não houve caso de `AccountId` presente que a Canopi não conseguisse resolver.
+- **Resolução Knopi:** não houve caso de `AccountId` presente que a Knopi não conseguisse resolver.
 - **Sugestões seguras:** nenhum candidato de alta confiança para atualização automática.
 
 ## CSVs de auditoria

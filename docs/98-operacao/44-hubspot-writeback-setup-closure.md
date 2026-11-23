@@ -14,11 +14,11 @@
 - Validação de leitura.
 - Validação de catálogo/schema.
 - Validação de permissões de escrita.
-- Validação de propriedades Canopi em Companies.
-- Validação de propriedades Canopi em Contacts.
+- Validação de propriedades Knopi em Companies.
+- Validação de propriedades Knopi em Contacts.
 - Validação de IDs externos únicos.
 - Rota de setup HubSpot.
-- Criação explícita de propriedades Canopi no HubSpot.
+- Criação explícita de propriedades Knopi no HubSpot.
 - Proteção para não criar propriedades automaticamente.
 - Bloqueio do botão **Enviar para HubSpot** até o setup ficar pronto.
 - Atualização automática do estado após criação/validação.
@@ -26,8 +26,8 @@
 ## Validação visual confirmada
 
 - Service Key atualizada com scopes de escrita/schema.
-- Setup reconheceu conexão, leitura, catálogo, escrita, propriedades Canopi e IDs externos únicos como prontos.
-- Ação **Criar propriedades Canopi no HubSpot** executada.
+- Setup reconheceu conexão, leitura, catálogo, escrita, propriedades Knopi e IDs externos únicos como prontos.
+- Ação **Criar propriedades Knopi no HubSpot** executada.
 - A tela atualizou sozinha após criar/validar propriedades.
 - O botão **Enviar para HubSpot** ficou tecnicamente liberável apenas após o setup pronto.
 - Nenhum registro foi enviado ao HubSpot.

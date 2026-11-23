@@ -1,4 +1,4 @@
-# Plano Canônico Fixo — Seed Operacional Coerente do Canopi
+# Plano Canônico Fixo — Seed Operacional Coerente do Knopi
 
 **Status:** Ativo  
 **Natureza:** Leitura obrigatória para handoff  
@@ -9,7 +9,7 @@
 
 ## 1. Objetivo desta fase
 
-Construir uma base fictícia canônica, coerente e reutilizável para o Canopi, de forma que a plataforma deixe de depender apenas do mock local e passe a ter um seed estável, crível e consistente no Supabase.
+Construir uma base fictícia canônica, coerente e reutilizável para o Knopi, de forma que a plataforma deixe de depender apenas do mock local e passe a ter um seed estável, crível e consistente no Supabase.
 
 Esta fase **não existe para otimizar UI** nem para expandir a plataforma indefinidamente.
 
@@ -168,7 +168,7 @@ Criar e popular:
 
 ### Objetivo do Bloco B
 
-Permitir que o Canopi mostre origem do dado, cobertura, confiança e lacunas de forma crível.
+Permitir que o Knopi mostre origem do dado, cobertura, confiança e lacunas de forma crível.
 
 ### Critério de pronto do Bloco B
 
@@ -296,7 +296,7 @@ Essas coisas podem acontecer de forma pontual, mas não podem competir com o obj
 
 ## 10. Resultado esperado desta fase
 
-Ao final desta fase, o Canopi deve estar em um estado em que:
+Ao final desta fase, o Knopi deve estar em um estado em que:
 
 - o seed fictício não parece improvisado
 - a plataforma consegue ser navegada com lógica mais crível
@@ -347,7 +347,7 @@ Quando esta fase terminar, ela deve ser encerrada explicitamente com:
 
 1. atualização deste documento para status concluído
 2. atualização do `00-status-atual.md`
-3. registro objetivo do que passou a ser a nova base operacional do Canopi
+3. registro objetivo do que passou a ser a nova base operacional do Knopi
 4. liberação consciente para voltar a otimizar a plataforma
 
 Até lá, este plano continua sendo a referência canônica fixa para seed e handoff.

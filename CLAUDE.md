@@ -1,4 +1,4 @@
-# Canopi — Sistema Operacional de Agentes
+# Knopi — Sistema Operacional de Agentes
 
 > **INSTRUÇÃO OBRIGATÓRIA:** Leia `CONTEXTO.md` na raiz do projeto no início de toda sessão. Ele contém o estado operacional atualizado — fase ativa, próximo passo aprovado, decisões recentes. Sem isso você vai perder contexto.
 >
@@ -9,9 +9,9 @@
 
 ## O Produto
 
-**Canopi** — plataforma SaaS B2B de inteligência de receita e Account Intelligence.
+**Knopi** — plataforma SaaS B2B de inteligência de receita e Account Intelligence.
 
-Problema que resolve: times de Revenue/GTM tomam decisões com dados fragmentados entre CRMs, canais e ferramentas. A Canopi consolida tudo num cockpit único orientado a **sinal → ação**.
+Problema que resolve: times de Revenue/GTM tomam decisões com dados fragmentados entre CRMs, canais e ferramentas. A Knopi consolida tudo num cockpit único orientado a **sinal → ação**.
 
 Módulos principais:
 - **Sinais** — alertas classificados por severidade (crítico/alerta/oportunidade) com causa, impacto em R$ e ação recomendada
@@ -84,7 +84,7 @@ Este projeto opera com grupos de agentes especializados. Claude Code (você) é 
 | 20 | QA Visual | agents/20-qa-visual.md | Playwright, visual audit, smoke tests |
 | 21 | GooseWorks | agents/21-gooseworks.md | Pesquisa, enriquecimento, dados externos |
 | 22 | OpenSquad | agents/22-opensquad.md | Orquestração multiagente complexa |
-| 23 | Agency Agents | agents/23-agency-agents.md | Marketing da Canopi como produto |
+| 23 | Agency Agents | agents/23-agency-agents.md | Marketing da Knopi como produto |
 
 ### Lógica de Roteamento
 
@@ -96,7 +96,7 @@ Este projeto opera com grupos de agentes especializados. Claude Code (você) é 
 | Schema / migration Supabase | 05 → 03 para rotas |
 | Pesquisa de mercado / ICP | 21 (GooseWorks) → 10 (estratégia) |
 | Copy website / produto | 11 |
-| Marketing da Canopi | 23 (Agency Agents) |
+| Marketing da Knopi | 23 (Agency Agents) |
 | Demanda cruzada | 00 (Orquestrador) declara quem faz o quê |
 
 ---

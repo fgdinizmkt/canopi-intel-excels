@@ -1,6 +1,6 @@
 # Auditoria Final Consolidada — Frente de Configurações
 
-Esta auditoria valida a conclusão integral das 5 etapas do Roadmap de Configurações da Canopi, consolidando a materialização visual e funcional do setup da plataforma.
+Esta auditoria valida a conclusão integral das 5 etapas do Roadmap de Configurações da Knopi, consolidando a materialização visual e funcional do setup da plataforma.
 
 
 ## 1. Visão Geral por Etapa
@@ -15,7 +15,7 @@ Esta auditoria valida a conclusão integral das 5 etapas do Roadmap de Configura
 - **Simulação/Local State:**
   - Persistência das regras de deduplicação e matching logic.
 - **Ainda não é motor operacional real:**
-  - Execução física do sync entre CRM e Canopi via API persistente.
+  - Execução física do sync entre CRM e Knopi via API persistente.
 
 ### Etapa 2: Medição, Conversões e Mídia
 
@@ -70,14 +70,14 @@ Esta auditoria valida a conclusão integral das 5 etapas do Roadmap de Configura
 - **Anti-Health Dashboard:** A página manteve sua natureza **operacional e de parametrização**. Não há dashboards de status decorativos; cada campo altera o comportamento sugerido do motor.
 - **Densidade:** Foi mantida a densidade "premium" com cards, tabelas ricas, badges semânticos e timelines de governança.
 - **Sem Duplicidades:** As etapas foram construídas incrementalmente, sem sobreposição de controles ou estados conflitantes.
-- **Conectividade Canopi:** Todas as configurações (taxonomia, scores, roteamento) possuem correspondência direta com módulos reais da plataforma.
+- **Conectividade Knopi:** Todas as configurações (taxonomia, scores, roteamento) possuem correspondência direta com módulos reais da plataforma.
 
 
 ---
 
 ## 3. Mapa Final da Frente (Configuração ↔ Impacto)
 
-| Macrobloco | Onde aparece na Canopi | O que muda quando alterada |
+| Macrobloco | Onde aparece na Knopi | O que muda quando alterada |
 | :--- | :--- | :--- |
 | **Objetos / CRM** | Listas e Perfis | Define a fonte da verdade e como as contas são agrupadas hierarquicamente. |
 | **Mídia / Conversões** | Ads e Attribution | Altera o peso da atribuição multi-touch e o mapeamento de KPIs de sucesso. |
@@ -133,7 +133,7 @@ Fonte de verdade operacional para Contas V2: `docs/98-operacao/32-rota-desenvolv
 ```text
 feat(settings): materialização integral do roadmap de configurações (Etapas 1-5)
 
-Conclui a materialização da camada de parametrização real da Canopi:
+Conclui a materialização da camada de parametrização real da Knopi:
 - Etapa 1: Objetos, CRM Matching e Hierarquia.
 - Etapa 2: Mídia, Conversões e Atribuição.
 - Etapa 3: Engine de Scoring, Sinais e Roteamento.

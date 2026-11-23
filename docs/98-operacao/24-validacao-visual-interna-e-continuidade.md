@@ -66,7 +66,7 @@ O usuário só precisa entrar como aprovador final quando a implementação já 
 
 **Status:** Ativo
 **Data:** 2026-04-15
-**Responsável:** ChatGPT | Canopi
+**Responsável:** ChatGPT | Knopi
 
 ---
 

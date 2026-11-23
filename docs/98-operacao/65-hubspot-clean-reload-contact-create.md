@@ -30,7 +30,7 @@
 |---|---|---|
 | `confirmCreateContacts` | `true` | Gate explícito — obrigatório |
 | `batchId` | string | Identificador do lote de importação |
-| `tenantId` | string | Identificador do tenant Canopi |
+| `tenantId` | string | Identificador do tenant Knopi |
 
 ### Campos opcionais
 
@@ -119,7 +119,7 @@
 |---|---|
 | `firstname` | Primeira palavra do `nome` |
 | `lastname` | Restante do `nome` (vazio se nome único) |
-| `jobtitle` | `cargo` da Canopi |
+| `jobtitle` | `cargo` da Knopi |
 | `canopi_canonical_id` | `contacts.id` (UUID) |
 | `canopi_contact_id` | `cpct_${FNV-1a(canonicalId)}` |
 | `canopi_tenant_id` | `tenantId` do payload |
@@ -130,7 +130,7 @@
 | `canopi_source` | `canopi_clean_reload` |
 | `canopi_last_sync_at` | ISO 8601 da execução |
 
-Nota: email não existe no schema `contacts` atual da Canopi — omitido por design.
+Nota: email não existe no schema `contacts` atual da Knopi — omitido por design.
 
 ---
 

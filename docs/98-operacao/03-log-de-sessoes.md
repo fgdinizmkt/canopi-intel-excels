@@ -11,7 +11,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Validação:** `npx tsc --noEmit` sem erros; login conferido renderizando.
 - **Decisões:** troca em tudo, inclusive propriedades `canopi_*` do HubSpot e colunas do Supabase (Fábio, 23/11); identidade visual definitiva no manual v1.1.
 - **Etapa 2 (mesmo dia):** 12 nomes internos que vivem só no app, arquivo `knopiAuth.ts`, pacote `knopi-intel-excels-app` e CSVs de exemplo; os 60 nomes camelCase ligados a gravação seguem com a etapa 4.
-- **Próximo passo:** etapa 3, documentação.
+- **Etapa 3 (mesmo dia):** marca trocada em 78 arquivos de documentação e scripts; `backups/` mantido como arquivo histórico.
+- **Próximo passo:** etapa 4, plano da migração dos contratos externos (HubSpot e Supabase).
 
 ## [2026-05-19] — HubSpot C2.9E.2D.14 (create limpo de Deals + recovery de mappings + associações Deal → Company/Contact + preflightOnly)
 
@@ -81,7 +82,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - 665 Companies auditadas no HubSpot;
   - 247 Companies da base operacional nova com `canopi_canonical_id`;
   - 348 Companies históricas com `canopi_company_id` e sem `canopi_canonical_id`;
-  - 70 Companies fora do padrão Canopi;
+  - 70 Companies fora do padrão Knopi;
   - 0 duplicidades reais entre base nova e histórico;
   - 89 duplicidades visuais sintéticas explicadas pelo artefato C4.17.1;
   - 247/247 mappings íntegros com `hs_object_id` confirmado;
@@ -159,7 +160,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-18] — HubSpot C2.9E.2D.8/9/10/10A (plano mínimo + registry + dry-run nova carga limpa)
 
 - **Agente:** Codex
-- **Natureza:** quatro recortes em sequência na frente de nova carga limpa HubSpot a partir da Canopi.
+- **Natureza:** quatro recortes em sequência na frente de nova carga limpa HubSpot a partir da Knopi.
 - **Commits técnicos:**
   - `d07e276` — `feat(settings): add HubSpot property registry for clean reload` (C2.9E.2D.9)
   - `e5d0fc0` — `feat(settings): add HubSpot clean reload dry-run service and route` (C2.9E.2D.10)
@@ -168,9 +169,9 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - `npm run lint` OK;
   - `npx tsc --noEmit` OK.
 - **C2.9E.2D.8 — Plano mínimo (arquitetural, sem código):**
-  - decisão de tratar HubSpot atual como histórico auditável e iniciar nova carga limpa a partir da Canopi;
+  - decisão de tratar HubSpot atual como histórico auditável e iniciar nova carga limpa a partir da Knopi;
   - definição do contrato obrigatório de identidade: `canopi_canonical_id`, `canopi_company_id`, `canopi_tenant_id`, `canopi_import_batch_id`, `canopi_contract_version`, `canopi_sync_status`;
-  - confirmação de que `hubspot_identity_mappings` tinha `0` registros úteis após crosswalk contra a base Canopi atual.
+  - confirmação de que `hubspot_identity_mappings` tinha `0` registros úteis após crosswalk contra a base Knopi atual.
 - **C2.9E.2D.9 — Property registry formal:**
   - `src/lib/hubspotPropertyRegistry.ts` com 42 propriedades (Company 11, Contact 12, Deal 10, Product/Service 9);
   - helpers: `getHubspotPropertiesByEntity`, `getBlockingHubspotProperties`, `getRequiredHubspotProperties`, `isRegisteredHubspotProperty`, `validateHubspotPropertyRegistry`;
@@ -209,7 +210,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-14] — HubSpot C2.9E.2B.1 (dry-run de execução canônica baseada em contrato salvo)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico do endpoint de dry-run de execução canônica HubSpot → Canopi sem escrita.
+- **Natureza:** fechamento técnico do endpoint de dry-run de execução canônica HubSpot → Knopi sem escrita.
 - **Commit técnico:** `93491cf` — `feat(settings): add HubSpot ingest execution dry-run`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -247,7 +248,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-17] — HubSpot C2.9E.2B.2A (fundação SQL/RPC transacional para apply real)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico da fundação SQL/RPC transacional que sustentará o apply real HubSpot → Canopi.
+- **Natureza:** fechamento técnico da fundação SQL/RPC transacional que sustentará o apply real HubSpot → Knopi.
 - **Commit técnico:** `f00ac0a` — `feat(settings): add HubSpot ingest apply RPC foundation`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -275,7 +276,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-17] — HubSpot C2.9E.2B.2B.2B (rota protegida de apply real)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico da rota protegida que chamará a RPC transacional do apply real HubSpot → Canopi.
+- **Natureza:** fechamento técnico da rota protegida que chamará a RPC transacional do apply real HubSpot → Knopi.
 - **Commit técnico:** `535f8ca` — `feat(settings): add protected HubSpot ingest apply route`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -297,10 +298,10 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - até lá, o caminho segue bloqueado por padrão.
 - **Próximo passo:** sincronizar a memória operacional no Drive e iniciar a auditoria de execução controlada do apply real com a flag explicitamente habilitada.
 
-## [2026-05-17] — HubSpot C2.9E.2C.1 (fundação do mapeamento de identidade HubSpot ↔ Canopi)
+## [2026-05-17] — HubSpot C2.9E.2C.1 (fundação do mapeamento de identidade HubSpot ↔ Knopi)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico da fundação estrutural de identidade para resolver HubSpot ↔ Canopi antes de qualquer nova tentativa de apply.
+- **Natureza:** fechamento técnico da fundação estrutural de identidade para resolver HubSpot ↔ Knopi antes de qualquer nova tentativa de apply.
 - **Commit técnico:** `3193a5e` — `feat(settings): add HubSpot identity mapping foundation`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -318,7 +319,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - nenhuma alteração em `accounts`, `contacts`, `hubspot_ingest_contracts` ou backups.
 - **Escopo entregue:**
   - tabela dedicada `hubspot_identity_mappings`;
-  - tipos centrais para mapping HubSpot ↔ Canopi;
+  - tipos centrais para mapping HubSpot ↔ Knopi;
   - service server-side para leitura/busca de mappings por `canonical_id`, `canopi_external_id` e `hubspot_id`;
   - guardrails RLS/service_role seguindo o padrão das tabelas técnicas anteriores.
 - **Limites explícitos:**
@@ -334,7 +335,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-14] — HubSpot C2.9E.2B.2A (snapshot de execução com plano por registro e hash)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico do snapshot de execução canônica HubSpot → Canopi, com materialização de plano por registro e hash determinístico, sem apply.
+- **Natureza:** fechamento técnico do snapshot de execução canônica HubSpot → Knopi, com materialização de plano por registro e hash determinístico, sem apply.
 - **Commit técnico:** `6b19b38` — `feat(settings): add HubSpot ingest execution plan snapshot`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -377,7 +378,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-13] — HubSpot C2.9E.2A (Fundação técnica do contrato de ingestão)
 
 - **Agente:** Codex
-- **Natureza:** Fundação técnica do contrato salvo de ingestão HubSpot → Canopi, sem execução canônica.
+- **Natureza:** Fundação técnica do contrato salvo de ingestão HubSpot → Knopi, sem execução canônica.
 - **Commit técnico:** `b6c9d4a` — `feat(settings): add HubSpot ingest contract foundation`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -396,7 +397,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - `hubspot_ingest_contracts`: `2 -> 3`;
   - `accounts`: `250 -> 250`;
   - `contacts`: `305 -> 305`;
-  - dry-run validado com Companies HubSpot `418`, Companies Canopi/tagged `348`, Companies fora da Canopi `70`, Contacts HubSpot `738`, Contacts Canopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
+  - dry-run validado com Companies HubSpot `418`, Companies Knopi/tagged `348`, Companies fora da Knopi `70`, Contacts HubSpot `738`, Contacts Knopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
 - **Entregas registradas:**
   - migration `hubspot_ingest_contracts`;
   - tipos server-side/client-safe para contrato de ingestão;
@@ -414,16 +415,16 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-13] — HubSpot read-only CRM snapshot (fechamento técnico e operacional)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico do snapshot read-only do HubSpot com conferência funcional e separação explícita entre total HubSpot e registros Canopi.
+- **Natureza:** fechamento técnico do snapshot read-only do HubSpot com conferência funcional e separação explícita entre total HubSpot e registros Knopi.
 - **Commit técnico:** `446da55` — `feat(settings): add HubSpot read-only CRM snapshot`
 - **Validação funcional confirmada:**
-  - Companies / Contas: HubSpot `418`, Canopi `348`;
-  - Contacts / Contatos: HubSpot `738`, Canopi `736`;
+  - Companies / Contas: HubSpot `418`, Knopi `348`;
+  - Contacts / Contatos: HubSpot `738`, Knopi `736`;
   - diferença real de Contacts: `2` contatos sem `canopi_contact_id`;
   - a UI ficou viável para seguir sem novo redesenho nesta etapa.
 - **Entregas registradas:**
   - snapshot read-only de HubSpot;
-  - separação entre total HubSpot, registros Canopi e amostra de associações;
+  - separação entre total HubSpot, registros Knopi e amostra de associações;
   - Contacts totais mantidos em leitura read-only;
   - `canopi_contact_id` contado quando a propriedade existe;
   - fallback explícito para estado de escopo/propriedade.
@@ -443,10 +444,10 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Decisões registradas:**
   - painel conectado deve mostrar estado real do HubSpot;
   - preview de 10 Companies é amostra, não inventário;
-  - identidade atual é dependente de IDs Canopi e precisa evoluir para identidade estável;
+  - identidade atual é dependente de IDs Knopi e precisa evoluir para identidade estável;
   - drawer de decisão assistida será necessário para conflitos;
   - classificação operacional de entidades será necessária;
-  - dados do HubSpot devem alimentar páginas transversais da Canopi após normalização/persistência;
+  - dados do HubSpot devem alimentar páginas transversais da Knopi após normalização/persistência;
   - enriquecimento fica depois de snapshot, classificação e identidade;
   - RD Station CRM segue postergado;
   - Salesforce não foi reaberto.
@@ -495,18 +496,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Commit técnico:** `a7b3034` — `feat(settings): add HubSpot writeback setup flow`
 - **Validação funcional confirmada:**
   - Service Key atualizada com scopes de escrita/schema;
-  - setup reconheceu conexão, leitura, catálogo, escrita, propriedades Canopi e IDs externos únicos como prontos;
-  - ação **Criar propriedades Canopi no HubSpot** executada;
+  - setup reconheceu conexão, leitura, catálogo, escrita, propriedades Knopi e IDs externos únicos como prontos;
+  - ação **Criar propriedades Knopi no HubSpot** executada;
   - a tela atualizou sozinha após criar/validar propriedades;
   - nenhum registro foi enviado ao HubSpot.
 - **Entregas registradas:**
   - seção visual de pré-requisitos para writeback;
   - verificação de conexão, leitura e catálogo/schema;
   - validação de permissões de escrita;
-  - validação de propriedades Canopi em Companies e Contacts;
+  - validação de propriedades Knopi em Companies e Contacts;
   - validação de IDs externos únicos;
   - rota de setup HubSpot;
-  - criação explícita de propriedades Canopi;
+  - criação explícita de propriedades Knopi;
   - bloqueio do botão de envio até o setup ficar pronto.
 - **Decisão operacional:**
   - C2.9D.1 fica fechado tecnicamente e publicado.
@@ -525,7 +526,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - catálogo de campos com 257 propriedades;
   - upload separado de Base de empresas e Base de contatos;
   - análise automática ao selecionar arquivos;
-  - dry-run consolidado com IDs Canopi e associações;
+  - dry-run consolidado com IDs Knopi e associações;
   - CSV de revisão;
   - botão “Enviar para HubSpot” visível, porém bloqueado sem scopes de escrita;
   - mensagem clara de bloqueio por permissão;
@@ -538,7 +539,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Decisão operacional:**
   - C2.9C fica fechado tecnicamente e publicado.
   - Próximo recorte correto: C2.9D — HubSpot Writeback Setup.
-  - O setup deve validar/criar propriedades Canopi, preparar scopes de escrita e só então liberar writeback real.
+  - O setup deve validar/criar propriedades Knopi, preparar scopes de escrita e só então liberar writeback real.
 - **Salesforce:** C4.18C permanece fechado e não foi reaberto.
 
 # [2026-05-12] — HubSpot C2.9B (Fechamento operacional com validação funcional real)
@@ -557,7 +558,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - refresh após conexão restaurou estado conectado sem exigir novo token;
   - desconectar removeu a conexão;
   - refresh após desconectar não restaurou a conexão;
-  - nenhum dado foi gravado na Canopi;
+  - nenhum dado foi gravado na Knopi;
   - nenhum dado foi alterado na HubSpot.
 - **Decisão operacional:**
   - HubSpot C2.9B fica fechado operacionalmente no escopo read-only.
@@ -621,7 +622,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Accounts:** 494 carregadas com full-load e hidratação pós-refresh.
   - **Contacts:** 317 carregados, 305 resolvidos, 12 sem vínculo.
   - **Contact Sync:** 300 criados, 5 atualizados, 12 ignorados.
-  - **Leads:** 86 encontrados/carregados em leitura; Lead Sync pendente; nenhum Lead gravado na Canopi.
+  - **Leads:** 86 encontrados/carregados em leitura; Lead Sync pendente; nenhum Lead gravado na Knopi.
   - **Opportunities:** 151 carregadas, 22 criadas, 9 já existentes, 120 sem vínculo.
   - **Funil:** derivado das Opportunities, mantendo pendências de vínculo explícitas.
   - **Estado final:** `Configuração concluída com pendências`.
@@ -633,7 +634,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Auditoria de vínculos pendentes:**
   - `12` Contacts sem vínculo por ausência de `AccountId` no Salesforce.
   - `120` Opportunities sem vínculo por ausência de `AccountId` no Salesforce.
-  - Nenhum caso de `AccountId` presente deixou de resolver na Canopi.
+  - Nenhum caso de `AccountId` presente deixou de resolver na Knopi.
   - Não há candidatos seguros para update automático.
   - CSVs gerados em `tmp/salesforce-pending-links-audit/` são apenas auditoria local e não entram em commit.
 - **Validação técnica consolidada:**
@@ -651,7 +652,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Resultados Técnicos:**
   - **Preview:** 5/5 contatos resolvidos (zero órfãos).
   - **Sync Execute:** Idempotência comprovada (0 criados, 5 atualizados).
-  - **Integridade:** `accountId` resolvido com sucesso para todos os registros no banco Canopi.
+  - **Integridade:** `accountId` resolvido com sucesso para todos os registros no banco Knopi.
   - **Audit Log:** `contact_sync_summary_log` persistido corretamente no contrato.
 - **Observações:** Identificada e corrigida segregação de datasets que gerava órfãos em contratos anteriores (`44de93e6`).
 - **Status:** Contact Sync fechado e comprovado. Próximo passo: Opportunity Sync (C4.18C).
@@ -695,7 +696,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Conexão Automática:** Validação silenciosa de OAuth no carregamento da página.
   - **Arquitetura Modular:** Divisão da tela em blocos (Autenticação, Sincronização de Objetos, Escopo/Filtros, Identidade, Configurações de Fluxo, Mapeamento).
   - **Integração de Pendências:** Discrepâncias de dados (quality resolutions) integradas contextualmente aos blocos de mapeamento, eliminando telas duplicadas.
-  - **Mapeamento Unificado:** Tabela centralizada para taxonomia de dados (Canopi <-> Salesforce).
+  - **Mapeamento Unificado:** Tabela centralizada para taxonomia de dados (Knopi <-> Salesforce).
   - **Sidebar de Atividade:** Auditoria rápida de logs e performance sem poluir a área de configuração.
 - **Próximo Passo (C4.16.29B):** Implementação técnica dos blocos modulares, começando pela Reestruturação do Layout e Autenticação Master.
 
@@ -759,9 +760,9 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-contact-role-preview` (GET + POST); exige `contractId` explícito e opera estritamente em memória.
   - **UI (`SalesforceMultiEntityPreview`):** Novo painel de Readiness com sumário compacto, tabela de prontidão e guardrails explícitos sobre a natureza read-only.
 - **Comportamento e Guardrails:**
-  - Sem gravação de dados, vínculos ou Opportunities na Canopi.
+  - Sem gravação de dados, vínculos ou Opportunities na Knopi.
   - Sem inferência por nome, e-mail ou domínio.
-  - Reutilização do `contact_sync_summary_log` para resolução de IDs Canopi.
+  - Reutilização do `contact_sync_summary_log` para resolução de IDs Knopi.
   - Tratamento de estados de erro/vazio (ex: sem contrato elegível) de forma amigável e não fatal.
 - **Validação:** `npm run lint` OK; `npm run build:safe` Exit 0; validação visual manual aprovada.
 - **Estado atual:** documentação C4.11 já consolidada no commit documental local; pendem apenas `push` e sync Drive.
@@ -770,8 +771,8 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ## [2026-05-06] — Salesforce C4.12 (Opportunity sync persistente controlado)
 
-- **Natureza:** Sync persistente controlado de Opportunities Salesforce → Canopi.
-- **Objetivo:** Gravar Opportunities na Canopi de forma explícita e conservadora, sem schema novo, sem writeback e sem criar vínculos Opportunity ↔ Contact.
+- **Natureza:** Sync persistente controlado de Opportunities Salesforce → Knopi.
+- **Objetivo:** Gravar Opportunities na Knopi de forma explícita e conservadora, sem schema novo, sem writeback e sem criar vínculos Opportunity ↔ Contact.
 - **Commit local:** `273529b` — `feat(settings): add controlled Salesforce Opportunity sync execution`
 - **O que foi materializado:**
   - **Repository (`syncOpportunityFromCRM`):** Persistência de Opportunities na tabela atual `oportunidades`, usando os campos já disponíveis e sem migration/schema novo.
@@ -779,7 +780,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
   - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-sync-execute`; não aceita fallback para último contrato.
   - **UI (`SalesforceMultiEntityPreview`):** Painel atual de Opportunities recebeu botão explícito de sync controlado, com texto claro sobre o que é gravado e o que continua proibido.
 - **Comportamento e Guardrails:**
-  - Grava Opportunities na Canopi somente quando há Account resolvida.
+  - Grava Opportunities na Knopi somente quando há Account resolvida.
   - Não cria Account, Contact ou vínculo Opportunity ↔ Contact.
   - Não usa OpportunityContactRole para persistência.
   - Não usa nome, e-mail ou domínio de Contact como fallback.
@@ -795,7 +796,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-06] — Salesforce C4.13 (Execução real controlada do Opportunity sync em DEV)
 
 - **Natureza:** Execução real controlada do Opportunity sync persistente em DEV.
-- **Objetivo:** Validar a persistência de Opportunities na Canopi com guardrails absolutos, sem efeitos colaterais em Accounts, Contacts ou vínculos Opportunity ↔ Contact.
+- **Objetivo:** Validar a persistência de Opportunities na Knopi com guardrails absolutos, sem efeitos colaterais em Accounts, Contacts ou vínculos Opportunity ↔ Contact.
 - **Base de código/documentação anterior:** `5a61e0f`
 - **Contrato auditado:** `75b7ccec-944d-4c6c-b51f-70eaae45438b`
 - **Resultado:**
@@ -839,12 +840,12 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ## [2026-05-06] — Salesforce C4.10 (Preview read-only de Opportunities e Pipeline)
 
-- **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Canopi.
-- **Objetivo:** Visualizar o impacto de importação de Opportunities do Salesforce antes de qualquer sync, identificando quais têm Account resolvida na Canopi e quais ficam sem destino (unresolved).
+- **Natureza:** Preview read-only autônomo de Opportunities com resolução de vínculo Account → Knopi.
+- **Objetivo:** Visualizar o impacto de importação de Opportunities do Salesforce antes de qualquer sync, identificando quais têm Account resolvida na Knopi e quais ficam sem destino (unresolved).
 - **Commit local:** `bfd7d0a` — `feat(settings): add Salesforce Opportunity relationship preview`
 - **O que foi materializado:**
   - **Service (`getEligibleSalesforceOpportunityPreviewContracts`):** Lista contratos com status `mapped` ou `synced` contendo Opportunities, com flag `hasAccountLookupSource` indicando se há contrato de Account synced disponível para lookup.
-  - **Service (`generateOpportunityRelationshipPreview`):** Lê contrato do banco, invoca `buildAccountIdLookup()` para resolver `AccountId` Salesforce → Conta Canopi via `sync_summary_log` dos contratos de Account (C4.7). Classifica cada Opportunity por `actionPreview` (`ready_to_create`, `ready_to_update`, `unresolved_account`, `missing_required_fields`). Sempre retorna `contactRoleLacuna: true` — vínculo Opportunity → Contact não é inferível sem OpportunityContactRole.
+  - **Service (`generateOpportunityRelationshipPreview`):** Lê contrato do banco, invoca `buildAccountIdLookup()` para resolver `AccountId` Salesforce → Conta Knopi via `sync_summary_log` dos contratos de Account (C4.7). Classifica cada Opportunity por `actionPreview` (`ready_to_create`, `ready_to_update`, `unresolved_account`, `missing_required_fields`). Sempre retorna `contactRoleLacuna: true` — vínculo Opportunity → Contact não é inferível sem OpportunityContactRole.
   - **Rota API:** `/api/account-connectors/salesforce/oauth/opportunity-preview` (GET + POST); `contractId` obrigatório no POST, sem fallback automático.
   - **Componente (`OpportunityPreviewPanel`):** Renderiza contadores, label descritivo por status e aviso explícito sobre lacuna de Contact. Painel independente de Account sync e Contact preview.
 - **Validação manual:** 5 Opportunities testadas — 2 resolvidas, 3 `unresolved_account`, 0 `missing_required_fields`. Nenhuma gravação indesejada ocorreu.
@@ -861,18 +862,18 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-06] — Salesforce C4.9 (Sync persistente controlado de Contacts)
 
 - **Natureza:** Implementação técnica e execução real de sync validada e saneada.
-- **Objetivo:** Executar de forma segura e com guardrails absolutos a primeira gravação de Contacts do Salesforce na Canopi, mantendo zero órfãos e blindagem de inteligência.
+- **Objetivo:** Executar de forma segura e com guardrails absolutos a primeira gravação de Contacts do Salesforce na Knopi, mantendo zero órfãos e blindagem de inteligência.
 - **Commit local:** `568aaa2` — `feat(settings): add controlled Salesforce Contact sync execution`
 - **O que foi materializado:**
   - **Repository (`syncContactFromCRM`):** Lógica com whitelist absoluta e suporte a modos create/update. Defaults de schema são inseridos sem assumir inteligência relacional prévia.
-  - **Service (`executeContactSync`):** Resolve `accountId` via lookup (Salesforce → Canopi via C4.7), garantindo que apenas contas que tenham um destino na Canopi recebam contatos. Dedupes intra e inter executados em memória com base em nome e accountId.
+  - **Service (`executeContactSync`):** Resolve `accountId` via lookup (Salesforce → Knopi via C4.7), garantindo que apenas contas que tenham um destino na Knopi recebam contatos. Dedupes intra e inter executados em memória com base em nome e accountId.
   - **Log:** `contact_sync_summary_log` persistido no contrato via Supabase, incluindo contadores de criados, atualizados, ignorados, erros e outcome total (synced).
   - **Rota API:** Rota protegida `contact-sync-execute` aceita estritamente chamadas back-end com `contractId`.
-- **Validação manual:** Leitura read-only no Supabase DEV confirmou 5 Contacts criados, todos com `accountId` da respectiva Account Canopi, e 0 órfãos. O log foi verificado dentro do contrato id `4f43fb33...`. Resultado: `createdCount = 5`, `updatedCount = 0`, `skippedCount = 0`, `errorCount = 0`, `outcome = synced`.
+- **Validação manual:** Leitura read-only no Supabase DEV confirmou 5 Contacts criados, todos com `accountId` da respectiva Account Knopi, e 0 órfãos. O log foi verificado dentro do contrato id `4f43fb33...`. Resultado: `createdCount = 5`, `updatedCount = 0`, `skippedCount = 0`, `errorCount = 0`, `outcome = synced`.
 - **Validações técnicas:** `npm run build:safe` = 0; `npm run lint` OK. Nenhum código de validação foi deixado na árvore de trabalho (`audit_c49.cjs` limpo e removido).
 - **Limites confirmados:**
   - C4.9 apenas grava Contacts com whitelist absoluta; nenhuma Account foi alterada e o contrato manteve seu status de origem.
-  - O sourceContactId fica isolado no log (Canopi gera seu próprio UUID interno).
+  - O sourceContactId fica isolado no log (Knopi gera seu próprio UUID interno).
   - Opportunity não foi implementada.
   - Writeback, Bulk API e migrations/alterações de schema ficaram fora do escopo.
 - **Próximo passo sugerido:** Avaliar o próximo recorte Salesforce com foco em Opportunity, mantendo a leitura relacional Account → Contact → Opportunity, sem writeback, Bulk API ou alteração de schema sem decisão explícita.
@@ -882,7 +883,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-06] — Salesforce C4.8 (preview read-only de Contacts e Buying Committee)
 
 - **Natureza:** Implementação técnica e desvinculação de UX do preview de relacionamentos Contact → Account; validado visualmente no browser.
-- **Objetivo:** Adicionar capacidade de visualizar o impacto de Contacts e seu vínculo com as Accounts da Canopi usando contratos existentes, preparando o buying committee sem exigir um novo fluxo de sincronização de Account.
+- **Objetivo:** Adicionar capacidade de visualizar o impacto de Contacts e seu vínculo com as Accounts da Knopi usando contratos existentes, preparando o buying committee sem exigir um novo fluxo de sincronização de Account.
 - **Commit local:** `485b092` — `feat(settings): add Salesforce Contact relationship preview`
 - **O que foi materializado:**
   - **Service (`getEligibleSalesforceContactPreviewContracts`):** Função de backend para listar, com segurança read-only, contratos Salesforce elegíveis (com status `mapped` ou `synced` e com registros de Contact).
@@ -903,12 +904,12 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-05] — Salesforce C4.7 (sync persistente controlado)
 
 - **Natureza:** Implementação técnica da primeira escrita controlada concluída; incidente de duplicação saneado em DEV.
-- **Objetivo:** Executar sync persistente de Account Salesforce → Canopi com whitelist absoluta e guardrails de segurança estratégica.
+- **Objetivo:** Executar sync persistente de Account Salesforce → Knopi com whitelist absoluta e guardrails de segurança estratégica.
 - **Commit local:** `0ed2a26` — `feat(settings): add controlled Salesforce Account sync execution`
 - **O que foi materializado:**
   - **Repository (`syncAccountFromCRM`):** Método central para escrita segura com whitelist estrita (nome, dominio, vertical, segmento, porte, localizacao, owner, etapa). Blindagem total de campos estratégicos (scoring, tipoEstrategico, etc).
   - **Service (`executeAccountSync`):** Motor de orquestração que lê exclusivamente do contrato `mapped`, aplica o mapeamento e persiste no Supabase.
-  - **Dedupe Robusto:** Identificação de match por domínio normalizado, com leitura administrativa *fresh* direta do Supabase antes de cada escrita. O sourceExternalId fica restrito ao log de execução e não é usado como id interno da Canopi.
+  - **Dedupe Robusto:** Identificação de match por domínio normalizado, com leitura administrativa *fresh* direta do Supabase antes de cada escrita. O sourceExternalId fica restrito ao log de execução e não é usado como id interno da Knopi.
   - **Rota API:** `/api/account-connectors/salesforce/oauth/sync-execute` para disparo controlado via back-end.
   - **UI (`SyncExecutePanel`):** Painel de execução com resumo de impacto, logs de registros ignorados por falta de dados mínimos e confirmação de transição de status para `synced`.
 - **Relato de Incidente (DEV):**
@@ -928,9 +929,9 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-05] — Decisões Estratégicas Pós-Salesforce C4.7
 
 - **Natureza:** Formalização de diretrizes de produto e arquitetura para os próximos recortes.
-- **ABM/ABX como Lente:** O conector Salesforce (e futuros) deve alimentar o modelo canônico da Canopi para servir tanto à prospecção (ABM) quanto à expansão/retenção (ABX). Account, Contact e Opportunity são os pilares essenciais desta visão.
+- **ABM/ABX como Lente:** O conector Salesforce (e futuros) deve alimentar o modelo canônico da Knopi para servir tanto à prospecção (ABM) quanto à expansão/retenção (ABX). Account, Contact e Opportunity são os pilares essenciais desta visão.
 - **Escalabilidade de Fluxo:** 
-  - **Inbound:** Foco atual (CRM → Canopi).
+  - **Inbound:** Foco atual (CRM → Knopi).
   - **Outbound (Writeback):** Planejado para fase posterior, devolvendo ao CRM decisões, sinais, recomendações e segmentação ABM/ABX. Exige consolidação de entidades e auditoria rigorosa.
 - **Evolução da UX:** A interface atual (técnica/assistida) será simplificada para o usuário final SaaS, mantendo os detalhes técnicos (contratos, logs, dry-runs) em um "Modo Avançado". O fluxo padrão será guiado: Conectar → Escolher → Validar → Impacto → Aprovar → Acompanhar.
 - **Impacto:** Estas decisões balizam o desenvolvimento do C4.8 (Contacts, buying committee e relacionamento por conta) e a padronização dos demais conectores, como HubSpot e futuros CRMs.
@@ -940,14 +941,14 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-04] — Salesforce C4.6 (preview read-only de sincronização)
 
 - **Natureza:** Implementação técnica do preview de impacto concluída; validada visualmente no browser.
-- **Objetivo:** Criar uma prévia read-only do impacto da sincronização de Account Salesforce → Canopi, usando o `canonical_mapping` salvo no C4.5.
+- **Objetivo:** Criar uma prévia read-only do impacto da sincronização de Account Salesforce → Knopi, usando o `canonical_mapping` salvo no C4.5.
 - **Commit local:** `30b9907` — `feat(settings): add Salesforce Account sync preview`
 - **O que foi materializado:**
-  - **Service:** Adicionada `generateAccountSyncPreview`. Recupera o contrato `mapped`, aplica o mapeamento aos registros selecionados em memória e compara com a base local da Canopi.
+  - **Service:** Adicionada `generateAccountSyncPreview`. Recupera o contrato `mapped`, aplica o mapeamento aos registros selecionados em memória e compara com a base local da Knopi.
   - **Rota API:** Nova rota `POST /api/account-connectors/salesforce/oauth/sync-preview` para simulação puramente funcional.
   - **UI (Sync Preview Panel):** Painel de preview de sincronização exibido após o mapeamento.
     - Sumário de impacto: Criar, Atualizar, Sem Alteração, Avisos.
-    - Tabela comparativa: Campos Salesforce Traduzidos vs. Estado Atual Canopi.
+    - Tabela comparativa: Campos Salesforce Traduzidos vs. Estado Atual Knopi.
     - Badges de ação por linha (CRIAR, ATUALIZAR, SEM ALTERAÇÃO, AVISO).
     - Avisos visuais para campos obrigatórios ausentes no Salesforce.
   - **Decisão de UX:** Registrada a decisão de manter a interface atual como técnica/interna, visando simplificação em etapas futuras de produto.
@@ -965,16 +966,16 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-05-04] — Salesforce C4.5 (mapeamento canônico de Account)
 
 - **Natureza:** Implementação backend + UI de mapeamento concluída; validada visualmente no browser e persistência confirmada em Supabase.
-- **Objetivo:** Permitir mapear campos de Account do Salesforce para campos canônicos da Canopi, evoluindo o contrato de `pending` para `mapped`.
+- **Objetivo:** Permitir mapear campos de Account do Salesforce para campos canônicos da Knopi, evoluindo o contrato de `pending` para `mapped`.
 - **Commit local:** `7b55192` — `feat(settings): add Salesforce Account canonical mapping`
 - **O que foi materializado:**
   - **Service:** Adicionadas `getLatestPendingSalesforceSyncContract` e `saveSalesforceAccountCanonicalMapping`. Esta última mescla o `canonical_mapping` no `contract_json` e atualiza o status.
   - **Rota API:** Rota `POST /api/account-connectors/salesforce/oauth/sync-contract` evoluída para suportar `GET` (busca contrato pendente) e `PATCH` (salva mapeamento).
   - **UI (Mapping Panel):** Novo componente `AccountMappingPanel` integrado após o Dry-run.
     - Exibição de campos Salesforce detectados no contrato.
-    - Seleção de campos canônicos Canopi (`source_external_id`, `nome`, `dominio`, `segmento`, `tipo`).
+    - Seleção de campos canônicos Knopi (`source_external_id`, `nome`, `dominio`, `segmento`, `tipo`).
     - Preview em tempo real de uma linha simulada (sem gravação).
-    - Explicação visual das regras de deduplicação e proteção de campos estratégicos da Canopi.
+    - Explicação visual das regras de deduplicação e proteção de campos estratégicos da Knopi.
   - **Evolução de Status:** O contrato no Supabase transita de `pending` -> `mapped` após o salvamento bem-sucedido.
 - **Validação manual:** Fábio aprovou a UI de mapeamento, o preview de linha e a persistência do mapeamento no Supabase (status `mapped` confirmado).
 - **Validações técnicas:** `npm run lint` OK; `npm run build:safe` OK (Build Exit 0).
@@ -1156,17 +1157,17 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ---
 
-## [2026-05-03] — Salesforce 2C.4 continuação (reorganização UX modos + mapeamento Canopi)
+## [2026-05-03] — Salesforce 2C.4 continuação (reorganização UX modos + mapeamento Knopi)
 
 - **Natureza:** Implementação local — pendente de validação manual no browser, push e sync Google Drive.
-- **Objetivo:** reorganizar a experiência para separar corretamente OAuth (fonte viva), Token (efêmero) e CSV (local); mover discovery para dentro do painel OAuth; adicionar mapeamento Canopi sugerido por objeto.
+- **Objetivo:** reorganizar a experiência para separar corretamente OAuth (fonte viva), Token (efêmero) e CSV (local); mover discovery para dentro do painel OAuth; adicionar mapeamento Knopi sugerido por objeto.
 - **Commits locais:** `e8c6d37` (5 objetos + UX) e commit desta sessão (reorganização)
 - **O que foi implementado:**
   - Discovery movido do bloco standalone global para dentro do painel OAuth do `SalesforceMethodSelector`
   - Título contextual: "Discovery via OAuth conectado"
   - Bloco "Sobre este modo" adicionado em todos os três painéis (OAuth, Token, CSV)
   - `CANOPI_MAPPING` por objeto (Account, Contact, Opportunity, Lead, Campaign) em `SalesforceDiscovery`
-  - Seção "Mapeamento Canopi sugerido" read-only por objeto, com indicação de campos mapeáveis vs ausentes
+  - Seção "Mapeamento Knopi sugerido" read-only por objeto, com indicação de campos mapeáveis vs ausentes
   - CTA: "Edição e persistência do mapeamento entram no próximo recorte."
   - Copy da página atualizado: header, status cards e seção de objetos refletem separação de modos
   - `SalesforceDiscovery` passa a aceitar props `title` e `description`
@@ -1198,7 +1199,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 - **Natureza:** Planejamento operacional (sem implementação).
 - **Decisão:** registrar a frente futura “Base de Teste Completa por CRM” para ser executada **depois** do fechamento das configurações de todos os CRMs.
-- **Objetivo:** criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Canopi consegue ler, interpretar, relacionar e organizar os dados corretamente.
+- **Objetivo:** criar bases fictícias, robustas e controladas por CRM (começando por Salesforce) para alimentar o CRM de origem e validar se a Knopi consegue ler, interpretar, relacionar e organizar os dados corretamente.
 - **Salesforce Test Data Pack v1 (previsto):** Accounts, Contacts, Opportunities, Leads, Campaigns; Campaign Members (se aplicável); Tasks/Activities (se fizer sentido para validar histórico e follow-up).
 - **Entregáveis previstos:** CSVs por entidade, ordem de importação, dicionário de campos, regras de vínculo, cenários bons/ruins, checklists (leitura vs inferência), critérios de “pronto para sync real”.
 - **Guardrails:** não antecipa sync real; não antecipa writeback; não substitui configuração de conectores.
@@ -1547,7 +1548,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 ## [2026-04-19] — Congelamento Estrutural e Substituição da Base Cockpit V2
 
 - **Natureza:** Sessão de congelamento estrutural e publicação da nova fundação visual.
-- **Objetivo:** Substituir a base antiga (legada) da Cockpit V2 por uma nova fundação de alta fidelidade integrada ao shell real da plataforma Canopi.
+- **Objetivo:** Substituir a base antiga (legada) da Cockpit V2 por uma nova fundação de alta fidelidade integrada ao shell real da plataforma Knopi.
 - **Contexto:** 
   - A base visual anterior foi abandonada devido a limitações de flexibilidade.
   - A nova fundação foi construída em `src/pages/CockpitV2.tsx` (Pages Router) para escapar das restrições de layout do App Router.
@@ -3206,7 +3207,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 
 ## [2026-04-04] — Marco Operacional & Analítico (Fechamento)
 - **Fase:** Fase 8 — Operational Efficiency (Encerramento do Marco)
-- **Escopo:** Operacionalização do Canopi como motor de execução local-first.
+- **Escopo:** Operacionalização do Knopi como motor de execução local-first.
 - **Decisões:**
   - Persistência em `localStorage` centralizada no `AccountDetailContext`.
   - Hidratação de `createdAt` em todos os mocks para viabilizar cálculos de Aging.
@@ -3337,7 +3338,7 @@ Registro cronológico do trabalho executado por sessão. Não substitui o git lo
 - **Fix de Compilação:** Resolução de erros `Cannot find name` (referências órfãs de constantes de estilo removidas) via mapeadores dinâmicos de classes Tailwind.
 - **Saneamento do Header:** Migração completa da seção hero e métricas de `Actions.tsx`.
 - **Barra de Filtros:** Refatoração integral e correção de acessibilidade (`aria-label`) nos seletores operacionais.
-- **Modal Nova Ação:** Conversão total para o design system Canopi via Tailwind, incluindo estados de hover e foco.
+- **Modal Nova Ação:** Conversão total para o design system Knopi via Tailwind, incluindo estados de hover e foco.
 - **Acessibilidade PaidMedia:** Adição de labels e estados de foco em componentes de select críticos.
 - **Build Sync:** Validação de integridade sistêmica com build produtivo bem-sucedido.
 
@@ -3831,7 +3832,7 @@ Performance.tsx — seção Contas:
 - Sinais ativos agora exibem: dot colorido por severidade + ID + título completo + badge de severidade
 - Ações em andamento agora exibem: título + owner + badge de status
 - Rodapé expandido de 3 para 5 campos: Canal, Valor, Owner, Relacionamento, Último contato
-- Botão "Ver análise" removido (não havia destino útil sem painel); adicionados "Ver no Canopi" + contador de sinais/ações
+- Botão "Ver análise" removido (não havia destino útil sem painel); adicionados "Ver no Knopi" + contador de sinais/ações
 - `openAccPanel` preservada no componente (ainda usada pelas Frentes)
 - CSS `perf-*` preservado — nenhuma dependência nova introduzida
 
@@ -3990,7 +3991,7 @@ AGENTS.md:
   - Toggle funcional entre vizualização em Árvore (Organograma) e Lista (Ranking).
 - **Fase 3 — Perfil Granular do Contato (Deep Dive):**
   - Criação da camada `ContactDetailProfile.tsx` (Slide-Overlay interno).
-  - Implementação de inteligência Canopi AI para recomendações de abordagem tática.
+  - Implementação de inteligência Knopi AI para recomendações de abordagem tática.
   - Sincronismo de Sinais e Ações associados ao contexto operacional do stakeholder.
   - Efeito de Dimming e Backdrop Blur no modo Fullscreen para preservação de foco.
 - **Saneamento Técnico de Build:**
@@ -4217,7 +4218,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 
 **Contexto:**
 - O projeto possuía uma página de configurações genérica, dispersa entre regras de negócio desequilibradas (funil, roteamento) e falta de centro de governança.
-- A direção estratégica aprovada foi transformar a página no "Cockpit de Governança e Confiabilidade" do Canopi, servindo como monitor de saúde do workspace e da engine Nexus.
+- A direção estratégica aprovada foi transformar a página no "Cockpit de Governança e Confiabilidade" do Knopi, servindo como monitor de saúde do workspace e da engine Nexus.
 
 **O que foi feito:**
 
@@ -4240,7 +4241,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - `git diff --stat`: 1 arquivo, 258 insertions, 136 deletions.
 
 **Resultado:**
-- O Canopi agora possui um terminal centralizado de Governança e Confiabilidade técnica.
+- O Knopi agora possui um terminal centralizado de Governança e Confiabilidade técnica.
 - A página de configurações transicionou de um formulário administrativo passivo para um cockpit operacional estratégico.
 - Próximo passo definido como 12º Recorte da Fase 5.
 
@@ -4559,7 +4560,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 4. **Validação:**
    - Lint OK
    - Build:safe OK
-   - Visual: aprovado por Fábio com teste em browser (Fábio + Canopi)
+   - Visual: aprovado por Fábio com teste em browser (Fábio + Knopi)
    - 50 record limit, per-entity partial failure, token refresh pattern reuso
 
 5. **Pequena correção de tipo:**
@@ -4598,7 +4599,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 ## [2026-05-14] — HubSpot C2.9E.2B.2B.1 (preflight de apply idempotente sem escrita canônica)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico do preflight de apply idempotente HubSpot → Canopi, sem escrita canônica.
+- **Natureza:** fechamento técnico do preflight de apply idempotente HubSpot → Knopi, sem escrita canônica.
 - **Commit técnico:** `95d37cc` — `feat(settings): add HubSpot ingest apply preflight`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -4626,7 +4627,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - service `hubspotIngestApplyPreflightService.ts`;
   - tipos atualizados para resposta de preflight auditável;
   - validação de `approvedPlanHash`, `idempotencyKey` e snapshot salvo;
-  - comparação da base Canopi atual sem escrita canônica;
+  - comparação da base Knopi atual sem escrita canônica;
   - nenhum apply, writeback ou ingestão real executados.
 - **Decisão operacional:**
   - C2.9E.2B.2B.1 fica tecnicamente fechado e validado funcionalmente;
@@ -4637,7 +4638,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 ## [2026-05-17] — HubSpot C2.9E.2C.2 (dry-run de recuperação de mappings de identidade)
 
 - **Agente:** Codex
-- **Natureza:** fechamento técnico do dry-run de recuperação de mappings de identidade HubSpot → Canopi, em leitura pura.
+- **Natureza:** fechamento técnico do dry-run de recuperação de mappings de identidade HubSpot → Knopi, em leitura pura.
 - **Commit técnico:** `ed53cc0` — `feat(settings): add HubSpot identity mapping recovery dry-run`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -4677,7 +4678,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 ## [2026-05-18] — HubSpot C2.9E.2C.3 (proposta controlada de recuperação de mappings)
 
 - **Agente:** Codex
-- **Natureza:** fechamento operacional da proposta controlada de recuperação de mappings HubSpot ↔ Canopi, somente leitura.
+- **Natureza:** fechamento operacional da proposta controlada de recuperação de mappings HubSpot ↔ Knopi, somente leitura.
 - **Commit técnico:** `2119893` — `feat(settings): add HubSpot identity mapping proposal dry-run`
 - **Validação estática confirmada:**
   - `git diff --check` OK;
@@ -4722,19 +4723,19 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - investigar o desalinhamento entre a base HubSpot e a base canônica atual antes de qualquer insert.
 - **Próximo passo:** atualizar a memória operacional, sincronizar o doc 56 no Drive e só então considerar persistência controlada de mappings.
 
-## [2026-05-18] — HubSpot C2.9E.2D.7 (decisão operacional para desalinhamento HubSpot x Canopi)
+## [2026-05-18] — HubSpot C2.9E.2D.7 (decisão operacional para desalinhamento HubSpot x Knopi)
 
 - **Agente:** Codex
 - **Natureza:** registro documental da decisão operacional após o crosswalk real retornar `0` matches de empresas e `0` matches de contatos.
 - **Diagnóstico consolidado:**
-  - HubSpot atual povoado a partir de population pack histórico sem IDs canônicos Canopi;
-  - base Canopi atual em outro universo de contas e contatos;
+  - HubSpot atual povoado a partir de population pack histórico sem IDs canônicos Knopi;
+  - base Knopi atual em outro universo de contas e contatos;
   - crosswalk real entre o pack e os exports completos do Supabase confirmou ponte insuficiente;
   - persistir mappings agora fabricaria vínculo falso.
 - **Decisão operacional registrada:**
   - HubSpot atual fica como histórico auditável;
-  - nova carga HubSpot deve nascer limpa a partir da Canopi atual;
-  - Canopi segue como fonte de verdade;
+  - nova carga HubSpot deve nascer limpa a partir da Knopi atual;
+  - Knopi segue como fonte de verdade;
   - contrato de identidade vem antes de qualquer nova carga;
   - não haverá reset improvisado nem apply com o estado atual.
 - **Documento operacional criado:**
@@ -4744,7 +4745,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 ## [2026-05-18] — HubSpot C2.9E.2D.9 (property registry formal da nova carga limpa)
 
 - **Agente:** Claude Code / Sonnet 4.6
-- **Natureza:** criação da registry formal de propriedades HubSpot da Canopi para Company, Contact, Deal e Product/Service, sem criar propriedades reais no HubSpot e sem escrever dados de negócio.
+- **Natureza:** criação da registry formal de propriedades HubSpot da Knopi para Company, Contact, Deal e Product/Service, sem criar propriedades reais no HubSpot e sem escrever dados de negócio.
 - **Validação estática confirmada:**
   - `git diff --check` OK;
   - `npm run lint` OK;
@@ -4772,9 +4773,9 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
 - **Decisão operacional:**
   - a registry fecha o gap de property coverage identificado no plano C2.9E.2D.8;
   - o próximo recorte (C2.9E.2D.10) pode usar os helpers para validar o dry-run da nova carga limpa.
-- **Próximo passo:** abrir C2.9E.2D.10 — dry-run de nova carga limpa Canopi → HubSpot usando a registry como guardrail de validação.
+- **Próximo passo:** abrir C2.9E.2D.10 — dry-run de nova carga limpa Knopi → HubSpot usando a registry como guardrail de validação.
 
-## [2026-05-18] — HubSpot C2.9E.2D.10 (dry-run da nova carga limpa Canopi → HubSpot)
+## [2026-05-18] — HubSpot C2.9E.2D.10 (dry-run da nova carga limpa Knopi → HubSpot)
 
 - **Agente:** Claude Code / Sonnet 4.6
 - **Natureza:** implementação do dry-run de validação da nova carga limpa, usando a property registry como guardrail, sem escrita no HubSpot, Supabase ou mappings.
@@ -4787,7 +4788,7 @@ Transformar a página de Contatos em um Radar de Stakeholder transversal, permit
   - `src/app/api/account-connectors/hubspot/clean-reload/dry-run/route.ts` — rota POST;
   - `docs/98-operacao/59-hubspot-clean-reload-dry-run.md` — doc operacional.
 - **Funcionalidades:**
-  - leitura de `accounts` e `contacts` da Canopi (somente leitura, sem escrita);
+  - leitura de `accounts` e `contacts` da Knopi (somente leitura, sem escrita);
   - validação contra `getBlockingHubspotProperties` e `getRequiredHubspotProperties` da registry C2.9E.2D.9;
   - `validateHubspotPropertyRegistry()` como primeira checagem de sanidade;
   - ancoragem contact → company: contacts sem `accountId` resolvido ficam bloqueados;

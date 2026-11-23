@@ -7,14 +7,14 @@
 - HubSpot conectado/desconectado muda o display corretamente.
 - Companies / Contas validados no HubSpot: `418`.
 - Contacts / Contatos validados no HubSpot: `738`.
-- Contacts Canopi identificados no snapshot: `736`.
+- Contacts Knopi identificados no snapshot: `736`.
 - Pendência futura registrada: `2` Contacts sem `canopi_contact_id`.
-- O snapshot diferencia total HubSpot, registros Canopi e amostra de associações.
+- O snapshot diferencia total HubSpot, registros Knopi e amostra de associações.
 
 ## Escopo entregue
 
 - leitura read-only de inventário HubSpot;
-- total HubSpot separado de registros Canopi;
+- total HubSpot separado de registros Knopi;
 - Companies;
 - Contacts;
 - Deals / Opportunities com estado de escopo;
@@ -36,7 +36,7 @@
 
 - writeback;
 - enriquecimento;
-- persistência canônica HubSpot -> Canopi;
+- persistência canônica HubSpot -> Knopi;
 - resolução dos 2 Contacts;
 - RD Station CRM;
 - Salesforce.

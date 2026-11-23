@@ -76,7 +76,7 @@ Não abrir refactor estrutural por causa disso no E22.1.
 
 ## Prompt final fechado para Claude Code
 ```text
-Contexto: Canopi | intel excels
+Contexto: Knopi | intel excels
 
 Reabrir E22.1 de forma controlada, sem ambiguidade e sem abrir novas frentes.
 

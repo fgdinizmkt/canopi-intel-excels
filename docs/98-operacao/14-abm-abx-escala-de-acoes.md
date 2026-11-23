@@ -1,7 +1,7 @@
 # Escala de ações em ABM e ABX
 
 ## Objetivo
-Registrar uma camada estrutural da modelagem de ABM e ABX no Canopi: toda ação, campanha, play ou ativação deve poder ser classificada também pela sua escala de personalização e abrangência.
+Registrar uma camada estrutural da modelagem de ABM e ABX no Knopi: toda ação, campanha, play ou ativação deve poder ser classificada também pela sua escala de personalização e abrangência.
 
 ---
 

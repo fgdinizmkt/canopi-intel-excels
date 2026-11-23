@@ -22,7 +22,7 @@ export type HealthStatus = 'healthy' | 'degraded' | 'down';
 /**
  * Integration Definition
  *
- * Represents a single integration available in the Canopi system.
+ * Represents a single integration available in the Knopi system.
  * Not account-specific; global definition.
  */
 export interface IntegrationDefinition {

@@ -3,7 +3,7 @@
 ## Objetivo
 Impedir que qualquer frente seja tratada como aprovada apenas com narrativa de commit, diff ou publicação no GitHub.
 
-Esta política complementa a política de clareza de fase e passa a valer de forma incondicional no projeto Canopi.
+Esta política complementa a política de clareza de fase e passa a valer de forma incondicional no projeto Knopi.
 
 ---
 

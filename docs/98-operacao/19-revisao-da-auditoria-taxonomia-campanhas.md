@@ -113,7 +113,7 @@ Rodar nova auditoria orientada por aderência semântica, não apenas por estado
 ---
 
 ## Resultado esperado
-Com isso, o Canopi mantém:
+Com isso, o Knopi mantém:
 - estabilidade
 - base publicada
 - UI existente

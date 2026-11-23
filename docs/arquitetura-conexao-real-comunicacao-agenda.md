@@ -420,7 +420,7 @@ CREATE TABLE account_link_audit (
 | **Fonte** | `WORKSPACE_POLICY` (admin) | `user_account_links` (OAuth) |
 | **Escopo** | Stack autorizado da empresa | Integração pessoal do usuário |
 | **Quem configura** | Admin do workspace | Usuário (via OAuth) |
-| **Responsabilidade** | Canopi (via app permissions) | Usuário (via personal account) |
+| **Responsabilidade** | Knopi (via app permissions) | Usuário (via personal account) |
 | **Dados** | Apenas informativos | Acesso real a calendário/chat |
 | **Status** | Always "Disponível" | "Conectado" ou "Erro" |
 | **Exemplo** | "Teams é a colaboração oficial" | "Meu Teams pessoal está vinculado" |

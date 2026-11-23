@@ -107,7 +107,7 @@ Três correções críticas sem refatoração estrutural:
 
 ## Evoluções Futuras
 
-- **Configuração da Empresa Cliente:** Em futuras evoluções da Canopi, considerar como item estruturante uma página/área de Configuração da Empresa Cliente. Essa área deve calibrar a inteligência da plataforma a partir de posicionamento, ICPs, personas, produtos/serviços, ciclo médio de fechamento, OKRs, metas, contexto comercial e premissas de GTM. Ver detalhes em `docs/98-operacao/36-configuracao-empresa-cliente.md`.
+- **Configuração da Empresa Cliente:** Em futuras evoluções da Knopi, considerar como item estruturante uma página/área de Configuração da Empresa Cliente. Essa área deve calibrar a inteligência da plataforma a partir de posicionamento, ICPs, personas, produtos/serviços, ciclo médio de fechamento, OKRs, metas, contexto comercial e premissas de GTM. Ver detalhes em `docs/98-operacao/36-configuracao-empresa-cliente.md`.
 
 ---
 

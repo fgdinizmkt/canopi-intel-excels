@@ -120,7 +120,7 @@ Esses elementos devem ser tratados prioritariamente como **formatos**, não como
 ---
 
 ## Leitura operacional final
-A leitura mínima de uma campanha ou ação no Canopi permanece:
+A leitura mínima de uma campanha ou ação no Knopi permanece:
 - campanha
 - tipo de campanha
 - formato
@@ -159,4 +159,4 @@ A partir desta revisão:
 Executar um recorte técnico de auditoria e aplicação mínima no código para:
 1. mapear aderência entre modelagem atual e taxonomia canônica
 2. identificar onde `canal` e `formato` ainda estão misturados
-3. preparar o caminho para aplicar a taxonomia no Canopi atual sem rebuild nem regressão
+3. preparar o caminho para aplicar a taxonomia no Knopi atual sem rebuild nem regressão

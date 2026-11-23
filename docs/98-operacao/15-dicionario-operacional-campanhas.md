@@ -1,12 +1,12 @@
 # Dicionário operacional de campanhas, ações, ABM e ABX
 
 ## Objetivo
-Consolidar a modelagem canônica de campanhas, ações, sinais e escalas operacionais no Canopi para orientar schema, filtros, interfaces e prompts futuros.
+Consolidar a modelagem canônica de campanhas, ações, sinais e escalas operacionais no Knopi para orientar schema, filtros, interfaces e prompts futuros.
 
 ---
 
 ## Princípio geral
-No Canopi, `campanha` não deve absorver origem, canal, sinal, audiência, objetivo ou escala.
+No Knopi, `campanha` não deve absorver origem, canal, sinal, audiência, objetivo ou escala.
 
 A leitura correta separa estes blocos:
 - origem
@@ -327,7 +327,7 @@ Classifica a abrangência e o grau de personalização da ação.
 ---
 
 ## Leitura composta recomendada
-A leitura mínima de uma campanha ou ação no Canopi deve combinar:
+A leitura mínima de uma campanha ou ação no Knopi deve combinar:
 - campanha
 - tipo de campanha
 - formato

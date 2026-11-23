@@ -18,8 +18,8 @@ A identidade visual única e definitiva é o **Knopi · Manual de Marca v1.1** (
 | # | Etapa | Status |
 |---|---|---|
 | 1 | Marca visível em `src/`: "Canopi" → "Knopi" e "CANOPI" → "KNOPI", só como palavra isolada | Feito (`c4a6f59`) |
-| 2 | Nomes internos que vivem só no app, nome do pacote e nomes dos CSVs de exemplo | Feito, aguardando commit |
-| 3 | Documentação | Pendente |
+| 2 | Nomes internos que vivem só no app, nome do pacote e nomes dos CSVs de exemplo | Feito (`f19784d`) |
+| 3 | Documentação: `docs/`, `agents/`, `CONTEXTO.md`, `CLAUDE.md`, `AGENTS.md` e comentários e textos de `scripts/` | Feito, aguardando commit |
 | 4 | Contratos externos, mais os 60 nomes internos camelCase que passam por gravação no banco ou RPC (por exemplo `canopiId`, que a função SQL de apply lê): propriedades `knopi_*` novas no HubSpot, cópia dos valores (247 empresas, 305 contatos, 27 negócios), migração Supabase e código, com teste antes de gravar | Pendente, plano próprio |
 | 5 | Texto gravado em dados (`seed/`, registros existentes) e chaves do navegador (`canopi_actions`, `canopi_v1_actions`, `canopi_v1_logs`, `canopi_hubspot_v1_session_token`), com leitura da chave antiga para não perder o que está salvo | Pendente |
 | 6 | Pasta local e configuração do Claude Code ligada a ela | Pendente |
@@ -38,3 +38,9 @@ A identidade visual única e definitiva é o **Knopi · Manual de Marca v1.1** (
 - CSVs de exemplo do Salesforce: `canopi_salesforce_*_exemplo.csv` → `knopi_salesforce_*_exemplo.csv`.
 - Os outros 60 nomes camelCase ficam em arquivos que gravam no HubSpot, no Supabase ou no Salesforce; vários são chaves de contratos guardados no banco, então seguem com a etapa 4.
 - `npx tsc --noEmit` sem erros; login e shell respondendo no servidor local.
+
+## Etapa 3 · o que mudou
+- 370 trocas de "Canopi"/"CANOPI" por "Knopi"/"KNOPI" em 78 arquivos de documentação e scripts, inclusive o histórico do log de sessões.
+- Mantidos de propósito: as linhas que descrevem a própria troca ("Canopi → Knopi"); nomes técnicos (`canopi_*`, camelCase) e caminhos com `canopi-intel-excels`, que continuam descrevendo o código real até as etapas 4, 6 e 7.
+- Ficaram para outras etapas: `scripts/seed/buildBlockASeed.ts` (valor `'Canopi Seed'` gravado no seed, etapa 5) e `scripts/sync-drive-memory.mjs` (cita o nome real da pasta "Canopi" no Google Drive; muda quando a pasta for renomeada).
+- Fora do escopo: `backups/`, que guarda cópias históricas do código e fica como arquivo.

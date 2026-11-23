@@ -16,7 +16,7 @@
 - leitura do contrato salvo por `contractId`;
 - leitura do snapshot salvo em `execution_summary`;
 - validação de `approvedPlanHash` e `idempotencyKey`;
-- comparação do snapshot com a base Canopi atual;
+- comparação do snapshot com a base Knopi atual;
 - retorno auditável com `summary`, `conflicts`, `blockers`, `warnings`, `guardrails` e `nextStep`;
 - sem escrita em `accounts`, `contacts` ou `hubspot_ingest_contracts`.
 

@@ -10,7 +10,7 @@ Sempre que houver dúvida sobre prioridade, ordem de execução, responsáveis, 
 ---
 
 ## Estado de partida
-- **Projeto:** Canopi | intel excels
+- **Projeto:** Knopi | intel excels
 - **Fase atual:** Fase 9 — Data Intelligence & Scale
 - **Branch de referência:** `main`
 - **Estado operacional de partida:** build íntegro, repositório sincronizado e último recorte concluído em Inteligência de Performance

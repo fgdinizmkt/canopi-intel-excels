@@ -42,7 +42,7 @@
 - conferência de que `hubspot_ingest_contracts` passou de `2` para `3` registros;
 - conferência de que `accounts` permaneceu em `250`;
 - conferência de que `contacts` permaneceu em `305`;
-- dry-run validado com Companies HubSpot `418`, Companies Canopi/tagged `348`, Companies fora da Canopi `70`, Contacts HubSpot `738`, Contacts Canopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
+- dry-run validado com Companies HubSpot `418`, Companies Knopi/tagged `348`, Companies fora da Knopi `70`, Contacts HubSpot `738`, Contacts Knopi/tagged `736` e `2` Contacts sem `canopi_contact_id`.
 
 ## Pendências
 - registrar `C2.9E.2B` como próximo recorte canônico baseado no contrato salvo;

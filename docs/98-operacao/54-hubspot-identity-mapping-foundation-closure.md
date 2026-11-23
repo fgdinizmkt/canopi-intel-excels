@@ -1,7 +1,7 @@
 # HubSpot identity mapping foundation — fechamento operacional
 
 ## Status
-- Fundação estrutural do mapeamento de identidade HubSpot ↔ Canopi implementada, publicada e validada manualmente no Supabase.
+- Fundação estrutural do mapeamento de identidade HubSpot ↔ Knopi implementada, publicada e validada manualmente no Supabase.
 - Nenhum apply real foi executado.
 - Nenhuma RPC foi chamada.
 - A frente ainda não popula mappings nem adapta snapshot, preflight ou RPC para consumo do crosswalk.
@@ -10,8 +10,8 @@
 - `3193a5e` — `feat(settings): add HubSpot identity mapping foundation`
 
 ## Objetivo do recorte
-- Criar a base estrutural para resolver identidade HubSpot ↔ Canopi antes de qualquer nova tentativa de apply real.
-- Preparar um crosswalk persistido entre identidade externa do HubSpot e identidade canônica da Canopi.
+- Criar a base estrutural para resolver identidade HubSpot ↔ Knopi antes de qualquer nova tentativa de apply real.
+- Preparar um crosswalk persistido entre identidade externa do HubSpot e identidade canônica da Knopi.
 
 ## Causa raiz que motivou a fundação
 - O snapshot de execução estava usando `canopiId` externo do HubSpot, derivado de writeback, como se fosse chave canônica local.
@@ -22,7 +22,7 @@
 - `canopi_external_id` representa o identificador externo do writeback:
   - `cpco_*` para Companies;
   - `cpct_*` para Contacts.
-- `canonical_id` representa o ID real da Canopi:
+- `canonical_id` representa o ID real da Knopi:
   - `accounts.id`;
   - `contacts.id`.
 - O apply futuro precisa operar sobre `canonical_id`, não sobre o ID externo cru.

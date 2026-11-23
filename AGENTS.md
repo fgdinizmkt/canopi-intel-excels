@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Produto
-Este projeto é a plataforma Canopi | intel excels.
+Este projeto é a plataforma Knopi | intel excels.
 É um SaaS B2B de inteligência operacional, account intelligence, marketing e receita.
 
 ---
@@ -121,7 +121,7 @@ Não usar Codex como agente principal para:
 - **Uso recomendado:** manter Codex para auditoria técnica, validação de build/lint/Git e ajustes cirúrgicos bem delimitados. Escalar para Claude Code quando houver reestruturação de componente, reorganização de JSX grande ou renderização condicional complexa.
 
 ### Protocolo obrigatório de output e economia de contexto
-- Este protocolo vale para todos os agentes do projeto Canopi: ChatGPT, Claude Code, Antigravity, Codex e qualquer executor auxiliar.
+- Este protocolo vale para todos os agentes do projeto Knopi: ChatGPT, Claude Code, Antigravity, Codex e qualquer executor auxiliar.
 - Não imprimir arquivo inteiro, salvo autorização explícita.
 - Não imprimir diff completo, salvo autorização explícita.
 - Não fazer full-file replacement sem justificar por que patch localizado é inviável.
@@ -165,7 +165,7 @@ Não usar Codex como agente principal para:
 - **Memória:** Nunca fechar uma sessão sem atualizar o Log de Sessões e o Status Atual.
 - **Retomada:** Em caso de quebra, usar estritamente a documentação como fonte da verdade.
 - **Continuidade Operacional:** Após cada validação, aprovação ou fechamento de estado, se houver continuidade operacional clara, entregar exatamente **1 próximo prompt operacional**. Só parar sem novo prompt quando o usuário mandar aguardar retorno de outro agente ou bloquear novas ações. Encerrar em "estado validado" sem converter isso no próximo comando é erro de processo recorrente e não deve se repetir.
-- **Ambiente Local Canopi:** validar a frente local primeiro com `npm run dev:check`; iniciar apenas com `npm run dev:clean`; a porta oficial de validação manual é `127.0.0.1:3053`; não usar `next start` para validação manual; não rodar `npm run build` com `next dev` ativo; se aparecer erro de chunk, `_document.js`, `clientReferenceManifest` ou `routes-manifest`, reiniciar pelo fluxo limpo.
+- **Ambiente Local Knopi:** validar a frente local primeiro com `npm run dev:check`; iniciar apenas com `npm run dev:clean`; a porta oficial de validação manual é `127.0.0.1:3053`; não usar `next start` para validação manual; não rodar `npm run build` com `next dev` ativo; se aparecer erro de chunk, `_document.js`, `clientReferenceManifest` ou `routes-manifest`, reiniciar pelo fluxo limpo.
 
 ---
 

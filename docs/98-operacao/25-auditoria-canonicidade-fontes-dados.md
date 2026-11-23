@@ -183,4 +183,4 @@ const METRICS: Record<string, Record<string, string>> = {
 
 **Versão:** 1.0  
 **Data:** 2026-04-15  
-**Responsável:** Canopi | Auditoria Operacional
+**Responsável:** Knopi | Auditoria Operacional

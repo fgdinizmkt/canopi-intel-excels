@@ -47,7 +47,7 @@
 - UI fina de clareza/copy.
 - Persistência em Supabase do histórico de execuções.
 - Logs operacionais persistentes.
-- Enriquecimento Canopi.
+- Enriquecimento Knopi.
 - RD Station CRM.
 - Ajustes adicionais em Salesforce.
 

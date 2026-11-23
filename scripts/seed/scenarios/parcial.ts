@@ -11,7 +11,7 @@ export interface CanonicalScenario {
 }
 
 /**
- * Cenário oficial inicial do seed canônico do Canopi.
+ * Cenário oficial inicial do seed canônico do Knopi.
  *
  * Intenção:
  * - não parecer uma demo perfeita

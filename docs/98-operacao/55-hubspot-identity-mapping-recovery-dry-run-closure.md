@@ -1,7 +1,7 @@
 # HubSpot identity mapping recovery dry-run — fechamento operacional
 
 ## Status
-- Dry-run de recuperação de mappings de identidade HubSpot ↔ Canopi implementado, validado funcionalmente em leitura pura e fechado operacionalmente.
+- Dry-run de recuperação de mappings de identidade HubSpot ↔ Knopi implementado, validado funcionalmente em leitura pura e fechado operacionalmente.
 - Nenhuma escrita foi feita.
 - Nenhum apply foi executado.
 - Nenhuma RPC foi chamada.
@@ -11,7 +11,7 @@
 - `ed53cc0` — `feat(settings): add HubSpot identity mapping recovery dry-run`
 
 ## Objetivo do recorte
-- Criar um dry-run somente leitura para avaliar, com o contrato real, quais registros do snapshot podem ser vinculados com segurança aos IDs canônicos da Canopi.
+- Criar um dry-run somente leitura para avaliar, com o contrato real, quais registros do snapshot podem ser vinculados com segurança aos IDs canônicos da Knopi.
 - Separar recuperação exata de tentativa heurística para impedir promoção indevida de identidade.
 
 ## Por que o dry-run foi necessário

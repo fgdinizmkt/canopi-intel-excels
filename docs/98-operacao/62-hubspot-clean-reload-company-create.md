@@ -12,7 +12,7 @@
 
 ## Objetivo
 
-Criar Companies no HubSpot a partir da base canônica Canopi (`accounts`), capturar `hs_object_id` para cada Company criada e persistir o mapping `canonical_id → hs_object_id` em `hubspot_identity_mappings`.
+Criar Companies no HubSpot a partir da base canônica Knopi (`accounts`), capturar `hs_object_id` para cada Company criada e persistir o mapping `canonical_id → hs_object_id` em `hubspot_identity_mappings`.
 
 Somente Companies são criadas neste recorte. Contacts, Deals, Products e Services não fazem parte deste recorte.
 
@@ -68,7 +68,7 @@ normalizeSlug(nome) + '|' + normalizeSlug(dominio ?? '') + '|'
 → 'cpco_' + hash
 ```
 
-`website` não faz parte do input para registros da base Canopi.
+`website` não faz parte do input para registros da base Knopi.
 
 ## Propriedades enviadas ao HubSpot por Company
 

@@ -4,12 +4,12 @@
 **Claude Code**
 
 ## Motivo
-O próximo passo não é mais debate conceitual. O próximo passo é auditar o código atual do Canopi e preparar/aplicar um recorte técnico mínimo que alinhe a modelagem de campanhas ao contrato semântico já consolidado nos docs `13`, `14`, `15` e `17`, sem rebuild e sem regressão visual ampla.
+O próximo passo não é mais debate conceitual. O próximo passo é auditar o código atual do Knopi e preparar/aplicar um recorte técnico mínimo que alinhe a modelagem de campanhas ao contrato semântico já consolidado nos docs `13`, `14`, `15` e `17`, sem rebuild e sem regressão visual ampla.
 
 ---
 
 ## Prompt
-Você está atuando no projeto **Canopi | intel excels**.
+Você está atuando no projeto **Knopi | intel excels**.
 
 Antes de qualquer ação, leia obrigatoriamente estes documentos:
 - `AGENTS.md`
@@ -21,7 +21,7 @@ Antes de qualquer ação, leia obrigatoriamente estes documentos:
 - `docs/98-operacao/17-revisao-canonica-taxonomia-campanhas.md`
 
 ## Objetivo do recorte
-Executar uma **auditoria técnica + aplicação mínima** da taxonomia canônica de campanhas no Canopi atual.
+Executar uma **auditoria técnica + aplicação mínima** da taxonomia canônica de campanhas no Knopi atual.
 
 Importante:
 - **não** reconstruir produto
@@ -137,7 +137,7 @@ Só depois da aprovação explícita:
 
 ## Critério de sucesso
 Este recorte será considerado bom se:
-- o Canopi atual continuar intacto e estável
+- o Knopi atual continuar intacto e estável
 - a taxonomia canônica começar a existir tecnicamente sem rebuild
 - o código ficar mais preparado para os próximos recortes de `Accounts`, `ABM Strategy`, `ABX Orchestration`, `Performance` e futuros perfis de empresa/contato
 - a mudança for pequena, precisa e auditável

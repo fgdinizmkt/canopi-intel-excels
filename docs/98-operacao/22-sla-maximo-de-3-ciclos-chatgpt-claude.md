@@ -109,4 +109,4 @@ Sem isso, a responsabilidade do vai e volta continua sendo do ChatGPT.
 
 **Status:** Ativo
 **Data:** 2026-04-15
-**Responsável:** ChatGPT | Canopi
+**Responsável:** ChatGPT | Knopi

@@ -519,7 +519,7 @@ Estratégia de Contacts
 
 ${retrySection}
 Após o upload
-- conectar a Canopi no Salesforce Sandbox/DEV;
+- conectar a Knopi no Salesforce Sandbox/DEV;
 - validar conexão;
 - encontrar dados;
 - carregar Accounts;

@@ -67,7 +67,7 @@ O Bloco B **complementa** com:
 
 ### Papel
 
-Registro de todas as integrações disponíveis no Canopi, e seu status geral (não por conta, mas global).
+Registro de todas as integrações disponíveis no Knopi, e seu status geral (não por conta, mas global).
 
 ### Fonte
 

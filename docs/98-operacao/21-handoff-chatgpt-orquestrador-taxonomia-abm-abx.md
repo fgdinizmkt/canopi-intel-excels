@@ -1,7 +1,7 @@
-# HANDOFF — ChatGPT Orquestrador | Canopi
+# HANDOFF — ChatGPT Orquestrador | Knopi
 
 ## Função deste handoff
-Este documento existe para permitir a continuidade do projeto **Canopi | intel excels** em um novo chat, com o ChatGPT atuando como **orquestrador principal**, sem perder o contexto recente, sem voltar para discussões já resolvidas e sem induzir leitura errada do estado atual do produto.
+Este documento existe para permitir a continuidade do projeto **Knopi | intel excels** em um novo chat, com o ChatGPT atuando como **orquestrador principal**, sem perder o contexto recente, sem voltar para discussões já resolvidas e sem induzir leitura errada do estado atual do produto.
 
 ---
 
@@ -22,7 +22,7 @@ Este documento existe para permitir a continuidade do projeto **Canopi | intel e
 ---
 
 ## Estado real do produto
-O **Canopi já é uma plataforma madura**, não um produto a ser inventado do zero.
+O **Knopi já é uma plataforma madura**, não um produto a ser inventado do zero.
 
 Estado real consolidado no repositório:
 - Fase E consolidada.
@@ -34,7 +34,7 @@ Estado real consolidado no repositório:
 - O produto já possui cockpit operacional, scoring, assistant, perfis, ABM/ABX, Supabase e Bloco C em operação.
 
 Regra importante:
-**não** falar como se estivéssemos criando “uma nova plataforma do zero” no contexto do Canopi atual.
+**não** falar como se estivéssemos criando “uma nova plataforma do zero” no contexto do Knopi atual.
 
 O enquadramento correto é:
 - produto maduro existente
@@ -44,11 +44,11 @@ O enquadramento correto é:
 ---
 
 ## Onde estávamos na conversa
-A frente recente não era recriar o Canopi.
+A frente recente não era recriar o Knopi.
 A frente recente era:
 1. revisar a taxonomia e o dicionário de campanhas, ABM e ABX
 2. corrigir inconsistências semânticas
-3. alinhar isso ao Canopi real
+3. alinhar isso ao Knopi real
 4. preparar o próximo recorte técnico mínimo
 
 Também ficou explícito que o ChatGPT deve atuar como orquestrador para não travar sobrecarga operacional e delegar quando fizer sentido.
@@ -248,7 +248,7 @@ O ChatGPT neste projeto deve operar assim:
 
 ## O que não deve ser feito agora
 - Não abrir nova frente paralela antes do retorno do Claude Code.
-- Não misturar a conversa de taxonomia do Canopi com antigos exercícios de prompt para Stitch / plataforma genérica externa.
+- Não misturar a conversa de taxonomia do Knopi com antigos exercícios de prompt para Stitch / plataforma genérica externa.
 - Não cair de volta em “vamos recriar a plataforma inteira”.
 - Não aprovar como canônico o que ainda é legado/transitório.
 - Não gerar novo prompt para implementação antes de ler criticamente o diagnóstico do Claude.
@@ -268,7 +268,7 @@ Mas não deve avançar implementação sem base nova.
 ---
 
 ## Handoff resumido em uma frase
-O Canopi já é uma plataforma madura; a frente atual é alinhar incrementalmente sua modelagem de campanhas, ABM e ABX ao contrato canônico definido em docs, aguardando agora o retorno do Claude Code para uma auditoria semântica mais correta e só então decidir o próximo recorte.
+O Knopi já é uma plataforma madura; a frente atual é alinhar incrementalmente sua modelagem de campanhas, ABM e ABX ao contrato canônico definido em docs, aguardando agora o retorno do Claude Code para uma auditoria semântica mais correta e só então decidir o próximo recorte.
 
 ---
 

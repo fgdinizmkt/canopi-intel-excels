@@ -3,7 +3,7 @@
 ## Objetivo
 Evitar ambiguidade sobre **em que fase o projeto está**, **o que já terminou** e **o que está sendo feito agora**.
 
-Esta política passa a valer como regra de governança operacional do Canopi.
+Esta política passa a valer como regra de governança operacional do Knopi.
 
 ---
 

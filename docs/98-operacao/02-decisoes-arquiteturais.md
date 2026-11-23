@@ -658,10 +658,10 @@ No Recorte 39, expandimos o padrão E6 para incluir três novos campos narrativo
 
 ### 19. Classificação Transversal de Conectores — Natureza Operacional, Não Apenas Nome da Ferramenta
 
-**Decisão:** Nenhum conector deve ser classificado apenas pelo nome da ferramenta. A Canopi classifica cada conexão pela **natureza operacional** do que ela permite ler, validar, publicar, medir, governar ou operar.
+**Decisão:** Nenhum conector deve ser classificado apenas pelo nome da ferramenta. A Knopi classifica cada conexão pela **natureza operacional** do que ela permite ler, validar, publicar, medir, governar ou operar.
 
 **Contexto do Problema:**
-Durante a implementação do Salesforce (Fases 2A–2B.2), tornou-se claro que uma ferramenta como Salesforce não é "apenas um CRM". Salesforce oferece CRM (Accounts, Leads), infraestrutura (My Domain, Experience Cloud), autenticação OAuth, metadados técnicos, e dados. Ao classificar automaticamente todos os conectores como "CRM local", perdemos a oportunidade de organizar a Canopi por **camadas operacionais**, não por nomes de tools.
+Durante a implementação do Salesforce (Fases 2A–2B.2), tornou-se claro que uma ferramenta como Salesforce não é "apenas um CRM". Salesforce oferece CRM (Accounts, Leads), infraestrutura (My Domain, Experience Cloud), autenticação OAuth, metadados técnicos, e dados. Ao classificar automaticamente todos os conectores como "CRM local", perdemos a oportunidade de organizar a Knopi por **camadas operacionais**, não por nomes de tools.
 
 **Classificações Possíveis:**
 Cada conector deve ser mapeado para uma ou mais destas naturezas:
@@ -727,7 +727,7 @@ Esta frente **não substitui** a Loja de CRMs. É uma **camada paralela** que:
 - Configurações > Canais e Infraestrutura (futuro — domínios, tracking, publicação)
 
 **Benefício:**
-Organização por natureza operacional (não por nome da tool) permite escalabilidade, reutilização de componentes de UI (editor de domínios, seletor de tracking pixels, etc.) e clareza sobre "o que Canopi sabe fazer" (não limitado a nome de ferramentas conhecidas).
+Organização por natureza operacional (não por nome da tool) permite escalabilidade, reutilização de componentes de UI (editor de domínios, seletor de tracking pixels, etc.) e clareza sobre "o que Knopi sabe fazer" (não limitado a nome de ferramentas conhecidas).
 
 **Commits que ilustram a decisão:**
 - Fases 2A–2B.2 (Salesforce): Consolidação da primeira trilha CRM com múltiplas naturezas operacionais

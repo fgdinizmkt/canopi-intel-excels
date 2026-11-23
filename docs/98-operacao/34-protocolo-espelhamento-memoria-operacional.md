@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Garantir que a memória operacional da Canopi fique sincronizada entre três superfícies:
+Garantir que a memória operacional da Knopi fique sincronizada entre três superfícies:
 
 1. **GitHub** — fonte versionada e auditável do projeto.
 2. **Ambiente local** — working copy usada pelos agentes e pelo Fábio.
@@ -39,8 +39,8 @@ Status confirmado:
 
 Leitura funcional do Salesforce 2C.2:
 
-- a Canopi mantém a visualização read-only de metadados de `Account` do 2C.1;
-- a Canopi adiciona preparação local de CSV exportado com gate de campos obrigatórios;
+- a Knopi mantém a visualização read-only de metadados de `Account` do 2C.1;
+- a Knopi adiciona preparação local de CSV exportado com gate de campos obrigatórios;
 - não existe persistência local ou remota para esse fluxo CSV;
 - não existe OAuth produtivo;
 - não existe sync;
@@ -133,7 +133,7 @@ O Google Drive passa a ser uma camada explícita da memória operacional.
 
 Pasta de referência:
 
-- `Canopi/`
+- `Knopi/`
 - subpasta: `Memória operacional/`, quando aplicável
 
 Documentos prioritários a espelhar ou atualizar:
@@ -149,7 +149,7 @@ Critérios:
 - o Drive não substitui o GitHub;
 - o Drive deve refletir o GitHub;
 - o Drive deve ser atualizado depois do commit/push ou no mesmo fechamento operacional;
-- se a escrita direta no Drive não estiver disponível, o agente local deve exportar/copiar os arquivos versionados para a pasta `Canopi` no Drive;
+- se a escrita direta no Drive não estiver disponível, o agente local deve exportar/copiar os arquivos versionados para a pasta `Knopi` no Drive;
 - o fechamento só deve declarar “memória atualizada” quando houver evidência de que o Drive recebeu o estado mais recente.
 
 ---
@@ -207,7 +207,7 @@ Não declarar um recorte como totalmente fechado se:
 ## Prompt operacional para agente local
 
 ```text
-Você está no projeto Canopi | intel excels.
+Você está no projeto Knopi | intel excels.
 
 Tarefa: sincronizar memória operacional entre GitHub, ambiente local e Google Drive.
 
@@ -245,7 +245,7 @@ Origem local:
 docs/98-operacao/
 
 Destino Drive:
-Canopi/Memória operacional/
+Knopi/Memória operacional/
 
 Arquivos prioritários:
 - 00-status-atual.md
@@ -280,4 +280,4 @@ Referência: Este protocolo de espelhamento é **parte constitucional** da matri
 
 Criado para impedir divergência entre narrativa, código e memória operacional após os fechamentos Salesforce 2C.1 e 2C.2.
 
-A partir deste ponto, atualização do Google Drive deixa de ser opcional em fechamentos relevantes e passa a compor o processo formal de atualização de memória da Canopi.
+A partir deste ponto, atualização do Google Drive deixa de ser opcional em fechamentos relevantes e passa a compor o processo formal de atualização de memória da Knopi.

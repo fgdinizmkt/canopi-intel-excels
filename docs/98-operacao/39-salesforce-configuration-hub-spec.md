@@ -2,11 +2,11 @@
 
 ## 1. Diagnóstico da Mudança de Direção (Wizard vs. Hub)
 
-A evolução da interface Salesforce na Canopi exigiu uma ruptura com o modelo de "Wizard Técnico" (Passo 1, 2, 3...) em favor de um "Hub de Configuração".
+A evolução da interface Salesforce na Knopi exigiu uma ruptura com o modelo de "Wizard Técnico" (Passo 1, 2, 3...) em favor de um "Hub de Configuração".
 
 *   **Por que o Wizard deixou de fazer sentido:** O modelo linear pressupõe uma jornada única de setup. Em integrações profissionais, o usuário precisa reconfigurar partes específicas (ex: mudar um filtro, adicionar um campo) sem precisar re-atravessar um funil técnico.
 *   **Impacto da Conexão Automática:** Ao remover a barreira de "Conectar" como um passo manual e heróico, a hierarquia da tela muda. A conexão passa a ser um *status* de sistema, e a configuração passa a ser o *protagonismo* do usuário.
-*   **Configuração Operacional:** A lógica deixa de ser "Como eu conecto?" para ser "Como eu quero que meus dados do Salesforce se comportem dentro da Canopi?".
+*   **Configuração Operacional:** A lógica deixa de ser "Como eu conecto?" para ser "Como eu quero que meus dados do Salesforce se comportem dentro da Knopi?".
 *   **O que será reaproveitado:** A lógica de `qualityResolutions`, o mapeamento de entidades (Accounts, Contacts, Opportunities), os esquemas de validação de dados e o motor de dry-run.
 
 ## 2. Arquitetura da Nova Tela
@@ -34,15 +34,15 @@ A página será composta por blocos modulares que permitem visão 360º da integ
 
 ### E. Identidade e Unicidade
 *   **Objetivo:** Evitar duplicação.
-*   **Campos:** Seletor de Chave Única (ex: Email, Id) e Regras de Conflito (ex: "Sobrescrever Canopi" vs "Preencher apenas vazios").
+*   **Campos:** Seletor de Chave Única (ex: Email, Id) e Regras de Conflito (ex: "Sobrescrever Knopi" vs "Preencher apenas vazios").
 
 ### F. Configurações de Fluxo
 *   **Objetivo:** Definir o comportamento de escrita e periodicidade.
-*   **Opções:** Direção dos dados (Bidirecional ou SF -> Canopi), Modo (Batch ou Real-time), Ação de Deleção.
+*   **Opções:** Direção dos dados (Bidirecional ou SF -> Knopi), Modo (Batch ou Real-time), Ação de Deleção.
 
 ### G. Mapeamento de Campos
 *   **Objetivo:** Unificar a taxonomia de dados.
-*   **Interface:** Lista de Campos Canopi <-> Campos Salesforce. Inclui tradução de valores (picklists).
+*   **Interface:** Lista de Campos Knopi <-> Campos Salesforce. Inclui tradução de valores (picklists).
 
 ### H. Atividade Recente (Sidebar)
 *   **Objetivo:** Auditoria rápida de performance e erros.
@@ -50,7 +50,7 @@ A página será composta por blocos modulares que permitem visão 360º da integ
 
 ## 3. Lógica de Conexão Automática
 
-A Canopi deve buscar ser "silenciosa" e resiliente:
+A Knopi deve buscar ser "silenciosa" e resiliente:
 *   **Restauração:** O sistema tenta validar o token existente assim que a página é carregada.
 *   **Estados:**
     *   *Aguardando:* Spinner discreto.
@@ -69,7 +69,7 @@ As pendências deixam de ser uma "lista de erros" para serem "decisões de confi
 
 *   **Seletor de Objeto:** Tabs ou Dropdown para alternar entre Leads, Contatos, etc.
 *   **Tabela de Mapeamento:**
-    *   *Campo Canopi:* Estático (ex: `email_address`).
+    *   *Campo Knopi:* Estático (ex: `email_address`).
     *   *Campo Salesforce:* Dropdown com campos descobertos via Describe API.
     *   *Tradução de Valores:* Para picklists (ex: `LeadStatus`), abre um sub-mapa de opções.
 *   **Status:** Ícone de check para mapeado corretamente, alerta para campos obrigatórios vazios.
@@ -88,7 +88,7 @@ As pendências deixam de ser uma "lista de erros" para serem "decisões de confi
 ## 8. Identidade e Configurações de Fluxo
 
 *   **Chave Única:** Essencial para reconciliação.
-*   **Direção:** Define se a Canopi pode escrever de volta no Salesforce (Writeback).
+*   **Direção:** Define se a Knopi pode escrever de volta no Salesforce (Writeback).
 *   **Modo de Sincronização:** Batch (periódico) ou Webhooks (exige setup de URL de callback no SF).
 
 ## 9. Atividade Recente / Logs
@@ -106,7 +106,7 @@ As pendências deixam de ser uma "lista de erros" para serem "decisões de confi
 
 ```text
 +--------------------------------------------------------------------------------+
-|  Canopi | Integrações > Salesforce                     [ Status: Conectado ]   |
+|  Knopi | Integrações > Salesforce                     [ Status: Conectado ]   |
 +--------------------------------------------------------------------------------+
 |                                                                                |
 |  CONFIGURAÇÃO SALESFORCE                                                       |
@@ -133,7 +133,7 @@ As pendências deixam de ser uma "lista de erros" para serem "decisões de confi
 |                                                                                |
 |  +-------------------------------------------------------------+                |
 |  | MAPEAMENTO DE CAMPOS                              Obj: Leads |                |
-|  | Campo Canopi       | Dir | Campo Salesforce                 |                |
+|  | Campo Knopi       | Dir | Campo Salesforce                 |                |
 |  | email_address      |  -> | [ Email               ^]         |                |
 |  | first_name         |  -> | [ FirstName           ^]         |                |
 |  | [ + Adicionar Mapeamento ]                                  |                |

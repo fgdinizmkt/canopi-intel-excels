@@ -1,6 +1,6 @@
-# Seed Canônico do Canopi
+# Seed Canônico do Knopi
 
-Este diretório é o ponto de entrada oficial da futura camada de seed reaplicável do Canopi.
+Este diretório é o ponto de entrada oficial da futura camada de seed reaplicável do Knopi.
 
 ## Objetivo
 

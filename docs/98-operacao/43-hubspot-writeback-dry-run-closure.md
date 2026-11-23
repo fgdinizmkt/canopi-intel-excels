@@ -16,7 +16,7 @@
 - Análise automática ao selecionar arquivos.
 - Sem botão “Analisar base”.
 - Dry-run consolidado com normalização.
-- Geração de IDs Canopi para empresas e contatos.
+- Geração de IDs Knopi para empresas e contatos.
 - Associação contato → empresa no dry-run.
 - Empresas não foram infladas pela base de contatos.
 - Contatos não foram extraídos da base de empresas.
@@ -40,7 +40,7 @@
 - Não houve upsert real de Companies.
 - Não houve upsert real de Contacts.
 - Não houve criação real de associações no HubSpot.
-- Não houve persistência de log de execução na Canopi/Supabase.
+- Não houve persistência de log de execução na Knopi/Supabase.
 
 ## Próximo recorte correto
 
@@ -48,7 +48,7 @@
 
 ## Escopo do próximo recorte
 
-- Validar/criar propriedades Canopi no HubSpot.
+- Validar/criar propriedades Knopi no HubSpot.
 - Validar `canopi_company_id` e `canopi_contact_id`.
 - Preparar permissões/scopes de escrita.
 - Desbloquear writeback real somente depois de setup aprovado.

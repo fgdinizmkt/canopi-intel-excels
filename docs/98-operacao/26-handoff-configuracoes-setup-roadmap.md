@@ -1,8 +1,8 @@
-# Handoff — Roadmap de Configurações / Setup da Canopi
+# Handoff — Roadmap de Configurações / Setup da Knopi
 
 
 ## Objetivo
-Registrar, em formato seguro para handoff entre chats e agentes, a direção aprovada para a frente de **Configurações** da Canopi.
+Registrar, em formato seguro para handoff entre chats e agentes, a direção aprovada para a frente de **Configurações** da Knopi.
 
 Este documento existe para evitar três erros recorrentes:
 1. empobrecer a página para um painel de status ou inventário
@@ -13,7 +13,7 @@ Este documento existe para evitar três erros recorrentes:
 
 
 ## Estado de referência no repositório
-A camada de Configurações está 100% materializada no front-end e integrada à lógica operacional da Canopi (Fase Funcional 2 concluída).
+A camada de Configurações está 100% materializada no front-end e integrada à lógica operacional da Knopi (Fase Funcional 2 concluída).
 
 ---
 
@@ -29,7 +29,7 @@ A camada de Configurações está 100% materializada no front-end e integrada à
 
 - não reduzir a tela a conexões + status
 
-- não criar settings genéricos de CRM sem impacto na Canopi
+- não criar settings genéricos de CRM sem impacto na Knopi
 
 - não inventar taxonomias, campos ou regras sem superfície real no produto
 
@@ -39,7 +39,7 @@ A camada de Configurações está 100% materializada no front-end e integrada à
 ### O que fazer
 Trazer um **setup robusto e amplo**, sim, mas sempre:
 
-- reancorado no que a Canopi já mostra, sugere ou depende
+- reancorado no que a Knopi já mostra, sugere ou depende
 
 - com efeito real em módulos já existentes ou explicitamente planejados
 
@@ -53,7 +53,7 @@ Toda configuração nova só pode entrar se responder claramente às 4 perguntas
 
 1. **De onde esse dado vem?**
    - integração, fonte interna, input manual, regra interna
-2. **Onde isso aparece na Canopi?**
+2. **Onde isso aparece na Knopi?**
    - Contas, Sinais, Ações, Desempenho, ABM, ABX, Cockpit, Assistant etc.
 3. **O que muda quando isso é alterado?**
    - score, sinal, roteamento, play, owner, classificação, recomendação, decisão
@@ -477,7 +477,7 @@ Cada campo deve permitir:
 
 
 ### 5. Taxonomia de Owners e Stakeholders
-Exemplos coerentes com a Canopi:
+Exemplos coerentes com a Knopi:
 
 - Executive Sponsor
 
@@ -581,7 +581,7 @@ Para qualquer agente que mexer nesta frente:
    - Etapa 1 não deve abrir GA4/Meta/Google Ads profundo
    - Etapa 1 não deve abrir score complexo ou ABM/ABX avançado
 
-4. **Não reinventar a Canopi**
+4. **Não reinventar a Knopi**
    - a lógica deve emergir do produto, não de um software de CRM genérico
 
 5. **Manter profundidade funcional**
@@ -622,7 +622,7 @@ Pode ser útil mais à frente para exploração visual, mas aqui tende a aumenta
 ---
 
 ## 🚀 ROADMAP CONCLUÍDO (2026-04-23)
-Todas as 5 etapas do Roadmap de Configurações foram materializadas no front-end da plataforma Canopi. A página `/configuracoes` agora atua como uma camada densa de parametrização para Objetos, Mídia, Scores, Sinais, Roteamento, Plays, ABM, ABX, Intelligence Exchange e Governança.
+Todas as 5 etapas do Roadmap de Configurações foram materializadas no front-end da plataforma Knopi. A página `/configuracoes` agora atua como uma camada densa de parametrização para Objetos, Mídia, Scores, Sinais, Roteamento, Plays, ABM, ABX, Intelligence Exchange e Governança.
 
 ---
 
@@ -630,7 +630,7 @@ Todas as 5 etapas do Roadmap de Configurações foram materializadas no front-en
 As configurações publicadas deixaram de ser apenas visual/mock e passaram a ser o motor de lógica dos seguintes módulos:
 
 ### 1. Mapa de Impacto: Configuração → Efeito
-| Configuração Criada | Onde aparece na Canopi | O que muda quando alterada |
+| Configuração Criada | Onde aparece na Knopi | O que muda quando alterada |
 | :--- | :--- | :--- |
 | **Scoring Rules** | `/accounts`, `/overview`, `/actions` | Altera pesos (Potencial, Risco, Prontidão, Cobertura) e bônus de pontuação, reordenando a triagem de contas. |
 | **Signal Configs** | `/sinais` | Define severidade ('Crítico', 'Alerta'), SLAs (ex: 2h, 24h) e o Owner Padrão de cada sinal categorizado. |
@@ -647,7 +647,7 @@ As configurações publicadas deixaram de ser apenas visual/mock e passaram a se
 ---
 
 ## Status deste documento
-- **Finalizado**: A frente de Configurações está funcional e integrada ao núcleo operacional da Canopi.
+- **Finalizado**: A frente de Configurações está funcional e integrada ao núcleo operacional da Knopi.
 
 ---
 

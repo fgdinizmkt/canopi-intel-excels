@@ -1,7 +1,7 @@
 # Notas canônicas da taxonomia de campanhas
 
 ## Objetivo
-Registrar decisões conceituais emergentes do chat para orientar a modelagem de campanhas, canais, origem e sinais no Canopi.
+Registrar decisões conceituais emergentes do chat para orientar a modelagem de campanhas, canais, origem e sinais no Knopi.
 
 ---
 

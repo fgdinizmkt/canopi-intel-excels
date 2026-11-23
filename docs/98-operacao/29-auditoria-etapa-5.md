@@ -50,9 +50,9 @@ Com base no arquivo `src/app/(shell)/configuracoes/page.tsx`:
 
 ---
 
-## 3. Mapa de Espelhamento: Configuração ↔ Canopi
+## 3. Mapa de Espelhamento: Configuração ↔ Knopi
 
-| Configuração Criada | Onde aparece na Canopi | O que muda quando alterada |
+| Configuração Criada | Onde aparece na Knopi | O que muda quando alterada |
 | :--- | :--- | :--- |
 | **Propagation Rules** | Todos os módulos de Inteligência | Define quais descobertas em ABM viram sinal automático em ABX. |
 | **Learning Catalog** | Recomendações (Cockpit) | Os aprendizados que podem ser "aceitos" pelo usuário em novos Tiers. |

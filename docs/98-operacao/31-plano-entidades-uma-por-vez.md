@@ -1,7 +1,7 @@
 # Plano de trabalho — Configurações / Objetos & CRM / Entidades (uma por vez)
 
 ## Objetivo
-Sair da implementação genérica da subpágina de Entidades e passar a materializar cada entidade canônica da Canopi de forma isolada, crível e operacional.
+Sair da implementação genérica da subpágina de Entidades e passar a materializar cada entidade canônica da Knopi de forma isolada, crível e operacional.
 
 A regra desta frente passa a ser:
 - trabalhar uma entidade por vez
@@ -10,7 +10,7 @@ A regra desta frente passa a ser:
 - não tratar a subpágina como editor genérico de metadados
 - forçar aderência ao produto real e aos conectores/ferramentas relevantes
 
-## Caminho dentro da Canopi
+## Caminho dentro da Knopi
 Configurações → Objetos & CRM → Entidades
 
 ## Sequência oficial de execução
@@ -25,7 +25,7 @@ Configurações → Objetos & CRM → Entidades
 
 ## Regra de passagem de fase
 Uma entidade só pode ser considerada fechada quando atender os 5 critérios abaixo:
-1. configuração crível para o papel real da entidade na Canopi
+1. configuração crível para o papel real da entidade na Knopi
 2. persistência funcional (draft, publish, reload)
 3. CTAs principais realmente funcionais
 4. integração conceitual clara com ferramentas/fontes relevantes
@@ -47,7 +47,7 @@ Cada rodada não deve cobrir:
 
 ## Critérios de qualidade para cada entidade
 Cada entidade deve ser especificada e implementada considerando:
-- qual seu papel operacional na Canopi
+- qual seu papel operacional na Knopi
 - onde aparece no produto
 - o que pode ou não ser configurado nela
 - o que é somente leitura / resumo
@@ -65,13 +65,13 @@ Conta deve deixar de ser tratada como schema genérico e passar a refletir uma c
 - Salesforce
 - RD Station
 - HubSpot
-- Canopi
+- Knopi
 
 ### O que a rodada de Conta precisa resolver
 - identidade operacional da conta
 - chaves e identificadores principais
 - origem e prioridade de dados por ferramenta
-- comportamento da conta dentro da Canopi
+- comportamento da conta dentro da Knopi
 - relação da conta com contatos, oportunidades, campanhas, sinais e ações
 - governança mínima da conta dentro do bloco de entidades
 
