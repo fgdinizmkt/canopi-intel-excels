@@ -201,9 +201,9 @@ export function HubspotWritebackSetup({
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pré-requisitos para atualização do HubSpot</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Pré-requisitos para atualização do HubSpot</p>
             <h3 className="text-2xl font-black text-slate-950">HubSpot pronto para atualização</h3>
-            <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
+            <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-400">
               A atualização do HubSpot só será liberada depois que o HubSpot tiver permissões de escrita e propriedades Canopi configuradas.
             </p>
           </div>
@@ -239,18 +239,18 @@ export function HubspotWritebackSetup({
                           : 'Pendente'}
                 </Badge>
               </div>
-              <p className="mt-2 text-xs font-medium leading-relaxed text-slate-600">{entry.description}</p>
+              <p className="mt-2 text-xs font-medium leading-relaxed text-slate-400">{entry.description}</p>
             </div>
           ))}
         </div>
 
         <div className="grid gap-4 xl:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Companies</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Companies</p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
               {companySummary?.ready ? 'Prontas para atualização' : 'Aguardando ajustes'}
             </p>
-            <p className="mt-1 text-sm font-medium text-slate-600">
+            <p className="mt-1 text-sm font-medium text-slate-400">
               {companySummary?.missing.length ? `${companySummary.missing.length} propriedade(s) ausente(s).` : 'Sem propriedades ausentes.'}
             </p>
             <p className="mt-1 text-xs font-medium text-slate-500">
@@ -259,11 +259,11 @@ export function HubspotWritebackSetup({
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Contacts</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Contacts</p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
               {contactSummary?.ready ? 'Prontos para atualização' : 'Aguardando ajustes'}
             </p>
-            <p className="mt-1 text-sm font-medium text-slate-600">
+            <p className="mt-1 text-sm font-medium text-slate-400">
               {contactSummary?.missing.length ? `${contactSummary.missing.length} propriedade(s) ausente(s).` : 'Sem propriedades ausentes.'}
             </p>
             <p className="mt-1 text-xs font-medium text-slate-500">
@@ -272,7 +272,7 @@ export function HubspotWritebackSetup({
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ações</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Ações</p>
             <div className="mt-3 flex flex-col gap-2">
               <Button
                 variant="primary"
@@ -304,7 +304,7 @@ export function HubspotWritebackSetup({
 
         {setupResult?.issues.length ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Pontos a revisar</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Pontos a revisar</p>
             <ul className="mt-2 space-y-1 text-sm font-medium leading-relaxed text-slate-700">
               {setupResult.issues.slice(0, 6).map((issue) => (
                 <li key={`${issue.objectType}-${issue.title}`}>
@@ -317,7 +317,7 @@ export function HubspotWritebackSetup({
 
         {actionLog.length > 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Log da última ação</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Log da última ação</p>
             <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
               {actionLog.slice(0, 6).map((line) => (
                 <li key={line}>• {line}</li>

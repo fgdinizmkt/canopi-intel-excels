@@ -16,19 +16,19 @@ export function AccountGovernance() {
          <div className="grid grid-cols-4 gap-6">
             <div className="p-8 bg-blue-50 border border-blue-100 rounded-3xl text-center">
                <p className="text-4xl font-black text-blue-900 mb-2">24</p>
-               <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Campos Mapeados</p>
+               <p className="text-xs font-black text-blue-600 uppercase tracking-widest">Campos Mapeados</p>
             </div>
             <div className="p-8 bg-emerald-50 border border-emerald-100 rounded-3xl text-center">
                <p className="text-4xl font-black text-emerald-900 mb-2">100%</p>
-               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Canônicos Mandatórios</p>
+               <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Canônicos Mandatórios</p>
             </div>
             <div className="p-8 bg-amber-50 border border-amber-100 rounded-3xl text-center">
                <p className="text-4xl font-black text-amber-900 mb-2">8</p>
-               <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Ativos p/ Writeback</p>
+               <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Ativos p/ Writeback</p>
             </div>
             <div className="p-8 bg-slate-50 border border-slate-100 rounded-3xl text-center">
                <p className="text-4xl font-black text-slate-900 mb-2">3</p>
-               <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Fontes de Conflito</p>
+               <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Fontes de Conflito</p>
             </div>
          </div>
 
@@ -40,7 +40,7 @@ export function AccountGovernance() {
                      <div key={i} className="flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-500 transition-all shadow-sm">
                         <span className="text-xs font-black text-slate-700 uppercase">{fluxo}</span>
                         <div className="flex items-center gap-4">
-                           <span className="text-[10px] font-bold text-slate-400 uppercase">Audit Health</span>
+                           <span className="text-xs font-bold text-slate-400 uppercase">Audit Health</span>
                            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-200" />
                         </div>
                      </div>

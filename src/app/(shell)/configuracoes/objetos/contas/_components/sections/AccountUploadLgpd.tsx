@@ -31,7 +31,7 @@ export function AccountUploadLgpd() {
                        <Download className="w-5 h-5" />
                        Download Template (.CSV)
                      </button>
-                     <button className="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-xs uppercase hover:bg-slate-200 transition-all">
+                     <button className="px-6 py-4 bg-slate-100 text-slate-400 rounded-2xl font-black text-xs uppercase hover:bg-slate-200 transition-all">
                         Upload Base Preparada
                      </button>
                   </div>
@@ -46,7 +46,7 @@ export function AccountUploadLgpd() {
                <div className="grid grid-cols-2 gap-8 divide-x divide-emerald-100 items-start">
                   <div className="space-y-6 pr-8">
                      <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1 block">Base Legal Declarada</label>
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Base Legal Declarada</label>
                         <select 
                           value={baseLegal}
                           onChange={(e) => setBaseLegal(e.target.value)}
@@ -61,7 +61,7 @@ export function AccountUploadLgpd() {
                         </select>
                      </div>
                      <div className="space-y-4">
-                        <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1 block">Responsável pela Carga</label>
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Responsável pela Carga</label>
                         <input type="text" placeholder="Nome do Growth/Marketing Op" className="w-full px-4 py-3 bg-white border border-emerald-200 rounded-2xl text-xs font-black shadow-sm outline-none" />
                      </div>
                   </div>
@@ -69,14 +69,14 @@ export function AccountUploadLgpd() {
                      <div className="space-y-3">
                         <label className="flex items-center gap-3 p-4 bg-white border border-emerald-200 rounded-2xl shadow-sm cursor-pointer hover:bg-emerald-50 transition-all group">
                            <input type="checkbox" className="w-5 h-5 rounded-lg border-emerald-300 text-emerald-600" />
-                           <span className="text-[11px] font-black text-emerald-900 uppercase leading-snug">Rastreabilidade source_record_url disponível?</span>
+                           <span className="text-xs font-black text-emerald-900 uppercase leading-snug">Rastreabilidade source_record_url disponível?</span>
                         </label>
                         <label className="flex items-center gap-3 p-4 bg-white border border-emerald-200 rounded-2xl shadow-sm cursor-pointer hover:bg-emerald-50 transition-all group">
                            <input type="checkbox" className="w-5 h-5 rounded-lg border-emerald-300 text-emerald-600" />
-                           <span className="text-[11px] font-black text-emerald-900 uppercase leading-snug">Coluna de Opt-in/Consentimento presente?</span>
+                           <span className="text-xs font-black text-emerald-900 uppercase leading-snug">Coluna de Opt-in/Consentimento presente?</span>
                         </label>
                      </div>
-                     <div className="p-4 bg-white/50 border border-emerald-100 rounded-2xl italic text-[10px] font-bold text-emerald-600">
+                     <div className="p-4 bg-white/50 border border-emerald-100 rounded-2xl italic text-xs font-bold text-emerald-600">
                        &quot;Registros sem base legal comprovada serão marcados com status ‘Risk’ e bloqueados para ações de outreach automático.&quot;
                      </div>
                   </div>
@@ -97,10 +97,10 @@ export function AccountUploadLgpd() {
                   ].map((m, i) => (
                      <div key={i} className="pt-4 border-t border-slate-100 first:border-0 first:pt-0">
                         <div className="flex items-center justify-between mb-2">
-                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter italic">Coluna: {m.col}</span>
-                           <span className="text-[9px] font-bold text-blue-600 uppercase mb-1">{m.sub}</span>
+                           <span className="text-xs font-black text-slate-400 uppercase tracking-tighter italic">Coluna: {m.col}</span>
+                           <span className="text-xs font-bold text-blue-600 uppercase mb-1">{m.sub}</span>
                         </div>
-                        <div className="p-3 bg-slate-900 rounded-xl text-white font-black text-[11px] tracking-tight flex items-center justify-between">
+                        <div className="p-3 bg-slate-900 rounded-xl text-white font-black text-xs tracking-tight flex items-center justify-between">
                            <span>{m.can.toUpperCase()}</span>
                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         </div>

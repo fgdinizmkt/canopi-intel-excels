@@ -57,7 +57,7 @@ export const StakeholderRadar: React.FC<StakeholderRadarProps> = ({ contacts }) 
               </div>
               <div className="min-w-0">
                 <h3 className="font-bold text-slate-100 truncate">{contact.nome}</h3>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold truncate">{contact.cargo}</p>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold truncate">{contact.cargo}</p>
               </div>
             </div>
 
@@ -65,16 +65,16 @@ export const StakeholderRadar: React.FC<StakeholderRadarProps> = ({ contacts }) 
               <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800">
                 <div className="flex items-center gap-1.5">
                   <Building2 className="w-3 h-3 text-blue-500" />
-                  <span className="text-[11px] font-bold text-slate-300 truncate">{contact.accountName}</span>
+                  <span className="text-xs font-bold text-slate-300 truncate">{contact.accountName}</span>
                 </div>
-                <div className="text-[9px] text-slate-500 uppercase font-black tracking-widest">{contact.vertical}</div>
+                <div className="text-xs text-slate-500 uppercase font-black tracking-widest">{contact.vertical}</div>
               </div>
 
               <div className="flex flex-wrap gap-2">
                 {contact.classificacao.map(c => (
                   <span 
                     key={c} 
-                    className={`px-2 py-0.5 rounded text-[9px] uppercase font-black tracking-tighter border ${getBadgeColor(c)}`}
+                    className={`px-2 py-0.5 rounded text-xs uppercase font-black tracking-tighter border ${getBadgeColor(c)}`}
                   >
                     {c}
                   </span>
@@ -83,7 +83,7 @@ export const StakeholderRadar: React.FC<StakeholderRadarProps> = ({ contacts }) 
 
               <div className="pt-2 border-t border-slate-700/50 flex justify-between items-end">
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1.5">Relacionamento</span>
+                  <span className="text-xs text-slate-500 uppercase font-black tracking-widest mb-1.5">Relacionamento</span>
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-16 bg-slate-900 rounded-full overflow-hidden">
                       <div 
@@ -97,14 +97,14 @@ export const StakeholderRadar: React.FC<StakeholderRadarProps> = ({ contacts }) 
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1">Poder</span>
+                  <span className="text-xs text-slate-500 uppercase font-black tracking-widest mb-1">Poder</span>
                   <div className="text-sm font-black text-slate-200">{contact.influencia}/10</div>
                 </div>
               </div>
             </div>
             
             <div className="mt-4 pt-4 border-t border-slate-700/30 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-               <span className="flex items-center gap-1 text-[10px] font-black text-blue-400 uppercase tracking-widest">
+               <span className="flex items-center gap-1 text-xs font-black text-blue-400 uppercase tracking-widest">
                  Ver Perfil AI <TrendingUp className="w-3 h-3" />
                </span>
             </div>

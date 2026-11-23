@@ -62,7 +62,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string; dot: 
   emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-200', shadow: 'shadow-emerald-200/20', icon: 'text-emerald-400' },
   amber: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-700 border-amber-200', shadow: 'shadow-amber-200/20', icon: 'text-amber-400' },
   red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100', dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-700 border-red-200', shadow: 'shadow-red-200/20', icon: 'text-red-400' },
-  slate: { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400' },
+  slate: { bg: 'bg-slate-50', text: 'text-slate-400', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400' },
   purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100', dot: 'bg-purple-500', badge: 'bg-purple-500/10 text-purple-700 border-purple-200', shadow: 'shadow-purple-200/20', icon: 'text-purple-400' },
 };
 
@@ -103,7 +103,7 @@ const SourceBadge: React.FC<{ source: string }> = ({ source }) => {
   
   return (
     <div className={cx(
-      "flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[9px] font-black uppercase tracking-tighter shadow-sm",
+      "flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-xs font-black uppercase tracking-tighter shadow-sm",
       colorMap[variant].bg,
       colorMap[variant].border,
       colorMap[variant].text
@@ -184,7 +184,7 @@ export const Outbound: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-between">
                 <div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
+                   <p className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
                       <Bot className="w-3 h-3" /> Racional de Execução
                    </p>
                    <p className="text-xs text-slate-700 italic font-medium leading-relaxed">
@@ -192,22 +192,22 @@ export const Outbound: React.FC = () => {
                    </p>
                 </div>
                 <div className="mt-4 p-3 bg-white rounded-xl border border-slate-200">
-                   <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Roteamento Sugerido</p>
+                   <p className="text-xs font-black text-slate-400 uppercase mb-1">Roteamento Sugerido</p>
                    <div className="flex items-center gap-2">
                       <div className={cx("w-2 h-2 rounded-full", signal.isGlobal ? 'bg-amber-500' : 'bg-emerald-500')}></div>
-                      <span className="text-[10px] font-bold text-slate-900">{signal.isGlobal ? 'Página de AÇÕES (Interdisciplinar)' : 'Execução Local (SDR)'}</span>
+                      <span className="text-xs font-bold text-slate-900">{signal.isGlobal ? 'Página de AÇÕES (Interdisciplinar)' : 'Execução Local (SDR)'}</span>
                    </div>
                 </div>
              </div>
              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
+                <p className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
                    <Info className="w-3 h-3" /> Semântica do Play: {signal.tag}
                 </p>
                 <div className="space-y-3">
-                   <div className="flex justify-between text-[11px] pb-2 border-b border-slate-200"><span className="text-slate-500">Natureza:</span> <span className="font-bold text-slate-900">{signal.tag}</span></div>
-                   <div className="flex justify-between text-[11px] pb-2 border-b border-slate-200"><span className="text-slate-500">Conta:</span> <span className="font-bold text-slate-900">{signal.account}</span></div>
-                   <div className="flex justify-between text-[11px] pb-2 border-b border-slate-200"><span className="text-slate-500">Canal:</span> <span className="font-bold text-indigo-600">{signal.channel}</span></div>
-                   <div className="flex justify-between text-[11px] pt-1"><span className="text-slate-500">Dificuldade:</span> <span className="font-bold text-slate-700">{signal.isGlobal ? 'Alta (Multi-stakeholder)' : 'Média (SDR Tactile)'}</span></div>
+                   <div className="flex justify-between text-xs pb-2 border-b border-slate-200"><span className="text-slate-500">Natureza:</span> <span className="font-bold text-slate-900">{signal.tag}</span></div>
+                   <div className="flex justify-between text-xs pb-2 border-b border-slate-200"><span className="text-slate-500">Conta:</span> <span className="font-bold text-slate-900">{signal.account}</span></div>
+                   <div className="flex justify-between text-xs pb-2 border-b border-slate-200"><span className="text-slate-500">Canal:</span> <span className="font-bold text-indigo-600">{signal.channel}</span></div>
+                   <div className="flex justify-between text-xs pt-1"><span className="text-slate-500">Dificuldade:</span> <span className="font-bold text-slate-700">{signal.isGlobal ? 'Alta (Multi-stakeholder)' : 'Média (SDR Tactile)'}</span></div>
                 </div>
              </div>
           </div>
@@ -215,19 +215,19 @@ export const Outbound: React.FC = () => {
           <div className="flex flex-col gap-3">
              <div className="flex gap-3">
                 <button className={cx(
-                  "flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
+                  "flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
                   signal.isGlobal ? 'bg-white border-slate-200 text-slate-400 cursor-not-allowed opacity-50' : 'bg-slate-900 border-slate-900 text-white hover:bg-black'
                 )}>
                    <Zap className="w-4 h-4" /> Executar Local (Outbound)
                 </button>
                 <button className={cx(
-                  "flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
+                  "flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2",
                   signal.isGlobal ? 'bg-amber-600 border-amber-600 text-white hover:bg-amber-700' : 'bg-white border-slate-100 text-slate-900 hover:bg-slate-50'
                 )}>
                    <ExternalLink className="w-4 h-4" /> Enviar para Ações
                 </button>
              </div>
-             <p className="text-[9px] text-center text-slate-400 font-medium px-8 italic">
+             <p className="text-xs text-center text-slate-400 font-medium px-8 italic">
                 {signal.isGlobal ? '* Este item foi roteado para Global pois exige alinhamento entre SDR, Executivo e Operações.' : '* Item de execução autônoma permitida conforme limites de alçada SDR.'}
              </p>
           </div>
@@ -252,7 +252,7 @@ export const Outbound: React.FC = () => {
             </div>
             <div className="pt-4 flex gap-3">
                <button className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold shadow-lg shadow-slate-900/10">Ver no CRM</button>
-               <button className="flex-1 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50">Explorar Sinais</button>
+               <button className="flex-1 py-3 bg-white border border-slate-200 text-slate-400 rounded-xl text-xs font-bold hover:bg-slate-50">Explorar Sinais</button>
             </div>
          </div>
       )
@@ -268,7 +268,7 @@ export const Outbound: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
-             <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest tracking-[0.2em]">Fluxo Tático Operacional</span>
+             <span className="text-xs font-bold text-blue-600 uppercase tracking-widest tracking-[0.2em]">Fluxo Tático Operacional</span>
           </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Outbound Intelligence</h1>
         </div>
@@ -315,10 +315,10 @@ export const Outbound: React.FC = () => {
               </div>
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest tracking-[0.1em]">{kpi.label}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest tracking-[0.1em]">{kpi.label}</p>
             <div className="flex items-baseline gap-2 mt-1">
                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{kpi.val}</h3>
-               <span className="text-[10px] font-bold text-slate-500">{kpi.detail}</span>
+               <span className="text-xs font-bold text-slate-500">{kpi.detail}</span>
             </div>
           </div>
         ))}
@@ -328,12 +328,12 @@ export const Outbound: React.FC = () => {
         <>
           {/* FASE 2: Glossário Tático Rápido */}
           <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-wrap gap-6 items-center">
-             <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest"><Layers className="w-4 h-4" /> Semântica do Dia:</div>
+             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest"><Layers className="w-4 h-4" /> Semântica do Dia:</div>
              <div className="flex gap-4">
-                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div> <span className="text-[10px] font-black text-slate-600">ABM: <span className="text-slate-400 font-medium">Conta Única</span></span></div>
-                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div> <span className="text-[10px] font-black text-slate-600">ABX: <span className="text-slate-400 font-medium">Cluster & Intent</span></span></div>
-                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> <span className="text-[10px] font-black text-slate-600">Growth: <span className="text-slate-400 font-medium">Volume & Taxa</span></span></div>
-                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div> <span className="text-[10px] font-black text-slate-600">Híbrido: <span className="text-slate-400 font-medium">Nexus + Minerva</span></span></div>
+                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div> <span className="text-xs font-black text-slate-400">ABM: <span className="text-slate-400 font-medium">Conta Única</span></span></div>
+                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div> <span className="text-xs font-black text-slate-400">ABX: <span className="text-slate-400 font-medium">Cluster & Intent</span></span></div>
+                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> <span className="text-xs font-black text-slate-400">Growth: <span className="text-slate-400 font-medium">Volume & Taxa</span></span></div>
+                <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div> <span className="text-xs font-black text-slate-400">Híbrido: <span className="text-slate-400 font-medium">Nexus + Minerva</span></span></div>
              </div>
           </div>
 
@@ -349,7 +349,7 @@ export const Outbound: React.FC = () => {
                         <SourceBadge source={signal.source} />
                         <div className="flex gap-1.5">
                            <Badge variant={signal.severity === 'crítico' ? 'red' : 'blue'}>{signal.tag}</Badge>
-                           {signal.isGlobal && <Badge variant="amber" className="text-[8px]">GLOBAL ATIVO</Badge>}
+                           {signal.isGlobal && <Badge variant="amber" className="text-xs">GLOBAL ATIVO</Badge>}
                         </div>
                      </div>
                   </div>
@@ -357,21 +357,21 @@ export const Outbound: React.FC = () => {
                   <div className="mt-2">
                     <h4 className="text-sm font-bold text-slate-900 leading-tight mb-2 group-hover:text-blue-700 transition-colors uppercase tracking-tight">{signal.title}</h4>
                     <div className="flex items-center gap-2 mb-3">
-                       <span className="text-[10px] font-bold text-slate-400 uppercase">Ação Sugerida:</span>
-                       <span className="text-[10px] font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full tracking-tighter truncate max-w-[150px]">{signal.mainAction.toUpperCase()}</span>
+                       <span className="text-xs font-bold text-slate-400 uppercase">Ação Sugerida:</span>
+                       <span className="text-xs font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full tracking-tighter truncate max-w-[150px]">{signal.mainAction.toUpperCase()}</span>
                     </div>
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
                      <div className="flex items-center gap-2 cursor-pointer group/item" onClick={() => openAccount(getAccountIdByName(signal.account))}>
-                        <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-[10px] font-black shadow-lg">
+                        <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs font-black shadow-lg">
                            {signal.account.substring(0, 2).toUpperCase()}
                         </div>
-                        <span className="text-[10px] font-extrabold text-slate-700 tracking-tighter hover:text-blue-600 transition-colors truncate max-w-[80px]">{signal.account}</span>
+                        <span className="text-xs font-extrabold text-slate-700 tracking-tighter hover:text-blue-600 transition-colors truncate max-w-[80px]">{signal.account}</span>
                         <ArrowUpRight className="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/item:opacity-100 transition-all" />
                      </div>
                      <button onClick={() => openPlaybookDrawer(signal)} className={cx(
-                       "text-[10px] font-black px-4 py-2 rounded-xl transition-all flex items-center gap-2 shadow-sm",
+                       "text-xs font-black px-4 py-2 rounded-xl transition-all flex items-center gap-2 shadow-sm",
                        signal.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-slate-900 text-white hover:bg-black'
                      )}>
                         {signal.isGlobal ? 'Escalar para Ações' : 'Executar Playbook'} <ArrowRight className="w-3 h-3" />
@@ -386,7 +386,7 @@ export const Outbound: React.FC = () => {
              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
                 <div>
                    <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">Fila de Intervenção Tática</h3>
-                   <p className="text-xs text-slate-500 font-medium mt-0.5 tracking-tight uppercase tracking-widest text-[9px]">Priorização Automática • Alçadas SDR & Global</p>
+                   <p className="text-xs text-slate-500 font-medium mt-0.5 tracking-tight uppercase tracking-widest text-xs">Priorização Automática • Alçadas SDR & Global</p>
                 </div>
                 <div className="flex items-center gap-3">
                    <div className="relative group">
@@ -397,7 +397,7 @@ export const Outbound: React.FC = () => {
                       />
                       <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                    </div>
-                   <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+                   <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-400 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
                       <Filter className="w-4 h-4" /> Filtros
                    </button>
                 </div>
@@ -409,7 +409,7 @@ export const Outbound: React.FC = () => {
                     
                     {/* Conta e Contato (Costura Arquitetural) */}
                     <div className="w-full lg:w-72 flex items-center gap-4">
-                       <div className="w-12 h-12 rounded-[18px] bg-slate-50 border border-slate-100 text-[11px] font-black text-slate-400 flex items-center justify-center shadow-inner group-hover:bg-white group-hover:border-blue-200 group-hover:text-blue-600 transition-all cursor-pointer" onClick={() => openAccount(getAccountIdByName(item.account))} title="Ver visão da empresa">
+                       <div className="w-12 h-12 rounded-[18px] bg-slate-50 border border-slate-100 text-xs font-black text-slate-400 flex items-center justify-center shadow-inner group-hover:bg-white group-hover:border-blue-200 group-hover:text-blue-600 transition-all cursor-pointer" onClick={() => openAccount(getAccountIdByName(item.account))} title="Ver visão da empresa">
                           {item.id.split('-')[1]}
                        </div>
                        <div className="flex-1 min-w-0">
@@ -417,7 +417,7 @@ export const Outbound: React.FC = () => {
                           <div className="flex items-center gap-2 mt-1">
                              <div className="flex items-center gap-1 cursor-pointer group/contact" onClick={() => openEntityModal('contact', item.owner)} title="Ver perfil do contato">
                                 <User className="w-3 h-3 text-slate-400 group-hover/contact:text-blue-500 transition-colors" />
-                                <span className="text-[10px] font-bold text-slate-500 group-hover/contact:text-slate-900 group-hover/contact:underline transition-all">{item.owner}</span>
+                                <span className="text-xs font-bold text-slate-500 group-hover/contact:text-slate-900 group-hover/contact:underline transition-all">{item.owner}</span>
                              </div>
                              <SourceBadge source={item.source} />
                           </div>
@@ -427,9 +427,9 @@ export const Outbound: React.FC = () => {
                     {/* Gatilho e Natureza */}
                     <div className="flex-1 px-4 lg:border-l border-slate-100 space-y-1 cursor-pointer" onClick={() => openPlaybookDrawer(item)}>
                        <div className="flex flex-wrap gap-2 mb-1.5">
-                          <Badge variant="slate" className="text-[8px] h-4 bg-slate-900 text-white border-none">{item.tag}</Badge>
-                          <Badge variant="blue" className="text-[8px] h-4 uppercase">{item.objective}</Badge>
-                          {item.isGlobal && <Badge variant="amber" className="text-[8px] px-1.5 h-4">ACTIONS QUEUE</Badge>}
+                          <Badge variant="slate" className="text-xs h-4 bg-slate-900 text-white border-none">{item.tag}</Badge>
+                          <Badge variant="blue" className="text-xs h-4 uppercase">{item.objective}</Badge>
+                          {item.isGlobal && <Badge variant="amber" className="text-xs px-1.5 h-4">ACTIONS QUEUE</Badge>}
                        </div>
                        <p className="text-sm font-bold text-slate-800 leading-snug group-hover:text-blue-900 transition-colors">
                           {item.title}
@@ -438,7 +438,7 @@ export const Outbound: React.FC = () => {
 
                     {/* Canal e Meta-dados */}
                     <div className="w-full lg:w-40 px-4 lg:border-l border-slate-100">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Canal Sugerido</p>
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Canal Sugerido</p>
                         <div className="flex items-center gap-2 text-xs font-black text-slate-700">
                            {item.channel.toLowerCase().includes('email') && <Mail className="w-3.5 h-3.5 text-purple-500" />}
                            {item.channel.toLowerCase().includes('linkedin') && <Linkedin className="w-3.5 h-3.5 text-blue-500" />}
@@ -451,7 +451,7 @@ export const Outbound: React.FC = () => {
                     {/* CTAs Finalizada (Costura Semântica) */}
                     <div className="flex items-center gap-3 ml-auto shrink-0 pt-4 lg:pt-0 border-t lg:border-none border-slate-50">
                        <button onClick={() => openPlaybookDrawer(item)} className={cx(
-                         "h-11 px-6 rounded-[16px] text-[10px] font-black uppercase tracking-[0.05em] transition-all shadow-xl flex items-center gap-2",
+                         "h-11 px-6 rounded-[16px] text-xs font-black uppercase tracking-[0.05em] transition-all shadow-xl flex items-center gap-2",
                          item.isGlobal ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-amber-600/10' : 'bg-slate-900 text-white hover:bg-black shadow-slate-900/10'
                        )}>
                           {item.isGlobal ? 'Escalar para Ações' : 'Executar Playbook'} <ArrowRight className="w-4 h-4" />
@@ -483,11 +483,11 @@ export const Outbound: React.FC = () => {
                     <div>
                        <div className="flex items-center gap-2 mb-1">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
-                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em]">Benchmarks de Operação</span>
+                          <span className="text-xs font-black text-blue-600 uppercase tracking-[0.2em]">Benchmarks de Operação</span>
                        </div>
                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">ICPs & Verticais Prioritárias</h3>
                     </div>
-                    <Badge variant="blue" className="px-4 py-2 text-[10px] font-black uppercase">MÉDIA GERAL: 11.2%</Badge>
+                    <Badge variant="blue" className="px-4 py-2 text-xs font-black uppercase">MÉDIA GERAL: 11.2%</Badge>
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
@@ -504,13 +504,13 @@ export const Outbound: React.FC = () => {
                              </div>
                              <div>
                                 <p className="text-[15px] font-black text-slate-900 leading-tight">{v.vertical}</p>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{v.focus}</p>
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">{v.focus}</p>
                              </div>
                           </div>
                           <div className="text-right">
                              <p className="text-[16px] font-black text-slate-900 tracking-tight">{v.benchmark}</p>
                              <div className={cx(
-                               "flex items-center justify-end gap-1 text-[9px] font-black uppercase mt-0.5",
+                               "flex items-center justify-end gap-1 text-xs font-black uppercase mt-0.5",
                                v.trend === 'up' ? 'text-emerald-600' : v.trend === 'down' ? 'text-rose-600' : 'text-slate-400'
                              )}>
                                 {v.trend === 'up' ? <TrendingUp className="w-2.5 h-2.5" /> : v.trend === 'down' ? <Activity className="w-2.5 h-2.5" /> : null}
@@ -530,7 +530,7 @@ export const Outbound: React.FC = () => {
                     <div>
                        <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Share de Conversão</span>
+                          <span className="text-xs font-black text-blue-400 uppercase tracking-widest">Share de Conversão</span>
                        </div>
                        <h3 className="text-xl font-bold">Mix de Canais por Persona</h3>
                     </div>
@@ -550,8 +550,8 @@ export const Outbound: React.FC = () => {
                                  <div className={cx("h-full rounded-full transition-all duration-1000", colorMap[p.variant]?.dot, colorMap[p.variant]?.shadow)} style={{ width: `${p.pct}%` } as React.CSSProperties}></div>
                               </div>
                               <div className="flex items-center gap-1.5 opacity-60">
-                                 <span className="text-[9px] font-bold uppercase text-slate-400">Canal Vencedor:</span>
-                                 <span className="text-[9px] font-black text-slate-300">{p.channel}</span>
+                                 <span className="text-xs font-bold uppercase text-slate-400">Canal Vencedor:</span>
+                                 <span className="text-xs font-black text-slate-300">{p.channel}</span>
                               </div>
                            </div>
                         ))}
@@ -559,7 +559,7 @@ export const Outbound: React.FC = () => {
 
                     <div className="pt-6 border-t border-white/5 flex items-center gap-3">
                        <Bot className="w-4 h-4 text-blue-500" />
-                       <p className="text-[9px] text-slate-500 leading-relaxed font-bold uppercase tracking-tight">Derived by Minerva Engine • Updated 2h ago</p>
+                       <p className="text-xs text-slate-500 leading-relaxed font-bold uppercase tracking-tight">Derived by Minerva Engine • Updated 2h ago</p>
                     </div>
                  </div>
               </div>
@@ -590,7 +590,7 @@ export const Outbound: React.FC = () => {
                        </div>
                        
                        <div className="flex items-center gap-2 mb-4">
-                          <Badge variant="blue" className="bg-blue-50 text-blue-700 border-none font-black px-3 py-1 text-[9px]">{p.vertical}</Badge>
+                          <Badge variant="blue" className="bg-blue-50 text-blue-700 border-none font-black px-3 py-1 text-xs">{p.vertical}</Badge>
                        </div>
                        
                        <h4 className="text-xl font-black text-slate-900 group-hover:text-blue-700 transition-colors tracking-tight">{p.title}</h4>
@@ -599,25 +599,25 @@ export const Outbound: React.FC = () => {
                           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 group-hover:bg-blue-50/20 group-hover:border-blue-100 transition-all">
                              <div className="flex items-center gap-2 mb-2">
                                 <AlertTriangle className="w-3.5 h-3.5 text-blue-600" />
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Ponto de Dor</p>
+                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Ponto de Dor</p>
                              </div>
-                             <p className="text-xs text-slate-600 leading-relaxed font-bold italic tracking-tight underline decoration-blue-100 decoration-4 underline-offset-4">{p.pain}</p>
+                             <p className="text-xs text-slate-400 leading-relaxed font-bold italic tracking-tight underline decoration-blue-100 decoration-4 underline-offset-4">{p.pain}</p>
                           </div>
                           
                           <div className="grid grid-cols-2 gap-4">
                              <div className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col items-center text-center shadow-sm">
-                                <span className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Melhor Canal</span>
-                                <span className="text-[11px] font-black text-slate-900 leading-tight">{p.channel}</span>
+                                <span className="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Melhor Canal</span>
+                                <span className="text-xs font-black text-slate-900 leading-tight">{p.channel}</span>
                              </div>
                              <div className="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col items-center text-center shadow-sm">
-                                <span className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest">Benchmark</span>
+                                <span className="text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Benchmark</span>
                                 <span className="text-[14px] font-black text-emerald-600 tracking-tight">{p.benchmark}</span>
                              </div>
                           </div>
 
                           <div className="flex items-center justify-between pt-6 mt-auto border-t border-slate-50">
-                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tactical Play</span>
-                             <span className="text-[11px] font-black text-slate-900 flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-xl">
+                             <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Tactical Play</span>
+                             <span className="text-xs font-black text-slate-900 flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-xl">
                                 <Bot className="w-3.5 h-3.5 text-blue-600" /> {p.play}
                              </span>
                           </div>

@@ -78,7 +78,7 @@ export const Settings: React.FC = () => {
 
           <div className="mt-6 p-4 bg-blue-50 rounded-2xl border border-blue-200">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Completude do Setup</span>
+              <span className="text-xs font-black text-blue-600 uppercase tracking-widest">Completude do Setup</span>
               <span className="text-lg font-black text-blue-700">{completionPercent}%</span>
             </div>
             <div className="w-full bg-blue-200 rounded-full h-2">
@@ -87,17 +87,17 @@ export const Settings: React.FC = () => {
                 style={{ width: `${completionPercent}%` }}
               ></div>
             </div>
-            <div className="flex gap-4 mt-4 text-[9px]">
+            <div className="flex gap-4 mt-4 text-xs">
               <div>
-                <span className="font-black text-slate-600">Configurado: </span>
+                <span className="font-black text-slate-400">Configurado: </span>
                 <span className="font-black text-emerald-600">{setupMetrics.configuredBlocks}</span>
               </div>
               <div>
-                <span className="font-black text-slate-600">Pendente: </span>
+                <span className="font-black text-slate-400">Pendente: </span>
                 <span className="font-black text-amber-600">{setupMetrics.pendingBlocks}</span>
               </div>
               <div>
-                <span className="font-black text-slate-600">Crítico: </span>
+                <span className="font-black text-slate-400">Crítico: </span>
                 <span className="font-black text-red-600">{setupMetrics.criticalBlocks}</span>
               </div>
             </div>
@@ -116,7 +116,7 @@ export const Settings: React.FC = () => {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
                   isActive
                     ? 'bg-blue-50 border border-blue-200 text-blue-700'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    : 'text-slate-400 hover:bg-slate-50'
                 }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -162,7 +162,7 @@ const OverviewSection: React.FC<{ setupMetrics: any; runtimeState: any }> = ({ s
             { label: 'Saúde Geral', val: 'Boa', color: 'bg-emerald-500/30' },
           ].map((stat, i) => (
             <div key={i} className={`${stat.color} rounded-xl p-4 backdrop-blur-sm`}>
-              <p className="text-[10px] font-bold text-blue-100 uppercase mb-1">{stat.label}</p>
+              <p className="text-xs font-bold text-blue-100 uppercase mb-1">{stat.label}</p>
               <p className="text-2xl font-black">{stat.val}</p>
             </div>
           ))}
@@ -224,7 +224,7 @@ const OverviewSection: React.FC<{ setupMetrics: any; runtimeState: any }> = ({ s
           { label: 'Última Sincronização', val: 'há 2 minutos', ok: true },
         ].map((item, i) => (
           <div key={i} className="p-4 border border-slate-200 rounded-2xl">
-            <p className="text-[10px] font-black text-slate-500 uppercase mb-2">{item.label}</p>
+            <p className="text-xs font-black text-slate-500 uppercase mb-2">{item.label}</p>
             <div className="flex items-center gap-2">
               <p className="text-lg font-black text-slate-900">{item.val}</p>
               {item.ok ? <Check className="w-5 h-5 text-emerald-600" /> : <AlertCircle className="w-5 h-5 text-amber-600" />}
@@ -241,7 +241,7 @@ const IntegrationSection: React.FC<{ runtimeState: any }> = ({ runtimeState }) =
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Integrações & Fontes de Dados</h2>
-      <p className="text-slate-600">Gerencie conexões com sistemas externos, sincronizações e cobertura de dados.</p>
+      <p className="text-slate-400">Gerencie conexões com sistemas externos, sincronizações e cobertura de dados.</p>
     </div>
 
     <ConfigTable
@@ -253,7 +253,7 @@ const IntegrationSection: React.FC<{ runtimeState: any }> = ({ runtimeState }) =
         // eslint-disable-next-line react/jsx-key
         ['Google Ads', <Badge className="bg-blue-100 text-blue-700">Sincronizando</Badge>, 'há 5 min', '95%', <ChevronRight className="w-4 h-4 text-slate-400" />],
         // eslint-disable-next-line react/jsx-key
-        ['HubSpot', <Badge className="bg-slate-100 text-slate-600">Desconectado</Badge>, 'nunca', '0%', <Plus className="w-4 h-4 text-blue-600" />],
+        ['HubSpot', <Badge className="bg-slate-100 text-slate-400">Desconectado</Badge>, 'nunca', '0%', <Plus className="w-4 h-4 text-blue-600" />],
         // eslint-disable-next-line react/jsx-key
         ['LinkedIn', <Badge className="bg-amber-100 text-amber-700">Parcial</Badge>, 'há 1h', '60%', <ChevronRight className="w-4 h-4 text-slate-400" />],
       ]}
@@ -277,7 +277,7 @@ const MappingsSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Mapeamentos & Taxonomia</h2>
-      <p className="text-slate-600">Configure estruturas de dados, classificações e relacionamentos.</p>
+      <p className="text-slate-400">Configure estruturas de dados, classificações e relacionamentos.</p>
     </div>
 
     {[
@@ -302,7 +302,7 @@ const ScoringSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Scoring & Percentuais</h2>
-      <p className="text-slate-600">Configure modelos de pontuação, probabilidades e thresholds.</p>
+      <p className="text-slate-400">Configure modelos de pontuação, probabilidades e thresholds.</p>
     </div>
 
     <ConfigTable
@@ -371,7 +371,7 @@ const SignalsSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Sinais & Alertas</h2>
-      <p className="text-slate-600">Configure regras de geração de sinais, severidade e critérios de ativação.</p>
+      <p className="text-slate-400">Configure regras de geração de sinais, severidade e critérios de ativação.</p>
     </div>
 
     <ConfigTable
@@ -412,7 +412,7 @@ const ActionsSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Ações & Plays</h2>
-      <p className="text-slate-600">Configure tipos de ações, quick actions, regras de recomendação e plays.</p>
+      <p className="text-slate-400">Configure tipos de ações, quick actions, regras de recomendação e plays.</p>
     </div>
 
     <ConfigTable
@@ -459,7 +459,7 @@ const AssistantSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Assistente & IA</h2>
-      <p className="text-slate-600">Configure comportamento, autonomia, instruções de tone e uso de fontes.</p>
+      <p className="text-slate-400">Configure comportamento, autonomia, instruções de tone e uso de fontes.</p>
     </div>
 
     <div className="grid grid-cols-2 gap-6">
@@ -483,7 +483,7 @@ const AssistantSection: React.FC = () => (
       <Card className="p-6 rounded-3xl">
         <h4 className="font-black text-slate-900 mb-4">Instruções do Sistema</h4>
         <textarea
-          className="w-full h-40 p-3 border border-slate-200 rounded-xl text-xs font-mono text-slate-600 resize-none"
+          className="w-full h-40 p-3 border border-slate-200 rounded-xl text-xs font-mono text-slate-400 resize-none"
           defaultValue="Você é um assistente de inteligência comercial estratégica. Priorize clareza e ação. Cite fontes de dados com confiança percentual."
           readOnly
         />
@@ -508,7 +508,7 @@ const GovernanceSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Governança & Políticas</h2>
-      <p className="text-slate-600">Configure roles, permissões, notificações e preferências de workspace.</p>
+      <p className="text-slate-400">Configure roles, permissões, notificações e preferências de workspace.</p>
     </div>
 
     <ConfigTable
@@ -569,7 +569,7 @@ const ABMAbxSection: React.FC = () => (
   <div className="space-y-8 animate-in fade-in">
     <div>
       <h2 className="text-3xl font-black text-slate-900 mb-2">Configuração ABM / ABX</h2>
-      <p className="text-slate-600">Configure tiers de conta, readiness, classified stakeholders e critérios de exchange.</p>
+      <p className="text-slate-400">Configure tiers de conta, readiness, classified stakeholders e critérios de exchange.</p>
     </div>
 
     <ConfigTable
@@ -602,7 +602,7 @@ const ABMAbxSection: React.FC = () => (
                 <span className="font-medium text-slate-700 text-sm">{c.crit}</span>
                 <span className="font-black text-slate-900 text-sm">{c.weight}</span>
               </div>
-              <p className="text-xs text-slate-600">{c.threshold}</p>
+              <p className="text-xs text-slate-400">{c.threshold}</p>
             </div>
           ))}
         </div>

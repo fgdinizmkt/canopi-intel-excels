@@ -470,7 +470,7 @@ function assessEligibility(
 
 const DRY_RUN_STATUS_STYLES: Record<DryRunRecordStatus, { badge: string; label: string }> = {
   valid: { badge: 'bg-emerald-100 text-emerald-800', label: 'Válido' },
-  missing: { badge: 'bg-slate-100 text-slate-600', label: 'Ausente' },
+  missing: { badge: 'bg-slate-100 text-slate-400', label: 'Ausente' },
   'permission-error': { badge: 'bg-red-100 text-red-700', label: 'Sem permissão' },
   'other-error': { badge: 'bg-amber-100 text-amber-700', label: 'Erro' },
 };
@@ -494,13 +494,13 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
           <p className="text-sm font-black text-slate-900">Resultado do dry-run read-only</p>
         </div>
         <div className="flex flex-col items-end gap-0.5">
-          <p className="text-[10px] font-medium text-slate-400">
+          <p className="text-xs font-medium text-slate-400">
             {formatDate(result.dryRunAt)} · {result.executionTimeMs}ms
           </p>
         </div>
       </div>
 
-      <p className="mt-1 text-xs font-medium text-slate-600">
+      <p className="mt-1 text-xs font-medium text-slate-400">
         Esta validação consultou o Salesforce em modo somente leitura.
         Nenhum registro foi importado, salvo ou sincronizado.
         O resultado indica quais registros parecem aptos para uma futura etapa de sync.
@@ -510,35 +510,35 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <div className="rounded-xl bg-slate-50 px-3 py-2 text-center">
           <p className="text-lg font-black text-slate-900">{result.summary.totalChecked}</p>
-          <p className="text-[10px] font-medium text-slate-500">verificados</p>
+          <p className="text-xs font-medium text-slate-500">verificados</p>
         </div>
         <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center">
           <p className="text-lg font-black text-emerald-800">{result.summary.totalValid}</p>
-          <p className="text-[10px] font-medium text-emerald-600">aptos para sync</p>
+          <p className="text-xs font-medium text-emerald-600">aptos para sync</p>
         </div>
         {result.summary.totalMissing > 0 && (
           <div className="rounded-xl bg-slate-100 px-3 py-2 text-center">
             <p className="text-lg font-black text-slate-700">{result.summary.totalMissing}</p>
-            <p className="text-[10px] font-medium text-slate-500">ausentes</p>
+            <p className="text-xs font-medium text-slate-500">ausentes</p>
           </div>
         )}
         {result.summary.totalPermissionError > 0 && (
           <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
             <p className="text-lg font-black text-red-800">{result.summary.totalPermissionError}</p>
-            <p className="text-[10px] font-medium text-red-600">sem permissão</p>
+            <p className="text-xs font-medium text-red-600">sem permissão</p>
           </div>
         )}
         {result.summary.totalOtherError > 0 && (
           <div className="rounded-xl bg-amber-50 px-3 py-2 text-center">
             <p className="text-lg font-black text-amber-800">{result.summary.totalOtherError}</p>
-            <p className="text-[10px] font-medium text-amber-600">outros erros</p>
+            <p className="text-xs font-medium text-amber-600">outros erros</p>
           </div>
         )}
       </div>
 
       {/* Estimated can sync */}
       <div className="mt-2 rounded-xl bg-blue-50 px-3 py-2 text-center">
-        <p className="text-[10px] font-medium text-blue-700">
+        <p className="text-xs font-medium text-blue-700">
           Estimativa de registros aptos para sync:{' '}
           <span className="font-black">{result.summary.estimatedRecordsCanSync}</span>
           {result.summary.estimatedRecordsWillFail > 0 && (
@@ -549,31 +549,31 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
 
       {/* Per-entity breakdown */}
       <div className="mt-4 space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
         {result.results.map((entity) => (
           <div key={entity.objectApiName} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-black text-slate-800">{entity.objectApiName}</span>
-              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-400">
                 {entity.selectedCount} verificados
               </span>
               {entity.validCount > 0 && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-800">
                   {entity.validCount} aptos
                 </span>
               )}
               {entity.missingCount > 0 && (
-                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-400">
                   {entity.missingCount} ausentes
                 </span>
               )}
               {entity.permissionErrorCount > 0 && (
-                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700">
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-black text-red-700">
                   {entity.permissionErrorCount} sem permissão
                 </span>
               )}
               {entity.otherErrorCount > 0 && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-700">
                   {entity.otherErrorCount} erros
                 </span>
               )}
@@ -585,7 +585,7 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
                 return (
                   <li
                     key={rec.id}
-                    className="flex flex-wrap items-center gap-1.5 rounded-lg px-2 py-1 text-[10px]"
+                    className="flex flex-wrap items-center gap-1.5 rounded-lg px-2 py-1 text-xs"
                   >
                     <span className={`shrink-0 rounded-full px-1.5 py-0.5 font-black uppercase tracking-wider ${styles.badge}`}>
                       {styles.label}
@@ -604,8 +604,8 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
 
       {/* Save sync contract */}
       <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Salvar intenção de sync</p>
-        <p className="mt-1 text-[10px] font-medium text-slate-600">
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Salvar intenção de sync</p>
+        <p className="mt-1 text-xs font-medium text-slate-400">
           Este passo salva a intenção de sync para revisão futura.
           Nenhum registro é importado, atualizado ou sincronizado.
           O status <span className="font-black text-slate-700">pending</span> indica que o contrato aguarda
@@ -628,7 +628,7 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
               {isSaving ? 'Salvando...' : 'Salvar contrato para sync'}
             </button>
             {!canSave && (
-              <p className="text-[10px] font-medium text-slate-400">
+              <p className="text-xs font-medium text-slate-400">
                 Disponível apenas quando há registros aptos para sync.
               </p>
             )}
@@ -645,21 +645,21 @@ function DryRunPanel({ result, syncContractState, onSaveSyncContract }: DryRunPa
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />
               <p className="text-xs font-black text-emerald-800">Contrato salvo com sucesso</p>
             </div>
-            <p className="mt-1 text-[10px] font-medium text-emerald-700">
+            <p className="mt-1 text-xs font-medium text-emerald-700">
               ID: <span className="font-black">{syncContractState.contractId}</span>
             </p>
-            <p className="text-[10px] font-medium text-emerald-700">
+            <p className="text-xs font-medium text-emerald-700">
               Status: <span className="font-black">pending</span> ·{' '}
               {syncContractState.estimatedRecordsCanSync} registro{syncContractState.estimatedRecordsCanSync !== 1 ? 's' : ''} aptos registrados
             </p>
-            <p className="mt-1 text-[10px] font-medium text-emerald-600">
+            <p className="mt-1 text-xs font-medium text-emerald-600">
               Nenhum registro foi sincronizado. O contrato aguarda mapeamento canônico para qualquer gravação futura.
             </p>
           </div>
         )}
       </div>
 
-      <p className="mt-3 text-[10px] font-medium text-slate-400">
+      <p className="mt-3 text-xs font-medium text-slate-400">
         Limites desta etapa: nenhum dado foi alterado, importado, sincronizado ou gravado nas tabelas canônicas.
       </p>
     </div>
@@ -684,10 +684,10 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
           <ClipboardList className="h-4 w-4 shrink-0 text-slate-800" />
           <p className="text-sm font-black text-slate-900">Contrato local multi-entidade</p>
         </div>
-        <p className="text-[10px] font-medium text-slate-400">Gerado em {formatDate(contract.createdAt)}</p>
+        <p className="text-xs font-medium text-slate-400">Gerado em {formatDate(contract.createdAt)}</p>
       </div>
 
-      <p className="mt-1 text-xs font-medium text-slate-600">
+      <p className="mt-1 text-xs font-medium text-slate-400">
         Este contrato organiza a seleção desta sessão para uma futura simulação de sync read-only.
         Nada é salvo, importado ou sincronizado.
         A validação final ainda acontecerá em um dry-run posterior.
@@ -697,7 +697,7 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
         <button
           type="button"
           onClick={onGenerateContract}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-2.5 py-1.5 text-[10px] font-black text-white transition-colors hover:bg-slate-900"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-black text-white transition-colors hover:bg-slate-900"
         >
           <ClipboardList className="h-3 w-3" />
           Atualizar contrato
@@ -706,7 +706,7 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
           type="button"
           onClick={onDryRun}
           disabled={dryRunLoading || contract.summary.estimatedRecordsToProcess === 0}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-2.5 py-1.5 text-[10px] font-black text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-700 px-2.5 py-1.5 text-xs font-black text-white transition-colors hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {dryRunLoading && <Loader2 className="h-3 w-3 animate-spin" />}
           {dryRunLoading ? 'Validando...' : 'Executar dry-run read-only'}
@@ -714,7 +714,7 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
       </div>
 
       {contract.summary.estimatedRecordsToProcess === 0 && (
-        <p className="mt-2 text-[10px] font-medium text-slate-500">
+        <p className="mt-2 text-xs font-medium text-slate-500">
           Nenhum registro apto no contrato — selecione registros válidos ou com alertas.
         </p>
       )}
@@ -723,46 +723,46 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl bg-slate-50 px-3 py-2 text-center">
           <p className="text-lg font-black text-slate-900">{contract.summary.totalSelected}</p>
-          <p className="text-[10px] font-medium text-slate-500">selecionados</p>
+          <p className="text-xs font-medium text-slate-500">selecionados</p>
         </div>
         <div className="rounded-xl bg-emerald-50 px-3 py-2 text-center">
           <p className="text-lg font-black text-emerald-800">{contract.summary.totalValid}</p>
-          <p className="text-[10px] font-medium text-emerald-600">válidos</p>
+          <p className="text-xs font-medium text-emerald-600">válidos</p>
         </div>
         {contract.summary.totalAlert > 0 && (
           <div className="rounded-xl bg-amber-50 px-3 py-2 text-center">
             <p className="text-lg font-black text-amber-800">{contract.summary.totalAlert}</p>
-            <p className="text-[10px] font-medium text-amber-600">com alertas</p>
+            <p className="text-xs font-medium text-amber-600">com alertas</p>
           </div>
         )}
         {contract.summary.totalBlocked > 0 && (
           <div className="rounded-xl bg-red-50 px-3 py-2 text-center">
             <p className="text-lg font-black text-red-800">{contract.summary.totalBlocked}</p>
-            <p className="text-[10px] font-medium text-red-600">bloqueados</p>
+            <p className="text-xs font-medium text-red-600">bloqueados</p>
           </div>
         )}
       </div>
 
       <div className="mt-2 rounded-xl bg-slate-50 px-3 py-2 text-center">
-        <p className="text-[10px] font-medium text-slate-500">
+        <p className="text-xs font-medium text-slate-500">
           Estimativa de registros processáveis:{' '}
           <span className="font-black text-slate-800">{contract.summary.estimatedRecordsToProcess}</span>
         </p>
       </div>
 
       {/* Scope metadata */}
-      <div className="mt-4 flex flex-wrap gap-2 text-[10px]">
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+      <div className="mt-4 flex flex-wrap gap-2 text-xs">
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-400">
           Fonte: Salesforce OAuth
         </span>
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-400">
           Modo: contrato local
         </span>
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-400">
           {contract.entitiesInScope.length} entidade{contract.entitiesInScope.length !== 1 ? 's' : ''} em escopo
         </span>
         {contract.referenceSamples.accountIds.length > 0 && (
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
+          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-400">
             {contract.referenceSamples.accountIds.length} Account{contract.referenceSamples.accountIds.length !== 1 ? 's' : ''} na amostra
           </span>
         )}
@@ -770,26 +770,26 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
 
       {/* Per-entity breakdown */}
       <div className="mt-4 space-y-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Detalhamento por entidade</p>
         {contract.entities.map((entity) => (
           <div key={entity.objectApiName} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-black text-slate-800">{entity.objectApiName}</span>
-              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-400">
                 {entity.selectedCount} selecionados
               </span>
               {entity.validCount > 0 && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-800">
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-800">
                   {entity.validCount} válidos
                 </span>
               )}
               {entity.alertCount > 0 && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-700">
                   {entity.alertCount} com alertas
                 </span>
               )}
               {entity.blockedCount > 0 && (
-                <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black text-red-700">
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-black text-red-700">
                   {entity.blockedCount} bloqueados
                 </span>
               )}
@@ -802,7 +802,7 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
                 return (
                   <li
                     key={rec.id}
-                    className={`flex flex-wrap items-start gap-1.5 rounded-lg px-2 py-1 text-[10px] ${styles.row}`}
+                    className={`flex flex-wrap items-start gap-1.5 rounded-lg px-2 py-1 text-xs ${styles.row}`}
                   >
                     <span className={`mt-0.5 shrink-0 rounded-full px-1.5 py-0.5 font-black uppercase tracking-wider ${styles.badge}`}>
                       {styles.label}
@@ -822,12 +822,12 @@ function ContractPanel({ contract, onGenerateContract, onDryRun, dryRunLoading, 
         ))}
       </div>
 
-      <p className="mt-4 text-[10px] font-medium text-slate-400">
+      <p className="mt-4 text-xs font-medium text-slate-400">
         Limites desta etapa: nenhum dado foi gravado, importado, sincronizado ou persistido.
         Contact e Opportunity têm AccountId avaliado apenas contra a amostra de Accounts carregada no preview.
       </p>
       {hasOnlyBlocked && (
-        <p className="mt-2 text-[10px] font-medium text-amber-600">
+        <p className="mt-2 text-xs font-medium text-amber-600">
           Todos os registros selecionados estão bloqueados — selecione pelo menos um válido ou com alertas para gerar o contrato.
         </p>
       )}
@@ -881,18 +881,18 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
           )}
           <span className="text-sm font-black text-slate-900">{result.objectApiName}</span>
           {success && (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-800">
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-800">
               {result.records.length} registro{result.records.length !== 1 ? 's' : ''}
             </span>
           )}
           {!success && (
-            <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-red-700">
+            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-red-700">
               Erro
             </span>
           )}
         </div>
         {success && result.totalSize > result.records.length && (
-          <span className="text-[10px] font-medium text-slate-500">
+          <span className="text-xs font-medium text-slate-500">
             mostrando {result.records.length} de {result.totalSize.toLocaleString('pt-BR')} total
           </span>
         )}
@@ -910,7 +910,7 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
         <>
           {/* Entity summary + action buttons */}
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-medium text-slate-500">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-500">
               <span>{summary.loaded} carregados</span>
               <span>·</span>
               <span className="font-black text-slate-700">{summary.selected} selecionados</span>
@@ -928,7 +928,7 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
                 <button
                   type="button"
                   onClick={onClearAll}
-                  className="flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-black text-slate-600 hover:bg-slate-200"
+                  className="flex items-center gap-1 rounded-lg bg-slate-100 px-2 py-1 text-xs font-black text-slate-400 hover:bg-slate-200"
                 >
                   <MinusSquare className="h-3 w-3" />
                   Limpar seleção
@@ -958,13 +958,13 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
                       )}
                     </button>
                   </th>
-                  <th className="whitespace-nowrap px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                  <th className="whitespace-nowrap px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
                     Status
                   </th>
                   {result.fields.map((f) => (
                     <th
                       key={f}
-                      className="whitespace-nowrap px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500"
+                      className="whitespace-nowrap px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-500"
                     >
                       {f}
                     </th>
@@ -1003,12 +1003,12 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
                       <td className="px-3 py-2">
                         <div className="flex flex-col gap-0.5">
                           <span
-                            className={`whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${styles.badge}`}
+                            className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-black uppercase tracking-wider ${styles.badge}`}
                           >
                             {styles.label}
                           </span>
                           {elig.alerts.map((alert, ai) => (
-                            <span key={ai} className="flex items-center gap-0.5 text-[9px] font-medium text-amber-700">
+                            <span key={ai} className="flex items-center gap-0.5 text-xs font-medium text-amber-700">
                               <AlertTriangle className="h-2.5 w-2.5 shrink-0" />
                               {alert}
                             </span>
@@ -1031,7 +1031,7 @@ function EntityCard({ result, selectedIds, onToggle, onSelectAll, onClearAll, ac
             </table>
           </div>
 
-          <p className="mt-2 text-[10px] font-medium text-slate-400">
+          <p className="mt-2 text-xs font-medium text-slate-400">
             Consultado em {formatDate(result.testedAt)}
           </p>
         </>
@@ -1105,23 +1105,23 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="space-y-0.5">
           <p className="text-sm font-black text-slate-900">Mapeamento canônico de Account</p>
-          <p className="text-xs font-medium text-slate-600">
+          <p className="text-xs font-medium text-slate-400">
             Este mapeamento prepara o contrato para uma futura etapa de sync read-only.
             Nenhum dado foi gravado em Contas.
           </p>
         </div>
-        <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-violet-800">
+        <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-black uppercase tracking-wider text-violet-800">
           Account only
         </span>
       </div>
 
       <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Contrato de referência</p>
-        <p className="mt-1 text-[10px] font-medium text-slate-600">
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Contrato de referência</p>
+        <p className="mt-1 text-xs font-medium text-slate-400">
           ID: <span className="font-black text-slate-800">{contractId}</span>
         </p>
-        <p className="text-[10px] font-medium text-slate-600">Status atual: <span className="font-black">pending</span></p>
-        <p className="text-[10px] font-medium text-slate-600">
+        <p className="text-xs font-medium text-slate-400">Status atual: <span className="font-black">pending</span></p>
+        <p className="text-xs font-medium text-slate-400">
           O mapeamento salvo irá atualizar este contrato para o status{' '}
           <span className="font-black text-violet-700">mapped</span>.
         </p>
@@ -1129,10 +1129,10 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
 
       {/* Tabela de mapeamento */}
       <div className="mt-5">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">
           Configurar mapeamento de campos
         </p>
-        <p className="mt-1 text-[10px] font-medium text-slate-500">
+        <p className="mt-1 text-xs font-medium text-slate-500">
           Selecione qual campo do Salesforce corresponde a cada campo canônico da Canopi.
         </p>
 
@@ -1140,13 +1140,13 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50">
-                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <th className="whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
                   Campo canônico (Canopi)
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <th className="whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
                   Obrigatório
                 </th>
-                <th className="whitespace-nowrap px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-500">
+                <th className="whitespace-nowrap px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
                   Campo Salesforce (origem)
                 </th>
               </tr>
@@ -1156,15 +1156,15 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
                 <tr key={cf.key} className="border-b border-slate-50 last:border-0">
                   <td className="px-4 py-2">
                     <span className="text-xs font-black text-slate-800">{cf.label}</span>
-                    <span className="ml-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">
+                    <span className="ml-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-500">
                       {cf.key}
                     </span>
                   </td>
                   <td className="px-4 py-2">
                     {cf.required ? (
-                      <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[9px] font-black text-violet-700">sim</span>
+                      <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-black text-violet-700">sim</span>
                     ) : (
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-medium text-slate-500">opcional</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">opcional</span>
                     )}
                   </td>
                   <td className="px-4 py-2">
@@ -1190,10 +1190,10 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
       {/* Preview de 1 linha */}
       {samplePreview && (
         <div className="mt-5">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          <p className="text-xs font-black uppercase tracking-widest text-slate-500">
             Preview: como esta conta ficaria após o mapeamento
           </p>
-          <p className="mt-0.5 text-[10px] font-medium text-slate-500">
+          <p className="mt-0.5 text-xs font-medium text-slate-500">
             Simulação visual apenas. Nenhum dado foi gravado em Contas.
           </p>
           <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1201,11 +1201,11 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
               const value = samplePreview[cf.key];
               return (
                 <div key={cf.key} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{cf.label}</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">{cf.label}</p>
                   <p className={`mt-0.5 text-xs font-medium ${value ? 'text-slate-800' : 'text-slate-400'}`}>
                     {value || '—'}
                   </p>
-                  <p className="text-[9px] text-slate-400">← {fieldMap[cf.key] || 'não mapeado'}</p>
+                  <p className="text-xs text-slate-400">← {fieldMap[cf.key] || 'não mapeado'}</p>
                 </div>
               );
             })}
@@ -1215,17 +1215,17 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
 
       {/* Regras de Dedupe */}
       <div className="mt-5 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Regras de deduplicação (não editável neste recorte)</p>
-        <ul className="mt-2 space-y-1 text-[10px] font-medium text-slate-600">
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Regras de deduplicação (não editável neste recorte)</p>
+        <ul className="mt-2 space-y-1 text-xs font-medium text-slate-400">
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
-            Prioridade 1: Salesforce Id (<code className="rounded bg-slate-200 px-1 text-[9px]">source_external_id</code>)
+            Prioridade 1: Salesforce Id (<code className="rounded bg-slate-200 px-1 text-xs">source_external_id</code>)
             — se já existir no banco.
           </li>
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
             Prioridade 2: Domínio / Website — match por{' '}
-            <code className="rounded bg-slate-200 px-1 text-[9px]">Website</code>.
+            <code className="rounded bg-slate-200 px-1 text-xs">Website</code>.
           </li>
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
@@ -1234,9 +1234,9 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
           <li className="flex items-start gap-1.5">
             <span className="mt-0.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
             Campos estratégicos da Canopi não serão sobrescritos por Salesforce:{' '}
-            <code className="rounded bg-slate-200 px-1 text-[9px]">tipoEstrategico</code>,{' '}
-            <code className="rounded bg-slate-200 px-1 text-[9px]">playAtivo</code>,{' '}
-            <code className="rounded bg-slate-200 px-1 text-[9px]">scoring</code>.
+            <code className="rounded bg-slate-200 px-1 text-xs">tipoEstrategico</code>,{' '}
+            <code className="rounded bg-slate-200 px-1 text-xs">playAtivo</code>,{' '}
+            <code className="rounded bg-slate-200 px-1 text-xs">scoring</code>.
           </li>
         </ul>
       </div>
@@ -1245,7 +1245,7 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
       {!isSaved && (
         <div className="mt-5">
           {missingRequired.length > 0 && (
-            <p className="mb-2 text-[10px] font-medium text-amber-700">
+            <p className="mb-2 text-xs font-medium text-amber-700">
               Campos obrigatórios sem mapeamento: {missingRequired.join(', ')}.
             </p>
           )}
@@ -1275,19 +1275,19 @@ function AccountMappingPanel({ contractId, accountRecords, mappingState, onSaveM
             <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />
             <p className="text-xs font-black text-emerald-800">Mapeamento salvo com sucesso.</p>
           </div>
-          <p className="mt-1 text-[10px] font-medium text-emerald-700">
+          <p className="mt-1 text-xs font-medium text-emerald-700">
             Status do contrato atualizado para <span className="font-black">mapped</span>.
           </p>
-          <p className="text-[10px] font-medium text-emerald-700">
+          <p className="text-xs font-medium text-emerald-700">
             Salvo em: {mappingState.updatedAt ? new Date(mappingState.updatedAt).toLocaleString('pt-BR') : '—'}
           </p>
-          <p className="mt-1 text-[10px] font-medium text-emerald-600">
+          <p className="mt-1 text-xs font-medium text-emerald-600">
             Nenhum registro foi sincronizado. O contrato aguarda a próxima etapa de sync read-only.
           </p>
         </div>
       )}
 
-      <p className="mt-4 text-[10px] font-medium text-slate-400">
+      <p className="mt-4 text-xs font-medium text-slate-400">
         Limites: nenhuma conta foi criada, atualizada ou sincronizada.
         Este mapeamento registra apenas a intenção de tradução de campos para uso futuro no sync read-only.
         Apenas Account está no escopo deste recorte.
@@ -2545,11 +2545,11 @@ export function SalesforceMultiEntityPreview({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-1">
             <p className="text-xl font-black text-slate-950">Configurar Salesforce</p>
-            <p className="max-w-3xl text-sm font-medium text-slate-600">
+            <p className="max-w-3xl text-sm font-medium text-slate-400">
               Conecte sua conta, revise os dados encontrados e sincronize com segurança os dados prontos para a Canopi.
             </p>
           </div>
-          <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+          <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
             oauthConnected ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
           }`}>
             {oauthConnected ? 'Conectado' : 'Pendente'}
@@ -2583,7 +2583,7 @@ export function SalesforceMultiEntityPreview({
                 </span>
                 <div className="min-w-0">
                   <p className={`text-xs font-black ${item.tone === 'active' ? 'text-white' : 'text-slate-900'}`}>{item.title}</p>
-                  <p className={`mt-1 text-[11px] font-bold ${
+                  <p className={`mt-1 text-xs font-bold ${
                     item.tone === 'active'
                       ? 'text-slate-200'
                       : item.tone === 'done' || item.tone === 'ready'
@@ -2602,9 +2602,9 @@ export function SalesforceMultiEntityPreview({
 
         <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 relative">
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">{activeStepContent.eyebrow}</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">{activeStepContent.eyebrow}</p>
             <p className="mt-1 text-lg font-black text-slate-950">{activeStepContent.title}</p>
-            <p className="mt-2 max-w-2xl text-sm font-medium text-slate-600">{activeStepContent.description}</p>
+            <p className="mt-2 max-w-2xl text-sm font-medium text-slate-400">{activeStepContent.description}</p>
 
             {currentSetupStep === 'discover' && state.phase === 'done' && hasDiscoveryData && (
               <div className="mt-6 border-t border-slate-200 pt-6">
@@ -2612,9 +2612,9 @@ export function SalesforceMultiEntityPreview({
                 <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   {state.results.map((r, i) => (
                     <div key={i} className="rounded-xl border border-slate-200 bg-white p-3">
-                      <p className="text-xs font-bold text-slate-600">{r.label || r.objectApiName}</p>
+                      <p className="text-xs font-bold text-slate-400">{r.label || r.objectApiName}</p>
                       <p className="mt-1 text-2xl font-black text-indigo-700">{r.records.length}</p>
-                      <p className="text-[10px] font-medium text-slate-500">encontrados</p>
+                      <p className="text-xs font-medium text-slate-500">encontrados</p>
                     </div>
                   ))}
                 </div>
@@ -2624,47 +2624,47 @@ export function SalesforceMultiEntityPreview({
             {currentSetupStep === 'sync' && accountsJourney && (
               <div id="salesforce-accounts-main" className="mt-6 border-t border-slate-200 pt-6">
                 <p className="text-sm font-black text-slate-900">Accounts</p>
-                <p className="mt-1 text-xs font-medium text-slate-600">
+                <p className="mt-1 text-xs font-medium text-slate-400">
                   Accounts ajudam a resolver Contacts e Opportunities que dependem de uma conta já existente na Canopi.
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-4">
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Status</p>
                     <p className="mt-1 text-sm font-black text-slate-900">{accountJourneySummaryStatus}</p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Encontradas</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Encontradas</p>
                     <p className="mt-1 text-2xl font-black text-blue-700">{accountJourneyFoundCount}</p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Prontas</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Prontas</p>
                     <p className="mt-1 text-2xl font-black text-emerald-700">{accountJourneyValidCount}</p>
-                    <p className="mt-1 text-[10px] font-medium text-slate-500">
+                    <p className="mt-1 text-xs font-medium text-slate-500">
                       {accountJourneySelectedCount > 0 ? `${accountJourneySelectedCount} selecionadas automaticamente` : 'Sem seleção automática'}
                     </p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Impacto</p>
-                    <p className="mt-1 text-sm font-medium text-slate-600">
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-500">Impacto</p>
+                    <p className="mt-1 text-sm font-medium text-slate-400">
                       Necessário para resolver vínculos de conta.
                     </p>
                   </div>
                 </div>
                 <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Ação principal desta etapa</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Ação principal desta etapa</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{accountJourneySummaryAction}</p>
-                  <p className="mt-1 text-xs font-medium text-slate-600">
+                  <p className="mt-1 text-xs font-medium text-slate-400">
                     {accountJourneyReadyToSync
                       ? 'A preparação técnica já permite sync real nesta sessão.'
                       : accountJourneyRequiresTechnicalReview
                         ? 'A preparação técnica precisa ser revisada antes do sync real.'
                         : 'Accounts encontradas entram na preparação antes da sincronização real.'}
                   </p>
-                  <p className="mt-2 text-[10px] font-medium text-slate-500">
+                  <p className="mt-2 text-xs font-medium text-slate-500">
                     {accountsJourney.autoSelectionApplied ? 'Seleção automática aplicada nesta leitura.' : 'Sem seleção automática nesta leitura.'}
                   </p>
                   {accountsJourney.technicalReviewReason && (
-                    <p className="mt-1 text-[10px] font-medium text-amber-700">
+                    <p className="mt-1 text-xs font-medium text-amber-700">
                       {accountsJourney.technicalReviewReason}
                     </p>
                   )}
@@ -2685,14 +2685,14 @@ export function SalesforceMultiEntityPreview({
                   <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                     <p className="text-3xl font-black text-emerald-700">{opportunityReadyCount}</p>
                     <p className="mt-1 text-xs font-bold text-emerald-900">prontas para sincronizar</p>
-                    <p className="mt-1 text-[10px] font-medium text-emerald-700">
+                    <p className="mt-1 text-xs font-medium text-emerald-700">
                       Serão atualizadas ou criadas na Canopi.
                     </p>
                   </div>
                   <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
                     <p className="text-3xl font-black text-amber-700">{opportunityPreviewResult.unresolvedCount}</p>
                     <p className="mt-1 text-xs font-bold text-amber-900">com conta não resolvida</p>
-                    <p className="mt-1 text-[10px] font-medium text-amber-700">
+                    <p className="mt-1 text-xs font-medium text-amber-700">
                       Serão ignoradas por segurança.
                     </p>
                   </div>
@@ -2711,7 +2711,7 @@ export function SalesforceMultiEntityPreview({
                     <p className="mt-1 text-xs font-bold text-blue-900">sincronizadas ou atualizadas</p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-3xl font-black text-slate-600">
+                    <p className="text-3xl font-black text-slate-400">
                       {oppSyncExecuteState.result.skippedCount}
                     </p>
                     <p className="mt-1 text-xs font-bold text-slate-700">ignoradas por pendência</p>
@@ -2783,7 +2783,7 @@ export function SalesforceMultiEntityPreview({
                 <div className="flex items-start justify-between gap-3 relative z-10">
                   <div className="flex items-center gap-2">
                     <Info className="h-4 w-4 text-blue-600" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-700">{activeStepContent.helpTitle}</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-blue-700">{activeStepContent.helpTitle}</p>
                   </div>
                   <button
                     type="button"
@@ -2822,7 +2822,7 @@ export function SalesforceMultiEntityPreview({
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-1">
               <p className="text-sm font-black text-slate-950">Resumo da configuração</p>
-              <p className="text-xs font-medium text-slate-600">
+              <p className="text-xs font-medium text-slate-400">
                 A jornada principal mostra dados encontrados, prontos para sincronizar e pendências. Detalhes técnicos ficam em modo avançado.
               </p>
             </div>
@@ -2833,7 +2833,7 @@ export function SalesforceMultiEntityPreview({
               <div key={item.title} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs font-black text-slate-900">{item.title}</p>
-                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-black uppercase tracking-widest ${
                     item.accent === 'emerald'
                       ? 'bg-emerald-100 text-emerald-700'
                       : item.accent === 'blue'
@@ -2845,14 +2845,14 @@ export function SalesforceMultiEntityPreview({
                     {item.label}
                   </span>
                 </div>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Status</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Status</p>
                 <p className="mt-0.5 text-xs font-bold text-slate-800">{item.status}</p>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Impacto</p>
-                <p className="mt-0.5 text-[11px] font-medium leading-4 text-slate-600">{item.impact}</p>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Bloqueio</p>
-                <p className="mt-0.5 text-[11px] font-medium leading-4 text-slate-600">{item.blocking}</p>
-                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Ação recomendada</p>
-                <p className="mt-0.5 text-[11px] font-medium leading-4 text-slate-600">{item.action}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Impacto</p>
+                <p className="mt-0.5 text-xs font-medium leading-4 text-slate-400">{item.impact}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Bloqueio</p>
+                <p className="mt-0.5 text-xs font-medium leading-4 text-slate-400">{item.blocking}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Ação recomendada</p>
+                <p className="mt-0.5 text-xs font-medium leading-4 text-slate-400">{item.action}</p>
               </div>
             ))}
           </div>
@@ -2866,7 +2866,7 @@ export function SalesforceMultiEntityPreview({
                     Estas pendências continuam separadas para evitar dados órfãos ou inconsistentes. Elas não bloqueiam a conclusão da configuração.
                   </p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-700">
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-amber-700">
                   {pendingItems.length} itens
                 </span>
               </div>
@@ -2875,17 +2875,17 @@ export function SalesforceMultiEntityPreview({
                   <div key={`${item.title}-${item.cause}-${item.count}`} className="rounded-xl border border-amber-100 bg-white p-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-xs font-black text-slate-900">{item.title}</p>
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-amber-700">
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black uppercase tracking-widest text-amber-700">
                         {item.count}
                       </span>
                     </div>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-500">Causa</p>
+                    <p className="mt-1 text-xs font-black uppercase tracking-widest text-slate-500">Causa</p>
                     <p className="mt-0.5 text-xs font-medium text-slate-700">{item.cause}</p>
-                    <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Impacto</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Impacto</p>
                     <p className="mt-0.5 text-xs font-medium text-slate-700">{item.impact}</p>
-                    <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Ação recomendada</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Ação recomendada</p>
                     <p className="mt-0.5 text-xs font-medium text-slate-700">{item.action}</p>
-                    <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Bloqueio</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-widest text-slate-500">Bloqueio</p>
                     <p className="mt-0.5 text-xs font-medium text-slate-700">{item.blocking}</p>
                   </div>
                 ))}
@@ -2900,7 +2900,7 @@ export function SalesforceMultiEntityPreview({
           }`}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">Ação recomendada</p>
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Ação recomendada</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{activeStepContent.action}</p>
                 {activeStepContent.writesData && (
                   <p className="mt-1 text-xs font-bold text-emerald-800">
@@ -2909,7 +2909,7 @@ export function SalesforceMultiEntityPreview({
                 )}
               </div>
             </div>
-            <p className="mt-3 text-xs font-medium text-slate-600">
+            <p className="mt-3 text-xs font-medium text-slate-400">
               {currentSetupStep === 'sync' && !accountsOperationalReadyForReview
                 ? !accountsLoaded
                   ? 'Carregue Accounts antes de avançar.'
@@ -2942,25 +2942,25 @@ export function SalesforceMultiEntityPreview({
                     Concluir não apaga pendências nem força dados incompletos. A Canopi usa apenas dados tratados com segurança e mantém itens pendentes separados para correção posterior.
                   </p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-700">
                   Finalizada
                 </span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Conexão</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Conexão</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{oauthConnected ? 'Ativa' : 'Pendente'}</p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Validação</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Validação</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{hasConnectionValidation ? 'Concluída' : 'Pendente'}</p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Dados encontrados</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Dados encontrados</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{hasDiscoveryData ? 'Sim' : 'Não'}</p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Accounts</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Accounts</p>
                   <p className="mt-1 text-sm font-black text-slate-900">
                     {accountJourneySynced
                       ? 'Sincronizadas'
@@ -2972,7 +2972,7 @@ export function SalesforceMultiEntityPreview({
                   </p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Contacts</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Contacts</p>
                   <p className="mt-1 text-sm font-black text-slate-900">
                     {contactSyncExecuteState.phase === 'done'
                       ? 'Sincronizados'
@@ -2984,7 +2984,7 @@ export function SalesforceMultiEntityPreview({
                   </p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Opportunities</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Opportunities</p>
                   <p className="mt-1 text-sm font-black text-slate-900">
                     {oppSyncExecuteState.phase === 'done'
                       ? 'Sincronizadas'
@@ -2996,13 +2996,13 @@ export function SalesforceMultiEntityPreview({
                   </p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Pendências</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Pendências</p>
                   <p className="mt-1 text-sm font-black text-slate-900">
                     {((contactPreviewResult?.unresolvedCount ?? 0) + (opportunityPreviewResult?.unresolvedCount ?? 0) + (opportunityPreviewResult?.missingFieldsCount ?? 0))}
                   </p>
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-white p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Próximo passo recomendado</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-500">Próximo passo recomendado</p>
                   <p className="mt-1 text-sm font-black text-slate-900">
                     {pendingItems.length > 0 ? 'Revisar pendências' : 'Voltar para conectores'}
                   </p>
@@ -3054,12 +3054,12 @@ export function SalesforceMultiEntityPreview({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               <p className="text-sm font-black text-slate-900">Detalhes técnicos e auditoria</p>
-              <p className="text-xs font-medium text-slate-600">
+              <p className="text-xs font-medium text-slate-400">
                 Você não precisa abrir esta área para concluir a configuração padrão. Ela existe apenas para auditoria, diagnóstico, investigação de pendências, logs, tabelas completas e ajustes manuais excepcionais.
                 Abrir ou fechar este bloco não altera a etapa do assistente principal.
               </p>
             </div>
-            <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-500 shadow-sm">
               Abrir modo avançado
             </span>
           </div>
@@ -3067,10 +3067,10 @@ export function SalesforceMultiEntityPreview({
         <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
 
       <details className="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2">
-        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black uppercase tracking-widest text-slate-500">
           Ver detalhes técnicos da descoberta
         </summary>
-        <ul className="mt-2 space-y-1 text-xs font-medium text-slate-600">
+        <ul className="mt-2 space-y-1 text-xs font-medium text-slate-400">
           <li>• Esta etapa apenas prepara registros para análise local.</li>
           <li>• Nada é importado, salvo ou sincronizado.</li>
           <li>• Contact e Opportunity são avaliados contra os Accounts carregados neste preview.</li>
@@ -3093,10 +3093,10 @@ export function SalesforceMultiEntityPreview({
       {state.phase === 'done' && (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <p className="text-xs font-black uppercase tracking-widest text-slate-500">
               Resultado — {state.results.filter((r) => r.status === 'success').length} de {state.results.length} entidades com sucesso
             </p>
-            <p className="text-[10px] font-medium text-slate-400">
+            <p className="text-xs font-medium text-slate-400">
               Consultado em {formatDate(state.requestedAt)}
             </p>
           </div>
@@ -3104,8 +3104,8 @@ export function SalesforceMultiEntityPreview({
           {/* Global summary */}
           {globalSummary && (
             <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sumário global</p>
-              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500">Sumário global</p>
+              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-400">
                 <span>
                   <span className="font-black text-slate-800">{globalSummary.totalSelected}</span> selecionados
                 </span>
@@ -3129,7 +3129,7 @@ export function SalesforceMultiEntityPreview({
                 )}
               </div>
               {hasOnlyBlocked && (
-                <p className="mt-1 text-[10px] font-medium text-amber-600">
+                <p className="mt-1 text-xs font-medium text-amber-600">
                   Todos os registros selecionados estão bloqueados — selecione pelo menos um válido ou com alertas para gerar o contrato.
                 </p>
               )}
@@ -3140,13 +3140,13 @@ export function SalesforceMultiEntityPreview({
             <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">Macroárea 2 · Descoberta e syncs de Accounts</p>
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-500">Macroárea 2 · Descoberta e syncs de Accounts</p>
                   <p className="text-sm font-black text-slate-900">Resumo visível, detalhes recolhidos por padrão</p>
-                  <p className="text-xs font-medium text-slate-600">
+                  <p className="text-xs font-medium text-slate-400">
                     Os resultados da descoberta continuam acessíveis, mas a leitura detalhada, o contrato local, o dry-run e o preview de sincronização ficam recolhidos para reduzir a densidade visual.
                   </p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500 shadow-sm">
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-500 shadow-sm">
                   Abrir detalhes
                 </span>
               </div>
@@ -3170,13 +3170,13 @@ export function SalesforceMultiEntityPreview({
                 <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="space-y-0.5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Seleção pronta para contrato</p>
-                      <p className="text-xs font-medium text-slate-600">
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-500">Seleção pronta para contrato</p>
+                      <p className="text-xs font-medium text-slate-400">
                         Revise a seleção e gere o contrato local para validar em modo read-only.
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] font-medium text-slate-600">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs font-medium text-slate-400">
                         <span>
                           <span className="font-black text-slate-800">{globalSummary?.totalSelected ?? 0}</span> selecionados
                         </span>
@@ -3199,7 +3199,7 @@ export function SalesforceMultiEntityPreview({
                         onClick={handleGenerateContract}
                         disabled={!hasAnySelection}
                         title={hasOnlyBlocked ? 'Todos os registros selecionados estão bloqueados.' : undefined}
-                        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-slate-800 enabled:text-white enabled:hover:bg-slate-900"
+                        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-slate-800 enabled:text-white enabled:hover:bg-slate-900"
                       >
                         <ClipboardList className="h-3 w-3" />
                         Gerar contrato local
@@ -3275,7 +3275,7 @@ export function SalesforceMultiEntityPreview({
                 <div className="flex flex-col items-center justify-center py-10">
                   <Loader2 className="h-8 w-8 animate-spin text-violet-700" />
                   <p className="mt-3 text-sm font-bold text-slate-700">Gerando preview de sincronização...</p>
-                  <p className="text-[10px] font-medium text-slate-500">Comparando dados do Salesforce com sua base local Canopi</p>
+                  <p className="text-xs font-medium text-slate-500">Comparando dados do Salesforce com sua base local Canopi</p>
                 </div>
               )}
 
@@ -3356,7 +3356,7 @@ export function SalesforceMultiEntityPreview({
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
                     <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
                   </svg>
-                  <p className="text-xs font-bold text-slate-600">Executando sincronização controlada…</p>
+                  <p className="text-xs font-bold text-slate-400">Executando sincronização controlada…</p>
                 </div>
               )}
 
@@ -3386,9 +3386,9 @@ export function SalesforceMultiEntityPreview({
       )}
 
       <div className="mt-6 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-slate-50 px-4 py-3 shadow-sm">
-        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-indigo-500">Macroárea 3 · Syncs controlados e descoberta relacional</p>
+        <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-500">Macroárea 3 · Syncs controlados e descoberta relacional</p>
         <p className="mt-1 text-sm font-black text-slate-900">Contacts e Opportunities seguem visíveis, mas a leitura técnica fica mais organizada</p>
-        <p className="mt-1 text-xs font-medium text-slate-600">
+        <p className="mt-1 text-xs font-medium text-slate-400">
           Esta área mantém os previews e os syncs principais acessíveis, enquanto as auditorias e leituras avançadas ficam subordinadas.
         </p>
       </div>
@@ -3404,13 +3404,13 @@ export function SalesforceMultiEntityPreview({
             <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-indigo-600">Modo avançado</p>
+                  <p className="text-xs font-black uppercase tracking-[0.28em] text-indigo-600">Modo avançado</p>
                   <p className="text-sm font-black text-slate-900">Contacts e grupo de compras</p>
-                  <p className="text-xs font-medium text-slate-600">
+                  <p className="text-xs font-medium text-slate-400">
                     Seleção manual opcional para casos específicos. O fluxo principal usa automaticamente a leitura recomendada e os registros prontos.
                   </p>
                 </div>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-600 shadow-sm">
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-indigo-600 shadow-sm">
                   Ver detalhes técnicos
                 </span>
               </div>
@@ -3420,12 +3420,12 @@ export function SalesforceMultiEntityPreview({
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-black text-indigo-900">Preview de Contacts</p>
-                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1 text-xs font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
                   <ShieldCheck className="h-3 w-3" />
                   Read-Only
                 </span>
               </div>
-              <p className="text-xs font-medium text-slate-600">
+              <p className="text-xs font-medium text-slate-400">
                 Use contratos Salesforce já salvos para validar vínculos Contact → Account Canopi sem executar sync.
               </p>
             </div>
@@ -3441,7 +3441,7 @@ export function SalesforceMultiEntityPreview({
           </div>
 
           {/* Guardrails sempre visíveis */}
-          <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-indigo-600">
+          <ul className="mt-3 space-y-0.5 text-xs font-medium text-indigo-600">
             <li>🔍 Nenhum contato será gravado nesta etapa.</li>
             <li>🔄 Não é necessário executar novamente o sync de Account.</li>
             <li>🔗 Contacts sem Account resolvida serão marcados como unresolved_account.</li>
@@ -3460,11 +3460,11 @@ export function SalesforceMultiEntityPreview({
           {eligibleContractsState.phase === 'error' && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
               <p className="text-xs font-black text-red-800">Erro ao carregar contratos</p>
-              <p className="mt-1 text-[10px] font-medium text-red-700">{eligibleContractsState.message}</p>
+              <p className="mt-1 text-xs font-medium text-red-700">{eligibleContractsState.message}</p>
               <button
                 type="button"
                 onClick={handleLoadEligibleContracts}
-                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
               >
                 Tentar novamente
               </button>
@@ -3475,7 +3475,7 @@ export function SalesforceMultiEntityPreview({
           {eligibleContractsState.phase === 'done' && eligibleContractsState.contracts.length === 0 && (
             <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
               <p className="text-xs font-black text-amber-800">Nenhum contrato elegível encontrado</p>
-              <p className="mt-1 text-[10px] font-medium text-amber-700">
+              <p className="mt-1 text-xs font-medium text-amber-700">
                 Nenhum contrato Salesforce com Contacts selecionados e status <span className="font-black">mapped</span> ou <span className="font-black">synced</span> foi encontrado.
                 Complete ao menos o fluxo de mapeamento de Account para habilitar o preview de Contacts.
               </p>
@@ -3485,7 +3485,7 @@ export function SalesforceMultiEntityPreview({
           {/* Estado: contratos carregados — seleção */}
           {eligibleContractsState.phase === 'done' && eligibleContractsState.contracts.length > 0 && contactPreviewState.phase === 'idle' && (
             <div className="mt-4 space-y-3">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500">
                 {eligibleContractsState.contracts.length} contrato{eligibleContractsState.contracts.length > 1 ? 's' : ''} disponível{eligibleContractsState.contracts.length > 1 ? 'is' : ''}
               </p>
               <div className="space-y-2">
@@ -3503,17 +3503,17 @@ export function SalesforceMultiEntityPreview({
                     <div className="flex items-center justify-between gap-3">
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-black text-slate-800 font-mono">{c.id.slice(0, 8)}…</span>
-                          <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${
+                          <span className="text-xs font-black text-slate-800 font-mono">{c.id.slice(0, 8)}…</span>
+                          <span className={`text-xs font-black uppercase px-1.5 py-0.5 rounded-full ${
                             c.status === 'synced' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
                           }`}>{c.status}</span>
                           {c.hasAccountLookupSource && (
-                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">
+                            <span className="text-xs font-black uppercase px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">
                               lookup ativo
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] font-medium text-slate-500">
+                        <p className="text-xs font-medium text-slate-500">
                           {c.contactCount} contact{c.contactCount > 1 ? 's' : ''} · criado em {formatDate(c.createdAt)}
                         </p>
                       </div>
@@ -3525,7 +3525,7 @@ export function SalesforceMultiEntityPreview({
                 ))}
               </div>
               {!eligibleContractsState.contracts.some((c) => c.hasAccountLookupSource) && (
-                <p className="text-[10px] font-medium text-amber-700 bg-amber-50 rounded-lg px-3 py-2 border border-amber-200">
+                <p className="text-xs font-medium text-amber-700 bg-amber-50 rounded-lg px-3 py-2 border border-amber-200">
                   ⚠ Nenhum contrato de Account com status <span className="font-black">synced</span> encontrado.
                   O preview de Contacts pode ter todos os registros como <span className="font-black">unresolved_account</span>.
                 </p>
@@ -3545,7 +3545,7 @@ export function SalesforceMultiEntityPreview({
           {contactPreviewState.phase === 'loading' && (
             <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
               <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-              <p className="text-xs font-bold text-slate-600">Resolvendo vínculos Account → Contact…</p>
+              <p className="text-xs font-bold text-slate-400">Resolvendo vínculos Account → Contact…</p>
             </div>
           )}
 
@@ -3553,11 +3553,11 @@ export function SalesforceMultiEntityPreview({
           {contactPreviewState.phase === 'error' && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
               <p className="text-xs font-black text-red-800">Erro no preview de Contacts</p>
-              <p className="mt-1 text-[10px] font-medium text-red-700">{contactPreviewState.message}</p>
+              <p className="mt-1 text-xs font-medium text-red-700">{contactPreviewState.message}</p>
               <button
                 type="button"
                 onClick={() => { setContactPreviewState({ phase: 'idle' }); }}
-                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
               >
                 Tentar novamente
               </button>
@@ -3573,7 +3573,7 @@ export function SalesforceMultiEntityPreview({
               {contactSyncExecuteState.phase === 'idle' && contactPreviewState.result?.resolvedCount > 0 && (
                 <div className="mt-6 rounded-2xl border-2 border-emerald-700 bg-white p-5 shadow-xl">
                   <p className="text-sm font-black text-slate-900">Executar sincronização controlada de Contacts</p>
-                  <ul className="mt-3 space-y-1 text-[10px] font-medium text-slate-500">
+                  <ul className="mt-3 space-y-1 text-xs font-medium text-slate-500">
                     <li>✅ Esta ação gravará apenas campos permitidos em Contacts.</li>
                     <li>🔒 Contacts sem Account resolvida serão ignorados.</li>
                     <li>🛡 Campos relacionais estratégicos da Canopi não serão sobrescritos.</li>
@@ -3599,12 +3599,12 @@ export function SalesforceMultiEntityPreview({
 
               {contactSyncExecuteState.phase === 'error' && (
                 <div className="mt-6 rounded-xl bg-red-50 px-4 py-3">
-                  <p className="text-[11px] font-black text-red-700">Erro no sync de Contacts</p>
-                  <p className="mt-1 text-[10px] font-medium text-red-600">{contactSyncExecuteState.message}</p>
+                  <p className="text-xs font-black text-red-700">Erro no sync de Contacts</p>
+                  <p className="mt-1 text-xs font-medium text-red-600">{contactSyncExecuteState.message}</p>
                   <button
                     type="button"
                     onClick={() => setContactSyncExecuteState({ phase: 'idle' })}
-                    className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                    className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
                   >
                     Tentar novamente
                   </button>
@@ -3635,9 +3635,9 @@ export function SalesforceMultiEntityPreview({
         </details>
 
         <div className="mt-6 rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 via-white to-slate-50 px-4 py-3 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-emerald-600">Macroárea 4 · Sync principal de Opportunities</p>
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-600">Macroárea 4 · Sync principal de Opportunities</p>
           <p className="mt-1 text-sm font-black text-slate-900">Preview e sincronização principal ficam em destaque</p>
-          <p className="mt-1 text-xs font-medium text-slate-600">
+          <p className="mt-1 text-xs font-medium text-slate-400">
             A execução controlada grava Opportunities na Canopi; as leituras avançadas continuam subordinadas abaixo.
           </p>
         </div>
@@ -3649,12 +3649,12 @@ export function SalesforceMultiEntityPreview({
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-black text-indigo-900">Preview de Opportunities</p>
-                <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1 text-xs font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
                   <ShieldCheck className="h-3 w-3" />
                   Read-Only (Relacional)
                 </span>
               </div>
-              <p className="text-xs font-medium text-slate-600">
+              <p className="text-xs font-medium text-slate-400">
                 Visualize as Opportunities do Salesforce e sua prontidão relacional com Accounts Canopi.
               </p>
             </div>
@@ -3670,7 +3670,7 @@ export function SalesforceMultiEntityPreview({
           </div>
 
           {/* Guardrails */}
-          <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-indigo-600">
+          <ul className="mt-3 space-y-0.5 text-xs font-medium text-indigo-600">
             <li>🛡 Nenhuma Opportunity será gravada nesta etapa.</li>
             <li>🔗 Opportunities sem Account resolvida serão marcadas como unresolved_account.</li>
             <li>👥 Vínculo Opportunity → Contact depende do papel do contato no Salesforce e não será inferido.</li>
@@ -3688,7 +3688,7 @@ export function SalesforceMultiEntityPreview({
           {/* Estado: contratos carregados */}
           {eligibleOppContractsState.phase === 'done' && oppPreviewState.phase === 'idle' && (
             <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4">
-              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Extração recomendada</p>
+              <p className="text-xs font-black uppercase tracking-widest text-indigo-600">Extração recomendada</p>
               {recommendedOppContract ? (
                 <>
                   <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
@@ -3696,7 +3696,7 @@ export function SalesforceMultiEntityPreview({
                       <p className="text-sm font-black text-slate-900">
                         {recommendedOppContract.opportunityCount} Opportunities encontradas
                       </p>
-                      <p className="mt-0.5 text-xs font-medium text-slate-600">
+                      <p className="mt-0.5 text-xs font-medium text-slate-400">
                         Criada em {formatDate(recommendedOppContract.createdAt)}
                       </p>
                     </div>
@@ -3709,7 +3709,7 @@ export function SalesforceMultiEntityPreview({
                     </button>
                   </div>
                   {!recommendedOppContract.hasAccountLookupSource && (
-                    <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-[10px] font-medium text-amber-700">
+                    <div className="mt-3 flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
                       <AlertTriangle className="h-3 w-3" />
                       Atenção: há Opportunities que podem ficar como conta não resolvida.
                     </div>
@@ -3719,7 +3719,7 @@ export function SalesforceMultiEntityPreview({
                 <p className="mt-2 text-xs font-medium text-amber-700">Nenhuma extração de Opportunities disponível.</p>
               )}
               <details className="mt-3 rounded-xl border border-indigo-100 bg-white px-3 py-2">
-                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-widest text-indigo-600">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black uppercase tracking-widest text-indigo-600">
                   Trocar extração
                 </summary>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -3759,7 +3759,7 @@ export function SalesforceMultiEntityPreview({
               <button
                 type="button"
                 onClick={handleLoadEligibleOpportunityContracts}
-                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
               >
                 Tentar novamente
               </button>
@@ -3781,7 +3781,7 @@ export function SalesforceMultiEntityPreview({
               <button
                 type="button"
                 onClick={() => handleLoadOpportunityPreview()}
-                className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
               >
                 Tentar novamente
               </button>
@@ -3810,7 +3810,7 @@ export function SalesforceMultiEntityPreview({
                     Executar sync controlado
                   </button>
                 </div>
-                <div className="mt-3 grid gap-2 text-[10px] font-bold text-emerald-700 sm:grid-cols-2">
+                <div className="mt-3 grid gap-2 text-xs font-bold text-emerald-700 sm:grid-cols-2">
                   <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-600" /> Exige contractId explícito</span>
                   <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-600" /> Sem fallback para último contrato</span>
                   <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-600" /> Não usa OpportunityContactRole</span>
@@ -3829,7 +3829,7 @@ export function SalesforceMultiEntityPreview({
                   <button
                     type="button"
                     onClick={() => handleExecuteOpportunitySync()}
-                    className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                    className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
                   >
                     Tentar novamente
                   </button>
@@ -3862,12 +3862,12 @@ export function SalesforceMultiEntityPreview({
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-black text-slate-800">Avançado: Readiness Opportunity ↔ Contact</p>
-                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-black uppercase text-indigo-700">
+                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-black uppercase text-indigo-700">
                     <ShieldCheck className="h-3 w-3" />
                     Read-only
                   </span>
                 </div>
-                <p className="max-w-2xl text-xs font-medium text-slate-600">
+                <p className="max-w-2xl text-xs font-medium text-slate-400">
                   Seleção manual opcional para casos específicos. O fluxo principal usa automaticamente a leitura recomendada e os registros prontos.
                 </p>
               </div>
@@ -3887,7 +3887,7 @@ export function SalesforceMultiEntityPreview({
               </div>
             )}
 
-            <div className="mb-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold text-slate-500">
+            <div className="mb-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-slate-500">
               <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Nenhuma Opportunity será gravada</span>
               <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Nenhum Contact será alterado</span>
               <span className="flex items-center gap-1"><span className="h-1 w-1 rounded-full bg-slate-400"></span> Sem vínculos criados no banco</span>
@@ -3898,7 +3898,7 @@ export function SalesforceMultiEntityPreview({
             {eligibleOcrContractsState.phase === 'loading' && (
               <div className="mt-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
                 <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
-                <p className="text-xs font-bold text-slate-600">Buscando extrações de Contact Roles…</p>
+                <p className="text-xs font-bold text-slate-400">Buscando extrações de Contact Roles…</p>
               </div>
             )}
 
@@ -3907,7 +3907,7 @@ export function SalesforceMultiEntityPreview({
               <div className="mt-4 pt-2">
                 {eligibleOcrContractsState.contracts.length > 0 ? (
                   <>
-                    <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-slate-500">Selecione o contrato base</p>
+                    <p className="mb-2 text-xs font-black uppercase tracking-widest text-slate-500">Selecione o contrato base</p>
                     <div className="flex flex-wrap items-center gap-3">
                       <select
                         value={selectedOcrContractId}
@@ -3949,7 +3949,7 @@ export function SalesforceMultiEntityPreview({
                 <button
                   type="button"
                   onClick={handleLoadEligibleOpportunityContactRoleContracts}
-                  className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                  className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
                 >
                   Tentar buscar novamente
                 </button>
@@ -3960,7 +3960,7 @@ export function SalesforceMultiEntityPreview({
             {ocrPreviewState.phase === 'loading' && (
               <div className="mt-4 flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-8 shadow-sm">
                 <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                <p className="mt-3 text-xs font-bold text-slate-600">Calculando readiness relacional…</p>
+                <p className="mt-3 text-xs font-bold text-slate-400">Calculando readiness relacional…</p>
               </div>
             )}
 
@@ -3971,7 +3971,7 @@ export function SalesforceMultiEntityPreview({
                 <button
                   type="button"
                   onClick={() => handleLoadOpportunityContactRolePreview()}
-                  className="mt-2 text-[10px] font-bold text-red-700 underline underline-offset-4"
+                  className="mt-2 text-xs font-bold text-red-700 underline underline-offset-4"
                 >
                   Tentar processar novamente
                 </button>
@@ -3989,7 +3989,7 @@ export function SalesforceMultiEntityPreview({
                     setEligibleOcrContractsState({ phase: 'idle' });
                     setSelectedOcrContractId('');
                   }}
-                  className="mt-3 text-[10px] font-bold text-slate-500 underline underline-offset-4 hover:text-slate-800"
+                  className="mt-3 text-xs font-bold text-slate-500 underline underline-offset-4 hover:text-slate-800"
                 >
                   ← Fechar e voltar à seleção de contrato
                 </button>
@@ -4016,32 +4016,32 @@ function SyncPreviewPanel({ result }: { result: any }) {
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Prévia de Sincronização de Contas</p>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
               Read-Only
             </span>
-            <p className="text-xs font-medium text-slate-600">
+            <p className="text-xs font-medium text-slate-400">
               Impacto simulado baseado no mapeamento canônico salvo.
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
-            <p className="text-[10px] font-black text-emerald-600">{summary.toCreate}</p>
-            <p className="text-[8px] font-bold uppercase text-slate-400">Criar</p>
+            <p className="text-xs font-black text-emerald-600">{summary.toCreate}</p>
+            <p className="text-xs font-bold uppercase text-slate-400">Criar</p>
           </div>
           <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
-            <p className="text-[10px] font-black text-blue-600">{summary.toUpdate}</p>
-            <p className="text-[8px] font-bold uppercase text-slate-400">Atualizar</p>
+            <p className="text-xs font-black text-blue-600">{summary.toUpdate}</p>
+            <p className="text-xs font-bold uppercase text-slate-400">Atualizar</p>
           </div>
           <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[60px]">
-            <p className="text-[10px] font-black text-slate-600">{summary.noChange}</p>
-            <p className="text-[8px] font-bold uppercase text-slate-400">Iguais</p>
+            <p className="text-xs font-black text-slate-400">{summary.noChange}</p>
+            <p className="text-xs font-bold uppercase text-slate-400">Iguais</p>
           </div>
           {summary.warnings > 0 && (
             <div className="flex flex-col items-center rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 min-w-[60px]">
-              <p className="text-[10px] font-black text-amber-600">{summary.warnings}</p>
-              <p className="text-[8px] font-bold uppercase text-amber-500">Avisos</p>
+              <p className="text-xs font-black text-amber-600">{summary.warnings}</p>
+              <p className="text-xs font-bold uppercase text-amber-500">Avisos</p>
             </div>
           )}
         </div>
@@ -4051,16 +4051,16 @@ function SyncPreviewPanel({ result }: { result: any }) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/50">
-              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
                 Conta Salesforce
               </th>
-              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
                 Campos Traduzidos (Preview)
               </th>
-              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
                 Estado na Canopi
               </th>
-              <th className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <th className="px-4 py-3 text-xs font-black uppercase tracking-wider text-slate-500">
                 Ação Prevista
               </th>
             </tr>
@@ -4070,21 +4070,21 @@ function SyncPreviewPanel({ result }: { result: any }) {
               <tr key={item.sourceExternalId + idx} className="hover:bg-slate-50/30 transition-colors">
                 <td className="px-4 py-3">
                   <div className="space-y-0.5">
-                    <p className="text-[11px] font-black text-slate-900">{item.sourceDisplayName}</p>
-                    <p className="text-[9px] font-medium text-slate-400 font-mono">SF ID: {item.sourceExternalId}</p>
+                    <p className="text-xs font-black text-slate-900">{item.sourceDisplayName}</p>
+                    <p className="text-xs font-medium text-slate-400 font-mono">SF ID: {item.sourceExternalId}</p>
                   </div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-[10px]">
+                    <div className="flex items-center gap-1 text-xs">
                       <span className="font-bold text-slate-400 w-12 shrink-0">Nome:</span>
                       <span className="font-medium text-slate-700">{item.canonicalFields.nome || '—'}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px]">
+                    <div className="flex items-center gap-1 text-xs">
                       <span className="font-bold text-slate-400 w-12 shrink-0">Domínio:</span>
                       <span className="font-medium text-slate-700">{item.canonicalFields.dominio || '—'}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-[10px]">
+                    <div className="flex items-center gap-1 text-xs">
                       <span className="font-bold text-slate-400 w-12 shrink-0">Seg:</span>
                       <span className="font-medium text-slate-700 truncate max-w-[120px]">{item.canonicalFields.segmento || '—'}</span>
                     </div>
@@ -4093,43 +4093,43 @@ function SyncPreviewPanel({ result }: { result: any }) {
                 <td className="px-4 py-3">
                   {item.currentCanopiValue ? (
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-[10px]">
+                      <div className="flex items-center gap-1 text-xs">
                         <span className="font-bold text-slate-400">Atual:</span>
-                        <span className="font-medium text-slate-600 italic">{item.currentCanopiValue.nome}</span>
+                        <span className="font-medium text-slate-400 italic">{item.currentCanopiValue.nome}</span>
                       </div>
-                      <p className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded inline-block">
+                      <p className="text-xs font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded inline-block">
                         Match por {item.currentCanopiValue.dominio === item.canonicalFields.dominio ? 'Domínio' : 'ID Externo'}
                       </p>
                     </div>
                   ) : (
-                    <span className="text-[10px] font-medium text-slate-400 italic">Novo registro</span>
+                    <span className="text-xs font-medium text-slate-400 italic">Novo registro</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-col gap-1.5">
                     {item.actionPreview === 'create' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black text-emerald-700 w-fit">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-700 w-fit">
                         <Zap className="h-3 w-3" /> CRIAR
                       </span>
                     )}
                     {item.actionPreview === 'update' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-black text-blue-700 w-fit">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-black text-blue-700 w-fit">
                         <ArrowRight className="h-3 w-3" /> ATUALIZAR
                       </span>
                     )}
                     {item.actionPreview === 'no_change' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-black text-slate-600 w-fit">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-black text-slate-400 w-fit">
                         <CheckCircle2 className="h-3 w-3" /> SEM ALTERAÇÃO
                       </span>
                     )}
                     {item.actionPreview === 'warning' && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-black text-amber-700 w-fit">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-700 w-fit">
                         <AlertTriangle className="h-3 w-3" /> AVISO
                       </span>
                     )}
 
                     {item.warnings.map((w: string, i: number) => (
-                      <p key={i} className="text-[9px] font-medium text-amber-600 leading-tight">
+                      <p key={i} className="text-xs font-medium text-amber-600 leading-tight">
                         ⚠ {w}
                       </p>
                     ))}
@@ -4146,11 +4146,11 @@ function SyncPreviewPanel({ result }: { result: any }) {
           <ShieldCheck className="h-4 w-4" />
           <p className="text-xs font-black">Sincronização Read-Only</p>
         </div>
-        <p className="mt-3 max-w-md text-center text-[11px] font-medium text-slate-500">
+        <p className="mt-3 max-w-md text-center text-xs font-medium text-slate-500">
           Nenhum dado foi gravado na sua base de Contas da Canopi.
           Este painel apenas simula a tradução dos campos e o impacto que o sync teria se fosse executado agora.
         </p>
-        <p className="mt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+        <p className="mt-1 text-xs font-black text-slate-400 uppercase tracking-widest">
           O sync persistente ainda não está habilitado.
         </p>
       </div>
@@ -4179,16 +4179,16 @@ function SyncExecutePanel({ result }: { result: any }) {
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Resultado da Sincronização Controlada</p>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
               Campos Estratégicos Preservados
             </span>
-            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Salesforce → Canopi
             </span>
           </div>
         </div>
-        <div className="text-right text-[10px] text-slate-400 font-medium">
+        <div className="text-right text-xs text-slate-400 font-medium">
           {startedAt && <p>Iniciado: {new Date(startedAt).toLocaleString('pt-BR')}</p>}
           {finishedAt && <p>Finalizado: {new Date(finishedAt).toLocaleString('pt-BR')}</p>}
         </div>
@@ -4197,24 +4197,24 @@ function SyncExecutePanel({ result }: { result: any }) {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl bg-emerald-50 p-3 text-center">
           <p className="text-2xl font-black text-emerald-700">{createdCount}</p>
-          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Criadas</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Criadas</p>
         </div>
         <div className="rounded-xl bg-blue-50 p-3 text-center">
           <p className="text-2xl font-black text-blue-700">{updatedCount}</p>
-          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">Atualizadas</p>
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">Atualizadas</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3 text-center">
-          <p className="text-2xl font-black text-slate-600">{skippedCount}</p>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Ignoradas</p>
+          <p className="text-2xl font-black text-slate-400">{skippedCount}</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ignoradas</p>
         </div>
         <div className={`rounded-xl p-3 text-center ${errorCount > 0 ? 'bg-red-50' : 'bg-slate-50'}`}>
           <p className={`text-2xl font-black ${errorCount > 0 ? 'text-red-700' : 'text-slate-400'}`}>{errorCount}</p>
-          <p className={`text-[10px] font-bold uppercase tracking-wide ${errorCount > 0 ? 'text-red-600' : 'text-slate-400'}`}>Erros</p>
+          <p className={`text-xs font-bold uppercase tracking-wide ${errorCount > 0 ? 'text-red-600' : 'text-slate-400'}`}>Erros</p>
         </div>
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${statusTransitioned ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+        <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-full ${statusTransitioned ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
           {statusTransitioned ? 'Contrato → synced' : 'Contrato permanece mapped (erros detectados)'}
         </span>
       </div>
@@ -4225,8 +4225,8 @@ function SyncExecutePanel({ result }: { result: any }) {
           <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
             {(skippedRecords as Array<{ displayName: string; reason: string }>).map((rec, i) => (
               <div key={i} className="flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2">
-                <span className="text-[10px] font-bold text-slate-500 shrink-0">{rec.displayName}</span>
-                <span className="text-[10px] text-slate-400">{rec.reason}</span>
+                <span className="text-xs font-bold text-slate-500 shrink-0">{rec.displayName}</span>
+                <span className="text-xs text-slate-400">{rec.reason}</span>
               </div>
             ))}
           </div>
@@ -4240,7 +4240,7 @@ function SyncExecutePanel({ result }: { result: any }) {
             {(warnings as string[]).map((w, i) => (
               <div key={i} className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2">
                 <AlertTriangle className="h-3 w-3 text-red-500 mt-0.5 shrink-0" />
-                <span className="text-[10px] font-medium text-red-700">{w}</span>
+                <span className="text-xs font-medium text-red-700">{w}</span>
               </div>
             ))}
           </div>
@@ -4252,7 +4252,7 @@ function SyncExecutePanel({ result }: { result: any }) {
           <ShieldCheck className="h-4 w-4" />
           <p className="text-xs font-black">Guardrails Ativos</p>
         </div>
-        <ul className="mt-2 space-y-0.5 text-center text-[10px] font-medium text-slate-400">
+        <ul className="mt-2 space-y-0.5 text-center text-xs font-medium text-slate-400">
           <li>Campos estratégicos (tipoEstrategico, playAtivo, scoring) não foram sobrescritos.</li>
           <li>Writeback para Salesforce não está habilitado.</li>
           <li>Nenhuma Bulk API foi utilizada.</li>
@@ -4281,49 +4281,49 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Preview de Contacts</p>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
               Read-Only
             </span>
-            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Salesforce → Canopi
             </span>
           </div>
         </div>
         <div className="flex gap-2">
           <div className="flex flex-col items-center rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 min-w-[56px]">
-            <p className="text-[10px] font-black text-slate-700">{totalContacts}</p>
-            <p className="text-[8px] font-bold uppercase text-slate-400">Total</p>
+            <p className="text-xs font-black text-slate-700">{totalContacts}</p>
+            <p className="text-xs font-bold uppercase text-slate-400">Total</p>
           </div>
           <div className="flex flex-col items-center rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1.5 min-w-[56px]">
-            <p className="text-[10px] font-black text-emerald-700">{resolvedCount}</p>
-            <p className="text-[8px] font-bold uppercase text-emerald-500">Resolvidos</p>
+            <p className="text-xs font-black text-emerald-700">{resolvedCount}</p>
+            <p className="text-xs font-bold uppercase text-emerald-500">Resolvidos</p>
           </div>
           <div className="flex flex-col items-center rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 min-w-[56px]">
-            <p className="text-[10px] font-black text-amber-700">{unresolvedCount}</p>
-            <p className="text-[8px] font-bold uppercase text-amber-500">S/ Account</p>
+            <p className="text-xs font-black text-amber-700">{unresolvedCount}</p>
+            <p className="text-xs font-bold uppercase text-amber-500">S/ Account</p>
           </div>
           {missingFieldsCount > 0 && (
             <div className="flex flex-col items-center rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 min-w-[56px]">
-              <p className="text-[10px] font-black text-red-700">{missingFieldsCount}</p>
-              <p className="text-[8px] font-bold uppercase text-red-500">Incompletos</p>
+              <p className="text-xs font-black text-red-700">{missingFieldsCount}</p>
+              <p className="text-xs font-bold uppercase text-red-500">Incompletos</p>
             </div>
           )}
         </div>
       </div>
 
-      <ul className="mt-3 space-y-0.5 text-[10px] font-medium text-slate-500">
+      <ul className="mt-3 space-y-0.5 text-xs font-medium text-slate-500">
         <li>🔍 Nenhum contato será gravado nesta etapa.</li>
         <li>🔗 Contacts sem Account resolvida serão ignorados.</li>
         <li>📋 Este preview prepara a cobertura do grupo de compras para ABM/ABX.</li>
       </ul>
 
       <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3">
-        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-wide text-slate-600">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black uppercase tracking-wide text-slate-400">
           Ver tabela e critérios
         </summary>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-[10px]">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-slate-100">
                 <th className="pb-2 text-left font-black text-slate-500 uppercase tracking-wide">Contact SF</th>
@@ -4337,7 +4337,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
             </thead>
             <tbody className="divide-y divide-slate-50">
               {items.map((item, i) => {
-                const action = ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+                const action = ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-400 bg-slate-50' };
                 return (
                   <tr key={i} className="hover:bg-slate-50/50">
                     <td className="py-2 pr-3 font-medium text-slate-800 whitespace-nowrap">
@@ -4346,8 +4346,8 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
                         <span className="ml-1 text-slate-300 font-normal">{item.sourceContactId.slice(0, 8)}…</span>
                       )}
                     </td>
-                    <td className="py-2 pr-3 text-slate-600">{item.email || <span className="text-slate-300">—</span>}</td>
-                    <td className="py-2 pr-3 text-slate-600">
+                    <td className="py-2 pr-3 text-slate-400">{item.email || <span className="text-slate-300">—</span>}</td>
+                    <td className="py-2 pr-3 text-slate-400">
                       {item.cargo && <span>{item.cargo}</span>}
                       {item.cargo && item.area && <span className="text-slate-300"> / </span>}
                       {item.area && <span className="text-slate-400">{item.area}</span>}
@@ -4360,7 +4360,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
                       {item.resolvedAccountName ?? <span className="text-amber-400 font-bold">não resolvida</span>}
                     </td>
                     <td className="py-2 pr-3 whitespace-nowrap">
-                      <span className={`rounded-full px-2 py-0.5 font-black text-[9px] uppercase ${action.color}`}>
+                      <span className={`rounded-full px-2 py-0.5 font-black text-xs uppercase ${action.color}`}>
                         {action.label}
                       </span>
                     </td>
@@ -4384,7 +4384,7 @@ function ContactPreviewPanel({ result }: { result: ContactRelationshipPreviewRes
             </tbody>
           </table>
         </div>
-        <p className="mt-4 text-[10px] font-medium text-indigo-600">
+        <p className="mt-4 text-xs font-medium text-indigo-600">
           O vínculo com Account usa o <span className="font-black">sync_summary_log</span> dos contratos Account sincronizados no C4.7.
           Cada Contact sem Account resolvida permanece como <span className="font-black">unresolved_account</span> e não será criado na Canopi.
         </p>
@@ -4414,16 +4414,16 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Resultado do Sync Controlado de Contacts</p>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
               Campos Estratégicos Preservados
             </span>
-            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Salesforce → Canopi
             </span>
           </div>
         </div>
-        <div className="text-right text-[10px] text-slate-400 font-medium">
+        <div className="text-right text-xs text-slate-400 font-medium">
           {startedAt && <p>Iniciado: {new Date(startedAt).toLocaleString('pt-BR')}</p>}
           {finishedAt && <p>Finalizado: {new Date(finishedAt).toLocaleString('pt-BR')}</p>}
         </div>
@@ -4432,38 +4432,38 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl bg-emerald-50 p-3 text-center">
           <p className="text-2xl font-black text-emerald-700">{createdCount}</p>
-          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Criados</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Criados</p>
         </div>
         <div className="rounded-xl bg-blue-50 p-3 text-center">
           <p className="text-2xl font-black text-blue-700">{updatedCount}</p>
-          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">Atualizados</p>
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">Atualizados</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3 text-center">
-          <p className="text-2xl font-black text-slate-600">{skippedCount}</p>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Ignorados</p>
+          <p className="text-2xl font-black text-slate-400">{skippedCount}</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ignorados</p>
         </div>
         <div className={`rounded-xl p-3 text-center ${errorCount > 0 ? 'bg-red-50' : 'bg-slate-50'}`}>
           <p className={`text-2xl font-black ${errorCount > 0 ? 'text-red-700' : 'text-slate-400'}`}>{errorCount}</p>
-          <p className={`text-[10px] font-bold uppercase tracking-wide ${errorCount > 0 ? 'text-red-600' : 'text-slate-400'}`}>Erros</p>
+          <p className={`text-xs font-bold uppercase tracking-wide ${errorCount > 0 ? 'text-red-600' : 'text-slate-400'}`}>Erros</p>
         </div>
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+        <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-full ${
           outcome === 'synced' ? 'bg-emerald-100 text-emerald-700'
           : outcome === 'partial' ? 'bg-amber-100 text-amber-700'
-          : outcome === 'skipped' ? 'bg-slate-100 text-slate-600'
+          : outcome === 'skipped' ? 'bg-slate-100 text-slate-400'
           : 'bg-red-100 text-red-700'
         }`}>
           Resultado: {outcome}
         </span>
-        <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+        <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
           Contrato permanece no status atual
         </span>
       </div>
 
       <details className="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3">
-        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-wide text-slate-600">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black uppercase tracking-wide text-slate-400">
           Ver auditoria técnica
         </summary>
         <div className="mt-4">
@@ -4473,8 +4473,8 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
               <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
                 {(skippedRecords as Array<{ displayName: string; reason: string }>).map((rec, i) => (
                   <div key={i} className="flex items-start gap-2 rounded-lg bg-white px-3 py-2">
-                    <span className="text-[10px] font-bold text-slate-500 shrink-0">{rec.displayName}</span>
-                    <span className="text-[10px] text-slate-400">{rec.reason}</span>
+                    <span className="text-xs font-bold text-slate-500 shrink-0">{rec.displayName}</span>
+                    <span className="text-xs text-slate-400">{rec.reason}</span>
                   </div>
                 ))}
               </div>
@@ -4488,7 +4488,7 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
                 {(warnings as string[]).map((w, i) => (
                   <div key={i} className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2">
                     <AlertTriangle className="h-3 w-3 text-red-500 mt-0.5 shrink-0" />
-                    <span className="text-[10px] font-medium text-red-700">{w}</span>
+                    <span className="text-xs font-medium text-red-700">{w}</span>
                   </div>
                 ))}
               </div>
@@ -4500,7 +4500,7 @@ function ContactSyncExecutePanel({ result }: { result: any }) {
               <ShieldCheck className="h-4 w-4" />
               <p className="text-xs font-black">Guardrails Ativos</p>
             </div>
-            <ul className="mt-2 space-y-0.5 text-center text-[10px] font-medium text-slate-400">
+            <ul className="mt-2 space-y-0.5 text-center text-xs font-medium text-slate-400">
               <li>Campos estratégicos (classificacao, forcaRelacional, influencia, papelComite) não foram sobrescritos.</li>
               <li>Contacts sem Account resolvida foram ignorados — nenhum órfão criado.</li>
               <li>Writeback para Salesforce não está habilitado.</li>
@@ -4531,10 +4531,10 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Resumo das Opportunities</p>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">
               Sincronização segura
             </span>
-            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Salesforce para Canopi
             </span>
           </div>
@@ -4543,7 +4543,7 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
           {contactRoleLacuna && (
             <div className="flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50 px-3 py-1.5 text-amber-700">
               <Info className="h-3.5 w-3.5" />
-              <span className="text-[10px] font-bold uppercase tracking-tight">Relacionamento avançado opcional</span>
+              <span className="text-xs font-bold uppercase tracking-tight">Relacionamento avançado opcional</span>
             </div>
           )}
         </div>
@@ -4552,24 +4552,24 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl bg-slate-50 p-3 text-center">
           <p className="text-2xl font-black text-slate-900">{totalOpportunities}</p>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Total Opportunities</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Opportunities</p>
         </div>
         <div className="rounded-xl bg-emerald-50 p-3 text-center">
           <p className="text-2xl font-black text-emerald-700">{resolvedCount}</p>
-          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Com Account Resolvida</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Com Account Resolvida</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
           <p className="text-2xl font-black text-amber-700">{unresolvedCount}</p>
-          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wide">Account Não Resolvida</p>
+          <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">Account Não Resolvida</p>
         </div>
         <div className="rounded-xl bg-red-50 p-3 text-center">
           <p className="text-2xl font-black text-red-700">{missingFieldsCount}</p>
-          <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide">Dados Incompletos</p>
+          <p className="text-xs font-bold text-red-600 uppercase tracking-wide">Dados Incompletos</p>
         </div>
       </div>
 
       <div className="mt-5 overflow-x-auto rounded-xl border border-slate-100">
-        <table className="w-full text-[11px]">
+        <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/50">
               <th className="px-4 py-2 text-left font-black text-slate-500 uppercase tracking-wide">Opportunity (SF)</th>
@@ -4582,19 +4582,19 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
           </thead>
           <tbody className="divide-y divide-slate-50">
             {items.map((item, i) => {
-              const action = OPPORTUNITY_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+              const action = OPPORTUNITY_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-400 bg-slate-50' };
               return (
                 <tr key={i} className="hover:bg-slate-50/50">
                   <td className="px-4 py-3 font-medium text-slate-800">
                     <div className="flex flex-col">
                       <span>{item.nome || '—'}</span>
-                      <span className="text-[9px] font-mono text-slate-400">{item.sourceOpportunityId}</span>
+                      <span className="text-xs font-mono text-slate-400">{item.sourceOpportunityId}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-700">
                     {item.resolvedAccountName ?? <span className="text-amber-500 font-bold italic">não resolvida</span>}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 text-slate-400">
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 font-bold uppercase text-slate-500">
                       {item.stageName || '—'}
                     </span>
@@ -4602,29 +4602,29 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
                   <td className="px-4 py-3 font-black text-slate-700">
                     {item.amount !== null ? item.amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 text-slate-400">
                     {item.closeDate ? new Intl.DateTimeFormat('pt-BR').format(new Date(item.closeDate)) : '—'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
-                      <span className={`inline-block self-start rounded-full px-2 py-0.5 text-[9px] font-black uppercase ${action.color}`}>
+                      <span className={`inline-block self-start rounded-full px-2 py-0.5 text-xs font-black uppercase ${action.color}`}>
                         {action.label}
                       </span>
                       {item.actionPreview === 'ready_to_create' || item.actionPreview === 'ready_to_update' ? (
-                        <span className="text-[9px] font-medium text-emerald-700">
+                        <span className="text-xs font-medium text-emerald-700">
                           Este registro pode entrar com segurança na Canopi.
                         </span>
                       ) : item.actionPreview === 'unresolved_account' ? (
-                        <span className="text-[9px] font-medium text-amber-700">
+                        <span className="text-xs font-medium text-amber-700">
                           Para resolver, sincronize a Account correspondente ou revise o vínculo manualmente no modo avançado.
                         </span>
                       ) : item.actionPreview === 'missing_required_fields' ? (
-                        <span className="text-[9px] font-medium text-red-700">
+                        <span className="text-xs font-medium text-red-700">
                           Corrija os dados de origem para liberar a sincronização.
                         </span>
                       ) : null}
                       {item.warnings.map((w, j) => (
-                        <span key={j} className="flex items-center gap-1 text-[9px] font-medium text-amber-600">
+                        <span key={j} className="flex items-center gap-1 text-xs font-medium text-amber-600">
                           <AlertTriangle className="h-2 w-2" />
                           {w}
                         </span>
@@ -4639,21 +4639,21 @@ function OpportunityPreviewPanel({ result }: { result: OpportunityRelationshipPr
       </div>
 
       <div className="mt-5 space-y-2 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
-        <p className="text-[10px] font-black text-indigo-700 uppercase tracking-wide italic">Como interpretar este resumo</p>
+        <p className="text-xs font-black text-indigo-700 uppercase tracking-wide italic">Como interpretar este resumo</p>
         <ul className="grid grid-cols-1 gap-x-6 gap-y-1 sm:grid-cols-2">
-          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+          <li className="flex items-center gap-1.5 text-xs font-medium text-indigo-600">
             <ShieldCheck className="h-3 w-3" />
             Nenhuma Opportunity é gravada antes da etapa de sincronização.
           </li>
-          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+          <li className="flex items-center gap-1.5 text-xs font-medium text-indigo-600">
             <ShieldCheck className="h-3 w-3" />
             Opportunities com conta não resolvida ficam pendentes.
           </li>
-          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+          <li className="flex items-center gap-1.5 text-xs font-medium text-indigo-600">
             <ShieldCheck className="h-3 w-3" />
             O vínculo com Contacts é tratado como relacionamento avançado.
           </li>
-          <li className="flex items-center gap-1.5 text-[10px] font-medium text-indigo-600">
+          <li className="flex items-center gap-1.5 text-xs font-medium text-indigo-600">
             <ShieldCheck className="h-3 w-3" />
             Registros prontos podem seguir para sincronização com segurança.
           </li>
@@ -4688,7 +4688,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
       : outcome === 'partial'
         ? 'bg-amber-100 text-amber-700'
         : outcome === 'skipped'
-          ? 'bg-slate-100 text-slate-600'
+          ? 'bg-slate-100 text-slate-400'
           : 'bg-red-100 text-red-700';
 
   return (
@@ -4697,16 +4697,16 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
         <div className="space-y-0.5">
           <p className="text-base font-black text-slate-900">Resultado do Sync Controlado de Opportunities</p>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
               <ShieldCheck className="h-3 w-3" />
               Grava Opportunities na Canopi
             </span>
-            <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
               Sem Accounts, Contacts ou vínculos OCR
             </span>
           </div>
         </div>
-        <div className="text-right text-[10px] text-slate-400 font-medium">
+        <div className="text-right text-xs text-slate-400 font-medium">
           {startedAt && <p>Iniciado: {new Date(startedAt).toLocaleString('pt-BR')}</p>}
           {finishedAt && <p>Finalizado: {new Date(finishedAt).toLocaleString('pt-BR')}</p>}
         </div>
@@ -4715,39 +4715,39 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         <div className="rounded-xl bg-emerald-50 p-3 text-center">
           <p className="text-2xl font-black text-emerald-700">{createdCount}</p>
-          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Criadas</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Criadas</p>
         </div>
         <div className="rounded-xl bg-blue-50 p-3 text-center">
           <p className="text-2xl font-black text-blue-700">{updatedCount}</p>
-          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wide">Atualizadas</p>
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">Atualizadas</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3 text-center">
-          <p className="text-2xl font-black text-slate-600">{skippedCount}</p>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Ignoradas</p>
+          <p className="text-2xl font-black text-slate-400">{skippedCount}</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Ignoradas</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
           <p className="text-2xl font-black text-amber-700">{unresolvedAccountCount}</p>
-          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wide">Account não resolvida</p>
+          <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">Account não resolvida</p>
         </div>
         <div className="rounded-xl bg-rose-50 p-3 text-center">
           <p className="text-2xl font-black text-rose-700">{missingRequiredFieldsCount}</p>
-          <p className="text-[10px] font-bold text-rose-600 uppercase tracking-wide">Campos ausentes</p>
+          <p className="text-xs font-bold text-rose-600 uppercase tracking-wide">Campos ausentes</p>
         </div>
         <div className="rounded-xl bg-indigo-50 p-3 text-center">
           <p className="text-2xl font-black text-indigo-700">{existingMatchSkippedCount + ambiguousMatchSkippedCount}</p>
-          <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wide">Match conservador</p>
+          <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide">Match conservador</p>
         </div>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${outcomeStyle}`}>
+        <span className={`text-xs font-black uppercase px-2 py-0.5 rounded-full ${outcomeStyle}`}>
           Resultado: {outcome}
         </span>
-        <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+        <span className="text-xs font-black uppercase text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
           Contract permanece no status atual
         </span>
         {errorCount > 0 && (
-          <span className="text-[10px] font-black uppercase text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs font-black uppercase text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
             Erros: {errorCount}
           </span>
         )}
@@ -4758,7 +4758,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
           <p className="text-xs font-black text-slate-700">Criadas ({createdRecords.length})</p>
           <div className="mt-2 max-h-36 overflow-y-auto space-y-1">
             {createdRecords.map((rec, i) => (
-              <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-[10px]">
+              <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs">
                 <span className="font-black text-emerald-800">{rec.nome}</span>
                 <span className="text-emerald-600">{rec.accountSlug}</span>
                 <span className="text-emerald-500">{rec.accountId}</span>
@@ -4774,7 +4774,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
           <p className="text-xs font-black text-slate-700">Atualizadas ({updatedRecords.length})</p>
           <div className="mt-2 max-h-36 overflow-y-auto space-y-1">
             {updatedRecords.map((rec, i) => (
-              <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-[10px]">
+              <div key={i} className="flex flex-wrap items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs">
                 <span className="font-black text-blue-800">{rec.nome}</span>
                 <span className="text-blue-600">{rec.accountSlug}</span>
                 <span className="text-blue-500">{rec.accountId}</span>
@@ -4786,7 +4786,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
       )}
 
       <details className="mt-4 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3">
-        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-[10px] font-black uppercase tracking-wide text-slate-600">
+        <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black uppercase tracking-wide text-slate-400">
           Ver auditoria técnica
         </summary>
         <div className="mt-4">
@@ -4796,13 +4796,13 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
               <div className="mt-2 max-h-52 overflow-y-auto space-y-1">
                 {skippedRecords.map((rec, i) => (
                   <div key={i} className="rounded-lg bg-white px-3 py-2">
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-slate-600">
+                    <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-slate-400">
                       <span>{rec.nome}</span>
                       {rec.accountSlug && <span className="text-slate-400">· {rec.accountSlug}</span>}
                       {rec.accountId && <span className="text-slate-400">· {rec.accountId}</span>}
                       {rec.canopiOpportunityId && <span className="font-mono text-slate-500">{rec.canopiOpportunityId}</span>}
                     </div>
-                    <p className="mt-1 text-[10px] text-slate-500">{rec.reason}</p>
+                    <p className="mt-1 text-xs text-slate-500">{rec.reason}</p>
                   </div>
                 ))}
               </div>
@@ -4816,7 +4816,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
                 {warnings.map((warning, i) => (
                   <div key={i} className="flex items-start gap-2 rounded-lg bg-red-50 px-3 py-2">
                     <AlertTriangle className="h-3 w-3 text-red-500 mt-0.5 shrink-0" />
-                    <span className="text-[10px] font-medium text-red-700">{warning}</span>
+                    <span className="text-xs font-medium text-red-700">{warning}</span>
                   </div>
                 ))}
               </div>
@@ -4828,7 +4828,7 @@ function OpportunitySyncExecutePanel({ result }: { result: OpportunitySyncExecut
               <ShieldCheck className="h-4 w-4" />
               <p className="text-xs font-black">Guardrails Ativos</p>
             </div>
-            <ul className="mt-2 space-y-0.5 text-center text-[10px] font-medium text-slate-400">
+            <ul className="mt-2 space-y-0.5 text-center text-xs font-medium text-slate-400">
               <li>Account precisa estar resolvida via C4.7 antes de qualquer gravação.</li>
               <li>Sem Contact, sem vínculo Opportunity ↔ Contact e sem OpportunityContactRole.</li>
               <li>Match por account_slug + nome normalizado fica bloqueado quando não há log confiável.</li>
@@ -4863,28 +4863,28 @@ function OpportunityContactRolePreviewPanel({ result }: { result: OpportunityCon
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
           <div className="rounded-lg bg-slate-50 p-2 text-center border border-slate-100">
             <p className="text-xl font-black text-slate-700">{totalRoles}</p>
-            <p className="text-[8px] font-bold text-slate-500 uppercase tracking-wide">Total Roles</p>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Roles</p>
           </div>
           <div className="rounded-lg bg-emerald-50 p-2 text-center border border-emerald-100">
             <p className="text-xl font-black text-emerald-600">{readyToLinkCount}</p>
-            <p className="text-[8px] font-bold text-emerald-600 uppercase tracking-wide">Prontos p/ Ligar</p>
+            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Prontos p/ Ligar</p>
           </div>
           <div className="rounded-lg bg-amber-50 p-2 text-center border border-amber-100">
             <p className="text-xl font-black text-amber-600">{unresolvedOppCount}</p>
-            <p className="text-[8px] font-bold text-amber-600 uppercase tracking-wide">Opp Sem Payload</p>
+            <p className="text-xs font-bold text-amber-600 uppercase tracking-wide">Opp Sem Payload</p>
           </div>
           <div className="rounded-lg bg-orange-50 p-2 text-center border border-orange-100">
             <p className="text-xl font-black text-orange-600">{unresolvedContactCount}</p>
-            <p className="text-[8px] font-bold text-orange-600 uppercase tracking-wide">Sem Contact Sinc.</p>
+            <p className="text-xs font-bold text-orange-600 uppercase tracking-wide">Sem Contact Sinc.</p>
           </div>
           <div className="rounded-lg bg-red-50 p-2 text-center border border-red-100">
             <p className="text-xl font-black text-red-600">{missingFieldsCount}</p>
-            <p className="text-[8px] font-bold text-red-600 uppercase tracking-wide">Incompletos</p>
+            <p className="text-xs font-bold text-red-600 uppercase tracking-wide">Incompletos</p>
           </div>
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-lg border border-slate-100">
-          <table className="w-full text-[10px]">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50">
                 <th className="px-3 py-2 text-left font-bold text-slate-500">Opp Salesforce</th>
@@ -4896,13 +4896,13 @@ function OpportunityContactRolePreviewPanel({ result }: { result: OpportunityCon
             </thead>
           <tbody className="divide-y divide-slate-50">
             {items.map((item, i) => {
-              const action = OCR_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-600 bg-slate-50' };
+              const action = OCR_ACTION_LABELS[item.actionPreview] ?? { label: item.actionPreview, color: 'text-slate-400 bg-slate-50' };
               return (
                 <tr key={i} className="hover:bg-slate-50/50">
                   <td className="px-3 py-2 font-medium text-slate-800">
                     <div className="flex flex-col">
                       <span>{item.opportunityName || '—'}</span>
-                      <span className="text-[8px] font-mono text-slate-400">{item.sourceOpportunityId}</span>
+                      <span className="text-xs font-mono text-slate-400">{item.sourceOpportunityId}</span>
                     </div>
                   </td>
                   <td className="px-3 py-2 font-medium text-slate-700">
@@ -4911,22 +4911,22 @@ function OpportunityContactRolePreviewPanel({ result }: { result: OpportunityCon
                   <td className="px-3 py-2 font-medium text-slate-800">
                     <div className="flex flex-col">
                       <span>{item.resolvedContactName || <span className="text-orange-500 font-bold italic">não resolvido</span>}</span>
-                      <span className="text-[8px] font-mono text-slate-400">{item.sourceContactId}</span>
+                      <span className="text-xs font-mono text-slate-400">{item.sourceContactId}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2 text-slate-600">
+                  <td className="px-3 py-2 text-slate-400">
                     <div className="flex flex-col gap-0.5">
                       <span className="font-bold text-slate-700">{item.roleName || '—'}</span>
-                      {item.isPrimary && <span className="text-[8px] font-black uppercase text-emerald-600">★ Primário</span>}
+                      {item.isPrimary && <span className="text-xs font-black uppercase text-emerald-600">★ Primário</span>}
                     </div>
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex flex-col gap-1">
-                      <span className={`inline-block self-start rounded px-1.5 py-0.5 text-[9px] font-black uppercase ${action.color}`}>
+                      <span className={`inline-block self-start rounded px-1.5 py-0.5 text-xs font-black uppercase ${action.color}`}>
                         {action.label}
                       </span>
                       {item.warnings.map((w, j) => (
-                        <span key={j} className="flex items-center gap-1 text-[8px] font-medium text-red-600 leading-tight">
+                        <span key={j} className="flex items-center gap-1 text-xs font-medium text-red-600 leading-tight">
                           <AlertTriangle className="h-2 w-2 shrink-0" />
                           {w}
                         </span>

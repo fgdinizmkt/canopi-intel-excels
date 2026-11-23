@@ -67,7 +67,7 @@ export const AccountValidation = () => {
                   <h4 className={`text-sm font-black uppercase tracking-tight ${blocker.severity === 'hard' ? 'text-red-900' : 'text-amber-900'}`}>
                     {blocker.id} • {blocker.section}
                   </h4>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${blocker.severity === 'hard' ? 'bg-red-200 text-red-800' : 'bg-amber-200 text-amber-800'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold uppercase ${blocker.severity === 'hard' ? 'bg-red-200 text-red-800' : 'bg-amber-200 text-amber-800'}`}>
                     {blocker.severity === 'hard' ? 'Bloqueador Crítico' : 'Aviso de Risco'}
                   </span>
                 </div>
@@ -75,11 +75,11 @@ export const AccountValidation = () => {
                 
                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-black/5">
                   <div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase block mb-1">Consequência</span>
-                    <p className="text-xs text-slate-600 leading-relaxed italic">{blocker.consequence}</p>
+                    <span className="text-xs font-black text-slate-400 uppercase block mb-1">Consequência</span>
+                    <p className="text-xs text-slate-400 leading-relaxed italic">{blocker.consequence}</p>
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase block mb-1">Ação Corretiva</span>
+                    <span className="text-xs font-black text-slate-400 uppercase block mb-1">Ação Corretiva</span>
                     <div className="space-y-2">
                       <p className="text-xs font-bold text-slate-700 leading-relaxed flex items-center gap-1">
                         <ArrowRight className="w-3 h-3" /> {blocker.action}
@@ -87,12 +87,12 @@ export const AccountValidation = () => {
                       {blocker.sectionSlug ? (
                         <Link
                           href={`/configuracoes/objetos/contas/${blocker.sectionSlug}`}
-                          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700"
+                          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-600 hover:text-blue-700"
                         >
                           Ir para {stepStatusMap.get(blocker.sectionSlug)?.label || blocker.section}
                         </Link>
                       ) : (
-                        <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <span className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-500">
                           Revisar em Validação Local
                         </span>
                       )}
@@ -136,7 +136,7 @@ export const AccountValidation = () => {
 
       <div className="bg-slate-100 p-4 rounded-xl flex items-center gap-3">
         <Database className="w-4 h-4 text-slate-400" />
-        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+        <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
           Ambiente: Homologação Local State • Dados persistentes apenas p/ navegação atual
         </p>
       </div>

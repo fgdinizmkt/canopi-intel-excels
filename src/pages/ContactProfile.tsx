@@ -27,12 +27,12 @@ interface ContactProfileProps {
 const MetricCard = ({ label, value, color, icon: Icon }: { label: string; value: number | string; color: string; icon: any }) => (
   <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2">
     <div className="flex items-center justify-between">
-      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
+      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{label}</span>
       <Icon className={`w-3.5 h-3.5 ${color}`} />
     </div>
     <div className="flex items-baseline gap-1">
       <span className={`text-xl font-black ${color}`}>{value}</span>
-      {typeof value === 'number' && <span className="text-[9px] text-slate-600 font-bold">/10</span>}
+      {typeof value === 'number' && <span className="text-xs text-slate-400 font-bold">/10</span>}
     </div>
   </div>
 );
@@ -167,8 +167,8 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
     setTimeout(() => setNarrativeStatus(null), 1500);
   };
 
-  if (loading) return <div className="p-10 text-slate-500 font-medium animate-pulse bg-slate-950 min-h-screen">Sincronizando perfil operacional do contato...</div>;
-  if (!account || !contact) return <div className="p-10 text-slate-500 bg-slate-950 min-h-screen">Contato ou Conta não encontrados.</div>;
+  if (loading) return <div className="p-10 text-slate-400 font-medium animate-pulse bg-slate-950 min-h-screen">Sincronizando perfil operacional do contato...</div>;
+  if (!account || !contact) return <div className="p-10 text-slate-400 bg-slate-950 min-h-screen">Contato ou Conta não encontrados.</div>;
 
   const leader = account.contatos.find(c => c.id === contact.liderId);
 
@@ -181,7 +181,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
             <button onClick={() => router.back()} className="p-2 hover:bg-slate-800 rounded-lg transition-all text-slate-400">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400">
               <Link href="/contas" className="hover:text-slate-300 transition-colors">Contas</Link>
               <ChevronRight className="w-3 h-3" />
               <Link href={`/contas/${slug}`} className="hover:text-slate-300 transition-colors uppercase">{account.nome}</Link>
@@ -202,25 +202,25 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
              <div className="flex items-center gap-4 mb-2">
                 <h1 className="text-4xl font-black tracking-tighter">{contact.nome}</h1>
                 <Linkedin className="w-4 h-4 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer" />
-                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black border ${contact.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                <span className={`px-2 py-0.5 rounded text-xs uppercase font-black border ${contact.status === 'Ativo' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
                   {contact.status}
                 </span>
              </div>
              <p className="text-lg text-slate-300 font-medium flex items-center gap-2">
-                {contact.cargo} <span className="text-slate-500">·</span> {contact.area}
+                {contact.cargo} <span className="text-slate-400">·</span> {contact.area}
              </p>
              <div className="flex items-center gap-6 mt-4">
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                    <Target className="w-3.5 h-3.5 text-brand" /> {contact.papelComite}
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                    <ShieldCheck className="w-3.5 h-3.5 text-blue-500" /> {contact.senioridade}
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 italic">
-                   <Building2 className="w-3.5 h-3.5 text-slate-600" /> {account.nome}
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400 italic">
+                   <Building2 className="w-3.5 h-3.5 text-slate-400" /> {account.nome}
                 </div>
                 {contact.owner && (
-                  <div className="flex items-center gap-2 text-[11px] font-black text-blue-400 uppercase tracking-tighter">
+                  <div className="flex items-center gap-2 text-xs font-black text-blue-400 uppercase tracking-tighter">
                      <Users className="w-3 h-3" /> Owner: {contact.owner}
                   </div>
                 )}
@@ -229,7 +229,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
           <div className="flex flex-col items-end gap-3 pb-2">
              <div className="flex gap-2">
                 {contact.classificacao.map(tag => (
-                   <span key={tag} className="px-2 py-0.5 bg-slate-800 border border-slate-700 text-slate-400 rounded-md text-[9px] font-black uppercase tracking-widest">{tag}</span>
+                   <span key={tag} className="px-2 py-0.5 bg-slate-800 border border-slate-700 text-slate-400 rounded-md text-xs font-black uppercase tracking-widest">{tag}</span>
                 ))}
              </div>
              <button className="px-6 py-2.5 bg-brand text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-brand/20 hover:scale-105 transition-all">
@@ -245,7 +245,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
         <aside className="col-span-4 space-y-6">
            {/* Matriz de Engajamento & Atribuição */}
            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-brand" /> Poder & Acesso Relacional
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -257,7 +257,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
 
               {/* Atribuição de Owner (RESTAURADO) */}
               <div className="mt-6 pt-6 border-t border-slate-800">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                    <Users className="w-3.5 h-3.5 text-blue-400" /> Atribuição de Owner
                 </p>
                 <div className="flex gap-2">
@@ -271,7 +271,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                    <button 
                      onClick={handleAssignOwner}
                      disabled={!ownerInput.trim() || !!ownerStatus}
-                     className={`px-4 h-9 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${ownerStatus ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30'}`}
+                     className={`px-4 h-9 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${ownerStatus ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/20' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30'}`}
                    >
                      {ownerStatus ? 'OK' : 'Atribuir'}
                    </button>
@@ -281,7 +281,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
 
            {/* Classificação Operacional (RESTAURADO - TOGGLES) */}
            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-blue-500" /> Classificação Estratégica
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -291,37 +291,37 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                        <button
                          key={option}
                          onClick={() => handleToggleClassification(option)}
-                         className={`text-[9px] font-black uppercase px-2 py-1.5 rounded-lg border transition-all ${isSelected ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 ring-1 ring-blue-500/20' : 'bg-slate-950 text-slate-600 border-slate-800 hover:text-slate-400'}`}
+                         className={`text-xs font-black uppercase px-2 py-1.5 rounded-lg border transition-all ${isSelected ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 ring-1 ring-blue-500/20' : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-400'}`}
                        >
                          {option}
                        </button>
                     );
                  })}
               </div>
-              {classificationStatus && <p className="mt-3 text-[10px] text-emerald-500 animate-pulse font-bold">{classificationStatus}</p>}
+              {classificationStatus && <p className="mt-3 text-xs text-emerald-500 animate-pulse font-bold">{classificationStatus}</p>}
            </section>
 
            {/* Hierarquia & Relacionamentos */}
            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <Network className="w-4 h-4 text-violet-400" /> Hierarquia & Influência
               </h3>
               <div className="space-y-6">
                  {leader ? (
                    <div>
-                      <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3 italic">Reporta para:</p>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 italic">Reporta para:</p>
                       <Link href={`/contas/${slug}/contato/${leader.id}`} className="flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl hover:border-brand/40 transition-all group">
-                         <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-bold text-slate-500 group-hover:text-brand transition-colors italic border border-slate-700">
+                         <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center font-bold text-slate-400 group-hover:text-brand transition-colors italic border border-slate-700">
                             {leader.nome.substring(0, 2)}
                          </div>
                          <div>
                             <p className="text-sm font-bold text-slate-200 group-hover:text-brand">{leader.nome}</p>
-                            <p className="text-[10px] text-slate-500 font-medium">{leader.cargo}</p>
+                            <p className="text-xs text-slate-400 font-medium">{leader.cargo}</p>
                          </div>
                       </Link>
                    </div>
                  ) : (
-                   <p className="text-[10px] text-slate-600 italic">Hierarquia superior não mapeada.</p>
+                   <p className="text-xs text-slate-400 italic">Hierarquia superior não mapeada.</p>
                  )}
               </div>
            </section>
@@ -337,7 +337,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
               </div>
               <div className="relative z-10">
                  <div className="flex items-center gap-3 mb-6">
-                    <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                    <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20">
                        Inteligência de Abordagem Canopi AI
                     </span>
                     <Sparkles className="w-4 h-4 text-white/60 animate-pulse" />
@@ -379,7 +379,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
            {/* Narrativas Operacionais (RESTAURADO - EDITOR) */}
            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative">
               <div className="flex items-center justify-between mb-6">
-                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                    <Edit3 className="w-4 h-4 text-brand" /> Narrativas Operacionais
                  </h3>
                  <button 
@@ -394,7 +394,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                 <div className="grid grid-cols-2 gap-6">
                    <div className="space-y-4">
                       <div>
-                        <label className="text-[9px] font-black text-slate-600 uppercase mb-2 block tracking-widest">Observações Táticas</label>
+                        <label className="text-xs font-black text-slate-400 uppercase mb-2 block tracking-widest">Observações Táticas</label>
                         <textarea 
                           value={observacoes}
                           onChange={(e) => setObservacoes(e.target.value)}
@@ -403,7 +403,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                         />
                       </div>
                       <div>
-                        <label className="text-[9px] font-black text-slate-600 uppercase mb-2 block tracking-widest">Histórico de Interação</label>
+                        <label className="text-xs font-black text-slate-400 uppercase mb-2 block tracking-widest">Histórico de Interação</label>
                         <textarea 
                           value={historicoNarrativo}
                           onChange={(e) => setHistoricoNarrativo(e.target.value)}
@@ -413,7 +413,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                       </div>
                    </div>
                    <div className="flex flex-col h-full">
-                      <label className="text-[9px] font-black text-slate-600 uppercase mb-2 block tracking-widest text-emerald-500">Próxima Ação Recomendada</label>
+                      <label className="text-xs font-black text-slate-400 uppercase mb-2 block tracking-widest text-emerald-500">Próxima Ação Recomendada</label>
                       <textarea 
                         value={proximaAcao}
                         onChange={(e) => setProximaAcao(e.target.value)}
@@ -423,7 +423,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                       <button 
                         onClick={handleSaveNarratives}
                         disabled={!!narrativeStatus}
-                        className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${narrativeStatus ? 'bg-emerald-600 text-white' : 'bg-brand text-white hover:bg-brand-dark'}`}
+                        className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${narrativeStatus ? 'bg-emerald-600 text-white' : 'bg-brand text-white hover:bg-brand-dark'}`}
                       >
                          {narrativeStatus ? 'Narrativas Atualizadas' : 'Salvar Estratégia'}
                       </button>
@@ -432,15 +432,15 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
               ) : (
                 <div className="grid grid-cols-3 gap-6">
                    <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800/50">
-                      <p className="text-[9px] font-black text-slate-600 uppercase mb-2">Observações</p>
+                      <p className="text-xs font-black text-slate-400 uppercase mb-2">Observações</p>
                       <p className="text-xs text-slate-400 leading-relaxed italic line-clamp-4">{observacoes || 'Nenhuma nota tática registrada.'}</p>
                    </div>
                    <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800/50">
-                      <p className="text-[9px] font-black text-slate-600 uppercase mb-2">Histórico Narrativo</p>
+                      <p className="text-xs font-black text-slate-400 uppercase mb-2">Histórico Narrativo</p>
                       <p className="text-xs text-slate-400 leading-relaxed italic line-clamp-4">{historicoNarrativo || 'Sem histórico registrado disponível.'}</p>
                    </div>
                    <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/20">
-                      <p className="text-[9px] font-black text-emerald-500 uppercase mb-2">Próxima Ação</p>
+                      <p className="text-xs font-black text-emerald-500 uppercase mb-2">Próxima Ação</p>
                       <p className="text-xs text-slate-200 font-bold leading-relaxed">{proximaAcao || 'Aguardando definição estratégica.'}</p>
                    </div>
                 </div>
@@ -452,23 +452,23 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
               <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col h-[450px]">
                  <div className="flex items-center justify-between mb-8">
                     <div>
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                       <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-blue-400" /> Timeline de Engajamento
                        </h3>
-                       <span className="text-[8px] font-bold text-slate-600 uppercase tracking-widest opacity-60">Filtro Contextual (Match por Nome)</span>
+                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest opacity-60">Filtro Contextual (Match por Nome)</span>
                     </div>
-                    <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-2 py-0.5 rounded-full">{contactInteractions.length} Eventos</span>
+                    <span className="text-xs font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">{contactInteractions.length} Eventos</span>
                  </div>
                  <div className="flex-1 overflow-y-auto space-y-6 pr-2 scrollbar-thin">
                     {contactInteractions.length > 0 ? contactInteractions.map((int, i) => (
                       <div key={i} className="relative pl-6 border-l-2 border-slate-800 pb-2 last:pb-0">
                          <div className="absolute top-0 -left-[9px] w-4 h-4 rounded-full bg-slate-900 border-2 border-blue-500" />
-                         <span className="text-[9px] font-black text-slate-500 uppercase">{new Date(int.date).toLocaleDateString('pt-BR')}</span>
+                         <span className="text-xs font-black text-slate-400 uppercase">{new Date(int.date).toLocaleDateString('pt-BR')}</span>
                          <p className="text-xs font-black text-slate-200 mt-1">{int.interactionType}</p>
-                         <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">{int.description}</p>
+                         <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">{int.description}</p>
                       </div>
                     )) : (
-                      <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-3">
+                      <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-3">
                          <Activity className="w-12 h-12 opacity-10" />
                          <p className="text-xs italic text-center">Nenhuma interação direta registrada para {contact.nome}.</p>
                       </div>
@@ -478,7 +478,7 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
 
               {/* Intervenções Associadas (RESTAURADO) */}
               <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col h-[450px]">
-                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 flex items-center gap-2">
+                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-blue-400" /> Intervenções Associadas
                  </h3>
                  <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin">
@@ -487,11 +487,11 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                        <div key={i} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl relative group overflow-hidden">
                           <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
                           <div className="flex items-center justify-between mb-2">
-                             <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">{sinal.tipo}</span>
+                             <span className="text-xs font-black text-blue-400 uppercase tracking-widest">{sinal.tipo}</span>
                              <Clock className="w-3 h-3 text-slate-700" />
                           </div>
                           <h4 className="text-xs font-bold text-slate-200 mb-2 truncate">{sinal.titulo}</h4>
-                          <p className="text-[10px] text-slate-500 line-clamp-2 leading-relaxed italic">
+                          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed italic">
                              {sinal.recomendacao}
                           </p>
                        </div>
@@ -503,8 +503,8 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
                           <div>
                              <p className="text-xs font-bold text-slate-200 group-hover:text-brand transition-colors">{acao.title}</p>
                              <div className="flex items-center gap-2 mt-1">
-                                <span className={`text-[8px] font-black uppercase ${acao.priority === 'Alta' ? 'text-red-500' : 'text-slate-500'}`}>{acao.status} · {acao.priority}</span>
-                                <span className="text-[8px] font-bold text-blue-500 tracking-tighter">@{acao.suggestedOwner}</span>
+                                <span className={`text-xs font-black uppercase ${acao.priority === 'Alta' ? 'text-red-500' : 'text-slate-400'}`}>{acao.status} · {acao.priority}</span>
+                                <span className="text-xs font-bold text-blue-500 tracking-tighter">@{acao.suggestedOwner}</span>
                              </div>
                           </div>
                           <ChevronRight className="w-4 h-4 text-slate-800 group-hover:text-brand" />
@@ -523,18 +523,18 @@ export const ContactProfile: React.FC<ContactProfileProps> = ({ slug, contactId 
 
            {/* Campanhas Digitais Relacionadas */}
            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <Link2 className="w-4 h-4 text-brand" /> Touchpoints em Campanhas Digitais
               </h3>
               <div className="grid grid-cols-3 gap-6">
                  {account.canaisCampanhas.influencias.slice(0, 3).map((inf, i) => (
                     <div key={i} className="p-4 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col gap-2 group hover:border-brand/30 transition-all">
                        <div className="flex items-center justify-between mb-1">
-                          <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[9px] font-black text-slate-400 uppercase border border-slate-800 tracking-widest group-hover:text-brand transition-colors">{inf.canal}</span>
-                          <span className="text-[9px] text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
+                          <span className="px-2 py-0.5 bg-slate-900 rounded-md text-xs font-black text-slate-400 uppercase border border-slate-800 tracking-widest group-hover:text-brand transition-colors">{inf.canal}</span>
+                          <span className="text-xs text-slate-400 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
                        </div>
                        <p className="text-xs font-bold text-slate-200 line-clamp-1 group-hover:text-white">{inf.campanha}</p>
-                       <p className="text-[10px] text-slate-500 leading-relaxed line-clamp-2">{inf.impacto}</p>
+                       <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{inf.impacto}</p>
                     </div>
                  ))}
               </div>

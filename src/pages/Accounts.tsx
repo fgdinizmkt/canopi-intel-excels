@@ -407,7 +407,7 @@ export const Accounts = () => {
   }
 
   if (contas.length === 0) {
-    return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-600">Nenhuma conta cadastrada no portfólio. Cadastre contas para iniciar a priorização operacional.</div>;
+    return <div className="bg-white border border-slate-200 rounded-2xl p-8 text-sm text-slate-400">Nenhuma conta cadastrada no portfólio. Cadastre contas para iniciar a priorização operacional.</div>;
   }
 
   return (
@@ -422,14 +422,14 @@ export const Accounts = () => {
           <div className="relative z-10">
             {/* Top Context Pills */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
-              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-black text-slate-400 uppercase tracking-widest">Revenue Intelligence</span>
-              <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[8px] font-black text-emerald-400 uppercase tracking-widest">Cockpit Ativo</span>
-              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-[8px] font-black text-slate-400 uppercase tracking-widest">Portfólio Estratégico</span>
+              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-xs font-black text-slate-400 uppercase tracking-widest">Revenue Intelligence</span>
+              <span className="px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-black text-emerald-400 uppercase tracking-widest">Cockpit Ativo</span>
+              <span className="px-2.5 py-0.5 bg-white/5 border border-white/10 rounded-full text-xs font-black text-slate-400 uppercase tracking-widest">Portfólio Estratégico</span>
             </div>
 
             {/* Breadcrumb & Title Area */}
             <div className="mb-6">
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.3em] mb-2">Canopi · Intelligence · Portfolio</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-2">Canopi · Intelligence · Portfolio</p>
               <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none mb-4">
                 Portfólio de Contas
               </h1>
@@ -441,16 +441,16 @@ export const Accounts = () => {
             {/* Middle Controls (View Toggle & Search) */}
             <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 mb-8">
               <div className="flex bg-white/5 border border-white/10 p-1 rounded-full backdrop-blur-md">
-                <button onClick={() => setVisualizacao('lista')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'lista' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Lista</button>
-                <button onClick={() => setVisualizacao('grade')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'grade' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Grade</button>
-                <button onClick={() => setVisualizacao('board')} className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase transition-all ${visualizacao === 'board' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Board</button>
+                <button onClick={() => setVisualizacao('lista')} className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${visualizacao === 'lista' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Lista</button>
+                <button onClick={() => setVisualizacao('grade')} className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${visualizacao === 'grade' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Grade</button>
+                <button onClick={() => setVisualizacao('board')} className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${visualizacao === 'board' ? 'bg-white text-brand shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>Board</button>
               </div>
               <div className="relative group flex-1 max-w-xs">
                 <Search className="w-3.5 h-3.5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors" />
                 <input 
                   value={filtros.busca} 
                   onChange={(e) => atualizarFiltro('busca', e.target.value)} 
-                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all placeholder:text-slate-600" 
+                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-white focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all placeholder:text-slate-400" 
                   placeholder="Localizar conta..." 
                 />
               </div>
@@ -459,39 +459,39 @@ export const Accounts = () => {
             {/* Integrated Metrics (Aligned Boxes) */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
               <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group text-left">
-                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Total de Contas</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Total de Contas</p>
                 <p className="text-2xl font-black text-white tracking-tighter">{contas.length}</p>
-                <p className="mt-1 text-[9px] font-bold text-emerald-500 uppercase">Base Ativa</p>
+                <p className="mt-1 text-xs font-bold text-emerald-500 uppercase">Base Ativa</p>
               </div>
 
               <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, potencial: 'alto' }))}>
-                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Alto Potencial</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Alto Potencial</p>
                 <p className="text-2xl font-black text-white tracking-tighter">{metricas.altoPotencial}</p>
-                <p className="mt-1 text-[9px] font-bold text-brand uppercase">Growth Fit</p>
+                <p className="mt-1 text-xs font-bold text-brand uppercase">Growth Fit</p>
               </div>
 
               <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, risco: 'alto' }))}>
-                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Exposição Crítica</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Exposição Crítica</p>
                 <p className="text-2xl font-black text-white tracking-tighter">{metricas.risco}</p>
-                <p className="mt-2 text-[10px] font-bold text-rose-500 uppercase">Risco Detectado</p>
+                <p className="mt-2 text-xs font-bold text-rose-500 uppercase">Risco Detectado</p>
               </div>
 
               <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group text-left">
-                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Cobertura Relacional</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Cobertura Relacional</p>
                 <p className="text-2xl font-black text-white tracking-tighter">{coberturaBase}%</p>
-                <p className="mt-1 text-[9px] font-bold text-blue-400 uppercase">Saúde</p>
+                <p className="mt-1 text-xs font-bold text-blue-400 uppercase">Saúde</p>
               </div>
 
               <div className="bg-white/5 border border-white/5 p-4 rounded-[2rem] hover:bg-white/[0.08] transition-all group cursor-pointer text-left" onClick={() => setFiltros(f => ({ ...f, oportunidade: 'com' }))}>
-                <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">Pipeline Ativo</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Pipeline Ativo</p>
                 <p className="text-2xl font-black text-white tracking-tighter">{metricas.oportunidades}</p>
-                <p className="mt-1 text-[9px] font-bold text-brand uppercase">Oportunidades</p>
+                <p className="mt-1 text-xs font-bold text-brand uppercase">Oportunidades</p>
               </div>
             </div>
 
             {/* Actions Bar */}
             <div className="flex justify-center md:justify-start gap-3">
-              <button className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+              <button className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-black text-white uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
                 <ArrowUpRight className="w-3 h-3" /> Exportar Intel
               </button>
             </div>
@@ -503,16 +503,16 @@ export const Accounts = () => {
         {/* ── REFINED FILTER COMMAND STRIP ── */}
         <section className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-xl shadow-slate-200/50 space-y-6 mb-8 relative">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+            <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-brand" /> Filtros e Segmentação
             </h2>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-3.5 h-3.5 text-slate-600" />
+                <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
                 <select 
                   value={ordenacao} 
                   onChange={(e) => setOrdenacao(e.target.value as Ordenacao)} 
-                  className="bg-transparent text-[11px] font-black text-slate-500 uppercase tracking-widest hover:text-brand focus:outline-none cursor-pointer"
+                  className="bg-transparent text-xs font-black text-slate-500 uppercase tracking-widest hover:text-brand focus:outline-none cursor-pointer"
                 >
                   <option value="potencial_desc">Potencial (maior)</option>
                   <option value="risco_desc">Risco (maior)</option>
@@ -524,7 +524,7 @@ export const Accounts = () => {
               </div>
               <button 
                 onClick={() => setFiltros(filtrosIniciais)} 
-                className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-brand transition-colors"
+                className="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-brand transition-colors"
               >
                 Limpar Todos
               </button>
@@ -600,7 +600,7 @@ export const Accounts = () => {
             </select>
             {/* E22.1: Filtros Canônicos de Campanhas */}
             <div className="col-span-full">
-              <span className="text-[8px] font-black text-fuchsia-600 uppercase tracking-widest">Campanhas Canônicas</span>
+              <span className="text-xs font-black text-fuchsia-600 uppercase tracking-widest">Campanhas Canônicas</span>
             </div>
             <select value={filtros.usoPrincipal} onChange={(e) => atualizarFiltro('usoPrincipal', e.target.value)} title="ABM, ABX ou Híbrido — define a audiência alvo principal da campanha" className="w-full bg-fuchsia-50 border border-fuchsia-100 rounded-xl p-2.5 text-xs font-black text-fuchsia-600 focus:border-fuchsia-500 transition-all shadow-sm uppercase tracking-tighter">
               <option value="todos">Uso Principal: Todos</option>
@@ -623,10 +623,10 @@ export const Accounts = () => {
 
         {/* ── TACTICAL SHORTCUTS & OPERATION PRESETS ── */}
         <div className="mb-4 flex items-center justify-between px-2">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
             <Layout className="w-3.5 h-3.5" /> Presets Operacionais
           </h3>
-          <span className="text-[9px] font-bold text-slate-400 uppercase">Acesso Rápido por Contexto</span>
+          <span className="text-xs font-bold text-slate-400 uppercase">Acesso Rápido por Contexto</span>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
@@ -638,7 +638,7 @@ export const Accounts = () => {
               <div className="w-6 h-6 rounded-lg bg-rose-50 flex items-center justify-center">
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
               </div>
-              <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest">Atenção Crítica</span>
+              <span className="text-xs font-black text-rose-600 uppercase tracking-widest">Atenção Crítica</span>
             </div>
             <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Contas de alto risco com movimentação recente detectada.</p>
           </button>
@@ -651,7 +651,7 @@ export const Accounts = () => {
               <div className="w-6 h-6 rounded-lg bg-brand/5 flex items-center justify-center">
                 <Users className="w-3.5 h-3.5 text-brand" />
               </div>
-              <span className="text-[9px] font-black text-brand uppercase tracking-widest">Gap Relacional</span>
+              <span className="text-xs font-black text-brand uppercase tracking-widest">Gap Relacional</span>
             </div>
             <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Contas ABM prontas para início de mapeamento estratégico.</p>
           </button>
@@ -664,7 +664,7 @@ export const Accounts = () => {
               <div className="w-6 h-6 rounded-lg bg-blue-50 flex items-center justify-center">
                 <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
               </div>
-              <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest">Aceleração Base</span>
+              <span className="text-xs font-black text-blue-600 uppercase tracking-widest">Aceleração Base</span>
             </div>
             <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Expansão em contas com pipeline e estratégia ABX ativa.</p>
           </button>
@@ -677,7 +677,7 @@ export const Accounts = () => {
               <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center">
                 <Cpu className="w-3.5 h-3.5 text-emerald-600" />
               </div>
-              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Machine Insight</span>
+              <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Machine Insight</span>
             </div>
             <p className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 leading-tight">Sugestão de plays recomendados pela inteligência Canopi.</p>
           </button>
@@ -691,7 +691,7 @@ export const Accounts = () => {
             </div>
             <p className="text-lg font-black text-white tracking-tighter uppercase tracking-widest">Nenhum Registro Identificado</p>
             <p className="text-sm text-slate-500 mt-2 font-medium">Os critérios selecionados não retornaram contas compatíveis.</p>
-            <button onClick={() => setFiltros(filtrosIniciais)} className="mt-8 px-6 py-2.5 bg-brand text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">Resetar Filtros</button>
+            <button onClick={() => setFiltros(filtrosIniciais)} className="mt-8 px-6 py-2.5 bg-brand text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">Resetar Filtros</button>
           </div>
         ) : visualizacao === 'grade' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -712,16 +712,16 @@ export const Accounts = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`w-1.5 h-1.5 rounded-full ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500 pulse-green' : conta.statusGeral === 'Atenção' ? 'bg-amber-500 pulse-amber' : 'bg-rose-500 pulse-red'}`} />
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{conta.vertical}</span>
+                        <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{conta.vertical}</span>
                       </div>
                       <h3 onClick={() => openAccount(conta.id)} className="text-xl font-bold text-slate-900 tracking-tighter leading-tight truncate cursor-pointer hover:text-brand transition-colors">
                         {conta.nome}
                       </h3>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate mt-0.5">{conta.dominio}</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter truncate mt-0.5">{conta.dominio}</p>
                     </div>
                     
                     <div className="flex flex-col items-end gap-2">
-                      <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                      <span className={`px-2 py-0.5 rounded-lg text-xs font-black uppercase tracking-widest ${
                         conta.statusGeral === 'Saudável' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
                         conta.statusGeral === 'Crítico' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 
                         'bg-amber-500/10 text-amber-400 border border-amber-500/20'
@@ -729,8 +729,8 @@ export const Accounts = () => {
                         {conta.statusGeral}
                       </span>
                       <div className="bg-slate-50 border border-slate-200 p-1.5 flex items-center gap-2 rounded-xl">
-                        <span className="text-[10px] font-black text-slate-400 px-1">SCORE</span>
-                        <span className={`text-[11px] font-black px-2 py-0.5 rounded-lg ${score.scoreTotal >= 75 ? 'bg-emerald-500/10 text-emerald-600' : score.scoreTotal >= 50 ? 'bg-amber-500/10 text-amber-600' : 'bg-rose-500/10 text-rose-600'}`}>
+                        <span className="text-xs font-black text-slate-400 px-1">SCORE</span>
+                        <span className={`text-xs font-black px-2 py-0.5 rounded-lg ${score.scoreTotal >= 75 ? 'bg-emerald-500/10 text-emerald-600' : score.scoreTotal >= 50 ? 'bg-amber-500/10 text-amber-600' : 'bg-rose-500/10 text-rose-600'}`}>
                           {score.scoreTotal}
                         </span>
                       </div>
@@ -738,17 +738,17 @@ export const Accounts = () => {
                   </div>
 
                   <div className="flex-1 space-y-4 relative z-10">
-                    <div className="flex items-center justify-between text-[11px] border-y border-slate-100 py-3">
+                    <div className="flex items-center justify-between text-xs border-y border-slate-100 py-3">
                        <div className="space-y-1">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Potencial</span>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">Potencial</span>
                           <span className="text-slate-900 font-bold">{conta.potencial}%</span>
                        </div>
                        <div className="space-y-1 text-center">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Mapeamento</span>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">Mapeamento</span>
                           <span className="text-slate-900 font-bold">{conta.coberturaRelacional}%</span>
                        </div>
                        <div className="space-y-1 text-end">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Risco</span>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest block">Risco</span>
                           <span className={`font-bold ${riscoClasse(conta.risco)}`}>{conta.risco}</span>
                        </div>
                     </div>
@@ -757,25 +757,25 @@ export const Accounts = () => {
                         {signals?.interactionsCount > 0 && (
                           <div className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded-lg flex items-center gap-1.5" title="Sinais do Bloco C">
                             <Activity className="w-3 h-3 text-emerald-500" />
-                            <span className="text-[10px] font-black text-emerald-400">{signals.interactionsCount}</span>
+                            <span className="text-xs font-black text-emerald-400">{signals.interactionsCount}</span>
                           </div>
                         )}
                         {signals?.playsCount > 0 && (
                           <div className="px-2 py-1 bg-blue-500/5 border border-blue-500/10 rounded-lg flex items-center gap-1.5">
                             <Sparkles className="w-3 h-3 text-blue-500" />
-                            <span className="text-[10px] font-black text-blue-400">{signals.playsCount} PLAYS</span>
+                            <span className="text-xs font-black text-blue-400">{signals.playsCount} PLAYS</span>
                           </div>
                         )}
                         {acoesAtrasadas > 0 && (
                           <div className="px-2 py-1 bg-rose-500/5 border border-rose-500/10 rounded-lg flex items-center gap-1.5">
                             <AlertTriangle className="w-3 h-3 text-rose-500" />
-                            <span className="text-[10px] font-black text-rose-400">{acoesAtrasadas} ATRASADAS</span>
+                            <span className="text-xs font-black text-rose-400">{acoesAtrasadas} ATRASADAS</span>
                           </div>
                         )}
                         {campanhasCanonicasPorConta[conta.id]?.length > 0 && (
                           <div className="px-2 py-1 bg-fuchsia-500/5 border border-fuchsia-500/10 rounded-lg flex items-center gap-1.5" title="Campanhas Canônicas">
                             <Mail className="w-3 h-3 text-fuchsia-500" />
-                            <span className="text-[10px] font-black text-fuchsia-400">{campanhasCanonicasPorConta[conta.id].length} CAM</span>
+                            <span className="text-xs font-black text-fuchsia-400">{campanhasCanonicasPorConta[conta.id].length} CAM</span>
                           </div>
                         )}
                     </div>
@@ -783,14 +783,14 @@ export const Accounts = () => {
 
                   <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-50">
                     <div className="flex items-center gap-2">
-                       <div className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400">
+                       <div className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-black text-slate-400">
                           {getInitials(conta.ownerPrincipal)}
                        </div>
-                       <span className="text-[10px] font-bold text-slate-500 truncate max-w-[100px]">{conta.ownerPrincipal}</span>
+                       <span className="text-xs font-bold text-slate-500 truncate max-w-[100px]">{conta.ownerPrincipal}</span>
                     </div>
                     <Link 
                       href={`/contas/${conta.slug}`}
-                      className="px-4 py-2 bg-slate-50 hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all shadow-sm"
+                      className="px-4 py-2 bg-slate-50 hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all shadow-sm"
                     >
                       Perfil 360
                     </Link>
@@ -808,9 +808,9 @@ export const Accounts = () => {
                   <div className="flex items-center justify-between px-3 mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{etapa}</h3>
+                      <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{etapa}</h3>
                     </div>
-                    <span className="text-[10px] font-black bg-slate-900 border border-slate-800 text-slate-400 px-3 py-0.5 rounded-full">{contasNaEtapa.length}</span>
+                    <span className="text-xs font-black bg-slate-900 border border-slate-800 text-slate-400 px-3 py-0.5 rounded-full">{contasNaEtapa.length}</span>
                   </div>
                   <div className="space-y-4">
                     {contasNaEtapa.map(conta => {
@@ -825,22 +825,22 @@ export const Accounts = () => {
                               <h4 onClick={() => openAccount(conta.id)} className="font-bold text-slate-900 tracking-tighter truncate leading-tight cursor-pointer hover:text-brand transition-colors">
                                 {conta.nome}
                               </h4>
-                              <p className="text-[9px] text-slate-400 font-bold uppercase truncate mt-0.5">{conta.vertical} · {conta.segmento}</p>
+                              <p className="text-xs text-slate-400 font-bold uppercase truncate mt-0.5">{conta.vertical} · {conta.segmento}</p>
                             </div>
                             <span className={`shrink-0 w-2.5 h-2.5 rounded-full mt-1.5 ${conta.statusGeral === 'Crítico' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]' : conta.statusGeral === 'Atenção' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'}`} />
                           </div>
                           
                           <div className="grid grid-cols-3 gap-2 py-3 border-y border-slate-50 my-3">
                              <div className="text-center">
-                                <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Growth</span>
-                                <span className="text-[10px] font-bold text-slate-900">{conta.potencial}%</span>
+                                <span className="text-xs font-black text-slate-400 uppercase block mb-1">Growth</span>
+                                <span className="text-xs font-bold text-slate-900">{conta.potencial}%</span>
                              </div>
                              <div className="text-center border-x border-slate-50">
-                                <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Risco</span>
-                                <span className={`text-[10px] font-bold ${riscoClasse(conta.risco)}`}>{conta.risco}</span>
+                                <span className="text-xs font-black text-slate-400 uppercase block mb-1">Risco</span>
+                                <span className={`text-xs font-bold ${riscoClasse(conta.risco)}`}>{conta.risco}</span>
                              </div>
                              <div className="text-center">
-                                <span className="text-[10px] font-black text-slate-900 uppercase block mb-1">
+                                <span className="text-xs font-black text-slate-900 uppercase block mb-1">
                                   {calculateAccountScore(conta).scoreTotal}
                                 </span>
                                 <span className="text-[7px] font-black text-slate-400 uppercase">Score</span>
@@ -850,19 +850,19 @@ export const Accounts = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5">
                               {signals?.interactionsCount > 0 && (
-                                <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10 flex items-center gap-1">
+                                <span className="text-xs font-black text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10 flex items-center gap-1">
                                   <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                 </span>
                               )}
                               {signals?.playsCount > 0 && (
-                                <span className="text-[9px] font-black text-blue-400 bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10 flex items-center gap-1">
+                                <span className="text-xs font-black text-blue-400 bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10 flex items-center gap-1">
                                   <Sparkles className="w-2.5 h-2.5" /> {signals.playsCount}
                                 </span>
                               )}
                             </div>
                             <Link 
                               href={`/contas/${conta.slug}`} 
-                              className="text-[9px] font-black text-slate-500 hover:text-brand uppercase tracking-widest transition-colors flex items-center gap-1.5"
+                              className="text-xs font-black text-slate-500 hover:text-brand uppercase tracking-widest transition-colors flex items-center gap-1.5"
                               onClick={(e) => e.stopPropagation()}
                             >
                               Perfil <ArrowUpRight className="w-3 h-3" />
@@ -888,13 +888,13 @@ export const Accounts = () => {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead className="sticky top-0 z-10">
-                        <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-[0.12em]">
-                          <th className="py-5 px-4 pl-8 text-[10px]">Conta & Inteligência</th>
-                          <th className="py-5 px-4 text-[10px]">Contexto / Owner</th>
-                          <th className="py-5 px-4 text-[10px]">Score & Pipeline</th>
-                          <th className="py-5 px-4 text-[10px]">Estratégia & Play</th>
-                          <th className="py-5 px-4 text-[10px]">Cobertura</th>
-                          <th className="py-5 px-4 text-end pr-8 text-[10px]">Ação de Próximo Passo</th>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-black uppercase text-slate-400 tracking-[0.12em]">
+                          <th className="py-5 px-4 pl-8 text-xs">Conta & Inteligência</th>
+                          <th className="py-5 px-4 text-xs">Contexto / Owner</th>
+                          <th className="py-5 px-4 text-xs">Score & Pipeline</th>
+                          <th className="py-5 px-4 text-xs">Estratégia & Play</th>
+                          <th className="py-5 px-4 text-xs">Cobertura</th>
+                          <th className="py-5 px-4 text-end pr-8 text-xs">Ação de Próximo Passo</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
@@ -908,7 +908,7 @@ export const Accounts = () => {
                               {/* 1. IDENTITY & CONTEXT */}
                               <td className="py-5 px-4 pl-8">
                                 <div className="flex items-center gap-4">
-                                  <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-[11px]">
+                                  <div className="w-9 h-9 shrink-0 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 text-xs">
                                      {getInitials(conta.nome)}
                                   </div>
                                   <div className="min-w-0">
@@ -922,23 +922,23 @@ export const Accounts = () => {
                                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${conta.statusGeral === 'Saudável' ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'}`} />
                                      </div>
                                      <div className="flex items-center gap-3 mb-1.5">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter leading-none">{conta.dominio}</span>
                                         {signals?.interactionsCount > 0 && (
-                                           <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
+                                           <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-emerald-100">
                                              <Activity className="w-2.5 h-2.5" /> {signals.interactionsCount}
                                            </span>
                                         )}
                                         {campanhasCanonicasPorConta[conta.id]?.length > 0 && (
-                                           <span className="text-[9px] font-black text-fuchsia-600 bg-fuchsia-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-fuchsia-100">
+                                           <span className="text-xs font-black text-fuchsia-600 bg-fuchsia-50 px-1.5 py-0.5 rounded flex items-center gap-0.5 border border-fuchsia-100">
                                              <Mail className="w-2.5 h-2.5" /> {campanhasCanonicasPorConta[conta.id].length} CAMP
                                            </span>
                                         )}
                                      </div>
                                      {/* Context Info moved below Identity to reduce horizontal tension */}
                                      <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-slate-500">{conta.vertical}</span>
-                                        <span className="text-[10px] font-black text-slate-200 uppercase">/</span>
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.05em]">{conta.segmento}</span>
+                                        <span className="text-xs font-bold text-slate-500">{conta.vertical}</span>
+                                        <span className="text-xs font-black text-slate-200 uppercase">/</span>
+                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.05em]">{conta.segmento}</span>
                                      </div>
                                   </div>
                                 </div>
@@ -947,10 +947,10 @@ export const Accounts = () => {
                               {/* 2. OWNER */}
                               <td className="py-5 px-4 text-slate-500 min-w-[140px]">
                                  <div className="flex items-center gap-2 leading-none text-slate-400">
-                                   <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-[8px] font-black">
+                                   <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-xs font-black">
                                       {getInitials(conta.ownerPrincipal)}
                                    </div>
-                                   <p className="text-[10px] font-bold uppercase tracking-widest">{conta.ownerPrincipal}</p>
+                                   <p className="text-xs font-bold uppercase tracking-widest">{conta.ownerPrincipal}</p>
                                  </div>
                               </td>
 
@@ -959,16 +959,16 @@ export const Accounts = () => {
                                  <div className="flex items-center gap-3">
                                     <div className="text-center bg-slate-50 border border-slate-200 px-2 py-1.5 rounded-xl min-w-[45px] shadow-sm">
                                        <p className="text-[12px] font-black text-slate-900">{score.scoreTotal}</p>
-                                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Score</p>
+                                       <p className="text-xs font-black text-slate-400 uppercase tracking-tighter">Score</p>
                                     </div>
                                     <div className="min-w-0">
                                        <div className="flex items-center gap-1.5 mb-1">
-                                         <p className={`text-[10px] font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
+                                         <p className={`text-xs font-black uppercase tracking-tight ${score.scoreTotal >= 75 ? 'text-emerald-600' : score.scoreTotal >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>{score.prioridade}</p>
                                          {conta.possuiOportunidade && (
-                                           <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-[8px] font-black uppercase tracking-tighter">Pipeline</span>
+                                           <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded text-xs font-black uppercase tracking-tighter">Pipeline</span>
                                          )}
                                        </div>
-                                       <p className="text-[10px] font-bold text-slate-400 uppercase leading-none tracking-tight">{conta.etapa}</p>
+                                       <p className="text-xs font-bold text-slate-400 uppercase leading-none tracking-tight">{conta.etapa}</p>
                                     </div>
                                  </div>
                               </td>
@@ -981,8 +981,8 @@ export const Accounts = () => {
                                         <button
                                           key={t}
                                           onClick={() => handleUpdateTipoEstrategico(conta.id, t)}
-                                          className={`px-2 py-1 rounded-md text-[9px] font-black uppercase transition-all ${
-                                            conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'
+                                          className={`px-2 py-1 rounded-md text-xs font-black uppercase transition-all ${
+                                            conta.tipoEstrategico === t ? 'bg-white text-brand shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-400'
                                           }`}
                                         >
                                           {t}
@@ -990,7 +990,7 @@ export const Accounts = () => {
                                       ))}
                                     </div>
                                     {/* 4B: Compact Play Indicator replaces redundant selection */}
-                                    <div className="flex items-center gap-2 px-1 text-[10px] font-bold text-slate-400">
+                                    <div className="flex items-center gap-2 px-1 text-xs font-bold text-slate-400">
                                       <Zap className="w-3 h-3 text-brand opacity-60 shrink-0" />
                                       <span>Play ativo: {signals?.playsCount > 0 ? 'Sim' : 'Não'} · {signals?.playsCount || 0}</span>
                                     </div>
@@ -1001,8 +1001,8 @@ export const Accounts = () => {
                               <td className="py-5 px-4">
                                  <div className="space-y-1.5">
                                     <div className="flex items-baseline justify-between w-24">
-                                       <span className="text-[8px] font-black text-slate-400 uppercase">Coverage</span>
-                                       <span className="text-[10px] font-bold text-slate-900">{conta.coberturaRelacional}%</span>
+                                       <span className="text-xs font-black text-slate-400 uppercase">Coverage</span>
+                                       <span className="text-xs font-bold text-slate-900">{conta.coberturaRelacional}%</span>
                                     </div>
                                     <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
                                        <div 
@@ -1017,8 +1017,8 @@ export const Accounts = () => {
                               <td className="py-5 px-4 text-end pr-8">
                                  <div className="flex items-center justify-end gap-3">
                                     <div className="text-end min-w-0 max-w-[150px]">
-                                       <p className="text-[11px] font-bold text-slate-900 truncate tracking-tight">{conta.proximaMelhorAcao || 'Sem ação'}</p>
-                                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Próximo Passo</p>
+                                       <p className="text-xs font-bold text-slate-900 truncate tracking-tight">{conta.proximaMelhorAcao || 'Sem ação'}</p>
+                                       <p className="text-xs font-black text-slate-400 uppercase tracking-tighter">Próximo Passo</p>
                                     </div>
                                     <button 
                                       onClick={() => abrirEditorNarrativo(conta)} 
@@ -1028,10 +1028,10 @@ export const Accounts = () => {
                                       <Sparkles className="w-3.5 h-3.5" />
                                     </button>
                                     <div className="flex flex-col items-end gap-1">
-                                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-black uppercase tracking-tight ${badgeClasse(conta.statusGeral)}`}>
                                         {conta.statusGeral}
                                       </span>
-                                      <Link href={`/contas/${conta.slug}`} className="text-[8px] font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">Perfil 360</Link>
+                                      <Link href={`/contas/${conta.slug}`} className="text-xs font-black text-brand uppercase tracking-widest hover:underline whitespace-nowrap">Perfil 360</Link>
                                     </div>
                                  </div>
                               </td>
@@ -1045,14 +1045,14 @@ export const Accounts = () => {
                   {/* 4C: Volume Control & Expansion Mechanism using consolidated derivation */}
                   <div className="bg-slate-50/50 border-t border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Exibição:</span>
+                      <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Exibição:</span>
                       <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">
                         {[10, 30, 50].map((v) => (
                           <button
                             key={v}
                             onClick={() => setVolume(v)}
-                            className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${
-                              volume === v ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'
+                            className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${
+                              volume === v ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-400'
                             }`}
                           >
                             {v}
@@ -1060,14 +1060,14 @@ export const Accounts = () => {
                         ))}
                         <button
                           onClick={() => setVolume(listViewContas.length)}
-                          className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${
-                            volume >= listViewContas.length ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'
+                          className={`px-4 py-1.5 rounded-lg text-xs font-black transition-all ${
+                            volume >= listViewContas.length ? 'bg-slate-900 text-white shadow-md' : 'text-slate-400 hover:text-slate-400'
                           }`}
                         >
                           TUDO
                         </button>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">
+                      <span className="text-xs font-bold text-slate-400">
                         Mostrando {Math.min(volume, listViewContas.length)} de {listViewContas.length} contas
                       </span>
                     </div>
@@ -1075,7 +1075,7 @@ export const Accounts = () => {
                     {volume < listViewContas.length && (
                       <button
                         onClick={() => setVolume(prev => prev + 20)}
-                        className="px-8 py-3 bg-white hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-[1.25rem] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all shadow-sm hover:shadow-xl hover:shadow-slate-200/50 flex items-center gap-2"
+                        className="px-8 py-3 bg-white hover:bg-slate-950 border border-slate-200 hover:border-slate-900 rounded-[1.25rem] text-xs font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-all shadow-sm hover:shadow-xl hover:shadow-slate-200/50 flex items-center gap-2"
                       >
                         Carregar mais contas <ChevronDown className="w-4 h-4" />
                       </button>

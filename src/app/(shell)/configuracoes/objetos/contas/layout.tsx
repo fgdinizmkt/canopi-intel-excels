@@ -83,7 +83,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
             {!isConnectorDetailPage && (
               <>
                 <div className="mr-6 text-right hidden xl:block">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">Prontidão do setup local</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Prontidão do setup local</p>
                   <div className="flex items-center gap-2">
                     <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
@@ -123,7 +123,7 @@ function ContasConfigLayoutInner({ children }: { children: React.ReactNode }) {
       </main>
 
       <footer className="bg-white border-t border-slate-200 p-8">
-         <div className="max-w-[1600px] mx-auto flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-widest">
+         <div className="max-w-[1600px] mx-auto flex items-center justify-between text-xs font-black text-slate-400 uppercase tracking-widest">
             <div className="flex items-center gap-8">
                <span>Canopi © 2026</span>
             </div>

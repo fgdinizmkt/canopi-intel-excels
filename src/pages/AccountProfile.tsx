@@ -33,10 +33,10 @@ const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
   return (
     <div className="flex-1 min-w-0">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</span>
-        <span className="text-[10px] font-bold text-slate-300">{val}</span>
+        <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">{label}</span>
+        <span className="text-xs font-bold text-slate-600">{val}</span>
       </div>
-      <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+      <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all duration-500 ${bgColor}`} style={{ width: `${val}%` }} />
       </div>
     </div>
@@ -48,29 +48,29 @@ const OrgNode = ({ contact, level, isRoot, onSelect }: { contact: ContatoConta; 
   const color = contact.classificacao.includes('Blocker') ? 'border-red-500 text-red-400 bg-red-500/5' :
                 contact.classificacao.includes('Sponsor') ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' :
                 contact.classificacao.includes('Decisor') ? 'border-amber-500 text-amber-400 bg-amber-500/5' :
-                'border-slate-700 text-slate-300 bg-slate-900';
+                'border-slate-200 text-slate-600 bg-white';
 
   return (
     <div className="relative group">
        {!isRoot && (
-         <div className="absolute -left-6 top-1/2 w-6 h-px bg-slate-800" />
+         <div className="absolute -left-6 top-1/2 w-6 h-px bg-slate-100" />
        )}
        <div 
          onClick={() => onSelect(contact.id)}
          className={`p-3 rounded-xl border-l-4 ${color} transition-all hover:translate-x-1 cursor-pointer shadow-lg w-64 shrink-0`}
        >
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs">
+             <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-xs">
                 {contact.nome.substring(0,2).toUpperCase()}
              </div>
              <div className="min-w-0">
                 <p className="text-xs font-black truncate">{contact.nome}</p>
-                <p className="text-[10px] text-slate-500 truncate">{contact.cargo}</p>
+                <p className="text-xs text-slate-600 truncate">{contact.cargo}</p>
              </div>
           </div>
           <div className="mt-2 flex items-center justify-between">
-             <span className="text-[8px] font-black uppercase text-slate-500">{contact.papelComite}</span>
-             <span className="text-[9px] font-bold text-blue-500">{contact.influencia}/10 Inf.</span>
+             <span className="text-xs font-black uppercase text-slate-400">{contact.papelComite}</span>
+             <span className="text-xs font-bold text-blue-500">{contact.influencia}/10 Inf.</span>
           </div>
        </div>
     </div>
@@ -205,7 +205,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
         {children.map(contact => (
           <div key={contact.id} className="flex items-start gap-6">
             <OrgNode contact={contact} level={level} isRoot={level === 0} onSelect={(id) => router.push(`/contas/${slug}/contato/${id}`)} />
-            <div className="flex flex-col gap-4 border-l border-slate-800 pl-6">
+            <div className="flex flex-col gap-4 border-l border-slate-200 pl-6">
                {renderTree(contatos, contact.id, level + 1)}
             </div>
           </div>
@@ -223,14 +223,14 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
          {roots.map(root => (
            <div key={root.id} className="inline-block min-w-max pr-12">
               <div className="mb-4">
-                 <span className="px-3 py-1 bg-slate-800 border border-slate-700 text-[10px] font-black uppercase text-slate-500 rounded-lg tracking-widest italic">
+                 <span className="px-3 py-1 bg-slate-100 border border-slate-200 text-xs font-black uppercase text-slate-400 rounded-lg tracking-widest italic">
                     Árvore Hierárquica: {root.area}
                  </span>
               </div>
               <div className="flex flex-col gap-6">
                  <div className="flex items-start gap-6">
                     <OrgNode contact={root} level={0} isRoot={true} onSelect={(id) => router.push(`/contas/${slug}/contato/${id}`)} />
-                    <div className="flex flex-col gap-4 border-l border-slate-800 pl-6">
+                    <div className="flex flex-col gap-4 border-l border-slate-200 pl-6">
                        {renderTree(account.contatos, root.id, 1)}
                     </div>
                  </div>
@@ -276,25 +276,25 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     return sessionActions.filter(a => a.accountName === account?.nome);
   }, [sessionActions, account?.nome]);
 
-  if (loading) return <div className="p-10 text-slate-500 font-medium animate-pulse bg-slate-950 min-h-screen">Sincronizando perfil 360 da conta...</div>;
-  if (!account) return <div className="p-10 text-slate-500 bg-slate-950 min-h-screen">Conta não encontrada.</div>;
+  if (loading) return <div className="p-10 text-slate-400 font-medium animate-pulse bg-slate-50 min-h-screen">Sincronizando perfil 360 da conta...</div>;
+  if (!account) return <div className="p-10 text-slate-400 bg-slate-50 min-h-screen">Conta não encontrada.</div>;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-12 overflow-x-hidden">
+    <div className="fixed inset-0 left-60 z-10 bg-slate-50 text-slate-900 overflow-y-auto">
       {/* ── TOP NAVIGATION ── */}
-      <nav className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="p-2 hover:bg-slate-800 rounded-lg transition-all">
+            <button onClick={() => router.back()} className="p-2 hover:bg-slate-100 rounded-lg transition-all">
               <ArrowLeft className="w-5 h-5 text-slate-400" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center font-bold text-lg shadow-lg border border-white/10 italic">
+              <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center font-bold text-lg shadow-lg border border-white/10 italic text-white">
                 {account.nome.substring(0, 2)}
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">{account.nome}</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-2">
+                <p className="text-xs text-slate-600 font-bold uppercase tracking-widest flex items-center gap-2">
                   <Globe className="w-3 h-3 text-blue-500" /> {account.dominio} · {account.vertical}
                 </p>
               </div>
@@ -302,88 +302,88 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
           </div>
           <div className="flex items-center gap-3">
             {showFeedback && (
-              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mr-4 animate-pulse">✓ {showFeedback}</span>
+              <span className="text-xs font-black text-emerald-400 uppercase tracking-widest mr-4 animate-pulse">✓ {showFeedback}</span>
             )}
-            <button className="px-4 py-2 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm">
+            <button className="px-4 py-2 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-600 rounded-xl transition-all text-xs font-black uppercase tracking-widest shadow-sm">
               Sincronizar CRM
             </button>
-            <button className="px-4 py-2 bg-brand text-white hover:bg-brand/90 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-lg shadow-brand/20">
+            <button className="px-4 py-2 bg-brand text-white hover:bg-brand/90 rounded-xl transition-all text-xs font-black uppercase tracking-widest shadow-lg shadow-brand/20">
               Gerar Account Review
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-12 gap-8">
+      <main className="w-full px-6 mt-8 grid grid-cols-12 gap-8">
         
         {/* ── LEFT COLUMN: IDENTITY & FIRMOGRAPHICS (4/12) ── */}
         <aside className="col-span-4 space-y-6">
           {/* Identity & Structure */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
+          <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex flex-col gap-1">
-                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Vertical Estratégica</span>
+                 <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Vertical Estratégica</span>
                  <h2 className="text-2xl font-black text-white italic tracking-tighter">{account.vertical}</h2>
               </div>
               <div className="flex flex-col items-end gap-1">
-                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Potencial Growth</span>
+                 <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Potencial Growth</span>
                  <span className="text-2xl font-black text-emerald-400">{account.potencial}%</span>
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4 mb-8 pt-4 border-t border-slate-800">
+            <div className="grid grid-cols-2 gap-4 mb-8 pt-4 border-t border-slate-200">
                <div>
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                      <Target className="w-3 h-3" /> Modelo de Atendimento
                   </p>
-                  <p className="text-xs font-bold text-slate-300 uppercase">{account.tipoEstrategico}</p>
+                  <p className="text-xs font-bold text-slate-600 uppercase">{account.tipoEstrategico}</p>
                </div>
                <div>
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                      <Building2 className="w-3 h-3" /> Porte Corporativo
                   </p>
-                  <p className="text-xs font-bold text-slate-300 uppercase">{account.porte}</p>
+                  <p className="text-xs font-bold text-slate-600 uppercase">{account.porte}</p>
                </div>
             </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-800/50">
+              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-200/50">
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Status Geral</p>
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest">Status Geral</p>
                   <p className={`text-xs font-bold uppercase ${account.statusGeral === 'Saudável' ? 'text-emerald-400' : 'text-amber-400'}`}>{account.statusGeral}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Budget Comercial</p>
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest">Budget Comercial</p>
                   <p className="text-xs font-bold text-emerald-400">{fmt(account.budgetBrl)}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Atividade Recente</p>
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest">Atividade Recente</p>
                   <p className={`text-xs font-bold ${account.atividadeRecente === 'Alta' ? 'text-emerald-400' : 'text-blue-500'}`}>{account.atividadeRecente}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Mapeamento</p>
+                  <p className="text-xs font-black text-slate-600 uppercase tracking-widest">Mapeamento</p>
                   <p className="text-xs font-bold text-blue-400">{account.coberturaRelacional}% do Comitê</p>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-slate-800/50">
-                 <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
+              <div className="pt-6 border-t border-slate-200/50">
+                 <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
                     <span>Account Ownership</span>
                     <Users className="w-3.5 h-3.5" />
                  </p>
                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl">
-                       <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px] font-black text-blue-400 border border-blue-500/20">
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                       <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-xs font-black text-blue-400 border border-blue-500/20">
                           {account.ownerPrincipal.substring(0,2).toUpperCase()}
                        </div>
                        <div>
-                          <p className="text-xs font-bold text-slate-200">{account.ownerPrincipal}</p>
-                          <p className="text-[9px] text-slate-500 font-black uppercase">Owner Principal</p>
+                          <p className="text-xs font-bold text-slate-700">{account.ownerPrincipal}</p>
+                          <p className="text-xs text-slate-400 font-black uppercase">Owner Principal</p>
                        </div>
                     </div>
                     {account.ownersSecundarios && account.ownersSecundarios.length > 0 && (
                        <div className="flex flex-wrap gap-2 pt-1">
                           {account.ownersSecundarios.map(o => (
-                            <span key={o} className="px-2 py-1 bg-slate-800 text-[8px] font-black text-slate-400 rounded-md border border-slate-700 uppercase tracking-tighter">Co-owner: {o}</span>
+                            <span key={o} className="px-2 py-1 bg-slate-100 text-xs font-black text-slate-400 rounded-md border border-slate-200 uppercase tracking-tighter">Co-owner: {o}</span>
                           ))}
                         </div>
                      )}
@@ -391,22 +391,22 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                </div>
 
               {/* Macro Priorização Section */}
-              <div className="pt-8 border-t border-slate-800/50">
+              <div className="pt-8 border-t border-slate-200/50">
                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-xs font-black text-slate-600 uppercase tracking-widest flex items-center gap-2">
                        <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Prioridade de Negócio
                     </p>
-                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${account.prioridadeMacro === 'Crítica' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-black uppercase tracking-widest ${account.prioridadeMacro === 'Crítica' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
                        {account.prioridadeMacro || 'Normal'}
                     </span>
                  </div>
-                 <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                    <p className="text-[11px] text-slate-400 leading-relaxed italic">&quot;{account.prioridadeRationale || 'Conta sob monitoramento padrão de ciclo de venda.'}&quot;</p>
+                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <p className="text-sm text-slate-700 leading-relaxed italic">&quot;{account.prioridadeRationale || 'Conta sob monitoramento padrão de ciclo de venda.'}&quot;</p>
                  </div>
               </div>
 
-              <div className="pt-8 border-t border-slate-800/50">
-                 <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
+              <div className="pt-8 border-t border-slate-200/50">
+                 <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-4 flex items-center justify-between">
                     <span>Priorização Baseada em Racional</span>
                     <TrendingUp className="w-3.5 h-3.5" />
                  </p>
@@ -414,10 +414,10 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     {score && [score.potencial, score.risco, score.prontidao, score.cobertura, score.confianca].map(dim => (
                       <div key={dim.name} className="space-y-1.5">
                         <ScoreMiniBar label={dim.name} val={dim.score} />
-                        <p className="text-[8px] text-slate-500 italic leading-tight pl-1">{dim.rationale}</p>
+                        <p className="text-sm text-slate-700 italic leading-tight pl-1">{dim.rationale}</p>
                         <div className="flex flex-wrap gap-1 pl-1">
                            {dim.signals.slice(0, 3).map((sig, idx) => (
-                             <span key={idx} className="text-[7px] text-blue-400 opacity-60">• {sig}</span>
+                             <span key={idx} className="text-xs text-orange-600 font-bold">• {sig}</span>
                            ))}
                         </div>
                       </div>
@@ -427,46 +427,46 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
            </section>
 
            {/* New: Portfólio & Expansão */}
-           <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
+           <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden relative">
               <div className="absolute top-0 right-0 p-8 opacity-5">
                  <Database className="w-16 h-16 text-emerald-400" />
               </div>
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                  <Database className="w-4 h-4 text-emerald-500" /> Portfólio & Contexto Comercial
               </h3>
               <div className="space-y-6">
                  {account.portfolio?.ativa?.length ? (
                    <div>
-                     <span className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.1em] mb-2 block">Ativo (O que já tem)</span>
+                     <span className="text-xs font-black text-emerald-500 uppercase tracking-[0.1em] mb-2 block">Ativo (O que já tem)</span>
                      <div className="flex flex-wrap gap-2">
-                        {account.portfolio.ativa.map(p => <span key={p} className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded text-[9px] font-bold text-emerald-300">{p}</span>)}
+                        {account.portfolio.ativa.map(p => <span key={p} className="px-2 py-1 bg-emerald-500/5 border border-emerald-500/10 rounded text-xs font-bold text-emerald-300">{p}</span>)}
                      </div>
                    </div>
                  ) : null}
 
                 {account.portfolio?.negociacao.length ? (
-                  <div className="pt-4 border-t border-slate-800">
-                    <span className="text-[9px] font-black text-blue-400 uppercase tracking-[0.1em] mb-2 block">Em Negociação / Pipeline</span>
+                  <div className="pt-4 border-t border-slate-200">
+                    <span className="text-xs font-black text-blue-400 uppercase tracking-[0.1em] mb-2 block">Em Negociação / Pipeline</span>
                     <div className="space-y-2">
-                       {account.portfolio.negociacao.map(p => <div key={p} className="flex items-center gap-2 text-[10px] text-slate-300 font-medium"><Plus className="w-3 h-3 text-blue-500" /> {p}</div>)}
+                       {account.portfolio.negociacao.map(p => <div key={p} className="flex items-center gap-2 text-xs text-slate-600 font-medium"><Plus className="w-3 h-3 text-blue-500" /> {p}</div>)}
                     </div>
                   </div>
                 ) : null}
 
                 {account.portfolio?.risco.length ? (
-                  <div className="pt-4 border-t border-slate-800">
-                    <span className="text-[9px] font-black text-red-500 uppercase tracking-[0.1em] mb-2 block">Exposição de Risco (Churn)</span>
+                  <div className="pt-4 border-t border-slate-200">
+                    <span className="text-xs font-black text-red-500 uppercase tracking-[0.1em] mb-2 block">Exposição de Risco (Churn)</span>
                     <div className="space-y-2">
-                       {account.portfolio.risco.map(p => <div key={p} className="flex items-center gap-2 text-[10px] text-red-400 font-medium"><AlertTriangle className="w-3 h-3 text-red-500" /> {p}</div>)}
+                       {account.portfolio.risco.map(p => <div key={p} className="flex items-center gap-2 text-xs text-red-400 font-medium"><AlertTriangle className="w-3 h-3 text-red-500" /> {p}</div>)}
                     </div>
                   </div>
                 ) : null}
 
                 {account.portfolio?.whitespace.length ? (
-                  <div className="pt-4 border-t border-slate-800">
-                    <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.1em] mb-2 block">Oportunidade Whitespace</span>
+                  <div className="pt-4 border-t border-slate-200">
+                    <span className="text-xs font-black text-amber-500 uppercase tracking-[0.1em] mb-2 block">Oportunidade Whitespace</span>
                     <div className="flex flex-wrap gap-2">
-                       {account.portfolio.whitespace.map(p => <span key={p} className="px-2 py-1 bg-amber-500/5 border border-amber-500/10 rounded text-[9px] font-bold text-amber-200/70">{p}</span>)}
+                       {account.portfolio.whitespace.map(p => <span key={p} className="px-2 py-1 bg-amber-500/5 border border-amber-500/10 rounded text-xs font-bold text-amber-700/70">{p}</span>)}
                     </div>
                   </div>
                 ) : null}
@@ -474,12 +474,12 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
           </section>
 
           {/* Technographics (Restored with Edit) */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
+          <section className="bg-white border border-slate-200 rounded-3xl p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
                  <Database className="w-4 h-4 text-blue-500" /> Stack Tecnológica
               </h3>
-              <button onClick={() => setEditingTecnografia(editingTecnografia === null ? '' : null)} className="p-1 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-blue-400 transition-all">
+              <button onClick={() => setEditingTecnografia(editingTecnografia === null ? '' : null)} className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-400 transition-all">
                  {editingTecnografia !== null ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               </button>
             </div>
@@ -490,17 +490,17 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                    type="text" 
                    value={editingTecnografia}
                    onChange={e => setEditingTecnografia(e.target.value)}
-                   className="flex-1 h-8 bg-slate-950 border border-slate-800 rounded-lg px-3 text-[10px] text-slate-200 outline-none focus:border-blue-500/50"
+                   className="flex-1 h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm text-slate-700 outline-none focus:border-blue-500/50"
                    placeholder="Nova tecnologia..."
                  />
-                 <button onClick={() => handleUpdateTecnografia(editingTecnografia)} className="px-3 h-8 bg-blue-600 text-white text-[9px] font-black uppercase rounded-lg">Add</button>
+                 <button onClick={() => handleUpdateTecnografia(editingTecnografia)} className="px-3 h-8 bg-blue-600 text-white text-xs font-black uppercase rounded-lg">Add</button>
               </div>
             )}
 
             <div className="flex flex-wrap gap-2">
               {localTecnografia.map(tech => (
                 <div key={tech} className="group relative">
-                  <span className="px-3 py-1 bg-slate-800/50 border border-slate-700 text-slate-300 rounded-xl text-[10px] font-black uppercase tracking-tight">
+                  <span className="px-3 py-1 bg-slate-100/50 border border-slate-200 text-slate-600 rounded-xl text-xs font-black uppercase tracking-tight">
                     {tech}
                   </span>
                   <button onClick={() => handleRemoveTecnografia(tech)} className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -508,48 +508,48 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                   </button>
                 </div>
               ))}
-              {localTecnografia.length === 0 && <p className="text-[10px] text-slate-600 italic">Sem stack registrada.</p>}
+              {localTecnografia.length === 0 && <p className="text-sm text-slate-700 italic">Sem stack registrada.</p>}
             </div>
           </section>
 
           {/* Canais, Origem & Campanhas (Compact Context) */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden relative">
+          <section className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-hidden relative">
              <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Link2 className="w-16 h-16 text-violet-400" />
              </div>
              
              <div className="mb-6 space-y-4">
                 <div>
-                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                   <span className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                        <Globe className="w-3 h-3 text-blue-500" /> Origem da Conta
                    </span>
-                   <p className="text-xs font-black text-blue-100 italic">&quot;{account.canaisCampanhas.origemPrincipal}&quot;</p>
+                   <p className="text-xs font-black text-orange-600 italic">&quot;{account.canaisCampanhas.origemPrincipal}&quot;</p>
                 </div>
-                <div className="pt-4 border-t border-slate-800/50">
-                   <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <div className="pt-4 border-t border-slate-200/50">
+                   <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-3 flex items-center gap-2">
                       <Zap className="w-3.5 h-3.5 text-violet-400" /> Influência de Canais
                    </h3>
                    <div className="flex flex-wrap gap-2">
                       {account.canaisCampanhas.influencias.map((inf, i) => (
-                         <span key={i} className="px-2 py-1 bg-violet-500/5 border border-violet-500/10 rounded text-[8px] font-black text-violet-400 uppercase tracking-tighter" title={inf.impacto}>{inf.canal}</span>
+                         <span key={i} className="px-2 py-1 bg-violet-500/5 border border-violet-500/10 rounded text-xs font-black text-violet-400 uppercase tracking-tighter" title={inf.impacto}>{inf.canal}</span>
                       ))}
                    </div>
                 </div>
              </div>
 
-             <div className="pt-4 border-t border-slate-800/50">
-                <h3 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+             <div className="pt-4 border-t border-slate-200/50">
+                <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-4 flex items-center gap-2">
                    <Link2 className="w-4 h-4 text-violet-400" /> Touchpoints em Andamento
                 </h3>
                 <div className="space-y-4">
                    {account.canaisCampanhas.influencias.slice(0, 3).map((inf, i) => (
-                      <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl relative group">
+                      <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl relative group">
                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="px-2 py-0.5 bg-slate-900 rounded-md text-[8px] font-black text-slate-400 uppercase border border-slate-800 tracking-tighter">{inf.canal}</span>
-                            <span className="text-[8px] text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
+                            <span className="px-2 py-0.5 bg-white rounded-md text-xs font-black text-slate-600 uppercase border border-slate-200 tracking-tighter">{inf.canal}</span>
+                            <span className="text-xs text-slate-600 font-bold">{new Date(inf.data).toLocaleDateString('pt-BR')}</span>
                          </div>
-                         <p className="text-xs font-bold text-slate-200 line-clamp-1">{inf.campanha}</p>
-                         <p className="text-[9px] text-slate-500 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
+                         <p className="text-xs font-bold text-slate-700 line-clamp-1">{inf.campanha}</p>
+                         <p className="text-sm text-slate-700 mt-1 line-clamp-2 italic leading-relaxed">{inf.impacto}</p>
                       </div>
                    ))}
                 </div>
@@ -557,17 +557,17 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
           </section>
 
           {/* History / Timeline Structural (Restored) */}
-          <section className="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+          <section className="bg-white border border-slate-200 rounded-3xl p-6">
+             <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <HistoryIcon className="w-4 h-4 text-amber-500" /> Memória Corporativa
              </h3>
              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin">
                 {account.historico.sort((a,b) => b.data.localeCompare(a.data)).map((h, i) => (
-                   <div key={i} className="relative pl-6 border-l border-slate-800 pb-4 last:pb-0">
-                      <div className="absolute top-0 -left-[5px] w-2.5 h-2.5 rounded-full bg-slate-800 border-2 border-amber-500" />
-                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">{h.data}</p>
-                      <p className="text-[11px] font-bold text-slate-200">{h.tipo}</p>
-                      <p className="text-[10px] text-slate-500 leading-tight">{h.descricao}</p>
+                   <div key={i} className="relative pl-6 border-l border-slate-200 pb-4 last:pb-0">
+                      <div className="absolute top-0 -left-[5px] w-2.5 h-2.5 rounded-full bg-slate-100 border-2 border-amber-500" />
+                      <p className="text-xs font-black text-slate-600 uppercase mb-1">{h.data}</p>
+                      <p className="text-xs font-bold text-slate-700">{h.tipo}</p>
+                      <p className="text-sm text-slate-700 leading-tight">{h.descricao}</p>
                    </div>
                 ))}
              </div>
@@ -584,7 +584,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             </div>
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6">
-                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20">
                    Canopi Command Engine
                 </span>
                 <Sparkles className="w-4 h-4 text-white/50 animate-pulse" />
@@ -609,7 +609,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                 </button>
                 <div className="flex -space-x-2">
                    {account.contatos.slice(0,3).map(c => (
-                     <div key={c.id} title={c.nome} className="w-9 h-9 rounded-full bg-brand-dark border-2 border-brand flex items-center justify-center font-bold text-[10px] text-white/80 shadow-lg">
+                     <div key={c.id} title={c.nome} className="w-9 h-9 rounded-full bg-brand-dark border-2 border-brand flex items-center justify-center font-bold text-xs text-white/80 shadow-lg">
                         {c.nome.substring(0,1)}
                      </div>
                    ))}
@@ -619,7 +619,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
           </section>
 
           {/* Deep Tabs */}
-          <div className="bg-slate-900 p-1.5 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-inner">
+          <div className="bg-white p-1.5 rounded-2xl border border-slate-200 flex items-center gap-1 shadow-inner">
             {[
               { id: 'operacional', label: 'Estratégia & Fila', icon: Activity },
               { id: 'relacional', label: 'Comitê & Organograma', icon: Users2 },
@@ -629,7 +629,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-slate-800 text-white shadow-xl ring-1 ring-slate-700' : 'text-slate-500 hover:text-slate-300'}`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800'}`}
               >
                 <tab.icon className="w-4 h-4" /> {tab.label}
               </button>
@@ -652,36 +652,36 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                            <Flame className="w-5 h-5 text-red-500" />
                         </div>
                         <div>
-                           <h2 className="text-xs font-black text-slate-100 uppercase tracking-[0.2em]">Fila de Fogo: Inteligência de Intervenção</h2>
-                           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 whitespace-nowrap">Cruzamento de Sinais, Memória e Radar Relacional</p>
+                           <h2 className="text-xs font-black text-slate-900 uppercase tracking-[0.2em]">Fila de Fogo: Inteligência de Intervenção</h2>
+                           <p className="text-xs text-slate-600 font-bold uppercase tracking-widest mt-0.5 whitespace-nowrap">Cruzamento de Sinais, Memória e Radar Relacional</p>
                         </div>
                      </div>
-                     <span className="px-3 py-1 rounded bg-red-500/10 border border-red-500/20 text-[9px] font-black text-red-400">PRÓXIMO MELHOR PLAY</span>
+                     <span className="px-3 py-1 rounded bg-red-500/10 border border-red-500/20 text-xs font-black text-red-400">PRÓXIMO MELHOR PLAY</span>
                    </div>
 
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                       {/* 카드 1: INTELIGÊNCIA RELACIONAL + SINAIS */}
-                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-red-500/40 transition-all group">
+                      <div className="p-6 rounded-2xl bg-white border border-slate-200 hover:border-red-500/40 transition-all group">
                          <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                               <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Alerta Crítico</span>
+                               <span className="text-xs font-black text-amber-500 uppercase tracking-widest">Alerta Crítico</span>
                             </div>
-                            <span className="text-[8px] font-black text-slate-600 uppercase">Prio #1</span>
+                            <span className="text-xs font-black text-slate-600 uppercase">Prio #1</span>
                          </div>
-                         <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                         <p className="text-sm font-bold text-slate-900 mb-4 leading-tight">
                             {radar.tension.length > 0 
                               ? `Stakeholder em área crítica (${radar.tension[0].area}) com sinal de alto impacto detectado.` 
                               : 'Alerta detectado em stakeholder estratégico com risco de bloqueio iminente.'}
                          </p>
-                         <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                         <div className="space-y-3 mt-4 border-t border-slate-200/80 pt-4">
                             <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Sinal Prioritário</span>
-                               <p className="text-[11px] text-slate-400">{account.sinais[0]?.titulo || 'Mudança Estrutural Detectada'}</p>
+                               <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Sinal Prioritário</span>
+                               <p className="text-sm text-slate-700">{account.sinais[0]?.titulo || 'Mudança Estrutural Detectada'}</p>
                             </div>
                             <div className="flex flex-col gap-1.5">
-                               <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Diretriz IA</span>
-                               <p className="text-[11px] text-slate-400 italic">&quot;Ativar play de blindagem executiva e alinhar resposta técnica.&quot;</p>
+                               <span className="text-xs font-black text-blue-500 uppercase tracking-widest">Diretriz IA</span>
+                               <p className="text-sm text-slate-700 italic">&quot;Ativar play de blindagem executiva e alinhar resposta técnica.&quot;</p>
                             </div>
                          </div>
                           <button 
@@ -709,34 +709,34 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                                setShowFeedback('Play de Blindagem injetado na fila.');
                                setTimeout(() => setShowFeedback(null), 3000);
                             }}
-                            className="w-full mt-6 py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all"
+                            className="w-full mt-6 py-3 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-xs font-black text-red-400 uppercase tracking-widest transition-all"
                           >
                              Ativar Play de Blindagem
                           </button>
                        </div>
 
                        {/* 카드 2: GAP DE COBERTURA */}
-                       <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all group">
+                       <div className="p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-500/40 transition-all group">
                           <div className="flex items-center justify-between mb-4">
                              <div className="flex items-center gap-2">
                                 <Users2 className="w-4 h-4 text-blue-500" />
-                                <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Gap de Cobertura</span>
+                                <span className="text-xs font-black text-blue-500 uppercase tracking-widest">Gap de Cobertura</span>
                              </div>
-                             <span className="text-[8px] font-black text-slate-600 uppercase">Prio #2</span>
+                             <span className="text-xs font-black text-slate-600 uppercase">Prio #2</span>
                           </div>
-                          <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                          <p className="text-sm font-bold text-slate-900 mb-4 leading-tight">
                              {radar.gaps.length > 0 
                                ? `Sinal estratégico em ${radar.gaps[0]} sem interlocutor mapeado. Risco de silêncio operacional.` 
                                : 'Vazios de interlocução em áreas com sinais recentes de tendência.'}
                           </p>
-                          <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                          <div className="space-y-3 mt-4 border-t border-slate-200/80 pt-4">
                              <div className="flex flex-col gap-1.5">
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Área Expansiva</span>
-                                <p className="text-[11px] text-slate-400">{radar.gaps[0] || 'Área sem cobertura'}</p>
+                                <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Área Expansiva</span>
+                                <p className="text-sm text-slate-700">{radar.gaps[0] || 'Área sem cobertura'}</p>
                              </div>
                              <div className="flex flex-col gap-1.5">
-                                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
-                                <p className="text-[11px] text-slate-400 italic">&quot;Padrão v6: Abertura via Champion de área adjacente.&quot;</p>
+                                <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Caminho do Sucesso</span>
+                                <p className="text-sm text-slate-700 italic">&quot;Padrão v6: Abertura via Champion de área adjacente.&quot;</p>
                              </div>
                           </div>
                           <button 
@@ -764,32 +764,32 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                                setShowFeedback('Mapeamento solicitado.');
                                setTimeout(() => setShowFeedback(null), 3000);
                             }}
-                            className="w-full mt-6 py-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all"
+                            className="w-full mt-6 py-3 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-xs font-black text-blue-400 uppercase tracking-widest transition-all"
                           >
                              Infiltrar Champion
                           </button>
                        </div>
 
                        {/* 카드 3: INTELIGÊNCIA CUMULATIVA */}
-                       <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 transition-all group">
+                       <div className="p-6 rounded-2xl bg-white border border-slate-200 hover:border-emerald-500/40 transition-all group">
                           <div className="flex items-center justify-between mb-4">
                              <div className="flex items-center gap-2">
                                 <Zap className="w-4 h-4 text-emerald-500" />
-                                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Atalhos Operacionais</span>
+                                <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Atalhos Operacionais</span>
                              </div>
-                             <span className="text-[8px] font-black text-slate-600 uppercase">Prio #3</span>
+                             <span className="text-xs font-black text-slate-600 uppercase">Prio #3</span>
                           </div>
-                          <p className="text-sm font-bold text-slate-100 mb-4 leading-tight">
+                          <p className="text-sm font-bold text-slate-900 mb-4 leading-tight">
                              Contexto atual favorável à replicação de padrão vitorioso: &quot;Alinhamento de ROI com CXO&quot;.
                           </p>
-                          <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
+                          <div className="space-y-3 mt-4 border-t border-slate-200/80 pt-4">
                              <div className="flex flex-col gap-1.5">
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese IA</span>
-                                <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Acelerar via Business Case'}</p>
+                                <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Hipótese IA</span>
+                                <p className="text-sm text-slate-700">{account.inteligencia.hipoteses[0] || 'Acelerar via Business Case'}</p>
                              </div>
                              <div className="flex flex-col gap-1.5">
-                                <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
-                                <p className="text-[11px] text-slate-400 italic">&quot;Padrão recorrente de destrave na vertical {account.vertical}.&quot;</p>
+                                <span className="text-xs font-black text-amber-500 uppercase tracking-widest">Histórico de Validação</span>
+                                <p className="text-sm text-slate-700 italic">&quot;Padrão recorrente de destrave na vertical {account.vertical}.&quot;</p>
                              </div>
                           </div>
                           <button 
@@ -817,7 +817,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                                setShowFeedback('Simulação de ROI agendada.');
                                setTimeout(() => setShowFeedback(null), 3000);
                             }}
-                            className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest transition-all"
+                            className="w-full mt-6 py-3 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs font-black text-emerald-400 uppercase tracking-widest transition-all"
                           >
                              Simular ROI Canopi
                           </button>
@@ -827,53 +827,53 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
 
                 <div className="grid grid-cols-2 gap-8">
                   {/* TIMELINE 360 UNIFICADA (RESTAURADA) */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[600px]">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col h-[600px]">
                     <div className="flex items-center justify-between mb-8">
-                      <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
                         <HistoryIcon className="w-4 h-4 text-amber-500" /> Timeline Unificada 360
                       </h3>
-                      <span className="text-[10px] font-bold text-slate-600 bg-slate-800 px-3 py-1 rounded-full">{unifiedTimeline.length} Entradas</span>
+                      <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">{unifiedTimeline.length} Entradas</span>
                     </div>
                     <div className="flex-1 overflow-y-auto space-y-8 pr-4 scrollbar-thin">
                       {unifiedTimeline.map((item, i) => (
-                        <div key={i} className="relative pl-8 border-l-2 border-slate-800 pb-2 group">
-                           <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-lg bg-slate-900 border-2 border-slate-700 flex items-center justify-center shadow-lg z-10">
+                        <div key={i} className="relative pl-8 border-l-2 border-slate-200 pb-2 group">
+                           <div className="absolute top-0 -left-[11px] w-5 h-5 rounded-lg bg-white border-2 border-slate-200 flex items-center justify-center shadow-lg z-10">
                               {item.icone === 'LogsIcon' ? <Edit3 className="w-2.5 h-2.5 text-blue-400" /> :
                                item.icone === 'Activity' ? <Activity className="w-2.5 h-2.5 text-emerald-400" /> :
                                <HistoryIcon className="w-2.5 h-2.5 text-amber-400" />}
                            </div>
-                           <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{item.data}</span>
-                           <h4 className={`text-[10px] font-black uppercase mt-1 ${item.color}`}>{item.tipo}</h4>
-                           <p className="text-xs text-slate-400 mt-1 leading-relaxed font-medium">{item.descricao}</p>
+                           <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{item.data}</span>
+                           <h4 className={`text-xs font-black uppercase mt-1 ${item.color}`}>{item.tipo}</h4>
+                           <p className="text-sm text-slate-700 mt-1 leading-relaxed font-medium">{item.descricao}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* AÇÕES OPERACIONAIS ATIVAS (RESTAURADO) */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col h-[600px]">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-8 flex items-center gap-2">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col h-[600px]">
+                    <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-8 flex items-center gap-2">
                        <Zap className="w-4 h-4 text-blue-500" /> Intervenções em Andamento
                     </h3>
                     <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin">
                        {accountActions.map((action, i) => (
-                         <div key={i} className="p-5 bg-slate-950 border border-slate-800 rounded-2xl border-l-4 border-l-blue-500 shadow-lg">
+                         <div key={i} className="p-5 bg-slate-50 border border-slate-200 rounded-2xl border-l-4 border-l-blue-500 shadow-lg">
                             <div className="flex justify-between items-start mb-3">
-                               <span className="text-[8px] font-black uppercase text-blue-400 px-2 py-0.5 bg-blue-500/5 rounded border border-blue-500/20">{action.status}</span>
-                               <span className="text-[8px] font-black text-slate-600 uppercase">{action.category}</span>
+                               <span className="text-xs font-black uppercase text-blue-400 px-2 py-0.5 bg-blue-500/5 rounded border border-blue-500/20">{action.status}</span>
+                               <span className="text-xs font-black text-slate-600 uppercase">{action.category}</span>
                             </div>
-                            <h4 className="text-sm font-black text-slate-100 mb-2 leading-tight">{action.title}</h4>
-                            <p className="text-[10px] text-slate-500 mb-4">{action.description}</p>
-                            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-                               <span className="text-[9px] font-bold text-slate-400">Owner: {action.ownerName || 'IA-System'}</span>
-                               <span className={`text-[9px] font-black ${action.priority === 'Alta' ? 'text-red-400' : 'text-slate-500'}`}>{action.priority}</span>
+                            <h4 className="text-sm font-black text-slate-900 mb-2 leading-tight">{action.title}</h4>
+                            <p className="text-sm text-slate-700 mb-4">{action.description}</p>
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-200">
+                               <span className="text-xs font-bold text-slate-600">Owner: {action.ownerName || 'IA-System'}</span>
+                               <span className={`text-xs font-black ${action.priority === 'Alta' ? 'text-red-400' : 'text-slate-400'}`}>{action.priority}</span>
                             </div>
                          </div>
                        ))}
                        {accountActions.length === 0 && (
                          <div className="flex flex-col items-center justify-center py-20 text-center opacity-40">
                             <CheckCircle2 className="w-12 h-12 text-slate-700 mb-4" />
-                            <p className="text-[10px] font-black uppercase text-slate-600 tracking-widest leading-loose">Nenhuma ação ativa<br/>Gere uma intervenção acima</p>
+                            <p className="text-xs font-black uppercase text-slate-400 tracking-widest leading-loose">Nenhuma ação ativa<br/>Gere uma intervenção acima</p>
                          </div>
                        )}
                     </div>
@@ -897,7 +897,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Tensão (Blockers)</span>
+                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Pontos de Tensão (Blockers)</span>
                       </div>
                       <div className="space-y-3">
                         {radar.tension.map(c => (
@@ -906,12 +906,12 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                               {c.nome.substring(0, 2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-xs font-black text-slate-100 truncate group-hover:text-red-400">{c.nome}</p>
-                              <p className="text-[9px] text-red-500/70 uppercase font-black tracking-tighter">{c.area} • Exposição Crítica</p>
+                              <p className="text-xs font-black text-slate-900 truncate group-hover:text-red-400">{c.nome}</p>
+                              <p className="text-xs text-red-500/70 uppercase font-black tracking-tighter">{c.area} • Exposição Crítica</p>
                             </div>
                           </div>
                         ))}
-                        {radar.tension.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Nenhum stakeholder influente sob alerta direto.</p>}
+                        {radar.tension.length === 0 && <p className="text-sm text-slate-700 italic pl-2">Nenhum stakeholder influente sob alerta direto.</p>}
                       </div>
                     </div>
 
@@ -919,7 +919,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Apoio (Sponsors)</span>
+                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Pontos de Apoio (Sponsors)</span>
                       </div>
                       <div className="space-y-3">
                         {radar.support.map(c => (
@@ -928,12 +928,12 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                               {c.nome.substring(0, 2).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <p className="text-xs font-black text-slate-100 truncate group-hover:text-emerald-400">{c.nome}</p>
-                              <p className="text-[9px] text-emerald-500/70 uppercase font-black tracking-tighter">{c.area} • Driver de Sucesso</p>
+                              <p className="text-xs font-black text-slate-900 truncate group-hover:text-emerald-400">{c.nome}</p>
+                              <p className="text-xs text-emerald-500/70 uppercase font-black tracking-tighter">{c.area} • Driver de Sucesso</p>
                             </div>
                           </div>
                         ))}
-                        {radar.support.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Sem sponsors ativos para os sinais atuais.</p>}
+                        {radar.support.length === 0 && <p className="text-sm text-slate-700 italic pl-2">Sem sponsors ativos para os sinais atuais.</p>}
                       </div>
                     </div>
 
@@ -941,17 +941,17 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-2">
                         <Target className="w-3.5 h-3.5 text-blue-500" />
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gaps (Lacunas de Mapeamento)</span>
+                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Gaps (Lacunas de Mapeamento)</span>
                       </div>
                       <div className="space-y-3">
                         {radar.gaps.map((area, i) => (
-                          <div key={i} className="p-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl group hover:border-blue-500/30 transition-all">
-                            <p className="text-xs font-black text-slate-200 group-hover:text-blue-400">{area}</p>
-                            <p className="text-[9px] text-blue-500/60 uppercase font-black tracking-tighter mt-1">Sinal Crítico Detectado • Sem Contato Mapeado</p>
-                            <button className="mt-3 text-[8px] font-black uppercase text-blue-400 hover:underline">Solicitar Mapeamento IA</button>
+                          <div key={i} className="p-4 bg-slate-100/40 border border-slate-300/50 rounded-2xl group hover:border-blue-500/30 transition-all">
+                            <p className="text-xs font-black text-slate-700 group-hover:text-blue-400">{area}</p>
+                            <p className="text-xs text-blue-500/60 uppercase font-black tracking-tighter mt-1">Sinal Crítico Detectado • Sem Contato Mapeado</p>
+                            <button className="mt-3 text-xs font-black uppercase text-blue-400 hover:underline">Solicitar Mapeamento IA</button>
                           </div>
                         ))}
-                        {radar.gaps.length === 0 && <p className="text-[10px] text-slate-600 italic pl-2">Toda área crítica possui interlocução mapeada.</p>}
+                        {radar.gaps.length === 0 && <p className="text-sm text-slate-700 italic pl-2">Toda área crítica possui interlocução mapeada.</p>}
                       </div>
                     </div>
                   </div>
@@ -962,31 +962,31 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                    <div className="flex items-center gap-4">
                       <button 
                         onClick={() => setOrgView('tree')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-500 hover:text-slate-300'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-400 hover:text-slate-600'}`}
                       >
                          <Network className="w-4 h-4" /> Organograma Profundo
                       </button>
                       <button 
                         onClick={() => setOrgView('list')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${orgView === 'list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-500 hover:text-slate-300'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all ${orgView === 'list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 'text-slate-400 hover:text-slate-600'}`}
                       >
                          <ListIcon className="w-4 h-4" /> Modo Lista
                       </button>
                    </div>
-                   <div className="text-[10px] text-slate-600 font-bold uppercase tracking-widest italic flex items-center gap-2">
+                   <div className="text-xs text-slate-600 font-bold uppercase tracking-widest italic flex items-center gap-2">
                       <ShieldCheck className="w-3.5 h-3.5" /> 100% Mapeado via CRM
                    </div>
                 </div>
 
                 {orgView === 'tree' ? (
-                  <div className="bg-slate-900/50 border border-slate-800 rounded-[2rem] p-8 min-h-[500px]">
+                  <div className="bg-white/50 border border-slate-200 rounded-[2rem] p-8 min-h-[500px]">
                      {organogramForest}
                   </div>
                 ) : (
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 overflow-x-auto">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-8 overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="text-[10px] font-black text-slate-700 uppercase border-b border-slate-800">
+                        <tr className="text-xs font-black text-slate-700 uppercase border-b border-slate-200">
                           <th className="pb-6">STAKEHOLDER</th>
                           <th className="pb-6 text-center">ÁREA / HIERARQUIA</th>
                           <th className="pb-6 text-center">PODER & ACESSO</th>
@@ -995,23 +995,23 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {account.contatos.sort((a,b) => b.influencia - a.influencia).map(c => (
-                          <tr key={c.id} className="group hover:bg-slate-800/30 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
+                          <tr key={c.id} className="group hover:bg-slate-100/30 transition-all cursor-pointer" onClick={() => router.push(`/contas/${slug}/contato/${c.id}`)}>
                              <td className="py-6">
                                 <div className="flex items-center gap-4">
-                                   <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center font-black text-slate-500 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
+                                   <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center font-black text-slate-400 group-hover:text-blue-400 group-hover:border-blue-500/30 transition-all">
                                       {c.nome.substring(0,2).toUpperCase()}
                                    </div>
                                    <div>
-                                      <p className="text-sm font-black text-slate-100 group-hover:text-blue-400 transition-colors">{c.nome}</p>
-                                      <p className="text-[10px] font-bold text-slate-500">{c.cargo}</p>
+                                      <p className="text-sm font-black text-slate-900 group-hover:text-blue-400 transition-colors">{c.nome}</p>
+                                      <p className="text-xs font-bold text-slate-600">{c.cargo}</p>
                                    </div>
                                 </div>
                              </td>
                              <td className="py-6 text-center">
                                 <div className="flex flex-col items-center gap-2">
-                                   <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] font-black text-slate-400 uppercase border border-slate-800">{c.area}</span>
-                                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tight ${
-                                      c.status === 'Frio' ? 'bg-slate-800 text-slate-600' : 
+                                   <span className="px-2 py-0.5 bg-slate-50 rounded text-xs font-black text-slate-600 uppercase border border-slate-200">{c.area}</span>
+                                   <span className={`px-2 py-0.5 rounded text-xs font-black uppercase tracking-tight ${
+                                      c.status === 'Frio' ? 'bg-slate-100 text-slate-400' : 
                                       c.status === 'Em Risco' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
                                       c.status === 'A desenvolver' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
                                       c.status === 'A mapear' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 border-dashed' :
@@ -1024,17 +1024,17 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                             <td className="py-6 text-center">
                                <div className="flex items-center justify-center gap-4">
                                   <div className="flex flex-col items-center">
-                                     <span className="text-[9px] font-black text-slate-600 uppercase">Inf.</span>
-                                     <span className="text-xs font-black text-slate-300">{c.influencia}/10</span>
+                                     <span className="text-xs font-black text-slate-600 uppercase">Inf.</span>
+                                     <span className="text-xs font-black text-slate-600">{c.influencia}/10</span>
                                   </div>
                                   <div className="flex flex-col items-center">
-                                     <span className="text-[9px] font-black text-slate-600 uppercase">Relac.</span>
+                                     <span className="text-xs font-black text-slate-600 uppercase">Relac.</span>
                                      <span className="text-xs font-black text-emerald-400">{c.forcaRelacional}%</span>
                                   </div>
                                </div>
                             </td>
                             <td className="py-6 text-right">
-                               <button className="p-2 hover:bg-slate-950 rounded-lg text-slate-700 hover:text-blue-500 transition-all">
+                               <button className="p-2 hover:bg-slate-50 rounded-lg text-slate-700 hover:text-blue-500 transition-all">
                                   <ArrowLeft className="w-4 h-4 rotate-180" />
                                 </button>
                             </td>
@@ -1050,15 +1050,15 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             {activeTab === 'inteligencia' && (
               <div className="space-y-8 animate-in fade-in">
                  {/* Leitura Canopi AI Section (Restored Parity) */}
-                 <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden">
+                 <section className="bg-white border border-slate-200 rounded-3xl p-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 opacity-5">
                        <Sparkles className="w-24 h-24 text-blue-500" />
                     </div>
                     <div className="flex items-center justify-between mb-8">
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                       <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
                           <Sparkles className="w-4 h-4 text-blue-500" /> Dril-down Canopi Intelligence
                        </h3>
-                       <button onClick={() => setEditingLeitura(editingLeitura === null ? { ...localLeitura } : null)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-black text-slate-400 transition-all uppercase hover:text-blue-400">
+                       <button onClick={() => setEditingLeitura(editingLeitura === null ? { ...localLeitura } : null)} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-black text-slate-400 transition-all uppercase hover:text-blue-400">
                           {editingLeitura ? <X className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />} {editingLeitura ? 'Cancelar' : 'Sugerir Insights'}
                        </button>
                     </div>
@@ -1067,35 +1067,35 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                        <div className="space-y-6">
                           {['factual', 'inferida', 'sugerida'].map(type => (
                              <div key={type}>
-                               <label className="text-[9px] font-black text-slate-600 uppercase tracking-widest block mb-2">{type === 'factual' ? 'Dados Verificáveis' : type === 'inferida' ? 'Inferências AI' : 'Ações Recomendadas'}</label>
+                               <label className="text-xs font-black text-slate-600 uppercase tracking-widest block mb-2">{type === 'factual' ? 'Dados Verificáveis' : type === 'inferida' ? 'Inferências AI' : 'Ações Recomendadas'}</label>
                                <textarea 
                                  value={editingLeitura[type as keyof typeof localLeitura].join('\n')}
                                  onChange={e => setEditingLeitura({ ...editingLeitura, [type]: e.target.value.split('\n') })}
-                                 className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 focus:border-blue-500/40 outline-none font-medium leading-relaxed"
+                                 className="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 focus:border-blue-500/40 outline-none font-medium leading-relaxed"
                                  placeholder="Uma entrada por linha..."
                                />
                              </div>
                           ))}
-                          <button onClick={handleSaveLeitura} className="w-full py-4 bg-brand text-white text-[11px] font-black uppercase rounded-2xl shadow-xl shadow-brand/20">Persistir Inteligência Estruturada</button>
+                          <button onClick={handleSaveLeitura} className="w-full py-4 bg-brand text-white text-xs font-black uppercase rounded-2xl shadow-xl shadow-brand/20">Persistir Inteligência Estruturada</button>
                        </div>
                     ) : (
                        <div className="grid grid-cols-3 gap-8">
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Factual (v6)</span>
+                             <span className="flex items-center gap-2 text-xs font-black text-blue-400 uppercase tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/20 w-max">Factual (v6)</span>
                              <div className="space-y-3">
-                                {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
+                                {localLeitura.factual.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-200 pl-3 group hover:border-blue-500 transition-all">{f}</p>)}
                              </div>
                           </div>
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/20 w-max">Inferências AI</span>
+                             <span className="flex items-center gap-2 text-xs font-black text-amber-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-amber-500/20 w-max">Inferências AI</span>
                              <div className="space-y-3">
-                                {localLeitura.inferida.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-800 pl-3 group hover:border-amber-500 transition-all">~ {f}</p>)}
+                                {localLeitura.inferida.map((f, i) => <p key={i} className="text-xs text-slate-400 font-medium italic leading-relaxed border-l-2 border-slate-200 pl-3 group hover:border-amber-500 transition-all">~ {f}</p>)}
                              </div>
                           </div>
                           <div className="space-y-4">
-                             <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-max">Recomendações</span>
+                             <span className="flex items-center gap-2 text-xs font-black text-emerald-500 uppercase tracking-widest bg-amber-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-max">Recomendações</span>
                              <div className="space-y-3">
-                                {localLeitura.sugerida.map((f, i) => <p key={i} className="text-xs text-slate-200 font-bold leading-relaxed border-l-2 border-emerald-500/40 pl-3 group hover:border-emerald-500 transition-all">→ {f}</p>)}
+                                {localLeitura.sugerida.map((f, i) => <p key={i} className="text-sm text-slate-700 font-bold leading-relaxed border-l-2 border-emerald-500/40 pl-3 group hover:border-emerald-500 transition-all">→ {f}</p>)}
                              </div>
                           </div>
                        </div>
@@ -1106,19 +1106,19 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                      
                      {/* Coluna 1: Memória de Prospecção (Fatos) */}
-                     <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col gap-6">
+                     <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col gap-6">
                         <div>
-                           <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                           <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Vitórias & Padrões de Sucesso
                            </h3>
                            <ul className="space-y-3">
                               {localInteligencia.sucessos.map((s, i) => (
-                                <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-xs text-slate-300 font-medium italic group hover:border-emerald-500/30 transition-all">{s}</li>
+                                <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-xs text-slate-600 font-medium italic group hover:border-emerald-500/30 transition-all">{s}</li>
                               ))}
                            </ul>
                         </div>
-                        <div className="pt-6 border-t border-slate-800">
-                           <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <div className="pt-6 border-t border-slate-200">
+                           <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                               <AlertTriangle className="w-4 h-4 text-red-500" /> Riscos & Alertas de Segmento
                            </h3>
                            <ul className="space-y-3">
@@ -1132,21 +1132,21 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                      {/* Coluna 2: Cérebro Estratégico (Padrões e Lições) */}
                      <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 border border-blue-500/10 rounded-3xl flex flex-col gap-8">
                         <div>
-                           <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-6 block">Padrões Observados IA</span>
+                           <span className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-6 block">Padrões Observados IA</span>
                            <div className="space-y-4">
                               {localInteligencia.padroes.map((p, i) => (
-                                <div key={i} className="bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 italic text-xs text-slate-200 font-medium leading-relaxed relative overflow-hidden group">
+                                <div key={i} className="bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 italic text-sm text-slate-700 font-medium leading-relaxed relative overflow-hidden group">
                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-20 group-hover:opacity-100 transition-all" />
                                    &quot;{p}&quot;
                                 </div>
                               ))}
                            </div>
                         </div>
-                        <div className="pt-8 border-t border-slate-700/50">
-                           <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-4 block">A Maior Lição (Canopi Core)</span>
+                        <div className="pt-8 border-t border-slate-300/50">
+                           <span className="text-xs font-black text-amber-500 uppercase tracking-widest mb-4 block">A Maior Lição (Canopi Core)</span>
                            <div className="flex items-start gap-4 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
                               <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-1" />
-                              <p className="text-xs text-amber-200/90 font-bold leading-relaxed">
+                              <p className="text-xs text-orange-600 font-bold leading-relaxed">
                                  {localInteligencia.learnings[0] || 'Nenhuma lição crítica extraída desta conta até o momento.'}
                               </p>
                            </div>
@@ -1154,25 +1154,25 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                      </div>
 
                      {/* Coluna 3: Futuro Operacional (Hipóteses) */}
-                     <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col gap-6">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Hipóteses de Destrave Strat</span>
+                     <div className="p-8 bg-white border border-slate-200 rounded-3xl flex flex-col gap-6">
+                        <span className="text-xs font-black text-slate-600 uppercase tracking-widest mb-2 block">Hipóteses de Destrave Strat</span>
                         <div className="space-y-4">
                            {localInteligencia.hipoteses.map((h, i) => (
-                              <div key={i} className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col gap-2 group hover:border-blue-500/20 transition-all">
+                              <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col gap-2 group hover:border-blue-500/20 transition-all">
                                  <div className="flex items-center gap-2">
                                     <Sparkles className="w-3 h-3 text-blue-400" />
-                                    <p className="text-[10px] font-black text-slate-300 uppercase">Hipótese #{i+1}</p>
+                                    <p className="text-xs font-black text-slate-600 uppercase">Hipótese #{i+1}</p>
                                  </div>
-                                 <p className="text-[11px] text-slate-500 leading-relaxed group-hover:text-slate-300 transition-colors">{h}</p>
+                                 <p className="text-sm text-slate-700 leading-relaxed group-hover:text-slate-600 transition-colors">{h}</p>
                               </div>
                            ))}
                         </div>
                         {localInteligencia.fatoresRecomendacao.length > 0 && (
-                           <div className="mt-auto pt-6 border-t border-slate-800">
-                              <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-3">Fatores de Qualificação AI</p>
+                           <div className="mt-auto pt-6 border-t border-slate-200">
+                              <p className="text-xs font-black text-slate-600 uppercase tracking-widest mb-3">Fatores de Qualificação AI</p>
                               <div className="flex flex-wrap gap-2">
                                  {localInteligencia.fatoresRecomendacao.map((f, i) => (
-                                   <span key={i} className="text-[8px] px-2 py-1 bg-slate-800 text-slate-500 rounded-lg border border-slate-700 font-black uppercase tracking-tighter">{f}</span>
+                                   <span key={i} className="text-xs px-2 py-1 bg-slate-100 text-slate-400 rounded-lg border border-slate-200 font-black uppercase tracking-tighter">{f}</span>
                                  ))}
                               </div>
                            </div>
@@ -1185,25 +1185,25 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
             {activeTab === 'estrategia' && (
               <div className="space-y-8 animate-in fade-in">
                  {/* Pipeline drill-down */}
-                 <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-10 flex items-center gap-2">
+                 <section className="bg-white border border-slate-200 rounded-3xl p-8">
+                    <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-10 flex items-center gap-2">
                        <TrendingUp className="w-4 h-4 text-emerald-500" /> Pipeline Drill-down & Forecast
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                        {account.oportunidades.map((op, i) => (
-                         <div key={i} className="group p-6 bg-slate-950 border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col gap-4">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-slate-800 group-hover:bg-brand transition-all" />
+                         <div key={i} className="group p-6 bg-slate-50 border border-slate-200 rounded-2xl relative overflow-hidden flex flex-col gap-4">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-slate-100 group-hover:bg-brand transition-all" />
                             <div className="flex items-center justify-between">
-                               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{op.etapa}</span>
-                               <span className="text-[10px] font-black text-red-500 uppercase">{op.risco} Risco</span>
+                               <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">{op.etapa}</span>
+                               <span className="text-xs font-black text-red-500 uppercase">{op.risco} Risco</span>
                             </div>
-                            <h4 className="text-base font-bold text-slate-100 group-hover:text-brand transition-colors italic">{op.nome}</h4>
-                            <div className="mt-auto pt-4 border-t border-slate-800 flex items-end justify-between">
+                            <h4 className="text-base font-bold text-slate-900 group-hover:text-brand transition-colors italic">{op.nome}</h4>
+                            <div className="mt-auto pt-4 border-t border-slate-200 flex items-end justify-between">
                                <div>
-                                  <p className="text-[9px] font-black text-slate-600 uppercase mb-1">Valor Contratual</p>
+                                  <p className="text-xs font-black text-slate-600 uppercase mb-1">Valor Contratual</p>
                                   <p className="text-xl font-black text-emerald-400">{fmt(op.valor)}</p>
                                </div>
-                               <button className="p-2 hover:bg-slate-800 rounded-lg text-slate-600 transition-all">
+                               <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition-all">
                                   <MoreHorizontal className="w-5 h-5" />
                                </button>
                             </div>
@@ -1213,24 +1213,24 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
                  </section>
 
                  <div className="grid grid-cols-2 gap-8">
-                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Maturidade Relacional</h3>
+                    <div className="p-8 bg-white border border-slate-200 rounded-3xl">
+                       <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6">Maturidade Relacional</h3>
                        <div className="h-64 flex flex-col items-center justify-center gap-6">
                           <div className="relative w-40 h-40 flex items-center justify-center">
-                             <div className="absolute inset-0 rounded-full border-8 border-slate-800" />
+                             <div className="absolute inset-0 rounded-full border-8 border-slate-200" />
                              <div className="absolute inset-0 rounded-full border-8 border-brand border-t-transparent animate-[spin_3s_linear_infinite]" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)'}} />
                              <span className="text-4xl font-black text-white">{account.coberturaRelacional}%</span>
                           </div>
-                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest animate-pulse">Engajamento Profundo Detectado</p>
+                          <p className="text-xs text-slate-600 font-bold uppercase tracking-widest animate-pulse">Engajamento Profundo Detectado</p>
                        </div>
                     </div>
-                    <div className="p-8 bg-slate-900 border border-slate-800 rounded-3xl">
-                       <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Sinais Operacionais de Intenção</h3>
+                    <div className="p-8 bg-white border border-slate-200 rounded-3xl">
+                       <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-6">Sinais Operacionais de Intenção</h3>
                        <div className="space-y-3">
                           {account.sinais.map((s, i) => (
-                             <div key={i} className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-between">
-                                <span className="text-[10px] font-bold text-slate-300">{s.titulo}</span>
-                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${s.impacto === 'Alto' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>{s.impacto}</span>
+                             <div key={i} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                                <span className="text-xs font-bold text-slate-600">{s.titulo}</span>
+                                <span className={`text-xs font-black uppercase px-2 py-0.5 rounded ${s.impacto === 'Alto' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'}`}>{s.impacto}</span>
                              </div>
                           ))}
                        </div>

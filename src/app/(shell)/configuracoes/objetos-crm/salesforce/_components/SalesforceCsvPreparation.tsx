@@ -618,7 +618,7 @@ export function SalesforceCsvPreparation() {
 
       {/* ── Seletor de entidade ── */}
       <div className="space-y-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Entidade Salesforce</p>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-500">Entidade Salesforce</p>
         <div className="flex flex-wrap gap-2">
           {ENTITIES.map((e) => (
             <button
@@ -628,7 +628,7 @@ export function SalesforceCsvPreparation() {
               className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors ${
                 entity === e
                   ? 'border-slate-900 bg-slate-900 text-white'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-800'
+                  : 'border-slate-200 bg-white text-slate-400 hover:border-slate-400 hover:text-slate-800'
               }`}
             >
               {e}
@@ -646,14 +646,14 @@ export function SalesforceCsvPreparation() {
           return (
             <React.Fragment key={label}>
               <div className="flex shrink-0 flex-col items-center gap-1">
-                <div className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black ${
+                <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black ${
                   done ? 'bg-emerald-600 text-white' :
                   current ? 'bg-slate-900 text-white' :
                   'border border-slate-300 bg-white text-slate-400'
                 }`}>
                   {done ? '✓' : stepNum}
                 </div>
-                <span className={`whitespace-nowrap text-[10px] font-bold ${
+                <span className={`whitespace-nowrap text-xs font-bold ${
                   done ? 'text-emerald-700' : current ? 'text-slate-900' : 'text-slate-400'
                 }`}>
                   {label}
@@ -675,7 +675,7 @@ export function SalesforceCsvPreparation() {
 
         {/* Obrigatórios */}
         <div className="space-y-3">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          <p className="text-xs font-black uppercase tracking-widest text-slate-500">
             Obrigatórios para confirmação local
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -683,12 +683,12 @@ export function SalesforceCsvPreparation() {
               <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupA.title}</p>
               <div className="flex flex-wrap gap-1.5">
                 {entityConfig.requiredGroupA.fields.map((f) => (
-                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
+                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-bold text-violet-700">
                     {f}
                   </span>
                 ))}
               </div>
-              <p className="text-[11px] font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500">
                 Pelo menos um desses campos deve estar presente e não ignorado.
               </p>
             </div>
@@ -696,12 +696,12 @@ export function SalesforceCsvPreparation() {
               <p className="text-xs font-black text-slate-800">{entityConfig.requiredGroupB.title}</p>
               <div className="flex flex-wrap gap-1.5">
                 {entityConfig.requiredGroupB.fields.map((f) => (
-                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-[11px] font-bold text-violet-700">
+                  <span key={f} className="rounded-lg border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-bold text-violet-700">
                     {f}
                   </span>
                 ))}
               </div>
-              <p className="text-[11px] font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500">
                 Pelo menos um desses campos garante identificação na leitura local.
               </p>
             </div>
@@ -710,17 +710,17 @@ export function SalesforceCsvPreparation() {
 
         {/* Recomendados */}
         <div className="space-y-2">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          <p className="text-xs font-black uppercase tracking-widest text-slate-500">
             Recomendados para melhor leitura
           </p>
           <div className="flex flex-wrap gap-1.5">
             {entityConfig.recommendedLabels.map((f) => (
-              <span key={f} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-bold text-slate-600">
+              <span key={f} className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-bold text-slate-400">
                 {f}
               </span>
             ))}
           </div>
-          <p className="text-[11px] font-medium leading-relaxed text-slate-500">
+          <p className="text-xs font-medium leading-relaxed text-slate-500">
             Campos adicionais enriquecem a leitura local sem serem obrigatórios para confirmar.
           </p>
         </div>
@@ -728,7 +728,7 @@ export function SalesforceCsvPreparation() {
 
       {/* ── BLOCO 2: Upload ── */}
       <div className="space-y-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Arquivo CSV</p>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Arquivo CSV</p>
         <div className="flex flex-wrap items-center gap-3">
           <label className="cursor-pointer rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100">
             <input ref={inputRef} type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
@@ -742,7 +742,7 @@ export function SalesforceCsvPreparation() {
             <Download className="h-3.5 w-3.5" />
             Baixar CSV exemplo ({entityConfig.label})
           </button>
-          <span className="text-[11px] text-slate-500">Apenas .csv · Máximo 5 MB · leitura local para preview</span>
+          <span className="text-xs text-slate-500">Apenas .csv · Máximo 5 MB · leitura local para preview</span>
         </div>
       </div>
 
@@ -780,7 +780,7 @@ export function SalesforceCsvPreparation() {
                     ['Preview exibido', `${analysis.previewRows.length} linha(s)`],
                   ] as [string, string][]).map(([label, value]) => (
                     <div key={label}>
-                      <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">{label}</p>
+                      <p className="text-xs font-black uppercase tracking-wider text-slate-500">{label}</p>
                       <p className="mt-0.5 truncate text-sm font-bold text-slate-800">{value}</p>
                     </div>
                   ))}
@@ -790,7 +790,7 @@ export function SalesforceCsvPreparation() {
                     analysis.compatibility === 'alta' ? 'bg-emerald-100' :
                     analysis.compatibility === 'parcial' ? 'bg-amber-100' : 'bg-red-100'
                   }`}>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-700">
                       Compatibilidade:
                     </span>
                     <span className={`text-sm font-black ${
@@ -801,12 +801,12 @@ export function SalesforceCsvPreparation() {
                     </span>
                   </div>
                   {requiredGroups.allMet ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-100 px-3 py-2 text-[10px] font-black text-emerald-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-100 px-3 py-2 text-xs font-black text-emerald-800">
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       Campos obrigatórios atendidos
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-amber-100 px-3 py-2 text-[10px] font-black text-amber-800">
+                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-amber-100 px-3 py-2 text-xs font-black text-amber-800">
                       <AlertCircle className="h-3.5 w-3.5" />
                       Campos obrigatórios pendentes
                     </span>
@@ -816,7 +816,7 @@ export function SalesforceCsvPreparation() {
               <button
                 type="button"
                 onClick={handleClear}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 hover:text-slate-400"
                 title="Limpar"
               >
                 <X className="h-4 w-4" />
@@ -841,33 +841,33 @@ export function SalesforceCsvPreparation() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-black text-slate-900">Ajuste local de leitura</p>
-                <p className="mt-0.5 text-[11px] font-medium text-slate-500">
+                <p className="mt-0.5 text-xs font-medium text-slate-500">
                   Preparação local · não cria campos · não salva configuração
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {derivedCounters.recognized > 0 && (
-                  <span className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-700">
+                  <span className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700">
                     {derivedCounters.recognized} reconhecida{derivedCounters.recognized !== 1 ? 's' : ''}
                   </span>
                 )}
                 {derivedCounters.alternative > 0 && (
-                  <span className="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-black text-blue-700">
+                  <span className="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-700">
                     {derivedCounters.alternative} alternativa{derivedCounters.alternative !== 1 ? 's' : ''} local{derivedCounters.alternative !== 1 ? 'ais' : ''}
                   </span>
                 )}
                 {derivedCounters.unrecognized > 0 && (
-                  <span className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-600">
+                  <span className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-400">
                     {derivedCounters.unrecognized} não reconhecida{derivedCounters.unrecognized !== 1 ? 's' : ''}
                   </span>
                 )}
                 {derivedCounters.ignored > 0 && (
-                  <span className="rounded-lg border border-slate-300 bg-slate-200 px-2.5 py-1 text-[10px] font-black text-slate-500">
+                  <span className="rounded-lg border border-slate-300 bg-slate-200 px-2.5 py-1 text-xs font-black text-slate-500">
                     {derivedCounters.ignored} ignorada{derivedCounters.ignored !== 1 ? 's' : ''}
                   </span>
                 )}
                 {analysis.warnings.length > 0 && (
-                  <span className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-black text-amber-700">
+                  <span className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-black text-amber-700">
                     {analysis.warnings.length} aviso{analysis.warnings.length !== 1 ? 's' : ''}
                   </span>
                 )}
@@ -879,7 +879,7 @@ export function SalesforceCsvPreparation() {
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
                     {['Coluna do arquivo', 'Exemplos', 'Campo sugerido', 'Ação', 'Status', 'Observação'].map((h) => (
-                      <th key={h} className="whitespace-nowrap px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-600">
+                      <th key={h} className="whitespace-nowrap px-3 py-2 text-left text-xs font-black uppercase tracking-wider text-slate-400">
                         {h}
                       </th>
                     ))}
@@ -906,7 +906,7 @@ export function SalesforceCsvPreparation() {
                         <td className="px-3 py-2.5 text-xs">
                           {col.exampleValues.length > 0
                             ? col.exampleValues.map((v, i) => (
-                                <span key={i} className="mr-1 inline-block max-w-[90px] truncate rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-700">
+                                <span key={i} className="mr-1 inline-block max-w-[90px] truncate rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-slate-700">
                                   {v}
                                 </span>
                               ))
@@ -957,31 +957,31 @@ export function SalesforceCsvPreparation() {
                         <td className="whitespace-nowrap px-3 py-2.5">
                           <div className="flex flex-col gap-1">
                             {effType === 'ignored' ? (
-                              <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-500">
+                              <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-500">
                                 Ignorada
                               </span>
                             ) : effType === 'salesforce' ? (
-                              <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-700">
+                              <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-700">
                                 Reconhecida
                               </span>
                             ) : effType === 'alternative' ? (
-                              <span className="rounded-lg bg-blue-100 px-2 py-0.5 text-[10px] font-black text-blue-700">
+                              <span className="rounded-lg bg-blue-100 px-2 py-0.5 text-xs font-black text-blue-700">
                                 Alternativa local
                               </span>
                             ) : (
-                              <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-600">
+                              <span className="rounded-lg bg-slate-200 px-2 py-0.5 text-xs font-black text-slate-400">
                                 Não reconhecida
                               </span>
                             )}
                             {isRequired && (
-                              <span className="rounded-lg bg-violet-100 px-2 py-0.5 text-[10px] font-black text-violet-700">
+                              <span className="rounded-lg bg-violet-100 px-2 py-0.5 text-xs font-black text-violet-700">
                                 Obrigatório
                               </span>
                             )}
                           </div>
                         </td>
                         {/* Observação */}
-                        <td className="max-w-[200px] px-3 py-2.5 text-[11px] text-slate-500">
+                        <td className="max-w-[200px] px-3 py-2.5 text-xs text-slate-500">
                           {isIgnored
                             ? 'Coluna ignorada nesta preparação local. Não será considerada.'
                             : adj.action === 'override' && !adj.overrideField
@@ -1007,12 +1007,12 @@ export function SalesforceCsvPreparation() {
                   <thead>
                     <tr className="border-b border-slate-300 bg-slate-100">
                       {analysis.headers.slice(0, 8).map((h) => (
-                        <th key={h} className="whitespace-nowrap px-3 py-2 text-left text-[10px] font-black uppercase tracking-wider text-slate-700">
+                        <th key={h} className="whitespace-nowrap px-3 py-2 text-left text-xs font-black uppercase tracking-wider text-slate-700">
                           {h}
                         </th>
                       ))}
                       {analysis.headers.length > 8 && (
-                        <th className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                        <th className="px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-400">
                           +{analysis.headers.length - 8} col.
                         </th>
                       )}
@@ -1034,7 +1034,7 @@ export function SalesforceCsvPreparation() {
                   </tbody>
                 </table>
               </div>
-              <p className="text-[11px] font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500">
                 Preview local: {analysis.previewRows.length} de {analysis.rowCount} linha(s). Sem persistência: leitura e ajuste local apenas nesta sessão.
               </p>
             </div>
@@ -1051,7 +1051,7 @@ export function SalesforceCsvPreparation() {
                       <p className="text-sm font-black text-amber-900">
                         Antes de confirmar, ajuste os campos obrigatórios
                       </p>
-                      <p className="mt-0.5 text-[11px] font-medium text-amber-800">
+                      <p className="mt-0.5 text-xs font-medium text-amber-800">
                         Para confirmar a preparação local, a Canopi precisa identificar pelo menos o {entityConfig.requiredGroupA.title.toLowerCase()} e a {entityConfig.requiredGroupB.title.toLowerCase()}.
                       </p>
                     </div>
@@ -1084,12 +1084,12 @@ export function SalesforceCsvPreparation() {
                           <p className={`text-sm font-black ${met ? 'text-emerald-900' : 'text-slate-800'}`}>
                             {label}
                           </p>
-                          <span className={`ml-auto text-[10px] font-black uppercase tracking-widest ${met ? 'text-emerald-700' : 'text-amber-700'}`}>
+                          <span className={`ml-auto text-xs font-black uppercase tracking-widest ${met ? 'text-emerald-700' : 'text-amber-700'}`}>
                             {met ? 'Atendido' : 'Pendente'}
                           </span>
                         </div>
                         {!met && (
-                          <p className="mt-1.5 pl-6 text-[11px] font-medium text-amber-800">
+                          <p className="mt-1.5 pl-6 text-xs font-medium text-amber-800">
                             {resolve}
                           </p>
                         )}
@@ -1110,7 +1110,7 @@ export function SalesforceCsvPreparation() {
               </button>
 
               {!canConfirm && (
-                <p className="text-center text-[11px] font-medium text-slate-500">
+                <p className="text-center text-xs font-medium text-slate-500">
                   Confirmação bloqueada até os campos obrigatórios serem atendidos.
                 </p>
               )}
@@ -1124,7 +1124,7 @@ export function SalesforceCsvPreparation() {
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
                 <div className="space-y-1">
                   <p className="text-sm font-black text-emerald-900">CSV confirmado para esta sessão</p>
-                  <p className="text-[11px] font-medium leading-relaxed text-emerald-800">
+                  <p className="text-xs font-medium leading-relaxed text-emerald-800">
                     Preparação local concluída para {entityConfig.label}. Sem persistência e sem atualização no Salesforce.
                   </p>
                 </div>
@@ -1142,19 +1142,19 @@ export function SalesforceCsvPreparation() {
                   ...(derivedCounters.unrecognized > 0 ? ([['Não reconhecidas', String(derivedCounters.unrecognized)]] as [string, string][]) : []),
                 ] as [string, string][]).map(([label, value]) => (
                   <div key={label}>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">{label}</p>
+                    <p className="text-xs font-black uppercase tracking-wider text-emerald-700">{label}</p>
                     <p className="mt-0.5 truncate text-sm font-bold text-emerald-900">{value}</p>
                   </div>
                 ))}
               </div>
               {confirmationSummary.ignored.length > 0 && (
                 <div className="rounded-xl border border-emerald-200 bg-white/60 px-4 py-3">
-                  <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                  <p className="mb-2 text-xs font-black uppercase tracking-wider text-emerald-700">
                     Colunas ignoradas nesta preparação
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {confirmationSummary.ignored.map((col) => (
-                      <span key={col} className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold text-slate-600">
+                      <span key={col} className="rounded-lg border border-slate-200 bg-slate-100 px-2 py-0.5 font-mono text-xs font-bold text-slate-400">
                         {col}
                       </span>
                     ))}

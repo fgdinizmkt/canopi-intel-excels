@@ -128,22 +128,22 @@ export const PaidMedia: React.FC = () => {
                  </h4>
                  <div className="grid grid-cols-3 gap-3">
                     <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase">Search Share</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase">Search Share</p>
                        <p className="text-lg font-black text-white">42%</p>
                     </div>
                     <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase">Video Share</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase">Video Share</p>
                        <p className="text-lg font-black text-white">28%</p>
                     </div>
                     <div className="bg-slate-800 p-3 rounded-xl border border-slate-700">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase">Display Share</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase">Display Share</p>
                        <p className="text-lg font-black text-white">30%</p>
                     </div>
                  </div>
               </div>
 
               <div className="p-5 bg-white border border-slate-200 rounded-3xl">
-                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Performance de Assets</p>
+                 <p className="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Performance de Assets</p>
                  <div className="space-y-3">
                     {[
                        { type: 'Headline 1', val: 'A Melhor Solução ABM', status: 'EXCELLENT' },
@@ -152,10 +152,10 @@ export const PaidMedia: React.FC = () => {
                     ].map((asset, i) => (
                        <div key={i} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
                           <div>
-                             <p className="text-[9px] font-bold text-slate-400 uppercase">{asset.type}</p>
+                             <p className="text-xs font-bold text-slate-400 uppercase">{asset.type}</p>
                              <p className="text-xs font-bold text-slate-800">{asset.val}</p>
                           </div>
-                          <span className={`text-[9px] font-black px-2 py-1 rounded ${asset.status === 'EXCELLENT' ? 'bg-emerald-50 text-emerald-600' : asset.status === 'GOOD' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
+                          <span className={`text-xs font-black px-2 py-1 rounded ${asset.status === 'EXCELLENT' ? 'bg-emerald-50 text-emerald-600' : asset.status === 'GOOD' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'}`}>
                              {asset.status}
                           </span>
                        </div>
@@ -175,20 +175,20 @@ export const PaidMedia: React.FC = () => {
                  <Youtube className="w-8 h-8 text-rose-600" />
                  <div>
                     <h5 className="text-sm font-bold text-rose-900 uppercase">YouTube Direct Inbound</h5>
-                    <p className="text-[10px] text-rose-700 font-medium">Campanha: Awareness Tech v1</p>
+                    <p className="text-xs text-rose-700 font-medium">Campanha: Awareness Tech v1</p>
                  </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">VTR (View Through Rate)</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase mb-2">VTR (View Through Rate)</p>
                     <p className="text-2xl font-black text-slate-900">38.4%</p>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2">
                        <div className="bg-rose-500 h-full rounded-full w-[38.4%]"></div>
                     </div>
                  </div>
                  <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Retention @ 30s</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase mb-2">Retention @ 30s</p>
                     <p className="text-2xl font-black text-slate-900">52.1%</p>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2">
                        <div className="bg-blue-500 h-full rounded-full w-[52.1%]"></div>
@@ -197,7 +197,7 @@ export const PaidMedia: React.FC = () => {
               </div>
 
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                 <p className="text-[10px] font-bold text-slate-500 uppercase mb-3">Audiência Principal Engajada</p>
+                 <p className="text-xs font-bold text-slate-500 uppercase mb-3">Audiência Principal Engajada</p>
                  <div className="flex gap-2">
                     <span className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm">CTOs Enterprise</span>
                     <span className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 shadow-sm">SaaS Founders</span>
@@ -218,12 +218,12 @@ export const PaidMedia: React.FC = () => {
                  </div>
                  <div>
                     <h5 className="text-sm font-extrabold text-slate-800 uppercase">Bing / Microsoft Ads B2B</h5>
-                    <p className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md inline-block mt-0.5 tracking-tighter">EXCLUVISO: LinkedIn Profile Targeting Enabled</p>
+                    <p className="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md inline-block mt-0.5 tracking-tighter">EXCLUVISO: LinkedIn Profile Targeting Enabled</p>
                  </div>
               </div>
 
               <div className="space-y-4">
-                 <p className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Filtros de Perfil Profissional (Microsoft Graph)</p>
+                 <p className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">Filtros de Perfil Profissional (Microsoft Graph)</p>
                  <div className="grid grid-cols-2 gap-2">
                     {[
                        { label: 'Job Title', val: 'Sales Manager' },
@@ -232,7 +232,7 @@ export const PaidMedia: React.FC = () => {
                        { label: 'Skills', val: 'Account Based Marketing' }
                     ].map((f, i) => (
                        <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <p className="text-[9px] text-slate-400 font-bold uppercase">{f.label}</p>
+                          <p className="text-xs text-slate-400 font-bold uppercase">{f.label}</p>
                           <p className="text-xs font-bold text-slate-800">{f.val}</p>
                        </div>
                     ))}
@@ -253,13 +253,13 @@ export const PaidMedia: React.FC = () => {
                  </div>
                  <div>
                     <h4 className="text-white font-bold text-sm uppercase tracking-tight">Campaign Strategy Builder</h4>
-                    <p className="text-[10px] text-blue-400 font-bold tracking-widest uppercase">Canopi Intelligence Integration</p>
+                    <p className="text-xs text-blue-400 font-bold tracking-widest uppercase">Canopi Intelligence Integration</p>
                  </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Canal de Origem</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase">Canal de Origem</label>
                     <select 
                        aria-label="Canal de Origem"
                        className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none ring-offset-2 focus:ring-2 focus:ring-blue-500 transition-all"
@@ -271,7 +271,7 @@ export const PaidMedia: React.FC = () => {
                     </select>
                  </div>
                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo Agêntico</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase">Objetivo Agêntico</label>
                     <select 
                        aria-label="Objetivo Agêntico"
                        className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none ring-offset-2 focus:ring-2 focus:ring-blue-500 transition-all"
@@ -285,10 +285,10 @@ export const PaidMedia: React.FC = () => {
 
               <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-[11px] font-bold text-blue-900 uppercase">Sincronização de Públicos</p>
+                    <p className="text-xs font-bold text-blue-900 uppercase">Sincronização de Públicos</p>
                     <BadgeCheck className="w-4 h-4 text-emerald-600" />
                  </div>
-                 <p className="text-[10px] text-blue-700 font-medium">Extraindo <span className="font-bold">842 Contas Impactadas</span> do seu CRM para Matched Audience automático.</p>
+                 <p className="text-xs text-blue-700 font-medium">Extraindo <span className="font-bold">842 Contas Impactadas</span> do seu CRM para Matched Audience automático.</p>
               </div>
 
               <button className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-black shadow-lg shadow-blue-500/10 transition-all" onClick={() => setModalOpen(false)}>Publicar Campanha Estratégica</button>
@@ -305,19 +305,19 @@ export const PaidMedia: React.FC = () => {
                  </div>
                  <div>
                     <h5 className="text-sm font-extrabold text-slate-800 uppercase tracking-tight">AI Bid Management</h5>
-                    <p className="text-[10px] text-slate-500 font-medium mt-0.5 tracking-wide">Status: <span className="text-emerald-600 font-bold uppercase">Optimized</span></p>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5 tracking-wide">Status: <span className="text-emerald-600 font-bold uppercase">Optimized</span></p>
                  </div>
               </div>
 
               <div className="space-y-4">
                  <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
                     <div>
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">CPA Atual (MQL)</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight mb-1">CPA Atual (MQL)</p>
                        <p className="text-lg font-black text-slate-900">R$ 84,20</p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-slate-300" />
                     <div>
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1">CPA Sugerido</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight mb-1">CPA Sugerido</p>
                        <p className="text-lg font-black text-blue-600">R$ 72,00</p>
                     </div>
                  </div>
@@ -343,7 +343,7 @@ export const PaidMedia: React.FC = () => {
            <div className="space-y-6">
               <div className="bg-[#0f172a] rounded-3xl p-6 border border-slate-800 shadow-2xl overflow-hidden relative">
                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                 <div className="relative z-10 font-mono text-[10px] text-emerald-400 space-y-2">
+                 <div className="relative z-10 font-mono text-xs text-emerald-400 space-y-2">
                     <p className="opacity-50">&gt; running canopi-paid-intelligence --audit all</p>
                     <p className="text-white font-bold">[!] DETECTADO: 14% de &quot;Wasteful Spend&quot; no Google Ads (Display Network)</p>
                     <p className="text-slate-400">&gt; Recomendação: Negativar canais de apps infantis e focar em clusters ABM.</p>
@@ -353,14 +353,14 @@ export const PaidMedia: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-4">
                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Saúde do Pixel</p>
+                    <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">Saúde do Pixel</p>
                     <div className="flex items-center gap-2">
                        <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                        <span className="text-xs font-bold text-slate-800">100% Sincronizado</span>
                     </div>
                  </div>
                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-                    <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Qualidade de Origem</p>
+                    <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">Qualidade de Origem</p>
                     <div className="flex items-center gap-2">
                        <ShieldCheck className="w-3 h-3 text-blue-500" />
                        <span className="text-xs font-bold text-slate-800">8.4/10 Score</span>
@@ -368,7 +368,7 @@ export const PaidMedia: React.FC = () => {
                  </div>
               </div>
 
-              <button className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-[10px] uppercase tracking-widest hover:bg-black transition-all" onClick={() => setModalOpen(false)}>Aplicar Otimizações em Lote</button>
+              <button className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl text-xs uppercase tracking-widest hover:bg-black transition-all" onClick={() => setModalOpen(false)}>Aplicar Otimizações em Lote</button>
            </div>
          );
          break;
@@ -383,21 +383,21 @@ export const PaidMedia: React.FC = () => {
                     </div>
                     <div>
                        <h5 className="text-sm font-bold text-slate-800">SDR: Demonstração Inteligente</h5>
-                       <p className="text-[10px] text-slate-400 font-medium truncate">/lp/demo-enterprise-v2</p>
+                       <p className="text-xs text-slate-400 font-medium truncate">/lp/demo-enterprise-v2</p>
                     </div>
                  </div>
 
                  <div className="grid grid-cols-3 gap-4 mb-4">
                     <div className="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Bounce Rate</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase mb-1">Bounce Rate</p>
                        <p className="text-lg font-black text-slate-900">32%</p>
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Conv. Rate</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase mb-1">Conv. Rate</p>
                        <p className="text-lg font-black text-emerald-600">14.5%</p>
                     </div>
                     <div className="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Avg. Load</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase mb-1">Avg. Load</p>
                        <p className="text-lg font-black text-blue-600">1.2s</p>
                     </div>
                  </div>
@@ -405,7 +405,7 @@ export const PaidMedia: React.FC = () => {
                  <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                        <Sparkles className="w-3 h-3 text-emerald-600" />
-                       <span className="text-[10px] font-bold text-emerald-800 tracking-tight uppercase">Performance Excelente</span>
+                       <span className="text-xs font-bold text-emerald-800 tracking-tight uppercase">Performance Excelente</span>
                     </div>
                     <ExternalLink className="w-3 h-3 text-emerald-400 cursor-pointer" />
                  </div>
@@ -421,7 +421,7 @@ export const PaidMedia: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-6">
                  <div className="flex-1 space-y-4">
                     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
-                       <h5 className="text-[10px] font-extrabold text-slate-400 uppercase mb-6 tracking-widest flex items-center gap-2">
+                       <h5 className="text-xs font-extrabold text-slate-400 uppercase mb-6 tracking-widest flex items-center gap-2">
                           <Layers className="w-3 h-3 text-blue-600" /> Grupos de Anúncios (Ad Groups)
                        </h5>
                        <div className="space-y-4 font-bold text-slate-800">
@@ -433,11 +433,11 @@ export const PaidMedia: React.FC = () => {
                              <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm cursor-pointer hover:border-blue-300 group transition-all">
                                 <div>
                                    <p className="text-xs group-hover:text-blue-700">{g.name}</p>
-                                   <p className="text-[9px] text-slate-400 font-medium mt-0.5">{g.invest} investidos</p>
+                                   <p className="text-xs text-slate-400 font-medium mt-0.5">{g.invest} investidos</p>
                                 </div>
                                 <div className="text-right">
                                    <p className="text-xs text-emerald-600 font-black">{g.conv} Conv.</p>
-                                   <p className="text-[9px] text-slate-400 font-bold uppercase">{g.cpl}/MQL</p>
+                                   <p className="text-xs text-slate-400 font-bold uppercase">{g.cpl}/MQL</p>
                                 </div>
                              </div>
                           ))}
@@ -447,7 +447,7 @@ export const PaidMedia: React.FC = () => {
 
                  <div className="w-full md:w-80 space-y-6">
                     <div className="bg-white border-2 border-slate-100 p-6 rounded-3xl relative overflow-hidden">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Atribuição por Canal</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest">Atribuição por Canal</p>
                        <div className="h-40 min-h-[160px]">
                           <ClientOnly fallback={<div className="h-full w-full bg-slate-50 animate-pulse rounded-xl" />}>
                              <ResponsiveContainer width="100%" height="100%">
@@ -522,13 +522,13 @@ export const PaidMedia: React.FC = () => {
                 <div className={`w-8 h-8 rounded-lg ${kpi.isDark ? 'bg-blue-600' : kpi.bg} ${kpi.isDark ? 'text-white' : kpi.color} flex items-center justify-center shadow-inner`}>
                   <kpi.icon className="w-4 h-4" />
                 </div>
-                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${kpi.isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600'}`}>
+                <span className={`text-xs font-black px-2 py-0.5 rounded-full ${kpi.isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600'}`}>
                   {kpi.trend}
                 </span>
              </div>
-             <p className={`text-[10px] font-extrabold ${kpi.isDark ? 'text-slate-400' : 'text-slate-400'} uppercase tracking-widest mb-1 relative z-10`}>{kpi.label}</p>
+             <p className={`text-xs font-extrabold ${kpi.isDark ? 'text-slate-400' : 'text-slate-400'} uppercase tracking-widest mb-1 relative z-10`}>{kpi.label}</p>
              <h3 className={`text-2xl font-bold ${kpi.isDark ? 'text-white' : 'text-slate-900'} relative z-10`}>{kpi.val}</h3>
-             <p className={`text-[10px] ${kpi.isDark ? 'text-slate-500' : 'text-slate-400'} mt-1 font-medium relative z-10`}>{kpi.sub}</p>
+             <p className={`text-xs ${kpi.isDark ? 'text-slate-500' : 'text-slate-400'} mt-1 font-medium relative z-10`}>{kpi.sub}</p>
           </div>
         ))}
       </div>
@@ -542,7 +542,7 @@ export const PaidMedia: React.FC = () => {
                <p className="text-xs text-slate-500 font-medium mt-1">Comparativo direto de ROAS e Match de Intenção por plataforma.</p>
              </div>
              <div className="flex gap-2">
-                <button className="px-4 py-2 bg-slate-50 text-slate-600 text-xs font-bold rounded-lg border border-slate-200" onClick={() => openSimModal('Auditoria Global de Bids', 'BID_CONTROL', 'md')}>Bids</button>
+                <button className="px-4 py-2 bg-slate-50 text-slate-400 text-xs font-bold rounded-lg border border-slate-200" onClick={() => openSimModal('Auditoria Global de Bids', 'BID_CONTROL', 'md')}>Bids</button>
                 <button className="px-4 py-2 bg-blue-700 text-white text-xs font-bold rounded-lg" onClick={() => openSimModal('Terminal de Auditoria AI', 'AUDIT_AI', 'lg')}>Audit AI</button>
              </div>
           </div>
@@ -559,11 +559,11 @@ export const PaidMedia: React.FC = () => {
                   <div className={`w-8 h-8 bg-${c.color}-50 rounded-lg flex items-center justify-center mb-4`}>
                      <c.icon className={`w-4 h-4 text-${c.color}-600`} />
                   </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mb-1">{c.name}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-1">{c.name}</p>
                   <p className="text-lg font-black text-slate-900">R$ {Math.round(c.val * currFilter.pVol)}k</p>
                   <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between">
-                     <span className="text-[9px] font-bold text-slate-400">Match</span>
-                     <span className="text-[10px] font-black text-blue-600">{c.infl}%</span>
+                     <span className="text-xs font-bold text-slate-400">Match</span>
+                     <span className="text-xs font-black text-blue-600">{c.infl}%</span>
                   </div>
                </div>
             ))}
@@ -572,7 +572,7 @@ export const PaidMedia: React.FC = () => {
           {/* Efficiency by Segment */}
           <div className="border-t border-slate-100 pt-8">
              <div className="flex items-center justify-between mb-6">
-                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                    <Activity className="w-3 h-3 text-blue-500" /> Eficiência de Segmento (Match)
                 </p>
              </div>
@@ -580,7 +580,7 @@ export const PaidMedia: React.FC = () => {
                 {performanceBySegmentData.map((seg, i) => (
                    <div key={i} className="space-y-1 group cursor-pointer" onClick={() => openSimModal(`Detalhamento: ${seg.name}`, 'DRILLDOWN_CAMPAIGN', 'lg')}>
                       <div className="flex justify-between text-xs font-bold">
-                         <span className="text-slate-600">{seg.name}</span>
+                         <span className="text-slate-400">{seg.name}</span>
                          <span className="text-blue-600">{seg.val}% • {seg.mqls} MQLs</span>
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -599,7 +599,7 @@ export const PaidMedia: React.FC = () => {
              <div className="relative z-10 space-y-5">
                 <div className="flex items-center gap-2 bg-blue-500/10 p-2 pr-4 rounded-full border border-blue-500/20 w-fit">
                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                   <span className="text-white text-[10px] font-bold tracking-widest uppercase">Canopi Intelligence</span>
+                   <span className="text-white text-xs font-bold tracking-widest uppercase">Canopi Intelligence</span>
                 </div>
                 
                 {[
@@ -608,7 +608,7 @@ export const PaidMedia: React.FC = () => {
                    { title: 'WASTE DETECTADO', text: 'Bing Ads exibindo para termos residenciais. Negativar keywords imprecisas.', color: 'amber', key: 'AUDIT_AI' },
                 ].map((ins, i) => (
                    <div key={i} className={`bg-slate-800/50 border border-${ins.color}-500/20 p-4 rounded-2xl hover:border-${ins.color}-500/40 transition-all cursor-pointer shadow-sm`} onClick={() => openSimModal(ins.title, ins.key, 'md')}>
-                      <span className={`text-[9px] font-bold text-${ins.color}-400 uppercase`}>{ins.title}</span>
+                      <span className={`text-xs font-bold text-${ins.color}-400 uppercase`}>{ins.title}</span>
                       <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">{ins.text}</p>
                    </div>
                 ))}
@@ -623,14 +623,14 @@ export const PaidMedia: React.FC = () => {
             <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-3">
                <TrendingUp className="w-6 h-6 text-blue-600" /> Destaques por Canal (Success vs Bottom)
             </h2>
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-200">Comparativo Multi-toque</div>
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-200">Comparativo Multi-toque</div>
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {channelBenchmarks.map((bench, i) => (
                <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
                   <div className="flex justify-between items-center border-b border-slate-50 pb-4">
-                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{bench.channel}</span>
+                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{bench.channel}</span>
                      <BadgeCheck className="w-5 h-5 text-blue-500" />
                   </div>
                   
@@ -639,12 +639,12 @@ export const PaidMedia: React.FC = () => {
                      <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 space-y-3 hover:bg-emerald-50 transition-colors cursor-pointer" onClick={() => openSimModal(`Sucesso: ${bench.best.name}`, 'DRILLDOWN_CAMPAIGN', 'lg')}>
                         <div className="flex items-center gap-2">
                            <ThumbsUp className="w-3.5 h-3.5 text-emerald-600" />
-                           <span className="text-[10px] font-black text-emerald-700 uppercase">Top Performer</span>
+                           <span className="text-xs font-black text-emerald-700 uppercase">Top Performer</span>
                         </div>
                         <h5 className="text-xs font-bold text-slate-800 leading-tight">{bench.best.name}</h5>
                         <div className="flex justify-between items-end">
                            <span className="text-2xl font-black text-emerald-600">{bench.best.rate}</span>
-                           <span className="text-[8px] font-bold text-emerald-500 mb-1">{bench.best.signal}</span>
+                           <span className="text-xs font-bold text-emerald-500 mb-1">{bench.best.signal}</span>
                         </div>
                      </div>
                      
@@ -652,12 +652,12 @@ export const PaidMedia: React.FC = () => {
                      <div className="p-4 bg-rose-50/50 rounded-2xl border border-rose-100 space-y-3 hover:bg-rose-50 transition-colors cursor-pointer" onClick={() => openSimModal(`Correção: ${bench.worst.name}`, 'AUDIT_AI', 'lg')}>
                         <div className="flex items-center gap-2">
                            <ThumbsDown className="w-3.5 h-3.5 text-rose-600" />
-                           <span className="text-[10px] font-black text-rose-700 uppercase">Bottom Line</span>
+                           <span className="text-xs font-black text-rose-700 uppercase">Bottom Line</span>
                         </div>
                         <h5 className="text-xs font-bold text-slate-800 leading-tight">{bench.worst.name}</h5>
                         <div className="flex justify-between items-end">
                            <span className="text-2xl font-black text-rose-600">{bench.worst.rate}</span>
-                           <span className="text-[8px] font-bold text-rose-500 mb-1">{bench.worst.signal}</span>
+                           <span className="text-xs font-bold text-rose-500 mb-1">{bench.worst.signal}</span>
                         </div>
                      </div>
                   </div>
@@ -675,18 +675,18 @@ export const PaidMedia: React.FC = () => {
             </div>
             <div className="flex gap-2">
                <button className="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"><Search className="w-4 h-4 text-slate-400" /></button>
-               <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">Exportar CSV</button>
+               <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:bg-slate-50 transition-colors shadow-sm">Exportar CSV</button>
             </div>
          </div>
          <div className="overflow-x-auto">
             <table className="w-full text-left">
                <thead>
                   <tr className="bg-slate-50">
-                     <th className="pl-8 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Campanha</th>
-                     <th className="px-4 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Canal</th>
-                     <th className="px-4 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Investimento</th>
-                     <th className="px-4 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Conv/MQL</th>
-                     <th className="px-4 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest text-center">Impacto Conta</th>
+                     <th className="pl-8 py-5 text-xs font-extrabold text-slate-400 uppercase tracking-widest">Campanha</th>
+                     <th className="px-4 py-5 text-xs font-extrabold text-slate-400 uppercase tracking-widest">Canal</th>
+                     <th className="px-4 py-5 text-xs font-extrabold text-slate-400 uppercase tracking-widest">Investimento</th>
+                     <th className="px-4 py-5 text-xs font-extrabold text-slate-400 uppercase tracking-widest">Conv/MQL</th>
+                     <th className="px-4 py-5 text-xs font-extrabold text-slate-400 uppercase tracking-widest text-center">Impacto Conta</th>
                   </tr>
                </thead>
                <tbody className="divide-y divide-slate-50">
@@ -694,10 +694,10 @@ export const PaidMedia: React.FC = () => {
                      <tr key={cmp.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer" onClick={() => openSimModal(`Campanha: ${cmp.name}`, 'DRILLDOWN_CAMPAIGN', 'xl')}>
                         <td className="pl-8 py-5">
                            <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600">{cmp.name}</p>
-                           <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">{cmp.type} • ID: {cmp.id}</p>
+                           <p className="text-xs text-slate-400 font-bold uppercase mt-1 tracking-tighter">{cmp.type} • ID: {cmp.id}</p>
                         </td>
                         <td className="px-4 py-5">
-                           <span className={`px-2 py-0.5 rounded text-[8px] font-black tracking-widest border ${
+                           <span className={`px-2 py-0.5 rounded text-xs font-black tracking-widest border ${
                               cmp.channel === 'LINKEDIN' ? 'bg-blue-50 text-blue-700 border-blue-100' :
                               cmp.channel === 'GOOGLE' ? 'bg-rose-50 text-rose-700 border-rose-100' :
                               cmp.channel === 'META' ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
@@ -708,18 +708,18 @@ export const PaidMedia: React.FC = () => {
                            </span>
                         </td>
                         <td className="px-4 py-5">
-                           <p className="text-[11px] font-bold text-slate-700">R$ {cmp.investment.toLocaleString()}</p>
+                           <p className="text-xs font-bold text-slate-700">R$ {cmp.investment.toLocaleString()}</p>
                         </td>
                         <td className="px-4 py-5">
-                           <p className="text-[11px] font-bold text-slate-900">{cmp.conv}</p>
-                           <p className="text-[9px] text-slate-400 font-bold">R$ {cmp.cpl}/MQL</p>
+                           <p className="text-xs font-bold text-slate-900">{cmp.conv}</p>
+                           <p className="text-xs text-slate-400 font-bold">R$ {cmp.cpl}/MQL</p>
                         </td>
                         <td className="px-4 py-5">
                            <div className="flex -space-x-2 items-center justify-center">
                               {Array.isArray(cmp.impact) ? cmp.impact.map((acc, idx) => (
-                                 <div key={idx} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-500 shadow-sm">{acc}</div>
+                                 <div key={idx} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 shadow-sm">{acc}</div>
                               )) : (
-                                 <span className="text-[10px] font-bold text-slate-500 italic bg-white px-3 py-1 rounded-full border border-slate-100 shadow-sm">{cmp.impact}</span>
+                                 <span className="text-xs font-bold text-slate-500 italic bg-white px-3 py-1 rounded-full border border-slate-100 shadow-sm">{cmp.impact}</span>
                               )}
                            </div>
                         </td>
@@ -737,9 +737,9 @@ export const PaidMedia: React.FC = () => {
                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
                   <Network className="w-4 h-4 text-blue-600" /> Fontes de Dados Conectadas
                </h3>
-               <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tight">Status de sincronização global Canopi Intel</p>
+               <p className="text-xs text-slate-500 font-bold mt-1 uppercase tracking-tight">Status de sincronização global Canopi Intel</p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50 transition-colors shadow-sm">
                <RefreshCw className="w-3 h-3 text-blue-500" /> Sincronizar Tudo
             </button>
          </div>
@@ -750,12 +750,12 @@ export const PaidMedia: React.FC = () => {
                   <div className={`w-10 h-10 ${source.color} bg-slate-50 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                      <source.icon className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-800 mb-1">{source.name}</p>
+                  <p className="text-xs font-black text-slate-800 mb-1">{source.name}</p>
                   <div className="flex items-center gap-1">
                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                     <span className="text-[9px] font-bold text-emerald-600 uppercase">ONLINE</span>
+                     <span className="text-xs font-bold text-emerald-600 uppercase">ONLINE</span>
                   </div>
-                  <span className="mt-2 text-[8px] text-slate-400 font-bold">{source.lastSync}</span>
+                  <span className="mt-2 text-xs text-slate-400 font-bold">{source.lastSync}</span>
                </div>
             ))}
          </div>

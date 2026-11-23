@@ -259,7 +259,7 @@ export function SalesforceHubRedesign({
       const count = criticalFieldIssues[sfName as CriticalField];
       if (count > 0) {
         return (
-          <Badge className="bg-red-50 text-red-700 border-none px-2 py-0.5 text-[10px] font-bold whitespace-nowrap">
+          <Badge className="bg-red-50 text-red-700 border-none px-2 py-0.5 text-xs font-bold whitespace-nowrap">
             {count} sem valor
           </Badge>
         );
@@ -269,18 +269,18 @@ export function SalesforceHubRedesign({
     const issue = fieldIssues[sfName];
     if (issue) {
       return (
-        <Badge className="bg-amber-50 text-amber-700 border-none px-2 py-0.5 text-[10px] font-bold">
+        <Badge className="bg-amber-50 text-amber-700 border-none px-2 py-0.5 text-xs font-bold">
           {issue.count} pendências
         </Badge>
       );
     }
 
     if (!accountsLoaded) {
-      return <Badge className="bg-slate-100 text-slate-400 border-none px-2 py-0.5 text-[10px] font-bold">—</Badge>;
+      return <Badge className="bg-slate-100 text-slate-400 border-none px-2 py-0.5 text-xs font-bold">—</Badge>;
     }
 
     return (
-      <Badge className="bg-emerald-50 text-emerald-700 border-none px-2 py-0.5 text-[10px] font-bold">
+      <Badge className="bg-emerald-50 text-emerald-700 border-none px-2 py-0.5 text-xs font-bold">
         Pronto
       </Badge>
     );
@@ -290,10 +290,10 @@ export function SalesforceHubRedesign({
     <div className="min-h-screen bg-[#F8FAFC] pb-24 font-sans text-slate-900">
       {/* ── HEADER ── */}
       <header className="px-8 pt-8 pb-6">
-        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
           <span>Integrações</span>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-slate-600">Salesforce</span>
+          <span className="text-slate-400">Salesforce</span>
         </div>
         <div className="mt-2 flex items-end justify-between">
           <div>
@@ -303,7 +303,7 @@ export function SalesforceHubRedesign({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest border-none ${
+            <Badge className={`px-3 py-1 text-xs font-black uppercase tracking-widest border-none ${
               isConnected ? 'bg-emerald-100 text-emerald-700'
               : isOAuthError ? 'bg-red-100 text-red-600'
               : isOAuthRestoring ? 'bg-slate-100 text-slate-400'
@@ -327,13 +327,13 @@ export function SalesforceHubRedesign({
           {/* ── A: Configuração OAuth do Salesforce ── */}
           <div className="border-b border-slate-100 p-6">
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400">
                 Configuração OAuth do Salesforce
               </p>
               {oauthConfigured && !showConfigForm ? (
                 <button
                   onClick={onConfigEditToggle}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 transition-colors hover:text-slate-700"
+                  className="flex items-center gap-1.5 text-xs font-bold text-slate-400 transition-colors hover:text-slate-700"
                 >
                   <Pencil className="h-3 w-3" />
                   Editar configuração
@@ -343,7 +343,7 @@ export function SalesforceHubRedesign({
 
             {showConfigForm ? (
               <div className="space-y-4">
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Configure o aplicativo conectado (Connected App) usado por esta empresa antes de iniciar a conexão OAuth. Consumer Key, Consumer Secret e Callback URL são obrigatórios.
                 </p>
                 {oauthConfigError ? (
@@ -352,7 +352,7 @@ export function SalesforceHubRedesign({
 
                 {/* Ambiente */}
                 <div>
-                  <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-slate-500">Ambiente</label>
+                  <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-500">Ambiente</label>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -381,7 +381,7 @@ export function SalesforceHubRedesign({
 
                 {/* Client ID */}
                 <div>
-                  <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-slate-500">
+                  <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-500">
                     Consumer Key / Client ID
                   </label>
                   <input
@@ -392,15 +392,15 @@ export function SalesforceHubRedesign({
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   />
                   {clientIdAlreadySaved ? (
-                    <p className="mt-1 text-[10px] text-slate-400">Consumer Key já salva. Preencha apenas se quiser substituir.</p>
+                    <p className="mt-1 text-xs text-slate-400">Consumer Key já salva. Preencha apenas se quiser substituir.</p>
                   ) : (
-                    <p className="mt-1 text-[10px] text-amber-600 font-medium">Obrigatório para primeira configuração.</p>
+                    <p className="mt-1 text-xs text-amber-600 font-medium">Obrigatório para primeira configuração.</p>
                   )}
                 </div>
 
                 {/* Client Secret */}
                 <div>
-                  <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-slate-500">
+                  <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-500">
                     Consumer Secret / Client Secret
                   </label>
                   <input
@@ -411,15 +411,15 @@ export function SalesforceHubRedesign({
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100"
                   />
                   {secretAlreadySaved ? (
-                    <p className="mt-1 text-[10px] text-slate-400">Consumer Secret já salvo. Preencha apenas se quiser substituir.</p>
+                    <p className="mt-1 text-xs text-slate-400">Consumer Secret já salvo. Preencha apenas se quiser substituir.</p>
                   ) : (
-                    <p className="mt-1 text-[10px] text-amber-600 font-medium">Obrigatório para primeira configuração.</p>
+                    <p className="mt-1 text-xs text-amber-600 font-medium">Obrigatório para primeira configuração.</p>
                   )}
                 </div>
 
                 {/* Callback URL */}
                 <div>
-                  <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-slate-500">
+                  <label className="mb-1.5 block text-xs font-black uppercase tracking-wider text-slate-500">
                     Callback URL da Canopi — use esta URL no Connected App do Salesforce
                   </label>
                   <div className="flex gap-2">
@@ -427,7 +427,7 @@ export function SalesforceHubRedesign({
                       type="text"
                       readOnly
                       value={oauthConfigForm.redirectUri}
-                      className="flex-1 rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-2.5 text-sm font-mono text-slate-600 focus:outline-none"
+                      className="flex-1 rounded-xl border border-slate-200 bg-slate-100 px-3.5 py-2.5 text-sm font-mono text-slate-400 focus:outline-none"
                     />
                     <button
                       type="button"
@@ -467,35 +467,35 @@ export function SalesforceHubRedesign({
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ambiente</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Ambiente</p>
                     <p className="text-sm font-bold text-slate-700">
                       {oauthConfig?.loginUrl === 'https://test.salesforce.com' ? 'Sandbox' : 'Produção'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Consumer Key</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Consumer Key</p>
                     <p className="text-sm font-mono font-medium text-slate-700">
                       {oauthConfig?.clientIdConfigured ? '•••••• salvo' : '—'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Consumer Secret</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Consumer Secret</p>
                     <p className="text-sm font-mono font-medium text-slate-700">
                       {oauthConfig?.clientSecretConfigured ? '•••••••• salvo' : '—'}
                     </p>
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Callback URL</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Callback URL</p>
                     <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-mono text-slate-600 truncate max-w-xs">{oauthConfigForm.redirectUri}</p>
-                      <button onClick={onCopyCallbackUrl} className="shrink-0 text-slate-400 hover:text-slate-600">
+                      <p className="text-xs font-mono text-slate-400 truncate max-w-xs">{oauthConfigForm.redirectUri}</p>
+                      <button onClick={onCopyCallbackUrl} className="shrink-0 text-slate-400 hover:text-slate-400">
                         <Copy className="h-3 w-3" />
                       </button>
                     </div>
                   </div>
                 </div>
                 {!oauthConfig?.updatedAt ? (
-                  <p className="text-[10px] text-amber-600">
+                  <p className="text-xs text-amber-600">
                     Configuração carregada do ambiente local. Para uso multiempresa, salve uma configuração própria para esta empresa.
                   </p>
                 ) : null}
@@ -505,7 +505,7 @@ export function SalesforceHubRedesign({
 
           {/* ── B: Conexão da conta Salesforce ── */}
           <div className="p-6">
-            <p className="mb-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <p className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
               Conexão da conta Salesforce
             </p>
             <div className="flex items-start justify-between gap-6">
@@ -555,7 +555,7 @@ export function SalesforceHubRedesign({
                     <button
                       onClick={onConnect}
                       disabled={!!oauthActionLoading}
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+                      className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-400 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:opacity-40"
                     >
                       Trocar conta Salesforce
                     </button>
@@ -594,34 +594,34 @@ export function SalesforceHubRedesign({
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <Database className="h-4 w-4 text-slate-400" />
-                <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Sincronização de Objetos</h4>
+                <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Sincronização de Objetos</h4>
               </div>
               
               <div className="space-y-3">
                 <div>
                   <p className="text-sm font-bold">Contas e Organizações</p>
-                  <p className="text-[10px] text-slate-400">Empresas e organizações do Salesforce</p>
+                  <p className="text-xs text-slate-400">Empresas e organizações do Salesforce</p>
                 </div>
 
                 {!isConnected ? (
-                  <p className="text-[10px] font-medium text-slate-400">Conecte o Salesforce para carregar.</p>
+                  <p className="text-xs font-medium text-slate-400">Conecte o Salesforce para carregar.</p>
                 ) : accountsLoaded ? (
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <div className="rounded-xl bg-slate-50 p-2.5">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Carregadas</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Carregadas</p>
                         <p className="mt-0.5 text-base font-black text-[#4F46E5]">{accountsCount}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2.5">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total SF</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Total SF</p>
                         <p className="mt-0.5 text-base font-black text-slate-800">{accountsPreview?.totalSize ?? '—'}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2.5">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selecionadas</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Selecionadas</p>
                         <p className="mt-0.5 text-base font-black text-slate-800">{selectedAccountPreviewRows.length}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2.5">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Preparadas</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Preparadas</p>
                         <p className={`mt-0.5 text-base font-black ${preparedAccountsPreviewSelection ? 'text-emerald-600' : 'text-slate-300'}`}>
                           {preparedAccountsPreviewSelection?.selectedCount ?? '—'}
                         </p>
@@ -630,7 +630,7 @@ export function SalesforceHubRedesign({
                     {preparedAccountsPreviewSelection ? (
                       <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                        <span className="text-[10px] font-black text-emerald-700">
+                        <span className="text-xs font-black text-emerald-700">
                           {preparedAccountsPreviewSelection.selectedCount} preparadas — prossiga pelo mapeamento abaixo
                         </span>
                       </div>
@@ -638,7 +638,7 @@ export function SalesforceHubRedesign({
                       <div className="flex gap-2">
                         <button
                           onClick={onSelectAll}
-                          className={`flex-1 rounded-xl py-2 text-[10px] font-black transition-colors ${
+                          className={`flex-1 rounded-xl py-2 text-xs font-black transition-colors ${
                             selectedAccountPreviewRows.length === 0
                               ? 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                               : selectedAccountPreviewRows.length === accountsCount
@@ -655,7 +655,7 @@ export function SalesforceHubRedesign({
                         <button
                           onClick={onPrepare}
                           disabled={selectedAccountPreviewRows.length === 0}
-                          className="flex-1 rounded-xl bg-[#4F46E5] py-2 text-[10px] font-black text-white hover:bg-[#4338CA] disabled:opacity-40"
+                          className="flex-1 rounded-xl bg-[#4F46E5] py-2 text-xs font-black text-white hover:bg-[#4338CA] disabled:opacity-40"
                         >
                           {selectedAccountPreviewRows.length === 0
                             ? 'Selecione Accounts'
@@ -666,7 +666,7 @@ export function SalesforceHubRedesign({
                     <button
                       onClick={hasFullAccountSnapshot ? onReloadHubState : onLoadAccounts}
                       disabled={accountsPreviewLoading}
-                      className="w-full rounded-xl border border-slate-100 py-1.5 text-[10px] font-bold text-slate-400 hover:bg-slate-50"
+                      className="w-full rounded-xl border border-slate-100 py-1.5 text-xs font-bold text-slate-400 hover:bg-slate-50"
                     >
                       {accountsPreviewLoading || hubRefreshState.phase === 'loading'
                         ? 'Recarregando estado...'
@@ -675,7 +675,7 @@ export function SalesforceHubRedesign({
                           : 'Recarregar amostra (50)'}
                     </button>
                     {hubRefreshState.phase === 'done' && (
-                      <p className="text-[10px] font-medium text-slate-400">
+                      <p className="text-xs font-medium text-slate-400">
                         Estado atualizado agora{hubRefreshState.updatedAt ? ` · ${new Date(hubRefreshState.updatedAt).toLocaleString('pt-BR')}` : ''}
                       </p>
                     )}
@@ -692,7 +692,7 @@ export function SalesforceHubRedesign({
                     <button
                       onClick={onLoadAccounts}
                       disabled={accountsPreviewLoading || accountsFullLoadState.phase === 'loading'}
-                      className="w-full rounded-xl border border-slate-200 py-1.5 text-[10px] font-bold text-slate-400 hover:bg-slate-50"
+                      className="w-full rounded-xl border border-slate-200 py-1.5 text-xs font-bold text-slate-400 hover:bg-slate-50"
                     >
                       Amostra (50)
                     </button>
@@ -706,13 +706,13 @@ export function SalesforceHubRedesign({
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-bold text-slate-800">Leads & Contatos</p>
-                          <p className="text-[10px] text-slate-400">Perfis e informações de contato</p>
+                          <p className="text-xs text-slate-400">Perfis e informações de contato</p>
                         </div>
                         <div className="flex items-center gap-1.5">
                           {contactSyncState.phase === 'done' && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
                           <button
                             onClick={() => onSetActiveObject('contacts')}
-                            className={`rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest transition-colors ${activeObject === 'contacts' ? 'bg-[#4F46E5] text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            className={`rounded-lg px-2.5 py-1 text-xs font-black uppercase tracking-widest transition-colors ${activeObject === 'contacts' ? 'bg-[#4F46E5] text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                           >
                             {contactSyncState.phase === 'done' ? 'Ver resultado' : 'Validar'}
                           </button>
@@ -720,27 +720,27 @@ export function SalesforceHubRedesign({
                       </div>
                       <div className="rounded-xl bg-slate-50 px-3 py-2 space-y-1">
                         <div className="flex items-center justify-between">
-                          <p className="text-[10px] font-black text-slate-500">Contacts</p>
+                          <p className="text-xs font-black text-slate-500">Contacts</p>
                           {contactSyncState.phase === 'done' ? (
-                            <span className="text-[10px] font-bold text-emerald-600">
+                            <span className="text-xs font-bold text-emerald-600">
                               {contactSyncState.result.createdCount} criados · {contactSyncState.result.skippedCount} ignorados
                             </span>
                           ) : contactFullLoadState.phase === 'done' ? (
-                            <span className="text-[10px] font-medium text-slate-500">{contactFullLoadState.recordCount ?? 0} carregados</span>
+                            <span className="text-xs font-medium text-slate-500">{contactFullLoadState.recordCount ?? 0} carregados</span>
                           ) : (
-                            <span className="text-[10px] font-medium text-slate-400">pendente</span>
+                            <span className="text-xs font-medium text-slate-400">pendente</span>
                           )}
                         </div>
                         <div className="flex items-center justify-between">
-                          <p className="text-[10px] font-black text-slate-500">Leads</p>
+                          <p className="text-xs font-black text-slate-500">Leads</p>
                           {leadLoadState.phase === 'done' ? (
-                            <span className="text-[10px] font-medium text-amber-600">
+                            <span className="text-xs font-medium text-amber-600">
                               {leadLoadState.records?.length ?? 0} encontrados · sync pendente
                             </span>
                           ) : leadLoadState.phase === 'loading' ? (
-                            <span className="text-[10px] font-medium text-slate-400">carregando para leitura...</span>
+                            <span className="text-xs font-medium text-slate-400">carregando para leitura...</span>
                           ) : (
-                            <span className="text-[10px] font-medium text-slate-400">
+                            <span className="text-xs font-medium text-slate-400">
                               {activeObject === 'contacts' && contactSyncState.phase === 'done'
                                 ? 'carregando para leitura...'
                                 : 'sync pendente'}
@@ -755,7 +755,7 @@ export function SalesforceHubRedesign({
                       <div className="flex items-center justify-between opacity-40">
                         <div>
                           <p className="text-sm font-bold">Oportunidades e Funil</p>
-                          <p className="text-[10px] text-slate-400">Disponível após validar Contacts.</p>
+                          <p className="text-xs text-slate-400">Disponível após validar Contacts.</p>
                         </div>
                         <ToggleLeft className="h-6 w-6 text-slate-300" />
                       </div>
@@ -764,13 +764,13 @@ export function SalesforceHubRedesign({
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-bold text-slate-800">Oportunidades e Funil</p>
-                            <p className="text-[10px] text-slate-400">Rastreie o pipeline de vendas</p>
+                            <p className="text-xs text-slate-400">Rastreie o pipeline de vendas</p>
                           </div>
                           <div className="flex items-center gap-1.5">
                             {opportunitySyncState.phase === 'done' && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
                             <button
                               onClick={() => onSetActiveObject('opportunities')}
-                              className={`rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest transition-colors ${activeObject === 'opportunities' ? 'bg-[#4F46E5] text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                              className={`rounded-lg px-2.5 py-1 text-xs font-black uppercase tracking-widest transition-colors ${activeObject === 'opportunities' ? 'bg-[#4F46E5] text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                             >
                               {opportunitySyncState.phase === 'done' ? 'Ver resultado' : 'Validar'}
                             </button>
@@ -785,25 +785,25 @@ export function SalesforceHubRedesign({
                           return (
                             <div className="rounded-xl bg-slate-50 px-3 py-2 space-y-1">
                               <div className="flex items-center justify-between">
-                                <p className="text-[10px] font-black text-slate-500">Opportunities</p>
-                                <span className="text-[10px] font-bold text-emerald-600">
+                                <p className="text-xs font-black text-slate-500">Opportunities</p>
+                                <span className="text-xs font-bold text-emerald-600">
                                   {r.createdCount} criadas · {r.skippedCount} ignoradas
                                 </span>
                               </div>
                               <div className="flex items-start justify-between gap-2">
-                                <p className="text-[10px] font-black text-slate-500">Funil</p>
+                                <p className="text-xs font-black text-slate-500">Funil</p>
                                 <div className="text-right">
                                   {stages.length > 0 ? (
-                                    <p className="text-[10px] font-medium text-slate-600">{stages.length} stage{stages.length !== 1 ? 's' : ''}</p>
+                                    <p className="text-xs font-medium text-slate-400">{stages.length} stage{stages.length !== 1 ? 's' : ''}</p>
                                   ) : (
-                                    <p className="text-[10px] font-medium text-slate-400">derivado das Opps</p>
+                                    <p className="text-xs font-medium text-slate-400">derivado das Opps</p>
                                   )}
                                   {hasAmount ? (
-                                    <p className="text-[10px] font-medium text-slate-500">
+                                    <p className="text-xs font-medium text-slate-500">
                                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalAmount)}
                                     </p>
                                   ) : (
-                                    <p className="text-[10px] font-medium text-slate-400">valor não disponível</p>
+                                    <p className="text-xs font-medium text-slate-400">valor não disponível</p>
                                   )}
                                 </div>
                               </div>
@@ -811,7 +811,7 @@ export function SalesforceHubRedesign({
                           );
                         })()}
                         {opportunitySyncState.phase !== 'done' && (
-                          <p className="text-[10px] font-medium text-slate-600">Oportunidades prontas para validação</p>
+                          <p className="text-xs font-medium text-slate-400">Oportunidades prontas para validação</p>
                         )}
                       </div>
                     )}
@@ -821,14 +821,14 @@ export function SalesforceHubRedesign({
                     <div className="flex items-center justify-between opacity-40">
                       <div>
                         <p className="text-sm font-bold">Leads & Contatos</p>
-                        <p className="text-[10px] text-slate-400">Disponível após sincronização de Contas</p>
+                        <p className="text-xs text-slate-400">Disponível após sincronização de Contas</p>
                       </div>
                       <ToggleLeft className="h-6 w-6 text-slate-300" />
                     </div>
                     <div className="flex items-center justify-between opacity-40">
                       <div>
                         <p className="text-sm font-bold">Oportunidades e Funil</p>
-                        <p className="text-[10px] text-slate-400">Disponível após sincronização de Contas</p>
+                        <p className="text-xs text-slate-400">Disponível após sincronização de Contas</p>
                       </div>
                       <ToggleLeft className="h-6 w-6 text-slate-300" />
                     </div>
@@ -842,21 +842,21 @@ export function SalesforceHubRedesign({
               <div className="flex items-center justify-between gap-2 mb-6">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-slate-400" />
-                  <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Configurações de Fluxo</h4>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Configurações de Fluxo</h4>
                 </div>
-                <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-400">Padrão</span>
+                <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-slate-400">Padrão</span>
               </div>
 
               <div className="space-y-4">
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Direção</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Direção</p>
                   <p className="text-xs font-bold mt-0.5">SF → Canopi</p>
                 </div>
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Modo</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Modo</p>
                   <p className="text-xs font-bold mt-0.5">Batch (Lote)</p>
                 </div>
-                <p className="text-[10px] font-medium text-slate-400 px-1">Fluxo bidirecional e modo real-time disponíveis em versões futuras.</p>
+                <p className="text-xs font-medium text-slate-400 px-1">Fluxo bidirecional e modo real-time disponíveis em versões futuras.</p>
               </div>
             </div>
           </div>
@@ -869,11 +869,11 @@ export function SalesforceHubRedesign({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ChevronRight className="h-4 w-4 text-slate-300 rotate-180 cursor-pointer" onClick={() => onSetActiveObject('accounts')} />
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Validação de Contacts e Leads</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Validação de Contacts e Leads</h4>
                   </div>
                   <button
                     onClick={() => onSetActiveObject('accounts')}
-                    className="text-[10px] font-bold text-slate-400 hover:text-slate-600"
+                    className="text-xs font-bold text-slate-400 hover:text-slate-400"
                   >
                     Voltar para Accounts
                   </button>
@@ -883,9 +883,9 @@ export function SalesforceHubRedesign({
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-slate-400" />
-                      <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Preview de Contacts</h4>
+                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Preview de Contacts</h4>
                     </div>
-                    <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] font-bold">Read-only</Badge>
+                    <Badge className="bg-slate-100 text-slate-500 border-none text-xs font-bold">Read-only</Badge>
                   </div>
 
                   {contactPreviewState.phase === 'idle' && (
@@ -903,7 +903,7 @@ export function SalesforceHubRedesign({
                           </button>
                         ) : (
                           <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-center">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                            <p className="text-xs font-black uppercase tracking-widest text-emerald-700">
                               {contactFullLoadState.recordCount ?? 0} Contacts carregados
                             </p>
                           </div>
@@ -911,12 +911,12 @@ export function SalesforceHubRedesign({
                         <button
                           onClick={onContactPreview}
                           disabled={contactFullLoadState.phase === 'loading'}
-                          className="rounded-2xl border border-slate-200 px-6 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                          className="rounded-2xl border border-slate-200 px-6 py-2 text-xs font-bold text-slate-400 hover:bg-slate-50 disabled:opacity-50"
                         >
                           {contactFullLoadState.phase === 'done' ? 'Validar Contacts' : 'Usar contrato existente'}
                         </button>
                         {contactFullLoadState.phase === 'error' && (
-                          <p className="text-[11px] font-medium text-red-500">{contactFullLoadState.message}</p>
+                          <p className="text-xs font-medium text-red-500">{contactFullLoadState.message}</p>
                         )}
                       </div>
                     </div>
@@ -931,8 +931,8 @@ export function SalesforceHubRedesign({
 
                   {contactPreviewState.phase === 'error' && (
                     <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-red-700">Erro</p>
-                      <p className="mt-0.5 text-xs font-medium text-slate-600">{contactPreviewState.message}</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-red-700">Erro</p>
+                      <p className="mt-0.5 text-xs font-medium text-slate-400">{contactPreviewState.message}</p>
                       <button
                         onClick={onContactPreview}
                         className="mt-2 rounded-xl bg-red-600 px-4 py-1.5 text-xs font-black text-white hover:bg-red-700"
@@ -950,20 +950,20 @@ export function SalesforceHubRedesign({
                         <div className="grid grid-cols-3 gap-3">
                           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
                             <p className="text-lg font-black text-slate-900">{preview.totalContacts}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total</p>
                           </div>
                           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-center">
                             <p className="text-lg font-black text-emerald-700">{preview.resolvedCount}</p>
-                            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Resolvidos</p>
+                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Resolvidos</p>
                           </div>
                           <div className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-center">
                             <p className="text-lg font-black text-amber-700">{preview.unresolvedCount}</p>
-                            <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Sem vínculo</p>
+                            <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">Sem vínculo</p>
                           </div>
                         </div>
 
                         {contractSource === 'fallback' && (
-                          <p className="text-[10px] font-medium text-slate-400">
+                          <p className="text-xs font-medium text-slate-400">
                             Contacts lidos de contrato com registros de contato; Accounts resolvidas pela base sincronizada.
                           </p>
                         )}
@@ -972,9 +972,9 @@ export function SalesforceHubRedesign({
                           <table className="w-full text-left">
                             <thead className="bg-slate-50 border-b border-slate-100">
                               <tr>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Nome</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Empresa</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Ação</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Nome</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Empresa</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Ação</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -982,7 +982,7 @@ export function SalesforceHubRedesign({
                                 <tr key={item.sourceContactId} className="hover:bg-slate-50/50">
                                   <td className="px-3 py-2.5">
                                     <p className="text-xs font-bold text-slate-900">{item.nome || '—'}</p>
-                                    {item.email && <p className="text-[10px] text-slate-400">{item.email}</p>}
+                                    {item.email && <p className="text-xs text-slate-400">{item.email}</p>}
                                   </td>
                                   <td className="px-3 py-2.5">
                                     {item.resolvedAccountName ? (
@@ -992,7 +992,7 @@ export function SalesforceHubRedesign({
                                     )}
                                   </td>
                                   <td className="px-3 py-2.5">
-                                    <span className={`inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold ${item.actionPreview === 'create' ? 'bg-emerald-100 text-emerald-700' : item.actionPreview === 'update' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>
+                                    <span className={`inline-flex rounded-lg px-2 py-0.5 text-xs font-bold ${item.actionPreview === 'create' ? 'bg-emerald-100 text-emerald-700' : item.actionPreview === 'update' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>
                                       {item.actionPreview === 'create' ? 'Criar' : item.actionPreview === 'update' ? 'Atualizar' : item.actionPreview}
                                     </span>
                                   </td>
@@ -1002,15 +1002,15 @@ export function SalesforceHubRedesign({
                           </table>
                           {preview.items.length > 10 && (
                             <div className="bg-slate-50 border-t border-slate-100 px-3 py-2">
-                              <p className="text-[10px] font-medium text-slate-400">+{preview.items.length - 10} contatos não exibidos</p>
+                              <p className="text-xs font-medium text-slate-400">+{preview.items.length - 10} contatos não exibidos</p>
                             </div>
                           )}
                         </div>
 
                         {allUnresolved ? (
                           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Nenhum vínculo resolvido</p>
-                            <p className="mt-0.5 text-xs font-medium text-slate-600">
+                            <p className="text-xs font-black uppercase tracking-widest text-amber-700">Nenhum vínculo resolvido</p>
+                            <p className="mt-0.5 text-xs font-medium text-slate-400">
                               Contacts encontrados, mas nenhum vínculo com Accounts sincronizadas foi resolvido. Reexecute Account Sync ou selecione um contrato compatível.
                             </p>
                           </div>
@@ -1026,7 +1026,7 @@ export function SalesforceHubRedesign({
                             <div className="flex items-center justify-end gap-2">
                               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                               <p className="text-sm font-black text-emerald-700">Contacts sincronizados</p>
-                              {microcopy && <p className="text-[11px] font-medium text-slate-400">{microcopy}</p>}
+                              {microcopy && <p className="text-xs font-medium text-slate-400">{microcopy}</p>}
                             </div>
                           );
                         })() : (
@@ -1040,7 +1040,7 @@ export function SalesforceHubRedesign({
                               {contactSyncState.phase === 'loading' ? 'Sincronizando Contacts...' : 'Sincronizar Contacts'}
                             </button>
                             {contactSyncState.phase === 'error' && (
-                              <p className="text-[11px] font-medium text-red-500">{contactSyncState.message}</p>
+                              <p className="text-xs font-medium text-red-500">{contactSyncState.message}</p>
                             )}
                           </div>
                         )}
@@ -1055,11 +1055,11 @@ export function SalesforceHubRedesign({
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-slate-400" />
                       <div>
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Leads</h4>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Leads carregados apenas para leitura. Nenhum Lead é gravado na Canopi.</p>
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Leads</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Leads carregados apenas para leitura. Nenhum Lead é gravado na Canopi.</p>
                       </div>
                     </div>
-                    <Badge className="bg-amber-100 text-amber-700 border-none text-[10px] font-bold">Sync pendente</Badge>
+                    <Badge className="bg-amber-100 text-amber-700 border-none text-xs font-bold">Sync pendente</Badge>
                   </div>
 
                   {leadLoadState.phase === 'idle' && (
@@ -1077,8 +1077,8 @@ export function SalesforceHubRedesign({
 
                   {leadLoadState.phase === 'error' && (
                     <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-red-700">Erro ao consultar Leads</p>
-                      <p className="text-xs font-medium text-slate-600">{leadLoadState.message}</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-red-700">Erro ao consultar Leads</p>
+                      <p className="text-xs font-medium text-slate-400">{leadLoadState.message}</p>
                       <button
                         onClick={onLoadLeads}
                         className="rounded-xl bg-red-600 px-4 py-1.5 text-xs font-black text-white hover:bg-red-700"
@@ -1095,21 +1095,21 @@ export function SalesforceHubRedesign({
                         <div className="grid grid-cols-3 gap-3">
                           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
                             <p className="text-lg font-black text-slate-900">{leadLoadState.totalSize ?? records.length}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Encontrados</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Encontrados</p>
                           </div>
                           <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-center">
                             <p className="text-lg font-black text-indigo-700">{records.length}</p>
-                            <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Carregados</p>
+                            <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Carregados</p>
                           </div>
                           <div className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-center">
                             <p className="text-lg font-black text-amber-700">—</p>
-                            <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Leads em leitura</p>
+                            <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">Leads em leitura</p>
                           </div>
                         </div>
 
                         <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Leads carregados apenas para leitura</p>
-                          <p className="mt-0.5 text-xs font-medium text-slate-600">
+                          <p className="text-xs font-black uppercase tracking-widest text-amber-700">Leads carregados apenas para leitura</p>
+                          <p className="mt-0.5 text-xs font-medium text-slate-400">
                             Nenhum Lead foi gravado na Canopi. Lead Sync permanece pendente.
                           </p>
                         </div>
@@ -1118,10 +1118,10 @@ export function SalesforceHubRedesign({
                           <table className="w-full text-left">
                             <thead className="bg-slate-50 border-b border-slate-100">
                               <tr>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Nome</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Empresa</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Email</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Nome</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Empresa</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Status</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Email</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -1134,10 +1134,10 @@ export function SalesforceHubRedesign({
                                     <p className="text-xs font-medium text-slate-700">{lead.Company || '—'}</p>
                                   </td>
                                   <td className="px-3 py-2.5">
-                                    <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600">{lead.Status || '—'}</span>
+                                    <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-slate-100 text-slate-400">{lead.Status || '—'}</span>
                                   </td>
                                   <td className="px-3 py-2.5">
-                                    <p className="text-[10px] text-slate-500">{lead.Email || '—'}</p>
+                                    <p className="text-xs text-slate-500">{lead.Email || '—'}</p>
                                   </td>
                                 </tr>
                               ))}
@@ -1145,7 +1145,7 @@ export function SalesforceHubRedesign({
                           </table>
                           {records.length > 10 && (
                             <div className="bg-slate-50 border-t border-slate-100 px-3 py-2">
-                              <p className="text-[10px] font-medium text-slate-400">+{records.length - 10} Leads não exibidos · {records.length} carregados no total</p>
+                              <p className="text-xs font-medium text-slate-400">+{records.length - 10} Leads não exibidos · {records.length} carregados no total</p>
                             </div>
                           )}
                         </div>
@@ -1157,12 +1157,12 @@ export function SalesforceHubRedesign({
                           >
                             Atualizar Leads
                           </button>
-                          <p className="text-[10px] text-slate-400">Consulta apenas para leitura.</p>
+                          <p className="text-xs text-slate-400">Consulta apenas para leitura.</p>
                         </div>
 
                         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Sincronização de Leads pendente</p>
-                          <p className="mt-0.5 text-xs font-medium text-slate-600">
+                          <p className="text-xs font-black uppercase tracking-widest text-amber-700">Sincronização de Leads pendente</p>
+                          <p className="mt-0.5 text-xs font-medium text-slate-400">
                             {records.length} Leads encontrados e carregados do Salesforce. Nenhum dado de Lead foi gravado na Canopi.
                           </p>
                         </div>
@@ -1177,11 +1177,11 @@ export function SalesforceHubRedesign({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ChevronRight className="h-4 w-4 text-slate-300 rotate-180 cursor-pointer" onClick={() => onSetActiveObject('accounts')} />
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Validação de Oportunidades</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Validação de Oportunidades</h4>
                   </div>
                   <button
                     onClick={() => onSetActiveObject('accounts')}
-                    className="text-[10px] font-bold text-slate-400 hover:text-slate-600"
+                    className="text-xs font-bold text-slate-400 hover:text-slate-400"
                   >
                     Voltar para Accounts
                   </button>
@@ -1192,23 +1192,23 @@ export function SalesforceHubRedesign({
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-slate-400" />
                       <div>
-                        <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Preview de Opportunities</h4>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Valide oportunidades relacionadas às Accounts sincronizadas.</p>
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Preview de Opportunities</h4>
+                        <p className="text-xs text-slate-400 mt-0.5">Valide oportunidades relacionadas às Accounts sincronizadas.</p>
                       </div>
                     </div>
-                    <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] font-bold">Read-only</Badge>
+                    <Badge className="bg-slate-100 text-slate-500 border-none text-xs font-bold">Read-only</Badge>
                   </div>
 
                   <div className="mb-4 space-y-1">
-                    <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-500">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                       <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                       Accounts sincronizadas com sucesso.
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-500">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                       <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                       Contacts já validados neste fluxo.
                     </div>
-                    <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
                       <Circle className="h-3 w-3 text-slate-300" />
                       Opportunity Contact Roles ficam para próximo recorte.
                     </div>
@@ -1228,7 +1228,7 @@ export function SalesforceHubRedesign({
                           </button>
                         ) : (
                           <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-center">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                            <p className="text-xs font-black uppercase tracking-widest text-emerald-700">
                               {opportunityFullLoadState.recordCount ?? 0} Opportunities carregadas
                             </p>
                           </div>
@@ -1236,12 +1236,12 @@ export function SalesforceHubRedesign({
                         <button
                           onClick={onOpportunityPreview}
                           disabled={opportunityFullLoadState.phase === 'loading'}
-                          className="rounded-2xl border border-slate-200 px-6 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                          className="rounded-2xl border border-slate-200 px-6 py-2 text-xs font-bold text-slate-400 hover:bg-slate-50 disabled:opacity-50"
                         >
                           {opportunityFullLoadState.phase === 'done' ? 'Validar Opportunities' : 'Usar contrato existente'}
                         </button>
                         {opportunityFullLoadState.phase === 'error' && (
-                          <p className="text-[11px] font-medium text-red-500">{opportunityFullLoadState.message}</p>
+                          <p className="text-xs font-medium text-red-500">{opportunityFullLoadState.message}</p>
                         )}
                       </div>
                     </div>
@@ -1256,8 +1256,8 @@ export function SalesforceHubRedesign({
 
                   {opportunityPreviewState.phase === 'error' && (
                     <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-red-700">Erro</p>
-                      <p className="mt-0.5 text-xs font-medium text-slate-600">{opportunityPreviewState.message}</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-red-700">Erro</p>
+                      <p className="mt-0.5 text-xs font-medium text-slate-400">{opportunityPreviewState.message}</p>
                       <button
                         onClick={onOpportunityPreview}
                         className="mt-2 rounded-xl bg-red-600 px-4 py-1.5 text-xs font-black text-white hover:bg-red-700"
@@ -1275,19 +1275,19 @@ export function SalesforceHubRedesign({
                         <div className="grid grid-cols-4 gap-3">
                           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
                             <p className="text-lg font-black text-slate-900">{preview.totalOpportunities}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total</p>
                           </div>
                           <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-center">
                             <p className="text-lg font-black text-emerald-700">{preview.resolvedCount}</p>
-                            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Novas</p>
+                            <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">Novas</p>
                           </div>
                           <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-center">
                             <p className="text-lg font-black text-slate-500">{preview.existingMatchCount ?? 0}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Já existem</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Já existem</p>
                           </div>
                           <div className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-center">
                             <p className="text-lg font-black text-amber-700">{preview.unresolvedCount}</p>
-                            <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Sem vínculo</p>
+                            <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">Sem vínculo</p>
                           </div>
                         </div>
 
@@ -1295,10 +1295,10 @@ export function SalesforceHubRedesign({
                           <table className="w-full text-left">
                             <thead className="bg-slate-50 border-b border-slate-100">
                               <tr>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Oportunidade</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Conta</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Stage</th>
-                                <th className="px-3 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400">Ação</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Oportunidade</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Conta</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Stage</th>
+                                <th className="px-3 py-2.5 text-xs font-black uppercase tracking-widest text-slate-400">Ação</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -1307,7 +1307,7 @@ export function SalesforceHubRedesign({
                                   <td className="px-3 py-2.5">
                                     <p className="text-xs font-bold text-slate-900">{item.nome || '—'}</p>
                                     {item.amount != null && (
-                                      <p className="text-[10px] text-slate-400">
+                                      <p className="text-xs text-slate-400">
                                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(item.amount)}
                                       </p>
                                     )}
@@ -1320,23 +1320,23 @@ export function SalesforceHubRedesign({
                                     )}
                                   </td>
                                   <td className="px-3 py-2.5">
-                                    <p className="text-xs font-medium text-slate-600">{item.stageName || '—'}</p>
+                                    <p className="text-xs font-medium text-slate-400">{item.stageName || '—'}</p>
                                   </td>
                                   <td className="px-3 py-2.5">
                                     {item.actionPreview === 'ready_to_create' && (
-                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-700">Criar</span>
+                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-emerald-100 text-emerald-700">Criar</span>
                                     )}
                                     {item.actionPreview === 'ready_to_update' && (
-                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-blue-100 text-blue-700">Atualizar</span>
+                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-700">Atualizar</span>
                                     )}
                                     {item.actionPreview === 'existing_match' && (
-                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-500">Já existe</span>
+                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-slate-100 text-slate-500">Já existe</span>
                                     )}
                                     {item.actionPreview === 'unresolved_account' && (
-                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-700">Sem vínculo</span>
+                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-amber-100 text-amber-700">Sem vínculo</span>
                                     )}
                                     {item.actionPreview === 'missing_required_fields' && (
-                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700">Campos faltando</span>
+                                      <span className="inline-flex rounded-lg px-2 py-0.5 text-xs font-bold bg-red-100 text-red-700">Campos faltando</span>
                                     )}
                                   </td>
                                 </tr>
@@ -1345,7 +1345,7 @@ export function SalesforceHubRedesign({
                           </table>
                           {preview.items.length > 10 && (
                             <div className="bg-slate-50 border-t border-slate-100 px-3 py-2">
-                              <p className="text-[10px] font-medium text-slate-400">+{preview.items.length - 10} oportunidades não exibidas</p>
+                              <p className="text-xs font-medium text-slate-400">+{preview.items.length - 10} oportunidades não exibidas</p>
                             </div>
                           )}
                         </div>
@@ -1359,13 +1359,13 @@ export function SalesforceHubRedesign({
                           if (stages.length === 0) return null;
                           return (
                             <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 space-y-2">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Funil derivado das Opportunities carregadas do Salesforce</p>
+                              <p className="text-xs font-black uppercase tracking-widest text-slate-500">Funil derivado das Opportunities carregadas do Salesforce</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {stages.map((stage) => (
-                                  <span key={stage} className="rounded-lg bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-700">{stage}</span>
+                                  <span key={stage} className="rounded-lg bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700">{stage}</span>
                                 ))}
                               </div>
-                              <p className="text-[10px] font-medium text-slate-500">
+                              <p className="text-xs font-medium text-slate-500">
                                 {stages.length} stage{stages.length !== 1 ? 's' : ''} identificado{stages.length !== 1 ? 's' : ''} · {preview.totalOpportunities} Opportunit{preview.totalOpportunities !== 1 ? 'ies' : 'y'} ·{' '}
                                 {hasAmount
                                   ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(totalAmount)
@@ -1377,8 +1377,8 @@ export function SalesforceHubRedesign({
 
                         {allUnresolved ? (
                           <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Nenhuma Account resolvida</p>
-                            <p className="mt-0.5 text-xs font-medium text-slate-600">
+                            <p className="text-xs font-black uppercase tracking-widest text-amber-700">Nenhuma Account resolvida</p>
+                            <p className="mt-0.5 text-xs font-medium text-slate-400">
                               Opportunities encontradas, mas nenhuma Account foi resolvida. Verifique o contrato de Opportunities.
                             </p>
                           </div>
@@ -1396,7 +1396,7 @@ export function SalesforceHubRedesign({
                               <div className="flex items-center justify-end gap-2">
                                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                 <p className="text-sm font-black text-emerald-700">Opportunities sincronizadas</p>
-                                {microcopy && <p className="text-[11px] font-medium text-slate-400">{microcopy}</p>}
+                                {microcopy && <p className="text-xs font-medium text-slate-400">{microcopy}</p>}
                               </div>
                               {configurationCompleted && (() => {
                                 const oppItems: any[] = preview.items;
@@ -1408,7 +1408,7 @@ export function SalesforceHubRedesign({
                                 const acctResult = accountSyncState.phase === 'done' ? accountSyncState.result : null;
                                 return (
                                   <div className={`rounded-2xl ${finalConfigurationTone.border} ${finalConfigurationTone.background} px-4 py-4 space-y-3`}>
-                                    <p className={`text-[10px] font-black uppercase tracking-widest ${finalConfigurationTone.label}`}>{finalConfigurationLabel}</p>
+                                    <p className={`text-xs font-black uppercase tracking-widest ${finalConfigurationTone.label}`}>{finalConfigurationLabel}</p>
                                     {hasPendingLinkIssues && (
                                       <p className={`text-xs font-medium ${finalConfigurationTone.text}`}>
                                         Há vínculos pendentes em Contacts e/ou Opportunities. A base está carregada, mas a leitura não está limpa.
@@ -1443,8 +1443,8 @@ export function SalesforceHubRedesign({
                             </div>
                           ) : (
                             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 space-y-2">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Base carregada · pendências de vínculo</p>
-                              <p className="text-xs font-medium text-slate-600">
+                              <p className="text-xs font-black uppercase tracking-widest text-amber-700">Base carregada · pendências de vínculo</p>
+                              <p className="text-xs font-medium text-slate-400">
                                 {microcopy ? `${microcopy} — ` : ''}Revise os vínculos de conta e campos obrigatórios, ou revalide o preview para atualizar os dados.
                               </p>
                               <button
@@ -1466,7 +1466,7 @@ export function SalesforceHubRedesign({
                               {opportunitySyncState.phase === 'loading' ? 'Sincronizando Opportunities...' : 'Sincronizar Opportunities'}
                             </button>
                             {opportunitySyncState.phase === 'error' && (
-                              <p className="text-[11px] font-medium text-red-500">{opportunitySyncState.message}</p>
+                              <p className="text-xs font-medium text-red-500">{opportunitySyncState.message}</p>
                             )}
                           </div>
                         )}
@@ -1483,16 +1483,16 @@ export function SalesforceHubRedesign({
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-slate-400" />
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Escopo e Filtros</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Escopo e Filtros</h4>
                   </div>
-                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-400">Padrão</span>
+                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-slate-400">Padrão</span>
                 </div>
                 <div className="space-y-3">
                   <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Corte</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Data de Corte</p>
                     <p className="text-xs font-bold">Últimos 12 meses</p>
                   </div>
-                  <p className="text-[10px] font-medium text-slate-400 px-1">Filtros adicionais disponíveis em versões futuras.</p>
+                  <p className="text-xs font-medium text-slate-400 px-1">Filtros adicionais disponíveis em versões futuras.</p>
                 </div>
               </div>
 
@@ -1501,18 +1501,18 @@ export function SalesforceHubRedesign({
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-slate-400" />
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Identidade</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Identidade</h4>
                   </div>
-                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-400">Padrão</span>
+                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-slate-400">Padrão</span>
                 </div>
                 <div className="space-y-3">
                   <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chave Única</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Chave Única</p>
                     <p className="text-xs font-bold">Salesforce ID</p>
                   </div>
                   <div className="flex items-center gap-2 px-1">
                     <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="text-[10px] font-medium text-slate-500">Deduplicação por Salesforce ID</span>
+                    <span className="text-xs font-medium text-slate-500">Deduplicação por Salesforce ID</span>
                   </div>
                 </div>
               </div>
@@ -1523,28 +1523,28 @@ export function SalesforceHubRedesign({
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <Settings2 className="h-4 w-4 text-slate-400" />
-                  <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Mapeamento de Campos</h4>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Mapeamento de Campos</h4>
                 </div>
-                <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] font-bold">Objeto: Accounts</Badge>
+                <Badge className="bg-slate-100 text-slate-500 border-none text-xs font-bold">Objeto: Accounts</Badge>
               </div>
 
               {/* Estados de fluxo — visíveis enquanto não há qualidade disponível */}
               {!accountsLoaded && (
                 <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Aguardando dados</p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-600">Carregue Accounts no painel à esquerda para iniciar a análise de campos.</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-blue-700">Aguardando dados</p>
+                  <p className="mt-0.5 text-xs font-medium text-slate-400">Carregue Accounts no painel à esquerda para iniciar a análise de campos.</p>
                 </div>
               )}
               {accountsLoaded && !preparedAccountsPreviewSelection && (
                 <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Selecione e prepare</p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-600">{accountsCount} registros disponíveis. Selecione os que deseja analisar e clique em Preparar.</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-blue-700">Selecione e prepare</p>
+                  <p className="mt-0.5 text-xs font-medium text-slate-400">{accountsCount} registros disponíveis. Selecione os que deseja analisar e clique em Preparar.</p>
                 </div>
               )}
               {preparedAccountsPreviewSelection && !localPreSyncContract && (
                 <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Preparação</p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-600">{preparedAccountsPreviewSelection.selectedCount} registros selecionados. Prepare a sincronização para continuar.</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-blue-700">Preparação</p>
+                  <p className="mt-0.5 text-xs font-medium text-slate-400">{preparedAccountsPreviewSelection.selectedCount} registros selecionados. Prepare a sincronização para continuar.</p>
                   <button onClick={onGenerateContract} className="mt-2 rounded-xl bg-[#4F46E5] px-4 py-1.5 text-xs font-black text-white hover:bg-[#4338CA]">
                     Preparar sincronização
                   </button>
@@ -1552,8 +1552,8 @@ export function SalesforceHubRedesign({
               )}
               {localPreSyncContract && !localPreSyncDryRun && (
                 <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Validação</p>
-                  <p className="mt-0.5 text-xs font-medium text-slate-600">Vamos validar a configuração antes de liberar a sincronização.</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-blue-700">Validação</p>
+                  <p className="mt-0.5 text-xs font-medium text-slate-400">Vamos validar a configuração antes de liberar a sincronização.</p>
                   <button onClick={onDryRun} className="mt-2 rounded-xl bg-[#4F46E5] px-4 py-1.5 text-xs font-black text-white hover:bg-[#4338CA]">
                     Validar configuração
                   </button>
@@ -1564,10 +1564,10 @@ export function SalesforceHubRedesign({
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 border-b border-slate-100">
                     <tr>
-                      <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Campo Canopi</th>
-                      <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Tipo</th>
-                      <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Salesforce</th>
-                      <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
+                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">Campo Canopi</th>
+                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-center">Tipo</th>
+                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">Salesforce</th>
+                      <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1577,10 +1577,10 @@ export function SalesforceHubRedesign({
                           <p className="text-xs font-bold text-slate-900">{row.label}</p>
                         </td>
                         <td className="px-4 py-4 text-center">
-                          <Badge className="bg-slate-100 text-slate-400 border-none text-[9px] font-bold px-1.5">{row.type}</Badge>
+                          <Badge className="bg-slate-100 text-slate-400 border-none text-xs font-bold px-1.5">{row.type}</Badge>
                         </td>
                         <td className="px-4 py-4">
-                          <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white px-2 py-1.5 text-[11px] font-medium text-slate-600">
+                          <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-100 bg-white px-2 py-1.5 text-xs font-medium text-slate-400">
                             {row.sfField}
                             <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </div>
@@ -1596,17 +1596,17 @@ export function SalesforceHubRedesign({
               {hasCriticalMissingFields && (
                 <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
                   <p className="text-xs font-black text-amber-800">Correção necessária no Salesforce</p>
-                  <p className="mt-1 text-[11px] font-medium text-amber-700">
+                  <p className="mt-1 text-xs font-medium text-amber-700">
                     {[
                       criticalFieldIssues.Industry > 0 && `${criticalFieldIssues.Industry} sem Industry`,
                       criticalFieldIssues.Website > 0 && `${criticalFieldIssues.Website} sem Website`,
                       criticalFieldIssues.Type > 0 && `${criticalFieldIssues.Type} sem Type`,
                     ].filter(Boolean).join(' · ')}
                   </p>
-                  <p className="mt-2 text-[10px] font-medium text-amber-600">
+                  <p className="mt-2 text-xs font-medium text-amber-600">
                     Preencha os campos ausentes no CSV e importe no Salesforce para atualizar os registros. Depois, recarregue Accounts na Canopi.
                   </p>
-                  <p className="mt-1 text-[10px] font-medium text-amber-500">
+                  <p className="mt-1 text-xs font-medium text-amber-500">
                     Use a coluna <span className="font-black">Id</span> como identificador no Salesforce. A coluna <span className="font-black">Canopi_Reference_AccountName</span> é apenas referência e não deve ser mapeada no upload.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -1638,7 +1638,7 @@ export function SalesforceHubRedesign({
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sticky top-8">
               <div className="flex items-center gap-2 mb-6">
                 <History className="h-4 w-4 text-slate-400" />
-                <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500">Atividade Recente</h4>
+                <h4 className="text-xs font-black uppercase tracking-widest text-slate-500">Atividade Recente</h4>
               </div>
 
               <div className="space-y-6">
@@ -1652,14 +1652,14 @@ export function SalesforceHubRedesign({
                     <div className={`absolute left-0 top-1 h-5 w-5 rounded-full border-4 border-white shadow-sm ${
                       item.status === 'success' ? 'bg-emerald-500' : 'bg-amber-500'
                     }`} />
-                    <p className="text-[10px] font-bold text-slate-400">{item.date}</p>
+                    <p className="text-xs font-bold text-slate-400">{item.date}</p>
                     <p className="text-xs font-black text-slate-900">{item.title}</p>
-                    <p className="text-[10px] font-medium text-slate-500">{item.desc}</p>
+                    <p className="text-xs font-medium text-slate-500">{item.desc}</p>
                   </div>
                 ))}
               </div>
               
-              <button className="mt-8 w-full text-[11px] font-black text-[#4F46E5] hover:underline">
+              <button className="mt-8 w-full text-xs font-black text-[#4F46E5] hover:underline">
                 Ver todos os logs
               </button>
             </div>
@@ -1676,7 +1676,7 @@ export function SalesforceHubRedesign({
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-black text-slate-900">Entrada alternativa por CSV</h4>
-                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-400">Opcional</span>
+                  <span className="rounded-lg bg-slate-100 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-slate-400">Opcional</span>
                 </div>
                 <p className="mt-0.5 text-xs font-medium text-slate-500">
                   Use um CSV padronizado para importar dados para a Canopi quando a conexão direta não for suficiente.
@@ -1698,7 +1698,7 @@ export function SalesforceHubRedesign({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-2 text-slate-400">
             <ShieldCheck className="h-4 w-4" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Criptografia ponta-a-ponta ativa</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Criptografia ponta-a-ponta ativa</span>
           </div>
           
           <div className="flex items-center gap-4">
@@ -1706,7 +1706,7 @@ export function SalesforceHubRedesign({
               {accountQualityPendingItems.length > 0 && (
                 <div className="flex items-center gap-2 text-amber-600">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="text-[10px] font-black uppercase tracking-wider">{accountQualityPendingItems.length} Pendências de Qualidade</span>
+                  <span className="text-xs font-black uppercase tracking-wider">{accountQualityPendingItems.length} Pendências de Qualidade</span>
                 </div>
               )}
             </div>
@@ -1784,12 +1784,12 @@ export function SalesforceHubRedesign({
                     <button
                       onClick={onLoadAccounts}
                       disabled={accountsPreviewLoading || accountsFullLoadState.phase === 'loading'}
-                      className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                      className="text-xs font-medium text-slate-400 hover:text-slate-400 transition-colors"
                     >
                       Carregar amostra (50)
                     </button>
                     {accountsFullLoadState.phase === 'error' && (
-                      <p className="text-[11px] font-medium text-red-500">{accountsFullLoadState.message}</p>
+                      <p className="text-xs font-medium text-red-500">{accountsFullLoadState.message}</p>
                     )}
                   </div>
                 );
@@ -1837,7 +1837,7 @@ export function SalesforceHubRedesign({
                     {ctaLabel}
                   </button>
               {syncMicrocopy && (
-                <p className="text-[11px] font-medium text-slate-400">{syncMicrocopy}</p>
+                <p className="text-xs font-medium text-slate-400">{syncMicrocopy}</p>
               )}
                 </div>
               );

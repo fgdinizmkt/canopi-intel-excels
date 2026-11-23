@@ -57,11 +57,11 @@ export const AccountIdentity = () => {
                 </div>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4">{field.description}</p>
                 <div className="flex items-center gap-2">
-                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${isPK ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                  <span className={`text-xs font-black uppercase px-2 py-0.5 rounded ${isPK ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
                     {isPK ? 'Chave Ativa' : 'Disponível'}
                   </span>
                   {isPK && field.id === 'dominio' && (
-                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-white animate-pulse">
+                    <span className="text-xs font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-white animate-pulse">
                       Sugestão: Master Key
                     </span>
                   )}
@@ -102,8 +102,8 @@ export const AccountIdentity = () => {
                 <p className="text-xs text-slate-400">Strict (Exact Match) vs Fuzzy (Partial Match)</p>
               </div>
               <div className="flex bg-slate-800 rounded-lg p-1">
-                <button className="px-3 py-1.5 text-[10px] font-black uppercase rounded-md bg-blue-600">Strict</button>
-                <button className="px-3 py-1.5 text-[10px] font-black uppercase rounded-md text-slate-400">Fuzzy</button>
+                <button className="px-3 py-1.5 text-xs font-black uppercase rounded-md bg-blue-600">Strict</button>
+                <button className="px-3 py-1.5 text-xs font-black uppercase rounded-md text-slate-400">Fuzzy</button>
               </div>
             </div>
           </div>
@@ -131,7 +131,7 @@ export const AccountIdentity = () => {
               Exige re-indexação do Search Engine
             </div>
           </div>
-          <button className="w-full mt-8 py-3 rounded-xl border-2 border-amber-200 text-amber-700 font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all">
+          <button className="w-full mt-8 py-3 rounded-xl border-2 border-amber-200 text-amber-700 font-black text-xs uppercase tracking-widest hover:bg-amber-100 transition-all">
             Validar Integridade
           </button>
         </div>

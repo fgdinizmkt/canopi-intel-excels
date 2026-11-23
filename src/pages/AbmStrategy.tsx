@@ -157,7 +157,7 @@ const AbmHeatmapLegend: React.FC = React.memo(() => (
     {HEATMAP_LEGEND.map(item => (
       <div key={item.label} className="flex items-center gap-1.5">
         <div className={`w-3 h-3 rounded-full ${item.color}`} />
-        <span className="text-[10px] font-bold text-slate-400 uppercase">{item.label}</span>
+        <span className="text-xs font-bold text-slate-400 uppercase">{item.label}</span>
       </div>
     ))}
   </div>
@@ -302,11 +302,11 @@ const StrategicScatterPlot: React.FC<{
         )}
       </svg>
     </div>
-    <div className="absolute left-1 top-8 bottom-8 flex flex-col justify-around text-[9px] font-bold text-slate-500 tracking-tighter w-[80px]">
+    <div className="absolute left-1 top-8 bottom-8 flex flex-col justify-around text-xs font-bold text-slate-500 tracking-tighter w-[80px]">
       {positioningYAxis.map(y => <div key={y} className="flex-1 flex items-center justify-end pr-2 border-r-2 border-slate-100"><span className="text-right leading-none max-w-[70px] break-words uppercase">{y}</span></div>)}
     </div>
     <div className="flex justify-around items-center pt-2 pb-4 ml-24 mr-2">
-      {matrixVerticals.map(v => <span key={v} className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter w-[60px] text-center truncate mt-2">{v}</span>)}
+      {matrixVerticals.map(v => <span key={v} className="text-xs font-bold text-slate-500 uppercase tracking-tighter w-[60px] text-center truncate mt-2">{v}</span>)}
     </div>
   </div>
 ));
@@ -324,7 +324,7 @@ const TacticalMatrixHeatmap: React.FC<{
       <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` } as React.CSSProperties}>
         {matrixVerticals.map(vertical => (
           <div key={vertical} className="flex items-end justify-center pb-1">
-            <span className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter truncate text-center max-w-[60px]">{vertical}</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter truncate text-center max-w-[60px]">{vertical}</span>
           </div>
         ))}
       </div>
@@ -332,7 +332,7 @@ const TacticalMatrixHeatmap: React.FC<{
     <div className="flex-1 flex flex-col gap-[2px] mt-2">
       {currentYAxis.map(yLabel => (
         <div key={yLabel} className="flex-1 flex min-h-[32px]">
-          <div className="w-[90px] shrink-0 flex items-center justify-end pr-3 text-[10px] font-bold text-slate-500 uppercase tracking-tighter truncate">{yLabel}</div>
+          <div className="w-[90px] shrink-0 flex items-center justify-end pr-3 text-xs font-bold text-slate-500 uppercase tracking-tighter truncate">{yLabel}</div>
           <div className="flex-1 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${matrixVerticals.length}, minmax(0, 1fr))` } as React.CSSProperties}>
             {matrixVerticals.map(vertical => {
               const score = getMatrixScore(viewId, vertical, yLabel);
@@ -341,20 +341,20 @@ const TacticalMatrixHeatmap: React.FC<{
               const scoreVal = Math.round(score * 100);
               return (
                 <div key={vertical} className="relative group transition-all rounded-[6px] cursor-pointer hover:border-slate-800 border-2 border-transparent hover:z-30 shadow-inner flex items-center justify-center isolate" style={{ backgroundColor: color } as React.CSSProperties}>
-                  <span className={`text-[10px] font-black ${textColor} opacity-90`}>{scoreVal}</span>
+                  <span className={`text-xs font-black ${textColor} opacity-90`}>{scoreVal}</span>
                   <div className="absolute opacity-0 group-hover:opacity-100 z-50 bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 border border-slate-700 w-52 rounded-xl shadow-2xl p-3 pointer-events-none transition-opacity">
                     <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-[11px] font-black text-white uppercase tracking-wider">{vertical}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${scoreVal >= 70 ? 'bg-red-500/20 text-red-400' : scoreVal <= 40 ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}`}>{scoreVal}%</span>
+                      <span className="text-xs font-black text-white uppercase tracking-wider">{vertical}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${scoreVal >= 70 ? 'bg-red-500/20 text-red-400' : scoreVal <= 40 ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}`}>{scoreVal}%</span>
                     </div>
-                    <p className="text-[10px] font-bold text-blue-400 mb-2">{yLabel}</p>
+                    <p className="text-xs font-bold text-blue-400 mb-2">{yLabel}</p>
                     <div className="h-px w-full bg-slate-700/50 mb-2"></div>
-                    <p className="text-[9px] text-slate-300 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
                       Insight: {score >= 0.7 ? 'Alta probabilidade estrutural. Engaje imediatamente.' : score <= 0.4 ? 'Zona de alerta logístico e fricção de acesso.' : 'Potencial moderado de abordagem em lote.'}
                     </p>
                     <div className="mt-3 flex items-center gap-1.5 p-1.5 bg-slate-950 rounded-lg">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                      <span className="text-[8px] font-bold text-slate-400 uppercase">Sugestão: {score >= 0.7 ? 'Direct Mail' : score <= 0.4 ? 'Social Ads' : 'Cold Call'}</span>
+                      <span className="text-xs font-bold text-slate-400 uppercase">Sugestão: {score >= 0.7 ? 'Direct Mail' : score <= 0.4 ? 'Social Ads' : 'Cold Call'}</span>
                     </div>
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-900"></div>
                   </div>
@@ -372,7 +372,7 @@ TacticalMatrixHeatmap.displayName = 'TacticalMatrixHeatmap';
 const FirmographicSection: React.FC = React.memo(() => (
   <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
     <div className="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm space-y-6">
-      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3"/> Fit Firmográfico ABM</h4>
+      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3"/> Fit Firmográfico ABM</h4>
       <div className="space-y-5">
         {[
           { label: 'Receita Anual (> R$ 500M)', val: 78 },
@@ -380,7 +380,7 @@ const FirmographicSection: React.FC = React.memo(() => (
           { label: 'Tamanho Time Tech (> 50)', val: 45 }
         ].map((item, i) => (
           <div key={i} className="space-y-2">
-            <div className="flex justify-between text-[9px] font-bold text-slate-600 uppercase"><span>{item.label}</span><span>{item.val}%</span></div>
+            <div className="flex justify-between text-xs font-bold text-slate-400 uppercase"><span>{item.label}</span><span>{item.val}%</span></div>
             <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
               <div className="h-full bg-blue-600" style={{ width: `${item.val}%` } as React.CSSProperties}></div>
             </div>
@@ -389,7 +389,7 @@ const FirmographicSection: React.FC = React.memo(() => (
       </div>
     </div>
     <div className="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm space-y-6">
-      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3"/> Fit Tecnográfico ABM</h4>
+      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3"/> Fit Tecnográfico ABM</h4>
       <div className="space-y-3">
         {[
           { icon: <Cloud className="w-4 h-4 text-blue-600" />, title: 'Stack Cloud', desc: 'AWS / Azure Dominante' },
@@ -399,8 +399,8 @@ const FirmographicSection: React.FC = React.memo(() => (
           <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 group hover:border-blue-300 transition-all cursor-pointer">
             {item.icon}
             <div className="flex-1">
-              <p className="text-[10px] font-bold text-slate-900 uppercase tracking-tight">{item.title}</p>
-              <p className="text-[9px] font-bold text-slate-400 uppercase">{item.desc}</p>
+              <p className="text-xs font-bold text-slate-900 uppercase tracking-tight">{item.title}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase">{item.desc}</p>
             </div>
             <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-blue-600" />
           </div>
@@ -734,9 +734,9 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
            </div>
            <div>
               <div className="flex items-center gap-2 mb-1">
-                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estratégia Comercial</span>
+                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Estratégia Comercial</span>
                  <ChevronRight className="w-3 h-3 text-slate-300" />
-                 <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Growth Framework</span>
+                 <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Growth Framework</span>
               </div>
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight leading-none uppercase">Estratégia ABM</h1>
               <p className="text-xs text-slate-500 font-medium mt-2 max-w-lg leading-relaxed">
@@ -746,11 +746,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
         </div>
         <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100 z-10">
            <div className="px-6 py-2 text-center border-r border-slate-200">
-              <p className="text-[9px] font-bold text-slate-400 uppercase">Target Accounts</p>
+              <p className="text-xs font-bold text-slate-400 uppercase">Target Accounts</p>
               <p className="text-lg font-bold text-slate-900">{accounts.length}</p>
            </div>
            <div className="px-6 py-2 text-center">
-              <p className="text-[9px] font-bold text-slate-400 uppercase">Health Score</p>
+              <p className="text-xs font-bold text-slate-400 uppercase">Health Score</p>
               <p className="text-lg font-bold text-emerald-600">{(accounts.reduce((acc, c) => acc + c.prontidao, 0) / (accounts.length * 10)).toFixed(1)}/10</p>
            </div>
            <Button size="sm" className="bg-slate-900 hover:bg-black text-white rounded-xl font-bold px-6 border-none" title="Refinar lista de contas-alvo" aria-label="Refinar lista de contas-alvo">Refinar TAL</Button>
@@ -766,22 +766,22 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
             <div className="px-6 py-4 border-b border-slate-50 flex justify-between items-center bg-slate-50/10">
               <div>
                 <h3 className="text-base font-bold text-slate-900 uppercase">Universo de Contas (TAL)</h3>
-                <p className="text-[10px] text-slate-500 font-medium mt-0.5">Interações, Fit e Maturidade do Pipeline ABM</p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Interações, Fit e Maturidade do Pipeline ABM</p>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost" className="text-[10px] font-bold text-slate-400 uppercase"><Filter className="w-3 h-3 mr-1.5"/>Filtros</Button>
-                <Button size="sm" className="bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase py-1.5 px-4 border-none shadow-lg shadow-blue-500/20">Nova Conta</Button>
+                <Button size="sm" variant="ghost" className="text-xs font-bold text-slate-400 uppercase"><Filter className="w-3 h-3 mr-1.5"/>Filtros</Button>
+                <Button size="sm" className="bg-blue-600 text-white rounded-xl text-xs font-bold uppercase py-1.5 px-4 border-none shadow-lg shadow-blue-500/20">Nova Conta</Button>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="pl-6 py-3 text-[9px] font-bold text-slate-500 uppercase">Account / Vertical</th>
-                    <th className="px-3 py-3 text-[9px] font-bold text-slate-500 uppercase text-center">Score</th>
-                    <th className="px-3 py-3 text-[9px] font-bold text-slate-500 uppercase text-center">MQA</th>
-                    <th className="px-3 py-3 text-[9px] font-bold text-slate-500 uppercase">Engaj.</th>
-                    <th className="pr-6 py-3 text-[9px] font-bold text-slate-500 uppercase text-right">Status</th>
+                    <th className="pl-6 py-3 text-xs font-bold text-slate-500 uppercase">Account / Vertical</th>
+                    <th className="px-3 py-3 text-xs font-bold text-slate-500 uppercase text-center">Score</th>
+                    <th className="px-3 py-3 text-xs font-bold text-slate-500 uppercase text-center">MQA</th>
+                    <th className="px-3 py-3 text-xs font-bold text-slate-500 uppercase">Engaj.</th>
+                    <th className="pr-6 py-3 text-xs font-bold text-slate-500 uppercase text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -792,7 +792,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       <td className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-400 text-xs group-hover:border-blue-400 transition-all shadow-sm">{acc.initials}</div>
-                          <div><p className="text-xs font-bold text-slate-800">{acc.name}</p><p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">{acc.vertical}</p></div>
+                          <div><p className="text-xs font-bold text-slate-800">{acc.name}</p><p className="text-xs text-slate-400 font-bold uppercase tracking-tight">{acc.vertical}</p></div>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 text-center"><span className="text-xs font-bold text-slate-900">{acc.fitScore}</span></td>
@@ -804,10 +804,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <div className="h-1.5 w-14 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                             <div className={`h-full ${acc.engagement > 80 ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ width: `${acc.engagement}%` } as React.CSSProperties}></div>
                           </div>
-                          <span className="text-[9px] font-bold text-slate-900">{acc.engagement}%</span>
+                          <span className="text-xs font-bold text-slate-900">{acc.engagement}%</span>
                         </div>
                       </td>
-                      <td className="pr-6 py-3.5 text-right"><Badge variant={acc.status === 'HOT' ? 'emerald' : 'slate'} className="text-[8px] font-bold uppercase border-none">{acc.status}</Badge></td>
+                      <td className="pr-6 py-3.5 text-right"><Badge variant={acc.status === 'HOT' ? 'emerald' : 'slate'} className="text-xs font-bold uppercase border-none">{acc.status}</Badge></td>
                     </tr>
                   ))}
                 </tbody>
@@ -854,21 +854,21 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 avg: [
                   <div key="avg-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-blue-500"/>Ranking ABM</p>
-                      <Badge variant="blue" className="text-[8px] border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {accounts.indexOf(activeAccount) + 1}º</Badge>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-blue-500"/>Ranking ABM</p>
+                      <Badge variant="blue" className="text-xs border-none bg-blue-50 text-blue-600 font-bold">POSIÇÃO: {accounts.indexOf(activeAccount) + 1}º</Badge>
                     </div>
                     {/* Strategia Switcher - Recorte 32 Mutation Point */}
                     <div className="flex flex-col gap-2">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Configuração de Estratégia</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Configuração de Estratégia</p>
                        <div className="flex gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                           {(['ABM', 'ABX', 'Híbrida', 'Em andamento'] as TipoEstrategico[]).map((t) => (
                              <button
                                 key={t}
                                 onClick={() => handleUpdateTipoEstrategico(t)}
-                                className={`flex-1 py-1.5 text-[8px] font-bold uppercase rounded-lg transition-all ${
+                                className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-lg transition-all ${
                                    activeAccount.tipoEstrategico === t
                                       ? 'bg-white text-blue-600 shadow-sm border border-slate-200 ring-1 ring-slate-100'
-                                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
+                                      : 'text-slate-400 hover:text-slate-400 hover:bg-slate-100/50'
                                 }`}
                              >
                                 {t}
@@ -878,16 +878,16 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     </div>
                     {/* Play Ativo Switcher - Recorte 33 Expansion */}
                     <div className="flex flex-col gap-2">
-                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Play Ativo</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Play Ativo</p>
                        <div className="flex gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
                           {(['ABM', 'ABX', 'Híbrido', 'Nenhum'] as PlayAtivo[]).map((p) => (
                              <button
                                 key={p}
                                 onClick={() => handleUpdatePlayAtivo(p)}
-                                className={`flex-1 py-1.5 text-[8px] font-bold uppercase rounded-lg transition-all ${
+                                className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-lg transition-all ${
                                    activeAccount.playAtivo === p
                                       ? 'bg-white text-emerald-600 shadow-sm border border-slate-200 ring-1 ring-slate-100'
-                                      : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
+                                      : 'text-slate-400 hover:text-slate-400 hover:bg-slate-100/50'
                                 }`}
                              >
                                 {p}
@@ -898,10 +898,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     {/* Narrativa Estratégica - Recorte 40 (E12) */}
                     <div className="flex flex-col gap-2 border-t border-slate-100 pt-3">
                        <div className="flex items-center justify-between">
-                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Narrativa Estratégica</p>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Narrativa Estratégica</p>
                           <button
                              onClick={() => setEditingNarrative(!editingNarrative)}
-                             className="text-slate-400 hover:text-slate-600 transition-colors text-xs"
+                             className="text-slate-400 hover:text-slate-400 transition-colors text-xs"
                              title={editingNarrative ? "Fechar edição" : "Editar narrativas"}
                           >
                              {editingNarrative ? '✕' : '✎'}
@@ -909,7 +909,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        </div>
                        {!editingNarrative ? (
                           // Read mode
-                          <div className="space-y-2 text-[8px] text-slate-600 leading-relaxed">
+                          <div className="space-y-2 text-xs text-slate-400 leading-relaxed">
                              {(strategyNarrative || riskAssessment || successCriteria) ? (
                                 <>
                                    {strategyNarrative && <p><span className="font-bold text-slate-700">Estratégia:</span> {strategyNarrative}</p>}
@@ -927,38 +927,38 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                                 placeholder="Racional estratégico da conta / tese de abordagem"
                                 value={strategyNarrative}
                                 onChange={(e) => setStrategyNarrative(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 rows={3}
                              />
                              <textarea
                                 placeholder="Avaliação de riscos da estratégia atual"
                                 value={riskAssessment}
                                 onChange={(e) => setRiskAssessment(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 rows={3}
                              />
                              <textarea
                                 placeholder="Critérios objetivos de sucesso da conta / play"
                                 value={successCriteria}
                                 onChange={(e) => setSuccessCriteria(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 rows={3}
                              />
                              <div className="flex gap-2 items-center">
                                 <button
                                    onClick={handleUpdateAbmNarratives}
-                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                                   className="flex-1 py-1.5 text-xs font-bold uppercase bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                                 >
                                    Salvar
                                 </button>
                                 <button
                                    onClick={() => setEditingNarrative(false)}
-                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-all"
+                                   className="flex-1 py-1.5 text-xs font-bold uppercase bg-slate-100 text-slate-400 rounded-lg hover:bg-slate-200 transition-all"
                                 >
                                    Cancelar
                                 </button>
                                 {narrativeStatus && (
-                                   <span className="text-[8px] font-bold text-emerald-600 ml-1">{narrativeStatus}</span>
+                                   <span className="text-xs font-bold text-emerald-600 ml-1">{narrativeStatus}</span>
                                 )}
                              </div>
                           </div>
@@ -967,10 +967,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     {/* Narrativa Expansionista - Recorte 41 (E13) */}
                     <div className="flex flex-col gap-2 border-t border-slate-100 pt-3">
                        <div className="flex items-center justify-between">
-                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">Narrativa Expansionista</p>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Narrativa Expansionista</p>
                           <button
                              onClick={() => setEditingAbxNarrative(!editingAbxNarrative)}
-                             className="text-slate-400 hover:text-slate-600 transition-colors text-xs"
+                             className="text-slate-400 hover:text-slate-400 transition-colors text-xs"
                              title={editingAbxNarrative ? "Fechar edição" : "Editar narrativas"}
                           >
                              {editingAbxNarrative ? '✕' : '✎'}
@@ -978,7 +978,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        </div>
                        {!editingAbxNarrative ? (
                           // Read mode
-                          <div className="space-y-2 text-[8px] text-slate-600 leading-relaxed">
+                          <div className="space-y-2 text-xs text-slate-400 leading-relaxed">
                              {(abxStrategyNarrative || abxRiskAssessment || abxSuccessCriteria) ? (
                                 <>
                                    {abxStrategyNarrative && <p><span className="font-bold text-slate-700">Estratégia:</span> {abxStrategyNarrative}</p>}
@@ -996,38 +996,38 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                                 placeholder="Racional estratégico de expansão / estratégia de retenção"
                                 value={abxStrategyNarrative}
                                 onChange={(e) => setAbxStrategyNarrative(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 rows={3}
                              />
                              <textarea
                                 placeholder="Avaliação de riscos da estratégia expansionista"
                                 value={abxRiskAssessment}
                                 onChange={(e) => setAbxRiskAssessment(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 rows={3}
                              />
                              <textarea
                                 placeholder="Critérios de sucesso para expansão / retenção"
                                 value={abxSuccessCriteria}
                                 onChange={(e) => setAbxSuccessCriteria(e.target.value)}
-                                className="w-full p-2 text-[8px] bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                className="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500"
                                 rows={3}
                              />
                              <div className="flex gap-2 items-center">
                                 <button
                                    onClick={handleUpdateAbxNarratives}
-                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all"
+                                   className="flex-1 py-1.5 text-xs font-bold uppercase bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all"
                                 >
                                    Salvar
                                 </button>
                                 <button
                                    onClick={() => setEditingAbxNarrative(false)}
-                                   className="flex-1 py-1.5 text-[8px] font-bold uppercase bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-all"
+                                   className="flex-1 py-1.5 text-xs font-bold uppercase bg-slate-100 text-slate-400 rounded-lg hover:bg-slate-200 transition-all"
                                 >
                                    Cancelar
                                 </button>
                                 {abxNarrativeStatus && (
-                                   <span className="text-[8px] font-bold text-emerald-600 ml-1">{abxNarrativeStatus}</span>
+                                   <span className="text-xs font-bold text-emerald-600 ml-1">{abxNarrativeStatus}</span>
                                 )}
                              </div>
                           </div>
@@ -1040,10 +1040,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         const tier = avg >= 72 ? { label:'TOP', cls:'bg-red-100 text-red-600' } : avg >= 55 ? { label:'MID', cls:'bg-amber-100 text-amber-600' } : { label:'LOW', cls:'bg-slate-100 text-slate-500' };
                         return (
                           <div key={acc.id} className={`flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 transition-colors ${isCurrent ? 'bg-blue-50 border border-blue-100' : ''}`}>
-                            <span className="text-[10px] font-bold text-slate-300 w-4">{i+1}</span>
-                            <div className="flex-1 min-w-0"><p className="text-[10px] font-bold text-slate-800 truncate">{acc.name}</p></div>
-                            <span className={`text-[8px] font-bold px-2 py-0.5 rounded-md ${tier.cls}`}>{tier.label}</span>
-                            <span className="text-[11px] font-black text-slate-700">{avg}%</span>
+                            <span className="text-xs font-bold text-slate-300 w-4">{i+1}</span>
+                            <div className="flex-1 min-w-0"><p className="text-xs font-bold text-slate-800 truncate">{acc.name}</p></div>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${tier.cls}`}>{tier.label}</span>
+                            <span className="text-xs font-black text-slate-700">{avg}%</span>
                           </div>
                         );
                       })}
@@ -1055,7 +1055,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="avg-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Zap className="w-3 h-3 text-amber-500"/>Próxima Ação: {activeAccount.nome}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Zap className="w-3 h-3 text-amber-500"/>Próxima Ação: {activeAccount.nome}</p>
                     <div className="space-y-2">
                       {[
                         { label: activeAccount.prontidao > 70 ? 'Ativação Prioritária (MQA)' : 'Nurturing Estratégico', sub: activeAccount.statusGeral === 'Crítico' ? 'Ação imediata exigida' : 'Acompanhamento semanal', cls: activeAccount.prontidao > 70 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-slate-200 hover:bg-slate-300 text-slate-700', icon: <Zap className="w-3 h-3"/> },
@@ -1064,7 +1064,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       ].map((btn, i) => (
                         <button key={i} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${btn.cls}`}>
                           {btn.icon}
-                          <div><p className="text-[10px] font-bold">{btn.label}</p><p className="text-[8px] opacity-70">{btn.sub}</p></div>
+                          <div><p className="text-xs font-bold">{btn.label}</p><p className="text-xs opacity-70">{btn.sub}</p></div>
                         </button>
                       ))}
                     </div>
@@ -1076,7 +1076,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   </div>,
 
                   <div key="avg-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layout className="w-3 h-3 text-indigo-500"/>Playbooks Sugeridos</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Layout className="w-3 h-3 text-indigo-500"/>Playbooks Sugeridos</p>
                     <div className="space-y-2">
                        {[
                          activeAccount.icp > 80 ? 'Expansão Tier 1 (ICP Alto)' : 'Infiltração Tech Stack',
@@ -1084,12 +1084,12 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          activeAccount.budgetBrl > 1000000 ? 'Executivo Lead (High Budget)' : 'Nurturing Mid-Market'
                        ].map((p, i) => (
                          <div key={i} className="flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100">
-                           <span className="text-[9px] font-bold text-slate-700">{p}</span>
+                           <span className="text-xs font-bold text-slate-700">{p}</span>
                            <Badge variant="blue" className="text-[7px] border-none bg-blue-50 text-blue-600">RECOMENDADO</Badge>
                          </div>
                        ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Ativar playbook para esta conta" aria-label="Ativar playbook para esta conta">Ativar Playbook Selecionado</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Ativar playbook para esta conta" aria-label="Ativar playbook para esta conta">Ativar Playbook Selecionado</button>
                     <MiniActions actions={[
                       { icon: <Activity className="w-3 h-3"/>, label: 'Performance' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Templates' },
@@ -1099,10 +1099,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 ],
                 icp: [
                   <div key="icp-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Target className="w-3 h-3 text-blue-500"/>Qualificação ICP</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Target className="w-3 h-3 text-blue-500"/>Qualificação ICP</p>
                     <div className="space-y-2">
                       <div>
-                        <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase mb-1">
+                        <div className="flex justify-between text-xs font-bold text-slate-500 uppercase mb-1">
                           <span>Score mínimo</span>
                           <span className="text-blue-600">≥ {icpThreshold}% — {qualifiedIcp.length} contas</span>
                         </div>
@@ -1116,14 +1116,14 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       <div className="space-y-1.5">
                         {qualifiedIcp.slice(0,4).map(acc => (
                           <div key={acc.id} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                            <span className="text-[9px] font-bold text-slate-700 truncate max-w-[110px]">{acc.name}</span>
-                            <span className="text-[10px] font-black text-blue-700">{getWeightedIcp(acc)}%</span>
+                            <span className="text-xs font-bold text-slate-700 truncate max-w-[110px]">{acc.name}</span>
+                            <span className="text-xs font-black text-blue-700">{getWeightedIcp(acc)}%</span>
                           </div>
                         ))}
-                        {qualifiedIcp.length === 0 && <p className="text-[9px] text-slate-400 text-center py-2">Nenhuma conta nesse threshold</p>}
+                        {qualifiedIcp.length === 0 && <p className="text-xs text-slate-400 text-center py-2">Nenhuma conta nesse threshold</p>}
                       </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Exportar contas qualificadas" aria-label="Exportar lista de contas qualificadas">Exportar Lista Qualificada</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Exportar contas qualificadas" aria-label="Exportar lista de contas qualificadas">Exportar Lista Qualificada</button>
                     <MiniActions actions={[
                       { icon: <FileSearch className="w-3 h-3"/>, label: 'Segmento' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Sync CRM' },
@@ -1131,8 +1131,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="icp-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings2 className="w-3 h-3 text-slate-500"/>Pesos do ICP</p>
-                    <p className="text-[8px] text-slate-400">Ajuste os pesos — scores recalculados ao vivo.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings2 className="w-3 h-3 text-slate-500"/>Pesos do ICP</p>
+                    <p className="text-xs text-slate-400">Ajuste os pesos — scores recalculados ao vivo.</p>
                     <div className="space-y-2">
                       {([
                         { label:'Receita Anual', key:'receita' as const, val: icpWeights.receita },
@@ -1141,7 +1141,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         { label:'Setor / Vertical', key:'setor' as const, val: icpWeights.setor },
                       ] as const).map((w) => (
                         <div key={w.key} className="space-y-0.5">
-                          <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase"><span>{w.label}</span><span className="text-slate-700">{w.val}%</span></div>
+                          <div className="flex justify-between text-xs font-bold text-slate-500 uppercase"><span>{w.label}</span><span className="text-slate-700">{w.val}%</span></div>
                           <input type="range" min="0" max="50" value={w.val}
                             onChange={e => setIcpWeights(prev => ({ ...prev, [w.key]: Number(e.target.value) }))}
                             className="w-full h-1.5 accent-slate-600 rounded-full cursor-pointer"
@@ -1151,7 +1151,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Salvar pesos de qualificação ICP" aria-label="Salvar pesos de qualificação ICP">Salvar Configuração</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase rounded-xl transition-all active:scale-[0.98]" title="Salvar pesos de qualificação ICP" aria-label="Salvar pesos de qualificação ICP">Salvar Configuração</button>
                     <MiniActions actions={[
                       { icon: <History className="w-3 h-3"/>, label: 'Histórico' },
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Compartilhar' },
@@ -1160,16 +1160,16 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   </div>,
 
                   <div key="icp-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Bot className="w-3 h-3 text-emerald-500"/>IA Lookalike</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed">Encontre contas gemêas baseadas nas TOP 10% qualificadas no ICP atual.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Bot className="w-3 h-3 text-emerald-500"/>IA Lookalike</p>
+                    <p className="text-xs text-slate-400 leading-relaxed">Encontre contas gemêas baseadas nas TOP 10% qualificadas no ICP atual.</p>
                     <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
                        <Bot className="w-5 h-5 text-emerald-600"/>
                        <div>
-                         <p className="text-[10px] font-bold text-slate-800">42 Contas Descobertas</p>
-                         <p className="text-[8px] text-emerald-600 font-bold uppercase">Sinergia &gt; 85% com o tier 1</p>
+                         <p className="text-xs font-bold text-slate-800">42 Contas Descobertas</p>
+                         <p className="text-xs text-emerald-600 font-bold uppercase">Sinergia &gt; 85% com o tier 1</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Importar contas via IA" aria-label="Importar do Canopi Intel">Importar do Canopi Intel</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Importar contas via IA" aria-label="Importar do Canopi Intel">Importar do Canopi Intel</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Refinar IA' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Enriquecer' },
@@ -1179,19 +1179,19 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 ],
                 ct: [
                   <div key="ct-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users className="w-3 h-3 text-indigo-500"/>Gap de Comitê: {activeAccount.nome}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Users className="w-3 h-3 text-indigo-500"/>Gap de Comitê: {activeAccount.nome}</p>
                     <div className="space-y-1.5 flex-1">
                       <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2">
                          <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/>
                          <div>
-                            <p className="text-[9px] font-bold text-slate-800">Mapeamento Incompleto ({activeAccount.ct}%)</p>
-                            <p className="text-[8px] text-slate-500 leading-tight">Faltam decisores estratégicos de <strong>{activeAccount.vertical}</strong>.</p>
+                            <p className="text-xs font-bold text-slate-800">Mapeamento Incompleto ({activeAccount.ct}%)</p>
+                            <p className="text-xs text-slate-500 leading-tight">Faltam decisores estratégicos de <strong>{activeAccount.vertical}</strong>.</p>
                          </div>
                       </div>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-2">Contatos Recomendados</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest pt-2">Contatos Recomendados</p>
                       {['VP of Engineering', 'Director of Finance', 'Head of Growth'].map((role, i) => (
                         <div key={i} className="flex items-center justify-between p-2 bg-slate-50 rounded-lg group hover:border-indigo-300 border border-transparent transition-all">
-                           <span className="text-[9px] font-bold text-slate-700">{role}</span>
+                           <span className="text-xs font-bold text-slate-700">{role}</span>
                            <button 
                              className="w-6 h-6 flex items-center justify-center bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors active:scale-90"
                              aria-label={`Adicionar contato recomendado: ${role}`}
@@ -1202,10 +1202,10 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Enriquecer dados via Apollo" aria-label="Enriquecer via Apollo">Enriquecer via Apollo</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase rounded-xl transition-colors" title="Enriquecer dados via Apollo" aria-label="Enriquecer via Apollo">Enriquecer via Apollo</button>
                   </div>,
                   <div key="ct-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-emerald-500"/>Status DMU</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgeCheck className="w-3 h-3 text-emerald-500"/>Status DMU</p>
                     <div className="space-y-1.5 flex-1">
                       {[
                         { cargo:'CEO / Board', status: activeAccount.ct > 80 ? 'ok' : 'gap', pct: activeAccount.ct > 80 ? 88 : 12 },
@@ -1215,12 +1215,12 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                       ].map((c, i) => (
                         <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-50">
                           <div className={`w-2 h-2 rounded-full shrink-0 ${c.status === 'ok' ? 'bg-emerald-400' : 'bg-red-400'}`}/>
-                          <span className="text-[9px] font-medium text-slate-600 flex-1">{c.cargo}</span>
-                          <span className={`text-[9px] font-bold ${c.status === 'ok' ? 'text-emerald-600' : 'text-red-500'}`}>{c.pct}%</span>
+                          <span className="text-xs font-medium text-slate-400 flex-1">{c.cargo}</span>
+                          <span className={`text-xs font-bold ${c.status === 'ok' ? 'text-emerald-600' : 'text-red-500'}`}>{c.pct}%</span>
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title="Iniciar sequência multi-thread" aria-label="Iniciar Sequência Multi-Thread">Iniciar Sequência Multi-Thread</button>
+                    <button className="w-full py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold uppercase rounded-xl transition-colors" title="Iniciar sequência multi-thread" aria-label="Iniciar Sequência Multi-Thread">Iniciar Sequência Multi-Thread</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'Campanha' },
                       { icon: <Calendar className="w-3 h-3"/>, label: 'Atividade' },
@@ -1228,8 +1228,8 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="ct-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Map className="w-3 h-3 text-blue-500"/>Mapa de Influência</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed font-medium">Visualizando bloqueadores e campeões em <strong>{activeAccount.vertical}</strong>.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Map className="w-3 h-3 text-blue-500"/>Mapa de Influência</p>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium">Visualizando bloqueadores e campeões em <strong>{activeAccount.vertical}</strong>.</p>
                     <div className="grid grid-cols-2 gap-2 mt-2">
                        <div className="p-2 border border-slate-100 rounded-lg text-center bg-slate-50">
                           <p className={`text-[12px] font-black ${activeAccount.ct > 50 ? 'text-blue-600' : 'text-slate-400'}`}>{activeAccount.ct > 50 ? '12' : '02'}</p>
@@ -1240,7 +1240,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <p className="text-[7px] font-bold text-slate-500 uppercase mt-0.5">Bloqueadores</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Analisar radar de influência" aria-label="Iniciar Radar de Influência">Iniciar Radar de Influência</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Analisar radar de influência" aria-label="Iniciar Radar de Influência">Iniciar Radar de Influência</button>
                     <MiniActions actions={[
                       { icon: <Share2 className="w-3 h-3"/>, label: 'Social Selling' },
                       { icon: <TrendingUp className="w-3 h-3"/>, label: 'Evolução' },
@@ -1251,25 +1251,25 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 ft: [
                   <div key="ft-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ArrowUpRight className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
-                      <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${activeAccount.ft > 70 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-500'}`}>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><ArrowUpRight className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${activeAccount.ft > 70 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-500'}`}>
                          {activeAccount.ft > 70 ? 'HIGH FIT' : 'FIT STAND.'}
                       </span>
                     </div>
                     <div className="space-y-1.5 flex-1 pt-1">
                        <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
-                          <p className="text-[9px] font-bold text-emerald-700 uppercase">Análise de Budget</p>
-                          <p className="text-[10px] font-bold text-slate-800">R$ {(activeAccount.budgetBrl / 1000).toFixed(0)}k <span className="text-[8px] font-medium text-slate-400">identificado</span></p>
-                          <p className="text-[8px] text-emerald-600 font-bold mt-1 uppercase">
+                          <p className="text-xs font-bold text-emerald-700 uppercase">Análise de Budget</p>
+                          <p className="text-xs font-bold text-slate-800">R$ {(activeAccount.budgetBrl / 1000).toFixed(0)}k <span className="text-xs font-medium text-slate-400">identificado</span></p>
+                          <p className="text-xs text-emerald-600 font-bold mt-1 uppercase">
                              {activeAccount.budgetBrl > 1000000 ? 'Prioridade Tier A (VP Level)' : 'Prioridade Tier B'}
                           </p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Gerar proposta comercial" aria-label="Gerar Proposta Estrutural">Gerar Proposta Estrutural</button>
+                    <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl transition-colors" title="Gerar proposta comercial" aria-label="Gerar Proposta Estrutural">Gerar Proposta Estrutural</button>
                     <MiniActions actions={[{icon:<BarChart className="w-3 h-3"/>, label:'ROI'}, {icon:<CheckCircle2 className="w-3 h-3"/>, label:'Validar'}]} />
                   </div>,
                   <div key="ft-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BarChart3 className="w-3 h-3 text-blue-500"/>Análise de Gaps de Fit</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><BarChart3 className="w-3 h-3 text-blue-500"/>Análise de Gaps de Fit</p>
                     <div className="space-y-2">
                       {[
                         { label:'Stack Tecnológico', val:72, color:'bg-blue-500' },
@@ -1278,24 +1278,24 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         { label:'Cultura de Dados', val:35, color:'bg-red-500' },
                       ].map((g, i) => (
                         <div key={i} className="space-y-0.5">
-                          <div className="flex justify-between text-[9px] font-bold text-slate-500 uppercase"><span>{g.label}</span><span>{g.val}%</span></div>
+                          <div className="flex justify-between text-xs font-bold text-slate-500 uppercase"><span>{g.label}</span><span>{g.val}%</span></div>
                           <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${g.color} rounded-full`} style={{ width: `${g.val}%` } as React.CSSProperties}/></div>
                         </div>
                       ))}
                     </div>
-                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title={`Benchmarking da vertical ${activeAccount.vertical}`} aria-label={`Benchmarking ${activeAccount.vertical}`}>Benchmarking {activeAccount.vertical}</button>
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-xs font-bold uppercase rounded-xl transition-colors" title={`Benchmarking da vertical ${activeAccount.vertical}`} aria-label={`Benchmarking ${activeAccount.vertical}`}>Benchmarking {activeAccount.vertical}</button>
                   </div>,
 
                   <div key="ft-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3 text-amber-500"/>Sinais de Intenção</p>
-                    <p className="text-[8px] text-slate-400 leading-relaxed font-medium">Detectando picos de interesse para o perfil de <strong>{activeAccount.vertical}</strong>.</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Cpu className="w-3 h-3 text-amber-500"/>Sinais de Intenção</p>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium">Detectando picos de interesse para o perfil de <strong>{activeAccount.vertical}</strong>.</p>
                     <div className="space-y-1.5 pt-2 flex-1">
                        <div className="p-2 bg-amber-50 rounded-lg border border-amber-100">
-                          <p className="text-[9px] font-bold text-slate-800">{activeAccount.nome}</p>
-                          <p className="text-[8px] text-amber-600 uppercase font-bold mt-1"><Zap className="inline w-2 h-2 mr-1"/>Picos de Acesso Recentes</p>
+                          <p className="text-xs font-bold text-slate-800">{activeAccount.nome}</p>
+                          <p className="text-xs text-amber-600 uppercase font-bold mt-1"><Zap className="inline w-2 h-2 mr-1"/>Picos de Acesso Recentes</p>
                        </div>
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors mt-2" title="Visualizar sinais de intenção" aria-label="Monitorar Signals">Monitorar Signals</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase rounded-xl transition-colors mt-2" title="Visualizar sinais de intenção" aria-label="Monitorar Signals">Monitorar Signals</button>
                     <MiniActions actions={[
                       { icon: <Search className="w-3 h-3"/>, label: 'Tech Stack' },
                       { icon: <Database className="w-3 h-3"/>, label: 'Alerta CRM' },
@@ -1306,18 +1306,18 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                 crm: [
                   <div key="crm-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Activity className="w-3 h-3 text-orange-500"/>Engajamento: {activeAccount.nome}</p>
-                      <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full ${activeAccount.crm > 65 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Activity className="w-3 h-3 text-orange-500"/>Engajamento: {activeAccount.nome}</p>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${activeAccount.crm > 65 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
                          {activeAccount.crm > 65 ? 'ATIVO' : 'AQUECENDO'}
                       </span>
                     </div>
                     <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-2 flex-1">
-                       <p className="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-2">Sinal de Receptividade</p>
-                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                       <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">Sinal de Receptividade</p>
+                       <p className="text-xs font-medium text-slate-700 leading-relaxed italic">
                          &quot;{activeAccount.crm > 60 ? 'A conta demonstra interações consistentes com SDRs nos últimos 15 dias.' : 'Baixa tração orgânica. Requer abordagem consultiva Tier 2 para destravar.'}&quot;
                        </p>
                     </div>
-                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Timeline de atividades no CRM" aria-label="Timeline CRM">Timeline CRM</button>
+                    <button className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold uppercase rounded-xl transition-colors" title="Timeline de atividades no CRM" aria-label="Timeline CRM">Timeline CRM</button>
                     <MiniActions actions={[
                       { icon: <Briefcase className="w-3 h-3"/>, label: 'Atividade' },
                       { icon: <Mail className="w-3 h-3"/>, label: 'Seq. E-mail' },
@@ -1325,7 +1325,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="crm-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><AlertCircle className="w-3 h-3 text-red-500"/>Gargalos Detectados</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><AlertCircle className="w-3 h-3 text-red-500"/>Gargalos Detectados</p>
                     <div className="space-y-2 flex-1">
                        {[
                          { l: 'Fricção de Contato', s: activeAccount.crm < 50 ? 'ALTA' : 'BAIXA', c: activeAccount.crm < 50 ? 'text-red-600 bg-red-50' : 'text-slate-400 bg-slate-50 border-none' },
@@ -1333,34 +1333,34 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                          { l: 'Aderência Tech', s: activeAccount.icp > 70 ? 'ALTA' : 'MODERADA', c: 'text-blue-600 bg-blue-50 border-none' }
                        ].map((g, i) => (
                          <div key={i} className="flex justify-between items-center p-2 rounded-lg border border-slate-50">
-                           <span className="text-[9px] font-bold text-slate-600 uppercase">{g.l}</span>
-                           <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${g.c}`}>{g.s}</span>
+                           <span className="text-xs font-bold text-slate-400 uppercase">{g.l}</span>
+                           <span className={`text-xs font-black px-1.5 py-0.5 rounded ${g.c}`}>{g.s}</span>
                          </div>
                        ))}
                     </div>
-                    <button className="w-full py-2 font-bold text-[9px] text-red-600 border border-red-100 hover:bg-red-50 rounded-xl uppercase" title="Escalar fluxo de atendimento crítico" aria-label="Escalar Fluxo">Escalar Fluxo</button>
+                    <button className="w-full py-2 font-bold text-xs text-red-600 border border-red-100 hover:bg-red-50 rounded-xl uppercase" title="Escalar fluxo de atendimento crítico" aria-label="Escalar Fluxo">Escalar Fluxo</button>
                   </div>,
 
                   <div key="crm-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Send className="w-3 h-3 text-blue-500"/>Playbook Sugerido</p>
-                    <p className="text-[9px] text-slate-500 leading-relaxed font-medium">Campanha para a vertical <strong>{activeAccount.vertical}</strong> baseada no score atual de CRM (<strong>{activeAccount.crm}%</strong>).</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Send className="w-3 h-3 text-blue-500"/>Playbook Sugerido</p>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">Campanha para a vertical <strong>{activeAccount.vertical}</strong> baseada no score atual de CRM (<strong>{activeAccount.crm}%</strong>).</p>
                     <div className="flex-1 p-3 bg-blue-50 border border-blue-100 rounded-xl border-dashed">
-                       <p className="text-[10px] font-bold text-blue-800">&quot;Desafios de {activeAccount.vertical} 2024&quot;</p>
-                       <p className="text-[8px] text-blue-600 mt-1 uppercase font-bold">3 e-mails | 2 calls | 1 LinkedIn</p>
+                       <p className="text-xs font-bold text-blue-800">&quot;Desafios de {activeAccount.vertical} 2024&quot;</p>
+                       <p className="text-xs text-blue-600 mt-1 uppercase font-bold">3 e-mails | 2 calls | 1 LinkedIn</p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Injetar playbooks no pipeline" aria-label="Injetar na Fila">Injetar na Fila</button>
+                    <button className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase rounded-xl transition-colors" title="Injetar playbooks no pipeline" aria-label="Injetar na Fila">Injetar na Fila</button>
                   </div>,
                 ],
                 vp: [
                   <div key="vp-c1" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-purple-500"/>Clusterização: {activeAccount.nome}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><PieChart className="w-3 h-3 text-purple-500"/>Clusterização: {activeAccount.nome}</p>
                     <div className="p-3 bg-purple-50 border border-purple-100 rounded-xl space-y-2 flex-1">
-                       <p className="text-[9px] font-bold text-purple-700 uppercase">Contexto de Vertical</p>
-                       <p className="text-[10px] font-medium text-slate-700 leading-relaxed italic">
+                       <p className="text-xs font-bold text-purple-700 uppercase">Contexto de Vertical</p>
+                       <p className="text-xs font-medium text-slate-700 leading-relaxed italic">
                          &quot;{activeAccount.vertical === 'Tecnologia' ? 'Alta propensão a adoção de novas stacks. Focar em ROI de infraestrutura.' : 'Vertical com ciclo de venda longo. Focar em conformidade e segurança.'}&quot;
                        </p>
                     </div>
-                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title={`Ver detalhes do cluster ${activeAccount.vertical}`} aria-label={`Ver Cluster ${activeAccount.vertical}`}>Ver Cluster {activeAccount.vertical}</button>
+                    <button className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase rounded-xl transition-colors" title={`Ver detalhes do cluster ${activeAccount.vertical}`} aria-label={`Ver Cluster ${activeAccount.vertical}`}>Ver Cluster {activeAccount.vertical}</button>
                     <MiniActions actions={[
                       { icon: <FileText className="w-3 h-3"/>, label: 'Exportar PDF' },
                       { icon: <Flag className="w-3 h-3"/>, label: 'Alocar Verba' },
@@ -1368,11 +1368,11 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                     ]} />
                   </div>,
                   <div key="vp-c2" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-indigo-500"/>Mover para Cluster</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Box className="w-3 h-3 text-indigo-500"/>Mover para Cluster</p>
                     <div className="space-y-1.5 flex-1 pt-1">
-                       <p className="text-[9px] text-slate-400 font-medium">Atribua {activeAccount.nome} a um cluster estratégico para disparar playbooks orquestrados.</p>
+                       <p className="text-xs text-slate-400 font-medium">Atribua {activeAccount.nome} a um cluster estratégico para disparar playbooks orquestrados.</p>
                        <select 
-                         className="w-full text-[10px] border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 mt-2 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                         className="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 bg-white font-medium text-slate-700 mt-2 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                          aria-label="Selecionar cluster estratégico para a conta"
                        >
                           <option value="">Selecione um Cluster...</option>
@@ -1381,7 +1381,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                           <option value="expansion">Expansion - Cross-sell</option>
                        </select>
                     </div>
-                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-xl transition-colors" title="Confirmar alocação estratégica" aria-label="Confirmar Alocação">Confirmar Alocação</button>
+                    <button className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase rounded-xl transition-colors" title="Confirmar alocação estratégica" aria-label="Confirmar Alocação">Confirmar Alocação</button>
                     <MiniActions actions={[
                       { icon: <Users className="w-3 h-3"/>, label: 'Ver Contas' },
                       { icon: <Mail className="w-3 h-3"/>, label: 'Play' },
@@ -1390,17 +1390,17 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                   </div>,
 
                   <div key="vp-c3" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-5 flex flex-col h-full space-y-3">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3 text-blue-500"/>Influência & Rapport</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Globe className="w-3 h-3 text-blue-500"/>Influência & Rapport</p>
                     <div className="space-y-1.5 flex-1 pt-1">
                        <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg">
-                          <span className="text-[9px] font-bold text-slate-600 uppercase">Acesso Decisor</span>
-                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${activeAccount.ct > 60 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                          <span className="text-xs font-bold text-slate-400 uppercase">Acesso Decisor</span>
+                          <span className={`text-xs font-black px-1.5 py-0.5 rounded ${activeAccount.ct > 60 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                              {activeAccount.ct > 60 ? 'MAPEADO' : 'PENDENTE'}
                           </span>
                        </div>
-                       <p className="text-[8px] text-slate-400 leading-relaxed mt-1">Status de mapeamento do comitê de compras (CT Score: {activeAccount.ct}%).</p>
+                       <p className="text-xs text-slate-400 leading-relaxed mt-1">Status de mapeamento do comitê de compras (CT Score: {activeAccount.ct}%).</p>
                     </div>
-                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-[9px] font-bold uppercase rounded-xl transition-colors" title="Mapa detalhado do comitê" aria-label="Visualizar Comitê">Visualizar Comitê</button>
+                    <button className="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100 text-xs font-bold uppercase rounded-xl transition-colors" title="Mapa detalhado do comitê" aria-label="Visualizar Comitê">Visualizar Comitê</button>
                     <MiniActions actions={[
                       { icon: <Mail className="w-3 h-3"/>, label: 'RSVP' },
                       { icon: <Users className="w-3 h-3"/>, label: 'Presentes' },
@@ -1437,7 +1437,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                         />
                         
                         {/* Disclaimer */}
-                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed pt-3 px-1 border-t border-slate-50 mt-2">
+                        <p className="text-xs text-slate-400 font-medium leading-relaxed pt-3 px-1 border-t border-slate-50 mt-2">
                           <span className="font-bold text-slate-500 uppercase tracking-wide mr-1">Como ler:</span>{criterion.note}
                         </p>
                       </div>
@@ -1518,12 +1518,12 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                const matrixCardsMap: Record<string, React.ReactNode[]> = {
                  pot: [
                    <div key="bp0" className="bg-white rounded-[24px] border border-slate-200 shadow-sm p-4 flex flex-col h-full space-y-3">
-                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
+                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><TrendingUp className="w-3 h-3 text-emerald-500"/>Potencial: {activeAccount.nome}</p>
                      <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex-1">
-                        <p className="text-[9px] font-bold text-slate-600 uppercase">Score ICP {activeAccount.icp}%</p>
-                        <p className="text-[10px] font-medium text-slate-700 leading-relaxed mt-1">Conta estratégica para vertical {activeAccount.vertical}.</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">Score ICP {activeAccount.icp}%</p>
+                        <p className="text-xs font-medium text-slate-700 leading-relaxed mt-1">Conta estratégica para vertical {activeAccount.vertical}.</p>
                      </div>
-                     <button className="w-full text-[9px] h-7 font-bold bg-emerald-600 text-white rounded-xl" title="Iniciar playbook para especialista" aria-label="Playbook Especialista">Playbook Especialista</button>
+                     <button className="w-full text-xs h-7 font-bold bg-emerald-600 text-white rounded-xl" title="Iniciar playbook para especialista" aria-label="Playbook Especialista">Playbook Especialista</button>
                    </div>
                  ]
                };
@@ -1567,7 +1567,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                                )}
                             </div>
                             <div className="mt-4 pt-4 px-2 border-t border-slate-100">
-                               <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                               <p className="text-xs text-slate-400 font-medium leading-relaxed">
                                   <span className="font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-md mr-2">Como Ler</span>
                                   {view.note}
                                </p>
@@ -1586,7 +1586,7 @@ export const ABMStrategy: React.FC<{subPage?: string}> = ({ subPage }) => {
                        {view.id === 'pos' && (
                          <div className="w-full flex items-center gap-4 pt-12 opacity-80">
                            <div className="h-px bg-slate-200 flex-1"></div>
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-4 border border-slate-200 rounded-full py-1">Heatmaps Táticos Verticais</span>
+                           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest px-4 border border-slate-200 rounded-full py-1">Heatmaps Táticos Verticais</span>
                            <div className="h-px bg-slate-200 flex-1"></div>
                          </div>
                        )}

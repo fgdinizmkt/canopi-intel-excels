@@ -17,7 +17,7 @@ const colorMap: Record<string, { bg: string, text: string, border: string }> = {
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const bc = (cls: string) => {
   const c = colorMap[cls] || colorMap.bsl;
-  return `inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${c.bg} ${c.text} ${c.border}`;
+  return `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border whitespace-nowrap ${c.bg} ${c.text} ${c.border}`;
 };
 
 const dc = (v?: string) => {
@@ -133,9 +133,9 @@ const PerformanceMetrics = React.memo(({ m }: { m: any }) => (
       { label: 'Score Médio',        value: m.score,            sub: m.scoreTrend, subCls: 'text-white/50' },
     ].map(metric => (
       <div key={metric.label} className="bg-white/10 border border-white/10 rounded-[18px] p-[14px_16px] backdrop-blur-md">
-        <div className="text-[9px] font-bold text-white/50 uppercase tracking-[0.16em] mb-1.5">{metric.label}</div>
+        <div className="text-xs font-bold text-white/50 uppercase tracking-[0.16em] mb-1.5">{metric.label}</div>
         <div className="text-2xl font-extrabold tracking-tight leading-none text-white">{metric.value}</div>
-        <div className={`text-[11px] font-bold mt-1 ${metric.subCls}`}>{metric.sub}</div>
+        <div className={`text-xs font-bold mt-1 ${metric.subCls}`}>{metric.sub}</div>
       </div>
     ))}
   </div>
@@ -151,10 +151,10 @@ const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin, isOriginExplora
       </div>
       {bestOrigin && (
         <div className="flex flex-col items-end">
-          <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Maior Volume por Origem {isOriginExploratoria && <span className="text-amber-500 ml-1">· exploratório</span>}</div>
+          <div className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Maior Volume por Origem {isOriginExploratoria && <span className="text-amber-500 ml-1">· exploratório</span>}</div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
             <span className="text-xs">📈</span>
-            <span className="text-[11px] font-black uppercase tracking-tight">{bestOrigin}</span>
+            <span className="text-xs font-black uppercase tracking-tight">{bestOrigin}</span>
           </div>
         </div>
       )}
@@ -164,18 +164,18 @@ const ExecutiveSummary = React.memo(({ channels, pl, bestOrigin, isOriginExplora
         <div key={ch.name} className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[14px] p-[14px_16px]">
           <div className="flex items-center gap-1.5 mb-1.5">
             <div style={{ background: ch.color }} className="w-2 h-2 rounded-full shrink-0" />
-            <div className="text-[9px] font-black text-[#94a3b8] uppercase tracking-[0.1em] mb-px">{ch.name}</div>
+            <div className="text-xs font-black text-[#94a3b8] uppercase tracking-[0.1em] mb-px">{ch.name}</div>
           </div>
-          <div className="text-[10px] font-bold text-slate-400 uppercase mb-1">Pipeline Associado</div>
+          <div className="text-xs font-bold text-slate-400 uppercase mb-1">Pipeline Associado</div>
           <div className="text-[20px] font-extrabold tracking-tight" style={{ color: ch.color }}>{ch.value === '0' ? 'R$ 0' : `R$ ${ch.value}`}</div>
-          <div className="mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Conversão de Sinais</div>
+          <div className="mt-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Conversão de Sinais</div>
           <div className="flex items-center gap-2 mt-1">
             <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
               <div style={{ width: `${ch.score}%`, background:ch.color }} className="h-full rounded-full" />
             </div>
-            <span className="text-[11px] font-black" style={{ color: ch.color }}>{ch.score > 0 ? `${ch.score}%` : '—'}</span>
+            <span className="text-xs font-black" style={{ color: ch.color }}>{ch.score > 0 ? `${ch.score}%` : '—'}</span>
           </div>
-          <div className="text-[9px] text-slate-400 mt-1.5 font-bold uppercase tracking-tighter">{ch.pct > 0 ? `${ch.pct}% da vazão total` : 'Sem vazão no período'}</div>
+          <div className="text-xs text-slate-400 mt-1.5 font-bold uppercase tracking-tighter">{ch.pct > 0 ? `${ch.pct}% da vazão total` : 'Sem vazão no período'}</div>
         </div>
       ))}
     </div>
@@ -186,7 +186,7 @@ ExecutiveSummary.displayName = 'ExecutiveSummary';
 const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[], panelId: string, onOpen: (f: any) => void }) => (
   <div className="bg-white rounded-[22px] p-[20px_24px] shadow-[0_1px_4px_rgba(0,0,0,0.05)] border border-[#e2e8f0]">
     <div className="mb-4">
-      <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Performance por Frente Operacional <span className="text-slate-400 text-[11px]">· editorial</span></div>
+      <div className="text-[18px] font-extrabold text-[#0f172a] tracking-tight mb-1">Performance por Frente Operacional <span className="text-slate-400 text-xs">· editorial</span></div>
       <div className="text-[13px] text-[#64748b]">Clique em qualquer frente para análise detalhada no painel lateral</div>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5">
@@ -202,7 +202,7 @@ const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[
               <div className="w-[30px] h-[30px] rounded-[9px] flex items-center justify-center text-[14px] shrink-0" style={{ background: fr.bg }}>{fr.icon}</div>
               <div>
                 <div className="text-[12px] font-extrabold text-[#0f172a] tracking-tight">{fr.name}</div>
-                <div className="text-[10px] text-[#94a3b8] mt-px leading-tight">{fr.tagline}</div>
+                <div className="text-xs text-[#94a3b8] mt-px leading-tight">{fr.tagline}</div>
               </div>
             </div>
             <span className={bc(fr.statusClass)}>{fr.statusLabel}</span>
@@ -210,9 +210,9 @@ const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[
           <div className="grid grid-cols-2 gap-2.5 pt-2.5 border-t border-[#f1f5f9]">
             {fr.kpis.slice(0, 2).map(kpi => (
               <div key={kpi.label}>
-                <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-[0.08em] mb-0.5">{kpi.label}</div>
+                <div className="text-xs font-bold text-[#94a3b8] uppercase tracking-[0.08em] mb-0.5">{kpi.label}</div>
                 <div className="text-[18px] font-extrabold tracking-tight leading-none" style={{ color: fr.color }}>{kpi.value}</div>
-                <div className={`text-[10px] font-bold mt-0.5 ${!kpi.delta ? 'text-[#94a3b8]' : kpi.delta.startsWith('+') ? 'text-[#16a34a]' : kpi.delta.startsWith('-') ? 'text-[#dc2626]' : 'text-[#0f172a]'}`}>{kpi.delta || '—'}</div>
+                <div className={`text-xs font-bold mt-0.5 ${!kpi.delta ? 'text-[#94a3b8]' : kpi.delta.startsWith('+') ? 'text-[#16a34a]' : kpi.delta.startsWith('-') ? 'text-[#dc2626]' : 'text-[#0f172a]'}`}>{kpi.delta || '—'}</div>
               </div>
             ))}
           </div>
@@ -226,7 +226,7 @@ const OperationsGrid = React.memo(({ frentes, panelId, onOpen }: { frentes: any[
             <polyline points={fr.sparkArea} fill={`url(#gfr${fr.id})`} stroke="none"/>
             <polyline points={fr.spark} fill="none" stroke={fr.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <div className="mt-1.5 text-[10px] font-bold text-right" style={{ color: fr.color }}>Ver análise →</div>
+          <div className="mt-1.5 text-xs font-bold text-right" style={{ color: fr.color }}>Ver análise →</div>
         </div>
       ))}
     </div>
@@ -494,11 +494,11 @@ export default function Performance() {
       {/* ── HERO ── */}
       <div className="bg-gradient-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] rounded-[36px] p-9 sm:p-10 text-white mx-6 sm:mx-7 mt-6 shadow-[0_28px_80px_rgba(15,36,104,0.28)] overflow-hidden relative before:content-[''] before:absolute before:-top-[60px] before:-right-[60px] before:w-[280px] before:h-[280px] before:rounded-full before:bg-white/[0.03] before:pointer-events-none after:content-[''] after:absolute after:bottom-[-80px] after:left-[40%] after:w-[200px] after:h-[200px] after:rounded-full after:bg-white/[0.02] after:pointer-events-none">
         <div className="flex gap-2 flex-wrap mb-4">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">Revenue Intelligence</span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Ciclo fechado</span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">{pl}</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">Revenue Intelligence</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.18em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Ciclo fechado</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-[0.18em] uppercase bg-white/10 text-white/90 border border-white/10">{pl}</span>
         </div>
-        <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+        <div className="text-xs font-bold text-white/40 uppercase tracking-[0.22em] mb-2">Canopi · Revenue Ops · Desempenho</div>
         <div className="text-5xl font-black tracking-tighter leading-none mb-2">Desempenho</div>
         <div className="text-sm text-white/60 leading-relaxed max-w-2xl mb-5">Entenda o que gerou resultado. Feche o ciclo Sinal → Ação → Desempenho → novo Sinal.</div>
 
@@ -507,19 +507,19 @@ export default function Performance() {
           {PERIODS.map(p => (
             <button 
               key={p.id} 
-              className={`px-4 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border transition-all duration-150 font-inherit ${period === p.id ? 'bg-white text-[#17348f] border-white' : 'border-white/20 bg-white/10 text-white/70 hover:bg-white/15'}`} 
+              className={`px-4 py-1.5 rounded-full text-xs font-bold cursor-pointer border transition-all duration-150 font-inherit ${period === p.id ? 'bg-white text-[#17348f] border-white' : 'border-white/20 bg-white/10 text-white/70 hover:bg-white/15'}`} 
               onClick={() => setPeriod(p.id)}
             >
               {p.label}
             </button>
           ))}
-          <button onClick={() => setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-[11px] font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit hover:bg-white/10 transition-all">📅 Personalizado</button>
+          <button onClick={() => setShowDatePicker(true)} className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer border border-white/20 bg-white/5 text-white/60 flex items-center gap-1.5 font-inherit hover:bg-white/10 transition-all">📅 Personalizado</button>
         </div>
 
         {/* Metrics — Editorial */}
         <div className="mb-2 flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white/60 uppercase tracking-[0.16em]">Métricas por Período</span>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">· editorial</span>
+          <span className="text-xs font-bold text-white/60 uppercase tracking-[0.16em]">Métricas por Período</span>
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">· editorial</span>
         </div>
         <PerformanceMetrics m={m} />
 
@@ -549,7 +549,7 @@ export default function Performance() {
             </svg>
             <div className="flex gap-3 mt-1.5 flex-wrap">
               {[{c:'#2b44ff',l:'ABM'},{c:'#7c3aed',l:'ABX'},{c:'#f59e0b',l:'Outbound'},{c:'#10b981',l:'Orgânico'}].map(x=>(
-                <div key={x.l} className="flex items-center gap-[5px]"><div className="w-[10px] h-[3px] rounded-[2px]" style={{background:x.c}}/><span className="text-[10px] text-[#64748b] font-semibold">{x.l}</span></div>
+                <div key={x.l} className="flex items-center gap-[5px]"><div className="w-[10px] h-[3px] rounded-[2px]" style={{background:x.c}}/><span className="text-xs text-[#64748b] font-semibold">{x.l}</span></div>
               ))}
             </div>
           </div>
@@ -562,7 +562,7 @@ export default function Performance() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-[18px] p-3.5">
-                <div className="text-[9px] font-bold text-[#16a34a] uppercase tracking-wider mb-2">✓ O que funcionou</div>
+                <div className="text-xs font-bold text-[#16a34a] uppercase tracking-wider mb-2">✓ O que funcionou</div>
                 {[{c:'#2b44ff',l:'ABM — contas estratégicas',d:'+18%'},{c:'#10b981',l:'Orgânico — SEO de produto',d:'+22%'},{c:'#7c3aed',l:'ABX — Cluster Fintech',d:'+7%'}].map((x,i,a)=>(
                   <div key={x.l} className={`flex items-center gap-2 py-2 ${i < a.length - 1 ? 'border-b border-[#16a34a]/10' : ''}`}>
                     <div className="w-2 h-2 rounded-full shrink-0" style={{background:x.c}}/><span className="text-[12px] font-semibold flex-1 text-[#0f172a]">{x.l}</span><span className="text-[12px] font-bold text-[#16a34a]">{x.d}</span>
@@ -591,19 +591,19 @@ export default function Performance() {
                     </div>
                     <div className="flex gap-2 items-center shrink-0">
                       <span className={bc(acc.statusClass)}>{acc.status}</span>
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">{acc.canal}</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">{acc.canal}</span>
                     </div>
                   </div>
                   
                   {/* sinais ativos */}
                   {acc.signals.length > 0 && (
                     <div className="mb-4">
-                      <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Sinais ativos</div>
+                      <div className="text-xs font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Sinais ativos</div>
                       <div className="flex flex-col gap-1">
                         {acc.signals.map((s, i) => (
                           <div key={s.id} className={`flex items-center gap-3 py-2 ${i < acc.signals.length - 1 ? 'border-b border-[#f1f5f9]' : ''}`}>
                             <div className="w-2 h-2 rounded-full shrink-0" style={{ background: s.sev === 'crítico' ? '#ef4444' : s.sev === 'alerta' ? '#f59e0b' : '#2b44ff' }} />
-                            <span className="text-[11px] font-black text-[#94a3b8] shrink-0 w-12">{s.id}</span>
+                            <span className="text-xs font-black text-[#94a3b8] shrink-0 w-12">{s.id}</span>
                             <span className="text-[13px] font-semibold text-[#1e293b] flex-1">{s.title}</span>
                             <span className={bc(s.sev === 'crítico' ? 'br' : s.sev === 'alerta' ? 'bam' : 'bb')}>{s.sev}</span>
                           </div>
@@ -615,12 +615,12 @@ export default function Performance() {
                   {/* ações em andamento */}
                   {acc.actions.length > 0 && (
                     <div className="mt-4">
-                      <div className="text-[9px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Ações em andamento</div>
+                      <div className="text-xs font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Ações em andamento</div>
                       <div className="flex flex-col gap-1">
                         {acc.actions.map((a, i) => (
                           <div key={a.title} className={`flex items-center gap-3 py-2 ${i < acc.actions.length - 1 ? 'border-b border-[#f1f5f9]' : ''}`}>
                             <span className="text-[13px] font-semibold text-[#1e293b] flex-1">{a.title}</span>
-                            <span className="text-[11px] font-bold text-[#64748b] bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{a.owner}</span>
+                            <span className="text-xs font-bold text-[#64748b] bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{a.owner}</span>
                             <span className={bc(a.status === 'Em andamento' ? 'bb' : 'bsl')}>{a.status}</span>
                           </div>
                         ))}
@@ -639,7 +639,7 @@ export default function Performance() {
                     { k: 'Último contato', v: acc.lastContact, c: '#0f172a' }
                   ].map(x => (
                     <div key={x.k}>
-                      <div className="text-[9px] font-black text-[#94a3b8] uppercase tracking-wider mb-0.5">{x.k}</div>
+                      <div className="text-xs font-black text-[#94a3b8] uppercase tracking-wider mb-0.5">{x.k}</div>
                       <div className="text-[13px] font-black truncate" style={{ color: x.c }}>{x.v}</div>
                     </div>
                   ))}
@@ -647,14 +647,14 @@ export default function Performance() {
 
                 {/* rodapé: botões */}
                 <div className="flex items-center gap-2 border-t border-[#f1f5f9] px-6 py-3 bg-white/50">
-                  <button className="h-8 px-4 rounded-full text-[11px] font-bold bg-[#2b44ff] text-white hover:bg-[#1a2dbb] transition-all shadow-sm hover:shadow-md cursor-pointer">→ Ver no Canopi</button>
-                  <button className="h-8 px-4 rounded-full text-[11px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer" onClick={() => showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
+                  <button className="h-8 px-4 rounded-full text-xs font-bold bg-[#2b44ff] text-white hover:bg-[#1a2dbb] transition-all shadow-sm hover:shadow-md cursor-pointer">→ Ver no Canopi</button>
+                  <button className="h-8 px-4 rounded-full text-xs font-bold bg-white text-slate-400 border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer" onClick={() => showToast(`Abrindo ${acc.name} no HubSpot`)}>🔗 HubSpot</button>
                   <div className="ml-auto flex items-center gap-2">
                     <div className="flex -space-x-1.5">
-                      <div className="w-5 h-5 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[8px] font-bold text-blue-600">S</div>
-                      <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-600">A</div>
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">S</div>
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-400">A</div>
                     </div>
-                    <span className="text-[11px] font-bold text-[#94a3b8]">{acc.signals.length} sinais · {acc.actions.length} ações</span>
+                    <span className="text-xs font-bold text-[#94a3b8]">{acc.signals.length} sinais · {acc.actions.length} ações</span>
                   </div>
                 </div>
               </div>
@@ -664,7 +664,7 @@ export default function Performance() {
         {/* ── FECHAMENTO ── */}
         <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] text-[#0f172a]">
           <div className="mb-4 leading-tight">
-            <div className="text-[10px] font-black tracking-tight uppercase text-[#94a3b8] mb-1">Análise Comercial</div>
+            <div className="text-xs font-black tracking-tight uppercase text-[#94a3b8] mb-1">Análise Comercial</div>
             <div className="text-[16px] font-black tracking-tight">Qualidade de Fechamento</div>
             <div className="text-[12px] text-[#64748b]">Motivos de perda, objeções e aceleradores</div>
           </div>
@@ -675,7 +675,7 @@ export default function Performance() {
               { title: 'Aceleradores', data: ACCELERATORS, bg: '#f0fdf4', border: '#bbf7d0', sep: '#dcfce7', tc: '#16a34a', prefix: '+' }
             ].map(col => (
               <div key={col.title} className="rounded-[20px] p-5 border shadow-sm transition-all hover:shadow-md" style={{ background: col.bg, borderColor: col.border }}>
-                <div className="text-[10px] font-black uppercase tracking-[0.1em] mb-3.5" style={{ color: col.tc }}>{col.title}</div>
+                <div className="text-xs font-black uppercase tracking-[0.1em] mb-3.5" style={{ color: col.tc }}>{col.title}</div>
                 <div className="flex flex-col gap-1">
                   {col.data.map((x, i) => (
                     <div key={x.label} className={`flex justify-between items-center py-2 ${i < col.data.length - 1 ? 'border-b' : ''}`} style={{ borderColor: col.sep }}>
@@ -692,7 +692,7 @@ export default function Performance() {
         {/* ── ALERTAS — EXPLORATÓRIO ── */}
         <div className="bg-white rounded-[24px] border border-[#e2e8f0] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
           <div className="mb-6 leading-tight">
-            <div className="text-[10px] font-black tracking-tight uppercase text-[#94a3b8] mb-1">Próximos Sinais</div>
+            <div className="text-xs font-black tracking-tight uppercase text-[#94a3b8] mb-1">Próximos Sinais</div>
             <div className="text-[18px] font-black tracking-tight text-[#0f172a]">Alertas de Desempenho <span className="text-amber-500 text-[12px]">· exploratório</span></div>
             <div className="text-[12px] text-[#64748b]">O desempenho atual está gerando estes sinais — clique para acessar</div>
           </div>
@@ -704,8 +704,8 @@ export default function Performance() {
                   <div className="text-[14px] font-black text-[#0f172a] mb-1 truncate">{alert.title}</div>
                   <div className="text-[12px] text-[#64748b] leading-relaxed mb-3 line-clamp-2">{alert.desc}</div>
                   <div className="flex gap-4">
-                    <button className="text-[11px] font-black hover:opacity-70 transition-opacity cursor-pointer" style={{ color: alert.linkColor }} onClick={() => showToast(`Navegando para ${alert.id}`)}>→ Ver {alert.id}</button>
-                    <button className="text-[11px] font-black text-slate-400 hover:text-slate-600 transition-colors cursor-pointer" onClick={() => showToast('Abrindo conta relacionada')}>Ver conta</button>
+                    <button className="text-xs font-black hover:opacity-70 transition-opacity cursor-pointer" style={{ color: alert.linkColor }} onClick={() => showToast(`Navegando para ${alert.id}`)}>→ Ver {alert.id}</button>
+                    <button className="text-xs font-black text-slate-400 hover:text-slate-400 transition-colors cursor-pointer" onClick={() => showToast('Abrindo conta relacionada')}>Ver conta</button>
                   </div>
                 </div>
                 <div className="absolute top-4 right-4">
@@ -724,7 +724,7 @@ export default function Performance() {
                 <div className="text-[18px] font-black text-[#0f172a] tracking-tight">Squads · Execução e SLA <span className="text-slate-400 text-[12px]">· editorial</span></div>
                 <div className="text-[12px] text-[#64748b]">Performance por owner no período · clique para análise</div>
               </div>
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-600 border border-green-200">84% global</span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-green-50 text-green-600 border border-green-200">84% global</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {SQUAD_OWNERS.map(owner=>(
@@ -733,14 +733,14 @@ export default function Performance() {
                     <div className="w-10 h-10 rounded-full bg-[#eff2ff] flex items-center justify-center text-[12px] font-black text-[#2b44ff] shrink-0">{ini(owner.name)}</div>
                     <div className="min-w-0 flex-1">
                       <div className="text-[14px] font-bold text-[#0f172a] truncate group-hover:text-[#2b44ff] transition-colors">{owner.name.split(' ').slice(0,2).join(' ')}</div>
-                      <div className="text-[11px] text-[#94a3b8]">{owner.role}</div>
+                      <div className="text-xs text-[#94a3b8]">{owner.role}</div>
                     </div>
                   </div>
                   <div className="h-1.5 bg-[#e2e8f0] rounded-full overflow-hidden mb-2">
                     <div className="h-full rounded-full transition-all duration-1000" style={{width:`${owner.sla}%`,background:slaC(owner.sla)}}/>
                   </div>
                   <div className="flex justify-between items-center leading-none">
-                    <span className="text-[11px] font-bold text-[#94a3b8]">{owner.acoes}</span>
+                    <span className="text-xs font-bold text-[#94a3b8]">{owner.acoes}</span>
                     <span className="text-[12px] font-black" style={{color:slaC(owner.sla)}}>{owner.sla}%</span>
                   </div>
                 </div>
@@ -763,7 +763,7 @@ export default function Performance() {
                     <div className="h-1 bg-slate-200 rounded-full overflow-hidden mb-1">
                       <div className="h-full rounded-full" style={{width:`${int.uptime}%`,background:int.uptime>=99?'#10b981':int.uptime>=90?'#f59e0b':'#ef4444'}}/>
                     </div>
-                    <div className="text-[10px] font-bold" style={{color:int.uptime>=99?'#16a34a':int.uptime>=90?'#d97706':'#dc2626'}}>{int.uptime}% uptime</div>
+                    <div className="text-xs font-bold" style={{color:int.uptime>=99?'#16a34a':int.uptime>=90?'#d97706':'#dc2626'}}>{int.uptime}% uptime</div>
                   </div>
                 </div>
               ))}
@@ -790,29 +790,29 @@ export default function Performance() {
             
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{pl}</span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{pl}</span>
                 <span className={bc(panel.statusClass)}>{panel.statusLabel}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {panel.kpis.map((kpi: any) => (
                   <div key={kpi.label} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 transition-hover hover:border-slate-200">
-                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">{kpi.label}</div>
+                    <div className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">{kpi.label}</div>
                     <div className="text-[22px] font-black tracking-tight" style={{ color: panel.color }}>{kpi.value}</div>
-                    <div className={`text-[11px] font-bold mt-1 ${!kpi.delta ? 'text-slate-400' : kpi.delta.startsWith('+') ? 'text-emerald-500' : kpi.delta.startsWith('-') ? 'text-rose-500' : 'text-slate-900'}`}>{kpi.delta || '—'}</div>
+                    <div className={`text-xs font-bold mt-1 ${!kpi.delta ? 'text-slate-400' : kpi.delta.startsWith('+') ? 'text-emerald-500' : kpi.delta.startsWith('-') ? 'text-rose-500' : 'text-slate-900'}`}>{kpi.delta || '—'}</div>
                   </div>
                 ))}
               </div>
 
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-4">Tendência no período</div>
+                <div className="text-xs font-black text-slate-400 uppercase tracking-wider mb-4">Tendência no período</div>
                 <div className="h-32 w-full flex items-end gap-1 px-1">
                   {/* Simplificação: Barras estilizadas em vez de SVG complexo para evitar bugs de token */}
                   {Array.from({ length: 12 }).map((_, i) => (
                     <div key={i} className="flex-1 rounded-t-sm transition-all duration-500 hover:opacity-80" style={{ height: i === 11 ? `${panel.score ?? 50}%` : '30%', background: panel.color, opacity: i === 11 ? 1 : 0.15 }} />
                   ))}
                 </div>
-                <div className="flex justify-between mt-2 px-1 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                <div className="flex justify-between mt-2 px-1 text-xs font-bold text-slate-400 uppercase tracking-tighter">
                   <span>Início</span>
                   <span>Meio</span>
                   <span>Fim</span>
@@ -820,12 +820,12 @@ export default function Performance() {
               </div>
 
               <div className="space-y-4">
-                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Análise do período</div>
+                <div className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Análise do período</div>
                 {panel.analysis.map((row: any) => (
                   <div key={row.name} className="flex justify-between items-center py-1">
                     <div>
                       <div className="text-[13px] font-bold text-slate-900 leading-tight">{row.name}</div>
-                      <div className="text-[11px] text-slate-500">{row.sub}</div>
+                      <div className="text-xs text-slate-500">{row.sub}</div>
                     </div>
                     <div className="text-right">
                       <div className={`text-[13px] font-black ${!row.val ? 'text-slate-900' : row.val.toString().startsWith('+') ? 'text-emerald-500' : row.val.toString().startsWith('-') ? 'text-rose-500' : 'text-slate-900'}`}>{row.val}</div>
@@ -851,7 +851,7 @@ export default function Performance() {
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-xl font-black text-white shrink-0 shadow-2xl">{ini(ownerPanel.name)}</div>
                 <div>
-                  <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Squads · Análise Individual</div>
+                  <div className="text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-2">Squads · Análise Individual</div>
                   <h2 className="text-[36px] font-black text-white tracking-tighter leading-none mb-1">{ownerPanel.name}</h2>
                   <p className="text-[15px] text-white/60 font-medium">{ownerPanel.role}</p>
                 </div>
@@ -869,9 +869,9 @@ export default function Performance() {
                 { l: 'Backlog', v: '2', s: 'pendentes', sc: 'text-white/40' }
               ].map(x => (
                 <div key={x.l} className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-                  <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">{x.l}</div>
+                  <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-2">{x.l}</div>
                   <div className="text-[28px] font-black text-white mb-1">{x.v}</div>
-                  <div className={`text-[11px] font-bold ${x.sc}`}>{x.s}</div>
+                  <div className={`text-xs font-bold ${x.sc}`}>{x.s}</div>
                 </div>
               ))}
             </div>
@@ -880,7 +880,7 @@ export default function Performance() {
           <div className="flex-1 overflow-y-auto bg-slate-50 p-10">
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Distribuição de SLA por tipo</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Distribuição de SLA por tipo</h4>
                 <div className="space-y-6">
                   {ownerPanel.slaTypes.map((t: any) => (
                     <div key={t.label}>
@@ -897,7 +897,7 @@ export default function Performance() {
               </div>
               
               <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Gargalos identificados</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Gargalos identificados</h4>
                 <div className="divide-y divide-slate-100">
                   {ownerPanel.gaps.map((g: any) => (
                     <div key={g.label} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
@@ -923,7 +923,7 @@ export default function Performance() {
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center text-3xl shadow-2xl">{intPanel.icon}</div>
                 <div>
-                  <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Canopi · Tecnologias · Diagnóstico</div>
+                  <div className="text-xs font-black text-white/40 uppercase tracking-[0.3em] mb-2">Canopi · Tecnologias · Diagnóstico</div>
                   <h2 className="text-[36px] font-black text-white tracking-tighter leading-none mb-3">{intPanel.name}</h2>
                   <span className={bc(intPanel.status==='Conectado'?'bg':intPanel.status==='Degradado'?'bam':'br')}>{intPanel.status}</span>
                 </div>
@@ -935,18 +935,18 @@ export default function Performance() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Uptime</div>
+                <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-2">Uptime</div>
                 <div className="text-[28px] font-black text-white">{intPanel.uptime}%</div>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Última sync</div>
+                <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-2">Última sync</div>
                 <div className="text-[18px] font-black text-white truncate">{intPanel.sub.split('·')[0].trim()}</div>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Frentes afetadas</div>
+                <div className="text-xs font-black text-white/40 uppercase tracking-widest mb-2">Frentes afetadas</div>
                 <div className="flex gap-2 flex-wrap mt-2">
                   {intPanel.affects.map((tag: string) => (
-                    <span key={tag} className="px-2.5 py-1 rounded-full bg-white/15 text-white text-[10px] font-bold ring-1 ring-white/10">{tag}</span>
+                    <span key={tag} className="px-2.5 py-1 rounded-full bg-white/15 text-white text-xs font-bold ring-1 ring-white/10">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -957,21 +957,21 @@ export default function Performance() {
             <div className="max-w-5xl mx-auto space-y-6">
               {intPanel.status !== 'Conectado' && (
                 <div className="bg-white rounded-3xl p-8 border border-rose-100 shadow-sm shadow-rose-50">
-                  <h4 className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-4">Impacto nos dados do período</h4>
+                  <h4 className="text-xs font-black text-rose-500 uppercase tracking-widest mb-4">Impacto nos dados do período</h4>
                   <p className="text-[15px] text-slate-700 leading-relaxed">{intPanel.impact}</p>
                 </div>
               )}
               
               <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Histórico de uptime no período</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Histórico de uptime no período</h4>
                 <div className="flex items-end gap-1.5 h-40">
                   {intPanel.uptimeHistory.map((bar: number, i: number) => (
                     <div key={i} className="flex-1 rounded-t-lg transition-all duration-300 group relative" style={{ height: `${bar}%`, background: bar >= 99 ? '#10b981' : bar >= 90 ? '#f59e0b' : '#ef4444' }}>
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">{bar}%</div>
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">{bar}%</div>
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <div className="flex justify-between mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
                   {['S1','S2','S3','S4','S5','S6','S7','S8'].map(l => <span key={l}>{l}</span>)}
                 </div>
               </div>
@@ -986,27 +986,27 @@ export default function Performance() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowExport(false)} />
           <div className="relative w-full max-w-[480px] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-8">
-              <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-3">Canopi · Revenue Ops</div>
+              <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-3">Canopi · Revenue Ops</div>
               <h3 className="text-[24px] font-black text-white tracking-tight mb-2">Exportar Relatório</h3>
               <p className="text-[13px] text-white/60">Desempenho · {pl}</p>
             </div>
             
             <div className="p-8 space-y-8">
               <div>
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Formato</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Formato</h4>
                 <div className="grid grid-cols-3 gap-3">
                   {EXPORT_FORMATS.map(fmt => (
                     <div key={fmt.id} className={`p-4 rounded-2xl border-2 transition-all cursor-pointer text-center group ${exportFmt === fmt.id ? 'border-[#2b44ff] bg-blue-50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`} onClick={() => setExportFmt(fmt.id)}>
                       <div className="text-[24px] mb-2 group-hover:scale-110 transition-transform">{fmt.icon}</div>
                       <div className={`text-[12px] font-black ${exportFmt === fmt.id ? 'text-[#2b44ff]' : 'text-slate-900'}`}>{fmt.label}</div>
-                      <div className="text-[10px] text-slate-400 mt-1">{fmt.desc}</div>
+                      <div className="text-xs text-slate-400 mt-1">{fmt.desc}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Incluir no relatório</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Incluir no relatório</h4>
                 <div className="space-y-2">
                   {exportSections.map(sec => (
                     <div key={sec.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer group hover:border-slate-200" onClick={() => setExportSections(prev => prev.map(s => s.id === sec.id ? { ...s, on: !s.on } : s))}>
@@ -1034,7 +1034,7 @@ export default function Performance() {
           <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-10 flex flex-col gap-8">
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-2">Canopi · Revenue Ops · Desempenho</div>
+                <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-2">Canopi · Revenue Ops · Desempenho</div>
                 <h2 className="text-[42px] font-black text-white tracking-tighter leading-none mb-3">Sinais Gerados</h2>
                 <p className="text-[15px] text-white/60">O desempenho atual está gerando estes sinais para o próximo ciclo</p>
               </div>
@@ -1057,7 +1057,7 @@ export default function Performance() {
                     <p className="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">{alert.desc}</p>
                     <div className="flex gap-4">
                       <button className="px-4 py-2 rounded-lg bg-blue-50 text-[#2b44ff] text-[12px] font-black hover:bg-blue-100 transition-colors cursor-pointer" onClick={() => setShowSignals(false)}>Ver {alert.id}</button>
-                      <button className="px-4 py-2 rounded-lg bg-slate-50 text-slate-600 text-[12px] font-bold border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => setShowSignals(false)}>Ver conta relacionada</button>
+                      <button className="px-4 py-2 rounded-lg bg-slate-50 text-slate-400 text-[12px] font-bold border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer" onClick={() => setShowSignals(false)}>Ver conta relacionada</button>
                     </div>
                   </div>
                 </div>
@@ -1073,7 +1073,7 @@ export default function Performance() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowDatePicker(false)} />
           <div className="relative w-full max-w-[420px] bg-white rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="bg-linear-to-br from-[#041135] via-[#11286e] to-[#1f3f9b] p-8">
-              <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.25em] mb-3">Filtro de Período</div>
+              <div className="text-xs font-black text-white/40 uppercase tracking-[0.25em] mb-3">Filtro de Período</div>
               <h3 className="text-[22px] font-black text-white tracking-tight">Período Personalizado</h3>
             </div>
             
@@ -1084,17 +1084,17 @@ export default function Performance() {
                   { label: 'Data final', val: dateTo, set: setDateTo }
                 ].map(x => (
                   <div key={x.label}>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{x.label}</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{x.label}</label>
                     <input type="date" value={x.val} onChange={e => x.set(e.target.value)} className="w-full h-11 px-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-[13px] font-bold focus:ring-2 focus:ring-[#2b44ff] focus:bg-white transition-all outline-none" />
                   </div>
                 ))}
               </div>
               
               <div>
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ou selecione um preset</h4>
+                <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Ou selecione um preset</h4>
                 <div className="flex flex-wrap gap-2">
                   {PERIODS.map(p => (
-                    <button key={p.id} className="px-4 py-2 rounded-full border border-slate-100 bg-slate-50 text-slate-600 text-[11px] font-black hover:bg-blue-50 hover:text-[#2b44ff] hover:border-blue-100 transition-all cursor-pointer" onClick={() => { setPeriod(p.id); setShowDatePicker(false); }}>{p.label}</button>
+                    <button key={p.id} className="px-4 py-2 rounded-full border border-slate-100 bg-slate-50 text-slate-400 text-xs font-black hover:bg-blue-50 hover:text-[#2b44ff] hover:border-blue-100 transition-all cursor-pointer" onClick={() => { setPeriod(p.id); setShowDatePicker(false); }}>{p.label}</button>
                   ))}
                 </div>
               </div>
@@ -1112,7 +1112,7 @@ export default function Performance() {
       {toast && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] bg-slate-900 text-white rounded-2xl px-6 py-4 shadow-2xl animate-in slide-in-from-bottom duration-300 flex flex-col items-center min-w-[280px]">
           <div className="text-[13px] font-black tracking-tight">{toast.msg}</div>
-          {toast.sub && <div className="text-[11px] text-white/50 font-medium mt-1 leading-none">{toast.sub}</div>}
+          {toast.sub && <div className="text-xs text-white/50 font-medium mt-1 leading-none">{toast.sub}</div>}
         </div>
       )}
     </div>

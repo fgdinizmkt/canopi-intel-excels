@@ -28,7 +28,7 @@ export default function SalesforceDedicatedPage() {
           </div>
           <div>
             <h2 className="text-4xl font-black tracking-tighter text-slate-900">Salesforce</h2>
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-sm font-medium text-slate-400">
               Configure a conexão, revise os dados encontrados e sincronize com segurança o que já está pronto para a Canopi.
             </p>
           </div>

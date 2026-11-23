@@ -227,7 +227,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-slate-800 rounded-xl text-slate-500 transition-colors"
+            className="p-2 hover:bg-slate-800 rounded-xl text-slate-400 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -238,15 +238,15 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             <h2 className="text-2xl font-black text-white tracking-tight">{contact.nome}</h2>
             <Linkedin className="w-4 h-4 text-blue-400 cursor-pointer hover:text-blue-300 transition-colors" />
           </div>
-          <p className="text-sm font-medium text-slate-400 mb-4">{contact.cargo} • <span className="text-slate-500">{contact.area}</span></p>
+          <p className="text-sm font-medium text-slate-400 mb-4">{contact.cargo} • <span className="text-slate-400">{contact.area}</span></p>
           
           <div className="flex flex-wrap gap-2">
             {contact.classificacao.map(cls => (
-              <span key={cls} className={`text-[9px] font-black uppercase px-2 py-1 rounded border ${styleClass}`}>
+              <span key={cls} className={`text-xs font-black uppercase px-2 py-1 rounded border ${styleClass}`}>
                 {cls}
               </span>
             ))}
-            <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
+            <span className="text-xs font-black uppercase px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
               {contact.senioridade}
             </span>
           </div>
@@ -257,13 +257,13 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
         
         {/* --- MÉTRICAS DE PODER & ACESSO --- */}
         <section>
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
             <TrendingUp className="w-3.5 h-3.5" /> Poder & Acesso Relacional
           </h3>
           <div className="space-y-4 bg-slate-800/30 p-4 rounded-2xl border border-slate-800">
             {/* Score de Sucesso (Canônico) */}
             <div>
-              <div className="flex justify-between text-[10px] font-black uppercase mb-1.5">
+              <div className="flex justify-between text-xs font-black uppercase mb-1.5">
                 <span className="text-blue-400">Score de Sucesso (AI)</span>
                 <span className="text-blue-400">{contact.scoreSucesso}%</span>
               </div>
@@ -273,7 +273,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             </div>
             {/* Influência */}
             <div>
-              <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+              <div className="flex justify-between text-xs font-bold uppercase mb-1.5">
                 <span className="text-slate-400">Influência no Comitê</span>
                 <span className="text-slate-300 font-black">{contact.influencia}/10</span>
               </div>
@@ -283,7 +283,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             </div>
             {/* Força Relacional */}
             <div>
-              <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+              <div className="flex justify-between text-xs font-bold uppercase mb-1.5">
                 <span className="text-slate-400">Força Relacional</span>
                 <span className="text-emerald-500">{contact.forcaRelacional}%</span>
               </div>
@@ -294,11 +294,11 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             {/* Receptividade / Acessibilidade */}
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-800">
                <div>
-                  <span className="text-[9px] font-black text-slate-600 uppercase block mb-1">Receptividade</span>
+                  <span className="text-xs font-black text-slate-400 uppercase block mb-1">Receptividade</span>
                   <span className={`text-xs font-bold ${contact.receptividade === 'Alta' ? 'text-emerald-500' : 'text-amber-500'}`}>{contact.receptividade}</span>
                </div>
                <div>
-                  <span className="text-[9px] font-black text-slate-600 uppercase block mb-1">Acessibilidade</span>
+                  <span className="text-xs font-black text-slate-400 uppercase block mb-1">Acessibilidade</span>
                   <span className={`text-xs font-bold ${contact.acessibilidade === 'Alta' ? 'text-emerald-500' : 'text-blue-500'}`}>{contact.acessibilidade}</span>
                </div>
             </div>
@@ -307,7 +307,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
 
         {/* --- ATRIBUIÇÃO DE OWNER --- */}
         <section className="bg-blue-500/5 p-4 rounded-2xl border border-blue-500/20">
-          <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+          <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Atribuição de Owner
           </h3>
           <div className="flex gap-2">
@@ -316,24 +316,24 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
               value={ownerInput}
               onChange={(e) => setOwnerInput(e.target.value)}
               placeholder="Nome do owner"
-              className="flex-1 h-8 px-3 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-all"
+              className="flex-1 h-8 px-3 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-all"
             />
             <button
               onClick={handleAssignOwner}
               disabled={!ownerInput.trim() || !!ownerStatus}
-              className={`h-8 px-3 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 ${ownerStatus ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50'}`}
+              className={`h-8 px-3 text-xs font-black uppercase tracking-widest rounded-lg transition-all active:scale-95 ${ownerStatus ? 'bg-emerald-600 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50'}`}
             >
               {ownerStatus ? 'OK' : 'Atribuir'}
             </button>
           </div>
           {contact.owner && (
-            <p className="text-[9px] text-blue-400 mt-2">Atual: <span className="font-bold">{contact.owner}</span></p>
+            <p className="text-xs text-blue-400 mt-2">Atual: <span className="font-bold">{contact.owner}</span></p>
           )}
         </section>
 
         {/* --- CLASSIFICAÇÃO DE CONTATO --- */}
         <section className="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50">
-          <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
             <ShieldCheck className="w-3.5 h-3.5" /> Classificação
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -351,10 +351,10 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                 <button
                   key={option}
                   onClick={() => handleToggleClassification(option)}
-                  className={`text-[9px] font-black uppercase px-2 py-1 rounded border transition-all ${
+                  className={`text-xs font-black uppercase px-2 py-1 rounded border transition-all ${
                     isSelected
                       ? `${bgColor} opacity-100 ring-1 ring-offset-1 ring-offset-slate-900`
-                      : 'bg-slate-700/30 text-slate-500 border-slate-700 opacity-60 hover:opacity-80'
+                      : 'bg-slate-700/30 text-slate-400 border-slate-700 opacity-60 hover:opacity-80'
                   }`}
                 >
                   {option}
@@ -363,19 +363,19 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             })}
           </div>
           {classificationStatus && (
-            <p className="text-[9px] text-emerald-400 mt-2">{classificationStatus}</p>
+            <p className="text-xs text-emerald-400 mt-2">{classificationStatus}</p>
           )}
         </section>
 
         {/* --- EDITOR NARRATIVO (OBSERVAÇÕES, HISTÓRICO, PRÓXIMA AÇÃO) --- */}
         <section className="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
               <MessageSquare className="w-3.5 h-3.5" /> Narrativas Operacionais
             </h3>
             <button
               onClick={() => setEditingNarrative(!editingNarrative)}
-              className="text-[11px] font-black uppercase px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500 transition-all"
+              className="text-xs font-black uppercase px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500 transition-all"
             >
               {editingNarrative ? '✕' : '✎'}
             </button>
@@ -384,47 +384,47 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           {editingNarrative ? (
             <div className="space-y-3">
               <div>
-                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Observações</label>
+                <label className="text-xs font-black text-emerald-300 uppercase block mb-1">Observações</label>
                 <textarea
                   value={observacoes}
                   onChange={(e) => setObservacoes(e.target.value)}
                   placeholder="Notas tácticas sobre o stakeholder..."
-                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-all resize-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Histórico de Interações</label>
+                <label className="text-xs font-black text-emerald-300 uppercase block mb-1">Histórico de Interações</label>
                 <textarea
                   value={historicoInteracoes}
                   onChange={(e) => setHistoricoInteracoes(e.target.value)}
                   placeholder="Pontos-chave de conversas anteriores..."
-                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-all resize-none"
                 />
               </div>
               <div>
-                <label className="text-[9px] font-black text-emerald-300 uppercase block mb-1">Próxima Ação</label>
+                <label className="text-xs font-black text-emerald-300 uppercase block mb-1">Próxima Ação</label>
                 <textarea
                   value={proximaAcao}
                   onChange={(e) => setProximaAcao(e.target.value)}
                   placeholder="Recomendação para próximo passo..."
-                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                  className="w-full h-12 px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-all resize-none"
                 />
               </div>
               <button
                 onClick={handleUpdateNarrativas}
                 disabled={!!narrativeStatus}
-                className={`w-full h-8 text-[10px] font-black uppercase rounded-lg transition-all active:scale-95 ${narrativeStatus ? 'bg-emerald-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
+                className={`w-full h-8 text-xs font-black uppercase rounded-lg transition-all active:scale-95 ${narrativeStatus ? 'bg-emerald-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
               >
                 {narrativeStatus ? '✓ Salvo' : 'Salvar Narrativas'}
               </button>
             </div>
           ) : (
             <div className="space-y-2 text-xs text-slate-300">
-              {observacoes && <p className="text-[9px]"><span className="font-bold text-emerald-400">Obs:</span> {observacoes}</p>}
-              {historicoInteracoes && <p className="text-[9px]"><span className="font-bold text-emerald-400">Hist:</span> {historicoInteracoes}</p>}
-              {proximaAcao && <p className="text-[9px]"><span className="font-bold text-emerald-400">Próx:</span> {proximaAcao}</p>}
+              {observacoes && <p className="text-xs"><span className="font-bold text-emerald-400">Obs:</span> {observacoes}</p>}
+              {historicoInteracoes && <p className="text-xs"><span className="font-bold text-emerald-400">Hist:</span> {historicoInteracoes}</p>}
+              {proximaAcao && <p className="text-xs"><span className="font-bold text-emerald-400">Próx:</span> {proximaAcao}</p>}
               {!observacoes && !historicoInteracoes && !proximaAcao && (
-                <p className="text-[9px] text-slate-500 italic">Clique em ✎ para adicionar narrativas operacionais.</p>
+                <p className="text-xs text-slate-400 italic">Clique em ✎ para adicionar narrativas operacionais.</p>
               )}
             </div>
           )}
@@ -432,7 +432,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
 
         {/* --- CONTEXTO OPERACIONAL (SINAIS/AÇÕES) --- */}
         <section>
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
             <Activity className="w-3.5 h-3.5" /> Intervenções Associadas
           </h3>
           <div className="space-y-3">
@@ -440,7 +440,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
               <>
                 {sinais.map(s => (
                   <div key={s.id} className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-xl">
-                    <div className="text-[9px] font-black text-blue-400 uppercase mb-1">{s.tipo}</div>
+                    <div className="text-xs font-black text-blue-400 uppercase mb-1">{s.tipo}</div>
                     <div className="text-xs font-bold text-slate-100">{s.titulo}</div>
                   </div>
                 ))}
@@ -449,8 +449,8 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                     <div>
                       <div className="text-xs font-bold text-slate-100">{a.title}</div>
                       <div className="flex items-center gap-2 mt-1">
-                         <span className="text-[8px] font-black uppercase text-slate-500">{a.status}</span>
-                         {a.ownerName && <span className="text-[8px] text-blue-500 font-bold tracking-tighter">@{a.ownerName}</span>}
+                         <span className="text-xs font-black uppercase text-slate-400">{a.status}</span>
+                         {a.ownerName && <span className="text-xs text-blue-500 font-bold tracking-tighter">@{a.ownerName}</span>}
                       </div>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-700" />
@@ -459,7 +459,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
               </>
             ) : (
               <div className="p-8 bg-slate-800/10 border border-dashed border-slate-800 rounded-2xl text-center">
-                <p className="text-xs text-slate-600 italic">Nenhum sinal crítico direto vinculado.</p>
+                <p className="text-xs text-slate-400 italic">Nenhum sinal crítico direto vinculado.</p>
               </div>
             )}
           </div>
@@ -470,20 +470,20 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
           <div className="absolute -right-4 -top-4 opacity-10">
             <BrainCircuit className="w-24 h-24 text-blue-400" />
           </div>
-          <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> Inteligência de Abordagem Canopi
           </h3>
           
           <div className="space-y-4">
             {contact.ganchoReuniao && (
               <div className="p-3 bg-blue-500/5 rounded-xl border border-blue-500/20">
-                <span className="text-[9px] font-black text-blue-500 uppercase block mb-1.5 tracking-widest">Gancho para Reunião</span>
+                <span className="text-xs font-black text-blue-500 uppercase block mb-1.5 tracking-widest">Gancho para Reunião</span>
                 <p className="text-xs text-slate-100 font-medium italic">&quot;{contact.ganchoReuniao}&quot;</p>
               </div>
             )}
 
             <div>
-              <span className="text-[9px] font-black text-slate-500 uppercase block mb-1">Estratégia de Conversão</span>
+              <span className="text-xs font-black text-slate-400 uppercase block mb-1">Estratégia de Conversão</span>
               <p className="text-xs text-slate-100 leading-relaxed font-bold">
                 {contact.scoreSucesso > 70 
                   ? `Engajamento crítico detectado. Recomenda-se abordagem direta via ${contact.papelComite} focando em prova de valor.` 
@@ -493,12 +493,12 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
             
             <div className="grid grid-cols-2 gap-3">
               <div className="p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                <span className="text-[8px] font-black text-slate-500 uppercase block">Tom de abordagem</span>
-                <span className="text-[10px] font-bold text-slate-200">{contact.senioridade === 'C-Level' ? 'Executivo / ROI' : 'Técnico / Eficiência'}</span>
+                <span className="text-xs font-black text-slate-400 uppercase block">Tom de abordagem</span>
+                <span className="text-xs font-bold text-slate-200">{contact.senioridade === 'C-Level' ? 'Executivo / ROI' : 'Técnico / Eficiência'}</span>
               </div>
               <div className="p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                <span className="text-[8px] font-black text-slate-500 uppercase block">Recomendação AI</span>
-                <span className="text-[10px] font-bold text-emerald-400">Abordar em 24h</span>
+                <span className="text-xs font-black text-slate-400 uppercase block">Recomendação AI</span>
+                <span className="text-xs font-bold text-emerald-400">Abordar em 24h</span>
               </div>
             </div>
 
@@ -521,7 +521,7 @@ export const ContactDetailProfile: React.FC<ContactDetailProfileProps> = ({
                 setPrepStatus('Interação enviada para fila');
                 setTimeout(() => setPrepStatus(null), 3000);
               }}
-              className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${prepStatus ? 'bg-emerald-600 text-white shadow-emerald-900/20' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/40'}`}
+              className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${prepStatus ? 'bg-emerald-600 text-white shadow-emerald-900/20' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/40'}`}
             >
               {prepStatus ? (
                 <>

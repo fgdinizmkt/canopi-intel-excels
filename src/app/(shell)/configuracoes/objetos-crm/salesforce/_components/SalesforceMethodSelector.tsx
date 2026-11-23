@@ -544,7 +544,7 @@ const METHODS: MethodDefinition[] = [
 const BADGE_CLASSES: Record<MethodDefinition['badgeVariant'], string> = {
   blue: 'border-none bg-blue-100 text-blue-700',
   amber: 'border-none bg-amber-100 text-amber-700',
-  slate: 'border-none bg-slate-100 text-slate-600',
+  slate: 'border-none bg-slate-100 text-slate-400',
 };
 
 const CHECKLIST_ITEMS = [

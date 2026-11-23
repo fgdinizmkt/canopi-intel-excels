@@ -43,7 +43,7 @@ const priorityClasses: Record<Priority, string> = {
   Crítica: "border border-red-200 bg-red-50 text-red-700",
   Alta:    "border border-blue-200 bg-blue-50 text-blue-700",
   Média:   "border border-orange-200 bg-orange-50 text-orange-700",
-  Baixa:   "border border-slate-200 bg-slate-100 text-slate-600",
+  Baixa:   "border border-slate-200 bg-slate-100 text-slate-400",
 };
 
 const statusClasses: Record<ActionStatus, string> = {
@@ -131,9 +131,9 @@ function sortByPriorityAndSla(items: ActionItem[]) {
 function MetricCard({ label, value, helper, icon }: { label: string; value: number | string; helper?: string; icon: React.ReactNode }) {
   return (
     <div className="bg-white/10 border border-white/10 rounded-[20px] p-4 flex flex-col justify-center backdrop-blur-md">
-      <div className="text-[10px] font-bold text-white/50 uppercase tracking-[0.16em] mb-2">{label}</div>
+      <div className="text-xs font-bold text-white/50 uppercase tracking-[0.16em] mb-2">{label}</div>
       <div className="text-[28px] font-extrabold tracking-tighter leading-none text-white">{value}</div>
-      {helper && <div className="text-[11px] text-white/50 mt-1 font-medium">{helper}</div>}
+      {helper && <div className="text-xs text-white/50 mt-1 font-medium">{helper}</div>}
     </div>
   );
 }
@@ -151,7 +151,7 @@ function SelectField({
 }) {
   return (
     <label className="relative flex min-w-[160px] flex-col gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:border-slate-300">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -201,9 +201,9 @@ function QuickButton({
 function InfoBlock({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
     <div className="bg-white/85 p-3 rounded-[14px]">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
       <p className="mt-1.5 text-[13px] font-bold leading-relaxed text-slate-900">{value}</p>
-      <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{helper}</p>
+      <p className="mt-1 text-xs leading-relaxed text-slate-500">{helper}</p>
     </div>
   );
 }
@@ -211,7 +211,7 @@ function InfoBlock({ label, value, helper }: { label: string; value: string; hel
 function DetailList({ title, items, emptyLabel }: { title: string; items: string[]; emptyLabel: string }) {
   return (
     <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{title}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{title}</p>
       <div className="mt-4 space-y-3">
         {items.length === 0 ? <p className="text-sm text-slate-500">{emptyLabel}</p> : null}
         {items.map((item) => (
@@ -240,7 +240,7 @@ function DensityToggle({
 
   return (
     <div className="flex items-center gap-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Densidade do Kanban</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Densidade do Kanban</p>
       <div className="flex overflow-hidden rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
         {options.map((option) => (
           <button
@@ -320,8 +320,8 @@ function ActionListCard({
         cardSurfaceClasses[item.status],
         "rounded-[14px] p-[10px_16px]"
       )}>
-        <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0")}>{item.priority}</span>
-        <span className={cx(statusClasses[item.status], "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0")}>{item.status}</span>
+        <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-xs font-bold shrink-0")}>{item.priority}</span>
+        <span className={cx(statusClasses[item.status], "rounded-full px-2 py-0.5 text-xs font-bold shrink-0")}>{item.status}</span>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }}
@@ -349,24 +349,24 @@ function ActionListCard({
           {/* Badges */}
           <div className="flex flex-wrap gap-2 items-center">
             {item.isRouted && (
-              <span className="rounded-full border border-emerald-200 bg-emerald-100/50 px-2.5 py-1 text-[11px] font-black text-emerald-600 uppercase tracking-tighter flex items-center gap-1">
+              <span className="rounded-full border border-emerald-200 bg-emerald-100/50 px-2.5 py-1 text-xs font-black text-emerald-600 uppercase tracking-tighter flex items-center gap-1">
                 ⚓ {item.routingFlow || 'Roteado via Fluxo Ativo'}
               </span>
             )}
-            <span className={cx(priorityClasses[item.priority], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
+            <span className={cx(priorityClasses[item.priority], "rounded-full px-2.5 py-1 text-xs font-bold")}>
               {item.priority}
             </span>
-            <span className={cx(statusClasses[item.status], "rounded-full px-2.5 py-1 text-[11px] font-bold")}>
+            <span className={cx(statusClasses[item.status], "rounded-full px-2.5 py-1 text-xs font-bold")}>
               {item.status}
             </span>
-            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500">
               {item.channel}
             </span>
-            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500">
               {item.category}
             </span>
             {item.sourceType === "playbook" && (
-              <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-600">
+              <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-600">
                 Playbook: {item.playbookName}
               </span>
             )}
@@ -387,14 +387,14 @@ function ActionListCard({
                 className="text-left bg-none border-none cursor-pointer p-0 block mt-1"
                 aria-label={`Ver detalhes da ação: ${item.title}`}
               >
-                <p className="text-sm font-semibold text-slate-600">{item.title}</p>
+                <p className="text-sm font-semibold text-slate-400">{item.title}</p>
               </button>
             </div>
             {density !== 'compacta' && (
               <p className="mt-3 text-[13px] leading-relaxed text-slate-500 max-w-[880px]">{item.description}</p>
             )}
             {density === 'compacta' && item.origin && (
-              <p className="mt-2 text-[11px] text-slate-400 font-medium">{item.origin}</p>
+              <p className="mt-2 text-xs text-slate-400 font-medium">{item.origin}</p>
             )}
           </div>
 
@@ -431,7 +431,7 @@ function ActionListCard({
             </button>
           ))}
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">SLA</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">SLA</p>
             <p className={cx("mt-1.25 text-[13px] font-bold", slaClasses[item.slaStatus])}>{item.slaText}</p>
           </div>
         </div>
@@ -479,20 +479,20 @@ function KanbanCard({
       <div className="flex items-center justify-between gap-1.5">
         <div className="flex items-center gap-1.5 min-w-0">
           <GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-          <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-[10px] font-bold")}>
+          <span className={cx(priorityClasses[item.priority], "rounded-full px-2 py-0.5 text-xs font-bold")}>
             {item.priority}
           </span>
-          <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500 truncate">
+          <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-semibold text-slate-500 truncate">
             {item.category}
           </span>
           {item.isRouted && (
-            <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-600 truncate flex items-center gap-1 max-w-[80px]">
+            <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-xs font-black text-emerald-600 truncate flex items-center gap-1 max-w-[80px]">
               ⚓ {item.routingFlow || 'Roteado'}
             </span>
           )}
         </div>
         {!compact && (
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-400 shrink-0">
             {item.channel}
           </span>
         )}
@@ -509,11 +509,11 @@ function KanbanCard({
             <p className={cx("font-black tracking-tight leading-tight text-slate-900 truncate", compact ? "text-[17px]" : "text-[18px]")}>
               {item.accountName}
             </p>
-            <p className="mt-0.5 text-xs font-semibold text-slate-600 truncate">
+            <p className="mt-0.5 text-xs font-semibold text-slate-400 truncate">
               {item.title}
             </p>
           </button>
-          <p className={cx("mt-2 leading-relaxed text-slate-500", compact ? "text-[11px]" : "text-xs")}>{summary}</p>
+          <p className={cx("mt-2 leading-relaxed text-slate-500", compact ? "text-xs" : "text-xs")}>{summary}</p>
         </div>
       )}
       {superCompact && (
@@ -530,14 +530,14 @@ function KanbanCard({
       {!superCompact && (
         <div className={cx("mt-3 grid gap-2", compact ? "grid-cols-1" : "grid-cols-2")}>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Owner</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Owner</p>
             <p className="mt-1 text-xs font-bold text-slate-900 truncate">{item.ownerName ?? 'Não atribuído'}</p>
-            <p className="mt-0.5 text-[11px] text-slate-500 truncate">{item.ownerTeam}</p>
+            <p className="mt-0.5 text-xs text-slate-500 truncate">{item.ownerTeam}</p>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">SLA</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">SLA</p>
             <p className={cx("mt-1 text-xs font-bold", slaClasses[item.slaStatus])}>{item.slaText}</p>
-            <p className="mt-0.5 text-[11px] text-slate-500 truncate">{item.status}</p>
+            <p className="mt-0.5 text-xs text-slate-500 truncate">{item.status}</p>
           </div>
         </div>
       )}
@@ -545,8 +545,8 @@ function KanbanCard({
       {/* Next step */}
       {density !== 'compacta' && !superCompact && (
         <div className="mt-2.5 rounded-xl bg-white/60 p-2.5 border border-white/40">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próximo passo</p>
-          <p className="mt-1 text-xs leading-relaxed text-slate-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Próximo passo</p>
+          <p className="mt-1 text-xs leading-relaxed text-slate-400">
             {truncateText(item.nextStep, density === 'media' ? 80 : 120)}
           </p>
         </div>
@@ -557,7 +557,7 @@ function KanbanCard({
         <button
           type="button"
           onClick={() => onButtonAction(item, 'open')}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 cursor-pointer hover:bg-slate-50 transition-all"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-400 cursor-pointer hover:bg-slate-50 transition-all"
         >
           Ver
         </button>
@@ -620,7 +620,7 @@ function PlaybookCard({ template, potentialCount, onConfigure }: { template: Pla
         <div className="p-2.5 bg-white border border-slate-200 rounded-xl">
           <FolderKanban className="w-5 h-5 text-slate-700" />
         </div>
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-100 px-3 py-1 rounded-full">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-white border border-slate-100 px-3 py-1 rounded-full">
           {template.category}
         </span>
       </div>
@@ -630,7 +630,7 @@ function PlaybookCard({ template, potentialCount, onConfigure }: { template: Pla
       </div>
       <div className="mt-auto pt-4 border-t border-slate-200/60 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Oportunidade</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Oportunidade</p>
           <p className="text-xs font-bold text-slate-700">{potentialCount} {potentialCount === 1 ? 'conta' : 'contas'}</p>
         </div>
         <button 
@@ -672,7 +672,7 @@ function PlaybookActivationOverlay({
         <div className="border-bottom border-slate-200 p-10 bg-slate-50/50">
           <div className="flex items-start justify-between gap-10">
             <div>
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest py-1 px-3 border border-blue-100 bg-blue-50 rounded-full">Configurando Ativação</span>
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-widest py-1 px-3 border border-blue-100 bg-blue-50 rounded-full">Configurando Ativação</span>
               <h2 className="mt-6 text-4xl font-black text-slate-900 letter-spacing-[-0.03em]">{template.name}</h2>
               <p className="mt-4 text-base text-slate-500 font-medium max-w-xl">{template.objective}</p>
             </div>
@@ -690,7 +690,7 @@ function PlaybookActivationOverlay({
         <div className="flex-1 overflow-y-auto p-10 grid grid-cols-[1fr_320px] gap-10">
           <div className="space-y-8">
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Contas Elegíveis para este Playbook</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Contas Elegíveis para este Playbook</p>
               <div className="space-y-3">
                 {eligibleAccounts.map(acc => (
                   <div key={acc.id} className="flex items-center gap-5 p-5 rounded-2xl border border-slate-200 bg-slate-50/50">
@@ -708,12 +708,12 @@ function PlaybookActivationOverlay({
                     <div className="flex-1">
                       <p className="text-lg font-black text-slate-900">{acc.nome}</p>
                       <div className="flex items-center gap-3 mt-1">
-                         <span className="text-[10px] uppercase font-bold text-red-600 bg-red-50 py-0.5 px-2 rounded">Risco {acc.risco}%</span>
-                         <span className="text-[10px] uppercase font-bold text-amber-600 bg-amber-50 py-0.5 px-2 rounded">Renovação em 65 dias</span>
+                         <span className="text-xs uppercase font-bold text-red-600 bg-red-50 py-0.5 px-2 rounded">Risco {acc.risco}%</span>
+                         <span className="text-xs uppercase font-bold text-amber-600 bg-amber-50 py-0.5 px-2 rounded">Renovação em 65 dias</span>
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-[10px] font-bold text-slate-400 uppercase">Owner Sugerido</p>
+                       <p className="text-xs font-bold text-slate-400 uppercase">Owner Sugerido</p>
                        <p className="text-sm font-bold text-slate-700">{acc.ownerPrincipal}</p>
                     </div>
                   </div>
@@ -722,17 +722,17 @@ function PlaybookActivationOverlay({
             </div>
 
             <div>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Injeção Operacional (3 Ações)</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Injeção Operacional (3 Ações)</p>
               <div className="space-y-2">
                 {template.actions.map((act, idx) => (
                   <div key={idx} className="flex items-center justify-between p-4 rounded-xl border border-dashed border-slate-200 bg-white">
                     <div className="flex items-center gap-4">
-                      <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">{idx+1}</span>
+                      <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">{idx+1}</span>
                       <p className="text-sm font-bold text-slate-700">{act.title}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                       <span className="text-[10px] font-bold text-slate-400 uppercase">{act.channel}</span>
-                       <span className="text-[10px] font-bold text-slate-400 uppercase border border-slate-100 py-1 px-2 rounded">{act.priority}</span>
+                       <span className="text-xs font-bold text-slate-400 uppercase">{act.channel}</span>
+                       <span className="text-xs font-bold text-slate-400 uppercase border border-slate-100 py-1 px-2 rounded">{act.priority}</span>
                     </div>
                   </div>
                 ))}
@@ -743,7 +743,7 @@ function PlaybookActivationOverlay({
           <div className="flex flex-col gap-6">
             <div className="p-8 rounded-3xl bg-slate-900 text-white flex flex-col gap-6">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resumo da Ativação</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Resumo da Ativação</p>
                 <p className="mt-4 text-base font-medium leading-relaxed">
                    Ao ativar, o sistema injetará <span className="font-black text-blue-400">3 ações</span> diretamente na fila operacional para a conta selecionada.
                 </p>
@@ -880,14 +880,14 @@ function ActionOverlay({
           <div className="flex items-start justify-between gap-8">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap gap-2">
-                <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold border", priorityClasses[item.priority])}>{item.priority}</span>
-                <span className={cx("rounded-full px-2.5 py-1 text-[11px] font-bold", statusClasses[item.status])}>{item.status}</span>
-                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500 uppercase tracking-widest">{item.channel}</span>
-                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{item.category}</span>
+                <span className={cx("rounded-full px-2.5 py-1 text-xs font-bold border", priorityClasses[item.priority])}>{item.priority}</span>
+                <span className={cx("rounded-full px-2.5 py-1 text-xs font-bold", statusClasses[item.status])}>{item.status}</span>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-500 uppercase tracking-widest">{item.channel}</span>
+                <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-400 uppercase tracking-widest">{item.category}</span>
               </div>
               <p 
                 onClick={(e) => { e.stopPropagation(); openAccount(getAccountIdByName(item.accountName), undefined, { originModule: 'Ações' }); }}
-                className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-600 hover:text-blue-700 transition-colors cursor-pointer inline-block"
+                className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-blue-600 hover:text-blue-700 transition-colors cursor-pointer inline-block"
               >
                 {item.accountName}
               </p>
@@ -951,11 +951,11 @@ function ActionOverlay({
                 {/* Impact + Next step */}
                 <div className="grid lg:grid-cols-2 gap-4">
                   <div className="rounded-[28px] border border-slate-200 bg-slate-50/50 p-8 flex flex-col justify-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Impacto esperado</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Impacto esperado</p>
                     <p className="mt-4 text-3xl font-black tracking-tight leading-tight text-slate-900">{item.expectedImpact}</p>
                   </div>
                   <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Próximo passo</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Próximo passo</p>
                     <input 
                       type="text"
                       id="next-step-input"
@@ -981,17 +981,17 @@ function ActionOverlay({
               {/* Right sidebar */}
               <div className="flex flex-col gap-6">
                 <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Controle Operacional</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Controle Operacional</p>
                   <div className="flex flex-col gap-6">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wider">Lifecycle da Ação</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Lifecycle da Ação</p>
                       <div className="grid grid-cols-2 gap-2">
                         {statusOptions.map(st => (
                           <button
                             key={st}
                             onClick={() => onChangeStatus(item.id, st)}
                             className={cx(
-                              "text-[10px] font-bold py-2.5 px-1 rounded-xl border transition-all text-center",
+                              "text-xs font-bold py-2.5 px-1 rounded-xl border transition-all text-center",
                               item.status === st 
                                 ? "bg-slate-900 text-white border-slate-900" 
                                 : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
@@ -1004,7 +1004,7 @@ function ActionOverlay({
                     </div>
 
                     <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Atribuir Owner</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase mb-2 tracking-wider">Atribuir Owner</p>
                       <input 
                         type="text"
                         placeholder="Nome do responsável..."
@@ -1015,17 +1015,17 @@ function ActionOverlay({
                     </div>
 
                     <div className="pt-4 border-t border-slate-100">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-3 tracking-wider">Registrar Observação</p>
+                      <p className="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Registrar Observação</p>
                       <textarea 
                         rows={3}
                         value={commentDraft}
                         onChange={(e) => setCommentDraft(e.target.value)}
                         placeholder="Adicione um comentário ou atualização rápida..."
-                        className="w-full p-3 rounded-2xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-600 focus:ring-2 focus:ring-blue-100 outline-none resize-none"
+                        className="w-full p-3 rounded-2xl border border-slate-200 bg-slate-50 text-xs font-medium text-slate-400 focus:ring-2 focus:ring-blue-100 outline-none resize-none"
                       />
                       <button 
                         onClick={handlePostComment}
-                        className="w-full mt-3 py-3 bg-slate-100 text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-200 transition-colors"
+                        className="w-full mt-3 py-3 bg-slate-100 text-slate-900 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-200 transition-colors"
                       >
                         Salvar observação
                       </button>
@@ -1033,14 +1033,14 @@ function ActionOverlay({
                   </div>
                 </div>
                 <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Histórico recente</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-6">Histórico recente</p>
                   <div className="flex flex-col gap-6">
                     {item.history.slice(0, 4).map((entry) => (
                       <div key={entry.id} className="flex gap-4">
                         <span className={cx("w-2.5 h-2.5 rounded-full shrink-0 mt-1", historyDotClasses[entry.type])} />
                         <div>
                           <p className="text-sm font-bold text-slate-900 leading-tight">{entry.text}</p>
-                          <p className="mt-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">{entry.actor} · {entry.when}</p>
+                          <p className="mt-1.5 text-xs font-black uppercase tracking-widest text-slate-400">{entry.actor} · {entry.when}</p>
                         </div>
                       </div>
                     ))}
@@ -1055,7 +1055,7 @@ function ActionOverlay({
               <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Projeto operacional da ação</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Projeto operacional da ação</p>
                     <h3 className="mt-4 text-3xl font-black tracking-tight leading-tight text-slate-900">{item.projectObjective}</h3>
                     <p className="mt-3 text-sm font-bold text-slate-500">Critério de sucesso: {item.projectSuccess}</p>
                   </div>
@@ -1078,7 +1078,7 @@ function ActionOverlay({
               <div className="rounded-[32px] border border-slate-200 bg-white p-1 shadow-sm overflow-hidden scrollbar-hide">
                 <div className="min-w-[1200px] p-10">
                   {/* Gantt header */}
-                  <div className="grid grid-cols-[200px_350px_160px_1fr] gap-6 pb-6 border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  <div className="grid grid-cols-[200px_350px_160px_1fr] gap-6 pb-6 border-b border-slate-100 text-xs font-black uppercase tracking-widest text-slate-400">
                     <div>Fase</div><div>Entregável</div><div>Owner</div>
                     <div className={cx("grid gap-2", config.units === 8 ? "grid-cols-8" : config.units === 4 ? "grid-cols-4" : "grid-cols-3")}>
                       {config.labels.map((l) => <div key={l} className="text-center">{l}</div>)}
@@ -1097,7 +1097,7 @@ function ActionOverlay({
                             <p className="text-sm font-bold text-slate-900">{step.label}</p>
                             <p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{step.detail}</p>
                           </div>
-                          <p className="text-xs font-bold text-slate-600">{step.owner}</p>
+                          <p className="text-xs font-bold text-slate-400">{step.owner}</p>
                           <div className="relative h-12 rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden">
                             <div className={cx("absolute inset-0 grid", config.units === 8 ? "grid-cols-8" : config.units === 4 ? "grid-cols-4" : "grid-cols-3")}>
                               {config.labels.map((l) => <div key={l} className="border-l border-slate-200/50 first:border-none" />)}
@@ -1105,7 +1105,7 @@ function ActionOverlay({
                             <div 
                               style={{ left: `${left}%`, width: `${Math.max(width, 10)}%` } as React.CSSProperties}
                               className={cx(
-                                "absolute top-2 h-8 rounded-xl shadow-lg flex items-center px-4 text-[10px] font-black text-white uppercase tracking-widest transition-all",
+                                "absolute top-2 h-8 rounded-xl shadow-lg flex items-center px-4 text-xs font-black text-white uppercase tracking-widest transition-all",
                                 ganttBarClasses[step.status]
                               )}
                             >
@@ -1124,14 +1124,14 @@ function ActionOverlay({
           {tab === 'historico' && (
             <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8">
               <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-8">Histórico completo da ação</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-4 mb-8">Histórico completo da ação</p>
                 <div className="flex flex-col gap-8">
                   {item.history.map((entry) => (
                     <div key={entry.id} className="flex gap-6">
                       <span className={cx("w-5 h-5 rounded-full shrink-0 border-4 border-white shadow-sm ring-1 ring-slate-100 mt-0.5", historyDotClasses[entry.type])} />
                       <div>
                         <p className="text-base font-bold text-slate-900 leading-tight">{entry.text}</p>
-                        <p className="mt-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{entry.actor} · {entry.when} · {entry.type}</p>
+                        <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-slate-400">{entry.actor} · {entry.when} · {entry.type}</p>
                       </div>
                     </div>
                   ))}
@@ -1149,7 +1149,7 @@ function ActionOverlay({
               <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Narrativa operacional</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Narrativa operacional</p>
                     <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900">Trilha de resolução e aprendizados</h3>
                   </div>
                   <button
@@ -1165,7 +1165,7 @@ function ActionOverlay({
                 {editingNarrative ? (
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Trilha de resolução</label>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Trilha de resolução</label>
                       <textarea
                         value={resolutionPath}
                         onChange={(e) => setResolutionPath(e.target.value)}
@@ -1176,7 +1176,7 @@ function ActionOverlay({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Notas de execução</label>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Notas de execução</label>
                       <textarea
                         value={executionNotes}
                         onChange={(e) => setExecutionNotes(e.target.value)}
@@ -1187,7 +1187,7 @@ function ActionOverlay({
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Aprendizados</label>
+                      <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Aprendizados</label>
                       <textarea
                         value={learnings}
                         onChange={(e) => setLearnings(e.target.value)}
@@ -1198,7 +1198,7 @@ function ActionOverlay({
                     </div>
 
                     <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
-                      <div className="text-[11px] font-bold text-emerald-600">{narrativeStatus}</div>
+                      <div className="text-xs font-bold text-emerald-600">{narrativeStatus}</div>
                       <button
                         type="button"
                         onClick={handleUpdateNarrativas}
@@ -1216,19 +1216,19 @@ function ActionOverlay({
                       <>
                         {resolutionPath && (
                           <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Trilha</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Trilha</p>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{resolutionPath}</p>
                           </div>
                         )}
                         {executionNotes && (
                           <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Notas</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Notas</p>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{executionNotes}</p>
                           </div>
                         )}
                         {learnings && (
                           <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Aprendizados</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Aprendizados</p>
                             <p className="text-sm text-slate-700 leading-relaxed font-medium">{learnings}</p>
                           </div>
                         )}
@@ -1252,10 +1252,10 @@ const KpiCard = ({ label, value, color = "text-slate-900", trend, variant }: { l
     "p-5 rounded-3xl border transition-all",
     variant === 'highlight' ? "bg-slate-900 border-slate-800 shadow-xl" : "bg-white border-slate-200"
   )}>
-    <p className={cx("text-[10px] font-black uppercase tracking-widest", variant === 'highlight' ? "text-slate-500" : "text-slate-400")}>{label}</p>
+    <p className={cx("text-xs font-black uppercase tracking-widest", variant === 'highlight' ? "text-slate-500" : "text-slate-400")}>{label}</p>
     <div className="mt-3 flex items-baseline gap-2">
       <span className={cx("text-2xl font-black tracking-tight", variant === 'highlight' ? "text-white" : color)}>{value}</span>
-      {trend && <span className="text-[10px] font-bold text-slate-400">{trend}</span>}
+      {trend && <span className="text-xs font-bold text-slate-400">{trend}</span>}
     </div>
   </div>
 );
@@ -1635,11 +1635,11 @@ export const Actions: React.FC = () => {
 
           <div className="max-w-[680px]">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className="bg-white/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white/90 border border-white/5">Revenue Ops</span>
-                <span className="bg-emerald-500/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-300 border border-emerald-500/10">Sinais conectados</span>
-                <span className="bg-white/10 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white/70 border border-white/5">Projeto por ação</span>
+                <span className="bg-white/10 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white/90 border border-white/5">Revenue Ops</span>
+                <span className="bg-emerald-500/10 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-300 border border-emerald-500/10">Sinais conectados</span>
+                <span className="bg-white/10 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white/70 border border-white/5">Projeto por ação</span>
               </div>
-              <p className="text-[11px] font-bold tracking-[0.24em] uppercase text-white/40 mt-6">Canopi · Revenue Ops · Fila de ações</p>
+              <p className="text-xs font-bold tracking-[0.24em] uppercase text-white/40 mt-6">Canopi · Revenue Ops · Fila de ações</p>
               <h1 className="text-5xl font-black tracking-tight leading-[1.05] mt-4">Fila operacional de ações</h1>
               <p className="mt-5 text-[15px] leading-relaxed text-white/60 font-medium">
                 Orquestração de ações com contexto de conta, sinal, owner, SLA, histórico e fluxo operacional por ação. A leitura geral fica leve, e o detalhe profundo abre em overlay central quando a equipe precisa decidir e agir.
@@ -1655,10 +1655,10 @@ export const Actions: React.FC = () => {
             <MetricCard label="Envelhecidas" value={metrics.aged} helper="+48h sem entrega" icon={<Timer className="h-5 w-5 text-slate-400" />} />
             <MetricCard label="Sem owner" value={metrics.noOwner} helper="pedem atribuição" icon={<Users className="h-5 w-5" />} />
             <div className="bg-white/10 border border-white/10 rounded-[20px] p-4 flex flex-col justify-center backdrop-blur-md">
-              <div className="text-[10px] font-bold text-white/50 uppercase tracking-[0.16em] mb-2">Ranking Canal</div>
+              <div className="text-xs font-bold text-white/50 uppercase tracking-[0.16em] mb-2">Ranking Canal</div>
               <div className="space-y-1">
                 {metrics.channelRanking.map(([channel, count], i) => (
-                  <div key={channel} className="flex items-center justify-between text-[11px]">
+                  <div key={channel} className="flex items-center justify-between text-xs">
                     <span className="text-white/70 font-bold truncate pr-2 max-w-[80px]">{i+1}. {channel}</span>
                     <span className="text-white font-black">{count}</span>
                   </div>
@@ -1674,7 +1674,7 @@ export const Actions: React.FC = () => {
             <div className="flex items-center gap-3 px-2 mb-4">
                <Activity className="w-5 h-5 text-blue-500" />
                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insights Operacionais</h3>
-               <span className="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">DETECÇÃO ATIVA</span>
+               <span className="bg-blue-600 text-white text-xs font-black px-2 py-0.5 rounded-full">DETECÇÃO ATIVA</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {metrics.anomalies.map((ano) => (
@@ -1689,7 +1689,7 @@ export const Actions: React.FC = () => {
                      <TrendingUp className="w-5 h-5" />}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider transition-all">{ano.type}</p>
+                    <p className="text-xs font-black uppercase text-slate-400 tracking-wider transition-all">{ano.type}</p>
                     <h4 className="mt-1 text-sm font-black text-slate-900">{ano.title}</h4>
                     <p className="mt-1.5 text-xs text-slate-500 font-medium leading-relaxed">{ano.description}</p>
                   </div>
@@ -1705,7 +1705,7 @@ export const Actions: React.FC = () => {
             <div className="flex items-center gap-3 px-2 mb-4">
               <Target className="w-5 h-5 text-red-500" />
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Contas que Exigem Ação Agora</h3>
-              <span className="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full">TRIAGEM POR SCORE</span>
+              <span className="bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded-full">TRIAGEM POR SCORE</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {contasParaTriagem.map((x) => (
@@ -1733,11 +1733,11 @@ export const Actions: React.FC = () => {
                     </span>
                   </div>
                   <div className="space-y-1.5">
-                    <div className="text-[9px] text-slate-700 italic line-clamp-2">
+                    <div className="text-xs text-slate-700 italic line-clamp-2">
                       {deriveProximaMelhorAcao(x.conta, x.score)}
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-600">Score</span>
+                      <span className="text-xs font-bold text-slate-400">Score</span>
                       <span className="text-sm font-black text-slate-900">{x.score.scoreTotal}</span>
                     </div>
                   </div>
@@ -1747,7 +1747,7 @@ export const Actions: React.FC = () => {
                       openAccount(x.conta.id);
                     }}
                     className={cx(
-                      "w-full mt-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
+                      "w-full mt-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all",
                       isContaCritica(x.score)
                         ? "bg-red-200 text-red-700 hover:bg-red-300"
                         : "bg-amber-200 text-amber-700 hover:bg-amber-300"
@@ -1770,7 +1770,7 @@ export const Actions: React.FC = () => {
               </div>
               <button 
                 onClick={() => setIsLibraryOpen(!isLibraryOpen)}
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-white hover:text-slate-900 transition-all"
+                className="text-xs font-bold text-slate-400 uppercase tracking-widest border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-white hover:text-slate-900 transition-all"
               >
                 {isLibraryOpen ? 'Recolher Biblioteca' : 'Ver Biblioteca'}
               </button>
@@ -1793,7 +1793,7 @@ export const Actions: React.FC = () => {
                        <Plus className="w-5 h-5 text-slate-300" />
                     </div>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Novo Template</p>
-                    <p className="mt-1 text-[10px] text-slate-400">Em breve: Playbooks customizados</p>
+                    <p className="mt-1 text-xs text-slate-400">Em breve: Playbooks customizados</p>
                  </div>
               </div>
            )}
@@ -1823,7 +1823,7 @@ export const Actions: React.FC = () => {
                 <select
                   value={f.value}
                   onChange={(e) => (f.set as (v: string) => void)(e.target.value)}
-                  className="appearance-none rounded-xl border border-slate-200 bg-white pl-3.5 pr-9 py-2 text-xs font-bold text-slate-600 cursor-pointer outline-none shadow-sm hover:border-slate-300"
+                  className="appearance-none rounded-xl border border-slate-200 bg-white pl-3.5 pr-9 py-2 text-xs font-bold text-slate-400 cursor-pointer outline-none shadow-sm hover:border-slate-300"
                   aria-label={f.label}
                 >
                   {f.options.map((o) => <option key={o as string} value={o as string}>{o as string}</option>)}
@@ -1837,7 +1837,7 @@ export const Actions: React.FC = () => {
             {/* Density (for list view, discrete) */}
             {viewMode === 'Lista' && (
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Densidade</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-400">Densidade</span>
                 <div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1 gap-1">
                   {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
                     <button
@@ -1847,7 +1847,7 @@ export const Actions: React.FC = () => {
                       title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
                       aria-label={`Mudar densidade da lista para ${d}`}
                       className={cx(
-                        "rounded-lg px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-all border-none",
+                        "rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer transition-all border-none",
                         listDensity === d ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-400"
                       )}
                     >
@@ -1902,7 +1902,7 @@ export const Actions: React.FC = () => {
           <div className="mt-5 flex flex-col gap-3.5">
             {/* Density toggle for Kanban — right aligned, compact */}
             <div className="flex justify-end items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">Densidade</span>
+              <span className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Densidade</span>
               <div className="flex rounded-[10px] border border-slate-200 bg-slate-50 p-0.75 gap-0.5">
                 {(['super-compacta', 'compacta', 'media', 'expandida'] as CardDensity[]).map((d) => (
                   <button
@@ -1912,7 +1912,7 @@ export const Actions: React.FC = () => {
                     title={{ 'super-compacta': 'Só título, owner e tags', compacta: 'Visão resumida', media: 'Visão padrão', expandida: 'Visão completa' }[d]}
                     aria-label={`Mudar densidade do kanban para ${d}`}
                     className={cx(
-                      "rounded-[7px] p-[4px_9px] text-[11px] font-semibold cursor-pointer border-none transition-all",
+                      "rounded-[7px] p-[4px_9px] text-xs font-semibold cursor-pointer border-none transition-all",
                       kanbanDensity === d ? "bg-white text-slate-900 shadow-sm" : "bg-transparent text-slate-400"
                     )}
                   >
@@ -1936,7 +1936,7 @@ export const Actions: React.FC = () => {
                         <p className="text-[20px] font-black leading-tight tracking-tight text-slate-950">{status}</p>
                         <p className="mt-1 text-xs text-slate-500">{laneItems.length} ação(ões)</p>
                       </div>
-                      <span className={cx("rounded-full px-3 py-1 text-[11px] font-bold", statusClasses[status])}>{status}</span>
+                      <span className={cx("rounded-full px-3 py-1 text-xs font-bold", statusClasses[status])}>{status}</span>
                     </div>
 
                     <div className="mt-4 space-y-3">
@@ -1988,13 +1988,13 @@ export const Actions: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
 
-            <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest">Nova ação</p>
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">Nova ação</p>
             <h2 className="mt-1.5 text-2xl font-black tracking-tight text-slate-900">Criar ação na fila</h2>
             <p className="mt-1.5 text-sm text-slate-500 leading-relaxed font-medium">Preencha os campos abaixo para adicionar uma nova ação à fila operacional.</p>
 
             <div className="mt-7 flex flex-col gap-5">
               <div className="space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Conta *</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 px-1">Conta *</label>
                 <input
                   value={newActionForm.account}
                   onChange={(e) => setNewActionForm((f) => ({ ...f, account: e.target.value }))}
@@ -2003,7 +2003,7 @@ export const Actions: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Título da ação *</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 px-1">Título da ação *</label>
                 <input
                   value={newActionForm.title}
                   onChange={(e) => setNewActionForm((f) => ({ ...f, title: e.target.value }))}
@@ -2013,7 +2013,7 @@ export const Actions: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Owner</label>
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-400 px-1">Owner</label>
                   <input
                     value={newActionForm.owner}
                     onChange={(e) => setNewActionForm((f) => ({ ...f, owner: e.target.value }))}
@@ -2022,7 +2022,7 @@ export const Actions: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 px-1">Prioridade</label>
+                  <label className="block text-xs font-black uppercase tracking-widest text-slate-400 px-1">Prioridade</label>
                   <div className="relative">
                     <select
                       value={newActionForm.priority}
@@ -2044,7 +2044,7 @@ export const Actions: React.FC = () => {
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setShowNewAction(false)}
-                className="flex-1 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-600 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 border-none"
+                className="flex-1 rounded-2xl border border-slate-200 bg-white p-4 text-sm font-bold text-slate-400 cursor-pointer hover:bg-slate-50 transition-all active:scale-95 border-none"
               >
                 Cancelar
               </button>

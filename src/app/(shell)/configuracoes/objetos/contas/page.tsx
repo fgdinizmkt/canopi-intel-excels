@@ -123,7 +123,7 @@ export default function ContasHubPage() {
       title: '8. Governança', 
       desc: 'Audit Health e Histórico de Validação.', 
       icon: Search, 
-      color: 'text-slate-600', 
+      color: 'text-slate-400', 
       bg: 'bg-slate-50',
       slug: 'governanca-mapeamento'
     },
@@ -153,7 +153,7 @@ export default function ContasHubPage() {
         </div>
         <div className="p-6 bg-white border border-slate-200 rounded-3xl shadow-xl shadow-slate-100 flex items-center gap-6">
            <div className="text-right">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Prontidão do setup local</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Prontidão do setup local</p>
               <p className="text-xl font-black text-slate-900 uppercase tracking-tight">{readinessScore >= 100 ? 'Pronto para revisão local' : 'Setup local em progresso'}</p>
            </div>
            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${readinessScore >= 100 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
@@ -184,7 +184,7 @@ export default function ContasHubPage() {
                 <div className={`p-4 rounded-2xl ${section.bg} ${section.color} transition-all ${isLocked ? '' : 'group-hover:scale-110 group-hover:shadow-lg'} shadow-black/5`}>
                   <section.icon className="w-6 h-6" />
                 </div>
-                <Badge className={`${getStatusBadgeClass(step.status)} font-black text-[9px] uppercase tracking-widest border-none px-3 py-1`}>
+                <Badge className={`${getStatusBadgeClass(step.status)} font-black text-xs uppercase tracking-widest border-none px-3 py-1`}>
                   {getStatusLabel(step.status)}
                 </Badge>
               </div>
@@ -198,32 +198,32 @@ export default function ContasHubPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pré-requisito</p>
-                  <p className="text-xs text-slate-600 font-medium leading-relaxed">{step.prerequisite}</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Pré-requisito</p>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed">{step.prerequisite}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Impacto</p>
-                  <p className="text-xs text-slate-600 font-medium leading-relaxed">{step.impact}</p>
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Impacto</p>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed">{step.impact}</p>
                 </div>
 
                 {section.slug === 'fontes-conectores' && (
                   <div className="rounded-2xl border border-blue-100 bg-blue-50 p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-700">Escopo atual</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-blue-700">Escopo atual</p>
                     <p className="text-xs font-medium text-blue-900 mt-1">Define apenas fonte e contrato local. Não conecta CRM externo.</p>
                   </div>
                 )}
 
                 {section.slug === 'camada-canonica' && (
                   <div className="rounded-2xl border border-orange-100 bg-orange-50 p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-700">Escopo atual</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-orange-700">Escopo atual</p>
                     <p className="text-xs font-medium text-orange-900 mt-1">Revisa mapeamento local do schema. Não implica conexão real.</p>
                   </div>
                 )}
 
                 {section.slug === 'validacao-publicacao' && (
                   <div className="rounded-2xl border border-red-100 bg-red-50 p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-red-700">Escopo atual</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-red-700">Escopo atual</p>
                     <p className="text-xs font-medium text-red-900 mt-1">Valida apenas setup local e blockers. Não publica em produção.</p>
                   </div>
                 )}
@@ -232,7 +232,7 @@ export default function ContasHubPage() {
                   <div className="rounded-2xl border border-red-100 bg-red-50 p-4 space-y-2">
                     <div className="flex items-center gap-2 text-red-700">
                       <CircleAlert className="w-4 h-4" />
-                      <p className="text-[10px] font-black uppercase tracking-widest">Bloqueio ativo</p>
+                      <p className="text-xs font-black uppercase tracking-widest">Bloqueio ativo</p>
                     </div>
                     <p className="text-xs text-red-900 font-bold leading-relaxed">{visibleBlockers[0].message}</p>
                   </div>
@@ -240,7 +240,7 @@ export default function ContasHubPage() {
               </div>
 
               <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between transition-all">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
                   {isLocked ? 'Desbloqueie a etapa anterior' : 'Acessar Configuração'}
                 </span>
                 {isLocked ? (

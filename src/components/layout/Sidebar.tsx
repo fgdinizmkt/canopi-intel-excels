@@ -90,8 +90,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
             <span className="font-bold text-brand text-xl tracking-tight leading-none">Canopi</span>
             <div className="h-6 w-px bg-slate-200"></div>
             <div className="flex flex-col leading-none">
-              <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">intel</span>
-              <span className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">excels</span>
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">intel</span>
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">excels</span>
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
         </nav>
 
         <div className="mt-6 mb-2 px-3">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Canais</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Canais</p>
         </div>
         <nav className="space-y-0.5">
           {channelItems.map((item) => (
@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
         </nav>
 
         <div className="mt-6 mb-2 px-3">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estratégia</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Estratégia</p>
         </div>
         <nav className="space-y-0.5">
           {strategyItems.map((item) => (
@@ -145,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
         </nav>
 
         <div className="mt-6 mb-2 px-3">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Testes</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Testes</p>
         </div>
         <nav className="space-y-0.5">
           {[
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNewCampaign }) => {
           </button>
 
           <div className="bg-blue-600 text-white rounded-xl p-4 shadow-sm w-full relative overflow-hidden">
-            <h4 className="text-[10px] font-bold text-blue-100 mb-1 leading-tight">Status do Pipeline</h4>
+            <h4 className="text-xs font-bold text-blue-100 mb-1 leading-tight">Status do Pipeline</h4>
             <p className="text-xl font-bold mb-3 tracking-tight">R$ 2.4M</p>
             <div className="w-full bg-blue-500/50 rounded-full h-1.5 overflow-hidden flex">
               <div className="bg-white h-full w-[65%] rounded-full"></div>

@@ -756,15 +756,15 @@ const ConfigStage1: React.FC = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4 rounded-2xl">
-          <p className="text-xs font-bold text-slate-600 uppercase mb-1">Entidades Configuradas</p>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Entidades Configuradas</p>
           <p className="text-3xl font-black text-emerald-600">{entities.filter(e => e.status === 'configured').length}</p>
         </Card>
         <Card className="p-4 rounded-2xl">
-          <p className="text-xs font-bold text-slate-600 uppercase mb-1">Campos Totais</p>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Campos Totais</p>
           <p className="text-3xl font-black text-blue-600">{entities.reduce((sum, e) => sum + e.fieldCount + e.customFieldCount, 0)}</p>
         </Card>
         <Card className="p-4 rounded-2xl">
-          <p className="text-xs font-bold text-slate-600 uppercase mb-1">Status Global</p>
+          <p className="text-xs font-bold text-slate-400 uppercase mb-1">Status Global</p>
           <p className="text-lg font-black text-slate-900 capitalize">{publishStatus.replace('_', ' ')}</p>
         </Card>
       </div>
@@ -779,7 +779,7 @@ const ConfigStage1: React.FC = () => {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   <div className="mt-1">
-                    <Icon className="w-6 h-6 text-slate-600" />
+                    <Icon className="w-6 h-6 text-slate-400" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -791,7 +791,7 @@ const ConfigStage1: React.FC = () => {
                         <Badge className="bg-amber-100 text-amber-700 animate-pulse">Alterações Pendentes</Badge>
                       )}
                     </div>
-                    <p className="text-sm text-slate-600">{entity.description}</p>
+                    <p className="text-sm text-slate-400">{entity.description}</p>
                     <p className="text-xs text-slate-500 mt-2">
                       {entity.fieldCount} base + {entity.customFieldCount} extra • Fonte: <span className="font-bold">{entity.sourceOfTruth}</span> • Modificado: {entity.lastModified}
                     </p>
@@ -835,15 +835,15 @@ const ConfigStage1: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <div>
-                  <p className="text-xs font-bold text-slate-600">Política de Conflito</p>
+                  <p className="text-xs font-bold text-slate-400">Política de Conflito</p>
                   <p className="text-slate-900 capitalize">{config.conflictPolicy.replace('_', ' ')}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-600">Sync</p>
+                  <p className="text-xs font-bold text-slate-400">Sync</p>
                   <p className="text-slate-900">{config.syncFreq}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-600">Fallback</p>
+                  <p className="text-xs font-bold text-slate-400">Fallback</p>
                   <p className="text-slate-900">{config.fallback}</p>
                 </div>
               </div>
@@ -878,7 +878,7 @@ const ConfigStage1: React.FC = () => {
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">{stage.order}</div>
                     <div>
                       <p className="font-bold text-slate-900">{stage.name}</p>
-                      <p className="text-xs text-slate-600">Critério: {stage.criteria}</p>
+                      <p className="text-xs text-slate-400">Critério: {stage.criteria}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -891,13 +891,13 @@ const ConfigStage1: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 ml-11">
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-400 ml-11">
                   <span><strong>Owner:</strong> {stage.owner}</span>
                   <span><strong>Duração:</strong> {stage.duration}</span>
                 </div>
                 {stage.lossReasons && stage.lossReasons.length > 0 && (
                   <div className="mt-3 ml-11 flex flex-wrap gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 w-full mb-1 uppercase">Motivos de Perda/Desqualificação:</span>
+                    <span className="text-xs font-bold text-slate-500 w-full mb-1 uppercase">Motivos de Perda/Desqualificação:</span>
                     {stage.lossReasons.map(r => (
                       <Badge key={r} className="bg-slate-50 text-slate-500 border border-slate-200">{r}</Badge>
                     ))}
@@ -974,9 +974,9 @@ const ConfigStage1: React.FC = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-slate-900">{role.name}</p>
-                  <Badge className="bg-slate-100 text-slate-600 border border-slate-200 uppercase text-[10px]">{role.roleType.replace('_', ' ')}</Badge>
+                  <Badge className="bg-slate-100 text-slate-400 border border-slate-200 uppercase text-xs">{role.roleType.replace('_', ' ')}</Badge>
                 </div>
-                <p className="text-sm text-slate-600 mt-1">Senioridade: {role.seniority} • Prioridade: {role.priority}</p>
+                <p className="text-sm text-slate-400 mt-1">Senioridade: {role.seniority} • Prioridade: {role.priority}</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -1022,7 +1022,7 @@ const ConfigStage1: React.FC = () => {
                           <Badge className="bg-amber-100 text-amber-700">Fuzzy Match</Badge>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-1">Prioridade: {rule.priority} • Resolução: <span className="font-bold capitalize">{rule.conflictResolution}</span></p>
+                      <p className="text-xs text-slate-400 mt-1">Prioridade: {rule.priority} • Resolução: <span className="font-bold capitalize">{rule.conflictResolution}</span></p>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
@@ -1079,7 +1079,7 @@ const ConfigStage1: React.FC = () => {
           ].map((type) => (
             <div key={type.id} className="p-4 border border-slate-200 rounded-xl bg-slate-50">
               <p className="font-bold text-slate-900">{type.name}</p>
-              <p className="text-xs text-slate-600 mt-1">{type.desc}</p>
+              <p className="text-xs text-slate-400 mt-1">{type.desc}</p>
             </div>
           ))}
         </div>
@@ -1096,11 +1096,11 @@ const ConfigStage1: React.FC = () => {
             <div key={group.parent} className="p-4 border border-slate-200 rounded-xl bg-white hover:border-blue-300 transition-all">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-bold text-slate-900">{group.parent}</p>
-                <Badge className="bg-blue-50 text-blue-600 text-[10px]">{group.type}</Badge>
+                <Badge className="bg-blue-50 text-blue-600 text-xs">{group.type}</Badge>
               </div>
               <div className="flex flex-wrap gap-2">
                 {group.children.map((child) => (
-                  <Badge key={child} className="bg-slate-50 text-slate-600 border border-slate-200 cursor-default">{child}</Badge>
+                  <Badge key={child} className="bg-slate-50 text-slate-400 border border-slate-200 cursor-default">{child}</Badge>
                 ))}
               </div>
             </div>
@@ -1128,12 +1128,12 @@ const ConfigStage1: React.FC = () => {
                   <Badge className={`bg-${statusColor}-100 text-${statusColor}-700 capitalize`}>{source.status}</Badge>
                 </div>
                 <div className="space-y-2 mb-4 text-xs">
-                  <p className="text-slate-600 font-medium">Conta: <span className="text-slate-900">{source.accountName}</span></p>
-                  <p className="text-slate-600">Escopo: <span className="text-slate-900">{source.scope.join(', ')}</span></p>
-                  <p className="text-slate-600 italic">Impacto: {source.impact}</p>
+                  <p className="text-slate-400 font-medium">Conta: <span className="text-slate-900">{source.accountName}</span></p>
+                  <p className="text-slate-400">Escopo: <span className="text-slate-900">{source.scope.join(', ')}</span></p>
+                  <p className="text-slate-400 italic">Impacto: {source.impact}</p>
                 </div>
                 <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{source.syncFreq} Sync</span>
+                  <span className="text-xs text-slate-400 uppercase font-black tracking-widest">{source.syncFreq} Sync</span>
                   <button
                     onClick={() => setDrawer({ type: 'media', id: source.id })}
                     className="text-xs font-bold text-blue-600 hover:underline"
@@ -1179,7 +1179,7 @@ const ConfigStage1: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 {event.usage.map(u => (
-                  <Badge key={u} className="bg-blue-50 text-blue-600 border border-blue-100 text-[9px] uppercase">{u}</Badge>
+                  <Badge key={u} className="bg-blue-50 text-blue-600 border border-blue-100 text-xs uppercase">{u}</Badge>
                 ))}
                 <button className="p-2 hover:bg-slate-100 rounded-lg ml-2" title={`Editar ${event.name}`}><Edit2 className="w-4 h-4 text-slate-400" /></button>
               </div>
@@ -1203,16 +1203,16 @@ const ConfigStage1: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] font-bold text-slate-500 uppercase">Janela</p>
+                <p className="text-xs font-bold text-slate-500 uppercase">Janela</p>
                 <p className="font-bold text-slate-900">{attribution.window} dias</p>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="text-[10px] font-bold text-slate-500 uppercase">Prioridade</p>
+                <p className="text-xs font-bold text-slate-500 uppercase">Prioridade</p>
                 <p className="font-bold text-slate-900 uppercase tracking-tighter">{attribution.priorities[0]} Wins</p>
               </div>
             </div>
             <div className="pt-4 border-t border-slate-100">
-              <p className="text-xs font-bold text-slate-600 mb-2 uppercase">Hierarquia de Conflito</p>
+              <p className="text-xs font-bold text-slate-400 mb-2 uppercase">Hierarquia de Conflito</p>
               <p className="text-sm font-medium text-slate-700 italic">&quot;Se GA4 e CRM divergirem, {attribution.conflictPolicy.replace(/_/g, ' ')}&quot;</p>
             </div>
           </div>
@@ -1225,11 +1225,11 @@ const ConfigStage1: React.FC = () => {
               <div key={rule.id} className="p-3 border border-slate-100 rounded-xl bg-slate-50 relative group">
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-slate-900 text-sm">{rule.field}</p>
-                  {rule.mandatory && <Badge className="bg-red-50 text-red-600 text-[9px]">Mandatory</Badge>}
+                  {rule.mandatory && <Badge className="bg-red-50 text-red-600 text-xs">Mandatory</Badge>}
                 </div>
-                <code className="text-[10px] text-blue-600 block bg-blue-50/50 p-1 rounded font-mono truncate">{rule.pattern}</code>
+                <code className="text-xs text-blue-600 block bg-blue-50/50 p-1 rounded font-mono truncate">{rule.pattern}</code>
                 {rule.canopiFlag && (
-                  <Badge className="absolute -top-2 -right-2 bg-blue-600 text-white text-[8px] uppercase tracking-widest">{rule.canopiFlag}</Badge>
+                  <Badge className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs uppercase tracking-widest">{rule.canopiFlag}</Badge>
                 )}
               </div>
             ))}
@@ -1250,13 +1250,13 @@ const ConfigStage1: React.FC = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <p className="font-black text-slate-900 uppercase tracking-tight">{sync.platform}</p>
-                  <Badge className="bg-slate-100 text-slate-600 text-[10px]">{sync.audienceType}</Badge>
+                  <Badge className="bg-slate-100 text-slate-400 text-xs">{sync.audienceType}</Badge>
                 </div>
-                <p className="text-xs text-slate-600 mt-1">Regra: <span className="font-mono text-blue-600">{sync.syncRule}</span></p>
+                <p className="text-xs text-slate-400 mt-1">Regra: <span className="font-mono text-blue-600">{sync.syncRule}</span></p>
               </div>
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-slate-400">REFRESH</p>
+                  <p className="text-xs font-bold text-slate-400">REFRESH</p>
                   <p className="text-xs font-black text-slate-700">{sync.refreshFreq}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1294,7 +1294,7 @@ const ConfigStage1: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-4">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase">Attention Threshold</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase">Attention Threshold</p>
                     <p className="font-black text-slate-900">&gt; {rule.threshold}</p>
                   </div>
                   <div className={`w-10 h-5 rounded-full relative transition-all ${rule.active ? 'bg-blue-600' : 'bg-slate-300'}`}>
@@ -1306,15 +1306,15 @@ const ConfigStage1: React.FC = () => {
                 {rule.components.map((comp, idx) => (
                   <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-black text-slate-500 uppercase">{comp.name}</span>
-                      <span className="text-[10px] font-bold text-blue-600">{comp.weight}%</span>
+                      <span className="text-xs font-black text-slate-500 uppercase">{comp.name}</span>
+                      <span className="text-xs font-bold text-blue-600">{comp.weight}%</span>
                     </div>
                     <p className="text-xs text-slate-900 font-medium truncate">Source: {comp.source}</p>
                   </div>
                 ))}
               </div>
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <p className="text-xs text-slate-600 italic">Impacto: {rule.impact}</p>
+                <p className="text-xs text-slate-400 italic">Impacto: {rule.impact}</p>
                 <button 
                   onClick={() => {
                     const newVal = prompt(`Novo threshold para ${rule.name}:`, rule.threshold.toString());
@@ -1354,23 +1354,23 @@ const ConfigStage1: React.FC = () => {
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <p className="font-black text-slate-900">{config.name}</p>
-                    <Badge className="bg-slate-100 text-slate-600 text-[9px] uppercase tracking-tighter">{config.category}</Badge>
+                    <Badge className="bg-slate-100 text-slate-400 text-xs uppercase tracking-tighter">{config.category}</Badge>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
                     <div className="text-right">
-                      <p className="text-[9px] font-bold text-slate-400">SLA</p>
+                      <p className="text-xs font-bold text-slate-400">SLA</p>
                       <p className="font-black text-slate-700">{config.slaHours}h</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[9px] font-bold text-slate-400">COOLDOWN</p>
+                      <p className="text-xs font-bold text-slate-400">COOLDOWN</p>
                       <p className="font-black text-slate-700">{config.cooldownDays}d</p>
                     </div>
                   </div>
                 </div>
                 <div className="bg-slate-50 p-2 rounded border border-slate-100 mb-2">
-                  <code className="text-[10px] text-blue-700 font-mono">{config.triggerCondition}</code>
+                  <code className="text-xs text-blue-700 font-mono">{config.triggerCondition}</code>
                 </div>
-                <div className="flex items-center justify-between text-[10px]">
+                <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 font-bold">FONTES: {config.sourceDependency.join(', ')}</span>
                     <span className="text-slate-500">•</span>
@@ -1411,11 +1411,11 @@ const ConfigStage1: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Prioridade</th>
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Critério de Gatilho</th>
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Destino (Fila/Owner)</th>
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">SLA Vazão</th>
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Fallback</th>
+                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Prioridade</th>
+                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Critério de Gatilho</th>
+                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Destino (Fila/Owner)</th>
+                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">SLA Vazão</th>
+                <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Fallback</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -1423,13 +1423,13 @@ const ConfigStage1: React.FC = () => {
               {routingRules.sort((a,b) => a.priority - b.priority).map((rule) => (
                 <tr key={rule.id} className="hover:bg-blue-50/30 transition-all group">
                   <td className="px-4 py-4">
-                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-600">
+                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400">
                       {rule.priority}
                     </div>
                   </td>
                   <td className="px-4 py-4">
                     <p className="text-sm font-bold text-slate-900">{rule.name}</p>
-                    <code className="text-[10px] text-blue-600">{rule.criteria}</code>
+                    <code className="text-xs text-blue-600">{rule.criteria}</code>
                   </td>
                   <td className="px-4 py-4">
                     <Badge className="bg-blue-100 text-blue-700 font-bold border-none">{rule.target}</Badge>
@@ -1465,16 +1465,16 @@ const ConfigStage1: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                     play.category === 'Acquisition' ? 'bg-emerald-100 text-emerald-600' :
-                    play.category === 'Expansion' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'
+                    play.category === 'Expansion' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'
                   }`}>
                     <PlayCircle className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-black text-slate-900">{play.name}</p>
-                      <Badge className={`text-[9px] uppercase tracking-tighter ${
+                      <Badge className={`text-xs uppercase tracking-tighter ${
                         play.priority === 'critical' ? 'bg-red-100 text-red-600' :
-                        play.priority === 'high' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-600'
+                        play.priority === 'high' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-400'
                       }`}>{play.priority}</Badge>
                     </div>
                     <p className="text-xs text-slate-500">{play.type} • {play.suggestedChannel}</p>
@@ -1487,22 +1487,22 @@ const ConfigStage1: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="p-2 bg-slate-50 rounded border border-slate-100">
-                  <p className="text-[9px] font-black text-slate-400 uppercase">Estágio Ativação</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Estágio Ativação</p>
                   <p className="text-xs font-bold text-slate-700">{play.activationStage}</p>
                 </div>
                 <div className="p-2 bg-slate-50 rounded border border-slate-100">
-                  <p className="text-[9px] font-black text-slate-400 uppercase">Owner Padrão</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Owner Padrão</p>
                   <p className="text-xs font-bold text-slate-700">{play.defaultOwner}</p>
                 </div>
                 <div className="p-2 bg-slate-50 rounded border border-slate-100">
-                  <p className="text-[9px] font-black text-slate-400 uppercase">Sucesso</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Sucesso</p>
                   <p className="text-xs font-bold text-slate-700 truncate">{play.successCriteria}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div className="flex gap-2">
                   {play.preConditions.map((cond, idx) => (
-                    <span key={idx} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded font-medium">{cond}</span>
+                    <span key={idx} className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded font-medium">{cond}</span>
                   ))}
                 </div>
                 <button className="text-xs font-bold text-blue-600 group-hover:underline">Editar Play</button>
@@ -1522,23 +1522,23 @@ const ConfigStage1: React.FC = () => {
           <h3 className="font-black text-slate-900 mb-4">Ideal Customer Profile (ICP)</h3>
           <div className="space-y-4">
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Verticals & Segments</p>
+              <p className="text-xs font-black text-slate-400 uppercase mb-2">Verticals & Segments</p>
               <div className="flex flex-wrap gap-2">
                 {abmConfig.icp.verticals.map(v => <Badge key={v} className="bg-white text-slate-700 border-slate-200">{v}</Badge>)}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Revenue Min</p>
+                <p className="text-xs font-black text-slate-400 uppercase mb-1">Revenue Min</p>
                 <p className="font-black text-slate-900 leading-none">${(abmConfig.icp.revenueMin/1000000).toFixed(0)}M+</p>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Employee Range</p>
+                <p className="text-xs font-black text-slate-400 uppercase mb-1">Employee Range</p>
                 <p className="text-xs font-bold text-slate-900">{abmConfig.icp.employeeRange.join(', ')}</p>
               </div>
             </div>
             <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-              <p className="text-[10px] font-black text-blue-600 uppercase mb-2">Technographics Match</p>
+              <p className="text-xs font-black text-blue-600 uppercase mb-2">Technographics Match</p>
               <div className="flex flex-wrap gap-2">
                 {abmConfig.icp.technographics.map(t => <Badge key={t} className="bg-blue-600 text-white border-none">{t}</Badge>)}
               </div>
@@ -1553,11 +1553,11 @@ const ConfigStage1: React.FC = () => {
               <div key={tier.id} className="p-4 border border-slate-200 rounded-xl bg-white hover:border-blue-300 transition-all">
                 <div className="flex justify-between items-start mb-2">
                   <p className="font-black text-slate-900 text-sm">{tier.label}</p>
-                  <p className="text-[10px] font-bold text-blue-600 uppercase">Min Coverage: {tier.minCoverage}%</p>
+                  <p className="text-xs font-bold text-blue-600 uppercase">Min Coverage: {tier.minCoverage}%</p>
                 </div>
-                <code className="text-[10px] text-slate-500 block mb-3">{tier.criteria}</code>
+                <code className="text-xs text-slate-500 block mb-3">{tier.criteria}</code>
                 <div className="flex flex-wrap gap-1">
-                  {tier.playbooks.map(p => <Badge key={p} className="bg-slate-100 text-slate-600 text-[9px] uppercase">{p}</Badge>)}
+                  {tier.playbooks.map(p => <Badge key={p} className="bg-slate-100 text-slate-400 text-xs uppercase">{p}</Badge>)}
                 </div>
               </div>
             ))}
@@ -1572,7 +1572,7 @@ const ConfigStage1: React.FC = () => {
             <div key={clu.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
               <div>
                 <p className="text-sm font-black text-slate-900">{clu.name}</p>
-                <code className="text-[10px] text-blue-600">{clu.logic}</code>
+                <code className="text-xs text-blue-600">{clu.logic}</code>
               </div>
               <button title="Editar Cluster" className="p-2 hover:bg-white rounded-lg transition-all shadow-sm border border-transparent hover:border-slate-200">
                 <Edit2 className="w-4 h-4 text-slate-400" />
@@ -1595,8 +1595,8 @@ const ConfigStage1: React.FC = () => {
               <div key={idx} className="flex items-center gap-4 group">
                 <div className="p-3 border border-slate-200 rounded-xl bg-white flex-1 hover:border-blue-400 transition-all group-hover:shadow-sm">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">EVENT TRIGGER</p>
-                    <Badge className="bg-blue-50 text-blue-600 border-none text-[9px]">{rule.handoff}</Badge>
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">EVENT TRIGGER</p>
+                    <Badge className="bg-blue-50 text-blue-600 border-none text-xs">{rule.handoff}</Badge>
                   </div>
                   <p className="font-bold text-slate-900 mb-2">{rule.event}</p>
                   <div className="flex items-center gap-2 text-xs font-black text-blue-600">
@@ -1622,7 +1622,7 @@ const ConfigStage1: React.FC = () => {
               </div>
             ))}
             <div className="mt-6 pt-6 border-t border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase mb-3">Governance Logic</p>
+              <p className="text-xs font-black text-slate-400 uppercase mb-3">Governance Logic</p>
               <div className="space-y-3 text-xs">
                 <div>
                   <p className="text-slate-500 mb-1">Sponsor Recognition</p>
@@ -1644,14 +1644,14 @@ const ConfigStage1: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-xl">
               <div>
-                <p className="text-[10px] font-black text-red-600 uppercase mb-1">Stagnation Alert</p>
+                <p className="text-xs font-black text-red-600 uppercase mb-1">Stagnation Alert</p>
                 <p className="text-sm font-bold text-red-900">After {abxConfig.stagnationRiskDays} days without Interaction</p>
               </div>
               <Zap className="w-5 h-5 text-red-500" />
             </div>
             <div className="flex items-center justify-between p-3 bg-orange-50 border border-orange-100 rounded-xl">
               <div>
-                <p className="text-[10px] font-black text-orange-600 uppercase mb-1">Multi-threading Trigger</p>
+                <p className="text-xs font-black text-orange-600 uppercase mb-1">Multi-threading Trigger</p>
                 <p className="text-sm font-bold text-orange-900">{abxConfig.multiThreadingTrigger}</p>
               </div>
               <Users className="w-5 h-5 text-orange-500" />
@@ -1664,7 +1664,7 @@ const ConfigStage1: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             {abxConfig.journeyStages.map((stage, idx) => (
               <div key={stage} className="flex items-center gap-2">
-                <Badge className="bg-slate-100 text-slate-600 border-none font-bold py-1 px-3">
+                <Badge className="bg-slate-100 text-slate-400 border-none font-bold py-1 px-3">
                   {idx + 1}. {stage}
                 </Badge>
                 {idx < abxConfig.journeyStages.length - 1 && <ChevronRight className="w-3 h-3 text-slate-300" />}
@@ -1698,16 +1698,16 @@ const ConfigStage1: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-[10px]">{insight.confidenceScore}% Trust</Badge>
-                  <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold">Scope: {insight.scope}</p>
+                  <Badge className="bg-emerald-50 text-emerald-600 border-none font-black text-xs">{insight.confidenceScore}% Trust</Badge>
+                  <p className="text-xs text-slate-400 mt-1 uppercase font-bold">Scope: {insight.scope}</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-600 mb-4">{insight.description}</p>
+              <p className="text-sm text-slate-400 mb-4">{insight.description}</p>
               <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    <span className="text-xs font-bold text-slate-600">Validade: {insight.validityDays}d</span>
+                    <span className="text-xs font-bold text-slate-400">Validade: {insight.validityDays}d</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className="capitalize">{insight.status}</Badge>
@@ -1730,10 +1730,10 @@ const ConfigStage1: React.FC = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Learning / Recommendation</th>
-              <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Context Map</th>
-              <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Confidence</th>
-              <th className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase">Status</th>
+              <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Learning / Recommendation</th>
+              <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Context Map</th>
+              <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Confidence</th>
+              <th className="px-4 py-3 text-xs font-black text-slate-400 uppercase">Status</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
@@ -1745,7 +1745,7 @@ const ConfigStage1: React.FC = () => {
                   <p className="text-xs text-blue-600 font-medium italic">{lrn.recommendation}</p>
                 </td>
                 <td className="px-4 py-4">
-                  <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase">
+                  <div className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase">
                     <span>{lrn.originContext}</span>
                     <ChevronRight className="w-3 h-3" />
                     <span className="text-blue-600">{lrn.destinationContext}</span>
@@ -1753,7 +1753,7 @@ const ConfigStage1: React.FC = () => {
                 </td>
                 <td className="px-4 py-4">
                   <Badge className={`${
-                    lrn.confidenceLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                    lrn.confidenceLevel === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'
                   }`}>{lrn.confidenceLevel}</Badge>
                 </td>
                 <td className="px-4 py-4">
@@ -1815,7 +1815,7 @@ const ConfigStage1: React.FC = () => {
                 <div key={idx} className="relative">
                   <div className="absolute -left-[31px] top-1 w-2 h-2 rounded-full bg-slate-300 border-4 border-white ring-1 ring-slate-100" />
                   <p className="text-sm font-black text-slate-800 leading-none mb-1">{log.event}</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">{log.date} • {log.author}</p>
+                  <p className="text-xs text-slate-400 font-bold uppercase">{log.date} • {log.author}</p>
                 </div>
               ))}
             </div>
@@ -1838,8 +1838,8 @@ const ConfigStage1: React.FC = () => {
                 <div className="flex gap-2 mt-2">
                   {prof.domains.map(dom => (
                     <div key={dom.name} className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-100 rounded">
-                      <span className="text-[9px] font-black text-slate-400 uppercase">{dom.name}:</span>
-                      <span className={`text-[9px] font-black uppercase ${
+                      <span className="text-xs font-black text-slate-400 uppercase">{dom.name}:</span>
+                      <span className={`text-xs font-black uppercase ${
                         dom.level === 'admin' ? 'text-red-500' :
                         dom.level === 'publish' ? 'text-blue-500' : 'text-slate-500'
                       }`}>{dom.level}</span>
@@ -1930,12 +1930,12 @@ const ConfigStage1: React.FC = () => {
           {isDirty && (
             <div className="flex items-center gap-2 px-3 py-1 bg-amber-50 rounded-lg border border-amber-200">
               <AlertCircle className="w-3 h-3 text-amber-600" />
-              <span className="text-[10px] font-bold text-amber-700 uppercase">Alterações Pendentes</span>
+              <span className="text-xs font-bold text-amber-700 uppercase">Alterações Pendentes</span>
             </div>
           )}
           <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
             <div className={`w-2 h-2 rounded-full ${publishStatus === 'published' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-            <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">
               Status: {publishStatus.replace('_', ' ')} • v{version}
             </span>
           </div>
@@ -1966,7 +1966,7 @@ const ConfigStage1: React.FC = () => {
         {/* Fixed Sidebar Navigation */}
         <aside className="w-72 bg-white border-r border-slate-200 flex flex-col overflow-y-auto shrink-0 no-scrollbar">
           <div className="p-4 space-y-1">
-            <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Módulos de Configuração</p>
+            <p className="px-4 text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Módulos de Configuração</p>
             {macroBlocks.map((macro) => {
               const isActive = currentMacro.id === macro.id;
               const Icon = macro.icon;
@@ -1982,7 +1982,7 @@ const ConfigStage1: React.FC = () => {
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                       isActive 
                         ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' 
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent'
+                        : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900 border-l-4 border-transparent'
                     }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
@@ -2017,11 +2017,11 @@ const ConfigStage1: React.FC = () => {
                 <Settings className="w-4 h-4 text-indigo-600" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-900 leading-none">Configurações</p>
-                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-tighter">Parâmetros da operação</p>
+                <p className="text-xs font-black text-slate-900 leading-none">Configurações</p>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-tighter">Parâmetros da operação</p>
               </div>
             </div>
-            <p className="text-[9px] text-slate-400 leading-relaxed font-medium">
+            <p className="text-xs text-slate-400 leading-relaxed font-medium">
               Ajuste entidades, fontes e regras operacionais conforme o contexto da sua operação.
             </p>
           </div>
@@ -2064,7 +2064,7 @@ const ConfigStage1: React.FC = () => {
                   <p className="text-sm font-bold uppercase tracking-widest">Carregando Parametrização Real...</p>
                   <Link
                     href="/configuracoes/objetos-crm"
-                    className="mt-4 inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all"
+                    className="mt-4 inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-xs font-black uppercase tracking-widest text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all"
                   >
                     Abrir Hub de CRM e Dados
                   </Link>
@@ -2075,7 +2075,7 @@ const ConfigStage1: React.FC = () => {
                     <div className="flex items-center justify-between mb-1">
                       <h2 className="text-xs font-black text-blue-600 uppercase tracking-widest">{currentMacro.label}</h2>
                       {lastSaved && (
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">
                           Último salvamento: {new Date(lastSaved).toLocaleString()}
                         </span>
                       )}

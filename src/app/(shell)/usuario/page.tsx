@@ -148,7 +148,7 @@ function SectionLabel({ icon: Icon, label }: { icon: React.ElementType; label: s
 function Field({ label, value, mono = false }: { label: string; value: React.ReactNode; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">{label}</p>
       <p className={`text-sm font-semibold text-slate-800 ${mono ? 'font-mono' : ''}`}>{value}</p>
     </div>
   );
@@ -159,10 +159,10 @@ function StatusPill({ label, variant }: { label: string; variant: 'green' | 'blu
     green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     blue: 'bg-brand/10 text-brand border-brand/20',
     amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    slate: 'bg-slate-100 text-slate-600 border-slate-200',
+    slate: 'bg-slate-100 text-slate-400 border-slate-200',
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${styles[variant]}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${styles[variant]}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${variant === 'green' ? 'bg-emerald-500' : variant === 'blue' ? 'bg-brand' : variant === 'amber' ? 'bg-amber-500' : 'bg-slate-400'}`} />
       {label}
     </span>
@@ -204,7 +204,7 @@ function InputField({
 }: { label: string; value: string; type?: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-1.5">{label}</label>
+      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1.5">{label}</label>
       <input
         type={type}
         value={value}
@@ -232,7 +232,7 @@ function getVendorIcon(id: string) {
 function getStatusDisplay(status: string) {
   const statusMap: Record<string, { label: string; bgColor: string; textColor: string; icon: React.ReactNode }> = {
     'conectado': { label: 'Conta Conectada', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700', icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-    'nao-conectado': { label: 'Não Conectado', bgColor: 'bg-slate-100', textColor: 'text-slate-600', icon: <Circle className="w-3.5 h-3.5" /> },
+    'nao-conectado': { label: 'Não Conectado', bgColor: 'bg-slate-100', textColor: 'text-slate-400', icon: <Circle className="w-3.5 h-3.5" /> },
     'aguardando': { label: 'Aguardando Autenticação', bgColor: 'bg-blue-50', textColor: 'text-blue-600', icon: <AlertCircle className="w-3.5 h-3.5" /> },
     'erro': { label: 'Erro de Conexão', bgColor: 'bg-red-50', textColor: 'text-red-600', icon: <AlertTriangle className="w-3.5 h-3.5" /> },
     'bloqueado': { label: 'Bloqueado pelo Workspace', bgColor: 'bg-amber-50', textColor: 'text-amber-600', icon: <AlertTriangle className="w-3.5 h-3.5" /> },
@@ -521,17 +521,17 @@ export default function UsuarioPage() {
             </div>
             <p className="text-sm text-slate-400 font-medium mb-3">{userProfile.cargo} · {userProfile.area}</p>
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Mail className="w-3.5 h-3.5" />
                 {userProfile.email}
               </span>
               <span className="text-slate-700 text-xs">·</span>
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Key className="w-3.5 h-3.5" />
                 {userProfile.papel}
               </span>
               <span className="text-slate-700 text-xs">·</span>
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Shield className="w-3.5 h-3.5" />
                 {permissions.nivelAcesso}
               </span>
@@ -551,14 +551,14 @@ export default function UsuarioPage() {
         {/* Tabs-like bottom bar */}
         <div className="relative border-t border-white/5 px-8 py-3 flex items-center gap-6">
           {operational.squads.map(s => (
-            <span key={s} className="text-[10px] font-bold uppercase tracking-widest text-brand/80 flex items-center gap-1.5">
+            <span key={s} className="text-xs font-bold uppercase tracking-widest text-brand/80 flex items-center gap-1.5">
               <Users className="w-3 h-3" />
               {s}
             </span>
           ))}
-          <span className="text-slate-700 text-[10px]">·</span>
+          <span className="text-slate-700 text-xs">·</span>
           {operational.frentes.slice(0, 2).map(f => (
-            <span key={f} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+            <span key={f} className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
               <Activity className="w-3 h-3" />
               {f}
             </span>
@@ -577,17 +577,17 @@ export default function UsuarioPage() {
             <div className="px-5 pt-5 pb-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-1 h-4 rounded-full bg-brand" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Contexto Operacional</span>
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500">Contexto Operacional</span>
               </div>
-              <p className="text-[9px] text-slate-400 pl-3">Squads, frentes e alcance</p>
+              <p className="text-xs text-slate-400 pl-3">Squads, frentes e alcance</p>
             </div>
 
             {/* Squads */}
             <div className="px-5 pb-4 border-b border-slate-50">
-              <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2.5">Squads</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2.5">Squads</p>
               <div className="flex flex-wrap gap-2">
                 {operational.squads.map(s => (
-                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand/10 text-brand border border-brand/20 rounded-full text-[10px] font-bold">
+                  <span key={s} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand/10 text-brand border border-brand/20 rounded-full text-xs font-bold">
                     <Users className="w-3 h-3" />
                     {s}
                   </span>
@@ -597,12 +597,12 @@ export default function UsuarioPage() {
 
             {/* Frentes */}
             <div className="px-5 py-4 border-b border-slate-50">
-              <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2.5">Frentes em Atuação</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2.5">Frentes em Atuação</p>
               <div className="space-y-1.5">
                 {operational.frentes.map((f, i) => (
                   <div key={f} className="flex items-center gap-2.5 py-1.5 px-2.5 rounded-lg bg-violet-50 border border-violet-100 hover:bg-violet-100 transition-colors">
                     <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
-                    <span className="text-[11px] font-semibold text-violet-900">{f}</span>
+                    <span className="text-xs font-semibold text-violet-900">{f}</span>
                   </div>
                 ))}
               </div>
@@ -611,11 +611,11 @@ export default function UsuarioPage() {
             {/* Papel + Escopo */}
             <div className="px-5 py-4 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-1.5">Papel</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1.5">Papel</p>
                 <p className="text-[12px] font-bold text-slate-800">{operational.papelOperacional}</p>
               </div>
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-1.5">Escopo</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1.5">Escopo</p>
                 <p className="text-[12px] font-bold text-slate-800">{operational.escopoContas}</p>
               </div>
             </div>
@@ -627,9 +627,9 @@ export default function UsuarioPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-4 rounded-full bg-violet-500" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Acessos e Permissões</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-500">Acessos e Permissões</span>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] font-black uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-black uppercase tracking-wider">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Ativo
                 </span>
@@ -638,7 +638,7 @@ export default function UsuarioPage() {
 
             {/* Nível de Acesso destaque */}
             <div className="px-5 pb-3 border-b border-slate-50">
-              <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2">Nível de Acesso</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">Nível de Acesso</p>
               <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-brand/10 border border-brand/20 rounded-xl">
                 <Shield className="w-4 h-4 text-brand" />
                 <span className="text-[12px] font-bold text-brand">{permissions.nivelAcesso}</span>
@@ -647,12 +647,12 @@ export default function UsuarioPage() {
 
             {/* Módulos em grid */}
             <div className="px-5 pb-4 border-b border-slate-50">
-              <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2.5">Módulos Disponíveis</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2.5">Módulos Disponíveis</p>
               <div className="grid grid-cols-2 gap-1.5">
                 {permissions.modulos.map(m => (
                   <div key={m} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-emerald-50 border border-emerald-100">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span className="text-[10px] font-semibold text-emerald-900 truncate">{m}</span>
+                    <span className="text-xs font-semibold text-emerald-900 truncate">{m}</span>
                   </div>
                 ))}
               </div>
@@ -660,10 +660,10 @@ export default function UsuarioPage() {
 
             {/* Squads visíveis */}
             <div className="px-5 py-4">
-              <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2.5">Squads Visíveis</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2.5">Squads Visíveis</p>
               <div className="flex flex-wrap gap-1.5">
                 {permissions.squadsVisiveis.map(s => (
-                  <span key={s} className="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-full text-[10px] font-semibold text-slate-600">{s}</span>
+                  <span key={s} className="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-400">{s}</span>
                 ))}
               </div>
             </div>
@@ -673,14 +673,14 @@ export default function UsuarioPage() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-5 pt-5 pb-4 flex items-center gap-2">
               <div className="w-1 h-4 rounded-full bg-emerald-400" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Segurança da Conta</span>
+              <span className="text-xs font-black uppercase tracking-widest text-slate-500">Segurança da Conta</span>
             </div>
 
             <div className="px-5 pb-5 space-y-0">
               {/* Status */}
               <div className="flex items-center justify-between py-3 border-b border-slate-50">
-                <span className="text-[11px] font-medium text-slate-500">Status</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-bold">
+                <span className="text-xs font-medium text-slate-500">Status</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   {userProfile.statusSeguranca}
                 </span>
@@ -688,19 +688,19 @@ export default function UsuarioPage() {
 
               {/* Método de auth */}
               <div className="flex items-center justify-between py-3 border-b border-slate-50">
-                <span className="text-[11px] font-medium text-slate-500">Autenticação</span>
-                <span className="text-[10px] font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">{userProfile.authMetodo}</span>
+                <span className="text-xs font-medium text-slate-500">Autenticação</span>
+                <span className="text-xs font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">{userProfile.authMetodo}</span>
               </div>
 
               {/* 2FA */}
               <div className="flex items-center justify-between py-3 border-b border-slate-50">
                 <div>
-                  <span className="text-[11px] font-medium text-slate-500">2FA</span>
-                  <p className="text-[8px] text-slate-400 mt-0.5">Autenticação em 2 passos</p>
+                  <span className="text-xs font-medium text-slate-500">2FA</span>
+                  <p className="text-xs text-slate-400 mt-0.5">Autenticação em 2 passos</p>
                 </div>
                 <button
                   onClick={toggleTFA}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     userProfile.tfaAtivo
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200'
                       : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-brand/8 hover:text-brand hover:border-brand/20'
@@ -714,9 +714,9 @@ export default function UsuarioPage() {
               </div>
 
               {/* Último acesso */}
-              <div className="pt-2 flex items-center gap-1.5 text-[9px] text-slate-400">
+              <div className="pt-2 flex items-center gap-1.5 text-xs text-slate-400">
                 <Clock className="w-3 h-3 shrink-0" />
-                Acesso: <span className="font-semibold text-slate-600">{userProfile.ultimoAcesso}</span>
+                Acesso: <span className="font-semibold text-slate-400">{userProfile.ultimoAcesso}</span>
               </div>
             </div>
           </div>
@@ -733,14 +733,14 @@ export default function UsuarioPage() {
                   <User className="w-3.5 h-3.5 text-sky-600" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-600">Informações Pessoais</p>
-                  <p className="text-[10px] text-slate-400">Identidade e contato</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Informações Pessoais</p>
+                  <p className="text-xs text-slate-400">Identidade e contato</p>
                 </div>
               </div>
               {!editing && (
                 <button
                   onClick={() => setEditing(true)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 text-[10px] font-bold text-slate-500 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 hover:border-slate-300 hover:bg-slate-50 transition-all"
                 >
                   <Edit3 className="w-3 h-3" />
                   Editar
@@ -778,23 +778,23 @@ export default function UsuarioPage() {
                 // Vista compacta em linha com divisores
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">Nome</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1">Nome</p>
                     <p className="text-[13px] font-bold text-slate-800">{userProfile.nome}</p>
                   </div>
                   <div className="md:col-span-2">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">E-mail</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1">E-mail</p>
                     <p className="text-[13px] font-mono font-semibold text-slate-700">{userProfile.email}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">Cargo</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1">Cargo</p>
                     <p className="text-[13px] font-semibold text-slate-800">{userProfile.cargo}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">Área</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1">Área</p>
                     <p className="text-[13px] font-semibold text-slate-800">{userProfile.area}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-1">Papel · Status</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-1">Papel · Status</p>
                     <div className="flex items-center gap-2">
                       <p className="text-[13px] font-semibold text-slate-700">{userProfile.papel}</p>
                       <StatusPill label={userProfile.status} variant="green" />
@@ -813,8 +813,8 @@ export default function UsuarioPage() {
                   <Zap className="w-3.5 h-3.5 text-amber-500" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-600">Ferramentas Oficiais do Workspace</p>
-                  <p className="text-[10px] text-slate-400">Infraestrutura tecnológica autorizada</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Ferramentas Oficiais do Workspace</p>
+                  <p className="text-xs text-slate-400">Infraestrutura tecnológica autorizada</p>
                 </div>
               </div>
             </div>
@@ -828,9 +828,9 @@ export default function UsuarioPage() {
                     <div className="w-6 h-6 rounded bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
                       {getVendorIcon('hubspot')}
                     </div>
-                    <span className="text-[9px] font-bold text-slate-600">Marketing</span>
+                    <span className="text-xs font-bold text-slate-400">Marketing</span>
                   </div>
-                  <p className="text-[9px] font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.crmMarketing.nome}</p>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.crmMarketing.nome}</p>
                   <div className="flex items-center gap-1 mt-auto">
                     <span className="text-[7px] font-semibold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded">Disponível</span>
                   </div>
@@ -842,9 +842,9 @@ export default function UsuarioPage() {
                     <div className="w-6 h-6 rounded bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
                       {getVendorIcon('salesforce')}
                     </div>
-                    <span className="text-[9px] font-bold text-slate-600">Vendas</span>
+                    <span className="text-xs font-bold text-slate-400">Vendas</span>
                   </div>
-                  <p className="text-[9px] font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.crmVendas.nome}</p>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.crmVendas.nome}</p>
                   <div className="flex items-center gap-1 mt-auto">
                     <span className="text-[7px] font-semibold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded">Disponível</span>
                   </div>
@@ -856,9 +856,9 @@ export default function UsuarioPage() {
                     <div className="w-6 h-6 rounded bg-purple-100 flex items-center justify-center text-purple-600 shrink-0">
                       {getVendorIcon('teams')}
                     </div>
-                    <span className="text-[9px] font-bold text-slate-600">Colaboração</span>
+                    <span className="text-xs font-bold text-slate-400">Colaboração</span>
                   </div>
-                  <p className="text-[9px] font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.colaboracao.nome}</p>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.colaboracao.nome}</p>
                   <div className="flex items-center gap-1 mt-auto">
                     <span className="text-[7px] font-semibold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded">Disponível</span>
                   </div>
@@ -870,9 +870,9 @@ export default function UsuarioPage() {
                     <div className="w-6 h-6 rounded bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
                       {getVendorIcon('outlook')}
                     </div>
-                    <span className="text-[9px] font-bold text-slate-600">Agenda</span>
+                    <span className="text-xs font-bold text-slate-400">Agenda</span>
                   </div>
-                  <p className="text-[9px] font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.agenda.nome}</p>
+                  <p className="text-xs font-semibold text-slate-800 mb-1">{WORKSPACE_POLICY.agenda.nome}</p>
                   <div className="flex items-center gap-1 mt-auto">
                     <span className="text-[7px] font-semibold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded">Disponível</span>
                   </div>
@@ -881,7 +881,7 @@ export default function UsuarioPage() {
 
               {/* Provedores Bloqueados */}
               <div className="pt-4 border-t border-slate-200">
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2.5">Bloqueados neste workspace</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2.5">Bloqueados neste workspace</p>
                 <div className="flex flex-wrap gap-2">
                   {(WORKSPACE_POLICY.suitePrincipal === 'microsoft'
                     ? [
@@ -893,7 +893,7 @@ export default function UsuarioPage() {
                         { nome: 'Outlook Calendar', id: 'outlook' },
                       ]
                   ).map(provider => (
-                    <span key={provider.id} className="inline-flex items-center gap-1 text-[8px] font-semibold px-2 py-1 bg-red-50 text-red-600 border border-red-200 rounded">
+                    <span key={provider.id} className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 bg-red-50 text-red-600 border border-red-200 rounded">
                       <Slash className="w-3 h-3" />
                       {provider.nome}
                     </span>
@@ -911,63 +911,63 @@ export default function UsuarioPage() {
                   <div className="w-6 h-6 rounded-lg bg-purple-50 flex items-center justify-center">
                     <Globe className="w-3.5 h-3.5 text-purple-600" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Comunicação Pessoal</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-500">Comunicação Pessoal</span>
                 </div>
-                <div className={`inline-flex items-center gap-1 text-[8px] font-semibold px-2 py-1 rounded-full border ${
+                <div className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full border ${
                   userProfile.comunicacao.status === 'conectado'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-slate-100 text-slate-600 border-slate-300'
+                    : 'bg-slate-100 text-slate-400 border-slate-300'
                 }`}>
                   {userProfile.comunicacao.status === 'conectado' && <CheckCircle2 className="w-3 h-3" />}
                   {getStatusDisplay(userProfile.comunicacao.status).label}
                 </div>
               </div>
-              <p className="text-[9px] text-slate-400">Provedor oficial: <span className="font-semibold text-slate-600">{WORKSPACE_POLICY.colaboracao.nome}</span></p>
+              <p className="text-xs text-slate-400">Provedor oficial: <span className="font-semibold text-slate-400">{WORKSPACE_POLICY.colaboracao.nome}</span></p>
             </div>
 
             <div className="px-5 py-4 space-y-3">
               {/* Workspace */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Workspace</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Workspace</label>
                 <input
                   type="text"
                   value={userProfile.comunicacao.workspace}
                   onChange={e => updateComunicacao({ ...userProfile.comunicacao, workspace: e.target.value })}
                   placeholder="Ex: canopi.teams.com"
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
                 />
               </div>
 
               {/* Canal Padrão */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Canal/Destino Padrão</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Canal/Destino Padrão</label>
                 <input
                   type="text"
                   value={userProfile.comunicacao.canalPadrao}
                   onChange={e => updateComunicacao({ ...userProfile.comunicacao, canalPadrao: e.target.value })}
                   placeholder="Ex: #revenue-ops"
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
                 />
               </div>
 
               {/* Identificador do Usuário */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Identificador do Usuário</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Identificador do Usuário</label>
                 <input
                   type="text"
                   value={userProfile.comunicacao.usuarioId}
                   onChange={e => updateComunicacao({ ...userProfile.comunicacao, usuarioId: e.target.value })}
                   placeholder="Ex: fdiniz ou @fabio.diniz"
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-purple-400 transition-all"
                 />
               </div>
 
               {/* Tipos de Alerta */}
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Alertas</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5">Alertas</p>
                 <div className="flex flex-wrap gap-1">
                   {['Urgentes', 'Reuniões'].map(tipo => (
-                    <label key={tipo} className="flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-[9px] font-medium text-slate-600 cursor-pointer transition-colors">
+                    <label key={tipo} className="flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-xs font-medium text-slate-400 cursor-pointer transition-colors">
                       <input
                         type="checkbox"
                         checked={userProfile.comunicacao.tiposAlerta.includes(tipo.toLowerCase())}
@@ -995,40 +995,40 @@ export default function UsuarioPage() {
                   <div className="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center">
                     <Clock className="w-3.5 h-3.5 text-indigo-600" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Agenda Pessoal</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-500">Agenda Pessoal</span>
                 </div>
-                <div className={`inline-flex items-center gap-1 text-[8px] font-semibold px-2 py-1 rounded-full border ${
+                <div className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full border ${
                   userProfile.agenda.status === 'conectado'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-slate-100 text-slate-600 border-slate-300'
+                    : 'bg-slate-100 text-slate-400 border-slate-300'
                 }`}>
                   {userProfile.agenda.status === 'conectado' && <CheckCircle2 className="w-3 h-3" />}
                   {getStatusDisplay(userProfile.agenda.status).label}
                 </div>
               </div>
-              <p className="text-[9px] text-slate-400">Provedor oficial: <span className="font-semibold text-slate-600">{WORKSPACE_POLICY.agenda.nome}</span></p>
+              <p className="text-xs text-slate-400">Provedor oficial: <span className="font-semibold text-slate-400">{WORKSPACE_POLICY.agenda.nome}</span></p>
             </div>
 
             <div className="px-5 py-4 space-y-3">
               {/* Email da Agenda */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Email da Agenda</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Email da Agenda</label>
                 <input
                   type="email"
                   value={userProfile.agenda.email}
                   onChange={e => updateAgenda({ ...userProfile.agenda, email: e.target.value })}
                   placeholder="fabio.diniz@canopi.com"
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                 />
               </div>
 
               {/* Fuso Horário */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Fuso Horário</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Fuso Horário</label>
                 <select
                   value={userProfile.agenda.fusoHorario}
                   onChange={e => updateAgenda({ ...userProfile.agenda, fusoHorario: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                 >
                   <option value="America/Sao_Paulo">São Paulo (UTC-3)</option>
                   <option value="America/New_York">Nova York (UTC-5)</option>
@@ -1039,10 +1039,10 @@ export default function UsuarioPage() {
 
               {/* Horário de Trabalho */}
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2">Horário de Trabalho</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Horário de Trabalho</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[8px] font-semibold text-slate-500 block mb-1">Início</label>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Início</label>
                     <input
                       type="time"
                       value={userProfile.agenda.horarioTrabalho.inicio}
@@ -1050,11 +1050,11 @@ export default function UsuarioPage() {
                         ...userProfile.agenda,
                         horarioTrabalho: { ...userProfile.agenda.horarioTrabalho, inicio: e.target.value }
                       })}
-                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="text-[8px] font-semibold text-slate-500 block mb-1">Fim</label>
+                    <label className="text-xs font-semibold text-slate-500 block mb-1">Fim</label>
                     <input
                       type="time"
                       value={userProfile.agenda.horarioTrabalho.fim}
@@ -1062,7 +1062,7 @@ export default function UsuarioPage() {
                         ...userProfile.agenda,
                         horarioTrabalho: { ...userProfile.agenda.horarioTrabalho, fim: e.target.value }
                       })}
-                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                     />
                   </div>
                 </div>
@@ -1070,7 +1070,7 @@ export default function UsuarioPage() {
 
               {/* Janelas de Foco */}
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Janelas de Foco</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5">Janelas de Foco</p>
                 <div className="space-y-1.5">
                   {userProfile.agenda.janelasFoco.map((janela, idx) => (
                     <input
@@ -1083,7 +1083,7 @@ export default function UsuarioPage() {
                         updateAgenda({ ...userProfile.agenda, janelasFoco: newJanelas });
                       }}
                       placeholder="Ex: 09:00-11:00"
-                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                      className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                     />
                   ))}
                 </div>
@@ -1091,11 +1091,11 @@ export default function UsuarioPage() {
 
               {/* Lembretes */}
               <div>
-                <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Preferências de Lembrete</label>
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Preferências de Lembrete</label>
                 <select
                   value={userProfile.agenda.lembretes}
                   onChange={e => updateAgenda({ ...userProfile.agenda, lembretes: e.target.value })}
-                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
+                  className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-400 transition-all"
                 >
                   <option value="ativados">Ativados</option>
                   <option value="desativados">Desativados</option>
@@ -1112,7 +1112,7 @@ export default function UsuarioPage() {
                 <Settings className="w-3 h-3 text-slate-500" />
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600">Preferências</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Preferências</p>
               </div>
             </div>
 
@@ -1122,11 +1122,11 @@ export default function UsuarioPage() {
 
                 {/* Visão Inicial */}
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2">Visão Inicial</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">Visão Inicial</p>
                   <select
                     value={userProfile.preferencias.visaoInicial}
                     onChange={e => setPref('visaoInicial', e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand transition-all"
+                    className="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-brand/20 focus:border-brand transition-all"
                   >
                     {['Accounts', 'Overview', 'Desempenho', 'Sinais'].map(o => <option key={o}>{o}</option>)}
                   </select>
@@ -1134,16 +1134,16 @@ export default function UsuarioPage() {
 
                 {/* Densidade */}
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2">Densidade</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">Densidade</p>
                   <div className="flex gap-0.5">
                     {['Compacto', 'Normal', 'Expandido'].map(opt => (
                       <button
                         key={opt}
                         onClick={() => setPref('densidade', opt)}
-                        className={`flex-1 py-1 rounded text-[9px] font-bold border transition-all ${
+                        className={`flex-1 py-1 rounded text-xs font-bold border transition-all ${
                           userProfile.preferencias.densidade === opt
                             ? 'bg-brand text-white border-brand'
-                            : 'border-slate-200 text-slate-400 hover:text-slate-600'
+                            : 'border-slate-200 text-slate-400 hover:text-slate-400'
                         }`}
                         title={opt}
                       >
@@ -1155,16 +1155,16 @@ export default function UsuarioPage() {
 
                 {/* Enfoque */}
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2">Enfoque</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">Enfoque</p>
                   <div className="flex gap-0.5">
                     {['ABM', 'ABX', 'Híbrido'].map(opt => (
                       <button
                         key={opt}
                         onClick={() => setPref('foco', opt)}
-                        className={`flex-1 py-1 rounded text-[9px] font-bold border transition-all ${
+                        className={`flex-1 py-1 rounded text-xs font-bold border transition-all ${
                           userProfile.preferencias.foco === opt
                             ? 'bg-brand text-white border-brand'
-                            : 'border-slate-200 text-slate-400 hover:text-slate-600'
+                            : 'border-slate-200 text-slate-400 hover:text-slate-400'
                         }`}
                       >
                         {opt}
@@ -1175,20 +1175,20 @@ export default function UsuarioPage() {
 
                 {/* SLA */}
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-slate-300 mb-2">SLA</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">SLA</p>
                   <div className="flex gap-0.5">
                     {['Baixa', 'Normal', 'Alta'].map(opt => (
                       <button
                         key={opt}
                         onClick={() => setPref('slaFoco', opt)}
-                        className={`flex-1 py-1 rounded text-[9px] font-bold border transition-all ${
+                        className={`flex-1 py-1 rounded text-xs font-bold border transition-all ${
                           userProfile.preferencias.slaFoco === opt
                             ? opt === 'Alta'
                               ? 'bg-amber-500 text-white border-amber-400'
                               : opt === 'Baixa'
                                 ? 'bg-slate-400 text-white border-slate-400'
                                 : 'bg-brand text-white border-brand'
-                            : 'border-slate-200 text-slate-400 hover:text-slate-600'
+                            : 'border-slate-200 text-slate-400 hover:text-slate-400'
                         }`}
                       >
                         {opt.slice(0, 3)}
@@ -1207,25 +1207,25 @@ export default function UsuarioPage() {
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
               </div>
               <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-slate-600">Segurança da Conta</p>
-                <p className="text-[9px] text-slate-400">Método de autenticação e senha</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Segurança da Conta</p>
+                <p className="text-xs text-slate-400">Método de autenticação e senha</p>
               </div>
             </div>
 
             <div className="px-6 py-4 space-y-4">
               {/* Método de Autenticação */}
               <div className="flex items-center justify-between py-2.5 px-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-600">Método</span>
-                <span className="text-[9px] font-semibold text-slate-700">{userProfile.authMetodo}</span>
+                <span className="text-xs font-bold text-slate-400">Método</span>
+                <span className="text-xs font-semibold text-slate-700">{userProfile.authMetodo}</span>
               </div>
 
               {/* 2FA */}
               <div className="flex items-center justify-between py-2.5 px-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-600">Autenticação 2FA</span>
-                <span className={`text-[9px] font-semibold px-2 py-1 rounded-full ${
+                <span className="text-xs font-bold text-slate-400">Autenticação 2FA</span>
+                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
                   userProfile.tfaAtivo
                     ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-slate-100 text-slate-600'
+                    : 'bg-slate-100 text-slate-400'
                 }`}>
                   {userProfile.tfaAtivo ? 'Ativado' : 'Desativado'}
                 </span>
@@ -1236,7 +1236,7 @@ export default function UsuarioPage() {
                 {!showChangePassword ? (
                   <button
                     onClick={() => setShowChangePassword(true)}
-                    className="w-full px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-[10px] font-bold hover:bg-amber-100 hover:border-amber-300 transition-all"
+                    className="w-full px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-xs font-bold hover:bg-amber-100 hover:border-amber-300 transition-all"
                   >
                     Alterar Senha
                   </button>
@@ -1244,7 +1244,7 @@ export default function UsuarioPage() {
                   <div className="space-y-3">
                       {/* Mensagens */}
                     {passwordMessage && (
-                      <div className={`p-3 rounded-lg border text-[11px] font-semibold flex items-center gap-2 ${
+                      <div className={`p-3 rounded-lg border text-xs font-semibold flex items-center gap-2 ${
                         passwordMessage.type === 'success'
                           ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                           : 'bg-red-50 border-red-200 text-red-700'
@@ -1256,7 +1256,7 @@ export default function UsuarioPage() {
 
                     {/* Campo Senha Atual */}
                     <div>
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Senha Atual</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">Senha Atual</label>
                       <div className="relative">
                         <input
                           type={showPasswords.current ? 'text' : 'password'}
@@ -1268,7 +1268,7 @@ export default function UsuarioPage() {
                         <button
                           type="button"
                           onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-400"
                         >
                           {showPasswords.current ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1277,7 +1277,7 @@ export default function UsuarioPage() {
 
                     {/* Campo Nova Senha */}
                     <div>
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Nova Senha</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">Nova Senha</label>
                       <div className="relative">
                         <input
                           type={showPasswords.new ? 'text' : 'password'}
@@ -1289,7 +1289,7 @@ export default function UsuarioPage() {
                         <button
                           type="button"
                           onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-400"
                         >
                           {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1302,11 +1302,11 @@ export default function UsuarioPage() {
                             const strength = validatePasswordStrength(passwordForm.new);
                             return (
                               <>
-                                <div className={`flex items-center gap-1.5 text-[9px] ${strength.hasMinLength ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                <div className={`flex items-center gap-1.5 text-xs ${strength.hasMinLength ? 'text-emerald-600' : 'text-slate-400'}`}>
                                   {strength.hasMinLength ? <CheckCircle2 className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
                                   Mínimo 8 caracteres
                                 </div>
-                                <div className={`flex items-center gap-1.5 text-[9px] ${strength.hasNumber || strength.hasSymbol ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                <div className={`flex items-center gap-1.5 text-xs ${strength.hasNumber || strength.hasSymbol ? 'text-emerald-600' : 'text-slate-400'}`}>
                                   {strength.hasNumber || strength.hasSymbol ? <CheckCircle2 className="w-3 h-3" /> : <Circle className="w-3 h-3" />}
                                   Inclua número ou símbolo
                                 </div>
@@ -1319,7 +1319,7 @@ export default function UsuarioPage() {
 
                     {/* Campo Confirmar Senha */}
                     <div>
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-1">Confirme a Senha</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-1">Confirme a Senha</label>
                       <div className="relative">
                         <input
                           type={showPasswords.confirm ? 'text' : 'password'}
@@ -1331,7 +1331,7 @@ export default function UsuarioPage() {
                         <button
                           type="button"
                           onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-400"
                         >
                           {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1339,7 +1339,7 @@ export default function UsuarioPage() {
 
                       {/* Validação de correspondência */}
                       {passwordForm.confirm && (
-                        <div className={`mt-2 text-[9px] flex items-center gap-1.5 ${
+                        <div className={`mt-2 text-xs flex items-center gap-1.5 ${
                           passwordForm.new === passwordForm.confirm ? 'text-emerald-600' : 'text-red-600'
                         }`}>
                           {passwordForm.new === passwordForm.confirm ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
@@ -1352,7 +1352,7 @@ export default function UsuarioPage() {
                     <div className="flex items-center gap-2 pt-2">
                       <button
                         onClick={handleChangePassword}
-                        className="flex-1 px-4 py-2 bg-brand text-white rounded-lg text-[10px] font-bold hover:bg-brand/90 transition-all"
+                        className="flex-1 px-4 py-2 bg-brand text-white rounded-lg text-xs font-bold hover:bg-brand/90 transition-all"
                       >
                         Atualizar
                       </button>
@@ -1362,7 +1362,7 @@ export default function UsuarioPage() {
                           setPasswordForm({ current: '', new: '', confirm: '' });
                           setPasswordMessage(null);
                         }}
-                        className="px-4 py-2 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-semibold hover:bg-slate-50 transition-all"
+                        className="px-4 py-2 border border-slate-200 text-slate-500 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-all"
                       >
                         Cancelar
                       </button>

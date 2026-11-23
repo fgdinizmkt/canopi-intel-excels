@@ -275,19 +275,19 @@ export const Assistant: React.FC = () => {
               <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl shadow-sm">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h4 className="text-sm font-bold text-slate-900">{card.title}</h4>
-                  <Badge className={`text-[10px] uppercase font-bold ${card.urgency === 'crítica' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{card.urgency}</Badge>
+                  <Badge className={`text-xs uppercase font-bold ${card.urgency === 'crítica' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{card.urgency}</Badge>
                 </div>
-                <p className="text-xs text-slate-600 mb-3">{card.reason}</p>
+                <p className="text-xs text-slate-400 mb-3">{card.reason}</p>
                 <div className="flex gap-2">
                   {isDuplicate || isCreated ? (
                     <div className="flex-1 flex items-center gap-2">
-                      <div className="flex-1 h-8 text-[11px] font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
-                      <Link href={targetLink} className="h-8 px-3 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200 rounded flex items-center gap-1 hover:bg-slate-200 transition-all">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
+                      <div className="flex-1 h-8 text-xs font-bold bg-emerald-500 text-white rounded flex items-center justify-center gap-1.5"><CheckCircle className="w-3 h-3" /> {isCreated ? 'Criada na Fila' : 'Já existe na fila'}</div>
+                      <Link href={targetLink} className="h-8 px-3 text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 rounded flex items-center gap-1 hover:bg-slate-200 transition-all">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
                     </div>
                   ) : (
-                    <Button onClick={() => handleCreateAction(card)} className="flex-1 h-8 text-[11px] font-bold bg-blue-600 text-white hover:bg-blue-700"><Plus className="w-3 h-3 mr-1" /> Criar na Fila</Button>
+                    <Button onClick={() => handleCreateAction(card)} className="flex-1 h-8 text-xs font-bold bg-blue-600 text-white hover:bg-blue-700"><Plus className="w-3 h-3 mr-1" /> Criar na Fila</Button>
                   )}
-                  <Button onClick={() => setInput(card.suggestedAction)} className="flex-1 h-8 text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200"><MessageCircle className="w-3 h-3 mr-1" /> Investigar</Button>
+                  <Button onClick={() => setInput(card.suggestedAction)} className="flex-1 h-8 text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200"><MessageCircle className="w-3 h-3 mr-1" /> Investigar</Button>
                 </div>
               </div>
             );
@@ -302,8 +302,8 @@ export const Assistant: React.FC = () => {
                   <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{card.name}</h4>
                   <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Contexto da conta.'}</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <Badge className="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold">Conta</Badge>
-                    <Link href={`/contas/${card.slug}`} className="text-[11px] font-black text-blue-600 hover:underline flex items-center gap-1">Ver Contexto <ChevronRight className="w-3 h-3" /></Link>
+                    <Badge className="bg-slate-100 text-slate-400 text-xs uppercase font-bold">Conta</Badge>
+                    <Link href={`/contas/${card.slug}`} className="text-xs font-black text-blue-600 hover:underline flex items-center gap-1">Ver Contexto <ChevronRight className="w-3 h-3" /></Link>
                   </div>
                 </div>
               </div>
@@ -319,8 +319,8 @@ export const Assistant: React.FC = () => {
                   <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{card.name}</h4>
                   <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Sinal tático para investigação.'}</p>
                   <div className="mt-3 flex items-center justify-between">
-                    <Badge className="bg-amber-50 text-amber-700 text-[10px] uppercase font-bold">{card.severity}</Badge>
-                    <Link href={`/sinais?signalId=${card.signalId}`} className="text-[11px] font-black text-amber-600 hover:underline flex items-center gap-1">Ver Sinal <ChevronRight className="w-3 h-3" /></Link>
+                    <Badge className="bg-amber-50 text-amber-700 text-xs uppercase font-bold">{card.severity}</Badge>
+                    <Link href={`/sinais?signalId=${card.signalId}`} className="text-xs font-black text-amber-600 hover:underline flex items-center gap-1">Ver Sinal <ChevronRight className="w-3 h-3" /></Link>
                   </div>
                 </div>
               </div>
@@ -335,8 +335,8 @@ export const Assistant: React.FC = () => {
                 <h4 className="text-sm font-bold text-slate-900 truncate leading-snug">{(card as any).title}</h4>
                 <p className="text-xs text-slate-500 mt-1 line-clamp-2">{card.reason || 'Ação operacional em andamento.'}</p>
                 <div className="mt-3 flex items-center justify-between">
-                  <Badge className="bg-emerald-50 text-emerald-700 text-[10px] uppercase font-bold">{(card as any).priority}</Badge>
-                  <Link href={`/acoes?actionId=${(card as any).actionId}`} className="text-[11px] font-black text-emerald-600 hover:underline flex items-center gap-1">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
+                  <Badge className="bg-emerald-50 text-emerald-700 text-xs uppercase font-bold">{(card as any).priority}</Badge>
+                  <Link href={`/acoes?actionId=${(card as any).actionId}`} className="text-xs font-black text-emerald-600 hover:underline flex items-center gap-1">Ver Ação <ChevronRight className="w-3 h-3" /></Link>
                 </div>
               </div>
             </div>
@@ -357,7 +357,7 @@ export const Assistant: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge className="bg-blue-50 text-blue-700 border-blue-200 py-1.5 px-4 uppercase text-[10px] tracking-widest font-black ring-1 ring-blue-100 italic">Enterprise Edition</Badge>
+          <Badge className="bg-blue-50 text-blue-700 border-blue-200 py-1.5 px-4 uppercase text-xs tracking-widest font-black ring-1 ring-blue-100 italic">Enterprise Edition</Badge>
         </div>
       </div>
 
@@ -368,7 +368,7 @@ export const Assistant: React.FC = () => {
             <Card key={i} className="p-4 bg-white border-slate-100 shadow-sm hover:shadow-md transition-all group">
               <div className="flex flex-col items-center text-center">
                 <div className={`p-2 rounded-xl ${kpi.bg} ${kpi.color} mb-3 group-hover:scale-110 transition-transform`}><kpi.icon className="w-5 h-5" /></div>
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{kpi.label}</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{kpi.label}</p>
                 <p className="text-xl font-black text-slate-900 tracking-tighter">{kpi.val}</p>
               </div>
             </Card>
@@ -418,10 +418,10 @@ export const Assistant: React.FC = () => {
             <div className="flex items-center justify-between px-1"><h3 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] italic">Plays Sugeridos</h3><Zap className="w-4 h-4 text-amber-500" /></div>
             {recommendedPlays.slice(0, 3).map((play) => (
               <Card key={play.id} className="p-5 border-slate-200 hover:border-blue-200 transition-all bg-white group cursor-help">
-                <div className="flex items-start justify-between mb-3"><h4 className="font-black text-sm text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{play.title}</h4><Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[9px] uppercase tracking-tighter">{play.urgency}</Badge></div>
+                <div className="flex items-start justify-between mb-3"><h4 className="font-black text-sm text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{play.title}</h4><Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs uppercase tracking-tighter">{play.urgency}</Badge></div>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed mb-4">{play.reason}</p>
                 <div className="flex gap-2">
-                  <Button onClick={() => setInput(play.promptForChat)} className="flex-1 h-8 text-[11px] font-black bg-blue-700 text-white uppercase hover:bg-blue-800 transition-all">Ativar Chat</Button>
+                  <Button onClick={() => setInput(play.promptForChat)} className="flex-1 h-8 text-xs font-black bg-blue-700 text-white uppercase hover:bg-blue-800 transition-all">Ativar Chat</Button>
                   <Button onClick={() => navigator.clipboard.writeText(play.promptForChat)} className="h-8 w-8 p-0 bg-slate-50 text-slate-500 border border-slate-200 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-all"><Copy className="w-4 h-4" /></Button>
                 </div>
               </Card>
@@ -435,12 +435,12 @@ export const Assistant: React.FC = () => {
                   <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100"><t.icon className={`w-5 h-5 ${t.status === 'Em andamento' ? 'text-blue-500 animate-spin' : t.status === 'Concluída' ? 'text-emerald-500' : 'text-slate-400'}`} /></div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-black text-slate-900 truncate uppercase mt-0.5" title={t.task}>{t.task}</p>
-                    <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">{t.sub} <span className="opacity-40 mx-1">·</span> {t.status}</p>
+                    <p className="text-xs text-slate-400 font-bold mt-1 uppercase tracking-wider">{t.sub} <span className="opacity-40 mx-1">·</span> {t.status}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <Link href="/acoes" className="block w-full py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all border-2 border-dashed border-slate-100 rounded-2xl">Ver Fila Completa</Link>
+            <Link href="/acoes" className="block w-full py-3 text-center text-xs font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all border-2 border-dashed border-slate-100 rounded-2xl">Ver Fila Completa</Link>
           </div>
         </div>
       </div>

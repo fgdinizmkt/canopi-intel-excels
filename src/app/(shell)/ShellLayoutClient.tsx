@@ -25,12 +25,12 @@ export default function ShellLayoutClient({ children }: { children: React.ReactN
           <footer className="p-8 border-t border-slate-100 flex flex-col items-center gap-2">
             <div className="flex items-center gap-3 opacity-40">
               <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">Canopi</span>
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">Canopi</span>
                 <div className="h-3 w-px bg-slate-300"></div>
-                <span className="text-[10px] font-bold text-brand uppercase tracking-widest">Intel Excels</span>
+                <span className="text-xs font-bold text-brand uppercase tracking-widest">Intel Excels</span>
               </div>
             </div>
-            <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
               &copy; 2026 · Todos os direitos reservados
             </p>
           </footer>
@@ -62,7 +62,7 @@ export default function ShellLayoutClient({ children }: { children: React.ReactN
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-900">{type.title}</h4>
-                    <p className="text-[11px] text-slate-500">{type.desc}</p>
+                    <p className="text-xs text-slate-500">{type.desc}</p>
                   </div>
                 </button>
               ))}

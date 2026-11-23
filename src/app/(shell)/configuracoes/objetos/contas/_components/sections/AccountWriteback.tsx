@@ -25,8 +25,8 @@ export function AccountWriteback() {
                </div>
             </div>
             <div className="flex flex-col items-end gap-2">
-               <Badge className="bg-emerald-500 text-white border-none py-1.5 px-4 rounded-lg font-black tracking-widest text-[10px]">Habilitado</Badge>
-               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Última Atualização: Hoje, 14:32</span>
+               <Badge className="bg-emerald-500 text-white border-none py-1.5 px-4 rounded-lg font-black tracking-widest text-xs">Habilitado</Badge>
+               <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Última Atualização: Hoje, 14:32</span>
             </div>
          </div>
 
@@ -49,21 +49,21 @@ export function AccountWriteback() {
                      </div>
                      <div className="flex items-center gap-8">
                         <div className="text-right">
-                           <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Destino no CRM</p>
+                           <p className="text-xs font-black text-slate-400 uppercase mb-1">Destino no CRM</p>
                            <input 
                              type="text" 
                              defaultValue={m.nativeField}
                              className="bg-white border-b-2 border-slate-200 focus:border-blue-600 outline-none px-2 py-1 text-sm font-black text-blue-600 text-right uppercase"
                            />
-                           <p className="text-[8px] font-bold text-orange-600 mt-1 uppercase italic">Risco: Sobrescrita de Valor</p>
+                           <p className="text-xs font-bold text-orange-600 mt-1 uppercase italic">Risco: Sobrescrita de Valor</p>
                         </div>
                         <div className="flex flex-col gap-1">
-                          <select className="bg-slate-200 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight outline-none focus:ring-2 focus:ring-blue-500">
+                          <select className="bg-slate-200 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-tight outline-none focus:ring-2 focus:ring-blue-500">
                              <option>OVERWRITE ALL</option>
                              <option>APPEND ONLY</option>
                              <option>MANUAL REVIEW</option>
                           </select>
-                          <Badge className="bg-blue-600/10 text-blue-700 text-[8px] border-none">Sync Ativo</Badge>
+                          <Badge className="bg-blue-600/10 text-blue-700 text-xs border-none">Sync Ativo</Badge>
                         </div>
                      </div>
                   </div>

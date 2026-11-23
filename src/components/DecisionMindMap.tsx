@@ -517,15 +517,15 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
           <div>
             <h3 className="font-black text-sm text-slate-900 uppercase tracking-[0.2em] leading-tight">Canopi Intelligence Oracle</h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Decision MindMap</span>
+              <span className="text-xs text-slate-400 font-black uppercase tracking-widest">Decision MindMap</span>
               <div className="w-1 h-1 bg-slate-200 rounded-full" />
-              <span className="text-[9px] text-blue-600 font-black uppercase tracking-widest">Account: {signalCase.accountName}</span>
+              <span className="text-xs text-blue-600 font-black uppercase tracking-widest">Account: {signalCase.accountName}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-xl">
-            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">🌳 Navegação Ativa</span>
+            <span className="text-xs font-black text-blue-600 uppercase tracking-widest">🌳 Navegação Ativa</span>
           </div>
         </div>
       </div>
@@ -646,8 +646,8 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                       {/* TOOLTIP HOVER (LEVE E RESUMIDO) */}
                       {isHovered && !dragging && !isSelected && (
                         <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-slate-900 text-white p-2.5 rounded-xl shadow-2xl z-[500] w-52 animate-in fade-in zoom-in duration-200 pointer-events-none border border-slate-700">
-                          <p className="text-[8px] font-black uppercase text-indigo-400 mb-0.5 tracking-widest">{data.category}</p>
-                          <p className="text-[10px] font-bold leading-tight line-clamp-2 mb-1.5">{data.title}</p>
+                          <p className="text-xs font-black uppercase text-indigo-400 mb-0.5 tracking-widest">{data.category}</p>
+                          <p className="text-xs font-bold leading-tight line-clamp-2 mb-1.5">{data.title}</p>
                           <div className="flex items-center justify-between pt-1.5 border-t border-slate-800">
                             <span className="text-[7px] text-slate-500 font-bold uppercase">{data.status}</span>
                             <div className={`w-1.5 h-1.5 rounded-full ${data.metric === 'CRITICAL' || data.metric === 'CRÍTICO' ? 'bg-red-500 animate-pulse' : 'bg-blue-500'}`} />
@@ -660,7 +660,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                           <div className="flex items-center justify-between mb-1">
                              <div className="flex items-center gap-2">
                                {data.icon}
-                               <span className="text-[11px] font-black text-blue-900 tracking-tighter uppercase">{data.title}</span>
+                               <span className="text-xs font-black text-blue-900 tracking-tighter uppercase">{data.title}</span>
                              </div>
                              <div className={`px-1.5 py-0.5 rounded text-[7px] font-black text-white ${
                                data.metric === 'CRITICAL' ? 'bg-red-600' : 'bg-blue-600'
@@ -669,9 +669,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                              </div>
                           </div>
                           <div className="flex-1 mt-1 text-left">
-                             <p className="text-[10px] font-black text-slate-800 leading-[1.2] line-clamp-2">{data.detail}</p>
+                             <p className="text-xs font-black text-slate-800 leading-[1.2] line-clamp-2">{data.detail}</p>
                              <div className="mt-auto pt-1 flex items-center justify-between border-t border-black/5">
-                                <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest">{data.category}</span>
+                                <span className="text-xs font-black text-blue-600 uppercase tracking-widest">{data.category}</span>
                                 <span className="text-[7px] font-bold text-slate-400">{data.status}</span>
                              </div>
                           </div>
@@ -683,7 +683,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                               isSelected ? 'bg-white/20 text-white' :
                               id === 'decision' || id.startsWith('opt') ? 'bg-indigo-50 text-indigo-600' :
                               id === 'action' ? 'bg-emerald-50 text-emerald-600' :
-                              'bg-slate-50 text-slate-600'
+                              'bg-slate-50 text-slate-400'
                             }`}>
                               {React.cloneElement(data.icon as any, { size: 12 })}
                             </div>
@@ -698,7 +698,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                           </div>
 
                           <div className="flex-1 overflow-hidden">
-                            <h6 className={`text-[9px] font-black uppercase tracking-tight leading-tight line-clamp-1 mb-1 ${
+                            <h6 className={`text-xs font-black uppercase tracking-tight leading-tight line-clamp-1 mb-1 ${
                               isSelected ? 'text-white' : 'text-slate-900'
                             }`}>
                               {data.title}
@@ -715,7 +715,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                                       isSelected ? 'text-white/40' : 'text-slate-400'
                                     }`}>{m.label}</p>
                                     <div className="flex items-center gap-1">
-                                      <p className={`text-[9px] font-black leading-none ${
+                                      <p className={`text-xs font-black leading-none ${
                                         m.isNegative ? 'text-red-500' : isSelected ? 'text-white' : 'text-slate-900'
                                       }`}>
                                         {m.value}
@@ -765,7 +765,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                 </button>
                 <div className="flex items-center gap-3 bg-indigo-500/10 border border-indigo-500/20 px-5 py-2 rounded-full">
                   <Zap className="w-4 h-4 text-indigo-400" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Tactical Recon HUD</span>
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-indigo-300">Tactical Recon HUD</span>
                 </div>
             </div>
 
@@ -773,7 +773,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
               {/* NODE IDENTITY */}
               <div className="relative pl-5">
                 <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-1.5">{selectedNodeData.data.category}</p>
+                <p className="text-xs font-black text-indigo-400 uppercase tracking-[0.3em] mb-1.5">{selectedNodeData.data.category}</p>
                 <h4 className="font-black text-xl text-white leading-tight uppercase tracking-tight">
                   {selectedNodeData.data.title}
                 </h4>
@@ -793,9 +793,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                     {nodeType === 'root' && nodeId === 'signal' && (
                       <div className="space-y-4">
                         <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 p-5 rounded-2xl">
-                          <label className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-3 block">Situação Crítica Detectada</label>
+                          <label className="text-xs font-black text-blue-400 uppercase tracking-widest mb-3 block">Situação Crítica Detectada</label>
                           <p className="text-[13px] text-white font-bold leading-relaxed">{data.detail}</p>
-                          <p className="text-[11px] text-slate-300 mt-3 italic">{data.desc}</p>
+                          <p className="text-xs text-slate-300 mt-3 italic">{data.desc}</p>
                         </div>
 
                         {data.metrics && (
@@ -815,9 +815,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                     {nodeId.startsWith('ev') && (
                       <div className="space-y-4">
                         <div className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-2xl">
-                          <label className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-2 block">Evidência Operacional</label>
+                          <label className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2 block">Evidência Operacional</label>
                           <p className="text-[12px] text-white font-bold">{data.detail}</p>
-                          <p className="text-[10px] text-slate-300 mt-3">Fonte: {data.desc}</p>
+                          <p className="text-xs text-slate-300 mt-3">Fonte: {data.desc}</p>
                         </div>
 
                         {data.metrics && (
@@ -837,9 +837,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                     {nodeId.startsWith('hyp') && (
                       <div className="space-y-4">
                         <div className="bg-amber-500/10 border border-amber-500/20 p-5 rounded-2xl border-dashed">
-                          <label className="text-[8px] font-black text-amber-400 uppercase tracking-widest mb-2 block">Projeção Probabilística</label>
+                          <label className="text-xs font-black text-amber-400 uppercase tracking-widest mb-2 block">Projeção Probabilística</label>
                           <p className="text-[12px] text-white font-bold">{data.detail}</p>
-                          <p className="text-[10px] text-slate-300 mt-3">{data.desc}</p>
+                          <p className="text-xs text-slate-300 mt-3">{data.desc}</p>
                         </div>
 
                         {data.metrics && (
@@ -859,15 +859,15 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                     {nodeId.startsWith('dec') && (
                       <div className="space-y-4">
                         <div className="bg-purple-500/10 border border-purple-500/20 p-5 rounded-2xl">
-                          <label className="text-[8px] font-black text-purple-400 uppercase tracking-widest mb-2 block">Ponto de Decisão</label>
+                          <label className="text-xs font-black text-purple-400 uppercase tracking-widest mb-2 block">Ponto de Decisão</label>
                           <p className="text-[12px] text-white font-bold">{data.detail}</p>
-                          <p className="text-[10px] text-slate-300 mt-3">{data.desc}</p>
+                          <p className="text-xs text-slate-300 mt-3">{data.desc}</p>
                         </div>
 
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                            <p className="text-[9px] font-black text-white uppercase tracking-widest">Alternativas Disponíveis</p>
+                            <p className="text-xs font-black text-white uppercase tracking-widest">Alternativas Disponíveis</p>
                           </div>
 
                           {(() => {
@@ -888,12 +888,12 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                             <div key={idx} className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col gap-4">
                               <div className="flex justify-between items-start">
                                 <div className="flex gap-3">
-                                  <div className="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-[10px] font-black text-purple-300">
+                                  <div className="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-xs font-black text-purple-300">
                                     {idx + 1}
                                   </div>
                                   <p className="text-[12px] font-black text-white uppercase tracking-tight pt-0.5">{opt.option}</p>
                                 </div>
-                                <div className="bg-purple-500/20 px-2 py-0.5 rounded text-[8px] font-black text-purple-300">
+                                <div className="bg-purple-500/20 px-2 py-0.5 rounded text-xs font-black text-purple-300">
                                   {opt.successProbability}% SUCESSO
                                 </div>
                               </div>
@@ -901,11 +901,11 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl">
                                   <label className="text-[6px] font-black text-red-400 uppercase tracking-widest mb-1 block">Risco</label>
-                                  <p className="text-[10px] text-slate-300 font-bold leading-tight">{opt.consequence}</p>
+                                  <p className="text-xs text-slate-300 font-bold leading-tight">{opt.consequence}</p>
                                 </div>
                                 <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
                                   <label className="text-[6px] font-black text-emerald-400 uppercase tracking-widest mb-1 block">Ação</label>
-                                  <p className="text-[10px] text-slate-300 font-bold leading-tight">{opt.actionDerived}</p>
+                                  <p className="text-xs text-slate-300 font-bold leading-tight">{opt.actionDerived}</p>
                                 </div>
                               </div>
 
@@ -922,7 +922,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                                     setSelectedCard(null);
                                   }
                                 }}
-                                className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all active:scale-[0.98]"
+                                className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-[0.98]"
                               >
                                 Escolher Esta Alternativa
                               </button>
@@ -942,9 +942,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                       return (
                         <div className="space-y-4">
                           <div className="bg-teal-500/10 border border-teal-500/20 p-5 rounded-2xl">
-                            <label className="text-[8px] font-black text-teal-400 uppercase tracking-widest mb-2 block">Alternativa Selecionada</label>
+                            <label className="text-xs font-black text-teal-400 uppercase tracking-widest mb-2 block">Alternativa Selecionada</label>
                             <p className="text-[12px] text-white font-bold">{opt?.option || data.title}</p>
-                            <p className="text-[10px] text-slate-300 mt-3">{opt?.description || data.detail}</p>
+                            <p className="text-xs text-slate-300 mt-3">{opt?.description || data.detail}</p>
                           </div>
 
                           {opt && (
@@ -964,11 +964,11 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                             <div className="space-y-3">
                               <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-xl">
                                 <label className="text-[7px] font-black text-red-400 uppercase tracking-widest mb-2 block">Risco / Consequência</label>
-                                <p className="text-[11px] text-slate-200 leading-relaxed">{opt.consequence}</p>
+                                <p className="text-xs text-slate-200 leading-relaxed">{opt.consequence}</p>
                               </div>
                               <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
                                 <label className="text-[7px] font-black text-emerald-400 uppercase tracking-widest mb-2 block">Ação Derivada</label>
-                                <p className="text-[11px] text-slate-200 leading-relaxed">{opt.actionDerived}</p>
+                                <p className="text-xs text-slate-200 leading-relaxed">{opt.actionDerived}</p>
                               </div>
                             </div>
                           )}
@@ -980,9 +980,9 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                     {nodeId.includes('act') && (
                       <div className="space-y-4">
                         <div className="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-2xl">
-                          <label className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mb-2 block">Ação Recomendada</label>
+                          <label className="text-xs font-black text-emerald-400 uppercase tracking-widest mb-2 block">Ação Recomendada</label>
                           <p className="text-[12px] text-white font-bold">{data.title}</p>
-                          <p className="text-[10px] text-slate-300 mt-3">{data.detail}</p>
+                          <p className="text-xs text-slate-300 mt-3">{data.detail}</p>
                         </div>
                       </div>
                     )}
@@ -995,11 +995,11 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
             <div className="p-10 border-t border-slate-800/50 bg-[#1A1D23]">
               {selectedNodeData.nodeId.startsWith('dec') ? (
                 <div className="flex items-center justify-center p-5 bg-[#20242B] rounded-2xl border border-slate-700/50 shadow-inner">
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] animate-pulse text-center">Selecione uma alternativa acima</p>
+                  <p className="text-xs text-slate-400 font-black uppercase tracking-[0.2em] animate-pulse text-center">Selecione uma alternativa acima</p>
                 </div>
               ) : selectedNodeData.nodeId.includes('opt') || selectedNodeData.nodeId.includes('act') ? (
                 <div className="text-center">
-                  <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest mb-3">Ramificação em análise</p>
+                  <p className="text-xs text-slate-400 font-black uppercase tracking-widest mb-3">Ramificação em análise</p>
                 </div>
               ) : (
                 <button
@@ -1015,7 +1015,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
                       setSelectedCard(null);
                     }
                   }}
-                  className="w-full bg-white hover:bg-slate-100 text-slate-900 rounded-2xl py-5 font-black text-[11px] uppercase tracking-[0.3em] shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-white hover:bg-slate-100 text-slate-900 rounded-2xl py-5 font-black text-xs uppercase tracking-[0.3em] shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   {(() => {
@@ -1032,7 +1032,7 @@ const DecisionMindMap: React.FC<DecisionMindMapProps> = ({ signalCase, onDecisio
       </div>
 
       <div className="bg-white border-t border-slate-100 px-10 py-6 shrink-0">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Selecione um nó para explorar o caminho de decisão</p>
+        <p className="text-xs font-black text-slate-400 uppercase tracking-widest text-center">Selecione um nó para explorar o caminho de decisão</p>
       </div>
 
       <style jsx>{`

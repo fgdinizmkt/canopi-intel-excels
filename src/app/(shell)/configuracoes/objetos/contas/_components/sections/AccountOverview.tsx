@@ -36,7 +36,7 @@ export function AccountOverview() {
             <h3 className="font-black text-slate-900 uppercase tracking-tight mb-2">Status do Módulo</h3>
             <div className="mt-4 flex items-center gap-3">
                <Badge className="bg-emerald-100 text-emerald-700 font-black">PUBLISHED</Badge>
-               <span className="text-[10px] font-bold text-slate-400">LAST SYNC: 2h ago</span>
+               <span className="text-xs font-bold text-slate-400">LAST SYNC: 2h ago</span>
             </div>
          </Card>
       </div>

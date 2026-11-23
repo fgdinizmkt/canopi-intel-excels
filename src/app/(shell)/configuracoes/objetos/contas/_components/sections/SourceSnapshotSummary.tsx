@@ -20,13 +20,13 @@ export function SourceSnapshotSummary({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
           Fonte: {sourceName}
         </span>
-        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
           Entrada: {entryLabel}
         </span>
-        <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+        <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
           Status: {statusLabel}
         </span>
       </div>

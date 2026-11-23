@@ -105,7 +105,7 @@ const STATUS_CONFIG: Record<
   },
   unavailable: {
     label: 'Indisponível',
-    badgeCls: 'bg-slate-100 text-slate-600',
+    badgeCls: 'bg-slate-100 text-slate-400',
     iconCls: 'text-slate-400',
   },
   no_permission: {
@@ -136,7 +136,7 @@ function coverageBar(present: number, total: number) {
       <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[10px] font-bold text-slate-500">
+      <span className="text-xs font-bold text-slate-500">
         {present}/{total}
       </span>
     </div>
@@ -160,7 +160,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="min-w-0">
             <span className="text-sm font-bold text-slate-900">{discovery.label}</span>
-            <span className="ml-2 font-mono text-[10px] text-slate-400">{discovery.objectApiName}</span>
+            <span className="ml-2 font-mono text-xs text-slate-400">{discovery.objectApiName}</span>
           </div>
 
           {discovery.readable && (
@@ -179,14 +179,14 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
 
         <div className="flex shrink-0 items-center gap-2">
           <span
-            className={`rounded-lg px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${cfg.badgeCls}`}
+            className={`rounded-lg px-2 py-0.5 text-xs font-black uppercase tracking-wider ${cfg.badgeCls}`}
           >
             {cfg.label}
           </span>
           {discovery.readable && (
             <button
               onClick={() => setExpanded((v) => !v)}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-bold text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800"
+              className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-bold text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800"
             >
               {expanded ? (
                 <ChevronDown className="h-3 w-3" />
@@ -215,7 +215,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
           {/* Recommended present */}
           {discovery.recommendedFields.length > 0 && (
             <div>
-              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+              <p className="mb-2 text-xs font-black uppercase tracking-widest text-emerald-700">
                 ✓ Recomendados presentes ({discovery.recommendedFields.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -223,7 +223,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                   <span
                     key={f.name}
                     title={`${f.label} · ${f.type}`}
-                    className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800"
+                    className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-xs font-bold text-emerald-800"
                   >
                     {f.name}
                   </span>
@@ -235,14 +235,14 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
           {/* Missing recommended */}
           {discovery.missingRecommendedFields.length > 0 && (
             <div>
-              <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-amber-600">
+              <p className="mb-2 text-xs font-black uppercase tracking-widest text-amber-600">
                 ✗ Ausentes / não mapeáveis ({discovery.missingRecommendedFields.length})
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {discovery.missingRecommendedFields.map((name) => (
                   <span
                     key={name}
-                    className="rounded-md border border-amber-100 bg-amber-50 px-2 py-0.5 font-mono text-[10px] font-medium text-amber-600 line-through decoration-amber-400"
+                    className="rounded-md border border-amber-100 bg-amber-50 px-2 py-0.5 font-mono text-xs font-medium text-amber-600 line-through decoration-amber-400"
                   >
                     {name}
                   </span>
@@ -254,10 +254,10 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
           {/* Canopi mapping suggestions */}
           {canopiMap.length > 0 && (
             <div>
-              <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <p className="mb-1 text-xs font-black uppercase tracking-widest text-slate-500">
                 Mapeamento Canopi sugerido
               </p>
-              <p className="mb-2 text-[10px] font-medium text-slate-400">
+              <p className="mb-2 text-xs font-medium text-slate-400">
                 Campos detectados via Salesforce describe · somente leitura na Canopi
               </p>
               <div className="rounded-xl border border-slate-100 bg-slate-50 overflow-hidden">
@@ -271,14 +271,14 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                       <span className="text-xs font-medium text-slate-700">{canopiAttr}</span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span
-                          className={`font-mono text-[10px] font-bold ${
+                          className={`font-mono text-xs font-bold ${
                             exists ? 'text-emerald-700' : 'text-slate-400 line-through'
                           }`}
                         >
                           {sfField}
                         </span>
                         <span
-                          className={`text-[9px] font-black uppercase ${
+                          className={`text-xs font-black uppercase ${
                             exists ? 'text-emerald-500' : 'text-slate-400'
                           }`}
                         >
@@ -289,7 +289,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                   );
                 })}
               </div>
-              <p className="mt-1.5 text-[10px] font-medium text-slate-400">
+              <p className="mt-1.5 text-xs font-medium text-slate-400">
                 Mapeamento editável será disponibilizado em versão futura.
               </p>
             </div>
@@ -299,7 +299,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
           <div>
             <button
               onClick={() => setShowAllFields((v) => !v)}
-              className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-slate-600"
+              className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-400"
             >
               {showAllFields ? (
                 <ChevronDown className="h-3 w-3" />
@@ -316,7 +316,7 @@ function ObjectRow({ discovery }: { discovery: SalesforceObjectDiscovery }) {
                     <span
                       key={f.name}
                       title={`${f.label} · ${f.type}`}
-                      className="font-mono text-[9px] text-slate-500"
+                      className="font-mono text-xs text-slate-500"
                     >
                       {f.name}
                     </span>
@@ -342,15 +342,15 @@ function DiscoverySummary({ discoveries }: { discoveries: SalesforceObjectDiscov
     <div className="grid grid-cols-3 gap-3">
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
         <p className="text-xl font-black text-emerald-700">{available}</p>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Disponíveis</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Disponíveis</p>
       </div>
       <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-center">
         <p className="text-xl font-black text-amber-600">{noPermission}</p>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Sem permissão</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-amber-500">Sem permissão</p>
       </div>
       <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center">
         <p className="text-xl font-black text-slate-500">{unavailable}</p>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Indisponíveis</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Indisponíveis</p>
       </div>
     </div>
   );
@@ -456,7 +456,7 @@ export function SalesforceDiscovery({
             ))}
           </div>
 
-          <p className="text-[10px] font-medium text-slate-400">
+          <p className="text-xs font-medium text-slate-400">
             Discovery read-only · Sync não disponível nesta versão.
           </p>
         </div>

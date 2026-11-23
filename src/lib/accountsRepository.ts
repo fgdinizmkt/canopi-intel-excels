@@ -432,7 +432,16 @@ export async function getAccounts(): Promise<Conta[]> {
       return {
         ...mockAccount,
         ...row,
-        // Garante que campos críticos de mock não sejam sobrescritos por undefined
+        // Preserva campos de scoring do mock quando Supabase ainda não populou esses valores
+        potencial: row.potencial ?? mockAccount.potencial,
+        risco: row.risco ?? mockAccount.risco,
+        prontidao: row.prontidao ?? mockAccount.prontidao,
+        coberturaRelacional: row.coberturaRelacional ?? mockAccount.coberturaRelacional,
+        // Preserva identidade do mock quando Supabase tem null
+        nome: row.nome ?? mockAccount.nome,
+        slug: row.slug ?? mockAccount.slug,
+        dominio: row.dominio ?? mockAccount.dominio,
+        // Campos profundos sempre vêm do mock (ainda não migrados para Supabase)
         sinais: mockAccount.sinais || [],
         acoes: mockAccount.acoes || [],
         contatos: mockAccount.contatos || [],
@@ -445,6 +454,18 @@ export async function getAccounts(): Promise<Conta[]> {
         canaisCampanhas: row.canaisCampanhas || mockAccount.canaisCampanhas || { origemPrincipal: '', influencias: [] },
       } as Conta;
     });
+
+    // Quality gate: se menos de 5 contas têm scoring real, base não está pronta para operação —
+    // usar contasMock para garantir que o cockpit mostre dados funcionais
+    const scorableCount = supabaseAccounts.filter(
+      a => (a.potencial || 0) > 0 || (a.sinais?.length || 0) > 0
+    ).length;
+    if (scorableCount < 5) {
+      console.warn(
+        `[Accounts] Base Supabase sem scoring suficiente (${scorableCount} scoráveis de ${supabaseAccounts.length}). Restaurando contasMock.`
+      );
+      return contasMock;
+    }
 
     console.info(`[Accounts] ${supabaseAccounts.length} contas carregadas do Supabase`);
     return supabaseAccounts;

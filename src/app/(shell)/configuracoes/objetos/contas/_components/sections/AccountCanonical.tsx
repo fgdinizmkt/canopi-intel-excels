@@ -81,7 +81,7 @@ export function AccountCanonical() {
       <Card className="border border-slate-200 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Revisão local da sessão</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Revisão local da sessão</p>
             <p className="text-sm font-medium text-slate-700">
               {canonicalMappingReviewed
                 ? 'Mapeamento canônico revisado nesta sessão.'
@@ -93,7 +93,7 @@ export function AccountCanonical() {
               type="button"
               onClick={resetCanonicalMappingToPreset}
               disabled={!selectedConnector}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-400 transition-all hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Restaurar padrão da fonte
@@ -102,7 +102,7 @@ export function AccountCanonical() {
               type="button"
               onClick={handleMarkReviewed}
               disabled={!selectedConnector || totalFields === 0}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-widest transition-all ${
                 canonicalMappingReviewed
                   ? 'bg-emerald-100 text-emerald-800'
                   : 'bg-slate-900 text-white hover:bg-slate-700'
@@ -119,14 +119,14 @@ export function AccountCanonical() {
         <table className="w-full text-left border-collapse">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Campo da fonte</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Campo canônico</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Obrigatório</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uso no pipeline</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uso em matching</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Uso em score/classificação</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status de revisão</th>
-              <th className="px-4 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Campo da fonte</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Campo canônico</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Obrigatório</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Uso no pipeline</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Uso em matching</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Uso em score/classificação</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Status de revisão</th>
+              <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Ação</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -135,21 +135,21 @@ export function AccountCanonical() {
                 <td className="px-4 py-3 text-xs font-bold text-slate-700">{mapping.nativeField}</td>
                 <td className="px-4 py-3 text-xs font-black text-slate-800 font-mono">{mapping.canonicalField}</td>
                 <td className="px-4 py-3">
-                  <Badge className={`${mapping.required ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'} border-none text-[9px] font-black uppercase`}>
+                  <Badge className={`${mapping.required ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-400'} border-none text-xs font-black uppercase`}>
                     {mapping.required ? 'Obrigatório' : 'Opcional'}
                   </Badge>
                 </td>
-                <td className="px-4 py-3 text-[11px] font-bold text-slate-600 uppercase tracking-wide">
+                <td className="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wide">
                   {resolvePipelineUsage(mapping.source)}
                 </td>
-                <td className="px-4 py-3 text-[11px] font-bold text-slate-600 uppercase tracking-wide">
+                <td className="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wide">
                   {resolveMatchingUsage(mapping.canonicalField)}
                 </td>
-                <td className="px-4 py-3 text-[11px] font-bold text-slate-600 uppercase tracking-wide">
+                <td className="px-4 py-3 text-xs font-bold text-slate-400 uppercase tracking-wide">
                   {resolveScoreUsage(mapping.isClassification)}
                 </td>
                 <td className="px-4 py-3">
-                  <Badge className={`${mapping.status === 'mapped' ? 'bg-emerald-100 text-emerald-700' : mapping.status === 'error' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'} border-none text-[9px] font-black uppercase`}>
+                  <Badge className={`${mapping.status === 'mapped' ? 'bg-emerald-100 text-emerald-700' : mapping.status === 'error' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'} border-none text-xs font-black uppercase`}>
                     {resolveReviewStatusLabel(mapping.status)}
                   </Badge>
                 </td>
@@ -157,7 +157,7 @@ export function AccountCanonical() {
                   <button
                     type="button"
                     onClick={() => handleToggleRowReview(mapping.canonicalField, mapping.status)}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-700 transition-all hover:border-slate-300"
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-black uppercase tracking-widest text-slate-700 transition-all hover:border-slate-300"
                   >
                     {mapping.status === 'mapped' ? 'Reabrir revisão' : 'Revisar campo'}
                   </button>

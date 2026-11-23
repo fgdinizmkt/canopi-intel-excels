@@ -37,8 +37,8 @@ const ScoreMiniBar = ({ label, val }: { label: string; val: number }) => {
   return (
     <div className="flex-1 min-w-0">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">{label}</span>
-        <span className="text-[10px] font-bold text-slate-300">{val}</span>
+        <span className="text-xs font-black text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-bold text-slate-300">{val}</span>
       </div>
       <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
         <div className={`h-full rounded-full transition-all duration-500 ${bgColor}`} style={{ width: `${val}%` }} />
@@ -198,7 +198,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     return sessionActions.filter(a => a.accountName === (account?.nome || ''));
   }, [sessionActions, account?.nome]);
 
-  const prioStyle: Record<string, string> = { 'Alta': 'text-red-400', 'Média': 'text-amber-400', 'Baixa': 'text-slate-500' };
+  const prioStyle: Record<string, string> = { 'Alta': 'text-red-400', 'Média': 'text-amber-400', 'Baixa': 'text-slate-400' };
   const riscoOpStyle: Record<string, string> = {
     'Alto': 'text-red-400 bg-red-500/10 border-red-500/20',
     'Médio': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
@@ -212,7 +212,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
     return (
       <div className={`relative h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 ${isFullscreen ? 'rounded-none' : 'rounded-l-2xl border-l border-slate-700/50'}`}>
         <div className="w-8 h-8 border-2 border-blue-600/30 border-t-blue-500 rounded-full animate-spin mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-widest animate-pulse">Sincronizando Profundidade da Conta...</p>
+        <p className="text-xs font-black uppercase tracking-widest animate-pulse">Sincronizando Profundidade da Conta...</p>
       </div>
     );
   }
@@ -472,8 +472,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h1 className="text-xl font-bold tracking-tight">{account.nome}</h1>
-                <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-slate-700 text-slate-400 border border-slate-600">{account.tipoEstrategico}</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${account.statusGeral === 'Saudável' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : account.statusGeral === 'Crítico' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
+                <span className="px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider bg-slate-700 text-slate-400 border border-slate-600">{account.tipoEstrategico}</span>
+                <span className={`px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider ${account.statusGeral === 'Saudável' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : account.statusGeral === 'Crítico' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}>
                   {account.statusGeral}
                 </span>
               </div>
@@ -486,17 +486,17 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           <div className="flex items-center gap-2">
             {showFeedback && (
               <div className="px-3 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg animate-in slide-in-from-top-1 fade-in duration-300">
-                <span className="text-[10px] font-black uppercase text-blue-400 tracking-widest flex items-center gap-2">
+                <span className="text-xs font-black uppercase text-blue-400 tracking-widest flex items-center gap-2">
                   <SparkleIcon className="w-3 h-3 animate-pulse" /> {showFeedback}
                 </span>
               </div>
             )}
             <button 
               onClick={onClose} 
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-sm group"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700/50 hover:bg-slate-700 text-slate-300 rounded-xl transition-all text-xs font-black uppercase tracking-widest shadow-sm group"
               title="Voltar"
             >
-              <X className="w-4 h-4 text-slate-500 group-hover:text-red-400 transition-colors" />
+              <X className="w-4 h-4 text-slate-400 group-hover:text-red-400 transition-colors" />
               Sair do Perfil
             </button>
           </div>
@@ -505,28 +505,28 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         <div className="flex items-center justify-between text-sm mb-3">
           <div className="flex items-center gap-5">
             <div className="flex flex-col">
-              <span className="text-slate-500 text-[9px] uppercase font-black tracking-widest mb-0.5">Owner Principal</span>
+              <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-0.5">Owner Principal</span>
               <span className="text-xs font-medium flex items-center gap-1.5"><Layout className="w-3 h-3 text-blue-500" />{account.ownerPrincipal}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-slate-500 text-[9px] uppercase font-black tracking-widest mb-0.5">Playbook Ativo</span>
+              <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-0.5">Playbook Ativo</span>
               <span className={`text-xs font-medium flex items-center gap-1.5 ${account.playAtivo !== 'Nenhum' ? 'text-blue-400' : 'text-slate-400'}`}>
                 <Zap className="w-3 h-3" />{account.playAtivo}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-slate-500 text-[9px] uppercase font-black tracking-widest mb-0.5">Atividade</span>
+              <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-0.5">Atividade</span>
               <span className={`text-xs font-bold ${account.atividadeRecente === 'Alta' ? 'text-emerald-400' : account.atividadeRecente === 'Baixa' ? 'text-red-400' : 'text-blue-400'}`}>{account.atividadeRecente}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 text-[10px] italic">Sincronizado Canopi AI</span>
+            <span className="text-slate-400 text-xs italic">Sincronizado Canopi AI</span>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
         </div>
 
         {/* Firmografia e Tecnografia enriquecida */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 border-t border-slate-700/40 text-[10px] text-slate-500">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 pt-3 border-t border-slate-700/40 text-xs text-slate-400">
           <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{account.localizacao}</span>
           <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400">{account.segmento} · {account.porte}</span>
           <span>Etapa: <span className="text-slate-100 font-bold uppercase">{account.etapa}</span></span>
@@ -539,7 +539,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
           {localTecnografia.length > 0 && (
             <div className="flex items-center gap-2 border-l border-slate-700 pl-4">
-              <span className="text-[9px] font-black uppercase text-slate-600 tracking-tighter">Stack:</span>
+              <span className="text-xs font-black uppercase text-slate-400 tracking-tighter">Stack:</span>
               <div className="flex gap-1.5">
                 {localTecnografia.map(t => (
                   <span key={t} className="px-1.5 py-0.5 bg-blue-500/5 border border-blue-500/20 text-blue-400 rounded-md font-bold tracking-tight">{t}</span>
@@ -570,14 +570,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/40 p-6 rounded-2xl border border-slate-700/50 shadow-lg space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <Target className="w-4 h-4 text-blue-400" /> Score & Priorização
                   </h2>
 
                   {/* Score Total + Prioridade */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex flex-col items-start">
-                      <span className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1">Score Total</span>
+                      <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-1">Score Total</span>
                       <div className={`text-3xl font-black ${accountScore.scoreTotal >= 75 ? 'text-emerald-400' : accountScore.scoreTotal >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                         {accountScore.scoreTotal}
                       </div>
@@ -589,7 +589,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       />
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1">Prioridade</span>
+                      <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-1">Prioridade</span>
                       <span className={`text-sm font-black uppercase tracking-wider px-3 py-1 rounded-lg ${
                         accountScore.prioridade === 'crítica' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                         accountScore.prioridade === 'alta' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
@@ -606,7 +606,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     {[accountScore.potencial, accountScore.risco, accountScore.prontidao, accountScore.cobertura, accountScore.confianca].map((dim, i) => (
                       <div key={i} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/40 hover:border-slate-600/60 transition-all">
                         <div className="flex justify-between items-start mb-2">
-                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{dim.name}</span>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">{dim.name}</span>
                           <span className={`text-sm font-black ${dim.score >= 75 ? 'text-emerald-400' : dim.score >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                             {dim.score}
                           </span>
@@ -617,7 +617,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                             style={{ width: `${dim.score}%` }}
                           />
                         </div>
-                        <p className="text-[8px] text-slate-500 italic leading-tight">{dim.rationale}</p>
+                        <p className="text-xs text-slate-400 italic leading-tight">{dim.rationale}</p>
                       </div>
                     ))}
                   </div>
@@ -625,15 +625,15 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   {/* Sinais por Dimensão */}
                   <div className="grid grid-cols-5 gap-2.5 mt-3">
                     {[accountScore.potencial, accountScore.risco, accountScore.prontidao, accountScore.cobertura, accountScore.confianca].map((dim, i) => (
-                      <div key={i} className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/25 text-[8px] text-slate-400 space-y-1">
+                      <div key={i} className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/25 text-xs text-slate-400 space-y-1">
                         {dim.signals.slice(0, 2).map((sig, j) => (
                           <div key={j} className="flex items-start gap-1">
-                            <span className="text-slate-600 flex-shrink-0 mt-0.5">•</span>
+                            <span className="text-slate-400 flex-shrink-0 mt-0.5">•</span>
                             <span className="leading-tight">{sig}</span>
                           </div>
                         ))}
                         {dim.signals.length > 2 && (
-                          <span className="text-slate-500 italic">+{dim.signals.length - 2} mais</span>
+                          <span className="text-slate-400 italic">+{dim.signals.length - 2} mais</span>
                         )}
                       </div>
                     ))}
@@ -647,7 +647,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   {accountScore.avisos.map((aviso, i) => (
                     <div key={i} className="flex items-center gap-2 p-2.5 bg-slate-800/50 rounded-lg border border-amber-500/20">
                       <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                      <span className="text-[10px] text-slate-200">{aviso}</span>
+                      <span className="text-xs text-slate-200">{aviso}</span>
                     </div>
                   ))}
                 </div>
@@ -663,7 +663,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xs font-black text-blue-300 uppercase tracking-widest mb-1">Próxima Melhor Ação</h3>
                   <p className="text-sm font-bold text-slate-100 mb-2">{deriveProximaMelhorAcao(account, accountScore)}</p>
-                  <p className="text-[11px] text-slate-400 leading-relaxed mb-3">{deriveMotivoDaRecomendacao(account, accountScore)}</p>
+                  <p className="text-xs text-slate-400 leading-relaxed mb-3">{deriveMotivoDaRecomendacao(account, accountScore)}</p>
                   <button
                     onClick={() => {
                       const acaoEstruturada = deriveAcaoOperacional(account, accountScore);
@@ -682,7 +682,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       setShowFeedback('✓ Ação operacional criada e adicionada à fila.');
                       setTimeout(() => setShowFeedback(null), 3000);
                     }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider rounded-lg transition-colors"
                   >
                     Gerar Ação Operacional
                   </button>
@@ -698,10 +698,10 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               { label: 'Score Potencial', val: `${account.potencial}`, color: 'text-emerald-400' },
               { label: 'Pipeline', val: fmt(localOportunidades.reduce((a, o) => a + o.valor, 0)), color: 'text-slate-100' },
               { label: 'Risco Churn', val: account.risco > 70 ? 'ALTO' : 'BAIXO', color: account.risco > 70 ? 'text-red-400' : 'text-emerald-400' },
-              { label: 'Oportunidades', val: `${localOportunidades.length}`, color: localOportunidades.length > 0 ? 'text-blue-400' : 'text-slate-500' },
+              { label: 'Oportunidades', val: `${localOportunidades.length}`, color: localOportunidades.length > 0 ? 'text-blue-400' : 'text-slate-400' },
             ].map(k => (
               <div key={k.label} className="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 flex flex-col items-center text-center">
-                <span className="text-slate-500 text-[9px] uppercase font-black tracking-widest mb-1">{k.label}</span>
+                <span className="text-slate-400 text-xs uppercase font-black tracking-widest mb-1">{k.label}</span>
                 <div className={`text-xl font-black ${k.color}`}>{k.val}</div>
               </div>
             ))}
@@ -716,7 +716,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
               <button
                 onClick={() => setEditingLeitura(editingLeitura ? null : { ...localLeitura })}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                 title={editingLeitura ? 'Cancelar edição' : 'Editar leitura'}
               >
                 <Pencil className="w-3 h-3" />
@@ -726,7 +726,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div className="p-4 rounded-xl bg-slate-800/40 border border-emerald-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Factual — Dados Verificáveis</span>
+                <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Factual — Dados Verificáveis</span>
               </div>
               {localLeitura.factual.length > 0 ? (
                 <ul className="space-y-1.5">
@@ -736,12 +736,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem dados factuais registrados.</p>}
+              ) : <p className="text-xs text-slate-400 italic">Sem dados factuais registrados.</p>}
             </div>
             <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <Brain className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest">Inferências — Padrão AI</span>
+                <span className="text-xs font-black text-amber-400 uppercase tracking-widest">Inferências — Padrão AI</span>
               </div>
               {localLeitura.inferida.length > 0 ? (
                 <ul className="space-y-1.5">
@@ -751,12 +751,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem inferências registradas.</p>}
+              ) : <p className="text-xs text-slate-400 italic">Sem inferências registradas.</p>}
             </div>
             <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/15">
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="w-3.5 h-3.5 text-blue-400" />
-                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Recomendações — Ação Sugerida</span>
+                <span className="text-xs font-black text-blue-400 uppercase tracking-widest">Recomendações — Ação Sugerida</span>
               </div>
               {localLeitura.sugerida.length > 0 ? (
                 <ul className="space-y-1.5">
@@ -766,14 +766,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem recomendações registradas.</p>}
+              ) : <p className="text-xs text-slate-400 italic">Sem recomendações registradas.</p>}
             </div>
 
             {/* Editor Mínimo: Leitura Estruturada (Recorte E17) */}
             {editingLeitura && (
               <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-blue-500/20 space-y-3">
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Dados Factuais</label>
+                  <label className="block text-xs font-black text-emerald-500 uppercase tracking-widest">Dados Factuais</label>
                   <textarea
                     value={editingLeitura.factual.join('\n')}
                     onChange={(e) => setEditingLeitura({ ...editingLeitura, factual: e.target.value.split('\n').filter(l => l.trim()) })}
@@ -783,7 +783,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-amber-500 uppercase tracking-widest">Padrões AI (Inferências)</label>
+                  <label className="block text-xs font-black text-amber-500 uppercase tracking-widest">Padrões AI (Inferências)</label>
                   <textarea
                     value={editingLeitura.inferida.join('\n')}
                     onChange={(e) => setEditingLeitura({ ...editingLeitura, inferida: e.target.value.split('\n').filter(l => l.trim()) })}
@@ -793,7 +793,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-blue-500 uppercase tracking-widest">Ações Sugeridas</label>
+                  <label className="block text-xs font-black text-blue-500 uppercase tracking-widest">Ações Sugeridas</label>
                   <textarea
                     value={editingLeitura.sugerida.join('\n')}
                     onChange={(e) => setEditingLeitura({ ...editingLeitura, sugerida: e.target.value.split('\n').filter(l => l.trim()) })}
@@ -805,13 +805,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     onClick={() => setEditingLeitura(null)}
-                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleSaveLeitura}
-                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all"
+                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-xs font-bold text-blue-400 hover:text-blue-300 transition-all"
                   >
                     Salvar
                   </button>
@@ -824,12 +824,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <HistoryIcon className="w-4 h-4 text-slate-500" />
+                <HistoryIcon className="w-4 h-4 text-slate-400" />
                 <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Histórico Estruturado</h2>
               </div>
               <button
                 onClick={() => setEditingHistorico(editingHistorico ? null : { data: '', tipo: '', descricao: '', icone: 'HistoryIcon' })}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                 title={editingHistorico ? 'Cancelar edição' : 'Adicionar entrada'}
               >
                 <Pencil className="w-3 h-3" />
@@ -841,7 +841,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <ul className="space-y-2.5">
                   {localHistorico.map((h, i) => (
                     <li key={i} className="text-xs text-slate-300 flex items-start gap-2 pb-2 border-b border-slate-700/30 last:border-b-0">
-                      <span className="text-slate-500 flex-shrink-0 font-bold">{h.data}</span>
+                      <span className="text-slate-400 flex-shrink-0 font-bold">{h.data}</span>
                       <div className="flex-1">
                         <div className="font-bold text-slate-200">{h.tipo}</div>
                         <div className="text-slate-400 mt-0.5">{h.descricao}</div>
@@ -849,14 +849,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem entradas no histórico.</p>}
+              ) : <p className="text-xs text-slate-400 italic">Sem entradas no histórico.</p>}
             </div>
 
             {/* Editor Mínimo: Nova Entrada Histórica (Recorte E18) */}
             {editingHistorico && (
               <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-amber-500/20 space-y-3">
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Data (dd/mm/aaaa)</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Data (dd/mm/aaaa)</label>
                   <input
                     type="text"
                     value={editingHistorico.data}
@@ -866,7 +866,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Tipo</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Tipo</label>
                   <select
                     value={editingHistorico.tipo}
                     onChange={(e) => setEditingHistorico({ ...editingHistorico, tipo: e.target.value })}
@@ -881,7 +881,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Descrição</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Descrição</label>
                   <textarea
                     value={editingHistorico.descricao}
                     onChange={(e) => setEditingHistorico({ ...editingHistorico, descricao: e.target.value })}
@@ -891,7 +891,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Ícone (opcional)</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Ícone (opcional)</label>
                   <select
                     value={editingHistorico.icone || 'HistoryIcon'}
                     onChange={(e) => setEditingHistorico({ ...editingHistorico, icone: e.target.value })}
@@ -907,13 +907,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     onClick={() => setEditingHistorico(null)}
-                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleSaveHistorico}
-                    className="px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 rounded-lg text-[9px] font-bold text-amber-400 hover:text-amber-300 transition-all"
+                    className="px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 rounded-lg text-xs font-bold text-amber-400 hover:text-amber-300 transition-all"
                   >
                     Salvar Entrada
                   </button>
@@ -926,12 +926,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-slate-500" />
+                <Globe className="w-4 h-4 text-slate-400" />
                 <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Stack Tecnológico</h2>
               </div>
               <button
                 onClick={() => setEditingTecnografia(editingTecnografia !== null ? null : '')}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                 title={editingTecnografia !== null ? 'Cancelar adição' : 'Adicionar tecnologia'}
               >
                 <Pencil className="w-3 h-3" />
@@ -946,7 +946,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       <span className="font-bold text-slate-200">{tech}</span>
                       <button
                         onClick={() => handleRemoveTecnografia(i)}
-                        className="text-[10px] text-slate-500 hover:text-red-400 transition-colors"
+                        className="text-xs text-slate-400 hover:text-red-400 transition-colors"
                         title="Remover tecnologia"
                       >
                         ✕
@@ -954,14 +954,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </li>
                   ))}
                 </ul>
-              ) : <p className="text-xs text-slate-600 italic">Sem tecnologias registradas.</p>}
+              ) : <p className="text-xs text-slate-400 italic">Sem tecnologias registradas.</p>}
             </div>
 
             {/* Editor Mínimo: Adicionar Tecnologia (Recorte E19) */}
             {editingTecnografia !== null && (
               <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-blue-500/20 space-y-3">
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest">Nome da Tecnologia</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Nome da Tecnologia</label>
                   <input
                     type="text"
                     value={editingTecnografia ?? ''}
@@ -974,13 +974,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     onClick={() => setEditingTecnografia(null)}
-                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleSaveTecnografia}
-                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] font-bold text-blue-400 hover:text-blue-300 transition-all"
+                    className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-xs font-bold text-blue-400 hover:text-blue-300 transition-all"
                   >
                     Adicionar
                   </button>
@@ -1002,12 +1002,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                    </div>
                    <div>
                       <h2 className="text-xs font-black text-slate-100 uppercase tracking-[0.2em]">Fila de Fogo: Priorização Estratégica</h2>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Cruzamento de Sinais, Memória e Radar Relacional</p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Cruzamento de Sinais, Memória e Radar Relacional</p>
                    </div>
                 </div>
                 <div className="flex gap-2">
-                   <span className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-[9px] font-black text-red-400">NEXT BEST PLAY</span>
-                   <span className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-[9px] font-black text-slate-500 uppercase tracking-widest">Calculado agora</span>
+                   <span className="px-2 py-1 rounded bg-red-500/10 border border-red-500/20 text-xs font-black text-red-400">NEXT BEST PLAY</span>
+                   <span className="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-black text-slate-400 uppercase tracking-widest">Calculado agora</span>
                 </div>
               </div>
 
@@ -1017,24 +1017,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <div className="flex items-center justify-between mb-4">
                        <div className="flex items-center gap-2">
                           <AlertTriangle className="w-4 h-4 text-amber-500" />
-                          <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">ALERTA CRÍTICO</span>
+                          <span className="text-xs font-black text-amber-500 uppercase tracking-widest">ALERTA CRÍTICO</span>
                        </div>
-                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #1</span>
+                       <span className="text-xs font-black text-slate-400 uppercase">Prioridade #1</span>
                     </div>
                     <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
                        Executivo em área crítica + histórico positivo com sponsor → priorizar abordagem executiva
                     </p>
                     <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Sinal Atual</span>
-                          <p className="text-[11px] text-slate-400">{account.sinais[0]?.titulo || 'Mudança Detectada'}</p>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Sinal Atual</span>
+                          <p className="text-xs text-slate-400">{account.sinais[0]?.titulo || 'Mudança Detectada'}</p>
                        </div>
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest">Aprendizado Histórico</span>
-                          <p className="text-[11px] text-slate-400 italic">&quot;{account.inteligencia.padroes[0] || 'Aceleração via decisores técnicos.'}&quot;</p>
+                          <span className="text-xs font-black text-blue-500 uppercase tracking-widest">Aprendizado Histórico</span>
+                          <p className="text-xs text-slate-400 italic">&quot;{account.inteligencia.padroes[0] || 'Aceleração via decisores técnicos.'}&quot;</p>
                        </div>
                     </div>
-                    <button className="w-full mt-5 py-2.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-[10px] font-black text-red-400 uppercase tracking-widest transition-all">
+                    <button className="w-full mt-5 py-2.5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/30 rounded-xl text-xs font-black text-red-400 uppercase tracking-widest transition-all">
                        Ativar Play de Blindagem
                     </button>
                  </div>
@@ -1044,24 +1044,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <div className="flex items-center justify-between mb-4">
                        <div className="flex items-center gap-2">
                           <Users2 className="w-4 h-4 text-blue-500" />
-                          <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">GAP DE COBERTURA</span>
+                          <span className="text-xs font-black text-blue-500 uppercase tracking-widest">GAP DE COBERTURA</span>
                        </div>
-                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #2</span>
+                       <span className="text-xs font-black text-slate-400 uppercase">Prioridade #2</span>
                     </div>
                     <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
                        Sinal de alerta em área sem cobertura + padrão histórico de bloqueio → priorizar preenchimento de gap
                     </p>
                     <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Ponto de Tensão</span>
-                          <p className="text-[11px] text-slate-400">{account.contatos.find(c => c.classificacao.includes('Blocker'))?.nome || 'Stakeholder Crítico'}</p>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Ponto de Tensão</span>
+                          <p className="text-xs text-slate-400">{account.contatos.find(c => c.classificacao.includes('Blocker'))?.nome || 'Stakeholder Crítico'}</p>
                        </div>
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Sucesso Base</span>
-                          <p className="text-[11px] text-slate-400 italic">&quot;{account.inteligencia.sucessos[0] || 'Abertura via outbound consultivo.'}&quot;</p>
+                          <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Sucesso Base</span>
+                          <p className="text-xs text-slate-400 italic">&quot;{account.inteligencia.sucessos[0] || 'Abertura via outbound consultivo.'}&quot;</p>
                        </div>
                     </div>
-                    <button className="w-full mt-5 py-2.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-[10px] font-black text-blue-400 uppercase tracking-widest transition-all">
+                    <button className="w-full mt-5 py-2.5 bg-blue-500/5 hover:bg-blue-500/10 border border-blue-500/30 rounded-xl text-xs font-black text-blue-400 uppercase tracking-widest transition-all">
                        Alocar Champion Técnico
                     </button>
                  </div>
@@ -1071,24 +1071,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     <div className="flex items-center justify-between mb-4">
                        <div className="flex items-center gap-2">
                           <Zap className="w-4 h-4 text-emerald-500" />
-                          <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">ESTRATÉGIA AI</span>
+                          <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">ESTRATÉGIA AI</span>
                        </div>
-                       <span className="text-[8px] font-black text-slate-600 uppercase">Prioridade #3</span>
+                       <span className="text-xs font-black text-slate-400 uppercase">Prioridade #3</span>
                     </div>
                     <p className="text-sm font-bold text-slate-100 mb-2 leading-tight">
                        Conta com hipótese recorrente e contexto favorável → priorizar play de destrave comercial
                     </p>
                     <div className="space-y-3 mt-4 border-t border-slate-800/80 pt-4">
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Hipótese AI</span>
-                          <p className="text-[11px] text-slate-400">{account.inteligencia.hipoteses[0] || 'Workshop executivo sugerido.'}</p>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Hipótese AI</span>
+                          <p className="text-xs text-slate-400">{account.inteligencia.hipoteses[0] || 'Workshop executivo sugerido.'}</p>
                        </div>
                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest">Contexto</span>
-                          <p className="text-[11px] text-slate-400">Janela de renovação ativa e sinais de engajamento.</p>
+                          <span className="text-xs font-black text-amber-500 uppercase tracking-widest">Contexto</span>
+                          <p className="text-xs text-slate-400">Janela de renovação ativa e sinais de engajamento.</p>
                        </div>
                     </div>
-                    <button className="w-full mt-5 py-2.5 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[10px] font-black text-emerald-500 uppercase tracking-widest transition-all">
+                    <button className="w-full mt-5 py-2.5 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs font-black text-emerald-500 uppercase tracking-widest transition-all">
                        Simular Valor do ROI
                     </button>
                  </div>
@@ -1098,12 +1098,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           {/* Canais e Campanhas (Evolução Canônica — Recorte 51: E20) */}
           <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <Globe className="w-4 h-4 text-emerald-500" /> Origem e Influência de Canais
               </h3>
               <button
                 onClick={() => setEditingCanaisCampanhas(editingCanaisCampanhas !== null ? null : { origemPrincipal: localCanaisCampanhas.origemPrincipal, influenciasJson: JSON.stringify(localCanaisCampanhas.influencias, null, 2) })}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                 title={editingCanaisCampanhas !== null ? 'Cancelar edição' : 'Editar canais'}
               >
                 <Pencil className="w-3 h-3" />
@@ -1112,19 +1112,19 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Origem Principal</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">Origem Principal</span>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                     <Target className="w-5 h-5" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-100">{localCanaisCampanhas.origemPrincipal || 'Não definido'}</p>
-                    <p className="text-[10px] text-slate-500">Atribuição por Primeiro Toque</p>
+                    <p className="text-xs text-slate-400">Atribuição por Primeiro Toque</p>
                   </div>
                 </div>
               </div>
               <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">Influência Recente ({localCanaisCampanhas.influencias.length})</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">Influência Recente ({localCanaisCampanhas.influencias.length})</span>
                 <div className="space-y-3">
                   {localCanaisCampanhas.influencias.length > 0 ? (
                     localCanaisCampanhas.influencias.map((inf, i) => (
@@ -1133,11 +1133,11 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                           <Share2 className="w-3 h-3 text-blue-400" />
                           <span className="text-slate-300">{inf.canal} — {inf.campanha}</span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-500 italic">{inf.data}</span>
+                        <span className="text-xs font-bold text-slate-400 italic">{inf.data}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-[10px] text-slate-500 italic">Sem influências registradas.</p>
+                    <p className="text-xs text-slate-400 italic">Sem influências registradas.</p>
                   )}
                 </div>
               </div>
@@ -1147,7 +1147,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             {editingCanaisCampanhas !== null && (
               <div className="mt-4 p-4 rounded-xl bg-slate-800/60 border border-emerald-500/20 space-y-3">
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Origem Principal</label>
+                  <label className="block text-xs font-black text-emerald-500 uppercase tracking-widest">Origem Principal</label>
                   <input
                     type="text"
                     value={editingCanaisCampanhas.origemPrincipal}
@@ -1157,7 +1157,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[9px] font-black text-emerald-500 uppercase tracking-widest">Influências (JSON)</label>
+                  <label className="block text-xs font-black text-emerald-500 uppercase tracking-widest">Influências (JSON)</label>
                   <textarea
                     value={editingCanaisCampanhas.influenciasJson}
                     onChange={(e) => setEditingCanaisCampanhas({ ...editingCanaisCampanhas, influenciasJson: e.target.value })}
@@ -1169,13 +1169,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <div className="flex gap-2 justify-end pt-2">
                   <button
                     onClick={() => setEditingCanaisCampanhas(null)}
-                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-300 transition-all"
+                    className="px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-300 transition-all"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleSaveCanaisCampanhas}
-                    className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg text-[9px] font-bold text-emerald-400 hover:text-emerald-300 transition-all"
+                    className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-lg text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-all"
                   >
                     Salvar
                   </button>
@@ -1187,7 +1187,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           {/* Operacional: Ações e Oportunidades */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <Zap className="w-4 h-4" /> Ações Operacionais
               </h3>
               <div className="space-y-3">
@@ -1195,24 +1195,24 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   <div key={a.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
                     <div className="flex justify-between items-start gap-2 mb-1.5">
                       <p className="text-sm font-bold text-slate-100">{a.title}</p>
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-black border ${statusAcaoStyle[a.status]}`}>{a.status}</span>
+                      <span className={`px-2 py-0.5 rounded-md text-xs font-black border ${statusAcaoStyle[a.status]}`}>{a.status}</span>
                     </div>
-                    <div className="text-[10px] text-slate-500">{a.ownerName || 'Sem owner'} • {a.category}</div>
+                    <div className="text-xs text-slate-400">{a.ownerName || 'Sem owner'} • {a.category}</div>
                     {a.nextStep && (
-                      <div className="mt-2 text-[10px] text-blue-400 font-medium italic truncate">
+                      <div className="mt-2 text-xs text-blue-400 font-medium italic truncate">
                         → {a.nextStep}
                       </div>
                     )}
                   </div>
                 )) : (
                   <div className="py-8 text-center border border-dashed border-slate-700/50 rounded-xl">
-                    <p className="text-[10px] text-slate-500 uppercase font-black">Nenhuma ação ativa</p>
+                    <p className="text-xs text-slate-400 uppercase font-black">Nenhuma ação ativa</p>
                   </div>
                 )}
               </div>
             </div>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" /> Pipeline
               </h3>
               <div className="space-y-3">
@@ -1220,7 +1220,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   <div key={op.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800 relative group">
                     <button 
                       onClick={() => setEditingOp(op)}
-                      className="absolute top-3 right-3 p-1 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-all border border-transparent hover:border-slate-700"
+                      className="absolute top-3 right-3 p-1 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-all border border-transparent hover:border-slate-700"
                       title="Editar risco e etapa"
                     >
                       <Pencil className="w-3.5 h-3.5" />
@@ -1229,7 +1229,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       <p className="text-sm font-bold text-slate-100">{op.nome}</p>
                       <span className="text-emerald-400 font-black">{fmt(op.valor)}</span>
                     </div>
-                    <div className="text-[10px] text-slate-500">{op.etapa} • Risco <span className={riscoOpStyle[op.risco].split(' ')[0]}>{op.risco}</span></div>
+                    <div className="text-xs text-slate-400">{op.etapa} • Risco <span className={riscoOpStyle[op.risco].split(' ')[0]}>{op.risco}</span></div>
                     <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500" style={{ width: `${op.probabilidade}%` }} />
                     </div>
@@ -1248,7 +1248,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
               <button 
                 onClick={() => setEditingIntel(localInteligencia)}
-                className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all border border-transparent hover:border-slate-700"
+                className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-800 rounded-lg transition-all border border-transparent hover:border-slate-700"
                 title="Editar Inteligência"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -1259,7 +1259,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               {/* Sucessos e Insucessos: O Fato Histórico */}
               <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50 flex flex-col gap-4">
                 <div>
-                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Memória de Prospecção</span>
+                   <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-3">Memória de Prospecção</span>
                    <div className="space-y-3">
                      {localInteligencia.sucessos.map((s, i) => (
                        <div key={i} className="flex gap-2 text-xs">
@@ -1279,10 +1279,10 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
               {/* Padrões e Learnings: O Conhecimento Extraído */}
               <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 border border-blue-500/10 flex flex-col gap-4">
-                <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest block mb-1">Padrões & Learnings</span>
+                <span className="text-xs font-black text-blue-400 uppercase tracking-widest block mb-1">Padrões & Learnings</span>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Padrões Observados</p>
+                    <p className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">Padrões Observados</p>
                     <div className="space-y-2 text-xs text-slate-200 font-medium">
                       {localInteligencia.padroes.map((p, i) => (
                         <div key={i} className="bg-blue-500/5 p-2 rounded-lg border border-blue-500/10 italic">
@@ -1292,7 +1292,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                     </div>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-tighter">Lição Principal</p>
+                    <p className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-tighter">Lição Principal</p>
                     <div className="flex items-center gap-3 bg-amber-500/5 p-2.5 rounded-xl border border-amber-500/10">
                       <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0" />
                       <p className="text-xs text-amber-200/80 font-bold leading-tight">{localInteligencia.learnings[0] || 'Sem learnings registrados.'}</p>
@@ -1303,7 +1303,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
 
               {/* Hipóteses e Recomendações: A Implicação operacional */}
               <div className="p-5 rounded-2xl bg-slate-800/30 border border-slate-700/50 flex flex-col gap-4">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-3">Hipóteses de Destrave</span>
+                <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-3">Hipóteses de Destrave</span>
                 <div className="space-y-3">
                   {localInteligencia.hipoteses.map((h, i) => (
                     <div key={i} className="p-3 rounded-xl bg-slate-900/30 border border-slate-800 flex flex-col gap-1.5">
@@ -1311,15 +1311,15 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                         <SparkleIcon className="w-3 h-3 text-blue-400" />
                         <p className="text-xs font-bold text-slate-200">Hipótese #{i+1}</p>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-normal">{h}</p>
+                      <p className="text-xs text-slate-400 leading-normal">{h}</p>
                     </div>
                   ))}
                   {localInteligencia.fatoresRecomendacao.length > 0 && (
                      <div className="mt-2 pt-3 border-t border-slate-700/50">
-                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1.5">Fatores AI</p>
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">Fatores AI</p>
                         <div className="flex flex-wrap gap-1.5">
                            {localInteligencia.fatoresRecomendacao.map((f, i) => (
-                             <span key={i} className="text-[8px] px-1.5 py-0.5 bg-slate-800 text-slate-500 rounded border border-slate-700">{f}</span>
+                             <span key={i} className="text-xs px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded border border-slate-700">{f}</span>
                            ))}
                         </div>
                      </div>
@@ -1334,7 +1334,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-5 flex items-center gap-3">
               <Network className="w-5 h-5" /> Radar de Inteligência Relacional
               <div className="flex-1 h-px bg-blue-500/20" />
-              <span className="text-[10px] font-normal text-blue-500/60 lowercase italic">cruzamento de sinais x comitê</span>
+              <span className="text-xs font-normal text-blue-500/60 lowercase italic">cruzamento de sinais x comitê</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1342,52 +1342,52 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Tensão</span>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Pontos de Tensão</span>
                 </div>
                 {radar.tension.length > 0 ? radar.tension.map(c => (
                   <div key={c.id} className="p-3 bg-red-500/5 border border-red-500/10 rounded-xl flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-[10px] font-bold text-red-400">
+                    <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-xs font-bold text-red-400">
                       {c.nome.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-slate-100 truncate">{c.nome}</p>
-                      <p className="text-[9px] text-red-400 uppercase font-black">{c.area} • Exposição Crítica</p>
+                      <p className="text-xs font-bold text-slate-100 truncate">{c.nome}</p>
+                      <p className="text-xs text-red-400 uppercase font-black">{c.area} • Exposição Crítica</p>
                     </div>
                   </div>
-                )) : <p className="text-[10px] text-slate-600 italic">Nenhum stakeholder influente sob alerta imediato.</p>}
+                )) : <p className="text-xs text-slate-400 italic">Nenhum stakeholder influente sob alerta imediato.</p>}
               </div>
 
               {/* Pontos de Apoio */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Pontos de Apoio</span>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Pontos de Apoio</span>
                 </div>
                 {radar.support.length > 0 ? radar.support.map(c => (
                   <div key={c.id} className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-400">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
                       {c.nome.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-slate-100 truncate">{c.nome}</p>
-                      <p className="text-[9px] text-emerald-400 uppercase font-black">{c.area} • Driver de Sucesso</p>
+                      <p className="text-xs font-bold text-slate-100 truncate">{c.nome}</p>
+                      <p className="text-xs text-emerald-400 uppercase font-black">{c.area} • Driver de Sucesso</p>
                     </div>
                   </div>
-                )) : <p className="text-[10px] text-slate-600 italic">Sem sponsors ativos para os sinais atuais.</p>}
+                )) : <p className="text-xs text-slate-400 italic">Sem sponsors ativos para os sinais atuais.</p>}
               </div>
 
               {/* Gaps de Interlocução */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Target className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gaps de Cobertura</span>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Gaps de Cobertura</span>
                 </div>
                 {radar.gaps.length > 0 ? radar.gaps.map((area, i) => (
                   <div key={i} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
-                    <p className="text-[11px] font-bold text-slate-100">{area}</p>
-                    <p className="text-[9px] text-blue-400 uppercase font-black">Sinal Crítico Detectado • Sem Contato</p>
+                    <p className="text-xs font-bold text-slate-100">{area}</p>
+                    <p className="text-xs text-blue-400 uppercase font-black">Sinal Crítico Detectado • Sem Contato</p>
                   </div>
-                )) : <p className="text-[10px] text-slate-600 italic">Toda área crítica possui interlocutor mapeado.</p>}
+                )) : <p className="text-xs text-slate-400 italic">Toda área crítica possui interlocutor mapeado.</p>}
               </div>
             </div>
           </div>
@@ -1399,13 +1399,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 <h3 className="text-xl font-black text-slate-100 uppercase tracking-tight flex items-center gap-3">
                   <Network className="w-5 h-5 text-blue-500" /> Comitê de Compras & Influência
                 </h3>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">Mapeamento hierárquico enriquecido com sinais de área</p>
+                <p className="text-xs text-slate-400 font-medium mt-1">Mapeamento hierárquico enriquecido com sinais de área</p>
               </div>
               <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
-                <button onClick={() => setOrgView('tree')} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>
+                <button onClick={() => setOrgView('tree')} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${orgView === 'tree' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>
                   <Network className="w-3.5 h-3.5" /> Organograma
                 </button>
-                <button onClick={() => setOrgView('list')} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${orgView === 'list' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>
+                <button onClick={() => setOrgView('list')} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${orgView === 'list' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}>
                   <ListIcon className="w-3.5 h-3.5" /> Lista
                 </button>
               </div>
@@ -1428,9 +1428,9 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   <table className="w-full text-left">
                     <thead>
                       <tr className="bg-slate-800/40 border-b border-slate-800">
-                        <th className="pl-8 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Stakeholder</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Área / Inteligência</th>
-                        <th className="px-4 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Relacional</th>
+                        <th className="pl-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Stakeholder</th>
+                        <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Área / Inteligência</th>
+                        <th className="px-4 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Relacional</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800">
@@ -1444,7 +1444,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                                 <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white border border-slate-700">{contact.nome.substring(0, 2).toUpperCase()}</div>
                                 <div>
                                   <div className="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition-colors">{contact.nome}</div>
-                                  <div className="text-[10px] text-slate-500">{contact.cargo}</div>
+                                  <div className="text-xs text-slate-400">{contact.cargo}</div>
                                 </div>
                               </div>
                             </td>
@@ -1452,7 +1452,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-slate-100 font-bold uppercase">{contact.area}</span>
                                 {sinaisNaArea.length > 0 && (
-                                  <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${hasCriticalSignal ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                                  <div className={`px-2 py-0.5 rounded-full text-xs font-black uppercase flex items-center gap-1 ${hasCriticalSignal ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
                                     {hasCriticalSignal ? <AlertTriangle className="w-2.5 h-2.5" /> : <SparkleIcon className="w-2.5 h-2.5" />}
                                     {sinaisNaArea.length} SINAL
                                   </div>
@@ -1469,7 +1469,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   </table>
                 )}
               </div>
-            ) : <div className="p-8 border border-slate-800 text-center text-xs italic text-slate-600">Nenhum contato mapeado.</div>}
+            ) : <div className="p-8 border border-slate-800 text-center text-xs italic text-slate-400">Nenhum contato mapeado.</div>}
           </div>
 
           {/* Plays Recomendados (Canopi AI) — RECORTE BLOCO C */}
@@ -1482,7 +1482,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 {playRecommendations.map(play => (
                   <div key={play.id} className="p-4 bg-slate-900/60 rounded-xl border border-slate-700/50 hover:border-blue-500/30 transition-all group">
                     <div className="flex justify-between items-start mb-2">
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter ${
+                      <span className={`px-2 py-0.5 rounded text-xs font-black uppercase tracking-tighter ${
                         play.playType === 'expansion' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
                         play.playType === 'entry' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
                         'bg-amber-500/20 text-amber-400 border border-amber-500/30'
@@ -1492,14 +1492,14 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                       <span className="text-xs font-black text-blue-500">{play.confidenceScore}% fit</span>
                     </div>
                     <h4 className="text-sm font-bold text-slate-100 mb-2 group-hover:text-blue-400 transition-colors uppercase italic">{play.playName}</h4>
-                    <p className="text-[11px] text-slate-400 leading-relaxed mb-4">{play.rationale}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed mb-4">{play.rationale}</p>
                     <div className="flex flex-col gap-2 pt-3 border-t border-slate-800">
-                      <div className="flex justify-between text-[9px] font-black uppercase tracking-tight">
-                        <span className="text-slate-500">Valor Estimado</span>
+                      <div className="flex justify-between text-xs font-black uppercase tracking-tight">
+                        <span className="text-slate-400">Valor Estimado</span>
                         <span className="text-emerald-400">{fmt(play.estimatedValue)}</span>
                       </div>
-                      <div className="flex justify-between text-[9px] font-black uppercase tracking-tight">
-                        <span className="text-slate-500">Próximo Passo</span>
+                      <div className="flex justify-between text-xs font-black uppercase tracking-tight">
+                        <span className="text-slate-400">Próximo Passo</span>
                         <span className="text-blue-400">{play.nextStepDescription}</span>
                       </div>
                     </div>
@@ -1512,7 +1512,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
           {/* Histórico e Sinais (RESTAURADOS ao nível de riqueza do Recorte 25) */}
           <div className={`grid gap-6 ${isFullscreen ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
                 <HistoryIcon className="w-4 h-4" /> Timeline Integrada (360)
               </h3>
               <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-slate-800">
@@ -1553,8 +1553,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                            <IconComp className={`w-3 h-3 ${h.tipo.includes('Sinal') ? 'text-red-500' : h.tipo.includes('Ação') ? 'text-blue-500' : 'text-emerald-500'}`} />
                         </div>
                         <div className="flex justify-between items-start mb-0.5">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{h.tipo}</span>
-                          <span className="text-[10px] font-bold text-slate-600 italic">{h.data}</span>
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{h.tipo}</span>
+                          <span className="text-xs font-bold text-slate-400 italic">{h.data}</span>
                         </div>
                         <p className="text-xs text-slate-300 leading-relaxed font-medium">{h.descricao}</p>
                       </div>
@@ -1564,7 +1564,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
               </div>
             </div>
             <div className="bg-slate-800/20 p-5 rounded-2xl border border-slate-700/50">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-5 flex items-center gap-2">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
                 <Target className="w-4 h-4" /> Sinais Ativos
               </h3>
               <div className="space-y-3">
@@ -1572,10 +1572,10 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                   <div key={s.id} className="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
                     <div className="flex justify-between items-start mb-1.5">
                       <p className="text-sm font-bold text-slate-100">{s.titulo}</p>
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${s.tipo === 'Alerta' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>{s.tipo}</span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-black uppercase ${s.tipo === 'Alerta' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>{s.tipo}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 italic mb-2">&quot;{s.recomendacao}&quot;</p>
-                    <div className="flex flex-wrap gap-2 text-[9px] text-slate-500 uppercase font-black tracking-tighter">
+                    <p className="text-xs text-slate-400 italic mb-2">&quot;{s.recomendacao}&quot;</p>
+                    <div className="flex flex-wrap gap-2 text-xs text-slate-400 uppercase font-black tracking-tighter">
                       <span className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">{s.contexto}</span>
                       <span>Impacto: <span className={s.impacto === 'Alto' ? 'text-red-400' : 'text-blue-400'}>{s.impacto}</span></span>
                       <span>Owner: {s.owner}</span>
@@ -1595,12 +1595,12 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
         {isLogging ? (
           <div className="w-full flex flex-col gap-3 p-3 bg-slate-900 border border-blue-500/30 rounded-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-2xl">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-black uppercase text-blue-400 tracking-widest">Novo Registro de Log</span>
+              <span className="text-xs font-black uppercase text-blue-400 tracking-widest">Novo Registro de Log</span>
               <LogsIcon className="w-3 h-3 text-blue-500" />
             </div>
             <textarea 
               autoFocus
-              className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-600 transition-all resize-none"
+              className="w-full h-24 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 transition-all resize-none"
               placeholder="Descreva a atividade realizada com esta conta..."
               value={logDraft}
               onChange={e => setLogDraft(e.target.value)}
@@ -1608,13 +1608,13 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div className="flex justify-end gap-2">
               <button 
                 onClick={() => { setIsLogging(false); setLogDraft(''); }} 
-                className="px-4 py-2 text-[10px] font-black uppercase text-slate-500 hover:text-slate-300 transition-colors"
+                className="px-4 py-2 text-xs font-black uppercase text-slate-400 hover:text-slate-300 transition-colors"
               >
                 Cancelar
               </button>
               <button 
                 onClick={handleSaveLog} 
-                className="px-6 py-2 bg-blue-600 text-white text-[10px] font-black uppercase rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-900/40 transition-all active:scale-95"
+                className="px-6 py-2 bg-blue-600 text-white text-xs font-black uppercase rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-900/40 transition-all active:scale-95"
               >
                 Salvar Log
               </button>
@@ -1635,8 +1635,8 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden md:flex flex-col items-end pr-4 border-r border-slate-700">
-                <span className="text-[9px] text-slate-500 uppercase font-black">Próxima Recomendação</span>
-                <span className="text-[10px] text-blue-400 font-bold truncate max-w-[200px]">{account.proximaMelhorAcao}</span>
+                <span className="text-xs text-slate-400 uppercase font-black">Próxima Recomendação</span>
+                <span className="text-xs text-blue-400 font-bold truncate max-w-[200px]">{account.proximaMelhorAcao}</span>
               </div>
               <button 
                 onClick={handleExecPlaybook}
@@ -1684,9 +1684,9 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 italic">Memória e Inteligência da Conta</h3>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest">Escrita Defensiva Atômica</p>
+                <p className="text-xs text-slate-400 uppercase tracking-widest">Escrita Defensiva Atômica</p>
               </div>
-              <button onClick={() => setEditingIntel(null)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-500 transition-colors" title="Fechar">
+              <button onClick={() => setEditingIntel(null)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 transition-colors" title="Fechar">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1701,7 +1701,7 @@ export const AccountDetailView: React.FC<AccountDetailViewProps> = ({
                 { key: 'fatoresRecomendacao', label: 'Fatores de Recomendação', color: 'text-slate-400' },
               ].map(block => (
                 <div key={block.key} className="space-y-2">
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">{block.label}</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest pl-1">{block.label}</label>
                   <textarea
                     className={`w-full h-32 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder:text-slate-700 focus:outline-none focus:border-blue-500/50 transition-all resize-none ${block.color}`}
                     placeholder="Um item por linha..."

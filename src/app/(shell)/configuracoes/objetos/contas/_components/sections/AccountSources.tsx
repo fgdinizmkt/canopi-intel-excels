@@ -494,7 +494,7 @@ function Field({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">{label}</label>
+      <label className="text-xs font-black uppercase tracking-[0.24em] text-slate-400">{label}</label>
       {textarea ? (
         <textarea
           value={value}
@@ -2043,18 +2043,18 @@ export function AccountSources() {
                       </div>
                       <div>
                         <h3 className="text-base font-black uppercase tracking-tight text-slate-900">{preset.name}</h3>
-                        <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">{getIntegrationLabel(type)}</p>
+                        <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">{getIntegrationLabel(type)}</p>
                       </div>
                     </div>
                     {isActive ? (
-                        <span className="rounded-lg px-2.5 py-1 text-[9px] font-black uppercase bg-blue-100 text-blue-700">
+                        <span className="rounded-lg px-2.5 py-1 text-xs font-black uppercase bg-blue-100 text-blue-700">
                         Fonte selecionada
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => setConnector(type)}
-                        className="rounded-lg px-2.5 py-1 text-[9px] font-black uppercase bg-slate-900 text-white transition-all hover:bg-slate-700"
+                        className="rounded-lg px-2.5 py-1 text-xs font-black uppercase bg-slate-900 text-white transition-all hover:bg-slate-700"
                       >
                         Usar esta fonte
                       </button>
@@ -2062,23 +2062,23 @@ export function AccountSources() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between">
-                    <Badge className={`border-none text-[8px] font-black ${preset.identity.confidenceScore > 90 ? 'bg-emerald-100 text-emerald-700' : preset.identity.confidenceScore > 75 ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700'}`}>
+                    <Badge className={`border-none text-xs font-black ${preset.identity.confidenceScore > 90 ? 'bg-emerald-100 text-emerald-700' : preset.identity.confidenceScore > 75 ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-700'}`}>
                       Confiança: {preset.identity.confidenceScore}%
                     </Badge>
-                    <Badge className={`border-none text-[8px] font-black ${getConnectorSurfaceTone(adapter.surfaceKind) === 'success' ? 'bg-emerald-100 text-emerald-700' : getConnectorSurfaceTone(adapter.surfaceKind) === 'warning' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+                    <Badge className={`border-none text-xs font-black ${getConnectorSurfaceTone(adapter.surfaceKind) === 'success' ? 'bg-emerald-100 text-emerald-700' : getConnectorSurfaceTone(adapter.surfaceKind) === 'warning' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'}`}>
                       {getConnectorSurfaceLabel(adapter.surfaceKind)}
                     </Badge>
                   </div>
-                  <p className="mt-2 text-[9px] font-bold text-slate-400">{getIngestMethod(type)}</p>
+                  <p className="mt-2 text-xs font-bold text-slate-400">{getIngestMethod(type)}</p>
 
                   <div className="mt-3 grid gap-2 text-xs">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5">
-                      <p className="text-[8px] font-black uppercase tracking-[0.22em] text-slate-400">Entidade nativa</p>
-                      <p className="mt-1 text-[11px] font-bold text-slate-700">{preset.nativeObject || 'A definir no setup'}</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entidade nativa</p>
+                      <p className="mt-1 text-xs font-bold text-slate-700">{preset.nativeObject || 'A definir no setup'}</p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-2.5">
-                      <p className="text-[8px] font-black uppercase tracking-[0.22em] text-slate-400">Chave primária</p>
-                      <p className="mt-1 text-[11px] font-bold text-slate-700">{preset.identity.nativePrimaryKey || 'A definir'}</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Chave primária</p>
+                      <p className="mt-1 text-xs font-bold text-slate-700">{preset.identity.nativePrimaryKey || 'A definir'}</p>
                     </div>
                   </div>
                 </div>
@@ -2089,7 +2089,7 @@ export function AccountSources() {
       </div>
 
       <Card className="border border-slate-200 p-4">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Fonte selecionada</h4>
+        <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400 mb-3">Fonte selecionada</h4>
         {!selectedConnector && legacySelectedConnector && (
           <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
             A fonte salva anteriormente não é compatível com o modelo atual. Selecione uma fonte novamente.
@@ -2097,25 +2097,25 @@ export function AccountSources() {
         )}
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
             <p className="mt-1 text-sm font-black text-slate-900">{draftConfig?.sourceName || 'Não configurada'}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
             <p className="mt-1 text-sm font-black text-slate-900">{getInputMethodLabel(selectedConnector, selectedInputMethod)}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Arquivo</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Arquivo</p>
             <p className="mt-1 text-sm font-black text-slate-900">
               {isCsvInput ? (csvUploadMeta?.fileName || 'Nenhum arquivo enviado') : 'Não aplicável neste método'}
             </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Linhas</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Linhas</p>
             <p className="mt-1 text-sm font-black text-slate-900">{isCsvInput ? csvRowCountLabel : '—'}</p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
             <p className="mt-1 text-sm font-black text-slate-900">
               {isHubspotMethodPending
                 ? 'Método pendente'
@@ -2131,7 +2131,7 @@ export function AccountSources() {
             </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Camada do conector</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Camada do conector</p>
             <p className="mt-1 text-sm font-black text-slate-900">
               {!selectedConnector
                 ? 'Não configurada'
@@ -2139,7 +2139,7 @@ export function AccountSources() {
                   ? 'Aguardando método'
                   : getConnectorSurfaceLabel(realConnectionContract?.surfaceKind || activeAdapter?.surfaceKind || 'functional_real')}
             </p>
-            <p className="mt-1 text-[10px] font-bold text-slate-500">
+            <p className="mt-1 text-xs font-bold text-slate-500">
               {!selectedConnector
                 ? 'Auth: —'
                 : realConnectionContract
@@ -2153,43 +2153,43 @@ export function AccountSources() {
         {realConnectionContract && (
           <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+              <Badge className="border-none bg-white text-xs font-black text-slate-700">
                 {getConnectorSurfaceLabel(realConnectionContract.surfaceKind)}
               </Badge>
-              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+              <Badge className="border-none bg-white text-xs font-black text-slate-700">
                 {getAuthTypeLabel(realConnectionContract.authType)}
               </Badge>
-              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+              <Badge className="border-none bg-white text-xs font-black text-slate-700">
                 Metadados: {getMetadataStatusLabel(realConnectionContract.metadataStatus)}
               </Badge>
-              <Badge className="border-none bg-white text-[8px] font-black text-slate-700">
+              <Badge className="border-none bg-white text-xs font-black text-slate-700">
                 Sync: {getSyncStatusLabel(realConnectionContract.syncStatus)}
               </Badge>
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Capacidades</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Capacidades</p>
                 <p className="mt-1 text-sm font-black text-slate-900">
                   {realConnectionContract.supportsMetadataDiscovery ? 'Descoberta de metadados' : 'Sem descoberta de metadados'}
                 </p>
-                <p className="mt-1 text-[10px] font-medium text-slate-500">
+                <p className="mt-1 text-xs font-medium text-slate-500">
                   {realConnectionContract.supportsIncrementalSync ? 'Sync incremental não disponível nesta versão' : 'Sem sync incremental'}
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Escopos</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Escopos</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.requiredScopes.length}</p>
-                <p className="mt-1 text-[10px] font-medium text-slate-500">
+                <p className="mt-1 text-xs font-medium text-slate-500">
                   Obrigatórios: {realConnectionContract.requiredScopes.length} · Opcionais: {realConnectionContract.optionalScopes.length}
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Cobertura</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Cobertura</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.coverage}%</p>
-                <p className="mt-1 text-[10px] font-medium text-slate-500">Confiança operacional {realConnectionContract.dataConfidence}%</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">Confiança operacional {realConnectionContract.dataConfidence}%</p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Estado desta versão</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Estado desta versão</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{realConnectionContract.nextRecommendedStep || 'Disponível nesta versão'}</p>
               </div>
             </div>
@@ -2199,11 +2199,11 @@ export function AccountSources() {
           <button
             type="button"
             onClick={() => setConnector(null)}
-            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-50"
+            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black uppercase tracking-widest text-slate-400 transition-all hover:bg-slate-50"
           >
             Trocar fonte
           </button>
-          <span className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+          <span className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">
             {selectedConnector ? `Fonte: ${activePreset?.name || '—'}` : 'Nenhuma fonte selecionada'}
           </span>
         </div>
@@ -2212,9 +2212,9 @@ export function AccountSources() {
       {selectedConnector && activePreset && selectedConnector === 'hubspot' && (
         <Card className="border border-slate-200 p-4">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Como deseja configurar o HubSpot?</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Como deseja configurar o HubSpot?</p>
             <h4 className="text-2xl font-black tracking-tight text-slate-900">Escolha um método de entrada</h4>
-            <p className="max-w-3xl text-sm font-medium text-slate-600">
+            <p className="max-w-3xl text-sm font-medium text-slate-400">
               Selecione CSV local para importar um arquivo exportado ou Private App / API Token para testar a conexão real no servidor.
             </p>
           </div>
@@ -2229,7 +2229,7 @@ export function AccountSources() {
               }`}
             >
               <p className="text-sm font-black uppercase tracking-[0.24em] text-emerald-700">Usar CSV local</p>
-              <p className="mt-2 text-sm font-medium text-slate-600">
+              <p className="mt-2 text-sm font-medium text-slate-400">
                 Importe um CSV exportado do HubSpot. Não conecta com a API.
               </p>
             </button>
@@ -2243,7 +2243,7 @@ export function AccountSources() {
               }`}
             >
               <p className="text-sm font-black uppercase tracking-[0.24em] text-blue-700">Conectar HubSpot via Private App</p>
-              <p className="mt-2 text-sm font-medium text-slate-600">
+              <p className="mt-2 text-sm font-medium text-slate-400">
                 Teste uma conexão real usando token temporário. Não inicia sync.
               </p>
             </button>
@@ -2255,16 +2255,16 @@ export function AccountSources() {
         <Card className="relative overflow-hidden border border-slate-200 p-5 min-h-[680px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Importar via CSV para esta fonte</h4>
-              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+              <p className="text-sm font-medium text-slate-400 max-w-3xl">
                 A Canopi vai ler o arquivo apenas no navegador. Nada será enviado para backend nesta etapa.
               </p>
             </div>
             <button
               type="button"
               onClick={openCsvPicker}
-              className="shrink-0 rounded-xl bg-slate-900 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700"
+              className="shrink-0 rounded-xl bg-slate-900 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700"
             >
               Selecionar CSV
             </button>
@@ -2286,25 +2286,25 @@ export function AccountSources() {
 
           <div className="mt-5 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
               <p className="mt-1 text-sm font-black text-slate-900">{activePreset?.name || '—'}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
               <p className="mt-1 text-sm font-black text-slate-900">CSV</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Arquivo</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Arquivo</p>
               <p className="mt-1 text-sm font-black text-slate-900">{csvUploadMeta?.fileName || 'Nenhum arquivo enviado'}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
               <p className="mt-1 text-sm font-black text-slate-900">{csvStatusLabel}</p>
             </div>
           </div>
 
           <div className="mt-2 rounded-xl border border-slate-200 bg-white p-3">
-            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Conexão real</p>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Conexão real</p>
             <p className="mt-1 text-sm font-black text-slate-900">
               {selectedConnector === 'salesforce'
                 ? (salesforceConnectionTestStatus === 'success'
@@ -2333,8 +2333,8 @@ export function AccountSources() {
             {csvUploadMeta && (
               <div className="space-y-4">
               <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Preview do arquivo</p>
-                <p className="mt-1 text-sm font-medium text-slate-600">Confira as primeiras linhas antes de salvar a configuração.</p>
+                <p className="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Preview do arquivo</p>
+                <p className="mt-1 text-sm font-medium text-slate-400">Confira as primeiras linhas antes de salvar a configuração.</p>
               </div>
               <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
                 <Field label="Campo de nome da conta" value={csvDraft.csvRequiredMinimumField} onChange={(v) => updateDraft('csvRequiredMinimumField', v)} placeholder="account_name" />
@@ -2345,11 +2345,11 @@ export function AccountSources() {
 
               {csvHasPreviewRows && (
                 <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-                  <p className="px-3 pt-3 text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">
+                  <p className="px-3 pt-3 text-xs font-black uppercase tracking-[0.22em] text-slate-400">
                     Preview
                   </p>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-[10px]">
+                    <table className="w-full text-xs">
                       <thead className="bg-slate-50">
                         <tr>
                           {csvHeaders.map((h) => (
@@ -2377,7 +2377,7 @@ export function AccountSources() {
 
               {csvHasValidationErrors && (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-3 space-y-1.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-red-600">Avisos importantes</p>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-red-600">Avisos importantes</p>
                   {csvValidationErrors.map((err) => (
                     <div key={err.code} className="flex items-start gap-2 text-xs font-medium text-red-800">
                       <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
@@ -2403,7 +2403,7 @@ export function AccountSources() {
                       description="Análise local dos headers do arquivo. Não aplica Camada Canônica, não importa dados e não cria mapeamento definitivo."
                     />
                     <div className="flex shrink-0 flex-col gap-2">
-                      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                      <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
                         getCsvSchemaTone(csvSchemaAnalysis.qualityLevel) === 'success'
                           ? 'bg-emerald-100 text-emerald-700'
                           : getCsvSchemaTone(csvSchemaAnalysis.qualityLevel) === 'warning'
@@ -2412,7 +2412,7 @@ export function AccountSources() {
                       }`}>
                         Qualidade {getCsvSchemaQualityLabel(csvSchemaAnalysis.qualityLevel)}
                       </span>
-                      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                      <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
                         getCsvSchemaTone(csvSchemaAnalysis.mappingConfidence) === 'success'
                           ? 'bg-emerald-100 text-emerald-700'
                           : getCsvSchemaTone(csvSchemaAnalysis.mappingConfidence) === 'warning'
@@ -2426,23 +2426,23 @@ export function AccountSources() {
 
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                     <div className="rounded-xl border border-violet-100 bg-white p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Headers detectados</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Headers detectados</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.totalHeaders.toLocaleString('pt-BR')}</p>
                     </div>
                     <div className="rounded-xl border border-violet-100 bg-white p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.detectedRecommendedFields.length.toLocaleString('pt-BR')}</p>
                     </div>
                     <div className="rounded-xl border border-violet-100 bg-white p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.missingRecommendedFields.length.toLocaleString('pt-BR')}</p>
                     </div>
                     <div className="rounded-xl border border-violet-100 bg-white p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Confiança do pré-mapeamento</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Confiança do pré-mapeamento</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{getCsvSchemaQualityLabel(csvSchemaAnalysis.mappingConfidence)}</p>
                     </div>
                     <div className="rounded-xl border border-violet-100 bg-white p-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Qualidade da base</p>
+                      <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Qualidade da base</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{csvSchemaAnalysis.qualityScore}/100</p>
                     </div>
                   </div>
@@ -2450,12 +2450,12 @@ export function AccountSources() {
                   <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
                     <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white">
                       <div className="border-b border-violet-50 bg-violet-50/60 px-4 py-3">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
+                        <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
                       </div>
                       <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-slate-200">
                           <thead className="bg-slate-50">
-                            <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                            <tr className="text-left text-xs font-black uppercase tracking-[0.22em] text-slate-500">
                               <th className="px-4 py-3">Campo CSV</th>
                               <th className="px-4 py-3">Campo sugerido Canopi</th>
                               <th className="px-4 py-3">Confiança</th>
@@ -2472,9 +2472,9 @@ export function AccountSources() {
                                   <div className="text-xs text-slate-500">{mapping.canopiLabel}</div>
                                 </td>
                                 <td className="px-4 py-3 capitalize">{getCsvSchemaQualityLabel(mapping.confidence)}</td>
-                                <td className="px-4 py-3 text-slate-600">{mapping.reason}</td>
+                                <td className="px-4 py-3 text-slate-400">{mapping.reason}</td>
                                 <td className="px-4 py-3">
-                                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                                  <span className={`rounded-full px-2.5 py-1 text-xs font-black uppercase tracking-widest ${
                                     mapping.status === 'encontrado'
                                       ? 'bg-emerald-100 text-emerald-700'
                                       : 'bg-amber-100 text-amber-700'
@@ -2491,13 +2491,13 @@ export function AccountSources() {
 
                     <div className="space-y-4">
                       <div className="rounded-2xl border border-violet-100 bg-white p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos ausentes</p>
-                        <p className="mt-1 text-sm font-medium text-slate-600">Campos recomendados que ainda não apareceram no schema detectado.</p>
+                        <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Campos ausentes</p>
+                        <p className="mt-1 text-sm font-medium text-slate-400">Campos recomendados que ainda não apareceram no schema detectado.</p>
                         <div className="mt-3 space-y-2">
                           {csvSchemaAnalysis.missingRecommendedFields.length > 0 ? csvSchemaAnalysis.missingRecommendedFields.map((mapping) => (
                             <div key={`${mapping.canopiField}-missing`} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                               <p className="text-sm font-black text-slate-900">{mapping.canopiField}</p>
-                              <p className="text-xs text-slate-600">{mapping.canopiLabel}</p>
+                              <p className="text-xs text-slate-400">{mapping.canopiLabel}</p>
                             </div>
                           )) : (
                             <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2">
@@ -2508,8 +2508,8 @@ export function AccountSources() {
                       </div>
 
                       <div className="rounded-2xl border border-violet-100 bg-white p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Avisos de qualidade</p>
-                        <p className="mt-1 text-sm font-medium text-slate-600">Leitura local da qualidade da base e do dedupe.</p>
+                        <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Avisos de qualidade</p>
+                        <p className="mt-1 text-sm font-medium text-slate-400">Leitura local da qualidade da base e do dedupe.</p>
                         <div className="mt-3 space-y-2">
                           {csvSchemaAnalysis.warnings.length > 0 ? csvSchemaAnalysis.warnings.map((warning) => (
                             <div key={warning} className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
@@ -2524,15 +2524,15 @@ export function AccountSources() {
                       </div>
 
                       <div className="rounded-2xl border border-violet-100 bg-white p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos extras</p>
-                        <p className="mt-1 text-sm font-medium text-slate-600">Headers presentes no arquivo, mas não usados no pré-mapeamento local.</p>
+                        <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Campos extras</p>
+                        <p className="mt-1 text-sm font-medium text-slate-400">Headers presentes no arquivo, mas não usados no pré-mapeamento local.</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {csvSchemaAnalysis.extraHeaders.length > 0 ? csvSchemaAnalysis.extraHeaders.map((header) => (
-                            <span key={header} className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                            <span key={header} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-400">
                               {header}
                             </span>
                           )) : (
-                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-700">
                               Nenhum campo extra relevante
                             </span>
                           )}
@@ -2550,17 +2550,17 @@ export function AccountSources() {
               <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200">
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Processando CSV no navegador</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Processando CSV no navegador</p>
                     <h5 className="text-2xl font-black tracking-tight text-slate-900">{csvProcessingState.fileName}</h5>
-                    <p className="text-sm font-medium text-slate-600">{csvProcessingState.message}</p>
+                    <p className="text-sm font-medium text-slate-400">{csvProcessingState.message}</p>
                   </div>
-                  <Badge className="border-none bg-slate-100 text-[10px] font-black text-slate-700">
+                  <Badge className="border-none bg-slate-100 text-xs font-black text-slate-700">
                     {csvProcessingState.phase}
                   </Badge>
                 </div>
 
                 <div className="mt-5 space-y-2">
-                  <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                  <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.22em] text-slate-400">
                     <span>Progresso real</span>
                     <span>{csvProcessingState.percent}%</span>
                   </div>
@@ -2587,23 +2587,23 @@ export function AccountSources() {
         <Card className="relative overflow-hidden border border-slate-200 bg-slate-50/70 p-5 min-h-[520px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Teste com token temporário do Salesforce</h4>
-              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+              <p className="text-sm font-medium text-slate-400 max-w-3xl">
                 A Canopi valida um token temporário e a URL da instância no servidor, sem salvar o segredo, sem sync e sem writeback.
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
                 Read-only
               </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
                 Token temporário
               </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
                 Sem sync
               </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-700">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-700">
                 Sem writeback
               </span>
             </div>
@@ -2611,20 +2611,20 @@ export function AccountSources() {
 
           <div className="mt-5 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
               <p className="mt-1 text-sm font-black text-slate-900">{activePreset?.name || 'Salesforce'}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
               <p className="mt-1 text-sm font-black text-slate-900">Validação com token temporário</p>
-              <p className="mt-1 text-[11px] font-medium text-slate-500">Leitura segura do Salesforce via token temporário e URL da instância.</p>
+              <p className="mt-1 text-xs font-medium text-slate-500">Leitura segura do Salesforce via token temporário e URL da instância.</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Instância</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Instância</p>
               <p className="mt-1 text-sm font-black text-slate-900">{salesforceInstanceUrl || 'Nenhuma URL informada'}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
               <p className="mt-1 text-sm font-black text-slate-900">{getHubspotTestLabel(salesforceConnectionTestStatus)}</p>
             </div>
           </div>
@@ -2652,7 +2652,7 @@ export function AccountSources() {
                   type="button"
                   onClick={() => void testSalesforceConnection()}
                   disabled={salesforceTesting || !salesforceInstanceUrl.trim() || !salesforceAccessToken.trim()}
-                  className="rounded-xl bg-slate-900 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                  className="rounded-xl bg-slate-900 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
                 >
                   {salesforceTesting ? (
                     <span className="inline-flex items-center gap-2">
@@ -2663,13 +2663,13 @@ export function AccountSources() {
                     'Testar acesso com token'
                   )}
                 </button>
-                <span className="rounded-full bg-sky-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">
                   <span className="inline-flex items-center gap-1">
                     <KeyRound className="h-3.5 w-3.5" />
                     Token não persistido
                   </span>
                 </span>
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
                   salesforceConnectionTestStatus === 'success'
                     ? 'bg-emerald-100 text-emerald-700'
                     : salesforceConnectionTestStatus === 'error'
@@ -2688,7 +2688,7 @@ export function AccountSources() {
                   ? 'border-red-200 bg-red-50'
                   : 'border-slate-200 bg-white'
             }`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
               {salesforceConnectionTestStatus === 'success' && salesforceConnectionTestMeta ? (
                 <div className="mt-2 space-y-3">
                   <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
@@ -2714,7 +2714,7 @@ export function AccountSources() {
               ) : (
                 <div className="mt-2 space-y-2">
                   <p className="text-base font-black text-slate-900">Aguardando teste com token temporário nesta sessão.</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-400">
                     O servidor ainda não validou a URL da instância e o token temporário. Após o teste, apenas metadados seguros permanecem na sessão.
                   </p>
                 </div>
@@ -2728,17 +2728,17 @@ export function AccountSources() {
         <Card className="relative overflow-hidden border border-blue-200 bg-blue-50/40 p-5 min-h-[540px]">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-500">Método de entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-blue-500">Método de entrada</p>
               <h4 className="text-2xl font-black tracking-tight text-slate-900">Testar conexão real do HubSpot</h4>
-              <p className="text-sm font-medium text-slate-600 max-w-3xl">
+              <p className="text-sm font-medium text-slate-400 max-w-3xl">
                 A Canopi valida o token da Private App no servidor, sem salvar o segredo e sem iniciar sync real.
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-blue-700">
                 Conexão real C2.1
               </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-500">
                 Token temporário
               </span>
             </div>
@@ -2746,24 +2746,24 @@ export function AccountSources() {
 
           <div className="mt-5 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
               <p className="mt-1 text-sm font-black text-slate-900">{activePreset?.name || 'HubSpot'}</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entrada</p>
               <p className="mt-1 text-sm font-black text-slate-900">HubSpot real</p>
-              <p className="mt-1 text-[11px] font-medium text-slate-500">
+              <p className="mt-1 text-xs font-medium text-slate-500">
                 Método Private App retomado desta sessão. Use o reset para voltar à escolha do método HubSpot.
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
               <p className="mt-1 text-sm font-black text-slate-900">
                 {hubspotLastConnectionTestAt ? formatActionTimestamp(hubspotLastConnectionTestAt) : 'Nenhum teste realizado'}
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Status</p>
               <p className="mt-1 text-sm font-black text-slate-900">{getHubspotTestLabel(hubspotConnectionTestStatus)}</p>
             </div>
           </div>
@@ -2779,8 +2779,8 @@ export function AccountSources() {
                   type="password"
                 />
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Orientação</p>
-                  <p className="mt-1 text-sm font-medium text-slate-600">
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Orientação</p>
+                  <p className="mt-1 text-sm font-medium text-slate-400">
                     Informe um token temporário apenas para testar a leitura de companies. O token não é salvo em sessionStorage nem localStorage.
                   </p>
                 </div>
@@ -2791,7 +2791,7 @@ export function AccountSources() {
                   type="button"
                   onClick={() => void testHubspotConnection()}
                   disabled={hubspotTesting || !hubspotPrivateAppToken.trim()}
-                  className="rounded-xl bg-slate-900 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                  className="rounded-xl bg-slate-900 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
                 >
                   {hubspotTesting ? (
                     <span className="inline-flex items-center gap-2">
@@ -2802,13 +2802,13 @@ export function AccountSources() {
                     'Testar conexão HubSpot'
                   )}
                 </button>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-blue-700">
                   <span className="inline-flex items-center gap-1">
                     <KeyRound className="h-3.5 w-3.5" />
                     Token não persistido
                   </span>
                 </span>
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest ${
+                <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-widest ${
                   hubspotConnectionTestStatus === 'success'
                     ? 'bg-emerald-100 text-emerald-700'
                     : hubspotConnectionTestStatus === 'error'
@@ -2821,7 +2821,7 @@ export function AccountSources() {
             </div>
 
             <div className={`rounded-2xl border p-4 ${hubspotConnectionTestStatus === 'success' ? 'border-emerald-200 bg-emerald-50' : hubspotConnectionTestStatus === 'error' ? 'border-red-200 bg-red-50' : 'border-slate-200 bg-white'}`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Resultado seguro</p>
               {hubspotConnectionTestStatus === 'success' && hubspotConnectionTestMeta ? (
                 <div className="mt-2 space-y-3">
                   <p className="inline-flex items-center gap-2 text-base font-black text-emerald-800">
@@ -2834,12 +2834,12 @@ export function AccountSources() {
                     <div className="flex flex-wrap gap-2">
                       {hubspotConnectionTestMeta.scopes.length > 0 ? (
                         hubspotConnectionTestMeta.scopes.map((scope) => (
-                          <span key={scope} className="rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                          <span key={scope} className="rounded-full bg-white px-2.5 py-1 text-xs font-black uppercase tracking-widest text-emerald-700">
                             {scope}
                           </span>
                         ))
                       ) : (
-                        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-black uppercase tracking-widest text-slate-500">
                           Escopos não retornados
                         </span>
                       )}
@@ -2857,7 +2857,7 @@ export function AccountSources() {
               ) : (
                 <div className="mt-2 space-y-2">
                   <p className="text-base font-black text-slate-900">Aguardando teste real nesta sessão.</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-400">
                     O servidor ainda não validou o token. Após o teste, apenas metadados seguros permanecem na sessão.
                   </p>
                 </div>
@@ -2877,9 +2877,9 @@ export function AccountSources() {
           }`}>
             <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Sessão HubSpot</p>
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Sessão HubSpot</p>
                 <h5 className="text-lg font-black tracking-tight text-slate-900">{getHubspotSessionStateLabel(hubspotSessionState)}</h5>
-                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                <p className="max-w-3xl text-sm font-medium text-slate-400">
                   Este é um reset completo da sessão HubSpot nesta tela. Ele remove o token temporário, o teste, o preview, o schema e a escolha do método, voltando o fluxo ao início. Nada é alterado no CRM externo.
                 </p>
                 <p className="text-xs font-semibold text-slate-500">
@@ -2889,22 +2889,22 @@ export function AccountSources() {
               <button
                 type="button"
                 onClick={resetHubspotSession}
-                className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
+                className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
               >
                 Resetar sessão HubSpot
               </button>
             </div>
             <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Estado</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Estado</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{getHubspotSessionStateLabel(hubspotSessionState)}</p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Último teste</p>
                 <p className="mt-1 text-sm font-black text-slate-900">{hubspotLastConnectionTestAt ? formatActionTimestamp(hubspotLastConnectionTestAt) : 'Nenhum teste nesta sessão'}</p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Preview</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Preview</p>
                 <p className="mt-1 text-sm font-black text-slate-900">
                   {hubspotPreviewStatus === 'success'
                     ? `Carregado (${hubspotPreviewCompanies.length.toLocaleString('pt-BR')})`
@@ -2916,7 +2916,7 @@ export function AccountSources() {
                 </p>
               </div>
               <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Schema</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Schema</p>
                 <p className="mt-1 text-sm font-black text-slate-900">
                   {hubspotSchemaStatus === 'success'
                     ? `Detectado (${(hubspotSchemaTotalCount ?? hubspotSchemaProperties.length).toLocaleString('pt-BR')})`
@@ -2937,15 +2937,15 @@ export function AccountSources() {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Read-only</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Sem sync</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Sem importação</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Token não persistido</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700">Amostra até 10 companies</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">Read-only</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">Sem sync</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">Sem importação</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">Token não persistido</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-sky-700">Amostra até 10 companies</span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-600">Preview read-only do HubSpot</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-sky-600">Preview read-only do HubSpot</p>
               <h4 className="text-xl font-black tracking-tight text-slate-900">Carregue uma amostra de companies para validar a leitura</h4>
-                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                <p className="max-w-3xl text-sm font-medium text-slate-400">
                 Isso não inicia sync, não importa companies e não salva o token. O preview é apenas uma leitura controlada desta versão.
               </p>
             </div>
@@ -2955,11 +2955,11 @@ export function AccountSources() {
                 type="button"
                 onClick={() => void loadHubspotPreview()}
                 disabled={hubspotPreviewStatus === 'loading' || !hubspotPrivateAppToken.trim()}
-                className="rounded-xl bg-sky-700 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                className="rounded-xl bg-sky-700 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
               >
                 {hubspotPreviewStatus === 'loading' ? 'Carregando preview...' : 'Carregar preview de companies'}
               </button>
-              <p className="text-[11px] font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500">
                 {hubspotPreviewStatus === 'idle'
                   ? 'Pronto para carregar uma amostra read-only.'
                   : hubspotPreviewStatus === 'success'
@@ -2974,8 +2974,8 @@ export function AccountSources() {
           <div className="mt-5 rounded-2xl border border-sky-100 bg-white p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Leitura read-only</p>
-                <p className="text-sm font-medium text-slate-600">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Leitura read-only</p>
+                <p className="text-sm font-medium text-slate-400">
                   {hubspotPreviewStatus === 'success'
                     ? `Amostra validada em ${formatActionTimestamp(hubspotPreviewLoadedAt) || 'agora'} com ${hubspotPreviewCompanies.length} company(s).`
                     : hubspotPreviewStatus === 'loading'
@@ -2986,8 +2986,8 @@ export function AccountSources() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Preview</span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-600">Companies</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-400">Preview</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-slate-400">Companies</span>
               </div>
             </div>
 
@@ -3003,7 +3003,7 @@ export function AccountSources() {
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-slate-200">
                     <thead className="bg-slate-50">
-                      <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                      <tr className="text-left text-xs font-black uppercase tracking-[0.22em] text-slate-500">
                         <th className="px-4 py-3">Empresa</th>
                         <th className="px-4 py-3">Domínio</th>
                         <th className="px-4 py-3">Setor</th>
@@ -3043,16 +3043,16 @@ export function AccountSources() {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Read-only</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Pré-mapeamento</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem sync</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Sem importação</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Token não persistido</span>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">Não aplica Camada Canônica</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Read-only</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Pré-mapeamento</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Sem sync</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Sem importação</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Token não persistido</span>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-widest text-violet-700">Não aplica Camada Canônica</span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-600">Schema e pré-mapeamento HubSpot</p>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-600">Schema e pré-mapeamento HubSpot</p>
               <h4 className="text-xl font-black tracking-tight text-slate-900">Detecte os campos de companies e veja uma sugestão inicial para Contas</h4>
-                <p className="max-w-3xl text-sm font-medium text-slate-600">
+                <p className="max-w-3xl text-sm font-medium text-slate-400">
                 Isso não aplica mapeamento canônico, não importa dados e não inicia sync. O objetivo é preparar esta versão com metadados seguros do schema.
               </p>
             </div>
@@ -3062,11 +3062,11 @@ export function AccountSources() {
                 type="button"
                 onClick={() => void loadHubspotSchema()}
                 disabled={hubspotSchemaStatus === 'loading' || !hubspotPrivateAppToken.trim()}
-                className="rounded-xl bg-violet-700 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-violet-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                className="rounded-xl bg-violet-700 px-5 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-violet-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
               >
                 {hubspotSchemaStatus === 'loading' ? 'Detectando schema...' : 'Detectar campos de companies'}
               </button>
-              <p className="text-[11px] font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500">
                 {hubspotSchemaStatus === 'idle'
                   ? 'Pronto para detectar properties read-only.'
                   : hubspotSchemaStatus === 'success'
@@ -3080,25 +3080,25 @@ export function AccountSources() {
 
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-violet-100 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Properties detectadas</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Properties detectadas</p>
               <p className="mt-1 text-sm font-black text-slate-900">
                 {(hubspotSchemaTotalCount ?? hubspotSchemaProperties.length).toLocaleString('pt-BR')}
               </p>
             </div>
             <div className="rounded-xl border border-violet-100 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Properties exibidas</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Properties exibidas</p>
               <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaProperties.length.toLocaleString('pt-BR')}</p>
             </div>
             <div className="rounded-xl border border-violet-100 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados encontrados</p>
               <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaSuggestedMappings.length.toLocaleString('pt-BR')}</p>
             </div>
             <div className="rounded-xl border border-violet-100 bg-white p-3">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Campos recomendados ausentes</p>
               <p className="mt-1 text-sm font-black text-slate-900">{hubspotMissingRecommendedFields.length.toLocaleString('pt-BR')}</p>
             </div>
             <div className="rounded-xl border border-violet-100 bg-white p-3 md:col-span-2 xl:col-span-4">
-              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Último carregamento</p>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Último carregamento</p>
               <p className="mt-1 text-sm font-black text-slate-900">{hubspotSchemaLoadedAt ? formatActionTimestamp(hubspotSchemaLoadedAt) || 'agora' : '—'}</p>
             </div>
           </div>
@@ -3115,12 +3115,12 @@ export function AccountSources() {
               <div className="grid gap-4 xl:grid-cols-[1.3fr_0.7fr]">
                 <div className="overflow-hidden rounded-2xl border border-violet-100 bg-white">
                   <div className="border-b border-violet-50 bg-violet-50/60 px-4 py-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Pré-mapeamento sugerido</p>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-200">
                       <thead className="bg-slate-50">
-                        <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                        <tr className="text-left text-xs font-black uppercase tracking-[0.22em] text-slate-500">
                           <th className="px-4 py-3">Campo HubSpot</th>
                           <th className="px-4 py-3">Rótulo HubSpot</th>
                           <th className="px-4 py-3">Tipo</th>
@@ -3138,7 +3138,7 @@ export function AccountSources() {
                             <td className="px-4 py-3 font-semibold text-slate-900">{mapping.canopiField}</td>
                             <td className="px-4 py-3">{mapping.confidence}</td>
                             <td className="px-4 py-3">
-                              <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest ${
+                              <span className={`rounded-full px-2.5 py-1 text-xs font-black uppercase tracking-widest ${
                                 mapping.status === 'encontrado'
                                   ? 'bg-emerald-100 text-emerald-700'
                                   : 'bg-amber-100 text-amber-700'
@@ -3155,13 +3155,13 @@ export function AccountSources() {
 
                 <div className="space-y-4">
                   <div className="rounded-2xl border border-violet-100 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Campos detectados</p>
-                    <p className="mt-1 text-sm font-medium text-slate-600">Lista compacta com os primeiros campos encontrados no schema read-only.</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Campos detectados</p>
+                    <p className="mt-1 text-sm font-medium text-slate-400">Lista compacta com os primeiros campos encontrados no schema read-only.</p>
                     <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
                       <div className="max-h-[420px] overflow-auto">
                         <table className="min-w-full divide-y divide-slate-200">
                           <thead className="bg-slate-50">
-                            <tr className="text-left text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                            <tr className="text-left text-xs font-black uppercase tracking-[0.22em] text-slate-500">
                               <th className="px-3 py-2">Nome</th>
                               <th className="px-3 py-2">Rótulo</th>
                               <th className="px-3 py-2">Tipo</th>
@@ -3188,13 +3188,13 @@ export function AccountSources() {
                   </div>
 
                   <div className="rounded-2xl border border-violet-100 bg-white p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-violet-700">Lacunas identificadas</p>
-                    <p className="mt-1 text-sm font-medium text-slate-600">Campos recomendados que ainda não apareceram no schema detectado.</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-violet-700">Lacunas identificadas</p>
+                    <p className="mt-1 text-sm font-medium text-slate-400">Campos recomendados que ainda não apareceram no schema detectado.</p>
                     <div className="mt-3 space-y-2">
                       {hubspotMissingRecommendedFields.length > 0 ? hubspotMissingRecommendedFields.map((mapping) => (
                         <div key={`${mapping.canopiField}-missing`} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                           <p className="text-sm font-black text-slate-900">{mapping.hubspotField}</p>
-                          <p className="text-xs text-slate-600">
+                          <p className="text-xs text-slate-400">
                             Sugestão Canopi: {mapping.canopiField} • {mapping.canopiLabel}
                           </p>
                         </div>
@@ -3215,11 +3215,11 @@ export function AccountSources() {
       {isCsvInput && (
       <Card className="border border-slate-200 p-0 overflow-hidden">
         <div className="border-b border-slate-100 bg-slate-50/80 px-5 py-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">Configuração da fonte selecionada</p>
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Configuração da fonte selecionada</p>
           <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
             {activePreset ? activePreset.name : 'Selecione uma fonte para continuar'}
           </h3>
-          <p className="mt-2 max-w-4xl text-sm font-medium text-slate-600">
+          <p className="mt-2 max-w-4xl text-sm font-medium text-slate-400">
             Aqui você configura a fonte escolhida e, quando aplicável, o CSV usado como entrada local desta fonte.
           </p>
         </div>
@@ -3235,10 +3235,10 @@ export function AccountSources() {
           <>
           <div className="space-y-6 px-5 py-5">
             <div className="rounded-xl border border-blue-100 bg-blue-50 p-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-blue-700">Fluxo da etapa</p>
+              <p className="text-xs font-black uppercase tracking-[0.26em] text-blue-700">Fluxo da etapa</p>
               <div className="mt-2 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
                 {WORKFLOW_STEPS.map((step) => (
-                  <div key={step} className="rounded-lg border border-blue-100 bg-white px-2.5 py-2 text-[10px] font-black uppercase tracking-wider text-blue-700">
+                  <div key={step} className="rounded-lg border border-blue-100 bg-white px-2.5 py-2 text-xs font-black uppercase tracking-wider text-blue-700">
                     {step}
                   </div>
                 ))}
@@ -3263,7 +3263,7 @@ export function AccountSources() {
             <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <h4 className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">Bloco B — Campos opcionais</h4>
-                <span className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Complementares, não obrigatórios</span>
+                <span className="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Complementares, não obrigatórios</span>
               </div>
               <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
                 <Field label="Campos customizados esperados" value={draftConfig.expectedCustomFields} onChange={(v) => updateDraft('expectedCustomFields', v)} />
@@ -3301,9 +3301,9 @@ export function AccountSources() {
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">O que fazer agora</p>
+                    <p className="text-xs font-black uppercase tracking-[0.28em] text-slate-400">O que fazer agora</p>
                     <h4 className="text-lg font-black tracking-tight text-slate-900">{sourceAction.title}</h4>
-                    <p className="max-w-4xl text-sm font-medium text-slate-600">{sourceAction.description}</p>
+                    <p className="max-w-4xl text-sm font-medium text-slate-400">{sourceAction.description}</p>
                     {'reason' in sourceAction && sourceAction.reason && (
                       <p className="text-xs font-bold text-slate-500">{sourceAction.reason}</p>
                     )}
@@ -3324,7 +3324,7 @@ export function AccountSources() {
                     type="button"
                     disabled={sourceAction.disabled}
                     onClick={sourceAction.onClick}
-                    className={`rounded-xl px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
+                    className={`rounded-xl px-5 py-3 text-xs font-black uppercase tracking-widest transition-all ${
                       sourceAction.tone === 'warning'
                         ? 'bg-amber-600 text-white shadow-lg hover:bg-amber-700'
                         : sourceAction.tone === 'danger'
@@ -3344,11 +3344,11 @@ export function AccountSources() {
               <button
                 type="button"
                 onClick={restorePreset}
-                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-700 transition-all hover:bg-slate-50"
               >
                 Restaurar padrão
               </button>
-              <span className={`rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest ${hasDraftChanges ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
+              <span className={`rounded-xl px-3 py-1.5 text-xs font-black uppercase tracking-widest ${hasDraftChanges ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-400'}`}>
                 {hasDraftChanges ? 'Há alterações locais não salvas' : 'Configuração salva'}
               </span>
             </div>
@@ -3357,25 +3357,25 @@ export function AccountSources() {
               <h4 className="mb-2 text-xs font-black uppercase tracking-[0.28em] text-slate-400">Detalhes de configuração da fonte</h4>
               <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Fonte</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.sourceName}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Entidade</p>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Entidade</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.primaryObject}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Chave primária</p>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Chave primária</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.primaryKeyField}</p>
                 </div>
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-slate-400">Objeto prioritário</p>
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Objeto prioritário</p>
                   <p className="mt-1 text-sm font-black text-slate-900">{draftConfig.priorityTestObject}</p>
                 </div>
               </div>
       <div className={`rounded-xl border p-3 ${(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-400">Status da configuração</p>
+                  <p className="text-xs font-black uppercase tracking-[0.26em] text-slate-400">Status da configuração</p>
                   <p className="text-sm font-medium text-slate-700">
                     {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated)
                       ? (isHubspotApiInput
@@ -3387,7 +3387,7 @@ export function AccountSources() {
                         ? 'Revise os dados, informe o token temporário e teste a conexão HubSpot.'
                         : 'Revise os dados, salve a configuração local e confirme o uso do CSV.')}
                   </p>
-                  <p className="text-[11px] font-medium text-slate-500">
+                  <p className="text-xs font-medium text-slate-500">
                     {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated)
                       ? (isHubspotApiInput
                         ? (currentSourceCompleted
@@ -3401,24 +3401,24 @@ export function AccountSources() {
                 </div>
               </div>
               {!(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && hasDraftChanges && !isHubspotMethodPending && (
-                <p className="mt-2 text-[11px] font-medium text-slate-500">
+                <p className="mt-2 text-xs font-medium text-slate-500">
                   Há edição local pendente. Salve a configuração para liberar a confirmação.
                 </p>
               )}
               {!(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && !hasDraftChanges && isCsvInput && csvUploadMeta?.validationResult?.isValid === false && !isHubspotMethodPending && (
-                <p className="mt-2 text-[11px] font-medium text-slate-500">
+                <p className="mt-2 text-xs font-medium text-slate-500">
                   Corrija o CSV antes de confirmar o uso desta fonte.
                 </p>
               )}
               {(isHubspotApiInput ? hubspotConnectionTestStatus === 'success' : connectorLocalValidated) && (isHubspotApiInput ? (hubspotConnectionStepCompletedAt || hubspotLastConnectionTestAt) : lastValidatedAt) && !isHubspotMethodPending && (
-                <p className="mt-2 text-[11px] font-medium text-emerald-700">
+                <p className="mt-2 text-xs font-medium text-emerald-700">
                   {isHubspotApiInput ? 'Conexão HubSpot concluída em' : 'CSV confirmado em'} {isHubspotApiInput ? (hubspotConnectionStepCompletedAt || hubspotLastConnectionTestAt) : lastValidatedAt}.
                 </p>
               )}
             </div>
 	        </div>
 	        <details className="rounded-xl border border-slate-200 bg-white p-4">
-	          <summary className="cursor-pointer text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+	          <summary className="cursor-pointer text-xs font-black uppercase tracking-[0.28em] text-slate-400">
 	            Detalhes desta versão
 	          </summary>
 	          <p className="mt-3 text-xs font-medium text-slate-500">

@@ -110,7 +110,7 @@ export const Contacts: React.FC = () => {
               placeholder="Buscar por nome ou empresa..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/40 border border-slate-700/50 rounded-xl text-sm placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-all text-slate-100"
+              className="w-full pl-10 pr-4 py-2 bg-slate-800/40 border border-slate-700/50 rounded-xl text-sm placeholder:text-slate-400 focus:outline-none focus:border-blue-500/50 transition-all text-slate-100"
             />
           </div>
           
@@ -124,7 +124,7 @@ export const Contacts: React.FC = () => {
               <button 
                 key={f.id}
                 onClick={() => setFilter(f.id)}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${filter === f.id ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'}`}
               >
                 <f.icon className="w-3.5 h-3.5" /> {f.label}
               </button>

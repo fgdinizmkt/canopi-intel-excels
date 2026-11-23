@@ -251,8 +251,8 @@ export default function LoginPage() {
             </div>
 
             {/* Terms Footer */}
-            <p className="text-center text-[10px] text-slate-400 max-w-xs mx-auto pt-8">
-              Ao continuar, você concorda com nossos <a href="#" className="font-bold text-slate-600 hover:text-blue-600">Termos de Uso</a> e <a href="#" className="font-bold text-slate-600 hover:text-blue-600">Política de Privacidade</a>.
+            <p className="text-center text-xs text-slate-400 max-w-xs mx-auto pt-8">
+              Ao continuar, você concorda com nossos <a href="#" className="font-bold text-slate-400 hover:text-blue-600">Termos de Uso</a> e <a href="#" className="font-bold text-slate-400 hover:text-blue-600">Política de Privacidade</a>.
             </p>
           </div>
 

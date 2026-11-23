@@ -706,7 +706,7 @@ export default function HubSpotPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-4xl font-black tracking-tighter text-slate-900">HubSpot</h1>
-            <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
+            <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-400">
               HubSpot é a fonte principal de empresas, contatos, propriedades e relacionamentos. A Canopi primeiro se conecta para ler e diagnosticar a base; depois, quando fizer sentido, devolve dados preparados ao CRM.
             </p>
           </div>
@@ -719,7 +719,7 @@ export default function HubSpotPage() {
             <Badge variant="slate">Catálogo de campos</Badge>
             <Badge variant="slate">Sem gravação</Badge>
           </div>
-          <p className="mt-3 max-w-4xl text-sm font-medium leading-relaxed text-slate-600">
+          <p className="mt-3 max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
             Nenhum dado será gravado na Canopi nesta etapa. A credencial fica apenas nesta sessão local do navegador. Esta etapa não altera dados na HubSpot.
           </p>
         </div>
@@ -730,9 +730,9 @@ export default function HubSpotPage() {
           {accessValidated ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">HubSpot conectado</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-600">HubSpot conectado</p>
                 <h2 className="text-2xl font-black text-slate-900">HubSpot conectado para leitura</h2>
-                <p className="text-sm font-medium leading-relaxed text-slate-600">
+                <p className="text-sm font-medium leading-relaxed text-slate-400">
                   Esta sessão já está conectada à HubSpot. Você pode carregar empresas, atualizar campos ou desconectar para encerrar o acesso local.
                 </p>
               </div>
@@ -745,7 +745,7 @@ export default function HubSpotPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Leitura disponível</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Leitura disponível</p>
                 {snapshotState.phase === 'loading' ? (
                   <div className="mt-2 flex items-center gap-2 text-xs font-medium text-slate-700">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -772,19 +772,19 @@ export default function HubSpotPage() {
                           <div className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-700">
                             <EntityIcon className="h-2.5 w-2.5" />
                           </div>
-                          <p className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-900">{entity.label}</p>
-                          <p className="whitespace-nowrap text-[11px] font-black text-slate-950">HubSpot {totalValue}</p>
-                          <p className="whitespace-nowrap text-[11px] font-black text-slate-700">Canopi {canopiValue}</p>
-                          <div className="text-[11px] font-medium text-slate-500">
+                          <p className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-900">{entity.label}</p>
+                          <p className="whitespace-nowrap text-xs font-black text-slate-950">HubSpot {totalValue}</p>
+                          <p className="whitespace-nowrap text-xs font-black text-slate-700">Canopi {canopiValue}</p>
+                          <div className="text-xs font-medium text-slate-500">
                             <p className="whitespace-nowrap">{stateLabel}</p>
                             {stateLabel === 'Sem escopo' && entity.scopeRequired ? (
-                              <p className="whitespace-nowrap text-[9px] text-slate-400">{entity.scopeRequired}</p>
+                              <p className="whitespace-nowrap text-xs text-slate-400">{entity.scopeRequired}</p>
                             ) : null}
                           </div>
                         </div>
                       );
                     })}
-                    <p className="pt-1 text-[10px] font-medium leading-relaxed text-slate-500">
+                    <p className="pt-1 text-xs font-medium leading-relaxed text-slate-500">
                       Total HubSpot e registros Canopi são leituras separadas.
                     </p>
                   </div>
@@ -798,15 +798,15 @@ export default function HubSpotPage() {
           ) : (
             <div className="space-y-4">
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Conectar HubSpot</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Conectar HubSpot</p>
                 <h2 className="text-2xl font-black text-slate-900">Use um token para liberar a leitura</h2>
-                <p className="text-sm font-medium leading-relaxed text-slate-600">
+                <p className="text-sm font-medium leading-relaxed text-slate-400">
                   Use uma Service Key ou token da HubSpot com permissão de leitura para conectar sua conta nesta sessão e iniciar a leitura da base.
                 </p>
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que esta etapa faz</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">O que esta etapa faz</p>
                 <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
                   <li>• Valida o acesso de leitura</li>
                   <li>• Mostra uma amostra de até 10 empresas</li>
@@ -815,7 +815,7 @@ export default function HubSpotPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">O que ainda não acontece</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">O que ainda não acontece</p>
                 <ul className="mt-2 space-y-1 text-sm font-medium text-slate-700">
                   <li>• Não sincroniza dados</li>
                   <li>• Não grava empresas na Canopi</li>
@@ -826,7 +826,7 @@ export default function HubSpotPage() {
               </div>
 
               <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Próximo passo</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Próximo passo</p>
                 <ul className="mt-1 space-y-1 text-sm font-medium leading-relaxed text-blue-950">
                   <li>• Informe o token</li>
                   <li>• Clique em Conectar</li>
@@ -841,9 +841,9 @@ export default function HubSpotPage() {
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Token e validação</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Token e validação</p>
                 <h2 className="text-2xl font-black text-slate-900">Validação de acesso</h2>
-                <p className="text-sm font-medium leading-relaxed text-slate-600">
+                <p className="text-sm font-medium leading-relaxed text-slate-400">
                   {mainStatus.message}
                 </p>
               </div>
@@ -853,7 +853,7 @@ export default function HubSpotPage() {
             </div>
 
             <label className="block space-y-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Private App token</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Private App token</span>
               <input
                 value={token}
                 onChange={(event) => setToken(event.target.value)}
@@ -864,7 +864,7 @@ export default function HubSpotPage() {
             </label>
 
             <div className={`rounded-2xl border p-4 ${tokenStatusPanelClassName}`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Estado da configuração</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] opacity-80">Estado da configuração</p>
               <p className="mt-1 text-sm font-semibold">{mainStatus.label}</p>
               <p className="mt-1 text-sm font-medium leading-relaxed">{mainStatus.message}</p>
             </div>
@@ -906,7 +906,7 @@ export default function HubSpotPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Resumo da conexão</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Resumo da conexão</p>
                 {accessValidated && validationState.data ? (
                   <div className="mt-2 space-y-2 text-sm text-slate-700">
                     <p><span className="font-semibold text-slate-900">Hub ID:</span> {validationState.data.hubId || 'não informado'}</p>
@@ -917,15 +917,15 @@ export default function HubSpotPage() {
                     </p>
                   </div>
                 ) : validationState.phase === 'manual_disconnect' ? (
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-400">
                     {validationState.message}
                   </p>
                 ) : hasToken ? (
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-400">
                     Token preenchido. Valide o acesso para ativar a conexão.
                   </p>
                 ) : (
-                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+                  <p className="mt-2 text-sm font-medium leading-relaxed text-slate-400">
                     Nenhuma conexão ativa.
                   </p>
                 )}
@@ -942,9 +942,9 @@ export default function HubSpotPage() {
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Empresas</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Empresas</p>
               <h3 className="text-xl font-black text-slate-900">Pré-visualização amostral de empresas</h3>
-              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-400">
                 Dados lidos do HubSpot para diagnóstico rápido da base antes de qualquer etapa de preparação assistida.
               </p>
               <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">
@@ -958,9 +958,9 @@ export default function HubSpotPage() {
 
           <div className="mt-4 space-y-3 text-sm">
             {!canPreview ? (
-              <p className="text-slate-600">Valide o acesso antes de pré-visualizar empresas.</p>
+              <p className="text-slate-400">Valide o acesso antes de pré-visualizar empresas.</p>
             ) : previewState.phase === 'idle' ? (
-              <p className="text-slate-600">Clique para carregar uma amostra rápida de até 10 empresas da HubSpot.</p>
+              <p className="text-slate-400">Clique para carregar uma amostra rápida de até 10 empresas da HubSpot.</p>
             ) : previewState.phase === 'loading' ? (
               <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -989,8 +989,8 @@ export default function HubSpotPage() {
                         {previewRows.map((company) => (
                           <tr key={company.id}>
                             <td className="px-3 py-2 font-medium text-slate-900">{company.name || '—'}</td>
-                            <td className="px-3 py-2 text-slate-600">{company.domain || '—'}</td>
-                            <td className="px-3 py-2 text-slate-600">{company.industry || '—'}</td>
+                            <td className="px-3 py-2 text-slate-400">{company.domain || '—'}</td>
+                            <td className="px-3 py-2 text-slate-400">{company.industry || '—'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1007,9 +1007,9 @@ export default function HubSpotPage() {
         <Card className="border border-slate-200">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Campos</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Campos</p>
               <h3 className="text-xl font-black text-slate-900">Catálogo de campos</h3>
-              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+              <p className="mt-1 text-sm font-medium leading-relaxed text-slate-400">
                 A Canopi usa este catálogo para entender propriedades, grupos e oportunidades de mapeamento no HubSpot.
               </p>
             </div>
@@ -1020,9 +1020,9 @@ export default function HubSpotPage() {
 
           <div className="mt-4 space-y-3 text-sm">
             {!canAnalyze ? (
-              <p className="text-slate-600">Valide o acesso antes de atualizar campos.</p>
+              <p className="text-slate-400">Valide o acesso antes de atualizar campos.</p>
             ) : schemaState.phase === 'idle' ? (
-              <p className="text-slate-600">Clique em Atualizar campos para carregar o catálogo de empresas disponível para leitura e mapeamento.</p>
+              <p className="text-slate-400">Clique em Atualizar campos para carregar o catálogo de empresas disponível para leitura e mapeamento.</p>
             ) : schemaState.phase === 'loading' ? (
               <div className="flex items-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-800">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -1043,7 +1043,7 @@ export default function HubSpotPage() {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-slate-700" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Diagnóstico de enriquecimento</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Diagnóstico de enriquecimento</p>
           </div>
           <div className="grid gap-2 md:grid-cols-2">
             {enrichmentPriorities.map((item) => {
@@ -1056,7 +1056,7 @@ export default function HubSpotPage() {
                   <div className="min-w-0">
                     <p className="text-xs font-black text-slate-900">{item.title}</p>
                     <p className="mt-0.5 text-xs font-semibold text-slate-700">{item.status}</p>
-                    <p className="mt-0.5 text-[11px] font-medium leading-relaxed text-slate-500">{item.detail}</p>
+                    <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{item.detail}</p>
                   </div>
                 </div>
               );
@@ -1065,12 +1065,12 @@ export default function HubSpotPage() {
           <div className="rounded-2xl border border-slate-100 bg-white px-3 py-3">
             <div className="flex items-center gap-2">
               <Database className="h-4 w-4 text-slate-700" />
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Leitura para a Canopi</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Leitura para a Canopi</p>
             </div>
             <p className="mt-2 text-sm font-medium leading-relaxed text-slate-700">
               Após inventário, normalização e persistência, estes dados alimentam Contas, Sinais, Comitê, Plays e demais leituras da Canopi.
             </p>
-            <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+            <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-400">
               <p className="font-semibold text-slate-900">Catálogo de campos</p>
               <p className="mt-1">
                 {schemaState.data ? `${schemaState.data.count} propriedades lidas nesta sessão.` : 'Não calculado nesta leitura.'}
@@ -1099,7 +1099,7 @@ export default function HubSpotPage() {
       />
 
       <div className={`rounded-3xl border p-5 ${accessValidated ? 'border-emerald-100 bg-emerald-50' : 'border-blue-100 bg-blue-50'}`}>
-        <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${accessValidated ? 'text-emerald-700' : 'text-blue-700'}`}>
+        <p className={`text-xs font-black uppercase tracking-[0.2em] ${accessValidated ? 'text-emerald-700' : 'text-blue-700'}`}>
           {accessValidated ? 'Conectado' : 'Próxima ação'}
         </p>
         <p className={`mt-2 text-sm font-medium leading-relaxed ${accessValidated ? 'text-emerald-950' : 'text-blue-950'}`}>

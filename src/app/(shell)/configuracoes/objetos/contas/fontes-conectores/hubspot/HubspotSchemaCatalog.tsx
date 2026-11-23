@@ -183,12 +183,12 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
       <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Catálogo de campos</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Catálogo de campos</p>
             <h4 className="text-lg font-black text-slate-900">{schema.count} propriedades carregadas</h4>
-            <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-600">
+            <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
               A Canopi identificou {schema.count} propriedades no HubSpot. Esta tela mostra uma prévia dos campos mais úteis para população e mapeamento. Para analisar todos os campos e montar uma massa mais completa, baixe o CSV completo.
             </p>
-            <p className="text-xs font-medium text-slate-600">
+            <p className="text-xs font-medium text-slate-400">
               Exportações locais baseadas nos dados carregados nesta sessão.
             </p>
           </div>
@@ -202,19 +202,19 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
 
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-xl border border-slate-100 bg-white px-3 py-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total de propriedades</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Total de propriedades</p>
             <p className="mt-1 text-lg font-black text-slate-900">{schema.count}</p>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Campos úteis para população</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">Campos úteis para população</p>
             <p className="mt-1 text-lg font-black text-emerald-950">{usefulPopulationCount}</p>
           </div>
           <div className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand">Campos com opções</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-brand">Campos com opções</p>
             <p className="mt-1 text-lg font-black text-blue-950">{optionsFieldCount}</p>
           </div>
           <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Campos técnicos/sistema</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Campos técnicos/sistema</p>
             <p className="mt-1 text-lg font-black text-slate-900">{technicalCount}</p>
           </div>
         </div>
@@ -223,13 +223,13 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
       <div className="rounded-2xl border border-slate-100 bg-white p-4 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Prévia útil</p>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Prévia útil</p>
             <h5 className="text-base font-black text-slate-900">Campos principais para população e mapeamento</h5>
           </div>
           <Badge variant="blue">{previewProperties.length} campos</Badge>
         </div>
 
-        <p className="text-sm font-medium leading-relaxed text-slate-600">
+        <p className="text-sm font-medium leading-relaxed text-slate-400">
           A prévia não limita a população. O CSV completo inclui campos úteis, históricos, lifecycle, cliente/ex-cliente, target account, analytics, sinais, opções controladas e campos técnicos. Use a classificação Canopi como orientação, não como trava.
         </p>
 
@@ -248,20 +248,20 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
               {previewProperties.map((property) => (
                 <tr key={property.name}>
                   <td className="px-4 py-3 align-top font-semibold text-slate-900">{property.name}</td>
-                  <td className="px-4 py-3 align-top text-slate-600">{property.label}</td>
-                  <td className="px-4 py-3 align-top text-slate-600">{property.groupName || '—'}</td>
+                  <td className="px-4 py-3 align-top text-slate-400">{property.label}</td>
+                  <td className="px-4 py-3 align-top text-slate-400">{property.groupName || '—'}</td>
                   <td className="px-4 py-3 align-top">
                     <Badge variant={badgeVariantForClass(property.canopiPopulationClass)}>
                       {getPopulationClassLabel(property.canopiPopulationClass)}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 align-top text-slate-600">
+                  <td className="px-4 py-3 align-top text-slate-400">
                     <div className="space-y-1">
                       <p>{property.canopiPopulationReason}</p>
                       {property.optionsCount > 0 && (
-                        <p className="text-[11px] text-slate-500">{property.optionsCount} opção(ões) controlada(s)</p>
+                        <p className="text-xs text-slate-500">{property.optionsCount} opção(ões) controlada(s)</p>
                       )}
-                      {property.readOnlyValue && <p className="text-[11px] text-slate-500">Campo read-only no schema.</p>}
+                      {property.readOnlyValue && <p className="text-xs text-slate-500">Campo read-only no schema.</p>}
                     </div>
                   </td>
                 </tr>
@@ -291,8 +291,8 @@ export function HubspotSchemaCatalog({ schema }: HubspotSchemaCatalogProps) {
       <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Exportação</p>
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Exportação</p>
+            <p className="text-sm font-medium text-slate-400">
               Baixe um CSV completo com {properties.length} campos e metadados úteis para análise em planilha.
             </p>
           </div>

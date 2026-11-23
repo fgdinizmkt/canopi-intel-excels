@@ -338,7 +338,7 @@ export const Overview: React.FC = () => {
             <div className="p-2 bg-brand/10 rounded-xl">
               <Sparkles className="w-5 h-5 text-brand" />
             </div>
-            <span className="text-[10px] font-bold text-brand uppercase tracking-widest">Plataforma de Inteligência de Receita</span>
+            <span className="text-xs font-bold text-brand uppercase tracking-widest">Plataforma de Inteligência de Receita</span>
           </div>
           <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Bem-vindo à Canopi</h1>
           <p className="text-slate-500 mt-2 max-w-md font-medium">
@@ -347,7 +347,7 @@ export const Overview: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3 relative z-10">
-          <Button variant="outline" className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50">Configurar Fontes</Button>
+          <Button variant="outline" className="bg-white border-slate-200 text-slate-400 hover:bg-slate-50">Configurar Fontes</Button>
           <Button className="bg-brand text-white hover:bg-brand/90 border-none shadow-lg shadow-brand/20">Gerar Relatório Executivo</Button>
         </div>
       </header>
@@ -356,11 +356,11 @@ export const Overview: React.FC = () => {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {/* KPI 1: Pipeline (Performance) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-brand text-white">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-100">Pipeline Total <span className="text-amber-200 ml-2">· exploratório</span></p>
+          <p className="text-xs font-bold uppercase tracking-widest text-brand-100">Pipeline Total <span className="text-amber-200 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{performanceMetrics.totalPipeline}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-white/80">
+              <div className="flex items-center gap-1 text-xs font-bold mt-1 text-white/80">
                 <TrendingUp className="w-3 h-3" />
                 <span>{performanceMetrics.activeAccounts} contas ativas</span>
               </div>
@@ -373,11 +373,11 @@ export const Overview: React.FC = () => {
 
         {/* KPI 2: Conversão (Performance) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Taxa de Conversão <span className="text-amber-500 ml-2">· exploratório</span></p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Taxa de Conversão <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{performanceMetrics.conversionRate}%</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-emerald-600">
+              <div className="flex items-center gap-1 text-xs font-bold mt-1 text-emerald-600">
                 <CheckCircle2 className="w-3 h-3" />
                 <span>{performanceMetrics.resolvedSignals}/{performanceMetrics.totalSignals} resolvidos</span>
               </div>
@@ -387,11 +387,11 @@ export const Overview: React.FC = () => {
 
         {/* KPI 3: Sinais Ativos */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sinais Ativos <span className="text-amber-500 ml-2">· exploratório</span></p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Sinais Ativos <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{advancedSignals.length}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-red-600">
+              <div className="flex items-center gap-1 text-xs font-bold mt-1 text-red-600">
                 <AlertTriangle className="w-3 h-3" />
                 <span>{criticosSinais.length} críticos</span>
               </div>
@@ -401,11 +401,11 @@ export const Overview: React.FC = () => {
 
         {/* KPI 4: Ações Críticas (Queue Intelligence) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ações Críticas <span className="text-amber-500 ml-2">· exploratório</span></p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Ações Críticas <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{queueIntelligence.critical}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-slate-400">
+              <div className="flex items-center gap-1 text-xs font-bold mt-1 text-slate-400">
                 <span>fila operacional</span>
               </div>
             </div>
@@ -414,11 +414,11 @@ export const Overview: React.FC = () => {
 
         {/* KPI 5: Em Risco de SLA (Queue Intelligence) */}
         <div className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white text-slate-900">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">SLA em Risco <span className="text-amber-500 ml-2">· exploratório</span></p>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">SLA em Risco <span className="text-amber-500 ml-2">· exploratório</span></p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{queueIntelligence.delayed}</h3>
-              <div className="flex items-center gap-1 text-[10px] font-bold mt-1 text-amber-600">
+              <div className="flex items-center gap-1 text-xs font-bold mt-1 text-amber-600">
                 <Zap className="w-3 h-3" />
                 <span>atrasadas</span>
               </div>
@@ -428,16 +428,16 @@ export const Overview: React.FC = () => {
 
         {/* KPI 6: Bloco C Engajamento (NEW) */}
         <div className="p-5 rounded-2xl border border-blue-100 shadow-sm bg-blue-50/30 text-slate-900 ring-1 ring-blue-100/50">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-blue-500">Engajamento Bloco C</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-500">Engajamento Bloco C</p>
           <div className="mt-2 flex items-end justify-between">
             <div>
               <h3 className="text-2xl font-bold font-headline">{executiveBlockC.recentInteractionsCount}</h3>
               <div className="flex flex-col mt-1">
-                <div className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
+                <div className="flex items-center gap-1 text-xs font-bold text-blue-600">
                   <Globe className="w-3 h-3" />
                   <span>interações recentes (30d)</span>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-bold text-blue-500 mt-0.5">
+                <div className="flex items-center gap-1 text-xs font-bold text-blue-500 mt-0.5">
                   <Sparkles className="w-3 h-3" />
                   <span>{executiveBlockC.activePlaysCount} plays recomendados</span>
                 </div>
@@ -456,18 +456,18 @@ export const Overview: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Contas Críticas */}
           <Card className="border-l-4 border-l-red-500 bg-red-50">
-            <Badge variant="slate" className="mb-2 bg-red-100 text-red-700 border-red-200 text-[9px]">CRÍTICAS</Badge>
+            <Badge variant="slate" className="mb-2 bg-red-100 text-red-700 border-red-200 text-xs">CRÍTICAS</Badge>
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.criticas.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.criticas.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-red-200/50 hover:border-red-400 transition-all">
                   <Link href={`/contas/${x.conta.slug}`}>
-                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-red-700">{x.conta.nome}</p>
+                    <p className="text-xs font-semibold text-slate-900 cursor-pointer hover:text-red-700">{x.conta.nome}</p>
                   </Link>
-                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-red-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-red-600 hover:text-red-700 font-bold uppercase">Ação</button>
+                    <span className="text-xs text-red-700 font-bold">Score {x.score.scoreTotal}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-xs text-red-600 hover:text-red-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -476,18 +476,18 @@ export const Overview: React.FC = () => {
 
           {/* Altas Prioridades */}
           <Card className="border-l-4 border-l-amber-500 bg-amber-50">
-            <Badge variant="slate" className="mb-2 bg-amber-100 text-amber-700 border-amber-200 text-[9px]">ALTAS PRIORIDADES</Badge>
+            <Badge variant="slate" className="mb-2 bg-amber-100 text-amber-700 border-amber-200 text-xs">ALTAS PRIORIDADES</Badge>
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altasPrio.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.altasPrio.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-amber-200/50 hover:border-amber-400 transition-all">
                   <Link href={`/contas/${x.conta.slug}`}>
-                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-amber-700">{x.conta.nome}</p>
+                    <p className="text-xs font-semibold text-slate-900 cursor-pointer hover:text-amber-700">{x.conta.nome}</p>
                   </Link>
-                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-amber-600 hover:text-amber-700 font-bold uppercase">Ação</button>
+                    <span className="text-xs text-amber-700 font-bold">Score {x.score.scoreTotal}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-xs text-amber-600 hover:text-amber-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -496,18 +496,18 @@ export const Overview: React.FC = () => {
 
           {/* Alto Potencial + Baixa Cobertura */}
           <Card className="border-l-4 border-l-blue-500 bg-blue-50">
-            <Badge variant="slate" className="mb-2 bg-blue-100 text-blue-700 border-blue-200 text-[9px]">ALTO POT. / BAIXA COB.</Badge>
+            <Badge variant="slate" className="mb-2 bg-blue-100 text-blue-700 border-blue-200 text-xs">ALTO POT. / BAIXA COB.</Badge>
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.altoPotencialBaixaCobertura.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.altoPotencialBaixaCobertura.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-blue-200/50 hover:border-blue-400 transition-all">
                   <Link href={`/contas/${x.conta.slug}`}>
-                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-blue-700">{x.conta.nome}</p>
+                    <p className="text-xs font-semibold text-slate-900 cursor-pointer hover:text-blue-700">{x.conta.nome}</p>
                   </Link>
-                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-blue-600 hover:text-blue-700 font-bold uppercase">Ação</button>
+                    <span className="text-xs text-blue-700 font-bold">Pot. {x.score.potencial.score}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-xs text-blue-600 hover:text-blue-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -516,18 +516,18 @@ export const Overview: React.FC = () => {
 
           {/* Top Oportunidades por Score */}
           <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
-            <Badge variant="slate" className="mb-2 bg-emerald-100 text-emerald-700 border-emerald-200 text-[9px]">TOP OPORTUNIDADES</Badge>
+            <Badge variant="slate" className="mb-2 bg-emerald-100 text-emerald-700 border-emerald-200 text-xs">TOP OPORTUNIDADES</Badge>
             <h3 className="text-sm font-bold text-slate-900 mb-3">{triageByScore.topOportunidades.length} contas</h3>
             <div className="space-y-2">
               {triageByScore.topOportunidades.map(x => (
                 <div key={x.conta.id} className="p-2.5 bg-white rounded-lg border border-emerald-200/50 hover:border-emerald-400 transition-all">
                   <Link href={`/contas/${x.conta.slug}`}>
-                    <p className="text-[11px] font-semibold text-slate-900 cursor-pointer hover:text-brand">{x.conta.nome}</p>
+                    <p className="text-xs font-semibold text-slate-900 cursor-pointer hover:text-brand">{x.conta.nome}</p>
                   </Link>
-                  <p className="text-[9px] text-slate-600 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-1">{deriveProximaMelhorAcao(x.conta, x.score)}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-[10px] text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
-                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-[8px] text-emerald-600 hover:text-emerald-700 font-bold uppercase">Ação</button>
+                    <span className="text-xs text-emerald-700 font-bold">Score {x.score.scoreTotal}</span>
+                    <button onClick={(e) => { e.stopPropagation(); const acao = deriveAcaoOperacional(x.conta, x.score); createAction({ title: acao.title, description: acao.description, priority: acao.priority, category: acao.category, accountName: x.conta.nome || 'Conta', accountContext: getAccountContext(x.conta), expectedImpact: acao.expectedImpact, nextStep: acao.nextStep, sourceType: acao.sourceType, relatedAccountId: x.conta.id }); }} className="text-xs text-emerald-600 hover:text-emerald-700 font-bold uppercase">Ação</button>
                   </div>
                 </div>
               ))}
@@ -545,12 +545,12 @@ export const Overview: React.FC = () => {
               <div className="relative z-10">
                 <Badge variant="blue" className="mb-4 bg-brand/10 text-brand border-none">SINAL FORTE / OPORTUNIDADE PRINCIPAL</Badge>
                 <h2 className="text-3xl font-bold text-slate-900 mb-4">{topSignal.account}</h2>
-                <p className="text-slate-600 max-w-xl leading-relaxed mb-8 text-sm">
+                <p className="text-slate-400 max-w-xl leading-relaxed mb-8 text-sm">
                   {topSignal.description}
                 </p>
                 <div className="flex flex-wrap items-center gap-8">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">NÍVEL DE CONFIANÇA</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">NÍVEL DE CONFIANÇA</p>
                     <div className="flex items-center gap-3">
                       <div className="h-2 w-48 bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-500" style={{ width: `${topSignal.confidence}%` }}></div>
@@ -571,21 +571,21 @@ export const Overview: React.FC = () => {
               <h3 className="text-2xl font-bold text-slate-900 mb-4">O que está melhorando</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Sinais Resolvidos</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Sinais Resolvidos</p>
                   <div className="flex items-end gap-3">
                     <h4 className="text-3xl font-bold text-emerald-600">{performanceMetrics.resolvedSignals}</h4>
                     <p className="text-xs text-slate-500 mb-1">{Math.round((performanceMetrics.resolvedSignals / performanceMetrics.totalSignals) * 100)}% do total</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Taxa de Conversão</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Taxa de Conversão</p>
                   <div className="flex items-end gap-3">
                     <h4 className="text-3xl font-bold text-emerald-600">{performanceMetrics.conversionRate}%</h4>
                     <p className="text-xs text-slate-500 mb-1">acima da meta</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Origem Destaque</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Origem Destaque</p>
                   <div className="flex items-end gap-3">
                     <h4 className="text-2xl font-bold text-emerald-600">{performanceMetrics.bestOrigin}</h4>
                     <p className="text-xs text-slate-500 mb-1">melhor performance</p>
@@ -600,7 +600,7 @@ export const Overview: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-widest text-slate-400 font-bold border-b border-slate-50">
+                  <tr className="text-xs uppercase tracking-widest text-slate-400 font-bold border-b border-slate-50">
                     <th className="pb-4">CONTA</th>
                     <th className="pb-4">SINAL CRÍTICO</th>
                     <th className="pb-4">OWNER</th>
@@ -614,7 +614,7 @@ export const Overview: React.FC = () => {
                         <p className="font-bold text-slate-900">{signal.account}</p>
                       </td>
                       <td className="py-4">
-                        <p className="text-xs text-slate-600 max-w-xs truncate">{signal.title}</p>
+                        <p className="text-xs text-slate-400 max-w-xs truncate">{signal.title}</p>
                       </td>
                       <td className="py-4">
                         <p className="text-xs font-medium text-slate-500">{signal.owner}</p>
@@ -633,11 +633,11 @@ export const Overview: React.FC = () => {
 
           {/* Channel Health */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Saúde dos Canais & Orquestração <span className="text-amber-500 text-[10px]">· exploratório</span></h3>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Saúde dos Canais & Orquestração <span className="text-amber-500 text-xs">· exploratório</span></h3>
             <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {channels.map((channel, i) => (
                 <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{channel.label}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">{channel.label}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-bold text-slate-900">{channel.status}</span>
                     {channel.variant === 'emerald' && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
@@ -654,7 +654,7 @@ export const Overview: React.FC = () => {
             <div className="space-y-6 pt-4">
               {originBreakdown.map((item) => (
                 <div key={item.origin} className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
                     <div>
                       <span className="text-slate-900">{item.origin}</span>
                       <span className="text-slate-400 ml-2">({item.total} sinais)</span>
@@ -682,7 +682,7 @@ export const Overview: React.FC = () => {
               {saudeOperacional.map((item, i) => (
                 <div key={i} className={`p-4 bg-white rounded-2xl border-l-4 ${item.border} shadow-sm`}>
                   <p className={`text-xs font-bold ${item.titleCls}`}>{item.title}</p>
-                  <p className={`text-[10px] ${item.detailCls} mt-1`}>{item.detail}</p>
+                  <p className={`text-xs ${item.detailCls} mt-1`}>{item.detail}</p>
                 </div>
               ))}
             </div>
@@ -702,7 +702,7 @@ export const Overview: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-slate-900 group-hover:text-brand transition-colors">{signal.title}</p>
-                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{signal.account}</p>
+                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{signal.account}</p>
                       </div>
                     </div>
                     <Badge variant={signal.severity === 'crítico' ? 'red' : signal.severity === 'alerta' ? 'amber' : 'slate'}>
@@ -719,8 +719,8 @@ export const Overview: React.FC = () => {
                   {queueIntelligence.anomalies.map((ano, i) => (
                     <div key={i} className={`p-3 rounded-lg mb-2 border-l-4 ${ano.severity === 'high' ? 'border-l-red-500 bg-red-50' : 'border-l-amber-500 bg-amber-50'}`}>
                       <p className={`text-xs font-bold ${ano.severity === 'high' ? 'text-red-900' : 'text-amber-900'}`}>{ano.type}</p>
-                      <p className={`text-[10px] ${ano.severity === 'high' ? 'text-red-700' : 'text-amber-700'} mt-1`}>{ano.title}</p>
-                      <p className={`text-[10px] ${ano.severity === 'high' ? 'text-red-600' : 'text-amber-600'} mt-0.5`}>{ano.description}</p>
+                      <p className={`text-xs ${ano.severity === 'high' ? 'text-red-700' : 'text-amber-700'} mt-1`}>{ano.title}</p>
+                      <p className={`text-xs ${ano.severity === 'high' ? 'text-red-600' : 'text-amber-600'} mt-0.5`}>{ano.description}</p>
                     </div>
                   ))}
                 </div>
@@ -758,21 +758,21 @@ export const Overview: React.FC = () => {
                 <Link key={item.conta.id} href={`/contas/${item.conta.slug}`}>
                   <div className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:border-brand/30 transition-all cursor-pointer group">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
                       {getInitials(item.conta.nome)}
                     </div>
                     <div>
                       <p className="text-xs font-bold text-slate-900 group-hover:text-brand">{item.conta.nome}</p>
-                      <p className="text-[9px] text-slate-400 font-medium">Última: {new Date(item.lastDate!).toLocaleDateString('pt-BR')}</p>
+                      <p className="text-xs text-slate-400 font-medium">Última: {new Date(item.lastDate!).toLocaleDateString('pt-BR')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-bold text-slate-700 flex items-center gap-1">
+                        <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
                            <Activity className="w-2.5 h-2.5" /> {item.interactionsCount}
                         </span>
                         {item.playsCount > 0 && (
-                          <span className="text-[9px] font-bold text-blue-500 flex items-center gap-1 mt-0.5">
+                          <span className="text-xs font-bold text-blue-500 flex items-center gap-1 mt-0.5">
                              <Sparkles className="w-2 h-2" /> {item.playsCount} plays
                           </span>
                         )}
@@ -781,7 +781,7 @@ export const Overview: React.FC = () => {
                   </div>
                 </Link>
               ))}
-              <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-600 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc&blocoCInteracoes=recente&blocoCPlays=com'}>Ver Ranking de Engajamento</Button>
+              <Button variant="outline" className="w-full mt-2 border-slate-200 text-slate-400 text-xs py-2 hover:bg-slate-50" onClick={() => (window as any).location.href = '/Accounts?sort=engajamento_desc&blocoCInteracoes=recente&blocoCPlays=com'}>Ver Ranking de Engajamento</Button>
             </div>
           </Card>
 
@@ -796,18 +796,18 @@ export const Overview: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{conta.nome}</p>
-                      <p className="text-[10px] text-slate-500 font-medium">{conta.oportunidadePrincipal}</p>
+                      <p className="text-xs text-slate-500 font-medium">{conta.oportunidadePrincipal}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                    <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">
                       {conta.prontidao > 80 ? 'Alta Prontidão' : 'Em Ascensão'}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-medium">Potencial: {conta.potencial}</p>
+                    <p className="text-xs text-slate-400 font-medium">Potencial: {conta.potencial}</p>
                   </div>
                 </div>
               ))}
-              <Button variant="outline" className="w-full mt-4 border-slate-200 text-slate-600 hover:bg-slate-50">Ver Pipeline ABM</Button>
+              <Button variant="outline" className="w-full mt-4 border-slate-200 text-slate-400 hover:bg-slate-50">Ver Pipeline ABM</Button>
             </div>
           </Card>
         </div>

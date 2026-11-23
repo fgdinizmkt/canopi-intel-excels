@@ -132,7 +132,7 @@ function buildReviewCsv(analysis: HubspotWritebackDryRunResult) {
 function MetricCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4">
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}</p>
+      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-black text-slate-950">{value}</p>
     </div>
   );
@@ -171,7 +171,7 @@ function MiniTable({
               {rows.map((row, index) => (
                 <tr key={`${title}-${index}`}>
                   {columns.map((column) => (
-                    <td key={column.key} className="px-3 py-2 text-slate-600">
+                    <td key={column.key} className="px-3 py-2 text-slate-400">
                       {row[column.key] || '—'}
                     </td>
                   ))}
@@ -203,7 +203,7 @@ function FileSlot({
   return (
     <label className="block space-y-2 rounded-2xl border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{label}</span>
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">{label}</span>
         <Badge variant={file ? 'emerald' : 'slate'}>{status}</Badge>
       </div>
       <input
@@ -216,7 +216,7 @@ function FileSlot({
         className="block w-full cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-widest file:text-white hover:file:bg-black"
       />
       <p className="text-xs font-medium text-slate-500">{description}</p>
-      <p className="text-xs font-medium text-slate-600">
+      <p className="text-xs font-medium text-slate-400">
         {file ? `${file.name} · ${formatFileSize(file.size)}` : 'Aguardando arquivo'}
       </p>
     </label>
@@ -526,9 +526,9 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Entrada assistida por arquivos</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Entrada assistida por arquivos</p>
               <h3 className="text-2xl font-black text-slate-950">Preparação da base</h3>
-              <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-600">
+              <p className="max-w-3xl text-sm font-medium leading-relaxed text-slate-400">
                 Use arquivos quando precisar complementar a leitura direta do HubSpot, revisar uma base externa ou preparar dados para retorno assistido ao CRM.
               </p>
             </div>
@@ -567,7 +567,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
             />
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-400">
             {hasAnyFile ? (
               <p>{uploadModeLabel}. O resultado sempre reflete apenas os arquivos atualmente selecionados nesta sessão.</p>
             ) : (
@@ -581,9 +581,9 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Resumo consolidado</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Resumo consolidado</p>
               <h4 className="text-xl font-black text-slate-950">Prévia da base preparada</h4>
-              <p className="mt-1 text-sm font-medium text-slate-600">
+              <p className="mt-1 text-sm font-medium text-slate-400">
                 Empresas únicas, contatos, vínculos válidos e bloqueios aparecem consolidados para orientar a revisão antes de qualquer retorno ao CRM.
               </p>
             </div>
@@ -599,7 +599,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
 
           {analysis?.warnings?.length ? (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-950">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">Aviso</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-700">Aviso</p>
               <ul className="mt-2 space-y-1">
                 {analysis.warnings.slice(0, 4).map((warning) => (
                   <li key={warning}>• {warning}</li>
@@ -610,7 +610,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
 
           {analysis?.blockers?.length ? (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-700">Bloqueios</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-red-700">Bloqueios</p>
               <ul className="mt-2 space-y-1">
                 {analysis.blockers.map((blocker) => (
                   <li key={blocker}>• {blocker}</li>
@@ -625,9 +625,9 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Prévia curta</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Prévia curta</p>
               <h4 className="text-xl font-black text-slate-950">Empresas, contatos e associações</h4>
-              <p className="mt-1 text-sm font-medium text-slate-600">
+              <p className="mt-1 text-sm font-medium text-slate-400">
                 A prévia mostra apenas uma amostra útil. O CSV de revisão continua disponível para checagem completa.
               </p>
             </div>
@@ -644,7 +644,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                   className={`rounded-full border px-4 py-2 text-xs font-black uppercase tracking-widest transition ${
                     previewTab === tab.key
                       ? 'border-slate-900 bg-slate-900 text-white'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                      : 'border-slate-200 bg-white text-slate-400 hover:border-slate-300 hover:text-slate-900'
                   }`}
                 >
                   {tab.label}
@@ -661,7 +661,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
               emptyLabel={`Nenhuma prévia disponível para ${previewTitle.toLowerCase()}.`}
             />
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-600">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-400">
               A prévia será exibida automaticamente depois que a análise terminar.
             </div>
           )}
@@ -672,12 +672,12 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
         <div className="space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Retorno ao HubSpot</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Retorno ao HubSpot</p>
               <h4 className="text-xl font-black text-slate-950">Atualizar HubSpot a partir da Canopi</h4>
-              <p className="mt-1 text-sm font-medium text-slate-600">
+              <p className="mt-1 text-sm font-medium text-slate-400">
                 Exporte o CSV de revisão e confirme os vínculos antes de devolver dados preparados ao HubSpot.
               </p>
-              <p className="mt-2 text-sm font-medium leading-relaxed text-slate-600">
+              <p className="mt-2 text-sm font-medium leading-relaxed text-slate-400">
                 A atualização usa IDs externos Canopi únicos no HubSpot. Se a mesma base gerar os mesmos IDs, o HubSpot atualiza os registros existentes.
               </p>
             </div>
@@ -714,24 +714,24 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
             <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm font-medium leading-relaxed text-blue-950">
               <div className="space-y-3">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Confirmação necessária</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Confirmação necessária</p>
                   <p className="mt-1 font-semibold">Confirmo que revisei a prévia e quero atualizar o HubSpot com esta base.</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-2xl border border-blue-100 bg-white p-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Empresas</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Empresas</p>
                     <p className="mt-1 text-lg font-black text-slate-950">{summary?.readyForSendCompanies ?? 0}</p>
                   </div>
                   <div className="rounded-2xl border border-blue-100 bg-white p-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Contatos</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Contatos</p>
                     <p className="mt-1 text-lg font-black text-slate-950">{summary?.readyForSendContacts ?? 0}</p>
                   </div>
                   <div className="rounded-2xl border border-blue-100 bg-white p-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Associações</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Associações</p>
                     <p className="mt-1 text-lg font-black text-slate-950">{totalAssociations}</p>
                   </div>
                   <div className="rounded-2xl border border-blue-100 bg-white p-3">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Bloqueados</p>
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Bloqueados</p>
                     <p className="mt-1 text-lg font-black text-slate-950">{summary?.blockedContacts ?? 0}</p>
                   </div>
                 </div>
@@ -777,7 +777,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
             </div>
           ) : null}
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-400">
             {canWriteHubspot ? (
               <p>Revisão pronta. A atualização real continua protegida por confirmação explícita.</p>
             ) : (
@@ -788,7 +788,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
                     : 'Atualização bloqueada por permissão. Reconecte o HubSpot com escopos de escrita para liberar a atualização.'}
                 </p>
                 {!setupState || !setupState.ready ? (
-                  <ul className="space-y-1 text-slate-600">
+                  <ul className="space-y-1 text-slate-400">
                     {setupState?.issues.slice(0, 4).map((issue) => (
                       <li key={`${issue.objectType}-${issue.title}`}>• {issue.message}</li>
                     ))}
@@ -805,13 +805,13 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-600">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-400">
             A atualização usa IDs externos Canopi para localizar registros no HubSpot. Reenviar a mesma base tende a atualizar os registros existentes quando os IDs permanecem iguais. Se mudanças em campos sensíveis gerarem IDs diferentes, pode haver risco de novo registro; esse cenário deve evoluir para uma revisão assistida antes da criação ou atualização.
           </div>
 
           {executionResult ? (
             <div className={`rounded-2xl border p-4 text-sm font-medium ${executionResult.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-200 bg-amber-50 text-amber-950'}`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
                 {executionResult.ok ? 'Atualização concluída' : 'Atualização concluída com erros'}
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -857,7 +857,7 @@ export function HubspotWritebackImport({ token, canWriteHubspot, missingWriteSco
               </p>
               {executionResult.errors.length > 0 ? (
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Erros principais</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Erros principais</p>
                   <ul className="mt-2 space-y-1 text-sm text-slate-700">
                     {executionResult.errors.slice(0, 5).map((item, index) => (
                       <li key={`${item.stage}-${item.canopiId || 'sem-id'}-${index}`}>• {item.message}</li>

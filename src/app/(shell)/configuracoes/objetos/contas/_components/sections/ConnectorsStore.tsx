@@ -130,7 +130,7 @@ function ConnectorLogo({ connector }: { connector: ConnectorStoreCard }) {
       aria-label="Sem marca especifica"
       title="Sem marca especifica"
     >
-      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">CRM</span>
+      <span className="text-xs font-black uppercase tracking-widest text-slate-500">CRM</span>
     </div>
   );
 }
@@ -140,14 +140,14 @@ export function ConnectorsStore() {
     <section className="space-y-8">
       <header className="space-y-3">
         <h2 className="text-3xl font-black tracking-tight text-slate-900">Loja de Conectores</h2>
-        <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-600">
+        <p className="max-w-4xl text-sm font-medium leading-relaxed text-slate-400">
           Catalogo de integracoes de contas da Canopi. Cada conector possui configuracao dedicada em sua propria tela,
           com metodos de conexao, requisitos e objetos suportados.
         </p>
       </header>
 
       <div className="rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4">
-        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-blue-700">Escopo de configuracao</p>
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">Escopo de configuracao</p>
         <p className="mt-1 text-sm font-medium text-blue-900">
           CSV, OAuth, token, schema e mapping serao configurados dentro da pagina dedicada de cada conector.
         </p>
@@ -172,11 +172,11 @@ export function ConnectorsStore() {
                 </div>
               </div>
 
-              <p className="mb-5 text-sm font-medium leading-relaxed text-slate-600">{connector.descricao}</p>
+              <p className="mb-5 text-sm font-medium leading-relaxed text-slate-400">{connector.descricao}</p>
 
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Metodos de conexao</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Metodos de conexao</p>
                   <ul className="mt-1 space-y-1 text-slate-700">
                     {connector.metodosConexao.map((metodo) => (
                       <li key={metodo}>• {metodo}</li>
@@ -185,12 +185,12 @@ export function ConnectorsStore() {
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Objetos suportados</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Objetos suportados</p>
                   <p className="mt-1 font-semibold text-slate-800">{connector.objetosSuportados.join(', ')}</p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Requisitos</p>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Requisitos</p>
                   <ul className="mt-1 space-y-1 text-slate-700">
                     {connector.requisitos.map((requisito) => (
                       <li key={requisito}>• {requisito}</li>

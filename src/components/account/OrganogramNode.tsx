@@ -83,15 +83,15 @@ export const OrganogramNode: React.FC<OrganogramNodeProps> = ({
           <div className="flex items-center justify-between gap-2">
             <h4 className="text-sm font-black text-slate-100 truncate flex items-center gap-2 group-hover:text-blue-400 transition-colors">
               {contact.nome}
-              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">Ver Perfil</span>
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">Ver Perfil</span>
             </h4>
             <div className="flex items-center gap-2">
-              <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-sm ${styleClass.split(' ').slice(1).join(' ')}`}>
+              <span className={`text-xs font-black uppercase px-1.5 py-0.5 rounded-sm ${styleClass.split(' ').slice(1).join(' ')}`}>
                 {contact.classificacao[0]}
               </span>
             </div>
           </div>
-          <div className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5 truncate">
+          <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5 truncate">
             {contact.cargo} • <span className="text-slate-400">{contact.area}</span>
           </div>
         </div>
@@ -101,8 +101,8 @@ export const OrganogramNode: React.FC<OrganogramNodeProps> = ({
           {/* Relacionamento */}
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-1.5">
-               <span className="text-[9px] font-black text-slate-500 uppercase">Relac.</span>
-               <span className={`text-[10px] font-bold ${contact.forcaRelacional > 70 ? 'text-emerald-500' : 'text-blue-500'}`}>
+               <span className="text-xs font-black text-slate-500 uppercase">Relac.</span>
+               <span className={`text-xs font-bold ${contact.forcaRelacional > 70 ? 'text-emerald-500' : 'text-blue-500'}`}>
                  {contact.forcaRelacional}%
                </span>
             </div>
@@ -114,8 +114,8 @@ export const OrganogramNode: React.FC<OrganogramNodeProps> = ({
           {/* Influência */}
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-1.5">
-               <span className="text-[9px] font-black text-slate-500 uppercase">Inf.</span>
-               <span className="text-[10px] font-bold text-blue-400">{contact.influencia}/10</span>
+               <span className="text-xs font-black text-slate-500 uppercase">Inf.</span>
+               <span className="text-xs font-bold text-blue-400">{contact.influencia}/10</span>
             </div>
             <div className="flex gap-0.5">
                {[...Array(5)].map((_, i) => (

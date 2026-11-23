@@ -23,13 +23,13 @@ const AbmTabs: React.FC = () => {
     <>
       <button
         onClick={() => router.push('/estrategia-abm?tab=principal')}
-        className={`text-sm font-bold transition-all ${!isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+        className={`text-sm font-bold transition-all ${!isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-400'}`}
       >
         Estratégia ABM
       </button>
       <button
         onClick={() => router.push('/estrategia-abm?tab=relatorios')}
-        className={`text-sm font-bold transition-all ${isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+        className={`text-sm font-bold transition-all ${isRelatorios ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-400'}`}
       >
         Relatórios
       </button>
@@ -101,7 +101,7 @@ export const Topbar: React.FC = () => {
   return (
     <header className="h-16 bg-white border-b border-slate-100 sticky top-0 z-40 flex items-center justify-between px-8">
       <div className="flex items-center gap-6 flex-1">
-        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
           {derivedBreadcrumbs.map((crumb, i) => (
             <React.Fragment key={i}>
               <span>{crumb}</span>
@@ -122,13 +122,13 @@ export const Topbar: React.FC = () => {
               <>
                 <button
                   onClick={() => router.push('/contas')}
-                  className={`text-sm font-bold transition-all ${pathname === '/contas' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`text-sm font-bold transition-all ${pathname === '/contas' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-400'}`}
                 >
                   Contas
                 </button>
                 <button
                   onClick={() => router.push('/sinais')}
-                  className={`text-sm font-bold transition-all ${pathname === '/sinais' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`text-sm font-bold transition-all ${pathname === '/sinais' ? 'text-brand border-b-2 border-brand pb-5 mt-5' : 'text-slate-400 hover:text-slate-400'}`}
                 >
                   Sinais
                 </button>
@@ -161,10 +161,10 @@ export const Topbar: React.FC = () => {
           className="flex items-center gap-3 pl-2 hover:opacity-70 transition-opacity"
         >
           <div className="text-right hidden sm:block">
-            <p className="text-[11px] font-bold text-slate-900 uppercase tracking-tight">Fábio Diniz</p>
+            <p className="text-xs font-bold text-slate-900 uppercase tracking-tight">Fábio Diniz</p>
             <div className="flex flex-col items-end leading-none">
-              <p className="text-[9px] text-brand font-bold">@fdiniz</p>
-              <p className="text-[8px] text-slate-400 font-medium lowercase tracking-tighter">fabio.diniz@canopi.com</p>
+              <p className="text-xs text-brand font-bold">@fdiniz</p>
+              <p className="text-xs text-slate-400 font-medium lowercase tracking-tighter">fabio.diniz@canopi.com</p>
             </div>
           </div>
           {avatarSrc ? (

@@ -201,7 +201,7 @@ const CockpitV2 = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{selectedSignalCase ? 'Signal Analysis' : 'System Overview'}</h2>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 block">{selectedSignalCase ? `Focused Decision Flow — ${selectedSignalCase.accountName}` : 'Cross-Intelligence Cockpit'}</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1 block">{selectedSignalCase ? `Focused Decision Flow — ${selectedSignalCase.accountName}` : 'Cross-Intelligence Cockpit'}</span>
                 </div>
               </div>
               <p className="text-slate-500 text-xs mb-4 leading-relaxed max-w-xl">
@@ -226,11 +226,11 @@ const CockpitV2 = () => {
                 { value: '98%', label: 'Sincronização', sub: 'Cobertura Dados', borderColor: 'border-slate-400', dot: 'bg-slate-400' }
               ].map((card, i) => (
                 <Card key={i} className={`p-4 border-t-2 ${card.borderColor} shadow-sm flex flex-col items-start justify-center`}>
-                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                     <div className={`w-1.5 h-1.5 rounded-full ${card.dot}`} /> {card.label}
                   </div>
                   <h4 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">{card.value}</h4>
-                  <p className="text-[10px] font-bold text-slate-400">{card.sub}</p>
+                  <p className="text-xs font-bold text-slate-400">{card.sub}</p>
                 </Card>
               ))}
             </div>
@@ -309,7 +309,7 @@ const CockpitV2 = () => {
                                >
                                  <div className="w-full h-full flex flex-col items-center justify-center text-center pointer-events-none p-0 overflow-hidden">
                                    <span className="text-slate-900 text-[12px] font-black leading-[1.1] break-words">{sub}</span>
-                                   <span className="text-slate-600 font-bold text-[9px] bg-white/70 px-1.5 py-0.5 rounded-full shadow-sm whitespace-nowrap mt-1">{localVol} CTXS</span>
+                                   <span className="text-slate-400 font-bold text-xs bg-white/70 px-1.5 py-0.5 rounded-full shadow-sm whitespace-nowrap mt-1">{localVol} CTXS</span>
                                  </div>
                                </foreignObject>
                              </g>
@@ -345,7 +345,7 @@ const CockpitV2 = () => {
                                   transform={`rotate(${getSafeTextAngle(getRotationCenter(sStart, sEnd))}, ${getArcCenter(380, 540, sStart, sEnd).x}, ${getArcCenter(380, 540, sStart, sEnd).y})`}
                                >
                                  <div className="w-full h-full flex flex-col items-center justify-center text-center pointer-events-none p-0 overflow-hidden">
-                                   <span className="text-slate-800 text-[10px] font-bold leading-tight break-words">{item}</span>
+                                   <span className="text-slate-800 text-xs font-bold leading-tight break-words">{item}</span>
                                  </div>
                                </foreignObject>
                              </g>
@@ -358,7 +358,7 @@ const CockpitV2 = () => {
                 
                 <div className={`absolute inset-0 m-auto w-44 h-44 rounded-full shadow-2xl border-[8px] border-slate-100 flex flex-col items-center justify-center text-center p-4 transition-all duration-300 pointer-events-none z-10 ${pinnedMotor ? 'bg-slate-900 text-white' : 'bg-white'}`}>
                   <Zap className={`w-8 h-8 mb-2 ${pinnedMotor ? 'text-white' : 'text-brand animate-pulse'}`} />
-                  <p className={`text-[11px] font-black uppercase tracking-[0.2em] leading-tight ${pinnedMotor ? 'text-white' : 'text-slate-900'}`}>{pinnedMotor ? 'Trava Ativa' : 'Sync On'}</p>
+                  <p className={`text-xs font-black uppercase tracking-[0.2em] leading-tight ${pinnedMotor ? 'text-white' : 'text-slate-900'}`}>{pinnedMotor ? 'Trava Ativa' : 'Sync On'}</p>
                 </div>
                 
               </div>
@@ -378,7 +378,7 @@ const CockpitV2 = () => {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-white leading-tight mb-1">Métrica cruzada via <span className="font-bold text-indigo-400">{hoveredSlice.motorName}</span></p>
-                    <p className="text-[10px] text-slate-400 font-medium leading-relaxed">{hoveredSlice.payload}</p>
+                    <p className="text-xs text-slate-400 font-medium leading-relaxed">{hoveredSlice.payload}</p>
                   </div>
                 </div>
 
@@ -392,7 +392,7 @@ const CockpitV2 = () => {
                     <span className="font-bold text-white text-xs">{hoveredSlice.source}</span>
                   </div>
                   <div className="flex justify-between items-center px-1 mt-2 pt-2 border-t border-slate-800/50">
-                    <span className="font-medium text-slate-500 text-[10px] uppercase tracking-widest">Peso Computado</span>
+                    <span className="font-medium text-slate-500 text-xs uppercase tracking-widest">Peso Computado</span>
                     <span className="font-bold text-indigo-400 text-xs">{hoveredSlice.valueInfo}</span>
                   </div>
                 </div>
@@ -419,7 +419,7 @@ const CockpitV2 = () => {
                    
                    {pinnedMotor && (
                      <div className="absolute top-4 right-4 z-20 cursor-pointer p-2 bg-slate-100 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors" onClick={() => setPinnedMotor(null)}>
-                       <span className="text-[10px] font-bold uppercase tracking-widest px-2 text-slate-800">Desfixar ✕</span>
+                       <span className="text-xs font-bold uppercase tracking-widest px-2 text-slate-800">Desfixar ✕</span>
                      </div>
                    )}
 
@@ -433,15 +433,15 @@ const CockpitV2 = () => {
                            {currentMotor.name}
                          </h4>
                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                           <span className="bg-slate-100 px-2 py-1 rounded text-slate-700 border border-slate-200 shadow-sm text-[10px] font-bold">
+                           <span className="bg-slate-100 px-2 py-1 rounded text-slate-700 border border-slate-200 shadow-sm text-xs font-bold">
                              {Math.round((currentMotor.signalCount / totalSignals)*100)}% Visibilidade
                            </span>
                            {currentMotor.sensitivity === 'Alta' && (
-                             <span className="bg-indigo-600 px-2 py-1 rounded text-white shadow-sm text-[10px] font-black uppercase animate-pulse flex items-center gap-1">
+                             <span className="bg-indigo-600 px-2 py-1 rounded text-white shadow-sm text-xs font-black uppercase animate-pulse flex items-center gap-1">
                                <Zap size={10} strokeWidth={3} /> Foco Sensível
                              </span>
                            )}
-                           <span className="bg-slate-900 px-2 py-1 rounded text-white shadow-sm text-[10px] font-bold">
+                           <span className="bg-slate-900 px-2 py-1 rounded text-white shadow-sm text-xs font-bold">
                              Threshold: {currentMotor.threshold || 70}%
                            </span>
                          </div>
@@ -456,14 +456,14 @@ const CockpitV2 = () => {
                        </div>
                      ))}
                      <div className="bg-indigo-50/50 border border-indigo-100 p-3 rounded-xl flex flex-col justify-center">
-                       <span className="text-[9px] uppercase font-bold text-indigo-400 mb-1">Regra de Scoring</span>
-                       <span className="text-[11px] font-black text-indigo-700 truncate">
+                       <span className="text-xs uppercase font-bold text-indigo-400 mb-1">Regra de Scoring</span>
+                       <span className="text-xs font-black text-indigo-700 truncate">
                          {scoringRules.find((r: any) => r.id?.toLowerCase().includes(currentMotor.id?.toLowerCase()))?.name || 'Padrão'}
                        </span>
                      </div>
                      <div className="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col justify-center">
-                       <span className="text-[9px] uppercase font-bold text-slate-500 mb-1">Peso Operacional</span>
-                       <span className="text-[11px] font-black text-white">
+                       <span className="text-xs uppercase font-bold text-slate-500 mb-1">Peso Operacional</span>
+                       <span className="text-xs font-black text-white">
                          {(currentMotor as any).weight || 1}.0x
                        </span>
                      </div>
@@ -473,7 +473,7 @@ const CockpitV2 = () => {
                      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm relative overflow-hidden">
                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500" />
                        <div className="flex items-center justify-between mb-3 pl-2">
-                         <span className="text-[11px] uppercase tracking-widest font-black text-red-600">Alerta Estratégico Crítico</span>
+                         <span className="text-xs uppercase tracking-widest font-black text-red-600">Alerta Estratégico Crítico</span>
                          <AlertTriangle className="w-5 h-5 text-red-400" />
                        </div>
                        <p className="text-sm text-slate-800 font-semibold pl-2 leading-relaxed">{currentMotor.risk}</p>
@@ -482,7 +482,7 @@ const CockpitV2 = () => {
                      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm relative overflow-hidden">
                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500" />
                        <div className="flex items-center justify-between mb-3 pl-2">
-                         <span className="text-[11px] uppercase tracking-widest font-black text-emerald-600">Oportunidade Expansível</span>
+                         <span className="text-xs uppercase tracking-widest font-black text-emerald-600">Oportunidade Expansível</span>
                          <Target className="w-5 h-5 text-emerald-400" />
                        </div>
                        <p className="text-sm text-slate-800 font-semibold pl-2 leading-relaxed">{currentMotor.opportunity}</p>
@@ -490,7 +490,7 @@ const CockpitV2 = () => {
                    </div>
 
                    <div className="space-y-4 relative z-10 mt-auto pt-4 border-t border-slate-100">
-                     <p className="text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-2">Engenharia de Ação Imediata</p>
+                     <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mb-2">Engenharia de Ação Imediata</p>
                      <Button className="w-full font-bold shadow-xl hover:-translate-y-1 transition-all text-sm py-6 text-white" style={{ backgroundColor: currentMotor.hex }}>
                        <Sparkles className="w-4 h-4 mr-2" /> Executar {currentMotor.nextMove}
                      </Button>
@@ -523,13 +523,13 @@ const CockpitV2 = () => {
 
                     <tr className="bg-slate-50 border-b border-slate-200">
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Nome da Play</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Nome da Play</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Gatilho</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Gatilho</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Status</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Status</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Motor</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Motor</th>
 
                     </tr>
 
@@ -561,7 +561,7 @@ const CockpitV2 = () => {
 
                         <td className="px-6 py-4">
 
-                          <span className="inline-flex border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-bold text-slate-600">
+                          <span className="inline-flex border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-400">
 
                             Dinâmico
 
@@ -571,7 +571,7 @@ const CockpitV2 = () => {
 
                         <td className="px-6 py-4">
 
-                          <span className="px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600">Ativa</span>
+                          <span className="px-2 py-1 rounded text-xs font-black uppercase tracking-widest bg-emerald-50 text-emerald-600">Ativa</span>
 
                         </td>
 
@@ -609,7 +609,7 @@ const CockpitV2 = () => {
 
                     <h4 className="font-black text-slate-900 mb-1">Ações Recomendadas (Intel)</h4>
 
-                    <p className="text-sm text-slate-600 mb-4">Descubra novas automações de playbook cruzando sinais de todos os motores.</p>
+                    <p className="text-sm text-slate-400 mb-4">Descubra novas automações de playbook cruzando sinais de todos os motores.</p>
 
                     <Button className="bg-purple-600 text-white hover:bg-purple-700 text-xs px-4 py-1.5 h-auto">Orquestrar Agora</Button>
 
@@ -641,13 +641,13 @@ const CockpitV2 = () => {
 
                     <tr className="bg-slate-50 border-b border-slate-200">
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Palavra/Tópico</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Palavra/Tópico</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Volume</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Volume</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Intenção</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Intenção</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Tráfego B2B</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Tráfego B2B</th>
 
                     </tr>
 
@@ -710,15 +710,15 @@ const CockpitV2 = () => {
                     className={`px-4 py-3 rounded-lg border-2 transition-all ${
                       selectedSignalId === signalId
                         ? 'border-blue-600 bg-blue-50 text-blue-900'
-                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300'
+                        : 'border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300'
                     }`}
                   >
                     <div className="text-left">
                       <div className="text-[12px] font-black uppercase">
                         {signalCase.signalType === 'risk' ? '🔴' : '🟢'} {signalCase.accountName}
                       </div>
-                      <div className="text-[10px] text-slate-500">{signalCase.signalTitle}</div>
-                      <div className="text-[9px] mt-1">
+                      <div className="text-xs text-slate-500">{signalCase.signalTitle}</div>
+                      <div className="text-xs mt-1">
                         <span className={`px-1.5 py-0.5 rounded font-black uppercase ${
                           signalCase.severity === 'critical' ? 'bg-red-100 text-red-700' :
                           signalCase.severity === 'high' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
@@ -819,13 +819,13 @@ const CockpitV2 = () => {
                       return (
                         <div key={idx} className="flex gap-2.5 p-2.5 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100/50 transition-colors">
                           <div className="flex-shrink-0 pt-0.5">
-                            <span className={`text-[9px] font-black px-2 py-0.5 rounded whitespace-nowrap ${typeColors[entry.nodeType] || 'bg-slate-100 text-slate-700'}`}>
+                            <span className={`text-xs font-black px-2 py-0.5 rounded whitespace-nowrap ${typeColors[entry.nodeType] || 'bg-slate-100 text-slate-700'}`}>
                               {stageLabels[entry.nodeType] || `Etapa ${entry.stage + 1}`}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-semibold text-slate-900 line-clamp-1">{displayTitle}</p>
-                            <p className="text-[9px] text-slate-500 line-clamp-1 mt-0.5">{entry.summary}</p>
+                            <p className="text-xs font-semibold text-slate-900 line-clamp-1">{displayTitle}</p>
+                            <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{entry.summary}</p>
                             <p className="text-[7px] text-slate-400 mt-0.5">{entry.timestamp}</p>
                           </div>
                         </div>
@@ -839,7 +839,7 @@ const CockpitV2 = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">⚡ Ações Recomendadas</h3>
                   {decisionLedger.length > 0 && (decisionLedger[decisionLedger.length - 1].nodeType === 'option' || decisionLedger[decisionLedger.length - 1].nodeType === 'decision-choice') && (
-                    <span className="text-[8px] font-black bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full uppercase tracking-widest border border-purple-200">Ativada pela Decisão</span>
+                    <span className="text-xs font-black bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full uppercase tracking-widest border border-purple-200">Ativada pela Decisão</span>
                   )}
                 </div>
                 {!selectedSignalCase ? (
@@ -848,9 +848,9 @@ const CockpitV2 = () => {
                   <div className="space-y-3">
                     {decisionLedger.length > 0 && (decisionLedger[decisionLedger.length - 1].nodeType === 'decision-choice') && (
                       <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-300 rounded-xl">
-                        <p className="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Opção Escolhida</p>
+                        <p className="text-xs font-black text-purple-600 uppercase tracking-widest mb-1">Opção Escolhida</p>
                         <p className="text-[13px] font-black text-slate-900">{decisionLedger[decisionLedger.length - 1].title}</p>
-                        <p className="text-[9px] text-slate-600 mt-1.5 font-semibold">{decisionLedger[decisionLedger.length - 1].summary}</p>
+                        <p className="text-xs text-slate-400 mt-1.5 font-semibold">{decisionLedger[decisionLedger.length - 1].summary}</p>
                       </div>
                     )}
                     {selectedSignalCase.outputActions.slice(0, 4).map((action, idx) => {
@@ -880,21 +880,21 @@ const CockpitV2 = () => {
                                 <h4 className={`text-xs font-black uppercase tracking-tight ${isHighlighted ? 'text-slate-900' : 'text-slate-800'}`}>
                                   {action.title}
                                 </h4>
-                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-widest ${
+                                <span className={`text-xs font-black px-1.5 py-0.5 rounded uppercase tracking-widest ${
                                   action.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                                 }`}>
                                   {action.priority}
                                 </span>
                               </div>
-                              <p className={`text-[10px] leading-relaxed mb-3 ${isHighlighted ? 'text-slate-600 font-medium' : 'text-slate-500'}`}>
+                              <p className={`text-xs leading-relaxed mb-3 ${isHighlighted ? 'text-slate-400 font-medium' : 'text-slate-500'}`}>
                                 {action.description}
                               </p>
                               <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100/50">
                                 <div className="flex items-center gap-2">
                                   <Users size={12} className="text-slate-400" />
-                                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{action.ownerSuggestion || 'Pendente'}</span>
+                                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{action.ownerSuggestion || 'Pendente'}</span>
                                 </div>
-                                <Button className={`h-auto py-1.5 px-4 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg transition-all ${
+                                <Button className={`h-auto py-1.5 px-4 text-xs font-black uppercase tracking-[0.2em] rounded-lg transition-all ${
                                   isHighlighted ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-md' : 'bg-slate-900 text-white'
                                 }`}>
                                   Executar
@@ -924,11 +924,11 @@ const CockpitV2 = () => {
 
                     <tr className="bg-slate-50 border-b border-slate-200">
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Plataforma B2B</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Plataforma B2B</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Taxa de Engajamento</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Taxa de Engajamento</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Crescimento Identificado</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Crescimento Identificado</th>
 
                     </tr>
 
@@ -954,7 +954,7 @@ const CockpitV2 = () => {
 
                         <td className="px-6 py-4">
 
-                          <span className="px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600">+{120 - i*20} / sem</span>
+                          <span className="px-2 py-1 rounded text-xs font-black uppercase tracking-widest bg-indigo-50 text-indigo-600">+{120 - i*20} / sem</span>
 
                         </td>
 
@@ -984,13 +984,13 @@ const CockpitV2 = () => {
 
                     <tr className="bg-slate-50 border-b border-slate-200">
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Cadência Operacional</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Cadência Operacional</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Taxa de Abertura</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Taxa de Abertura</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Taxa de Resposta</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Taxa de Resposta</th>
 
-                      <th className="px-6 py-3 text-[10px] uppercase tracking-widest font-black text-slate-400">Status Operacional</th>
+                      <th className="px-6 py-3 text-xs uppercase tracking-widest font-black text-slate-400">Status Operacional</th>
 
                     </tr>
 
@@ -1010,7 +1010,7 @@ const CockpitV2 = () => {
 
                         <td className="px-6 py-4">
 
-                          <span className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${i === 2 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                          <span className={`px-2 py-1 rounded text-xs font-black uppercase tracking-widest ${i === 2 ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
 
                             {i === 2 ? 'Alerta' : 'Saudável'}
 
@@ -1040,7 +1040,7 @@ const CockpitV2 = () => {
 
                <p className="text-indigo-400 font-bold mb-4">squad@canopi.com.br</p>
 
-               <p className="text-[10px] uppercase tracking-widest font-black">© 2026 Canopi. Intel Excels.</p>
+               <p className="text-xs uppercase tracking-widest font-black">© 2026 Canopi. Intel Excels.</p>
 
              </div>
 

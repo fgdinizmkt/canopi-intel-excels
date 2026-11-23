@@ -97,7 +97,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string; dot: 
   emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-200', shadow: 'shadow-emerald-200/20', icon: 'text-emerald-400', borderB: 'border-b-emerald-500' },
   amber: { bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', dot: 'bg-amber-500', badge: 'bg-amber-500/10 text-amber-700 border-amber-200', shadow: 'shadow-amber-200/20', icon: 'text-amber-400', borderB: 'border-b-amber-500' },
   red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100', dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-700 border-red-200', shadow: 'shadow-red-200/20', icon: 'text-red-400', borderB: 'border-b-red-500' },
-  slate: { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400', borderB: 'border-b-slate-400' },
+  slate: { bg: 'bg-slate-50', text: 'text-slate-400', border: 'border-slate-100', dot: 'bg-slate-500', badge: 'bg-slate-500/10 text-slate-700 border-slate-200', shadow: 'shadow-slate-200/20', icon: 'text-slate-400', borderB: 'border-b-slate-400' },
 };
 
 // --- DATA PROCESSING & MAPPING ---
@@ -275,11 +275,11 @@ const SectionHeader: React.FC<{
       </div>
       <div>
         <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight leading-tight">{title}</h3>
-        <p className="text-[11px] font-medium text-slate-500 mt-0.5">{subtitle}</p>
+        <p className="text-xs font-medium text-slate-500 mt-0.5">{subtitle}</p>
       </div>
     </div>
     {badge && (
-      <Badge className={cx("text-[10px] font-black uppercase tracking-widest px-3 py-1 shadow-sm", colorMap[badgeColor]?.badge)}>
+      <Badge className={cx("text-xs font-black uppercase tracking-widest px-3 py-1 shadow-sm", colorMap[badgeColor]?.badge)}>
         {badge}
       </Badge>
     )}
@@ -303,8 +303,8 @@ const HeroLayer: React.FC<{
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Badge className="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 text-[10px] font-black tracking-[0.2em] uppercase">Command Center Active</Badge>
-                <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-bold">
+                <Badge className="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-3 py-1.5 text-xs font-black tracking-[0.2em] uppercase">Command Center Active</Badge>
+                <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                   CRM LIVE SYNC
                 </div>
@@ -315,8 +315,8 @@ const HeroLayer: React.FC<{
               <p className="text-slate-400 text-sm font-medium max-w-xl">Coordenação centralizada de jornadas, cobertura de comitê e white-space para maximizar LTV e mitigar churn.</p>
             </div>
             <div className="flex gap-3">
-              <Button className="bg-white text-slate-950 hover:bg-slate-100 font-black text-[10px] px-8 py-6 rounded-2xl uppercase tracking-widest shadow-xl h-14">Fila de Comando</Button>
-              <Button variant="ghost" className="text-white border border-white/10 hover:bg-white/5 font-black text-[10px] px-8 py-6 rounded-2xl uppercase tracking-widest h-14">Ações Estratégicas</Button>
+              <Button className="bg-white text-slate-950 hover:bg-slate-100 font-black text-xs px-8 py-6 rounded-2xl uppercase tracking-widest shadow-xl h-14">Fila de Comando</Button>
+              <Button variant="ghost" className="text-white border border-white/10 hover:bg-white/5 font-black text-xs px-8 py-6 rounded-2xl uppercase tracking-widest h-14">Ações Estratégicas</Button>
             </div>
           </div>
 
@@ -330,9 +330,9 @@ const HeroLayer: React.FC<{
               { label: 'Receita Exposta', val: formatCurrency(bigNumbers.exposureRisk), sub: 'Churn Risk R$', color: 'text-red-400' },
             ].map((stat, i) => (
               <div key={i} className="space-y-1">
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
                 <h3 className={`text-xl font-black tracking-tighter ${stat.color}`}>{stat.val}</h3>
-                <p className="text-[9px] font-bold text-slate-600 uppercase">{stat.sub}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase">{stat.sub}</p>
               </div>
             ))}
           </div>
@@ -371,12 +371,12 @@ const HeroLayer: React.FC<{
               {item.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{item.title}</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{item.title}</p>
               <h4 className="text-base font-black text-slate-900 truncate">{item.account}</h4>
-              <p className="text-[11px] font-medium text-slate-500 mb-2 truncate">{item.desc}</p>
+              <p className="text-xs font-medium text-slate-500 mb-2 truncate">{item.desc}</p>
               <div className="flex items-center gap-2">
-                <Badge className={cx("text-[9px] font-black uppercase px-2 py-0 border-none", colorMap[item.color]?.badge)}>{item.val}</Badge>
-                <div className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Impacto Est.</div>
+                <Badge className={cx("text-xs font-black uppercase px-2 py-0 border-none", colorMap[item.color]?.badge)}>{item.val}</Badge>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-tighter">Impacto Est.</div>
               </div>
             </div>
             <ArrowRight className="w-5 h-5 text-slate-200 group-hover:text-blue-600 transition-colors" />
@@ -427,7 +427,7 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
            </ResponsiveContainer>
          </ClientOnly>
          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Growth</span>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Growth</span>
             <span className="text-2xl font-black text-slate-900">+38%</span>
          </div>
       </div>
@@ -435,8 +435,8 @@ const Pipeline360Layer: React.FC<{ pipelineData: any[]; channelData: any[] }> = 
         {channelData.slice(0, 4).map((c, i) => (
           <div key={i} className="flex items-center gap-2 p-2 bg-slate-50 rounded-xl">
             <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-indigo-500' : i === 2 ? 'bg-violet-500' : 'bg-fuchsia-500')}></div>
-            <span className="text-[9px] font-bold text-slate-600 truncate">{c.name}</span>
-            <span className="ml-auto text-[9px] font-black">{c.value}%</span>
+            <span className="text-xs font-bold text-slate-400 truncate">{c.name}</span>
+            <span className="ml-auto text-xs font-black">{c.value}%</span>
           </div>
         ))}
       </div>
@@ -466,12 +466,12 @@ const ActionRoutesLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => voi
             {route.accounts.map((acc, idx) => (
               <div key={idx} className="p-4 bg-slate-50 rounded-2xl space-y-3 hover:bg-slate-100 transition-colors cursor-pointer border border-transparent hover:border-slate-200 group/item" onClick={() => onSelect(acc)}>
                 <div className="flex justify-between items-start">
-                  <p className="text-[11px] font-black text-slate-900 truncate pr-2">{acc.name}</p>
-                  <Badge className={cx("text-[8px] font-black uppercase px-2 py-0 border-none shadow-sm", colorMap[route.color]?.badge)}>{acc.score}</Badge>
+                  <p className="text-xs font-black text-slate-900 truncate pr-2">{acc.name}</p>
+                  <Badge className={cx("text-xs font-black uppercase px-2 py-0 border-none shadow-sm", colorMap[route.color]?.badge)}>{acc.score}</Badge>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Intervenção Sugerida</p>
-                  <p className="text-[10px] font-medium text-slate-700 leading-tight">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">Intervenção Sugerida</p>
+                  <p className="text-xs font-medium text-slate-700 leading-tight">
                     {route.id === 'upsell' ? 'Acionar Sponsor Executivo para demonstrar valor do módulo IA' :
                      route.id === 'cross' ? 'Ativar play de caso complementar com área de Dados' :
                      route.id === 'churn' ? 'Iniciar play de recuperação e diagnóstico de risco' :
@@ -481,17 +481,17 @@ const ActionRoutesLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => voi
                 <div className="flex items-center gap-4 pt-1 border-t border-slate-200/50">
                   <div className="flex items-center gap-1.5 opacity-40">
                     <Database className="w-3 h-3" />
-                    <span className="text-[8px] font-black uppercase tracking-tighter">CRM</span>
+                    <span className="text-xs font-black uppercase tracking-tighter">CRM</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Rocket className="w-3 h-3 text-indigo-500" />
-                    <span className="text-[8px] font-black uppercase tracking-tighter">Apollo</span>
+                    <span className="text-xs font-black uppercase tracking-tighter">Apollo</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <Button variant="ghost" className="w-full mt-6 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 gap-2">Ver Todas <ArrowRight className="w-3 h-3" /></Button>
+          <Button variant="ghost" className="w-full mt-6 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 gap-2">Ver Todas <ArrowRight className="w-3 h-3" /></Button>
         </Card>
       ))}
     </div>
@@ -513,35 +513,35 @@ const RankingsLayer: React.FC<{ hotUpsell: any[]; hotCrossSell: any[]; highRiskC
             </div>
             <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">{rank.title}</h4>
           </div>
-          <Badge className={cx("text-[9px] font-black tracking-widest uppercase px-2 py-0 border-none shadow-sm", colorMap[rank.color]?.badge)}>{rank.badge}</Badge>
+          <Badge className={cx("text-xs font-black tracking-widest uppercase px-2 py-0 border-none shadow-sm", colorMap[rank.color]?.badge)}>{rank.badge}</Badge>
         </div>
         <div className="space-y-4">
           {rank.data.slice(0, 4).map((acc, idx) => (
             <div key={idx} className="p-4 hover:bg-slate-50 rounded-3xl transition-all cursor-pointer group border border-transparent hover:border-slate-100">
               <div className="flex items-center gap-4 mb-3">
-                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400 group-hover:bg-white group-hover:text-blue-600 transition-all shadow-sm">{idx + 1}</div>
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-white group-hover:text-blue-600 transition-all shadow-sm">{idx + 1}</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-black text-slate-800 truncate">{acc.name}</p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical}</p>
+                  <p className="text-xs font-black text-slate-800 truncate">{acc.name}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] font-black text-slate-900">{acc.score}</p>
+                  <p className="text-xs font-black text-slate-900">{acc.score}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-100">
                 <div className="space-y-0.5">
-                  <p className="text-[8px] font-black text-slate-400 uppercase">Whitelist Area</p>
-                  <p className="text-[9px] font-bold text-blue-600 truncate">Marketing Ops</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Whitelist Area</p>
+                  <p className="text-xs font-bold text-blue-600 truncate">Marketing Ops</p>
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[8px] font-black text-slate-400 uppercase">Next Best Action</p>
-                  <p className="text-[9px] font-bold text-slate-900 truncate">Play de {rank.tactic}</p>
+                  <p className="text-xs font-black text-slate-400 uppercase">Next Best Action</p>
+                  <p className="text-xs font-bold text-slate-900 truncate">Play de {rank.tactic}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <Button variant="ghost" className="w-full mt-6 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 gap-2 bg-slate-50 hover:bg-slate-100 transition-all rounded-xl py-3">Ver Ranking Completo <ArrowRight className="w-3 h-3" /></Button>
+        <Button variant="ghost" className="w-full mt-6 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 gap-2 bg-slate-50 hover:bg-slate-100 transition-all rounded-xl py-3">Ver Ranking Completo <ArrowRight className="w-3 h-3" /></Button>
       </Card>
     ))}
   </div>
@@ -556,33 +556,33 @@ const CommercialMemoryLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) =>
           <div className="flex justify-between items-start mb-6">
             <div className="min-w-0">
               <h4 className="text-sm font-black text-slate-900 truncate">{acc.name}</h4>
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{acc.vertical}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{acc.vertical}</p>
             </div>
-            <Badge className="bg-slate-100 text-slate-600 border-none text-[8px] font-black uppercase tracking-tighter whitespace-nowrap ml-2">{acc.lastActivity}</Badge>
+            <Badge className="bg-slate-100 text-slate-400 border-none text-xs font-black uppercase tracking-tighter whitespace-nowrap ml-2">{acc.lastActivity}</Badge>
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Vitórias Recentes</p>
+              <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">Vitórias Recentes</p>
               {acc.memory.wins.map((w: string, idx: number) => (
-                <div key={idx} className="flex items-center gap-2 text-[10px] font-medium text-slate-600">
+                <div key={idx} className="flex items-center gap-2 text-xs font-medium text-slate-400">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                   {w}
                 </div>
               ))}
-              {acc.memory.wins.length === 0 && <p className="text-[10px] italic text-slate-400">Nenhum registro</p>}
+              {acc.memory.wins.length === 0 && <p className="text-xs italic text-slate-400">Nenhum registro</p>}
             </div>
             <div className="space-y-2 border-t border-slate-100 pt-4">
-              <p className="text-[9px] font-black text-slate-800 uppercase tracking-widest">Projetos Ativos</p>
+              <p className="text-xs font-black text-slate-800 uppercase tracking-widest">Projetos Ativos</p>
               {acc.memory.active.map((p: string, idx: number) => (
-                <div key={idx} className="flex items-center gap-2 text-[10px] font-bold text-blue-600">
+                <div key={idx} className="flex items-center gap-2 text-xs font-bold text-blue-600">
                   <Activity className="w-3 h-3" />
                   {p}
                 </div>
               ))}
-              {acc.memory.active.length === 0 && <p className="text-[10px] italic text-slate-400">Aguardando início</p>}
+              {acc.memory.active.length === 0 && <p className="text-xs italic text-slate-400">Aguardando início</p>}
             </div>
           </div>
-          <Button variant="ghost" onClick={() => onSelect(acc)} className="w-full mt-6 text-[9px] font-black uppercase text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-slate-100 py-3 rounded-xl transition-all">Explorar Ficha 360°</Button>
+          <Button variant="ghost" onClick={() => onSelect(acc)} className="w-full mt-6 text-xs font-black uppercase text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-slate-100 py-3 rounded-xl transition-all">Explorar Ficha 360°</Button>
         </Card>
       ))}
     </div>
@@ -599,7 +599,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
             <tr>
               <th className="p-2 min-w-[140px]"></th>
               {committeeRoles.map(role => (
-                <th key={role} className="p-2 text-[8px] font-black text-slate-400 uppercase tracking-tighter text-center h-24">
+                <th key={role} className="p-2 text-xs font-black text-slate-400 uppercase tracking-tighter text-center h-24">
                   <span className="[writing-mode:vertical-lr] rotate-180">{role}</span>
                 </th>
               ))}
@@ -609,8 +609,8 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
             {accounts.slice(0, 8).map((acc, i) => (
               <tr key={i}>
                 <td className="p-3 bg-slate-50 rounded-l-xl">
-                  <p className="text-[10px] font-black text-slate-900 truncate max-w-[120px]">{acc.name}</p>
-                  <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical}</p>
+                  <p className="text-xs font-black text-slate-900 truncate max-w-[120px]">{acc.name}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical}</p>
                 </td>
                 {committeeRoles.map((_, idx) => {
                   const intensity = (acc.score / 20) - (idx % 3);
@@ -640,7 +640,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
         {['Risco', 'Baixo', 'Médio', 'Forte', 'Bluechip'].map((l, i) => (
           <div key={i} className="flex items-center gap-1.5">
             <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-red-500' : i === 1 ? 'bg-red-400' : i === 2 ? 'bg-orange-400' : i === 3 ? 'bg-slate-400' : 'bg-blue-500')}></div>
-            <span className="text-[8px] font-black text-slate-400 uppercase">{l}</span>
+            <span className="text-xs font-black text-slate-400 uppercase">{l}</span>
           </div>
         ))}
       </div>
@@ -654,7 +654,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
             <tr>
               <th className="p-2 min-w-[120px]"></th>
               {['DataViz', 'Cloud', 'RPA', 'IA/GenIA'].map(h => (
-                <th key={h} className="p-2 text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">{h}</th>
+                <th key={h} className="p-2 text-xs font-black text-slate-500 uppercase tracking-widest text-center">{h}</th>
               ))}
             </tr>
           </thead>
@@ -662,7 +662,7 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
             {accounts.slice(0, 10).map((acc, i) => (
               <tr key={i}>
                 <td className="p-2">
-                   <p className="text-[10px] font-black text-slate-800 truncate">{acc.name}</p>
+                   <p className="text-xs font-black text-slate-800 truncate">{acc.name}</p>
                 </td>
                 {['dataViz', 'cloud', 'rpa', 'ia'].map((key, idx) => {
                   const status = (acc.solutions as any)[key];
@@ -691,11 +691,11 @@ const HeatmapsLayer: React.FC<{ accounts: any[]; committeeRoles: string[] }> = (
       <div className="grid grid-cols-2 gap-4 mt-8">
         <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-          <span className="text-[9px] font-black text-emerald-800 uppercase">Expansão Recomendada</span>
+          <span className="text-xs font-black text-emerald-800 uppercase">Expansão Recomendada</span>
         </div>
         <div className="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-red-500"></div>
-          <span className="text-[9px] font-black text-red-800 uppercase">Risco de Churn Solução</span>
+          <span className="text-xs font-black text-red-800 uppercase">Risco de Churn Solução</span>
         </div>
       </div>
     </Card>
@@ -715,21 +715,21 @@ const OperationalFilaLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => 
       <div className="flex gap-3">
          <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="BUSCAR NO CRM..." className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none w-64 shadow-sm focus:ring-2 focus:ring-blue-500" />
+            <input type="text" placeholder="BUSCAR NO CRM..." className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-black uppercase tracking-widest outline-none w-64 shadow-sm focus:ring-2 focus:ring-blue-500" />
          </div>
-         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl p-3"><Filter className="w-5 h-5 text-slate-600" /></Button>
+         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl p-3"><Filter className="w-5 h-5 text-slate-400" /></Button>
       </div>
     </div>
     <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead>
           <tr className="bg-slate-50/80 border-b border-slate-100">
-            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Empresa & Contexto</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Fase Real</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Score</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Gap</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rota Sugerida</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Fonte</th>
+            <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Empresa & Contexto</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Fase Real</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Score</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Gap</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Rota Sugerida</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Fonte</th>
             <th className="px-8 py-5"></th>
           </tr>
         </thead>
@@ -743,12 +743,12 @@ const OperationalFilaLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => 
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-black text-slate-900 truncate">{acc.name}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical} • {acc.owner}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{acc.vertical} • {acc.owner}</p>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-6 text-center">
-                <Badge className={`px-3 py-1 font-black text-[9px] uppercase tracking-widest border-2 ${
+                <Badge className={`px-3 py-1 font-black text-xs uppercase tracking-widest border-2 ${
                   acc.stage === 'Retenção' ? 'border-blue-100 text-blue-700 bg-blue-50' :
                   acc.stage === 'Expansão' ? 'border-emerald-100 text-emerald-700 bg-emerald-50' :
                   'border-slate-100 text-slate-500 bg-slate-50'
@@ -771,7 +771,7 @@ const OperationalFilaLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => 
               <td className="px-6 py-6">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${acc.actionRoute.includes('Upsell') ? 'bg-emerald-500' : acc.actionRoute.includes('Churn') ? 'bg-red-500' : 'bg-blue-500'}`}></div>
-                  <span className="text-[10px] font-bold text-slate-700">{acc.actionRoute}</span>
+                  <span className="text-xs font-bold text-slate-700">{acc.actionRoute}</span>
                 </div>
               </td>
               <td className="px-6 py-6 text-center">
@@ -781,7 +781,7 @@ const OperationalFilaLayer: React.FC<{ accounts: any[]; onSelect: (acc: any) => 
                 </div>
               </td>
               <td className="px-8 py-6 text-right">
-                 <Button size="sm" className="bg-slate-900 text-white hover:bg-blue-600 border-none rounded-xl font-black text-[10px] uppercase px-5 transition-all shadow-md">
+                 <Button size="sm" className="bg-slate-900 text-white hover:bg-blue-600 border-none rounded-xl font-black text-xs uppercase px-5 transition-all shadow-md">
                    Explorar 360°
                  </Button>
               </td>
@@ -807,9 +807,9 @@ const ContactsSummaryLayer: React.FC<{ stats: any }> = ({ stats }) => (
       { label: 'Risco Político', val: stats.riskPolitical, sub: 'Churn Humano', color: 'text-red-500' },
     ].map((s, i) => (
       <div key={i} className="space-y-1 relative z-10 border-r border-white/5 last:border-none pr-4">
-        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{s.label}</p>
+        <p className="text-xs font-black text-slate-500 uppercase tracking-widest">{s.label}</p>
         <h3 className={cx("text-xl font-black tracking-tighter", s.color)}>{s.val}</h3>
-        <p className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">{s.sub}</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{s.sub}</p>
       </div>
     ))}
   </div>
@@ -828,10 +828,10 @@ const HumanMappingDiagnosis: React.FC<{ accounts: any[] }> = ({ accounts }) => (
            {d.icon}
         </div>
         <div className="flex-1 min-w-0">
-           <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{d.title}</h4>
+           <h4 className="text-xs font-black text-slate-900 uppercase tracking-tight">{d.title}</h4>
            <div className="flex items-end gap-2 mt-1">
               <span className="text-xl font-black text-slate-900">{d.accounts}</span>
-              <span className="text-[10px] font-bold text-slate-400 mb-1">contas</span>
+              <span className="text-xs font-bold text-slate-400 mb-1">contas</span>
            </div>
            <div className="w-full h-1 bg-slate-100 rounded-full mt-2 overflow-hidden">
               <div className={cx("h-full transition-all duration-1000", d.color === 'blue' ? 'bg-blue-500' : d.color === 'red' ? 'bg-red-500' : d.color === 'amber' ? 'bg-amber-500' : 'bg-slate-500')} style={{ width: `${d.percentage}%` } as React.CSSProperties}></div>
@@ -866,7 +866,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
               {accounts.slice(0, 8).map((acc, i) => (
                 <tr key={i}>
                   <td className="p-3 bg-slate-50 rounded-l-xl">
-                    <p className="text-[10px] font-black text-slate-900 truncate max-w-[120px]">{acc.name}</p>
+                    <p className="text-xs font-black text-slate-900 truncate max-w-[120px]">{acc.name}</p>
                   </td>
                   {roles.map((role, idx) => {
                     const person = people.find(p => p.accountId === acc.id && p.role === role);
@@ -890,7 +890,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
           {['Relacionamento Ativo', 'Mapeado (Frio)', 'Gap de Perfil'].map((l, i) => (
             <div key={i} className="flex items-center gap-1.5">
               <div className={cx("w-2 h-2 rounded-full", i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-blue-300' : 'bg-slate-100')}></div>
-              <span className="text-[8px] font-black text-slate-500 uppercase">{l}</span>
+              <span className="text-xs font-black text-slate-500 uppercase">{l}</span>
             </div>
           ))}
         </div>
@@ -904,7 +904,7 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
               <tr>
                 <th className="p-2 min-w-[140px]"></th>
                 {channels.map(c => (
-                  <th key={c} className="p-2 text-[8px] font-black text-slate-400 uppercase tracking-widest text-center">{c}</th>
+                  <th key={c} className="p-2 text-xs font-black text-slate-400 uppercase tracking-widest text-center">{c}</th>
                 ))}
               </tr>
             </thead>
@@ -912,8 +912,8 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
               {people.slice(0, 10).map((p, i) => (
                 <tr key={i}>
                   <td className="p-2">
-                    <p className="text-[10px] font-black text-slate-800 truncate">{p.name}</p>
-                    <p className="text-[8px] font-bold text-slate-400 uppercase truncate">{p.account}</p>
+                    <p className="text-xs font-black text-slate-800 truncate">{p.name}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase truncate">{p.account}</p>
                   </td>
                   {channels.map((c, idx) => {
                     const isActive = p.channel === c;
@@ -936,11 +936,11 @@ const ContactHeatmapsLayer: React.FC<{ accounts: any[]; people: any[] }> = ({ ac
         <div className="flex gap-4 mt-8">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm bg-emerald-500"></div>
-            <span className="text-[9px] font-black text-slate-500 uppercase">Alta Tração</span>
+            <span className="text-xs font-black text-slate-500 uppercase">Alta Tração</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm bg-emerald-100"></div>
-            <span className="text-[9px] font-black text-slate-500 uppercase">Baixa Resposta</span>
+            <span className="text-xs font-black text-slate-500 uppercase">Baixa Resposta</span>
           </div>
         </div>
       </Card>
@@ -970,16 +970,16 @@ const ContactAnalyticsLayer: React.FC<{ people: any[] }> = ({ people }) => (
       </div>
       <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-100">
          <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
-            <p className="text-[10px] font-black text-emerald-700 uppercase">Foco Direto</p>
-            <p className="text-[8px] font-medium text-emerald-600">Influente & Acessível</p>
+            <p className="text-xs font-black text-emerald-700 uppercase">Foco Direto</p>
+            <p className="text-xs font-medium text-emerald-600">Influente & Acessível</p>
          </div>
          <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100">
-            <p className="text-[10px] font-black text-amber-700 uppercase">Multicanal</p>
-            <p className="text-[8px] font-medium text-amber-600">Influente & Difícil</p>
+            <p className="text-xs font-black text-amber-700 uppercase">Multicanal</p>
+            <p className="text-xs font-medium text-amber-600">Influente & Difícil</p>
          </div>
          <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-            <p className="text-[10px] font-black text-slate-700 uppercase">Acompanhar</p>
-            <p className="text-[8px] font-medium text-slate-600">Baixa Influência</p>
+            <p className="text-xs font-black text-slate-700 uppercase">Acompanhar</p>
+            <p className="text-xs font-medium text-slate-400">Baixa Influência</p>
          </div>
       </div>
     </Card>
@@ -1006,14 +1006,14 @@ const ContactAnalyticsLayer: React.FC<{ people: any[] }> = ({ people }) => (
          <div className="flex gap-4">
             <div className="flex items-center gap-2">
                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-               <span className="text-[9px] font-black text-slate-500 uppercase">Sponsor Ativo</span>
+               <span className="text-xs font-black text-slate-500 uppercase">Sponsor Ativo</span>
             </div>
             <div className="flex items-center gap-2">
                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-               <span className="text-[9px] font-black text-slate-500 uppercase">Decisor Frio</span>
+               <span className="text-xs font-black text-slate-500 uppercase">Decisor Frio</span>
             </div>
          </div>
-         <Badge className="bg-indigo-50 text-indigo-700 border-none text-[8px] font-black uppercase">Foco: Reativação</Badge>
+         <Badge className="bg-indigo-50 text-indigo-700 border-none text-xs font-black uppercase">Foco: Reativação</Badge>
       </div>
     </Card>
   </div>
@@ -1030,20 +1030,20 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
         <p className="text-sm font-medium text-slate-500 mt-1">Gestão tática do comitê de contas ativas</p>
       </div>
       <div className="flex gap-3">
-         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl py-3 px-6 text-[10px] font-black uppercase text-slate-600 shadow-sm">Todos os Sponsors</Button>
-         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl py-3 px-6 text-[10px] font-black uppercase text-slate-600 shadow-sm">Filtrar Bloqueadores</Button>
+         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl py-3 px-6 text-xs font-black uppercase text-slate-400 shadow-sm">Todos os Sponsors</Button>
+         <Button variant="ghost" className="bg-white border border-slate-200 rounded-2xl py-3 px-6 text-xs font-black uppercase text-slate-400 shadow-sm">Filtrar Bloqueadores</Button>
       </div>
     </div>
     <div className="overflow-x-auto">
       <table className="w-full text-left">
         <thead>
           <tr className="bg-slate-50/80 border-b border-slate-100">
-            <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pessoa & Cargo</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Conta</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Papel ABX</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Influência</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Canal Pref.</th>
-            <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Último Toque</th>
+            <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Pessoa & Cargo</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Conta</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Papel ABX</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Influência</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Canal Pref.</th>
+            <th className="px-6 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Último Toque</th>
             <th className="px-8 py-5"></th>
           </tr>
         </thead>
@@ -1057,15 +1057,15 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
                   </div>
                   <div>
                     <p className="text-sm font-black truncate">{p.name}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[150px]">{p.title}</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[150px]">{p.title}</p>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-6 items-center">
-                 <p className="text-[11px] font-black text-slate-800">{p.account}</p>
+                 <p className="text-xs font-black text-slate-800">{p.account}</p>
               </td>
               <td className="px-6 py-6 text-center">
-                <Badge className={cx("px-2 py-0.5 font-black text-[8px] uppercase tracking-widest border-none shadow-sm",
+                <Badge className={cx("px-2 py-0.5 font-black text-xs uppercase tracking-widest border-none shadow-sm",
                     p.role.includes('Sponsor') ? 'bg-blue-100 text-blue-700' :
                     p.role.includes('Champion') ? 'bg-emerald-100 text-emerald-700' :
                     p.role.includes('Bloqueador') ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-500'
@@ -1081,14 +1081,14 @@ const ContactOperationalFilaLayer: React.FC<{ people: any[]; onSelect: (acc: any
               <td className="px-6 py-6">
                  <div className="flex items-center gap-2">
                     {p.channel === 'Email' ? <Mail className="w-3.5 h-3.5 text-slate-400" /> : <MessageSquare className="w-3.5 h-3.5 text-slate-400" />}
-                    <span className="text-[11px] font-bold text-slate-600">{p.channel}</span>
+                    <span className="text-xs font-bold text-slate-400">{p.channel}</span>
                  </div>
               </td>
               <td className="px-6 py-6 text-center">
-                 <span className="text-[11px] font-black text-slate-700">{p.lastTouch}</span>
+                 <span className="text-xs font-black text-slate-700">{p.lastTouch}</span>
               </td>
               <td className="px-8 py-6 text-right">
-                 <Button size="sm" onClick={() => { const account = processedAccounts.find(a => a.id === p.accountId); if (account) onSelect(account); }} className="bg-white border border-slate-200 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 rounded-xl font-black text-[9px] uppercase px-4 transition-all">Ação</Button>
+                 <Button size="sm" onClick={() => { const account = processedAccounts.find(a => a.id === p.accountId); if (account) onSelect(account); }} className="bg-white border border-slate-200 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 rounded-xl font-black text-xs uppercase px-4 transition-all">Ação</Button>
               </td>
             </tr>
           ))}
@@ -1108,18 +1108,18 @@ const ContactActionsLayer: React.FC = () => (
     ].map((action, i) => (
       <Card key={i} className={cx("p-8 border-slate-200 shadow-sm rounded-[40px] bg-white border-l-8 group hover:shadow-lg transition-all", action.color === 'blue' ? 'border-l-blue-500' : action.color === 'red' ? 'border-l-red-500' : action.color === 'emerald' ? 'border-l-emerald-500' : 'border-l-indigo-500')}>
         <div className="flex justify-between items-start mb-6">
-           <Badge className={cx("border-none text-[8px] font-black uppercase", colorMap[action.color]?.badge)}>{action.tag}</Badge>
+           <Badge className={cx("border-none text-xs font-black uppercase", colorMap[action.color]?.badge)}>{action.tag}</Badge>
            <Zap className={cx("w-4 h-4 group-hover:animate-pulse shadow-sm rounded-full", colorMap[action.color]?.icon)} />
         </div>
         <div className="space-y-4">
            <div>
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{action.title}</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{action.title}</p>
               <h4 className="text-sm font-black text-slate-900 mt-1">{action.person}</h4>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{action.account}</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">{action.account}</p>
            </div>
            <div className="p-4 bg-slate-50 rounded-2xl">
-              <p className="text-[9px] font-black text-slate-800 uppercase mb-2">Ação Recomendada</p>
-              <p className="text-[11px] font-medium text-slate-700 leading-tight">{action.action}</p>
+              <p className="text-xs font-black text-slate-800 uppercase mb-2">Ação Recomendada</p>
+              <p className="text-xs font-medium text-slate-700 leading-tight">{action.action}</p>
            </div>
         </div>
       </Card>
@@ -1139,15 +1139,15 @@ const DataOriginFooter: React.FC = () => (
           <div key={i} className="flex items-center gap-2">
              <div className="p-1.5 bg-slate-100 rounded-lg">{src.icon}</div>
              <div>
-               <p className="text-[9px] font-black uppercase text-slate-900">{src.name}</p>
-               <p className="text-[8px] font-bold text-slate-500">{src.sync}</p>
+               <p className="text-xs font-black uppercase text-slate-900">{src.name}</p>
+               <p className="text-xs font-bold text-slate-500">{src.sync}</p>
              </div>
           </div>
         ))}
      </div>
      <div className="text-right">
-       <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Canopi Intel Engine v4.2</p>
-       <p className="text-[9px] font-bold text-slate-400">© 2026 ABX Command Center</p>
+       <p className="text-xs font-black text-slate-900 uppercase tracking-widest">Canopi Intel Engine v4.2</p>
+       <p className="text-xs font-bold text-slate-400">© 2026 ABX Command Center</p>
      </div>
   </div>
 );
@@ -1189,11 +1189,11 @@ export const ABXOrchestration: React.FC = () => {
           <div className="md:col-span-2 space-y-8">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-100">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pain Point Prioritário</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Pain Point Prioritário</p>
                 <p className="text-sm font-medium text-slate-700 italic">&quot;{acc.obs}&quot;</p>
               </div>
               <div className="p-6 bg-blue-50 rounded-[32px] border border-blue-100">
-                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Rota Recomendada</p>
+                <p className="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">Rota Recomendada</p>
                 <p className="text-sm font-black text-blue-900">{acc.actionRoute}</p>
               </div>
             </div>
@@ -1202,8 +1202,8 @@ export const ABXOrchestration: React.FC = () => {
               <div className="grid grid-cols-4 gap-3">
                 {Object.entries(acc.solutions).map(([key, val]) => (
                   <div key={key} className={`p-4 rounded-2xl border ${val !== 'Não identificado' && val !== 'Não' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100 opacity-50'}`}>
-                    <p className="text-[9px] font-black uppercase text-slate-500">{key}</p>
-                    <p className="text-[10px] font-bold truncate">{(val as string)}</p>
+                    <p className="text-xs font-black uppercase text-slate-500">{key}</p>
+                    <p className="text-xs font-bold truncate">{(val as string)}</p>
                   </div>
                 ))}
               </div>
@@ -1211,14 +1211,14 @@ export const ABXOrchestration: React.FC = () => {
           </div>
           <div className="space-y-6">
             <div className="p-6 bg-slate-900 text-white rounded-[40px] shadow-xl">
-              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">Dados Financeiros</p>
+              <p className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4">Dados Financeiros</p>
               <div className="space-y-4">
                 <div>
-                  <p className="text-[9px] font-bold text-slate-500 uppercase">Potencial Upsell</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase">Potencial Upsell</p>
                   <p className="text-xl font-black">R$ {(acc.financial.upsell / 1000).toFixed(0)}k</p>
                 </div>
                 <div>
-                  <p className="text-[9px] font-bold text-slate-500 uppercase">Potencial Cross-sell</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase">Potencial Cross-sell</p>
                   <p className="text-xl font-black">R$ {(acc.financial.crossSell / 1000).toFixed(0)}k</p>
                 </div>
               </div>

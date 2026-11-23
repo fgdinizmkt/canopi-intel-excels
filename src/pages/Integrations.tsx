@@ -159,11 +159,11 @@ export const Integrations: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3 min-w-[280px]">
               <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-                <p className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Confiança do Stack</p>
+                <p className="text-xs uppercase tracking-widest text-white/60 font-bold">Confiança do Stack</p>
                 <p className={`text-2xl font-bold mt-1 ${getConfidenceColor(confiancaMedia)}`}>{confiancaMedia}%</p>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-                <p className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Fontes Críticas</p>
+                <p className="text-xs uppercase tracking-widest text-white/60 font-bold">Fontes Críticas</p>
                 <div className="flex items-baseline gap-1 mt-1">
                   <span className="text-2xl font-bold">{fontesCriticasAtivas}</span>
                   <span className="text-sm text-white/40">/ {fontesCriticas.length} ativas</span>
@@ -210,19 +210,19 @@ export const Integrations: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-1.5">
                         <h4 className="font-bold text-slate-900">{int.nome}</h4>
-                        {int.crítica && <Badge variant="red" className="text-[9px] px-1 py-0 h-4 uppercase">Crítica</Badge>}
+                        {int.crítica && <Badge variant="red" className="text-xs px-1 py-0 h-4 uppercase">Crítica</Badge>}
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Sincronização: {int.lastSync}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">Sincronização: {int.lastSync}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[10px]">
+                      <div className="flex items-center gap-2 text-xs">
                         <Activity className="w-3 h-3 text-slate-400" />
-                        <span className="text-slate-600 font-medium truncate">{int.volume}</span>
+                        <span className="text-slate-400 font-medium truncate">{int.volume}</span>
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {int.impacto.map((imp) => (
-                          <Badge key={imp} variant="slate" className="text-[9px] bg-slate-50 text-slate-600 border-slate-100 font-medium">
+                          <Badge key={imp} variant="slate" className="text-xs bg-slate-50 text-slate-400 border-slate-100 font-medium">
                             Alimenta: {imp}
                           </Badge>
                         ))}
@@ -230,7 +230,7 @@ export const Integrations: React.FC = () => {
                     </div>
 
                     {int.status !== 'connected' && int.confianca < 100 && (
-                      <div className={`text-[11px] font-bold p-2 rounded-lg border flex items-start gap-2 ${
+                      <div className={`text-xs font-bold p-2 rounded-lg border flex items-start gap-2 ${
                         int.status === 'error' ? 'bg-red-50 border-red-100' : 'bg-amber-50 border-amber-100'
                       }`}>
                         <AlertCircle className={`w-3.5 h-3.5 mt-0.5 ${int.status === 'error' ? 'text-red-500' : 'text-amber-500'}`} />
