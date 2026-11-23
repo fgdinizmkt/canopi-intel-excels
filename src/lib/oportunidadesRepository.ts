@@ -1,4 +1,4 @@
-import supabase, { isSupabaseConfigured } from './supabaseClient';
+import supabase, { isSupabaseConfigured, fetchAllRows } from './supabaseClient';
 import type { OportunidadeConta } from '../data/accountsData';
 
 export interface OpportunityRow {
@@ -24,7 +24,7 @@ export async function getOportunidadesMap(): Promise<Record<string, Oportunidade
   }
 
   try {
-    const { data, error } = await supabase!
+    const { data, error } = await fetchAllRows<OpportunityRow>(() => supabase!
       .from('oportunidades')
       .select(`
         id,
@@ -36,7 +36,7 @@ export async function getOportunidadesMap(): Promise<Record<string, Oportunidade
         risco,
         probabilidade,
         historico
-      `);
+      `));
 
     if (error) {
       console.warn('[Oportunidades] Erro na query:', error.message);

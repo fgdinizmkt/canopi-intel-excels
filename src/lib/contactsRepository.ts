@@ -1,4 +1,4 @@
-import supabase, { isSupabaseConfigured } from './supabaseClient';
+import supabase, { isSupabaseConfigured, fetchAllRows } from './supabaseClient';
 import { contasMock } from '../data/accountsData';
 
 /**
@@ -121,7 +121,7 @@ export async function getContacts(): Promise<RepositoryContact[]> {
 
   try {
     // Query defensiva: lê apenas campos mínimos necessários para listagem
-    const { data, error } = await supabase!
+    const { data, error } = await fetchAllRows<ContactRow>(() => supabase!
       .from('contacts')
       .select(`
         id,
@@ -146,7 +146,7 @@ export async function getContacts(): Promise<RepositoryContact[]> {
         observacoes,
         historicoInteracoes,
         proximaAcao
-      `);
+      `));
 
     if (error) {
       console.warn('[Contacts] Erro ao buscar do Supabase:', error.message);

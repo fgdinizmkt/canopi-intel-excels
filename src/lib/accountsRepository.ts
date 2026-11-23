@@ -1,4 +1,4 @@
-import supabase, { isSupabaseConfigured } from './supabaseClient';
+import supabase, { isSupabaseConfigured, fetchAllRows } from './supabaseClient';
 import { contasMock, type Conta, type TipoEstrategico } from '../data/accountsData';
 import { getOportunidadesMap } from './oportunidadesRepository';
 
@@ -303,7 +303,7 @@ export async function getAccounts(): Promise<Conta[]> {
     const oportunidadesMap = await getOportunidadesMap();
 
     // Query defensiva: lê apenas campos mínimos necessários para listagem
-    const { data, error } = await supabase!
+    const { data, error } = await fetchAllRows<AccountRow>(() => supabase!
       .from('accounts')
       .select(`
         id,
@@ -336,7 +336,7 @@ export async function getAccounts(): Promise<Conta[]> {
         historico,
         tecnografia,
         canaisCampanhas
-      `);
+      `));
 
     if (error) {
       console.warn('[Accounts] Erro ao buscar do Supabase:', error.message);

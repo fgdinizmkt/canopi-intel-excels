@@ -61,4 +61,38 @@ export const getEnvironment = (): Environment => {
   return currentEnv;
 };
 
+/**
+ * Lê todas as linhas de uma consulta, contornando o teto padrão do PostgREST
+ * (1.000 linhas por requisição). Pagina com .range() até esgotar o resultado.
+ *
+ * Uso: fetchAllRows(() => supabase!.from('accounts').select('...'))
+ * O factory é reexecutado a cada página para aplicar um novo range.
+ */
+type RowsResult = { data: unknown[] | null; error: { message: string } | null };
+
+export async function fetchAllRows<T>(
+  build: () => PromiseLike<RowsResult> & {
+    range: (from: number, to: number) => PromiseLike<RowsResult>;
+  },
+): Promise<{ data: T[] | null; error: { message: string } | null }> {
+  const PAGE = 1000;
+  let fromIdx = 0;
+  const all: T[] = [];
+
+  for (;;) {
+    const { data, error } = await build().range(fromIdx, fromIdx + PAGE - 1);
+    if (error) {
+      return { data: null, error };
+    }
+    const batch = (data || []) as T[];
+    all.push(...batch);
+    if (batch.length < PAGE) {
+      break;
+    }
+    fromIdx += PAGE;
+  }
+
+  return { data: all, error: null };
+}
+
 export default supabase;
