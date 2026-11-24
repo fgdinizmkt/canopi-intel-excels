@@ -993,7 +993,15 @@ export async function POST(req: Request) {
       .join('');
     const { cleanText, cards } = extractCards(rawText);
 
-    const responseBody: Record<string, any> = { text: cleanText };
+    // Tokens usados vão junto: permite conferir o custo real de cada chamada.
+    const responseBody: Record<string, any> = {
+      text: cleanText,
+      usage: {
+        model: response.model,
+        input_tokens: response.usage.input_tokens,
+        output_tokens: response.usage.output_tokens,
+      },
+    };
     if (cards.length > 0) {
       responseBody.cards = cards;
     }
