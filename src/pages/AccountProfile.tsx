@@ -17,6 +17,8 @@ import { getCampaignsMap } from '../lib/campaignsRepository';
 import { calculateAccountScore, ScoringResult, deriveProximaMelhorAcao, deriveMotivoDaRecomendacao, deriveAcaoOperacional } from '../lib/scoringRepository';
 import { persistOportunidade } from '../lib/oportunidadesRepository';
 import { contasMock, Conta, ContatoConta, OportunidadeConta, SinalConta, AcaoConta } from '../data/accountsData';
+import { AccountScorecard } from '../components/account/AccountScorecard';
+import { suggestICPFromHistory, ICPProfile } from '../lib/icp';
 import { Interaction, PlayRecommendation, Campaign } from '../../scripts/seed/buildBlockCSeed';
 import { useAccountDetail } from '../context/AccountDetailContext';
 import { usePublishedSettings } from '../hooks/usePublishedSettings';
@@ -89,6 +91,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
   const [plays, setPlays] = useState<PlayRecommendation[]>([]);
   const [campaigns, setCampaigns] = useState<Record<string, Campaign>>({});
   const [loading, setLoading] = useState(true);
+  const [icps, setIcps] = useState<ICPProfile[]>([]);
   const [activeTab, setActiveTab] = useState<'operacional' | 'relacional' | 'inteligencia' | 'estrategia'>('operacional');
 
   // -- LOCAL OPERATIONAL STATES --
@@ -105,6 +108,7 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
     async function load() {
       try {
         const allAccounts = await getAccounts();
+        setIcps(suggestICPFromHistory(allAccounts));
         const found = allAccounts.find(c => c.slug === slug || c.nome.toLowerCase().replace(/\s+/g, '-') === slug) 
                    || contasMock.find(c => c.slug === slug || c.nome.toLowerCase().replace(/\s+/g, '-') === slug);
         
@@ -315,6 +319,10 @@ export const AccountProfile: React.FC<AccountProfileProps> = ({ slug }) => {
       </nav>
 
       <main className="w-full px-6 mt-8 grid grid-cols-12 gap-8">
+        <div className="col-span-12">
+          <AccountScorecard account={account} icps={icps} />
+        </div>
+
         
         {/* ── LEFT COLUMN: IDENTITY & FIRMOGRAPHICS (4/12) ── */}
         <aside className="col-span-4 space-y-6">

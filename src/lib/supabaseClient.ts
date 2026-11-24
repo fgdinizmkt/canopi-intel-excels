@@ -1,42 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import { getSupabaseEnv } from './supabase/env';
 
 /**
  * Supabase Client Configuration
  * Supports dev, staging, and prod environments via NEXT_PUBLIC_ENVIRONMENT
  * Degrades gracefully when environment variables are not configured
+ *
+ * No navegador o cliente carrega a sessao do usuario (Supabase Auth, em
+ * cookies), entao toda leitura vai como usuario logado e as regras de RLS
+ * liberam so para membros. No servidor (pre-render de componente cliente)
+ * nao ha sessao: o cliente existe so para nao quebrar o import.
  */
 
 type Environment = 'dev' | 'staging' | 'prod';
 
-const currentEnv: Environment = (process.env.NEXT_PUBLIC_ENVIRONMENT as Environment) || 'dev';
-
-/**
- * Explicit environment mapping for security and clarity
- */
-const environmentConfig: Record<Environment, { url?: string; anonKey?: string }> = {
-  dev: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL_DEV,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY_DEV,
-  },
-  staging: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL_STAGING,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY_STAGING,
-  },
-  prod: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL_PROD,
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY_PROD,
-  },
-};
-
-const config = environmentConfig[currentEnv];
+const { url: supabaseUrl, anonKey: supabaseAnonKey, env: currentEnv } = getSupabaseEnv();
 
 /**
  * Supabase client instance
  * Returns null if environment variables are not configured
- * This allows the application to run without Supabase during development
  */
 export const supabase = (() => {
-  if (!config.url || !config.anonKey) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     console.warn(
       `[Supabase] Environment variables not configured for '${currentEnv}' environment. ` +
       `Add NEXT_PUBLIC_SUPABASE_URL_${currentEnv.toUpperCase()} and NEXT_PUBLIC_SUPABASE_ANON_KEY_${currentEnv.toUpperCase()} to .env.local`
@@ -44,7 +30,14 @@ export const supabase = (() => {
     return null;
   }
 
-  return createClient(config.url, config.anonKey);
+  if (typeof window !== 'undefined') {
+    // Singleton no navegador, sessao em cookies (lida pelo middleware).
+    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 })();
 
 /**
@@ -58,7 +51,7 @@ export const isSupabaseConfigured = (): boolean => {
  * Get current environment
  */
 export const getEnvironment = (): Environment => {
-  return currentEnv;
+  return currentEnv as Environment;
 };
 
 /**

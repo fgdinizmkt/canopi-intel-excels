@@ -105,3 +105,9 @@ Itens em andamento/previstos:
 
 Próxima etapa: Iniciar o 6º Recorte da Fase 5 (Evolução do Assistente de IA ou orquestração).
 
+### Pauta registrada em 24/11/2026 (pedido do Fábio)
+- [ ] **Scanner 3D como feature do Knopi.** Trazer o Scanner 3D (diagnóstico de UX com Boletim RCE) que o Fábio construiu, hoje no repositório da UX Agency (branch `feat/scanner-3d-producao`). A UX não usa mais. Vem o código e o modelo; nenhum dado de cliente ou lead da UX vem junto.
+- [ ] **Dashboard comercial como feature do Knopi.** Trazer o painel comercial (Intelligence Dashboard, funil, tráfego diário, fontes) que foi feito para a UX. Mesma regra: vem a estrutura, não os negócios, contatos e números da UX.
+- [ ] **Decisão aberta: contas reais ou de exemplo.** O app troca as 8.152 contas reais pela base de exemplo quando menos de 5 têm pontuação (`accountsRepository.ts`, regra "scoring suficiente"). Hoje só 3 têm. Enquanto essa regra existir, nenhuma conta real abre no app.
+- [ ] **Tabela `system_settings`.** Não existe no Supabase; as configurações (inclusive o ICP configurado) ainda não gravam.
+

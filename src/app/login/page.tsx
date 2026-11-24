@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { Check, Mail, Lock, LogIn, ArrowRight, Github, Chrome, Apple, AlertCircle } from 'lucide-react';
-import { setKnopiAuthClient } from '@/src/lib/knopiAuth';
+import supabase from '@/src/lib/supabaseClient';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,12 +14,12 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleAuth = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (mode === 'signup') {
-      window.alert('[SIMULAÇÃO] Criação de conta. Em um ambiente real, você receberia um e-mail de confirmação.');
+      setError('Cadastro fechado. Peça acesso ao administrador da plataforma.');
       setMode('signin');
       return;
     }
@@ -29,32 +29,37 @@ export default function LoginPage() {
       return;
     }
 
+    if (!supabase) {
+      setError('Autenticação indisponível: Supabase não configurado neste ambiente.');
+      return;
+    }
+
     setLoading(true);
 
-    // Get credentials from localStorage (or use defaults)
-    setTimeout(() => {
-      const storedCreds = localStorage.getItem('user_credentials');
-      let validUsername = 'fabio.diniz';
-      let validPassword = '1234';
+    // Login real (Supabase Auth). A sessao fica em cookies e o middleware
+    // passa a reconhecer o usuario em todas as paginas.
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: username.trim().toLowerCase(),
+      password,
+    });
 
-      if (storedCreds) {
-        try {
-          const creds = JSON.parse(storedCreds);
-          validUsername = creds.username;
-          validPassword = creds.password;
-        } catch (e) {
-          console.error('Erro ao ler credenciais:', e);
-        }
-      }
+    if (authError) {
+      setError('E-mail ou senha incorretos.');
+      setLoading(false);
+      return;
+    }
 
-      if (username === validUsername && password === validPassword) {
-        setKnopiAuthClient(true);
-        router.push('/');
-      } else {
-        setError(`Credenciais inválidas. Tente ${validUsername} / ${validPassword}`);
-        setLoading(false);
-      }
-    }, 1500);
+    // Limpa o legado do login provisorio.
+    try {
+      localStorage.removeItem('user_credentials');
+      localStorage.removeItem('canopi_auth');
+      sessionStorage.removeItem('canopi_auth');
+    } catch {
+      /* armazenamento indisponivel */
+    }
+
+    router.replace('/');
+    router.refresh();
   };
 
   const handleSocialMock = (provider: string) => {
@@ -155,14 +160,15 @@ export default function LoginPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Usuário corporativo</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">E-mail</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="text" 
+                    <input
+                      type="email"
+                      autoComplete="email"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Ex: fabio.diniz"
+                      placeholder="seu@email.com"
                       className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 rounded-xl outline-none transition-all text-sm font-medium disabled:opacity-50"
                       disabled={loading}
                     />
@@ -173,15 +179,16 @@ export default function LoginPage() {
                   <div className="flex justify-between items-center mb-1.5">
                     <label className="block text-sm font-bold text-slate-700">Senha</label>
                     {mode === 'signin' && (
-                      <button type="button" onClick={() => window.alert('[SIMULAÇÃO] Link de recuperação enviado.')} className="text-xs text-blue-600 font-bold hover:underline">
+                      <button type="button" onClick={() => setError('Para redefinir a senha, peça ao administrador da plataforma.')} className="text-xs text-blue-600 font-bold hover:underline">
                         Esqueceu a senha?
                       </button>
                     )}
                   </div>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="password" 
+                    <input
+                      type="password"
+                      autoComplete="current-password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={mode === 'signin' ? "••••••••" : "Crie uma senha forte"}

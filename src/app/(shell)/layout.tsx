@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import ShellLayoutClient from './ShellLayoutClient';
+import { getUsuarioAtual } from '@/src/lib/supabase/server';
 
 export default async function ShellLayout({ children }: { children: ReactNode }) {
-  const cookieStore = await cookies();
-  const auth = cookieStore.get('canopi_auth')?.value;
+  // Segunda checagem, no servidor: sessao valida no Supabase Auth.
+  // O middleware ja redireciona; aqui e defesa em profundidade.
+  const usuario = await getUsuarioAtual();
 
-  if (auth !== 'true') {
+  if (!usuario) {
     redirect('/login');
   }
 

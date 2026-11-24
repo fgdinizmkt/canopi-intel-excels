@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import supabase from '@/src/lib/supabaseClient';
 import {
   User, Mail, Building2, Briefcase, Shield, Lock, Zap,
   Settings, CheckCircle2, Circle, Edit3, Save, X,
@@ -388,29 +389,11 @@ export default function UsuarioPage() {
     return { hasMinLength, hasNumber, hasSymbol, isStrong: hasMinLength && (hasNumber || hasSymbol) };
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setPasswordMessage(null);
 
     if (!passwordForm.current || !passwordForm.new || !passwordForm.confirm) {
       setPasswordMessage({ type: 'error', text: 'Preencha todos os campos.' });
-      return;
-    }
-
-    // Get current password from localStorage
-    const storedCreds = localStorage.getItem('user_credentials');
-    let currentPassword = '1234'; // default
-    if (storedCreds) {
-      try {
-        const creds = JSON.parse(storedCreds);
-        currentPassword = creds.password;
-      } catch (e) {
-        console.error('Erro ao ler credenciais:', e);
-      }
-    }
-
-    // Verify current password
-    if (passwordForm.current !== currentPassword) {
-      setPasswordMessage({ type: 'error', text: 'Senha atual incorreta.' });
       return;
     }
 
@@ -427,10 +410,32 @@ export default function UsuarioPage() {
       return;
     }
 
-    // Save new password
-    const creds = storedCreds ? JSON.parse(storedCreds) : { username: 'fabio.diniz' };
-    creds.password = passwordForm.new;
-    localStorage.setItem('user_credentials', JSON.stringify(creds));
+    if (!supabase) {
+      setPasswordMessage({ type: 'error', text: 'Autenticação indisponível neste ambiente.' });
+      return;
+    }
+
+    // Senha real no Supabase Auth: confere a atual e grava a nova.
+    const { data: userData } = await supabase.auth.getUser();
+    const email = userData.user?.email;
+    if (!email) {
+      setPasswordMessage({ type: 'error', text: 'Sessão expirada. Entre de novo para trocar a senha.' });
+      return;
+    }
+
+    const { error: erroAtual } = await supabase.auth.signInWithPassword({ email, password: passwordForm.current });
+    if (erroAtual) {
+      setPasswordMessage({ type: 'error', text: 'Senha atual incorreta.' });
+      return;
+    }
+
+    const { error: erroNova } = await supabase.auth.updateUser({ password: passwordForm.new });
+    if (erroNova) {
+      setPasswordMessage({ type: 'error', text: `Não foi possível trocar a senha: ${erroNova.message}` });
+      return;
+    }
+
+    try { localStorage.removeItem('user_credentials'); } catch { /* legado */ }
 
     setPasswordMessage({ type: 'success', text: 'Senha alterada com sucesso! Use a nova senha ao fazer login.' });
     setPasswordForm({ current: '', new: '', confirm: '' });
