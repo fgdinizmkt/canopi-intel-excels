@@ -1,14 +1,16 @@
-import { GoogleGenAI } from '@google/genai';
+import Anthropic from '@anthropic-ai/sdk';
 
-// ─── Validação de Chave de API ───────────────────────────────────────
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error('[SECURITY] GEMINI_API_KEY não configurada em variáveis de ambiente');
-}
-if (!process.env.GEMINI_API_KEY.startsWith('AIza')) {
-  throw new Error('[SECURITY] GEMINI_API_KEY inválida ou corrompida (não começa com AIza)');
-}
+// Assistente roda no Claude (Anthropic). Haiku 5.5: o mais barato da linha,
+// suficiente para chat; esforço "low" porque conversa não ganha com mais
+// raciocínio e o raciocínio é cobrado como saída.
+const MODELO_ASSISTENTE = 'claude-haiku-5-5';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// O cliente é criado só quando há chave: sem ela a rota responde 500 com
+// mensagem clara, em vez de derrubar o módulo no carregamento.
+function clienteAnthropic(): Anthropic | null {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  return apiKey ? new Anthropic({ apiKey }) : null;
+}
 
 const SYSTEM_INSTRUCTION = `Você vai atuar como estrategista de produto, arquiteto funcional, analista de UX, analista de dados e copiloto de documentação para a plataforma Knopi | intel excels.
 
@@ -946,9 +948,10 @@ export async function POST(req: Request) {
   try {
     const { message, history, context } = await req.json();
 
-    if (!process.env.GEMINI_API_KEY) {
+    const client = clienteAnthropic();
+    if (!client) {
       return new Response(
-        JSON.stringify({ error: 'API Key não configurada. Defina GEMINI_API_KEY no arquivo .env.local' }),
+        JSON.stringify({ error: 'Assistente indisponível: ANTHROPIC_API_KEY não configurada.' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },
       );
     }
@@ -958,26 +961,36 @@ export async function POST(req: Request) {
       ? SYSTEM_INSTRUCTION + buildContextualInstruction(context as OperationalContext)
       : SYSTEM_INSTRUCTION;
 
-    // Map conversation history to Gemini format
-    // Local: { role: 'user' | 'assistant', content: string }
-    // Gemini: { role: 'user' | 'model', parts: [{ text: string }] }
-    const historyContents = ((history as HistoryMessage[]) || []).map(msg => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }],
-    }));
-
-    const contents = [
-      ...historyContents,
-      { role: 'user', parts: [{ text: message }] },
+    // Histórico local { role: 'user' | 'assistant', content } já é o formato da API.
+    const messages: Anthropic.MessageParam[] = [
+      ...((history as HistoryMessage[]) || [])
+        .filter((msg) => typeof msg.content === 'string' && msg.content.trim() !== '')
+        .map((msg): Anthropic.MessageParam => ({
+          role: msg.role === 'assistant' ? 'assistant' : 'user',
+          content: msg.content,
+        })),
+      { role: 'user', content: message },
     ];
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents,
-      config: { systemInstruction },
+    const response = await client.messages.create({
+      model: MODELO_ASSISTENTE,
+      max_tokens: 16000,
+      system: systemInstruction,
+      output_config: { effort: 'low' },
+      messages,
     });
 
-    const rawText = response.text ?? '';
+    if (response.stop_reason === 'refusal') {
+      return new Response(
+        JSON.stringify({ text: 'Não consigo responder a esse pedido. Reformule a pergunta, por favor.' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const rawText = response.content
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map((block) => block.text)
+      .join('');
     const { cleanText, cards } = extractCards(rawText);
 
     const responseBody: Record<string, any> = { text: cleanText };
