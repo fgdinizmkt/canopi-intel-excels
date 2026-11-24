@@ -5,8 +5,11 @@
  * /login quem nao esta logado. Cobre todas as paginas, inclusive as do
  * Pages Router em src/pages, que antes escapavam do guard por cookie.
  *
- * /api fica fora por enquanto: as rotas de servidor usam a chave de servico,
- * que nao vai para a Vercel, e precisam de revisao propria antes de travar.
+ * /api tambem exige sessao: sem login a resposta e 401 em JSON (nada de
+ * redirecionar chamada de API para a tela de login). Sem isso, qualquer um
+ * chamava o assistente (credito do Gemini) e as rotas de escrita no CRM.
+ * O retorno do OAuth do Salesforce chega pelo navegador do proprio usuario,
+ * com o cookie de sessao, entao continua funcionando.
  */
 
 import { createServerClient } from '@supabase/ssr';
@@ -16,9 +19,15 @@ import { getSupabaseEnv } from './lib/supabase/env';
 const ROTAS_PUBLICAS = ['/login', '/logout'];
 
 function ehPublica(path: string): boolean {
-  return (
-    ROTAS_PUBLICAS.some((r) => path === r || path.startsWith(`${r}/`)) || path.startsWith('/api/')
-  );
+  return ROTAS_PUBLICAS.some((r) => path === r || path.startsWith(`${r}/`));
+}
+
+function ehApi(path: string): boolean {
+  return path === '/api' || path.startsWith('/api/');
+}
+
+function naoAutorizado(): NextResponse {
+  return NextResponse.json({ error: 'Não autorizado. Faça login.' }, { status: 401 });
 }
 
 export async function middleware(request: NextRequest) {
@@ -28,6 +37,7 @@ export async function middleware(request: NextRequest) {
   // Sem Supabase configurado nao ha como autenticar: fecha tudo menos o login.
   if (!url || !anonKey) {
     if (ehPublica(path)) return NextResponse.next();
+    if (ehApi(path)) return naoAutorizado();
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -51,6 +61,10 @@ export async function middleware(request: NextRequest) {
   // Renova e valida a sessao antes de qualquer resposta.
   const { data } = await supabase.auth.getClaims();
   const logado = Boolean(data?.claims?.sub);
+
+  if (!logado && ehApi(path)) {
+    return naoAutorizado();
+  }
 
   if (!logado && !ehPublica(path)) {
     return NextResponse.redirect(new URL('/login', request.url));
